@@ -10,7 +10,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
    */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      width: 500,
+      width: 600,
       height: 700,
       svelte: {
         class: ActorSheetShell,

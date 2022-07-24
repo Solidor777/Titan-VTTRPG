@@ -58,13 +58,14 @@ export class SvelteDocumentSheet extends SvelteApplication {
          },
       });
    }
+
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
       buttons.unshift({
          class: "configure-sheet",
          icon: "fas fa-cog",
          title: "open sheet configurator",
-         onclick: (ev) => this._onCofigureSheet(ev),
+         onclick: (ev) => this._onConfigureSheet(ev),
       });
       const canConfigure = game.user.isGM || (this.reactive.document.isOwner && game.user.can("TOKEN_CONFIGURE"));
       if (this.reactive.document.documentName === "Actor") {
@@ -80,12 +81,7 @@ export class SvelteDocumentSheet extends SvelteApplication {
       return buttons;
    }
 
-   /**
-    * Drag&Drop handling
-    *
-    *
-    */
-
+   // Drag Drop Handling
    _canDragStart(selector) {
       return true;
    }
@@ -155,7 +151,6 @@ export class SvelteDocumentSheet extends SvelteApplication {
          case "Item": {
             return this._onDropItem(event, data, actor);
          }
-
          case "Folder": {
             return this._onDropFolder(event, data, actor);
          }
@@ -255,7 +250,7 @@ export class SvelteDocumentSheet extends SvelteApplication {
       return actor.updateEmbeddedDocuments("Item", updateData);
    }
 
-   _onCofigureSheet(event) {
+   _onConfigureSheet(event) {
       if (event) {
          event.preventDefault();
       }
