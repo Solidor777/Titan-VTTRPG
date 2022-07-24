@@ -1,0 +1,45 @@
+{
+  "name": "titan",
+  "title": "Titan VTTRPG",
+  "description": "Provides a bare-bones Foundry module template repo to get set up with using the TyphonJS Runtime Library and Svelte with ES Modules.",
+  "author": "Michael Leahy (TyphonJS) - MLeahy#4299",
+  "authors": [
+    {
+      "name": "Michael Leahy (TyphonJS) - MLeahy#4299",
+      "url": "https://www.typhonjs.io"
+    }
+  ],
+  "url": "https://github.com/JustinCamden/Titan-VTTRPG",
+  "readme": "https://github.com/JustinCamden/Titan-VTTRPG/README.md",
+  "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
+  "changelog": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/",
+  "version": "0.0.0",
+  "minimumCoreVersion": "0.8.6",
+  "compatibleCoreVersion": "10",
+  "esmodules": [
+    "index.js"
+  ],
+  "styles": [
+    "style.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "system": [],
+  "dependencies": [],
+  "socket": false,
+  "manifest": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/download/system.json",
+  "download": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/0.0.0/module.zip",
+  "protected": false,
+  "coreTranslation": false,
+  "library": false,
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "primaryTokenAttribute": "stamina",
+  "secondaryTokenAttribute": "wounds",
+  "license": "LICENSE.txt"
+}

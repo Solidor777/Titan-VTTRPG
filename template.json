@@ -1,0 +1,656 @@
+{
+  "Actor": {
+    "types": ["player", "npc"],
+    "templates": {
+      "character": {
+        "attribute": {
+          "body": {
+            "baseValue": 1,
+            "staticMod": 0
+          },
+          "mind": {
+            "baseValue": 1,
+            "staticMod": 0
+          },
+          "soul": {
+            "baseValue": 1,
+            "staticMod": 0
+          }
+        },
+        "resistance": {
+          "reflexes": {
+            "staticMod": 0
+          },
+          "resilience": {
+            "staticMod": 0
+          },
+          "willpower": {
+            "staticMod": 0
+          }
+        },
+        "skill": {
+          "arcana": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "athletics": {
+            "defaultAttribute": "body",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "beastHandling": {
+            "defaultAttribute": "soul",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "deception": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "dexterity": {
+            "defaultAttribute": "body",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "diplomacy": {
+            "defaultAttribute": "soul",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "engineering": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "intimidation": {
+            "defaultAttribute": "body",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "investigation": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "lore": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "medicine": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "meleeWeapons": {
+            "defaultAttribute": "body",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "perception": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "performance": {
+            "defaultAttribute": "soul",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "rangedWeapons": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "sleightOfHand": {
+            "defaultAttribute": "body",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "stealth": {
+            "defaultAttribute": "body",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "survival": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
+          "theology": {
+            "defaultAttribute": "soul",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          }
+        },
+        "rating": {
+          "awareness": {
+            "staticMod": 0
+          },
+          "defense": {
+            "staticMod": 0
+          },
+          "melee": {
+            "staticMod": 0
+          },
+          "accuracy": {
+            "staticMod": 0
+          },
+          "initiative": {
+            "staticMod": 0
+          }
+        },
+        "resource": {
+          "stamina": {
+            "value": 3,
+            "staticMod": 0
+          },
+          "resolve": {
+            "value": 0,
+            "staticMod": 0
+          },
+          "wounds": {
+            "value": 0,
+            "staticMod": 0
+          }
+        },
+        "movement": {
+          "land": {
+            "speed": {
+              "base": 1
+            }
+          }
+        },
+        "equipped": {
+          "armor": null
+        },
+        "mod": {
+          "armor": {
+            "staticMod": 0
+          },
+          "damage": {
+            "staticMod": 0
+          }
+        }
+      },
+      "base": {
+        "description": "",
+        "race": "",
+        "size": "",
+        "tags": [],
+        "version": 1.0
+      }
+    },
+    "player": {
+      "templates": ["base", "character"],
+      "exp": {
+        "earned": 0
+      },
+      "inspiration": 0
+    },
+    "npc": {
+      "templates": ["base", "character"]
+    }
+  },
+  "Item": {
+    "types": ["item", "equipment", "armor", "weapon", "spell", "miracle", "talent"],
+    "templates": {
+      "base": {
+        "description": "",
+        "rarity": "common",
+        "rulesElements": [],
+        "traits": [],
+        "version": 1.0
+      },
+      "value": {
+        "value" : 0
+      }, 
+      "quantity": {
+        "quantity": 1
+      }, 
+      "expCost": {
+        "expCost" : 2
+      },
+      "equipped": {
+        "equipped": false
+      },
+      "resolveCost": {
+        "resolveCost": 0
+      }
+    },
+    "gear": {
+      "templates": ["base", "value", "quantity"]
+    },
+    "equipment": {
+      "templates": ["base", "value", "equipped"]
+    },
+    "armor": {
+      "templates": ["base", "value", "equipped"],
+      "armor": 2,
+      "armorTraits": []
+    },
+    "weapon": {
+      "templates": ["base", "value", "equipped"],
+      "attack": [{
+        "name": "Attack",
+        "type": "melee",
+        "range": "close",
+        "attribute": "body",
+        "skill": "meleeWeapons",
+        "damage": 1,
+        "plusSuccessDamage": true,
+        "traits": [],
+        "multiAttack": false
+      }],
+      "attackDescription": "",
+      "resistanceChecks": [],
+      "weaponTraits": []
+    },
+    "spell": {
+      "templates": ["base", "duration"],
+      "tradition": "Common",
+      "range": {
+        "type": "medium",
+        "custom": "Custom"
+      },
+      "target": {
+        "type": "single",
+        "custom": "Custom",
+        "initialValue": 1,
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "damage": {
+        "initialValue": 1,
+        "ignoreArmor": false,
+        "resistanceCheck": "none",
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "healing": {
+        "initialValue": 0,
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "duration": {
+        "period": "instant",
+        "custom": "Custom",
+        "initialValue": 0,
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "removeCondition": {
+        "all": false,
+        "any": {
+          "initialValue": 0,
+          "overcast": {
+            "enable": true,
+            "calculateSuccessCost": true,
+            "successCost": 2
+          }
+        },
+        "condition": {
+          "blinded": false,
+          "charmed": false,
+          "deafened": false, 
+          "frightened": false,
+          "incapacitated": false,
+          "poisoned": false,
+          "prone": false,
+          "restrained": false,
+          "stunned": false,
+          "unconscious": false
+        }
+      },
+      "inflictCondition": {
+        "blinded": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "charmed": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "deafened": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "frightened": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "incapacitated": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "poisoned": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "prone": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "restrained": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "stunned": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        },
+        "unconscious": {
+          "enabled": false,
+          "resistanceCheck": "none"
+        }
+      },
+      "increaseSkill": {
+        "initialValue": 0,
+        "choose": 0,
+        "skill": {
+          "arcana": false,
+          "athletics": false,
+          "beastHandling": false,
+          "deception": false,
+          "dexterity": false,
+          "diplomacy": false,
+          "engineering": false,
+          "intimidation": false,
+          "investigation": false,
+          "lore": false,
+          "medicine": false,
+          "meleeWeapons": false,
+          "perception": false,
+          "performance": false,
+          "rangedWeapons": false,
+          "sleightOfHand": false,
+          "stealth": false,
+          "survival": false,
+          "theology": false
+        },
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "decreaseSkill": {
+        "initialValue": 0,
+        "choose": 0,
+        "skill": {
+          "arcana": false,
+          "athletics": false,
+          "beastHandling": false,
+          "deception": false,
+          "dexterity": false,
+          "diplomacy": false,
+          "engineering": false,
+          "intimidation": false,
+          "investigation": false,
+          "lore": false,
+          "medicine": false,
+          "meleeWeapons": false,
+          "perception": false,
+          "performance": false,
+          "rangedWeapons": false,
+          "sleightOfHand": false,
+          "stealth": false,
+          "survival": false,
+          "theology": false
+        },
+        "resistanceCheck": "none",
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "increaseResistance": {
+        "initialValue": 0,
+        "choose": 0,
+        "resistance": {
+          "reflexes": false,
+          "resilience": false,
+          "willpower": false
+        },
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "decreaseResistance": {
+        "initialValue": 0,
+        "choose": 0,
+        "resistance": {
+          "reflexes": false,
+          "resilience": false,
+          "willpower": false
+        },
+        "resistanceCheck": "none",
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "increaseAttribute": {
+        "initialValue": 0,
+        "choose": 0,
+        "attribute": {
+          "body": false,
+          "mind": false,
+          "soul": false
+        },
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 4
+        }
+      },
+      "decreaseAttribute": {
+        "initialValue": 0,
+        "choose": 0,
+        "attribute": {
+          "body": false,
+          "mind": false,
+          "soul": false
+        },
+        "resistanceCheck": "none",
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 4
+        }
+      },
+      "increaseRating": {
+        "initialValue": 0,
+        "choose": 0,
+        "rating": {
+          "melee": false,
+          "accuracy": false,
+          "defense": false,
+          "speed": false,
+          "initiative": false
+        },
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "decreaseRating": {
+        "initialValue": 0,
+        "choose": 0,
+        "rating": {
+          "accuracy": false,
+          "awareness": false,
+          "defense": false,
+          "initiative": false,
+          "melee": false,
+          "speed": false
+        },
+        "resistanceCheck": "none",
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "increaseArmor": {
+        "initialValue": 0,
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "decreaseArmor": {
+        "initialValue": 0,
+        "resistanceCheck": "none",
+        "overcast": {
+          "enable": true,
+          "calculateSuccessCost": true,
+          "successCost": 1
+        }
+      },
+      "customAspect": []
+    },
+    "miracle": {
+      "templates": ["base", "resolveCost", "expCost"],
+      "source": "",
+      "resistanceChecks": []
+    },
+    "ability": {
+      "templates": ["base", "resolveCost", "expCost"]
+    }
+  }
+}
