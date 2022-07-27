@@ -40,7 +40,7 @@
     "no-unused-vars": "off",
     "brace-style": [
       "error",
-      "1tbs"
+      "stroustrup"
     ],
     "object-shorthand": "off",
     "prefer-const": "off",

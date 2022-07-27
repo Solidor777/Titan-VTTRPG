@@ -38,7 +38,11 @@ export default () => {
 
       css: {
          // Creates a standard configuration for PostCSS with autoprefixer & postcss-preset-env.
-         postcss: postcssConfig({ compress: s_COMPRESS, sourceMap: s_SOURCEMAPS }),
+         postcss: postcssConfig({
+            compress: s_COMPRESS,
+            sourceMap: s_SOURCEMAPS,
+            extract: "style.css"
+         }),
       },
 
       // About server options:

@@ -1,7 +1,7 @@
-import { SvelteDocumentSheet } from '../../DocumentSheet';
-import ActorSheetShell from './ActorSheetShell.svelte';
+import { SvelteDocumentSheet } from '../../documents/DocumentSheet';
+import PlayerSheetShell from './PlayerSheetShell.svelte';
 
-export default class TitanActorSheet extends SvelteDocumentSheet {
+export default class TitanPlayerSheet extends SvelteDocumentSheet {
   /**
    * Default Application options
    *
@@ -13,7 +13,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       width: 600,
       height: 700,
       svelte: {
-        class: ActorSheetShell,
+        class: PlayerSheetShell,
         target: document.body
       }
     });

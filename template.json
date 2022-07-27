@@ -1,7 +1,11 @@
 {
   "Actor": {
-    "types": ["player", "npc"],
+    "types": [
+      "player",
+      "npc"
+    ],
     "templates": {
+      "typeComponent": null,
       "character": {
         "attribute": {
           "body": {
@@ -298,18 +302,32 @@
       }
     },
     "player": {
-      "templates": ["base", "character"],
+      "templates": [
+        "base",
+        "character"
+      ],
       "exp": {
         "earned": 0
       },
       "inspiration": 0
     },
     "npc": {
-      "templates": ["base", "character"]
+      "templates": [
+        "base",
+        "character"
+      ]
     }
   },
   "Item": {
-    "types": ["item", "equipment", "armor", "weapon", "spell", "miracle", "talent"],
+    "types": [
+      "item",
+      "equipment",
+      "armor",
+      "weapon",
+      "spell",
+      "miracle",
+      "talent"
+    ],
     "templates": {
       "base": {
         "description": "",
@@ -319,13 +337,13 @@
         "version": 1.0
       },
       "value": {
-        "value" : 0
-      }, 
+        "value": 0
+      },
       "quantity": {
         "quantity": 1
-      }, 
+      },
       "expCost": {
-        "expCost" : 2
+        "expCost": 2
       },
       "equipped": {
         "equipped": false
@@ -335,35 +353,56 @@
       }
     },
     "gear": {
-      "templates": ["base", "value", "quantity"]
+      "templates": [
+        "base",
+        "value",
+        "quantity"
+      ]
     },
     "equipment": {
-      "templates": ["base", "value", "equipped"]
+      "templates": [
+        "base",
+        "value",
+        "equipped"
+      ]
     },
     "armor": {
-      "templates": ["base", "value", "equipped"],
+      "templates": [
+        "base",
+        "value",
+        "equipped"
+      ],
       "armor": 2,
       "armorTraits": []
     },
     "weapon": {
-      "templates": ["base", "value", "equipped"],
-      "attack": [{
-        "name": "Attack",
-        "type": "melee",
-        "range": "close",
-        "attribute": "body",
-        "skill": "meleeWeapons",
-        "damage": 1,
-        "plusSuccessDamage": true,
-        "traits": [],
-        "multiAttack": false
-      }],
+      "templates": [
+        "base",
+        "value",
+        "equipped"
+      ],
+      "attack": [
+        {
+          "name": "Attack",
+          "type": "melee",
+          "range": "close",
+          "attribute": "body",
+          "skill": "meleeWeapons",
+          "damage": 1,
+          "plusSuccessDamage": true,
+          "traits": [],
+          "multiAttack": false
+        }
+      ],
       "attackDescription": "",
       "resistanceChecks": [],
       "weaponTraits": []
     },
     "spell": {
-      "templates": ["base", "duration"],
+      "templates": [
+        "base",
+        "duration"
+      ],
       "tradition": "Common",
       "range": {
         "type": "medium",
@@ -420,7 +459,7 @@
         "condition": {
           "blinded": false,
           "charmed": false,
-          "deafened": false, 
+          "deafened": false,
           "frightened": false,
           "incapacitated": false,
           "poisoned": false,
@@ -645,12 +684,20 @@
       "customAspect": []
     },
     "miracle": {
-      "templates": ["base", "resolveCost", "expCost"],
+      "templates": [
+        "base",
+        "resolveCost",
+        "expCost"
+      ],
       "source": "",
       "resistanceChecks": []
     },
     "ability": {
-      "templates": ["base", "resolveCost", "expCost"]
+      "templates": [
+        "base",
+        "resolveCost",
+        "expCost"
+      ]
     }
   }
 }
