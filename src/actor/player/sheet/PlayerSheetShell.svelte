@@ -30,34 +30,28 @@
          <div class="resources">
             <!--Stamina-->
             <div class="resource">
-               <!--Label-->
-               <div class="label">
-                  {localize("LOCAL.stamina")}
-               </div>
                <!--Meter-->
                <div class="meter stamina">
                   <ActorResourceMeter
                      bind:value={$document.system.resource.stamina.value}
                      max={$document.system.resource.stamina.maxValue}
                      meterTooltip={localize("LOCAL.staminaRemainingDesc")}
-                     maxTooltip={localize("LOCAL.maxValue")}
+                     maxTooltip={localize("LOCAL.maxStamina")}
+                     label={localize("LOCAL.stamina")}
                   />
                </div>
             </div>
 
             <!--Wounds-->
             <div class="resource">
-               <!--Label-->
-               <div class="label">
-                  {localize("LOCAL.wounds")}
-               </div>
                <!--Meter-->
                <div class="meter wounds">
                   <ActorResourceMeter
                      bind:value={$document.system.resource.wounds.value}
                      max={$document.system.resource.wounds.maxValue}
-                     meterTooltip={localize("LOCAL.staminaRemainingDesc")}
-                     maxTooltip={localize("LOCAL.maxValue")}
+                     meterTooltip={localize("LOCAL.woundsTakenDesc")}
+                     maxTooltip={localize("LOCAL.maxWounds")}
+                     label={localize("LOCAL.wounds")}
                   />
                </div>
             </div>
