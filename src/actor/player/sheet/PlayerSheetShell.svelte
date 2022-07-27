@@ -49,6 +49,17 @@
                   label={localize("LOCAL.wounds")}
                />
             </div>
+
+            <!--Resolve-->
+            <div class="resource resolve">
+               <ActorResourceMeter
+                  bind:value={$document.system.resource.resolve.value}
+                  max={$document.system.resource.resolve.maxValue}
+                  meterTooltip={localize("LOCAL.resolveRemainingDesc")}
+                  maxTooltip={localize("LOCAL.maxResolve")}
+                  label={localize("LOCAL.resolve")}
+               />
+            </div>
          </div>
       </div>
       <!--Main Sheet-->
@@ -126,6 +137,10 @@
                }
                &.wounds {
                   --meter-color: #a80000;
+               }
+
+               &.resolve {
+                  --meter-color: #0096c7;
                }
             }
          }
