@@ -5,8 +5,9 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import TextInput from "../../../documents/components/TextInput.svelte";
-   import ImagePicker from "../../../documents/components/ImagePicker.svelte";
+   import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
+   import DocumentImagePicker from "../../../documents/components/DocumentImagePicker.svelte";
+   import ActorResourceMeter from "../../sheet/ActorResourceMeter.svelte";
 
    // Setup
    export let elementRoot;
@@ -22,7 +23,7 @@
       <div class="sidebar">
          <!--Character Portrait-->
          <div class="portrait">
-            <ImagePicker path={"img"} alt={"character portrait"} />
+            <DocumentImagePicker path={"img"} alt={"character portrait"} />
          </div>
 
          <!--Resources-->
@@ -30,15 +31,18 @@
             <!--Stamina-->
             <div class="resource stamina">
                <!--Label-->
-               <div class="label" data-tooltip={localize("LOCAL.staminaDesc")}>
+               <div class="label">
                   {localize("LOCAL.stamina")}
                </div>
                <!--Meter-->
-               <meter
-                  class="stamina"
-                  value={$document.system.resource.stamina.value}
-                  max={$document.system.resource.stamina.maxValue}
-               />
+               <div class="meter">
+                  <ActorResourceMeter
+                     bind:value={$document.system.resource.stamina.value}
+                     max={$document.system.resource.stamina.maxValue}
+                     meterTooltip={localize("LOCAL.staminaRemainingDesc")}
+                     maxTooltip={localize("LOCAL.maxValue")}
+                  />
+               </div>
             </div>
          </div>
       </div>
@@ -48,7 +52,7 @@
          <div class="header">
             <!--Actor name Sheet-->
             <div class="actor-name">
-               <TextInput bind:value={$document.name} />
+               <DocumentTextInput bind:value={$document.name} />
             </div>
 
             <!--Exp-->
@@ -60,7 +64,7 @@
 
                <!--Earned Input-->
                <div class="earned" data-tooltip={localize("LOCAL.expEarned")}>
-                  <TextInput bind:value={$document.system.exp.earned} />
+                  <DocumentTextInput bind:value={$document.system.exp.earned} />
                </div>
 
                <!--Label-->
@@ -112,16 +116,6 @@
                   font-family: var(--font-family);
                   font-weight: bold;
                   font-size: 1.1rem;
-               }
-
-               meter {
-                  width: 100%;
-                  height: 1rem;
-                  -webkit-appearance: none;
-                  background: rgb(187, 0, 0);
-                  border-radius: 10px;
-                  border-style: solid;
-                  border-width: 0.125rem;
                }
             }
          }

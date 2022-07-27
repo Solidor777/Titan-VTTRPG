@@ -67,6 +67,9 @@
    input {
       height: 100%;
       width: 100%;
+      border-radius: var(--border-radius);
+      border-style: var(--border-style);
+      border-width: var(--border-width);
       font-size: var(--font-size);
       font-family: var(--font-family);
       text-align: var(--text-alignment);

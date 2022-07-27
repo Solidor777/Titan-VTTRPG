@@ -10,8 +10,7 @@
   "LOCAL.melee": "Melee",
   "LOCAL.speed": "Speed",
   "LOCAL.stamina": "Stamina",
-  "LOCAL.staminaDesc": "Stamina remaining. Depleted by damage.",
-  "LOCAL.remaining": "Remaining Stamina",
+  "LOCAL.staminaRemainingDesc": "Stamina remaining. Depleted by damage.",
   "LOCAL.wounds": "Wounds",
   "LOCAL.woundsTaken": "Wounds Taken",
   "LOCAL.resolve": "Resolve",
@@ -180,6 +179,8 @@
   "LOCAL.decreaseRating": "Decrease Rating",
   "LOCAL.increase": "Increase",
   "LOCAL.decrease": "Decrease",
+  "LOCAL.maxValue": "Max Value",
+  "LOCAL.minValue": "Min Value",
   "SETTINGS.showCheckOptions": {
     "name": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
