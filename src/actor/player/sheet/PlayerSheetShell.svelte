@@ -29,16 +29,33 @@
          <!--Resources-->
          <div class="resources">
             <!--Stamina-->
-            <div class="resource stamina">
+            <div class="resource">
                <!--Label-->
                <div class="label">
                   {localize("LOCAL.stamina")}
                </div>
                <!--Meter-->
-               <div class="meter">
+               <div class="meter stamina">
                   <ActorResourceMeter
                      bind:value={$document.system.resource.stamina.value}
                      max={$document.system.resource.stamina.maxValue}
+                     meterTooltip={localize("LOCAL.staminaRemainingDesc")}
+                     maxTooltip={localize("LOCAL.maxValue")}
+                  />
+               </div>
+            </div>
+
+            <!--Wounds-->
+            <div class="resource">
+               <!--Label-->
+               <div class="label">
+                  {localize("LOCAL.wounds")}
+               </div>
+               <!--Meter-->
+               <div class="meter wounds">
+                  <ActorResourceMeter
+                     bind:value={$document.system.resource.wounds.value}
+                     max={$document.system.resource.wounds.maxValue}
                      meterTooltip={localize("LOCAL.staminaRemainingDesc")}
                      maxTooltip={localize("LOCAL.maxValue")}
                   />
@@ -112,16 +129,23 @@
                flex-direction: column;
                width: 100%;
 
+               &:not(:first-child) {
+                  padding-top: 0.5rem;
+               }
+
                .label {
                   font-family: var(--font-family);
                   font-weight: bold;
                   font-size: 1.1rem;
                }
-            }
 
-            .stamina {
                .meter {
-                  --meter-color: #a80000;
+                  &.stamina {
+                     --meter-color: #006f37;
+                  }
+                  &.wounds {
+                     --meter-color: #a80000;
+                  }
                }
             }
          }

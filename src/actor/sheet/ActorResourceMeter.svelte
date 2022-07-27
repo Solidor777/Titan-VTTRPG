@@ -1,11 +1,12 @@
 <script>
    import DocumentTextInput from "../../documents/components/DocumentTextInput.svelte";
 
-   // Max value of the bar
+   // Max value of the meter
    export let max;
 
-   // Current value of the bar
+   // Current value of the meter
    export let value;
+   $: meterWidth = ((value / max) * 100).toString() + "%";
 
    // Tooltips
    export let meterTooltip;
@@ -13,8 +14,15 @@
 </script>
 
 <div class="resource-meter">
-   <div class="value" data-tooltip={meterTooltip}><DocumentTextInput bind:value /></div>
-   <meter {value} {max} data-tooltip={meterTooltip} />
+   <!--Current Value Input-->
+   <div class="value"><DocumentTextInput bind:value /></div>
+
+   <!--The Mater-->
+   <div class="meter">
+      <span style="width: {meterWidth}" />
+   </div>
+
+   <!--Max Value Display-->
    <div class="max" data-tooltip={maxTooltip}>{max}</div>
 </div>
 
@@ -32,15 +40,27 @@
          --border-radius: 50%;
       }
 
-      meter {
+      .meter {
          margin-left: 0.25rem;
          margin-right: 0.25rem;
          display: flex;
          height: 100%;
          width: 100%;
-         border-radius: 10px;
-         -webkit-appearance: none;
-         background: var(--meter-color);
+         position: relative;
+         background: whitesmoke;
+         border-radius: 25px;
+         padding: 3px;
+         box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+
+         span {
+            display: block;
+            height: 100%;
+            border-radius: 20px;
+            background-color: var(--meter-color);
+            box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+         }
       }
 
       .max {
