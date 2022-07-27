@@ -5,21 +5,26 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import TextInput from "../../../documents/components/TextInput.svelte";
+   import ImagePicker from "../../../documents/components/ImagePicker.svelte";
 
    // Setup
    export let elementRoot;
    export let storeDoc;
    setContext("DocumentSheetObject", storeDoc);
    const document = getContext("DocumentSheetObject");
-
-   import TextInput from "../../../documents/components/TextInput.svelte";
 </script>
 
 <ApplicationShell bind:elementRoot>
    <!--Sheet-->
    <form class="player-sheet">
       <!--Sidebar-->
-      <div class="sidebar" />
+      <div class="sidebar">
+         <!--Character Portrait-->
+         <div class="portrait">
+            <ImagePicker path={"img"} alt={"character portrait"} />
+         </div>
+      </div>
       <!--Main Sheet-->
       <div class="main">
          <!--Header -->
