@@ -118,6 +118,12 @@
                   font-size: 1.1rem;
                }
             }
+
+            .stamina {
+               .meter {
+                  --meter-color: #a80000;
+               }
+            }
          }
       }
 

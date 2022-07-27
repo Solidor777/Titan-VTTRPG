@@ -65,6 +65,7 @@
 
 <style lang="scss">
    input {
+      box-sizing: border-box;
       height: 100%;
       width: 100%;
       border-radius: var(--border-radius);

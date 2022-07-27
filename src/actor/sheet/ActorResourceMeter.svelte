@@ -27,6 +27,7 @@
       justify-content: center;
 
       .value {
+         box-sizing: border-box;
          width: 2rem;
          --border-radius: 50%;
       }
@@ -39,10 +40,11 @@
          width: 100%;
          border-radius: 10px;
          -webkit-appearance: none;
-         background: rgb(187, 0, 0);
+         background: var(--meter-color);
       }
 
       .max {
+         box-sizing: border-box;
          display: flex;
          align-items: center;
          justify-content: center;
