@@ -2,6 +2,10 @@ import { TitanActor } from "./actor/Actor";
 import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
 import { TITANCONSTANTS } from "./helpers/Constants.mjs";
 import { TITANLOCAL } from "./helpers/Local.mjs";
+import './styles/Fonts.scss';
+import './styles/Variables.scss';
+import './styles/Global.scss';
+import './styles/Mixins.scss';
 
 Hooks.once("init", async () => {
    console.log("TITAN | Starting Titan VTTRPG System");

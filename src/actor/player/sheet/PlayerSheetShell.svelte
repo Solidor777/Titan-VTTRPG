@@ -24,6 +24,23 @@
          <div class="portrait">
             <ImagePicker path={"img"} alt={"character portrait"} />
          </div>
+
+         <!--Resources-->
+         <div class="resources">
+            <!--Stamina-->
+            <div class="resource stamina">
+               <!--Label-->
+               <div class="label" data-tooltip={localize("LOCAL.staminaDesc")}>
+                  {localize("LOCAL.stamina")}
+               </div>
+               <!--Meter-->
+               <meter
+                  class="stamina"
+                  value={$document.system.resource.stamina.value}
+                  max={$document.system.resource.stamina.maxValue}
+               />
+            </div>
+         </div>
       </div>
       <!--Main Sheet-->
       <div class="main">
@@ -33,22 +50,21 @@
             <div class="actor-name">
                <TextInput bind:value={$document.name} />
             </div>
+
             <!--Exp-->
             <div class="exp">
                <!--Available-->
-               <div class="available">
+               <div class="available" data-tooltip={localize("LOCAL.expAvailable")}>
                   {$document.system.exp.available} /
                </div>
 
                <!--Earned Input-->
-               <div class="earned">
+               <div class="earned" data-tooltip={localize("LOCAL.expEarned")}>
                   <TextInput bind:value={$document.system.exp.earned} />
                </div>
 
                <!--Label-->
-               <div>
-                  <div class="label">{localize("LOCAL.exp")}</div>
-               </div>
+               <div class="label">{localize("LOCAL.exp")}</div>
             </div>
          </div>
          <!--Tab Content-->
@@ -58,18 +74,57 @@
 </ApplicationShell>
 
 <style lang="scss">
+   @import "../../../Styles/Mixins.scss";
+
    .player-sheet {
       display: flex;
       flex: 1;
 
       .sidebar {
+         @include border;
+         @include flex-column;
+         @include flex-group-top;
+
          width: 12rem;
-         min-width: 10rem;
+         min-width: 12rem;
          height: 100%;
-         border: solid;
-         border-radius: 10px;
          margin-right: 0.5rem;
          padding: 0.5rem;
+
+         .portrait {
+            --border-style: none;
+         }
+
+         .resources {
+            @include flex-column;
+            @include flex-group-top;
+
+            width: 100%;
+
+            .resource {
+               display: flex;
+               justify-content: center;
+               text-align: center;
+               flex-direction: column;
+               width: 100%;
+
+               .label {
+                  font-family: var(--font-family);
+                  font-weight: bold;
+                  font-size: 1.1rem;
+               }
+
+               meter {
+                  width: 100%;
+                  height: 1rem;
+                  -webkit-appearance: none;
+                  background: rgb(187, 0, 0);
+                  border-radius: 10px;
+                  border-style: solid;
+                  border-width: 0.125rem;
+               }
+            }
+         }
       }
 
       .main {
@@ -77,16 +132,16 @@
          flex: 1;
 
          .header {
-            display: flex;
-            width: 100%;
-            height: 4rem;
+            @include border;
+            @include flex-row;
             align-items: center;
             justify-content: space-between;
-            border: solid;
-            border-radius: 10px;
+            width: 100%;
+            height: 4rem;
             padding: 0.5rem;
 
             .actor-name {
+               font-family: var(--font-family);
                font-size: 1.6rem;
                height: 2rem;
                width: 50%;
@@ -101,19 +156,22 @@
                justify-content: flex-end;
 
                .available {
-                  display: flex;
+                  font-family: var(--font-family);
                   font-weight: bold;
-                  margin-right: 0.25rem;
                   font-size: 1.1rem;
+                  display: flex;
+                  margin-right: 0.25rem;
                }
 
                .earned {
+                  font-family: var(--font-family);
                   display: flex;
                   margin-right: 0.5rem;
                   width: 2rem;
                }
 
                .label {
+                  font-family: var(--font-family);
                   font-weight: bold;
                }
             }

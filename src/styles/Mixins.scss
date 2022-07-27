@@ -1,0 +1,39 @@
+@mixin border {
+  border-style: var(--border-style);
+  border-radius: var(--border-radius);
+  border-width: var(--border-width);
+}
+
+@mixin flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-group-center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+@mixin flex-group-left {
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+@mixin flex-group-right {
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+@mixin flex-group-top {
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+}

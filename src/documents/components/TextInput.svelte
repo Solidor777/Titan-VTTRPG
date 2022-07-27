@@ -67,7 +67,8 @@
    input {
       height: 100%;
       width: 100%;
-      font-size: var(--input-font-size);
-      text-align: var(--input-font-alignment);
+      font-size: var(--font-size);
+      font-family: var(--font-family);
+      text-align: var(--text-alignment);
    }
 </style>
