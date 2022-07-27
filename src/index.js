@@ -1,5 +1,5 @@
 import { TitanActor } from "./actor/Actor";
-import TitanPlayerSheet from "./actor/sheet/PlayerSheet";
+import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
 import { TITANCONSTANTS } from "./helpers/Constants.mjs";
 import { TITANLOCAL } from "./helpers/Local.mjs";
 

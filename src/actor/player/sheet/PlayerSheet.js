@@ -1,4 +1,4 @@
-import { SvelteDocumentSheet } from '../../documents/DocumentSheet';
+import { SvelteDocumentSheet } from '../../../documents/DocumentSheet';
 import PlayerSheetShell from './PlayerSheetShell.svelte';
 
 export default class TitanPlayerSheet extends SvelteDocumentSheet {

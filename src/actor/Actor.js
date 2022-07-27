@@ -3,47 +3,45 @@ import TitanSkillCheck from "../check/SkillCheck.js";
 import TitanResistanceCheck from "../check/ResistanceCheck.js";
 import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
+import { TitanNPCComponent } from "./npc/NPC.js";
 
 export class TitanActor extends Actor {
-  /** @override */
-  prepareData() {
-    // Prepare data for the actor. Calling the super version of this executes
-    // the following, in order: data reset (to clear active effects),
-    // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
-    // prepareDerivedData().
-    super.prepareData();
-  }
 
-  prepareBaseData() {
-    // Data modifications in this step occur before processing embedded
-    // documents or derived data.
-  }
-
+  // Prepare calculated data
   prepareDerivedData() {
-    // Make separate methods for each Actor type (player, npc, etc.) to keep
-    // things organized.
+    // Prepare universal character data
+    this._prepareCharacterData();
 
-    switch (this.type) {
-      case "player": {
-        if (!this.system.typeComponent) {
-          console.log("New Comp");
+    // Create type component if necessary
+    if (!this.system.typeComponent) {
+      switch (this.type) {
+        // Player
+        case "player": {
           this.typeComponent = new TitanPlayerComponent(this);
+          this.player = this.typeComponent;
+          break;
         }
-        else {
-          console.log(this.typeComponent);
+
+        // NPC
+        case "npc": {
+          this._prepareNpcData();
+          this.typeComponent = new TitanNPCComponent(this);
+          this.npc = this.typeComponent;
+          break;
         }
-        this._preparePlayerData();
-        break;
-      }
-      case "npc": {
-        this._prepareNpcData();
-        break;
-      }
-      default: {
-        console.error("TITAN: Invalid actor type when preparing derived data.");
-        break;
+
+        // Default is an error
+        default: {
+          console.error("TITAN: Invalid actor type when preparing derived data.");
+          break;
+        }
       }
     }
+
+    // Prepare type specific data
+    this.typeComponent.prepareDerivedData();
+
+    return;
   }
 
   // Prepare Character type specific data
@@ -196,99 +194,7 @@ export class TitanActor extends Actor {
     return;
   }
 
-  /**
-   * Prepare Player type specific data
-   */
-  _preparePlayerData() {
-    // Prepare template data
-    this._prepareCharacterData();
-
-    // Make modifications to data here.
-    const systemData = this.system;
-
-    // Calculate the amount of EXP spent
-    let spentExp = 0;
-
-    // Add cost of current attribute
-    for (const attribute in systemData.attribute) {
-      const attributeBaseValue = systemData.attribute[attribute].baseValue;
-
-      // Calculate xp cost
-      const minAttributeValue = CONFIG.TITAN.constants.attribute.min;
-      if (attributeBaseValue > minAttributeValue) {
-        spentExp +=
-          CONFIG.TITAN.constants.attribute.totalExpCostByRank[
-          attributeBaseValue - minAttributeValue - 1
-          ];
-      }
-    }
-
-    // Add cost of current skill
-    for (const skill in systemData.skill) {
-      const skillData = systemData.skill[skill];
-
-      // Calculate xp cost of training
-      const skillTrainingBaseValue = skillData.training.baseValue;
-      if (skillTrainingBaseValue > 0) {
-        spentExp +=
-          CONFIG.TITAN.constants.skill.training.totalExpCostByRank[
-          skillTrainingBaseValue - 1
-          ];
-      }
-
-      // Calculate xp cost of training
-      const skillExpertiseBaseValue = skillData.expertise.baseValue;
-      if (skillExpertiseBaseValue > 0) {
-        spentExp +=
-          CONFIG.TITAN.constants.skill.expertise.totalExpCostByRank[
-          skillExpertiseBaseValue - 1
-          ];
-      }
-    }
-
-    systemData.exp.available = systemData.exp.earned - spentExp;
-  }
-
-
-  // Prepare NPC type specific data.
-  _prepareNpcData(actorData) {
-    // Prepare template data
-    this._prepareCharacterData();
-  }
-
-  // Override getRollData() that's supplied to rolls.
-  getRollData() {
-    const rollData = super.getRollData();
-
-    // Prepare player roll data.
-    this._getPlayerRollData(rollData);
-    this._getNpcRollData(rollData);
-
-    return rollData;
-  }
-
-  // Prepare player roll data.
-  _getPlayerRollData(data) {
-    if (this.type !== "player") {
-      return;
-    }
-
-    // Copy the ability scores to the top level, so that rolls can use
-  }
-
-  // Prepare NPC roll data.
-  _getNpcRollData(data) {
-    if (this.type !== "npc") {
-      return;
-    }
-
-    // Process additional NPC data here.
-  }
-
-  _onUpdate(changed, options, userId) {
-    super._onUpdate(changed, options, userId);
-  }
-
+  // Get the initiative check
   async getInitiativeRoll(inData) {
     // Calculate the initiative value
     const initiative = this.system.rating.initiative.value;
@@ -317,7 +223,7 @@ export class TitanActor extends Actor {
     return retVal;
   }
 
-  // Get a check from the actor
+  // Get a skill check from the actor
   async getSkillCheck(inData) {
     // Initialize options
     let checkOptions = inData;
@@ -357,6 +263,7 @@ export class TitanActor extends Actor {
     return skillCheck;
   }
 
+  // Get a resistance check at the actor
   async getResistanceCheck(inData) {
     // Get a check from the actor
     let checkOptions = inData;
@@ -384,6 +291,7 @@ export class TitanActor extends Actor {
     return resistanceCheck;
   }
 
+  // Get an attack check
   async getAttackCheck(inData) {
     // Get the weapon check data.
     const checkWeapon = this.items.get(inData?.itemId);
@@ -433,6 +341,7 @@ export class TitanActor extends Actor {
     return attackCheck;
   }
 
+  // Get the check data 
   getCheckData() {
     const checkData = this.system;
     return checkData;
