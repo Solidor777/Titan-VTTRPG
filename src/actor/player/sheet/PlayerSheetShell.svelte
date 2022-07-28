@@ -47,20 +47,30 @@
 
          <!--Resistances-->
          <div class="resistances">
-            <!--Reflexes-->
+            <!--Reflexeses-->
             {#each Object.entries($document.system.resistance) as [key, resistance]}
                <div class="resistance" data-resistance={key}>
-                  <div class="label">{localize(`LOCAL.${key}.label`)}</div>
+                  <!--Resistance Label-->
+                  <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+                     {localize(`LOCAL.${key}.label`)}
+                  </div>
+
+                  <!--Stats-->
                   <div class="stats">
-                     <div class="label">
+                     <!--Base Value-->
+                     <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
                         {resistance.baseValue}
                      </div>
                      <div class="label">+</div>
-                     <div class="static-mod">
+
+                     <!--Static Mod-->
+                     <div class="static-mod" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
                         <DocumentTextInput bind:value={$document.system.resistance[key].staticMod} type="integer" />
                      </div>
                      <div class="label">=</div>
-                     <div class="label">
+
+                     <!--Total Value-->
+                     <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
                         {resistance.value}
                      </div>
                   </div>
@@ -165,6 +175,9 @@
                @include flex-row;
                align-items: center;
                justify-content: space-between;
+               border-bottom-style: var(--border-style);
+               border-width: var(--border-width);
+               padding-bottom: 0.25rem;
 
                &:not(:first-child) {
                   margin-top: 0.25rem;

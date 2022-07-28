@@ -119,13 +119,13 @@ export class TitanActor extends Actor {
     systemData.rating.melee.value =
       systemData.rating.melee.baseValue + systemData.rating.melee.staticMod;
 
-    // Reflexes = (Mind + (Body/2))
-    systemData.resistance.reflex.baseValue =
+    // Reflexeses = (Mind + (Body/2))
+    systemData.resistance.reflexes.baseValue =
       systemData.attribute.mind.value +
       Math.ceil(systemData.attribute.body.value / 2);
-    systemData.resistance.reflex.value =
-      systemData.resistance.reflex.baseValue +
-      systemData.resistance.reflex.staticMod;
+    systemData.resistance.reflexes.value =
+      systemData.resistance.reflexes.baseValue +
+      systemData.resistance.reflexes.staticMod;
 
     // Resilience = (Body + (Soul/2))
     systemData.resistance.resilience.baseValue =
