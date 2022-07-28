@@ -37,3 +37,20 @@
   justify-content: flex-start;
   text-align: center;
 }
+
+@mixin grid($column-count) {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0;
+  grid-column: span $column-count / span $column-count;
+  grid-template-columns: repeat($column-count, minmax(0, 1fr));
+}
+
+@mixin grid-start($column-count) {
+  grid-column-start: $column-count
+}
+
+@mixin grid-span($column-count) {
+  grid-column-end: span $column-count;
+}

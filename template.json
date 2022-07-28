@@ -22,7 +22,7 @@
           }
         },
         "resistance": {
-          "reflexes": {
+          "reflex": {
             "staticMod": 0
           },
           "resilience": {
@@ -576,7 +576,7 @@
         "initialValue": 0,
         "choose": 0,
         "resistance": {
-          "reflexes": false,
+          "reflex": false,
           "resilience": false,
           "willpower": false
         },
@@ -590,7 +590,7 @@
         "initialValue": 0,
         "choose": 0,
         "resistance": {
-          "reflexes": false,
+          "reflex": false,
           "resilience": false,
           "willpower": false
         },

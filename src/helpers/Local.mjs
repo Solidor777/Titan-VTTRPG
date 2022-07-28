@@ -30,7 +30,7 @@ export const TITANLOCAL = Object.freeze({
   resolve: "LOCAL.resolve",
   stamina: "LOCAL.stamina",
   wounds: "LOCAL.wounds",
-  reflexes: "LOCAL.reflexes",
+  reflex: "LOCAL.reflex",
   resilience: "LOCAL.resilience",
   willpower: "LOCAL.willpower",
   check: "LOCAL.check",

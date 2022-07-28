@@ -32,7 +32,9 @@
             <div class="resource stamina">
                <ActorResourceMeter
                   bind:value={$document.system.resource.stamina.value}
+                  bind:staticMod={$document.system.resource.stamina.staticMod}
                   max={$document.system.resource.stamina.maxValue}
+                  valueTooltip={localize("LOCAL.editCurrentStamina")}
                   meterTooltip={localize("LOCAL.staminaRemainingDesc")}
                   maxTooltip={localize("LOCAL.maxStamina")}
                   label={localize("LOCAL.stamina")}
@@ -43,7 +45,9 @@
             <div class="resource wounds">
                <ActorResourceMeter
                   bind:value={$document.system.resource.wounds.value}
+                  bind:staticMod={$document.system.resource.wounds.staticMod}
                   max={$document.system.resource.wounds.maxValue}
+                  valueTooltip={localize("LOCAL.editCurrentWounds")}
                   meterTooltip={localize("LOCAL.woundsTakenDesc")}
                   maxTooltip={localize("LOCAL.maxWounds")}
                   label={localize("LOCAL.wounds")}
@@ -54,11 +58,32 @@
             <div class="resource resolve">
                <ActorResourceMeter
                   bind:value={$document.system.resource.resolve.value}
+                  bind:staticMod={$document.system.resource.resolve.staticMod}
                   max={$document.system.resource.resolve.maxValue}
+                  valueTooltip={localize("LOCAL.editCurrentResolve")}
                   meterTooltip={localize("LOCAL.resolveRemainingDesc")}
                   maxTooltip={localize("LOCAL.maxResolve")}
                   label={localize("LOCAL.resolve")}
                />
+            </div>
+         </div>
+
+         <!--Resistances-->
+         <div class="resistances">
+            <div class="label">{localize("LOCAL.resistances")}</div>
+            <div class="resistance-container">
+               <!--Reflexes-->
+               <div class="resistance">
+                  <div class="label">{localize("LOCAL.reflex")}</div>
+               </div>
+               <!--Resilience-->
+               <div class="resistance">
+                  <div class="label">{localize("LOCAL.resilience")}</div>
+               </div>
+               <!--Reflexes-->
+               <div class="willpower">
+                  <div class="label">{localize("LOCAL.willpower")}</div>
+               </div>
             </div>
          </div>
       </div>
@@ -74,13 +99,13 @@
             <!--Exp-->
             <div class="exp">
                <!--Available-->
-               <div class="available" data-tooltip={localize("LOCAL.expAvailable")}>
+               <div class="available" data-titan-tooltip={localize("LOCAL.expAvailable")}>
                   {$document.system.exp.available} /
                </div>
 
                <!--Earned Input-->
-               <div class="earned" data-tooltip={localize("LOCAL.expEarned")}>
-                  <DocumentTextInput bind:value={$document.system.exp.earned} />
+               <div class="earned" data-titan-tooltip={localize("LOCAL.expEarned")}>
+                  <DocumentTextInput bind:value={$document.system.exp.earned} type="integer" />
                </div>
 
                <!--Label-->
@@ -105,13 +130,14 @@
          @include flex-column;
          @include flex-group-top;
 
-         width: 12rem;
-         min-width: 12rem;
+         width: 13rem;
+         min-width: 13rem;
          height: 100%;
          margin-right: 0.5rem;
          padding: 0.5rem;
 
          .portrait {
+            width: 10rem;
             --border-style: none;
          }
 
@@ -127,9 +153,12 @@
                text-align: center;
                flex-direction: column;
                width: 100%;
+               padding-bottom: 0.25rem;
+               border-bottom: var(--border-style);
+               border-width: var(--border-width);
 
                &:not(:first-child) {
-                  padding-top: 0.5rem;
+                  padding-top: 0.25rem;
                }
 
                &.stamina {
@@ -141,6 +170,30 @@
 
                &.resolve {
                   --meter-color: #0096c7;
+               }
+            }
+         }
+
+         .resistances {
+            @include flex-column;
+            margin-top: 0.5rem;
+            width: 100%;
+
+            .label {
+               display: flex;
+               font-weight: bold;
+               width: 100%;
+               border-bottom: var(--border-style);
+               border-width: var(--border-width);
+            }
+
+            .resistance-container {
+               @include grid(3);
+
+               .resistance {
+                  .label {
+                     font-weight: bold;
+                  }
                }
             }
          }

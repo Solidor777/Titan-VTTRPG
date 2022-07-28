@@ -9,26 +9,48 @@
 
    // Current value of the meter
    export let value;
-   $: meterWidth = ((value / max) * 100).toString() + "%";
+
+   // The static mod of the meter
+   export let staticMod;
 
    // Tooltips
+   export let valueTooltip;
    export let meterTooltip;
    export let maxTooltip;
+
+   // Calculate the meter width
+   $: meterWidth = ((value / max) * 100).toString() + "%";
 </script>
 
 <div class="resource-meter">
-   <div class="meter-row"><span class="label">{label}</span></div>
+   <!--Label row-->
+   <div class="meter-row">
+      <!--Spacer-->
+      <div class="spacer" />
+
+      <!--Label-->
+      <span class="label">{label}</span>
+      <!--Static Mod-->
+      <div class="static-mod">
+         <div>+</div>
+         <div class="input">
+            <DocumentTextInput bind:value={staticMod} type="integer" />
+         </div>
+      </div>
+   </div>
+
+   <!--Meter bar row-->
    <div class="meter-row">
       <!--Current Value Input-->
-      <div class="value"><DocumentTextInput bind:value /></div>
+      <div class="value" data-titan-tooltip={valueTooltip}><DocumentTextInput bind:value type="integer" /></div>
 
       <!--The Mater-->
-      <div class="meter" data-tooltip={meterTooltip}>
+      <div class="meter" data-titan-tooltip={meterTooltip}>
          <span style="width: {meterWidth}" />
       </div>
 
       <!--Max Value Display-->
-      <div class="max" data-tooltip={maxTooltip}>{max}</div>
+      <div class="max" data-titan-tooltip={maxTooltip}>{max}</div>
    </div>
 </div>
 
@@ -44,8 +66,9 @@
       .meter-row {
          display: flex;
          width: 100%;
+         height: 100%;
          flex-direction: row;
-         justify-content: center;
+         justify-content: space-between;
          align-items: center;
          text-align: center;
 
@@ -53,15 +76,38 @@
             padding-top: 0.25rem;
          }
 
+         .spacer {
+            width: 2.5rem;
+         }
+
          .label {
             font-weight: bold;
-            font-size: 1rem;
+         }
+
+         .static-mod {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            text-align: center;
+            height: 100%;
+            width: 2.5rem;
+            --border-radius: 50%;
+
+            .input {
+               width: 1.5rem;
+            }
          }
 
          .value {
             box-sizing: border-box;
+            text-align: center;
+            height: 100%;
             width: 2rem;
             --border-radius: 50%;
+            --tooltip-delay: 1.2s;
          }
 
          .meter {
@@ -89,12 +135,9 @@
 
          .max {
             box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
             width: 2rem;
-            height: 1.5rem;
+            height: 100%;
+            text-align: center;
             border-style: var(--border-style);
             border-width: var(--border-width);
             border-radius: 50%;

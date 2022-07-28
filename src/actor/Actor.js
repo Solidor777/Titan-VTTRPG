@@ -120,12 +120,12 @@ export class TitanActor extends Actor {
       systemData.rating.melee.baseValue + systemData.rating.melee.staticMod;
 
     // Reflexes = (Mind + (Body/2))
-    systemData.resistance.reflexes.baseValue =
+    systemData.resistance.reflex.baseValue =
       systemData.attribute.mind.value +
       Math.ceil(systemData.attribute.body.value / 2);
-    systemData.resistance.reflexes.value =
-      systemData.resistance.reflexes.baseValue +
-      systemData.resistance.reflexes.staticMod;
+    systemData.resistance.reflex.value =
+      systemData.resistance.reflex.baseValue +
+      systemData.resistance.reflex.staticMod;
 
     // Resilience = (Body + (Soul/2))
     systemData.resistance.resilience.baseValue =
@@ -148,6 +148,7 @@ export class TitanActor extends Actor {
       totalBaseAttributeValue *
       CONFIG.TITAN.constants.resource.option.stamina.maxBaseMulti;
     systemData.resource.stamina.maxBase = maxStaminaBase;
+    console.log(this);
     systemData.resource.stamina.maxValue =
       maxStaminaBase + systemData.resource.stamina.staticMod;
 

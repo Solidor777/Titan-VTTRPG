@@ -22,7 +22,7 @@ export default class TitanResistanceCheck extends TitanCheck {
     const parameters = super._initializeParameters(inData);
 
     // Initialize resistance parameters
-    parameters.resistance = inData.resistance ?? "reflexes";
+    parameters.resistance = inData.resistance ?? "reflex";
 
     return parameters;
   }
@@ -51,7 +51,7 @@ export default class TitanResistanceCheck extends TitanCheck {
 
   static async getOptionsFromDialog(initialOptions) {
     const dialogData = {
-      resistance: initialOptions?.resistance ?? "reflexes",
+      resistance: initialOptions?.resistance ?? "reflex",
       difficulty: initialOptions?.difficulty ?
         TitanUtility.clamp(initialOptions.difficulty, 2, 6) : 4,
       complexity: initialOptions?.complexity ?
