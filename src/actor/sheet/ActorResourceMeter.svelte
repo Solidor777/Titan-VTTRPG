@@ -44,7 +44,7 @@
       <!--Current Value Input-->
       <div class="value" data-titan-tooltip={valueTooltip}><DocumentTextInput bind:value type="integer" /></div>
 
-      <!--The Mater-->
+      <!--The Meter-->
       <div class="meter" data-titan-tooltip={meterTooltip}>
          <span style="width: {meterWidth}" />
       </div>

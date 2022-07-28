@@ -70,19 +70,21 @@
 
          <!--Resistances-->
          <div class="resistances">
-            <div class="label">{localize("LOCAL.resistances")}</div>
-            <div class="resistance-container">
-               <!--Reflexes-->
-               <div class="resistance">
-                  <div class="label">{localize("LOCAL.reflex")}</div>
-               </div>
-               <!--Resilience-->
-               <div class="resistance">
-                  <div class="label">{localize("LOCAL.resilience")}</div>
-               </div>
-               <!--Reflexes-->
-               <div class="willpower">
-                  <div class="label">{localize("LOCAL.willpower")}</div>
+            <!--Reflexes-->
+            <div class="resistance">
+               <div class="label">{localize("LOCAL.reflex")}</div>
+               <div class="stats">
+                  <div class="base-value">
+                     {$document.system.resistance.reflex.baseValue}
+                  </div>
+                  <div class="mod-label">+</div>
+                  <div class="mod-input">
+                     <DocumentTextInput bind:value={$document.system.resistance.reflex.staticMod} type="integer" />
+                  </div>
+                  <div class="value-label">=</div>
+                  <div class="value">
+                     {$document.system.resistance.reflex.value}
+                  </div>
                </div>
             </div>
          </div>
@@ -179,21 +181,16 @@
             margin-top: 0.5rem;
             width: 100%;
 
-            .label {
-               display: flex;
-               font-weight: bold;
-               width: 100%;
-               border-bottom: var(--border-style);
-               border-width: var(--border-width);
-            }
+            .resistance {
+               @include flex-row;
+               align-items: center;
+               justify-content: space-between;
+               .label {
+                  font-weight: bold;
+               }
 
-            .resistance-container {
-               @include grid(3);
-
-               .resistance {
-                  .label {
-                     font-weight: bold;
-                  }
+               .stats {
+                  @include flex-row;
                }
             }
          }
