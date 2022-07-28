@@ -14,11 +14,19 @@
    export let storeDoc;
    setContext("DocumentSheetObject", storeDoc);
    const document = getContext("DocumentSheetObject");
+
+   function preventDefault(event) {
+      event.preventDefault();
+   }
+
+   async function rollResistance(resistance) {
+      $document.rollResistanceCheck({ resistance: resistance });
+   }
 </script>
 
 <ApplicationShell bind:elementRoot>
    <!--Sheet-->
-   <form class="player-sheet">
+   <div class="player-sheet">
       <!--Sidebar-->
       <div class="sidebar">
          <!--Character Portrait-->
@@ -51,7 +59,12 @@
             {#each Object.entries($document.system.resistance) as [key, resistance]}
                <div class="resistance" data-resistance={key}>
                   <!--Resistance Label-->
-                  <button class="roll-resistance">
+                  <button
+                     class="resistance-roll"
+                     data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
+                     on:click={rollResistance(key)}
+                     on:mousedown={preventDefault}
+                  >
                      {localize(`LOCAL.${key}.label`)}
                   </button>
 
@@ -106,7 +119,7 @@
          <!--Tab Content-->
          <div class="tab-content" />
       </div>
-   </form>
+   </div>
 </ApplicationShell>
 
 <style lang="scss">
@@ -178,6 +191,13 @@
                border-bottom-style: var(--border-style);
                border-width: var(--border-width);
                padding-bottom: 0.25rem;
+
+               button {
+                  @include border;
+                  border-radius: 25px;
+                  width: 6rem;
+                  font-weight: bold;
+               }
 
                &:not(:first-child) {
                   margin-top: 0.25rem;

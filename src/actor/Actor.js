@@ -291,6 +291,16 @@ export class TitanActor extends Actor {
     return resistanceCheck;
   }
 
+  async rollResistanceCheck(inData) {
+    const resistanceCheck = await this.getResistanceCheck(inData);
+    if (resistanceCheck && resistanceCheck.isValid) {
+      await resistanceCheck.evaluateCheck();
+      await resistanceCheck.sendToChat();
+    }
+
+    return;
+  }
+
   // Get an attack check
   async getAttackCheck(inData) {
     // Get the weapon check data.

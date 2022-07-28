@@ -62,7 +62,7 @@ export default class TitanCheck {
   }
 
   // Evaluates the check result
-  async evaluateCheck(sendToChat) {
+  async evaluateCheck() {
     // Get the roll for the check
     this.roll = new Roll(`${this.parameters.totalDice}d6`);
     await this.roll.evaluate({ async: true });

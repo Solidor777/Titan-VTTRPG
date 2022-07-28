@@ -2,6 +2,7 @@
 
 <script>
    import { getContext } from "svelte";
+
    // The value of the input
    export let value;
 
