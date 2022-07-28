@@ -22,7 +22,7 @@
   padding: 7px;
   width: 100%;
   min-width: 5rem;
-  max-width: 12rem;
+  max-width: 15rem;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -30,6 +30,7 @@
   background-color: hsla(0, 0%, 10%, 0.944);
   color: #fff;
   content: attr(data-titan-tooltip);
+  font-weight: normal;
   text-align: center;
   font-size: 1rem;
   line-height: 1.2;

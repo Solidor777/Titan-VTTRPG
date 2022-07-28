@@ -148,7 +148,6 @@ export class TitanActor extends Actor {
       totalBaseAttributeValue *
       CONFIG.TITAN.constants.resource.option.stamina.maxBaseMulti;
     systemData.resource.stamina.maxBase = maxStaminaBase;
-    console.log(this);
     systemData.resource.stamina.maxValue =
       maxStaminaBase + systemData.resource.stamina.staticMod;
 

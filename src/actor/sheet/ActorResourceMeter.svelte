@@ -15,7 +15,8 @@
 
    // Tooltips
    export let valueTooltip;
-   export let meterTooltip;
+   export let editStaticModTooltip;
+   export let editValueTooltip;
    export let maxTooltip;
 
    // Calculate the meter width
@@ -29,11 +30,11 @@
       <div class="spacer" />
 
       <!--Label-->
-      <span class="label">{label}</span>
+      <span class="label" data-titan-tooltip={valueTooltip}>{label}</span>
       <!--Static Mod-->
       <div class="static-mod">
          <div>+</div>
-         <div class="input">
+         <div class="input" data-titan-tooltip={editStaticModTooltip}>
             <DocumentTextInput bind:value={staticMod} type="integer" />
          </div>
       </div>
@@ -42,10 +43,10 @@
    <!--Meter bar row-->
    <div class="meter-row">
       <!--Current Value Input-->
-      <div class="value" data-titan-tooltip={valueTooltip}><DocumentTextInput bind:value type="integer" /></div>
+      <div class="value" data-titan-tooltip={editValueTooltip}><DocumentTextInput bind:value type="integer" /></div>
 
       <!--The Meter-->
-      <div class="meter" data-titan-tooltip={meterTooltip}>
+      <div class="meter" data-titan-tooltip={valueTooltip}>
          <span style="width: {meterWidth}" />
       </div>
 

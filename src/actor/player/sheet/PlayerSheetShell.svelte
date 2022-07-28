@@ -28,65 +28,44 @@
 
          <!--Resources-->
          <div class="resources">
-            <!--Meter-->
-            <div class="resource stamina">
-               <ActorResourceMeter
-                  bind:value={$document.system.resource.stamina.value}
-                  bind:staticMod={$document.system.resource.stamina.staticMod}
-                  max={$document.system.resource.stamina.maxValue}
-                  valueTooltip={localize("LOCAL.editCurrentStamina")}
-                  meterTooltip={localize("LOCAL.staminaRemainingDesc")}
-                  maxTooltip={localize("LOCAL.maxStamina")}
-                  label={localize("LOCAL.stamina")}
-               />
-            </div>
-
-            <!--Wounds-->
-            <div class="resource wounds">
-               <ActorResourceMeter
-                  bind:value={$document.system.resource.wounds.value}
-                  bind:staticMod={$document.system.resource.wounds.staticMod}
-                  max={$document.system.resource.wounds.maxValue}
-                  valueTooltip={localize("LOCAL.editCurrentWounds")}
-                  meterTooltip={localize("LOCAL.woundsTakenDesc")}
-                  maxTooltip={localize("LOCAL.maxWounds")}
-                  label={localize("LOCAL.wounds")}
-               />
-            </div>
-
-            <!--Resolve-->
-            <div class="resource resolve">
-               <ActorResourceMeter
-                  bind:value={$document.system.resource.resolve.value}
-                  bind:staticMod={$document.system.resource.resolve.staticMod}
-                  max={$document.system.resource.resolve.maxValue}
-                  valueTooltip={localize("LOCAL.editCurrentResolve")}
-                  meterTooltip={localize("LOCAL.resolveRemainingDesc")}
-                  maxTooltip={localize("LOCAL.maxResolve")}
-                  label={localize("LOCAL.resolve")}
-               />
-            </div>
+            <!--Each Resource Meter-->
+            {#each Object.entries($document.system.resource) as [key, resource]}
+               <div class="resource {key}">
+                  <ActorResourceMeter
+                     bind:value={$document.system.resource[key].value}
+                     bind:staticMod={$document.system.resource[key].staticMod}
+                     max={$document.system.resource[key].maxValue}
+                     label={localize(`LOCAL.${key}.label`)}
+                     editStaticModTooltip={localize(`LOCAL.${key}.editStaticMod.label`)}
+                     editValueTooltip={localize(`LOCAL.${key}.editValue.label`)}
+                     valueTooltip={localize(`LOCAL.${key}.valueDesc.label`)}
+                     maxTooltip={localize(`LOCAL.${key}.max.label`)}
+                  />
+               </div>
+            {/each}
          </div>
 
          <!--Resistances-->
          <div class="resistances">
             <!--Reflexes-->
-            <div class="resistance">
-               <div class="label">{localize("LOCAL.reflex")}</div>
-               <div class="stats">
-                  <div class="base-value">
-                     {$document.system.resistance.reflex.baseValue}
-                  </div>
-                  <div class="mod-label">+</div>
-                  <div class="mod-input">
-                     <DocumentTextInput bind:value={$document.system.resistance.reflex.staticMod} type="integer" />
-                  </div>
-                  <div class="value-label">=</div>
-                  <div class="value">
-                     {$document.system.resistance.reflex.value}
+            {#each Object.entries($document.system.resistance) as [key, resistance]}
+               <div class="resistance" data-resistance={key}>
+                  <div class="label">{localize(`LOCAL.${key}.label`)}</div>
+                  <div class="stats">
+                     <div class="label">
+                        {resistance.baseValue}
+                     </div>
+                     <div class="label">+</div>
+                     <div class="static-mod">
+                        <DocumentTextInput bind:value={$document.system.resistance[key].staticMod} type="integer" />
+                     </div>
+                     <div class="label">=</div>
+                     <div class="label">
+                        {resistance.value}
+                     </div>
                   </div>
                </div>
-            </div>
+            {/each}
          </div>
       </div>
       <!--Main Sheet-->
@@ -191,6 +170,16 @@
 
                .stats {
                   @include flex-row;
+                  align-items: center;
+
+                  :not(:first-child) {
+                     margin-left: 0.25rem;
+                  }
+
+                  .static-mod {
+                     width: 1.5rem;
+                     --border-radius: 50%;
+                  }
                }
             }
          }
