@@ -51,9 +51,9 @@
             {#each Object.entries($document.system.resistance) as [key, resistance]}
                <div class="resistance" data-resistance={key}>
                   <!--Resistance Label-->
-                  <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+                  <button class="roll-resistance">
                      {localize(`LOCAL.${key}.label`)}
-                  </div>
+                  </button>
 
                   <!--Stats-->
                   <div class="stats">

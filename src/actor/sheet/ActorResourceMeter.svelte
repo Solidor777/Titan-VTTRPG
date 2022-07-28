@@ -31,6 +31,7 @@
 
       <!--Label-->
       <span class="label" data-titan-tooltip={valueTooltip}>{label}</span>
+
       <!--Static Mod-->
       <div class="static-mod">
          <div>+</div>
