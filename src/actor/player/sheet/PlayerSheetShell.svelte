@@ -80,17 +80,17 @@
             <!--Exp-->
             <div class="exp">
                <!--Available-->
-               <div class="available" data-titan-tooltip={localize("LOCAL.expAvailable")}>
+               <div class="available" data-tooltip={localize("LOCAL.expAvailable.label")}>
                   {$document.system.exp.available} /
                </div>
 
                <!--Earned Input-->
-               <div class="earned" data-titan-tooltip={localize("LOCAL.expEarned")}>
+               <div class="earned" data-tooltip={localize("LOCAL.expEarned.label")}>
                   <DocumentTextInput bind:value={$document.system.exp.earned} type="integer" />
                </div>
 
                <!--Label-->
-               <div class="label">{localize("LOCAL.exp")}</div>
+               <div class="label">{localize("LOCAL.exp.label")}</div>
             </div>
          </div>
          <!--Tab Content-->
@@ -145,6 +145,7 @@
                &.stamina {
                   --meter-color: #006f37;
                }
+
                &.wounds {
                   --meter-color: #a80000;
                }
@@ -164,6 +165,11 @@
                @include flex-row;
                align-items: center;
                justify-content: space-between;
+
+               &:not(:first-child) {
+                  margin-top: 0.25rem;
+               }
+
                .label {
                   font-weight: bold;
                }
