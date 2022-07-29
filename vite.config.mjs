@@ -2,6 +2,7 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import resolve from "@rollup/plugin-node-resolve"; // This resolves NPM systems from node_systems.
 import preprocess from "svelte-preprocess";
 import { postcssConfig, terserConfig, typhonjsRuntime } from "@typhonjs-fvtt/runtime/rollup";
+import * as path from 'path';
 
 const s_COMPRESS = false; // Set to true to compress the module bundle.
 const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).
@@ -29,7 +30,12 @@ export default () => {
       publicDir: false, // No public resources to copy.
       cacheDir: "../.vite-cache", // Relative from root directory.
 
-      resolve: { conditions: ["import", "browser"] },
+      resolve: {
+         conditions: ["import", "browser"],
+         alias: {
+            '~': path.resolve(__dirname, 'src'),
+         }
+      },
 
       esbuild: {
          target: ["es2022", "chrome100"],

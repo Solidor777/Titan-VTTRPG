@@ -295,7 +295,11 @@ export class TitanActor extends Actor {
     const resistanceCheck = await this.getResistanceCheck(inData);
     if (resistanceCheck && resistanceCheck.isValid) {
       await resistanceCheck.evaluateCheck();
-      await resistanceCheck.sendToChat();
+      await resistanceCheck.sendToChat({
+        user: game.user.id,
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        rollMode: game.settings.get("core", "rollMode"),
+      });
     }
 
     return;

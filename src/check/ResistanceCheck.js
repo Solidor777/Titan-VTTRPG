@@ -128,7 +128,11 @@ export default class TitanResistanceCheck extends TitanCheck {
     return checkOptions;
   }
 
-  _getChatTemplate() {
-    return "systems/titan/templates/checks/ResistanceCheck-chat-message.hbs";
+  _getCheckType() {
+    return "resistanceCheck";
+  }
+
+  _getLabel() {
+    return game.i18n.localize(CONFIG.TITAN.local.resistanceCheck);
   }
 }

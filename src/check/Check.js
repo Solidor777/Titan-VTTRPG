@@ -231,28 +231,22 @@ export default class TitanCheck {
       await this.evaluateCheck();
     }
 
-    // Setup the data to display
-    const messageData = {
-      label: inData.label ? inData.label : false,
+    // Create the context object
+    const chatContext = {
+      label: inData?.label ?? this._getLabel(),
       parameters: this.parameters,
       results: this.results,
+      type: this._getCheckType(),
     };
 
-    // Create the html
-    const chatContent = await renderTemplate(
-      this._getChatTemplate(),
-      messageData
-    );
-
     // Create and post the message
-    const messageClass = getDocumentClass("ChatMessage");
-    this.chatMessage = messageClass.create(
-      messageClass.applyRollMode(
+    this.chatMessage = await ChatMessage.create(
+      ChatMessage.applyRollMode(
         {
-          user: inData.user ? inData.user : game.user.id,
-          speaker: inData.speaker,
+          content: "<div></div>",
+          user: inData?.user ? inData.user : game.user.id,
+          speaker: inData?.speaker ? inData.speaker : null,
           roll: this.roll,
-          content: chatContent,
           type: CONST.CHAT_MESSAGE_TYPES.ROLL,
           sound: CONFIG.sounds.dice,
         },
@@ -261,11 +255,16 @@ export default class TitanCheck {
           game.settings.get("core", "rollMode")
       )
     );
+    await this.chatMessage.setFlag('titan', 'data', { chatContext: chatContext });
 
     return this.chatMessage;
   }
 
-  _getChatTemplate() {
-    return "systems/titan/templates/checks/SkillCheck.js-chat-message.hbs";
+  _getCheckType() {
+    return "check";
+  }
+
+  _getLabel() {
+    return game.i18n.localize(CONFIG.TITAN.local.check);
   }
 }

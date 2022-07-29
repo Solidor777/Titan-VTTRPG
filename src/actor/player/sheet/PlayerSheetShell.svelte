@@ -5,9 +5,9 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
-   import DocumentImagePicker from "../../../documents/components/DocumentImagePicker.svelte";
-   import ActorResourceMeter from "../../sheet/ActorResourceMeter.svelte";
+   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
+   import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
 
    // Setup
    export let elementRoot;

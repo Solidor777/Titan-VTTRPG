@@ -2,6 +2,7 @@ import { TitanActor } from "./actor/Actor";
 import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
 import { TITANCONSTANTS } from "./helpers/Constants.mjs";
 import { TITANLOCAL } from "./helpers/Local.mjs";
+import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
 import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Global.scss';
@@ -27,3 +28,14 @@ Hooks.once("init", async () => {
 
    return;
 });
+
+Hooks.on('renderChatMessage', (message, html) => {
+   // Check if this is a valid titan chat message
+   const messageData = message.getFlag('titan', 'data');
+   const validTypes = new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck']);
+   if (validTypes.has(messageData?.chatContext?.type)) {
+      // If so, display the message
+      new ChatMessageShell({ target: html[0], props: messageData });
+   }
+});
+
