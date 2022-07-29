@@ -53,19 +53,19 @@
          min-width: 2.5rem;
 
          &.critical-success {
-            background-color: lightskyblue;
+            background-color: var(--color-critical-success-bright);
          }
 
          &.success {
-            background-color: lightgreen;
+            background-color: var(--color-success-bright);
          }
 
          &.failure {
-            background-color: gold;
+            background-color: var(--color-failure-bright);
          }
 
          &.critical-failure {
-            background-color: lightsalmon;
+            background-color: var(--color-critical-failure-bright);
          }
 
          &:not(:first-child) {

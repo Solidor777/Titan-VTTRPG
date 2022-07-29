@@ -166,15 +166,15 @@
                }
 
                &.stamina {
-                  --meter-color: #006f37;
+                  --meter-color: var(--color-stamina-dark);
                }
 
                &.wounds {
-                  --meter-color: #a80000;
+                  --meter-color: var(--color-wounds-dark);
                }
 
                &.resolve {
-                  --meter-color: #0096c7;
+                  --meter-color: var(--color-resolve-dark);
                }
             }
          }
@@ -199,15 +199,15 @@
                   font-weight: bold;
 
                   &.reflexes {
-                     background-color: #f6ac28;
+                     background-color: var(--color-reflexes-bright);
                   }
 
                   &.resilience {
-                     background-color: #aef151;
+                     background-color: var(--color-resilience-bright);
                   }
 
                   &.willpower {
-                     background-color: #c6a5f4;
+                     background-color: var(--color-willpower-bright);
                   }
                }
 

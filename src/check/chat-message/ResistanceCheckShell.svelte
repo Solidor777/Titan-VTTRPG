@@ -1,24 +1,13 @@
 <script>
    import CheckLabel from "./components/CheckLabel.svelte";
    import CheckDiceContainer from "./components/CheckDiceContainer.svelte";
-   import { onMount } from "svelte";
+   import { autoScroll } from "~/helpers/svelte-actions/AutoScroll.js";
 
    // Context object
    export let chatContext = void 0;
-   let scrolledDown = false;
-
-   function handleScrollDown(node) {
-      if (!scrolledDown) {
-         const chatMessage = node.parentNode;
-         const chatLog = chatMessage.parentNode;
-         console.log(chatLog.scrollTop);
-         chatLog.scrollTop += 200;
-         scrolledDown = true;
-      }
-   }
 </script>
 
-<div class="check-chat-message" use:handleScrollDown>
+<div class="check-chat-message" use:autoScroll>
    <CheckLabel label={chatContext.label} typeLabel={chatContext.typeLabel} />
    <CheckDiceContainer dice={chatContext.results.dice} />
 </div>

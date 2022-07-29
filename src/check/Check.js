@@ -246,7 +246,6 @@ export default class TitanCheck {
     this.chatMessage = await ChatMessage.create(
       ChatMessage.applyRollMode(
         {
-          content: "<div></div>",
           user: inData?.user ? inData.user : game.user.id,
           speaker: inData?.speaker ? inData.speaker : null,
           roll: this.roll,
