@@ -132,7 +132,7 @@ export default class TitanResistanceCheck extends TitanCheck {
     return "resistanceCheck";
   }
 
-  _getLabel() {
-    return game.i18n.localize(CONFIG.TITAN.local.resistanceCheck);
+  _getTypeLabel() {
+    return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.resistance])} (${this.parameters.difficulty}:${this.parameters.complexity})`;
   }
 }

@@ -233,11 +233,14 @@ export default class TitanCheck {
 
     // Create the context object
     const chatContext = {
-      label: inData?.label ?? this._getLabel(),
+      label: inData?.label ? inData.label : this._getTypeLabel(),
       parameters: this.parameters,
       results: this.results,
       type: this._getCheckType(),
     };
+    if (inData?.label) {
+      chatContext.typeLabel = this._getTypeLabel();
+    }
 
     // Create and post the message
     this.chatMessage = await ChatMessage.create(
@@ -264,7 +267,7 @@ export default class TitanCheck {
     return "check";
   }
 
-  _getLabel() {
-    return game.i18n.localize(CONFIG.TITAN.local.check);
+  _getTypeLabel() {
+    return `${game.i18n.localize(CONFIG.TITAN.local.check)} (${this.parameters.difficulty}:${this.parameters.complexity})`;
   }
 }

@@ -1,5 +1,5 @@
 <script>
-   import ResistanceCheckShell from "~/check/ResistanceCheckShell.svelte";
+   import ResistanceCheckShell from "~/check/chat-message/ResistanceCheckShell.svelte";
 
    // Context object
    export let chatContext = void 0;
@@ -13,4 +13,4 @@
    }
 </script>
 
-<svelte:component this={selectComponent(chatContext)} chatContext />
+<svelte:component this={selectComponent(chatContext)} {chatContext} />
