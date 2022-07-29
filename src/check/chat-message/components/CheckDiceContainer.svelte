@@ -1,0 +1,76 @@
+<script>
+   // Results
+   export let dice = void 0;
+
+   function getDieTypeClass(die) {
+      if (die.criticalSuccess) {
+         return "critical-success";
+      } else if (die.success) {
+         return "success";
+      } else if (die.criticalFailure) {
+         return "critical-failure";
+      } else {
+         return "failure";
+      }
+   }
+
+   function getDieNumber(die) {
+      if (die.expertiseApplied) {
+         return `${die.final} + ${die.expertiseApplied}`;
+      } else {
+         return `${die.final}`;
+      }
+   }
+</script>
+
+<div class="container">
+   <!--For each dice-->
+   {#each dice as die}
+      <div class="die {getDieTypeClass(die)}">
+         {getDieNumber(die)}
+      </div>
+   {/each}
+</div>
+
+<style lang="scss">
+   @import "../../../styles/Mixins.scss";
+
+   .container {
+      @include flex-row;
+      @include flex-group-center;
+      width: 100%;
+      flex-wrap: wrap;
+      padding: 0.5rem;
+
+      .die {
+         @include border;
+         @include flex-row;
+         @include flex-group-center;
+         font-size: 1.2rem;
+         font-weight: bold;
+         padding: 0.25rem;
+         height: 2.5rem;
+         min-width: 2.5rem;
+
+         &.critical-success {
+            background-color: lightskyblue;
+         }
+
+         &.success {
+            background-color: lightgreen;
+         }
+
+         &.failure {
+            background-color: gold;
+         }
+
+         &.critical-failure {
+            background-color: lightsalmon;
+         }
+
+         &:not(:first-child) {
+            margin-left: 0.5rem;
+         }
+      }
+   }
+</style>

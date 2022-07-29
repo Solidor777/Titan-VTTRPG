@@ -60,7 +60,7 @@
                <div class="resistance" data-resistance={key}>
                   <!--Resistance Label-->
                   <button
-                     class="resistance-roll"
+                     class="resistance-roll {key}"
                      data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
                      on:click={rollResistance(key)}
                      on:mousedown={preventDefault}
@@ -197,6 +197,18 @@
                   border-radius: 25px;
                   width: 6rem;
                   font-weight: bold;
+
+                  &.reflexes {
+                     background-color: #f6ac28;
+                  }
+
+                  &.resilience {
+                     background-color: #aef151;
+                  }
+
+                  &.willpower {
+                     background-color: #c6a5f4;
+                  }
                }
 
                &:not(:first-child) {

@@ -250,7 +250,7 @@ export default class TitanCheck {
           user: inData?.user ? inData.user : game.user.id,
           speaker: inData?.speaker ? inData.speaker : null,
           roll: this.roll,
-          type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
           sound: CONFIG.sounds.dice,
         },
         inData.rollMode ?

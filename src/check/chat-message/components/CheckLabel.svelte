@@ -1,12 +1,9 @@
 <script>
    // Main label
-   export let label;
+   export let label = void 0;
 
    // Sublabel
-   export let typeLabel;
-
-   // Paramets
-   export let parameters;
+   export let typeLabel = void 0;
 </script>
 
 <div class="label">
@@ -30,6 +27,7 @@
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;
+      background-color: whitesmoke;
 
       .main-label {
          font-size: 1.2rem;
