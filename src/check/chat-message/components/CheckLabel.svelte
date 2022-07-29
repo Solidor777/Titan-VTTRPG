@@ -27,7 +27,7 @@
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;
-      background-color: whitesmoke;
+      background-color: var(--color-label);
 
       .main-label {
          font-size: 1.2rem;

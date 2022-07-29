@@ -1,4 +1,5 @@
 <script>
+   import { autoScroll } from "~/helpers/svelte-actions/AutoScroll.js";
    import ResistanceCheckShell from "~/check/chat-message/ResistanceCheckShell.svelte";
 
    // Context object
@@ -13,4 +14,6 @@
    }
 </script>
 
-<svelte:component this={selectComponent(chatContext)} {chatContext} />
+<div use:autoScroll>
+   <svelte:component this={selectComponent(chatContext)} {chatContext} />
+</div>
