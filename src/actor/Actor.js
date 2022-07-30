@@ -1,9 +1,10 @@
 import TitanAttributeCheck from "../check/AttributeCheck.js";
 import TitanSkillCheck from "../check/SkillCheck.js";
-import TitanResistanceCheck from "../check/ResistanceCheck.js";
+import TitanResistanceCheck from "../check/resistance-check/ResistanceCheck.js";
 import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
+import { ResistanceCheckDialog } from "../check/resistance-check/ResistanceCheckDialog.js";
 
 export class TitanActor extends Actor {
 
@@ -266,19 +267,7 @@ export class TitanActor extends Actor {
   // Get a resistance check at the actor
   async getResistanceCheck(inData) {
     // Get a check from the actor
-    let checkOptions = inData;
-
-    // Get options?
-    if (inData?.getOptions) {
-      checkOptions = await TitanResistanceCheck.getOptionsFromDialog(
-        checkOptions
-      );
-
-      // Return if cancelled
-      if (checkOptions.cancelled) {
-        return;
-      }
-    }
+    const checkOptions = inData;
 
     // Get the actor check data
     const actorCheckData = this.getCheckData();
@@ -291,8 +280,16 @@ export class TitanActor extends Actor {
     return resistanceCheck;
   }
 
-  async rollResistanceCheck(inData) {
-    const resistanceCheck = await this.getResistanceCheck(inData);
+  async rollResistanceCheck(checkData) {
+    // If get options, then create a dialog for setting options.
+    if (checkData?.getOptions) {
+      const dialog = new ResistanceCheckDialog(this, checkData);
+      dialog.render(true);
+      return;
+    }
+
+    // Otherwise, get a simple check
+    const resistanceCheck = await this.getResistanceCheck(checkData);
     if (resistanceCheck && resistanceCheck.isValid) {
       await resistanceCheck.evaluateCheck();
       await resistanceCheck.sendToChat({

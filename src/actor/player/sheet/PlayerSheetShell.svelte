@@ -5,6 +5,7 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
@@ -15,12 +16,11 @@
    setContext("DocumentSheetObject", storeDoc);
    const document = getContext("DocumentSheetObject");
 
-   function preventDefault(event) {
-      event.preventDefault();
-   }
-
    async function rollResistance(resistance) {
-      $document.rollResistanceCheck({ resistance: resistance });
+      $document.rollResistanceCheck({
+         resistance: resistance,
+         getOptions: true,
+      });
    }
 </script>
 

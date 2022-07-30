@@ -1,5 +1,5 @@
-import TitanCheck from "./Check.js";
-import TitanUtility from "../helpers/Utility.mjs";
+import TitanCheck from "../Check.js";
+import TitanUtility from "../../helpers/Utility.mjs";
 
 export default class TitanResistanceCheck extends TitanCheck {
   _ensureValidConstruction(inData) {
