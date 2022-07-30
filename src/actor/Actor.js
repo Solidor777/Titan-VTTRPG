@@ -4,7 +4,7 @@ import TitanResistanceCheck from "../check/resistance-check/ResistanceCheck.js";
 import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
-import { ResistanceCheckDialog } from "../check/resistance-check/ResistanceCheckDialog.js";
+import { ResistanceCheckDialog } from "../check/resistance-check/dialog/ResistanceCheckDialog.js";
 
 export class TitanActor extends Actor {
 

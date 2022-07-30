@@ -1,15 +1,15 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import ResistanceCheckDialogShell from "./ResistanceCheckDialogShell.svelte";
 export class ResistanceCheckDialog extends TJSDialog {
-  constructor(storeDoc, checkData) {
+  constructor(storeDoc, inData) {
     super(
       {
         title: `${game.i18n.localize(CONFIG.TITAN.local.resistanceCheck)} (${storeDoc.name})`,
         content: {
-          class: ResistanceCheckDialog,
+          class: ResistanceCheckDialogShell,
           props: {
             storeDoc: storeDoc,
-            checkData: checkData,
+            inData: inData,
           },
         },
       },

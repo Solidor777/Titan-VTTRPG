@@ -1,0 +1,28 @@
+<svelte:options accessors={true} />
+
+<script>
+   // The value of the input
+   export let value;
+
+   /**
+    * If number, only allow numbers.
+    * If text, allow anything
+    */
+   function checkInput(event) {
+      // Input equals the target value
+      const input = event.target.value;
+
+      // Only accept valid inputs
+      if (!/[0-9\.,-]/.test(event.key)) {
+         event.preventDefault();
+      } else if (event.key === "-") {
+         event.preventDefault();
+      } else if (event.key === "0" && input.length < 2) {
+         event.preventDefault();
+      } else if (/[\.,]/.test(event.key)) {
+         event.preventDefault();
+      }
+   }
+</script>
+
+<input type="number" bind:value on:keypress={(event) => checkInput(event)} />
