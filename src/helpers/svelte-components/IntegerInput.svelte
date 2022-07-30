@@ -2,7 +2,8 @@
 
 <script>
    // The value of the input
-   export let value;
+   export let value = void 0;
+   export let positive = false;
 
    /**
     * If number, only allow numbers.
@@ -15,7 +16,7 @@
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {
          event.preventDefault();
-      } else if (event.key === "-") {
+      } else if (event.key === "-" && (positive || input.length > 0)) {
          event.preventDefault();
       } else if (event.key === "0" && input.length < 2) {
          event.preventDefault();
@@ -25,4 +26,4 @@
    }
 </script>
 
-<input type="number" bind:value on:keypress={(event) => checkInput(event)} />
+<input bind:value on:keypress={(event) => checkInput(event)} />

@@ -2,7 +2,7 @@
    import { setContext } from "svelte";
    import ResistanceSelect from "../components/ResistanceSelect.svelte";
    import CheckDifficultySelect from "../../components/CheckDifficultySelect.svelte";
-   import PositiveIntegerInput from "../../../helpers/svelte-components/PositiveIntegerInput.svelte";
+   import IntegerInput from "../../../helpers/svelte-components/IntegerInput.svelte";
 
    // The actor document making this check
    export let storeDoc = void 0;
@@ -24,7 +24,8 @@
 <div class="resistance-check-dialog">
    <ResistanceSelect bind:value={checkParameters.resistance} />
    <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
-   <PositiveIntegerInput bind:value={checkParameters.complexity} />
+   <IntegerInput bind:value={checkParameters.complexity} positive={true} />
+   <IntegerInput bind:value={checkParameters.diceMod} />
 </div>
 
 <style lang="scss">
