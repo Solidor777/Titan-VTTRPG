@@ -2,9 +2,9 @@ import TitanUtility from "../helpers/Utility.mjs";
 
 export default class TitanCheck {
   // Constructor
-  constructor(inData) {
+  constructor(options) {
     // Check if the provided data is valid
-    this.isValid = this._ensureValidConstruction(inData);
+    this.isValid = this._ensureValidConstruction(options);
     if (!this.isValid) {
       return this;
     }
@@ -13,10 +13,10 @@ export default class TitanCheck {
     this.isEvaluated = false;
 
     // Initialize the parameters
-    this.parameters = this._initializeParameters(inData);
+    this.parameters = this._initializeParameters(options);
 
     // Calculate the check data
-    this._calculateDerivedData(inData);
+    this._calculateDerivedData(options);
 
     // Calculate the final data
     this._calculateTotalDiceAndExpertise();
@@ -25,29 +25,29 @@ export default class TitanCheck {
   }
 
   // Ensure the provided input is valid
-  _ensureValidConstruction(inData) {
+  _ensureValidConstruction(options) {
     return true;
   }
 
   // Initialize Parameters
-  _initializeParameters(inData) {
+  _initializeParameters(options) {
     const parameters = {
-      difficulty: inData.difficulty ?
-        TitanUtility.clamp(inData.difficulty, 2, 6) : 4,
-      complexity: inData.complexity ? Math.max(0, inData.complexity) : 0,
-      diceMod: inData.diceMod ?? 0,
-      expertiseMod: inData.expertiseMod ?? 0,
-      doubleExpertise: inData.doubleExpertise ?? false,
-      maximizeSuccesses: inData.maximizeSuccesses ?? false,
-      extraSuccessOnCritical: inData.extraSuccessOnCritical ?? false,
-      extraFailureOnCritical: inData.extraFailureOnCritical ?? false,
+      difficulty: options.difficulty ?
+        TitanUtility.clamp(options.difficulty, 2, 6) : 4,
+      complexity: options.complexity ? Math.max(0, options.complexity) : 0,
+      diceMod: options.diceMod ?? 0,
+      expertiseMod: options.expertiseMod ?? 0,
+      doubleExpertise: options.doubleExpertise ?? false,
+      maximizeSuccesses: options.maximizeSuccesses ?? false,
+      extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
+      extraFailureOnCritical: options.extraFailureOnCritical ?? false,
     };
 
     return parameters;
   }
 
   // Use the check data to calculate the check data
-  _calculateDerivedData(inData) {
+  _calculateDerivedData(options) {
     return;
   }
 
@@ -225,7 +225,7 @@ export default class TitanCheck {
     return sortedDice;
   }
 
-  async sendToChat(inData) {
+  async sendToChat(options) {
     // Ensure the check is evaluated
     if (!this.evaluated) {
       await this.evaluateCheck();
@@ -233,12 +233,12 @@ export default class TitanCheck {
 
     // Create the context object
     const chatContext = {
-      label: inData?.label ? inData.label : this._getTypeLabel(),
+      label: options?.label ? options.label : this._getTypeLabel(),
       parameters: this.parameters,
       results: this.results,
       type: this._getCheckType(),
     };
-    if (inData?.label) {
+    if (options?.label) {
       chatContext.typeLabel = this._getTypeLabel();
     }
 
@@ -246,14 +246,14 @@ export default class TitanCheck {
     this.chatMessage = await ChatMessage.create(
       ChatMessage.applyRollMode(
         {
-          user: inData?.user ? inData.user : game.user.id,
-          speaker: inData?.speaker ? inData.speaker : null,
+          user: options?.user ? options.user : game.user.id,
+          speaker: options?.speaker ? options.speaker : null,
           roll: this.roll,
           type: CONST.CHAT_MESSAGE_TYPES.OTHER,
           sound: CONFIG.sounds.dice,
         },
-        inData.rollMode ?
-          inData.rollMode :
+        options.rollMode ?
+          options.rollMode :
           game.settings.get("core", "rollMode")
       )
     );

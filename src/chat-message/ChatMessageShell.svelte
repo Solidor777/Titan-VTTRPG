@@ -9,7 +9,7 @@
    function selectComponent() {
       const chatComponents = {
          resistanceCheck: CheckChatMessageShell,
-      };`${game.i18n.localize(CONFIG.TITAN.local.resistanceCheck)} (${storeDoc.name})`
+      };
       return chatComponents[chatContext.type];
    }
 </script>

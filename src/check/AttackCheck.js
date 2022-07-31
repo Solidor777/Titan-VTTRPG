@@ -2,25 +2,25 @@ import TitanUtility from "../helpers/Utility.mjs";
 import TitanSkillCheck from "./SkillCheck.js";
 
 export default class TitanAttackCheck extends TitanSkillCheck {
-  _ensureValidConstruction(inData) {
-    if (!super._ensureValidConstruction(inData)) {
+  _ensureValidConstruction(options) {
+    if (!super._ensureValidConstruction(options)) {
       return false;
     }
 
     // Check if the weapon is valid
-    const weaponCheckData = inData.weaponCheckData;
+    const weaponCheckData = options.weaponCheckData;
     if (!weaponCheckData) {
       console.log(
-        `TITAN | Attack Check failed during construction. Invalid Data. ${inData}`
+        `TITAN | Attack Check failed during construction. Invalid Data. ${options}`
       );
       return false;
     }
 
     // Check if the attack is valid
-    const checkAttack = weaponCheckData.attack[inData.attackIdx];
+    const checkAttack = weaponCheckData.attack[options.attackIdx];
     if (!checkAttack) {
       console.log(
-        `TITAN | Attack Check failed during construction. Attack IDX. ${inData}`
+        `TITAN | Attack Check failed during construction. Attack IDX. ${options}`
       );
       return false;
     }
@@ -28,39 +28,39 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     return true;
   }
 
-  _initializeParameters(inData) {
+  _initializeParameters(options) {
     const parameters = {
-      attribute: inData.attribute ?? false,
-      skill: inData.skill ?? false,
-      type: inData.type ?? false,
-      targetDefense: inData.targetDefense ?? false,
-      attackerMelee: inData.attackerMelee ?? false,
-      attackerAccuracy: inData.attackerAccuracy ?? false,
-      difficulty: inData.difficulty ?? false,
+      attribute: options.attribute ?? false,
+      skill: options.skill ?? false,
+      type: options.type ?? false,
+      targetDefense: options.targetDefense ?? false,
+      attackerMelee: options.attackerMelee ?? false,
+      attackerAccuracy: options.attackerAccuracy ?? false,
+      difficulty: options.difficulty ?? false,
       complexity: 1,
-      diceMod: inData.diceMod ?? 0,
-      trainingMod: inData.trainingMod ?? 0,
-      expertiseMod: inData.expertiseMod ?? 0,
-      damageMod: inData.damageMod ?? 0,
-      doubleExpertise: inData.doubleExpertise ?? false,
-      maximizeSuccesses: inData.maximizeSuccesses ?? false,
-      extraSuccessOnCritical: inData.extraSuccessOnCritical ?? false,
-      extraFailureOnCritical: inData.extraFailureOnCritical ?? false,
+      diceMod: options.diceMod ?? 0,
+      trainingMod: options.trainingMod ?? 0,
+      expertiseMod: options.expertiseMod ?? 0,
+      damageMod: options.damageMod ?? 0,
+      doubleExpertise: options.doubleExpertise ?? false,
+      maximizeSuccesses: options.maximizeSuccesses ?? false,
+      extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
+      extraFailureOnCritical: options.extraFailureOnCritical ?? false,
       weaponName:
-        inData.weaponName ??
+        options.weaponName ??
         game.i18n.localize(CONFIG.TITAN.weapon.unarmed.label),
-      multiAttack: inData.multiAttack ?? null,
+      multiAttack: options.multiAttack ?? null,
     };
 
     return parameters;
   }
 
-  _calculateDerivedData(inData) {
+  _calculateDerivedData(options) {
     // Get the weapon reference
-    const actorCheckData = inData.actorCheckData;
-    const weaponCheckData = inData.weaponCheckData;
-    const targetCheckData = inData.targetCheckData;
-    const checkAttack = weaponCheckData.attack[inData.attackIdx];
+    const actorCheckData = options.actorCheckData;
+    const weaponCheckData = options.weaponCheckData;
+    const targetCheckData = options.targetCheckData;
+    const checkAttack = weaponCheckData.attack[options.attackIdx];
 
     // Get the attack description
     if (weaponCheckData.attackDescription) {
@@ -78,7 +78,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     }
 
     // Get the actor data
-    super._calculateDerivedData(inData);
+    super._calculateDerivedData(options);
 
     // Cache the attack info
     this.parameters.attack = checkAttack;

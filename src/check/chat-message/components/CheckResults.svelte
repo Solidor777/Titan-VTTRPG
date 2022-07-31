@@ -29,7 +29,7 @@
    @import "../../../styles/Mixins.scss";
 
    .results {
-      @include-border-normal;
+      @include border-normal;
       @include flex-column;
       @include flex-group-center;
       width: 100%;

@@ -196,7 +196,7 @@ export class TitanActor extends Actor {
   }
 
   // Get the initiative check
-  async getInitiativeRoll(inData) {
+  async getInitiativeRoll(options) {
     // Calculate the initiative value
     const initiative = this.system.rating.initiative.value;
 
@@ -213,8 +213,8 @@ export class TitanActor extends Actor {
     const roll = new Roll(
       initiativeFormula +
       initiative.toString() +
-      (inData !== undefined && inData.bonus !== undefined ?
-        inData.bonus.toString() : "")
+      (options !== undefined && options.bonus !== undefined ?
+        options.bonus.toString() : "")
     );
     const retVal = {
       outRoll: roll,
@@ -225,9 +225,9 @@ export class TitanActor extends Actor {
   }
 
   // Get a skill check from the actor
-  async getSkillCheck(inData) {
+  async getSkillCheck(options) {
     // Initialize options
-    let checkOptions = inData;
+    let checkOptions = options;
 
     // Check if the attribute set to default
     if (checkOptions.attribute === "default") {
@@ -237,7 +237,7 @@ export class TitanActor extends Actor {
     }
 
     // Get the options from a dialog if appropriate
-    if (inData?.getOptions) {
+    if (options?.getOptions) {
       checkOptions = await TitanSkillCheck.getOptionsFromDialog(checkOptions);
 
       // Return if cancelled
@@ -265,9 +265,9 @@ export class TitanActor extends Actor {
   }
 
   // Get a resistance check at the actor
-  async getResistanceCheck(inData) {
+  async getResistanceCheck(options) {
     // Get a check from the actor
-    const checkOptions = inData;
+    const checkOptions = options;
 
     // Get the actor check data
     const actorCheckData = this.getCheckData();
@@ -303,9 +303,9 @@ export class TitanActor extends Actor {
   }
 
   // Get an attack check
-  async getAttackCheck(inData) {
+  async getAttackCheck(options) {
     // Get the weapon check data.
-    const checkWeapon = this.items.get(inData?.itemId);
+    const checkWeapon = this.items.get(options?.itemId);
     if (!checkWeapon) {
       console.error(
         "TITAN | Attack check failed. Invalid weapon ID provided to actor"
@@ -315,11 +315,11 @@ export class TitanActor extends Actor {
     }
 
     // Initialize check options
-    let checkOptions = inData;
-    checkOptions.damageMod = inData.damageMod ?? this.system.mod.damage.value;
+    let checkOptions = options;
+    checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
     // Get the options from a dialog if appropriate
-    if (inData.getOptions) {
+    if (options.getOptions) {
       checkOptions = await TitanAttackCheck.getOptionsFromDialog(checkOptions);
 
       // Return if cancelled

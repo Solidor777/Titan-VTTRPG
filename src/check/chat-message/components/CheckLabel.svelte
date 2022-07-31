@@ -23,7 +23,7 @@
 <style lang="scss">
    @import "../../../styles/mixins.scss";
    .label {
-      @include-border-normal;
+      @include border-normal;
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;

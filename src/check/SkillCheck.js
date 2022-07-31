@@ -2,20 +2,20 @@ import TitanUtility from "../helpers/Utility.mjs";
 import TitanAttributeCheck from "./AttributeCheck.js";
 
 export default class TitanSkillCheck extends TitanAttributeCheck {
-  _initializeParameters(inData) {
-    const parameters = super._initializeParameters(inData);
+  _initializeParameters(options) {
+    const parameters = super._initializeParameters(options);
 
     // Initialize skill parameters
-    parameters.skill = inData.skill ?? "athletics";
-    parameters.trainingMod = inData.trainingMod ?? 0;
-    parameters.doubleTraining = inData.doubleTraining ?? false;
+    parameters.skill = options.skill ?? "athletics";
+    parameters.trainingMod = options.trainingMod ?? 0;
+    parameters.doubleTraining = options.doubleTraining ?? false;
 
     return parameters;
   }
 
-  _calculateDerivedData(inData) {
-    super._calculateDerivedData(inData);
-    const actorCheckData = inData.actorCheckData;
+  _calculateDerivedData(options) {
+    super._calculateDerivedData(options);
+    const actorCheckData = options.actorCheckData;
 
     // Get the skill training and expertise values
     const skill = actorCheckData.skill[this.parameters.skill];

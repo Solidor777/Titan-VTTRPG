@@ -43,7 +43,7 @@
       padding: 0.5rem;
 
       .die {
-         @include-border-normal;
+         @include border-normal;
          @include flex-row;
          @include flex-group-center;
          font-size: 1.2rem;

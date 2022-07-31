@@ -1,13 +1,13 @@
 import TitanCheck from "./Check.js";
 
 export default class TitanAttributeCheck extends TitanCheck {
-  _ensureValidConstruction(inData) {
-    if (!super._ensureValidConstruction(inData)) {
+  _ensureValidConstruction(options) {
+    if (!super._ensureValidConstruction(options)) {
       return false;
     }
 
     // Check if actor check data is valid
-    if (!inData?.actorCheckData) {
+    if (!options?.actorCheckData) {
       console.error(
         "TITAN | Attribute Check failed during construction. No provided Actor Check Data."
       );
@@ -17,18 +17,18 @@ export default class TitanAttributeCheck extends TitanCheck {
     return true;
   }
 
-  _initializeParameters(inData) {
-    const parameters = super._initializeParameters(inData);
+  _initializeParameters(options) {
+    const parameters = super._initializeParameters(options);
 
     // Initialize attribute parameters
-    parameters.attribute = inData.attribute ?? "body";
+    parameters.attribute = options.attribute ?? "body";
 
     return parameters;
   }
 
-  _calculateDerivedData(inData) {
-    super._calculateDerivedData(inData);
-    const actorCheckData = inData.actorCheckData;
+  _calculateDerivedData(options) {
+    super._calculateDerivedData(options);
+    const actorCheckData = options.actorCheckData;
 
     // Get the attribute dice
     this.parameters.attributeDice =

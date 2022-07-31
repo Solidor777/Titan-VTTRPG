@@ -1,27 +1,38 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { setContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ResistanceSelect from "../components/ResistanceSelect.svelte";
    import CheckDifficultySelect from "../../components/CheckDifficultySelect.svelte";
    import IntegerInput from "../../../helpers/svelte-components/IntegerInput.svelte";
 
    // The actor document making this check
-   export let storeDoc = void 0;
+   export let actor;
 
    // Initial check options
-   export let inData = void 0;
+   export let options = void 0;
 
+   // Callbacks
+   export let closeDialog;
+
+   // Initialize check parameters
    let checkParameters = {
-      resistance: inData.resistance ? inData.resistance : "reflexes",
-      difficulty: inData.difficulty ? inData.difficulty : 4,
-      complexity: inData.complexity ? inData.complexity : 0,
-      diceMod: inData.diceMod ? inData.diceMod : 0,
+      resistance: options.resistance ? options.resistance : "reflexes",
+      difficulty: options.difficulty ? options.difficulty : 4,
+      complexity: options.complexity ? options.complexity : 0,
+      diceMod: options.diceMod ? options.diceMod : 0,
    };
 
-   // Setup context and store
-   setContext("DialogObject", storeDoc);
+   async function onRoll() {
+      await actor.rollResistanceCheck(checkParameters);
+      closeDialog();
+      return;
+   }
+
+   async function onCancel() {
+      closeDialog();
+      return;
+   }
 </script>
 
 <div class="resistance-check-dialog">
@@ -65,6 +76,12 @@
             <IntegerInput bind:value={checkParameters.diceMod} />
          </div>
       </div>
+   </div>
+
+   <!--Buttons-->
+   <div class="row">
+      <button on:click={onRoll}>{localize("LOCAL.roll.label")}</button>
+      <button on:click={onCancel}>{localize("LOCAL.cancel.label")}</button>
    </div>
 </div>
 
