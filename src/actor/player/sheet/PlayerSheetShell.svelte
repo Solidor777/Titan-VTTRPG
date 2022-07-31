@@ -130,7 +130,7 @@
       flex: 1;
 
       .sidebar {
-         @include border;
+         @include border-normal;
          @include flex-column;
          @include flex-group-top;
 
@@ -142,7 +142,7 @@
 
          .portrait {
             width: 10rem;
-            --border-style: none;
+            --border-style-normal: none;
          }
 
          .resources {
@@ -158,8 +158,8 @@
                flex-direction: column;
                width: 100%;
                padding-bottom: 0.25rem;
-               border-bottom: var(--border-style);
-               border-width: var(--border-width);
+               border-bottom: var(--border-style-normal);
+               border-width: var(--border-width-normal);
 
                &:not(:first-child) {
                   padding-top: 0.25rem;
@@ -188,15 +188,16 @@
                @include flex-row;
                align-items: center;
                justify-content: space-between;
-               border-bottom-style: var(--border-style);
-               border-width: var(--border-width);
+               border-bottom-style: var(--border-style-normal);
+               border-width: var(--border-width-normal);
                padding-bottom: 0.25rem;
 
                button {
-                  @include border;
+                  @include border-normal;
                   border-radius: 25px;
                   width: 6rem;
                   font-weight: bold;
+                  border-color: var(--border-color-normal);
 
                   &.reflexes {
                      background-color: var(--color-reflexes-bright);
@@ -228,8 +229,8 @@
                   }
 
                   .static-mod {
-                     width: 1.5rem;
-                     --border-radius: 50%;
+                     width: 1.8rem;
+                     --border-radius-input: 10px;
                   }
                }
             }
@@ -241,7 +242,7 @@
          flex: 1;
 
          .header {
-            @include border;
+            @include border-normal;
             @include flex-row;
             align-items: center;
             justify-content: space-between;
@@ -252,14 +253,16 @@
             .actor-name {
                font-family: var(--font-family);
                font-size: 1.6rem;
-               height: 2rem;
                width: 50%;
+               --height-input: 2.5rem;
+               --border-radius-input: 10px;
+               --font-size: 1.5rem;
             }
 
             .exp {
                margin-right: 1rem;
                display: flex;
-               width: 6rem;
+               width: 7rem;
                align-items: center;
                text-align: center;
                justify-content: flex-end;
@@ -276,7 +279,9 @@
                   font-family: var(--font-family);
                   display: flex;
                   margin-right: 0.5rem;
-                  width: 2rem;
+                  width: 3rem;
+                  --border-radius-input: 10px;
+                  --height-input: 1.8rem;
                }
 
                .label {

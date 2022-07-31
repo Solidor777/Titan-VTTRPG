@@ -14,7 +14,7 @@ export class ResistanceCheckDialog extends TJSDialog {
         },
       },
       {
-        width: 400,
+        width: 320,
         height: 300,
       }
     );

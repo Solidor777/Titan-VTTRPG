@@ -22,13 +22,13 @@
    .check-chat-message {
       .label {
          &.reflexes {
-            --color-label: var(--color-reflexes-bright);
+            --color-background-label: var(--color-reflexes-bright);
          }
          &.resilience {
-            --color-label: var(--color-resilience-bright);
+            --color-background-label: var(--color-resilience-bright);
          }
          &.willpower {
-            --color-label: var(--color-willpower-bright);
+            --color-background-label: var(--color-willpower-bright);
          }
       }
       @include flex-column;

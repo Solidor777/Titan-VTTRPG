@@ -55,7 +55,7 @@
 [data-titan-tooltip]:hover:after {
   visibility: visible;
   opacity: 1;
-  transition-delay: var(--tooltip-delay);
+  transition-delay: var(--tooltip-delay-normal);
   transform: translate(-50%, 0)
 }
 

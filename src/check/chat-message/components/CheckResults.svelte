@@ -29,12 +29,12 @@
    @import "../../../styles/Mixins.scss";
 
    .results {
-      @include border;
+      @include-border-normal;
       @include flex-column;
       @include flex-group-center;
       width: 100%;
       padding: 0.5rem;
-      background-color: var(--color-label);
+      background-color: var(--color-background-label);
 
       .successes {
          font-weight: bold;

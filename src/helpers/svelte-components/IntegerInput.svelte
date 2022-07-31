@@ -27,3 +27,11 @@
 </script>
 
 <input bind:value on:keypress={(event) => checkInput(event)} />
+
+<style lang="scss">
+   @import "../../styles/Mixins.scss";
+
+   input {
+      @include input;
+   }
+</style>

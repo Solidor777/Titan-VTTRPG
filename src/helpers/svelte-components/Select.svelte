@@ -10,3 +10,11 @@
       </option>
    {/each}
 </select>
+
+<style lang="scss">
+   @import "../../styles/Mixins.scss";
+
+   select {
+      @include input;
+   }
+</style>

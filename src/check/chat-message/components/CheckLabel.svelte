@@ -23,11 +23,11 @@
 <style lang="scss">
    @import "../../../styles/mixins.scss";
    .label {
-      @include border;
+      @include-border-normal;
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;
-      background-color: var(--color-label);
+      background-color: var(--color-background-label);
 
       .main-label {
          font-size: 1.2rem;

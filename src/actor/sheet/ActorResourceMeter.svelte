@@ -23,9 +23,9 @@
    $: meterWidth = ((value / max) * 100).toString() + "%";
 </script>
 
-<div class="resource-meter">
+<div class="resource">
    <!--Label row-->
-   <div class="meter-row">
+   <div class="row">
       <!--Spacer-->
       <div class="spacer" />
 
@@ -34,7 +34,7 @@
 
       <!--Static Mod-->
       <div class="static-mod">
-         <div>+</div>
+         +
          <div class="input" data-titan-tooltip={editStaticModTooltip}>
             <DocumentTextInput bind:value={staticMod} type="integer" />
          </div>
@@ -42,9 +42,9 @@
    </div>
 
    <!--Meter bar row-->
-   <div class="meter-row">
+   <div class="row">
       <!--Current Value Input-->
-      <div class="value" data-titan-tooltip={editValueTooltip}><DocumentTextInput bind:value type="integer" /></div>
+      <div class="input" data-titan-tooltip={editValueTooltip}><DocumentTextInput bind:value type="integer" /></div>
 
       <!--The Meter-->
       <div class="meter" data-titan-tooltip={valueTooltip}>
@@ -57,59 +57,45 @@
 </div>
 
 <style lang="scss">
-   .resource-meter {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+   @import "../../styles/Mixins.scss";
+
+   .resource {
+      @include flex-column;
+      @include flex-group-top;
+      box-sizing: border-box;
       width: 100%;
       height: 100%;
 
-      .meter-row {
-         display: flex;
+      .row {
+         @include flex-row;
+         @include flex-space-between;
          width: 100%;
          height: 100%;
-         flex-direction: row;
-         justify-content: space-between;
-         align-items: center;
-         text-align: center;
-
-         &:not(:first-child) {
-            padding-top: 0.25rem;
-         }
+         padding-top: 0.25rem;
+         font-weight: bold;
 
          .spacer {
-            width: 2.5rem;
+            width: 5rem;
          }
 
          .label {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+            height: 100%;
             font-weight: bold;
          }
 
          .static-mod {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            text-align: center;
-            height: 100%;
-            width: 2.5rem;
-            --border-radius: 50%;
-
-            .input {
-               width: 1.5rem;
-            }
+            @include flex-row;
+            @include flex-group-center;
+            width: 5rem;
          }
 
-         .value {
-            box-sizing: border-box;
-            text-align: center;
-            height: 100%;
-            width: 2rem;
-            --border-radius: 50%;
-            --tooltip-delay: 1.2s;
+         .input {
+            --width-input: 2rem;
+            --border-radius-input: 10px;
+            margin-left: 0.25rem;
          }
 
          .meter {
@@ -137,12 +123,15 @@
 
          .max {
             box-sizing: border-box;
-            width: 2rem;
+            @include flex-row;
+            @include flex-group-center;
+            @include border-normal;
+            background-color: var(--color-background-highlight);
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 3.2rem;
             height: 100%;
             text-align: center;
-            border-style: var(--border-style);
-            border-width: var(--border-width);
-            border-radius: 50%;
          }
       }
    }

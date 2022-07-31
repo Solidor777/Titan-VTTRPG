@@ -22,6 +22,22 @@
    ];
 </script>
 
-<div class="resistance-check-dialog">
+<div class="resistance-select {value}">
    <Select options={resistanceOptions} bind:value />
 </div>
+
+<style lang="scss">
+   .resistance-select {
+      &.reflexes {
+         --color-background-input: var(--color-reflexes-bright);
+      }
+
+      &.resilience {
+         --color-background-input: var(--color-resilience-bright);
+      }
+
+      &.willpower {
+         --color-background-input: var(--color-willpower-bright);
+      }
+   }
+</style>

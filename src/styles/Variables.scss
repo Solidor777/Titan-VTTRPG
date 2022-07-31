@@ -1,23 +1,53 @@
 :root {
+  // Fonts
   --font-primary: "Lato";
   --font-mono: "Lato";
   --font-awesome: "Lato";
   --font-family: "Lato";
-  --border-style: solid;
-  --border-radius: 10px;
-  --border-width: 0.125rem;
-  --tooltip-delay: 0.6s;
+  --font-size: 1rem;
+
+  // Normal border
+  --border-style-normal: solid;
+  --border-radius-normal: 10px;
+  --border-width-normal: 0.1rem;
+  --color-border-normal: black;
+
+  // Input border
+  --border-style-input: solid;
+  --border-radius-input: 0px;
+  --border-width-input: 0.1rem;
+  --color-border-input: black;
+
+  // Tool tip delay
+  --tooltip-delay-normal: 0.6s;
+  --tooltip-delay-input: 0.9s;
+
+  // Resource colors
   --color-stamina-dark: #006f37;
   --color-wounds-dark: #a80000;
   --color-resolve-dark: #0096c7;
-  --color-reflexes-bright: #f6ac28;
-  --color-resilience-bright: #aef151;
-  --color-willpower-bright: #c6a5f4;
+
+  // Resistance colors
+  --color-reflexes-bright: #ffd183;
+  --color-resilience-bright: #d4ff98;
+  --color-willpower-bright: #e4d1ff;
+
+  // Dice result colors
   --color-critical-success-bright: lightskyblue;
   --color-success-bright: lightgreen;
   --color-failure-bright: gold;
   --color-critical-failure-bright: lightsalmon;
+
+  // Check results colors
   --color-succeeded-dark: darkblue;
   --color-failed-dark: darkred;
-  --color-label: whitesmoke;
+
+  // General colors
+  --color-background-label: rgb(255, 255, 255);
+  --color-background-input: whitesmoke;
+  --color-background-highlight: rgb(255, 219, 147);
+
+  // Sizes
+  --height-input: 1.5rem;
+  --width-input: 100%;
 }

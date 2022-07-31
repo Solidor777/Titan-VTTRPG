@@ -1,7 +1,28 @@
-@mixin border {
-  border-style: var(--border-style);
-  border-radius: var(--border-radius);
-  border-width: var(--border-width);
+@mixin input {
+  box-sizing: border-box;
+  height: var(--height-input);
+  border-style: var(--border-style-input);
+  border-radius: var(--border-radius-input);
+  border-width: var(--border-width-input);
+  border-color: var(--color-border-input);
+  background-color: var(--color-background-input);
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+  text-align: var(--text-alignment);
+  height: var(--height-input);
+  width: var(--width-input);
+}
+
+@mixin border-normal {
+  border-style: var(--border-style-normal);
+  border-radius: var(--border-radius-normal);
+  border-width: var(--border-width-normal);
+}
+
+@mixin border-input {
+  border-style: var(--border-style-input);
+  border-radius: var(--border-radius-input);
+  border-width: var(--border-width-input);
 }
 
 @mixin flex-row {
@@ -35,6 +56,12 @@
 @mixin flex-group-top {
   align-items: center;
   justify-content: flex-start;
+  text-align: center;
+}
+
+@mixin flex-space-between {
+  align-items: center;
+  justify-content: space-between;
   text-align: center;
 }
 
