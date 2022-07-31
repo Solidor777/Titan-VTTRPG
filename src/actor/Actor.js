@@ -266,6 +266,7 @@ export class TitanActor extends Actor {
 
   // Get a resistance check at the actor
   async getResistanceCheck(options) {
+
     // Get a check from the actor
     const checkOptions = options;
 

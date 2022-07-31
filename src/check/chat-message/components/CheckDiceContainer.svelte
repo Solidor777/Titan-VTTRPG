@@ -51,6 +51,7 @@
          padding: 0.25rem;
          height: 2.5rem;
          min-width: 2.5rem;
+         margin: 0.25rem;
 
          &.critical-success {
             background-color: var(--color-critical-success-bright);
@@ -66,10 +67,6 @@
 
          &.critical-failure {
             background-color: var(--color-critical-failure-bright);
-         }
-
-         &:not(:first-child) {
-            margin-left: 0.5rem;
          }
       }
    }

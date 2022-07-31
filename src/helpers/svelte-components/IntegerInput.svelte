@@ -5,6 +5,8 @@
    export let value = void 0;
    export let positive = false;
 
+   $: value = parseInt(value);
+
    /**
     * If number, only allow numbers.
     * If text, allow anything

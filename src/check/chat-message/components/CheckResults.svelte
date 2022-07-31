@@ -12,11 +12,18 @@
       {localize(`LOCAL.successes.label`)}
    </div>
 
-   {#if results.success}
+   {#if results.succeeded}
       <!--Succeeded-->
       <div class="result succeeded">
          {localize(`LOCAL.succeeded.label`)}
       </div>
+      <!--Extra Successes-->
+      {#if results.extraSuccesses}
+         <div class="extra-successes">
+            {results.extraSuccesses}
+            {localize(`LOCAL.extraSuccesses.label`)}
+         </div>
+      {/if}
    {:else if results.failed}
       <!--Failed-->
       <div class="result failed">
@@ -43,8 +50,23 @@
 
       .result {
          @include flex-row;
+         @include flex-group-center;
          width: 100%;
-         font-weight: 1.1;
+         font-weight: bold;
+         font-size: 1.2rem;
+
+         &.succeeded {
+            color: var(--color-succeeded-dark);
+         }
+
+         &.failed {
+            color: var(--color-failed-dark);
+         }
+      }
+
+      .extra-successes {
+         font-weight: bold;
+         font-size: 1rem;
       }
    }
 </style>
