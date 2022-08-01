@@ -90,6 +90,24 @@
                </div>
             {/each}
          </div>
+
+         <!--Ratings-->
+         <div class="ratings">
+            <!--Awarenesss-->
+            <div class="rating">
+               <div class="label">
+                  <!--Icon-->
+                  <span class="fas fa-eye" />
+                  {localize("LOCAL.awareness.label")}
+               </div>
+               <!--Stats-->
+               <div class="stats">
+                  {$document.system.rating.awareness.baseValue} +
+                  <DocumentTextInput bind:value={$document.system.rating.awareness.staticMod} type="integer" /> =
+                  {$document.system.rating.awareness.value}
+               </div>
+            </div>
+         </div>
       </div>
       <!--Main Sheet-->
       <div class="main">
@@ -232,6 +250,29 @@
                      width: 1.8rem;
                      --border-radius-input: 10px;
                   }
+               }
+            }
+         }
+
+         .ratings {
+            @include flex-column;
+            @include flex-group-center;
+            margin-top: 0.5rem;
+            width: 100%;
+
+            .rating {
+               @include flex-row;
+               @include flex-group-center;
+               width: 100%;
+
+               .label {
+                  @include flex-row;
+                  @include flex-group-center;
+               }
+
+               .stats {
+                  @include flex-row;
+                  @include flex-group-center;
                }
             }
          }

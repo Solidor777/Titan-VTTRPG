@@ -19,6 +19,11 @@
   border-width: var(--border-width-normal);
 }
 
+@mixin border-top-normal {
+  border-top: var(--border-style-normal);
+  border-width: var(--border-width-normal);
+}
+
 @mixin border-input {
   border-style: var(--border-style-input);
   border-radius: var(--border-radius-input);

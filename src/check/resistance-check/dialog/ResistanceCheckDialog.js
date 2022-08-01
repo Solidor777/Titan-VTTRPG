@@ -11,7 +11,6 @@ export class ResistanceCheckDialog extends TJSDialog {
           props: {
             options: options,
             actor: actor,
-            closeDialog: () => this.close(),
           },
         },
       },

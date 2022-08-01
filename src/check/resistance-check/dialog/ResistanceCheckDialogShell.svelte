@@ -2,6 +2,7 @@
 
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { getContext } from "svelte";
    import ResistanceSelect from "../components/ResistanceSelect.svelte";
    import CheckDifficultySelect from "../../components/CheckDifficultySelect.svelte";
    import IntegerInput from "../../../helpers/svelte-components/IntegerInput.svelte";
@@ -12,9 +13,6 @@
    // Initial check options
    export let options = void 0;
 
-   // Callbacks
-   export let closeDialog;
-
    // Initialize check parameters
    let checkParameters = {
       resistance: options.resistance ? options.resistance : "reflexes",
@@ -23,14 +21,16 @@
       diceMod: options.diceMod ? options.diceMod : 0,
    };
 
+   const application = getContext("external").application;
+
    async function onRoll() {
       await actor.rollResistanceCheck(checkParameters);
-      closeDialog();
+      application.close();
       return;
    }
 
    async function onCancel() {
-      closeDialog();
+      application.close();
       return;
    }
 </script>
@@ -78,6 +78,14 @@
       </div>
    </div>
 
+   <!--Total Dice-->
+   <div class="row">
+      <div class="total-dice">
+         {localize("LOCAL.totalDice.label") + ": "}
+         {actor.system.resistance[checkParameters.resistance].value + checkParameters.diceMod}
+      </div>
+   </div>
+
    <!--Buttons-->
    <div class="row">
       <button on:click={onRoll}>{localize("LOCAL.roll.label")}</button>
@@ -94,7 +102,7 @@
 
       .row {
          @include flex-row;
-         justify-content: flex-start;
+         justify-content: center;
          align-items: flex-end;
 
          height: 100%;
@@ -102,6 +110,8 @@
 
          &:not(:first-child) {
             margin-top: 0.5rem;
+            @include border-top-normal;
+            padding-top: 0.25rem;
          }
       }
 
@@ -120,6 +130,11 @@
          .input {
             --height-input: 1.8rem;
          }
+      }
+
+      .total-dice {
+         font-weight: bold;
+         font-size: 1rem;
       }
    }
 </style>
