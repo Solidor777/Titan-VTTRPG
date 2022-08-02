@@ -24,19 +24,19 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
-         {speed.baseValue}
+      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
+         <DocumentTextInput bind:value={$document.system.speed[key].baseValue} type="integer" />
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="static-mod" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
+      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
          <DocumentTextInput bind:value={$document.system.speed[key].staticMod} type="integer" />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
+      <div class="label final" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
          {speed.value}
       </div>
    </div>
@@ -56,6 +56,10 @@
          @include flex-group-center;
          height: 100%;
          font-size: 1rem;
+
+         &.final {
+            font-weight: bold;
+         }
       }
 
       .stats {
@@ -64,11 +68,11 @@
          height: 100%;
 
          :not(:first-child) {
-            margin-left: 0.25rem;
+            margin-left: 0.5rem;
          }
 
-         .static-mod {
-            width: 1.8rem;
+         .input {
+            width: 1.7rem;
             --border-radius-input: 10px;
          }
       }

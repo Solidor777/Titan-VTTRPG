@@ -49,15 +49,6 @@
             {/each}
          </div>
 
-         <!--Resistances-->
-         <div class="resistances">
-            {#each Object.entries($document.system.resistance) as [key]}
-               <div class="resistance">
-                  <ActorResistance bind:key />
-               </div>
-            {/each}
-         </div>
-
          <!--Ratings-->
          <div class="ratings">
             {#each Object.entries($document.system.rating) as [key]}
@@ -69,6 +60,11 @@
 
          <!--Speeds-->
          <div class="speeds">
+            <div class="label">
+               <div class="name">Speed</div>
+               <div class="base">Base</div>
+               <div class="mod">Mod</div>
+            </div>
             {#each Object.entries($document.system.speed) as [key]}
                <div class="speed">
                   <ActorSpeed bind:key />
@@ -104,12 +100,35 @@
                </div>
             </div>
 
-            <!--Attributes-->
+            <!--Attributes and Resistances-->
             <div class="row">
+               <!--Attributes-->
                <div class="attributes">
+                  <div class="label">
+                     <div class="name">Attribute</div>
+                     <div class="base">Base</div>
+                     <div class="mod">Mod</div>
+                  </div>
                   {#each Object.entries($document.system.attribute) as [key]}
                      <div class="attribute">
                         <ActorAttribute bind:key />
+                     </div>
+                  {/each}
+               </div>
+
+               <!--Divider-->
+               <div class="divider" />
+
+               <!--Resistances-->
+               <div class="resistances">
+                  <div class="label">
+                     <div class="name">Resistance</div>
+                     <div class="base">Base</div>
+                     <div class="mod">Mod</div>
+                  </div>
+                  {#each Object.entries($document.system.resistance) as [key]}
+                     <div class="resistance">
+                        <ActorResistance bind:key />
                      </div>
                   {/each}
                </div>
@@ -133,8 +152,8 @@
          @include flex-column;
          @include flex-group-top;
 
-         width: 13.5rem;
-         min-width: 13.5rem;
+         width: 14rem;
+         min-width: 14rem;
          height: 100%;
          margin-right: 0.5rem;
          padding: 0.5rem;
@@ -221,6 +240,28 @@
             width: 100%;
             margin-top: 0.5rem;
 
+            .label {
+               @include flex-row;
+               @include flex-group-left;
+               font-size: 1rem;
+               font-weight: bold;
+               width: 100%;
+
+               .name {
+                  @include flex-row;
+                  text-align: left;
+                  width: 5rem;
+               }
+               .base {
+                  margin-left: 0.325rem;
+                  width: 2.5rem;
+               }
+
+               .mod {
+                  width: 2.5rem;
+                  margin-left: 0.875rem;
+               }
+            }
             .speed {
                width: 100%;
                margin-top: 0.25rem;
@@ -252,7 +293,9 @@
                width: 100%;
 
                &:not(:first-child) {
+                  @include border-top-normal;
                   margin-top: 0.5rem;
+                  padding-top: 0.5rem;
                }
 
                .actor-name {
@@ -299,12 +342,83 @@
                   @include flex-column;
                   height: 100%;
 
+                  .label {
+                     font-size: 1rem;
+                     font-weight: bold;
+                     @include flex-row;
+                     width: 100%;
+                     .name {
+                        @include flex-row;
+                        @include flex-group-center;
+                        width: 6rem;
+                     }
+                     .base {
+                        width: 2.5rem;
+                     }
+
+                     .mod {
+                        width: 2.5rem;
+                        margin-left: 0.4rem;
+                     }
+                  }
+
                   .attribute {
                      height: 100%;
                      &:not(:first-child) {
                         margin-top: 0.25rem;
                      }
+
+                     &:not(:last-child) {
+                        @include border-bottom-normal;
+                        padding-bottom: 0.25rem;
+                     }
                   }
+               }
+
+               .resistances {
+                  @include flex-column;
+                  @include flex-group-top;
+
+                  .label {
+                     @include flex-row;
+                     font-size: 1rem;
+                     font-weight: bold;
+                     width: 100%;
+
+                     .name {
+                        @include flex-row;
+                        @include flex-group-center;
+                        width: 5.5rem;
+                        margin-left: 0.325rem;
+                     }
+
+                     .base {
+                        width: 2.5rem;
+                     }
+
+                     .mod {
+                        width: 2.5rem;
+                        margin-left: 0.325rem;
+                     }
+                  }
+
+                  .resistance {
+                     width: 100%;
+                     margin-top: 0.25rem;
+
+                     &:not(:last-child) {
+                        @include border-bottom-normal;
+                        padding-bottom: 0.25rem;
+                     }
+                  }
+               }
+
+               .divider {
+                  //width: var(--border-width-normal);
+                  height: 100%;
+                  width: --border-width-normal;
+                  border-left: var(--border-style-normal);
+                  border-width: var(--border-width-normal);
                }
             }
          }

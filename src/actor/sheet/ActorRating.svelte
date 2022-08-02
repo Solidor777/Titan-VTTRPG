@@ -45,7 +45,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
+      <div class="label final" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
          {rating.value}
       </div>
    </div>
@@ -65,6 +65,11 @@
          @include flex-group-center;
          height: 100%;
          font-size: 1rem;
+
+         &.final {
+            font-weight: bold;
+         }
+
          .fas {
             margin-right: 0.25rem;
          }
@@ -80,7 +85,7 @@
          }
 
          .static-mod {
-            width: 1.8rem;
+            width: 1.7rem;
             --border-radius-input: 10px;
          }
       }

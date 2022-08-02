@@ -11,7 +11,7 @@ export default class TitanPlayerSheet extends SvelteDocumentSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       width: 750,
-      height: 880,
+      height: 800,
       svelte: {
         class: PlayerSheetShell,
         target: document.body

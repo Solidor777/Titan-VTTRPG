@@ -131,6 +131,7 @@
             width: 3.2rem;
             height: 100%;
             text-align: center;
+            font-weight: bold;
          }
       }
    }

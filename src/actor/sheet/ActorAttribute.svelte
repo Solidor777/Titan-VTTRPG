@@ -47,7 +47,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
+      <div class="label final" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
          {attribute.value}
       </div>
    </div>
@@ -63,6 +63,8 @@
       width: 100%;
       align-items: center;
       justify-content: space-between;
+      font-size: 1rem;
+      box-sizing: border-box;
 
       button {
          @include border-normal;
@@ -85,14 +87,6 @@
          }
       }
 
-      .label {
-         @include flex-row;
-         @include flex-group-center;
-         height: 100%;
-         font-weight: bold;
-         font-size: 1rem;
-      }
-
       .stats {
          @include flex-row;
          @include flex-group-center;
@@ -100,7 +94,7 @@
          margin-left: 0.25rem;
 
          :not(:first-child) {
-            margin-left: 0.25rem;
+            margin-left: 0.5rem;
          }
 
          .input {
@@ -108,8 +102,20 @@
             @include flex-group-center;
             height: 100%;
             height: 100%;
-            width: 1.8rem;
+            width: 1.7rem;
             --border-radius-input: 10px;
+         }
+
+         .label {
+            @include flex-row;
+            @include flex-group-center;
+            height: 100%;
+            font-size: 1rem;
+
+            &.final {
+               font-weight: bold;
+               width: 1rem;
+            }
          }
       }
    }
