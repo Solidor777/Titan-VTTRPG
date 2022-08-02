@@ -281,16 +281,17 @@ export class TitanActor extends Actor {
     return resistanceCheck;
   }
 
-  async rollResistanceCheck(checkData) {
+  async rollResistanceCheck(options) {
     // If get options, then create a dialog for setting options.
-    if (checkData?.getOptions) {
-      const dialog = new ResistanceCheckDialog(this, checkData);
+    const getOptions = options?.getOptions;
+    if (getOptions === true) {
+      const dialog = new ResistanceCheckDialog(this, options);
       dialog.render(true);
       return;
     }
 
     // Otherwise, get a simple check
-    const resistanceCheck = await this.getResistanceCheck(checkData);
+    const resistanceCheck = await this.getResistanceCheck(options);
     if (resistanceCheck && resistanceCheck.isValid) {
       await resistanceCheck.evaluateCheck();
       await resistanceCheck.sendToChat({

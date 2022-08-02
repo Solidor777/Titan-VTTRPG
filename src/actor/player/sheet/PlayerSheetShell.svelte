@@ -5,23 +5,17 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
+   import ActorResistance from "~/actor/sheet/ActorResistance.svelte";
+   import ActorRating from "../../sheet/ActorRating.svelte";
 
    // Setup
    export let elementRoot;
    export let storeDoc;
    setContext("DocumentSheetObject", storeDoc);
    const document = getContext("DocumentSheetObject");
-
-   async function rollResistance(resistance) {
-      $document.rollResistanceCheck({
-         resistance: resistance,
-         getOptions: true,
-      });
-   }
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -55,58 +49,20 @@
 
          <!--Resistances-->
          <div class="resistances">
-            <!--Reflexeses-->
-            {#each Object.entries($document.system.resistance) as [key, resistance]}
-               <div class="resistance" data-resistance={key}>
-                  <!--Resistance Label-->
-                  <button
-                     class="resistance-roll {key}"
-                     data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
-                     on:click={rollResistance(key)}
-                     on:mousedown={preventDefault}
-                  >
-                     {localize(`LOCAL.${key}.label`)}
-                  </button>
-
-                  <!--Stats-->
-                  <div class="stats">
-                     <!--Base Value-->
-                     <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
-                        {resistance.baseValue}
-                     </div>
-                     <div class="label">+</div>
-
-                     <!--Static Mod-->
-                     <div class="static-mod" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
-                        <DocumentTextInput bind:value={$document.system.resistance[key].staticMod} type="integer" />
-                     </div>
-                     <div class="label">=</div>
-
-                     <!--Total Value-->
-                     <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
-                        {resistance.value}
-                     </div>
-                  </div>
+            {#each Object.entries($document.system.resistance) as [key]}
+               <div class="resistance">
+                  <ActorResistance bind:key />
                </div>
             {/each}
          </div>
 
          <!--Ratings-->
          <div class="ratings">
-            <!--Awarenesss-->
-            <div class="rating">
-               <div class="label">
-                  <!--Icon-->
-                  <span class="fas fa-eye" />
-                  {localize("LOCAL.awareness.label")}
+            {#each Object.entries($document.system.rating) as [key]}
+               <div class="rating">
+                  <ActorRating bind:key />
                </div>
-               <!--Stats-->
-               <div class="stats">
-                  {$document.system.rating.awareness.baseValue} +
-                  <DocumentTextInput bind:value={$document.system.rating.awareness.staticMod} type="integer" /> =
-                  {$document.system.rating.awareness.value}
-               </div>
-            </div>
+            {/each}
          </div>
       </div>
       <!--Main Sheet-->
@@ -166,21 +122,20 @@
          .resources {
             @include flex-column;
             @include flex-group-top;
-
+            @include border-bottom-normal;
             width: 100%;
+            padding-bottom: 0.25rem;
 
             .resource {
-               display: flex;
-               justify-content: center;
-               text-align: center;
-               flex-direction: column;
                width: 100%;
-               padding-bottom: 0.25rem;
-               border-bottom: var(--border-style-normal);
-               border-width: var(--border-width-normal);
 
                &:not(:first-child) {
-                  padding-top: 0.25rem;
+                  margin-top: 0.25rem;
+               }
+
+               &:not(:last-child) {
+                  padding-bottom: 0.25rem;
+                  @include border-bottom-normal;
                }
 
                &.stamina {
@@ -199,80 +154,38 @@
 
          .resistances {
             @include flex-column;
-            margin-top: 0.5rem;
+            @include flex-group-top;
+            @include border-bottom-normal;
             width: 100%;
+            margin-top: 0.5rem;
+            padding-bottom: 0.5rem;
 
             .resistance {
-               @include flex-row;
-               align-items: center;
-               justify-content: space-between;
-               border-bottom-style: var(--border-style-normal);
-               border-width: var(--border-width-normal);
-               padding-bottom: 0.25rem;
+               width: 100%;
+               margin-top: 0.25rem;
 
-               button {
-                  @include border-normal;
-                  border-radius: 25px;
-                  width: 6rem;
-                  font-weight: bold;
-                  border-color: var(--border-color-normal);
-
-                  &.reflexes {
-                     background-color: var(--color-reflexes-bright);
-                  }
-
-                  &.resilience {
-                     background-color: var(--color-resilience-bright);
-                  }
-
-                  &.willpower {
-                     background-color: var(--color-willpower-bright);
-                  }
-               }
-
-               &:not(:first-child) {
-                  margin-top: 0.25rem;
-               }
-
-               .label {
-                  font-weight: bold;
-               }
-
-               .stats {
-                  @include flex-row;
-                  align-items: center;
-
-                  :not(:first-child) {
-                     margin-left: 0.25rem;
-                  }
-
-                  .static-mod {
-                     width: 1.8rem;
-                     --border-radius-input: 10px;
-                  }
+               &:not(:last-child) {
+                  @include border-bottom-normal;
+                  padding-bottom: 0.25rem;
                }
             }
          }
 
          .ratings {
             @include flex-column;
-            @include flex-group-center;
-            margin-top: 0.5rem;
+            @include flex-group-top;
+            @include border-bottom-normal;
             width: 100%;
+            margin-top: 0.5rem;
+            padding-bottom: 0.5rem;
 
             .rating {
-               @include flex-row;
-               @include flex-group-center;
                width: 100%;
+               margin-top: 0.25rem;
 
-               .label {
-                  @include flex-row;
-                  @include flex-group-center;
-               }
-
-               .stats {
-                  @include flex-row;
-                  @include flex-group-center;
+               &:not(:last-child) {
+                  @include border-bottom-normal;
+                  padding-bottom: 0.25rem;
                }
             }
          }
