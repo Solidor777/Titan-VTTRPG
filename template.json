@@ -274,11 +274,22 @@
             "staticMod": 0
           }
         },
-        "movement": {
-          "land": {
-            "speed": {
-              "base": 1
-            }
+        "speed": {
+          "ground": {
+            "baseValue": 6,
+            "staticMod": 0
+          },
+          "flight": {
+            "baseValue": 0,
+            "staticMod": 0
+          },
+          "swim": {
+            "baseValue": 0,
+            "staticMod": 0
+          },
+          "burrow": {
+            "baseValye": 0,
+            "staticMod": 0
           }
         },
         "equipped": {
@@ -634,10 +645,9 @@
         "initialValue": 0,
         "choose": 0,
         "rating": {
+          "defense": false,
           "melee": false,
           "accuracy": false,
-          "defense": false,
-          "speed": false,
           "initiative": false
         },
         "overcast": {

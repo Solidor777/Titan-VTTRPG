@@ -17,82 +17,78 @@ export const TITANCONSTANTS = Object.freeze({
   },
 
   resource: {
-    option: {
-      resolve: {
-        maxBaseMulti: 1.0,
-      },
-      stamina: {
-        maxBaseMulti: 1.0,
-      },
-      wounds: {
-        maxBaseMulti: 1.0,
-      },
+    resolve: {
+      maxBaseMulti: 1.0,
+    },
+    stamina: {
+      maxBaseMulti: 0.5,
+    },
+    wounds: {
+      maxBaseMulti: 0.5,
     },
   },
 
   attack: {
     trait: {
-      option: {
-        blast: {
-          type: "number"
-        },
-        cleave: {
-          type: "bool"
-        },
-        close: {
-          type: "bool"
-        },
-        crushing: {
-          type: "bool"
-        },
-        dualAttack: {
-          type: "bool"
-        },
-        defensive: {
-          type: "bool"
-        },
-        ineffective: {
-          type: "bool"
-        },
-        loud: {
-          type: "bool"
-        },
-        magical: {
-          type: "bool"
-        },
-        penetrating: {
-          type: "bool"
-        },
-        piercing: {
-          type: "bool"
-        },
-        range: {
-          type: "bool"
-        },
-        reload: {
-          type: "bool"
-        },
-        rend: {
-          type: "bool"
-        },
-        restraining: {
-          type: "bool"
-        },
-        slashing: {
-          type: "bool"
-        },
-        spread: {
-          type: "number"
-        },
-        subtle: {
-          type: "bool"
-        },
-        thrown: {
-          type: "bool"
-        },
-        twoHanded: {
-          type: "bool"
-        },
+      blast: {
+        type: "number"
+      },
+      cleave: {
+        type: "bool"
+      },
+      close: {
+        type: "bool"
+      },
+      crushing: {
+        type: "bool"
+      },
+      dualAttack: {
+        type: "bool"
+      },
+      defensive: {
+        type: "bool"
+      },
+      ineffective: {
+        type: "bool"
+      },
+      loud: {
+        type: "bool"
+      },
+      magical: {
+        type: "bool"
+      },
+      penetrating: {
+        type: "bool"
+      },
+      piercing: {
+        type: "bool"
+      },
+      range: {
+        type: "bool"
+      },
+      reload: {
+        type: "bool"
+      },
+      rend: {
+        type: "bool"
+      },
+      restraining: {
+        type: "bool"
+      },
+      slashing: {
+        type: "bool"
+      },
+      spread: {
+        type: "number"
+      },
+      subtle: {
+        type: "bool"
+      },
+      thrown: {
+        type: "bool"
+      },
+      twoHanded: {
+        type: "bool"
       },
     },
   },
