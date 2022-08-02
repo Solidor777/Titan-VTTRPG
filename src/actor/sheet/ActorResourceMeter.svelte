@@ -72,7 +72,7 @@
          width: 100%;
          height: 100%;
          padding-top: 0.25rem;
-         font-weight: bold;
+         font-size: 1rem;
 
          .spacer {
             width: 5rem;
@@ -83,6 +83,7 @@
             @include flex-group-center;
             width: 100%;
             height: 100%;
+            font-size: 1rem;
             font-weight: bold;
          }
 
@@ -127,7 +128,6 @@
             @include flex-group-center;
             @include border-normal;
             background-color: var(--color-background-highlight);
-            font-weight: bold;
             width: 3.2rem;
             height: 100%;
             text-align: center;

@@ -6,6 +6,8 @@
    // The value of the input
    export let value;
 
+   let medium = value;
+
    // The type of input
    // Text or Number
    export let type = "text";
@@ -27,9 +29,17 @@
       };
    }
 
+   function validateInput(medium) {
+      let retVal = type === "integer" ? parseInt(medium) : parseFloat(medium);
+      if (isNaN(retVal)) {
+         retVal = 0;
+      }
+      return retVal;
+   }
+
    // Filter the value appropriately
    $: if (type !== "text") {
-      value = type === "integer" ? parseInt(value) : parseFloat(value);
+      value = validateInput(medium);
    }
 
    /**
@@ -57,7 +67,7 @@
 
 <input
    bind:this={input}
-   bind:value
+   bind:value={medium}
    on:keypress={(event) => checkInput(event)}
    on:change={() => {
       $document.update(data);

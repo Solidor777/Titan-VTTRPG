@@ -57,8 +57,9 @@
    @import "../../Styles/Mixins.scss";
 
    .attribute {
-      @include flex-column;
+      @include flex-row;
       @include flex-group-center;
+      height: 100%;
       width: 100%;
       align-items: center;
       justify-content: space-between;
@@ -68,6 +69,7 @@
          border-radius: 25px;
          width: 6rem;
          font-weight: bold;
+         font-size: 1rem;
          border-color: var(--border-color-normal);
 
          &.reflexes {
@@ -84,19 +86,28 @@
       }
 
       .label {
+         @include flex-row;
+         @include flex-group-center;
+         height: 100%;
          font-weight: bold;
+         font-size: 1rem;
       }
 
       .stats {
          @include flex-row;
          @include flex-group-center;
-         margin-top: 0.25rem;
+         height: 100%;
+         margin-left: 0.25rem;
 
          :not(:first-child) {
             margin-left: 0.25rem;
          }
 
          .input {
+            @include flex-row;
+            @include flex-group-center;
+            height: 100%;
+            height: 100%;
             width: 1.8rem;
             --border-radius-input: 10px;
          }

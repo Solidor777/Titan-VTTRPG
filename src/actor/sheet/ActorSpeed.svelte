@@ -55,7 +55,7 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         font-weight: bold;
+         font-size: 1rem;
       }
 
       .stats {

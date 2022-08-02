@@ -66,9 +66,9 @@
          @include border-normal;
          border-radius: 25px;
          width: 6rem;
-         font-weight: bold;
+         font-size: 1rem;
          border-color: var(--border-color-normal);
-
+         font-weight: bold;
          &.reflexes {
             background-color: var(--color-reflexes-bright);
          }
@@ -83,7 +83,7 @@
       }
 
       .label {
-         font-weight: bold;
+         font-size: 1rem;
       }
 
       .stats {

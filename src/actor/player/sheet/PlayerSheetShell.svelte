@@ -106,11 +106,13 @@
 
             <!--Attributes-->
             <div class="row">
-               {#each Object.entries($document.system.attribute) as [key]}
-                  <div class="attribute">
-                     <ActorAttribute bind:key />
-                  </div>
-               {/each}
+               <div class="attributes">
+                  {#each Object.entries($document.system.attribute) as [key]}
+                     <div class="attribute">
+                        <ActorAttribute bind:key />
+                     </div>
+                  {/each}
+               </div>
             </div>
          </div>
          <!--Tab Content-->
@@ -131,8 +133,8 @@
          @include flex-column;
          @include flex-group-top;
 
-         width: 13rem;
-         min-width: 13rem;
+         width: 13.5rem;
+         min-width: 13.5rem;
          height: 100%;
          margin-right: 0.5rem;
          padding: 0.5rem;
@@ -290,6 +292,18 @@
                   .label {
                      font-family: var(--font-family);
                      font-weight: bold;
+                  }
+               }
+
+               .attributes {
+                  @include flex-column;
+                  height: 100%;
+
+                  .attribute {
+                     height: 100%;
+                     &:not(:first-child) {
+                        margin-top: 0.25rem;
+                     }
                   }
                }
             }

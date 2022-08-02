@@ -5,7 +5,6 @@
    export let value = void 0;
    export let positive = false;
    let medium = value;
-   let oldValue = value;
 
    function validateInput(medium) {
       let retVal = parseInt(medium);
