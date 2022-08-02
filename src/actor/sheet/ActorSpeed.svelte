@@ -3,30 +3,21 @@
    import { getContext } from "svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
 
-   // The key / name of the Rating
+   // The key / name of the speed
    export let key;
 
    // The Actor Data
    const document = getContext("DocumentSheetObject");
 
-   // The rating data
-   $: rating = $document.system.rating[key];
-
-   // Map of icons to use for the ratings
-   const ratingIcons = {
-      awareness: "eye",
-      defense: "shield",
-      melee: "hand-fist",
-      accuracy: "crosshairs",
-      initiative: "clock",
-   };
+   // The speed data
+   $: speed = $document.system.speed[key];
 </script>
 
-<div class="rating">
+<!--Speeds-->
+<div class="speed">
    <!--Label-->
-   <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+   <div class="label">
       <!--Icon-->
-      <i class="fas fa-{ratingIcons[key]}" />
       {localize(`LOCAL.${key}.label`)}
    </div>
 
@@ -34,19 +25,19 @@
    <div class="stats">
       <!--Base Value-->
       <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
-         {rating.baseValue}
+         {speed.baseValue}
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
       <div class="static-mod" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
-         <DocumentTextInput bind:value={$document.system.rating[key].staticMod} type="integer" />
+         <DocumentTextInput bind:value={$document.system.speed[key].staticMod} type="integer" />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
       <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
-         {rating.value}
+         {speed.value}
       </div>
    </div>
 </div>
@@ -54,7 +45,7 @@
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .rating {
+   .speed {
       @include flex-row;
       @include flex-space-between;
       width: 100%;
@@ -65,9 +56,6 @@
          @include flex-group-center;
          height: 100%;
          font-weight: bold;
-         .fas {
-            margin-right: 0.25rem;
-         }
       }
 
       .stats {

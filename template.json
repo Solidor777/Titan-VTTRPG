@@ -275,11 +275,11 @@
           }
         },
         "speed": {
-          "ground": {
-            "baseValue": 6,
+          "stride": {
+            "baseValue": 5,
             "staticMod": 0
           },
-          "flight": {
+          "fly": {
             "baseValue": 0,
             "staticMod": 0
           },
@@ -288,7 +288,7 @@
             "staticMod": 0
           },
           "burrow": {
-            "baseValye": 0,
+            "baseValue": 0,
             "staticMod": 0
           }
         },

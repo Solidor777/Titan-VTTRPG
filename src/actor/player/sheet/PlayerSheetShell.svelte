@@ -9,7 +9,9 @@
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
    import ActorResistance from "~/actor/sheet/ActorResistance.svelte";
-   import ActorRating from "../../sheet/ActorRating.svelte";
+   import ActorRating from "~/actor/sheet/ActorRating.svelte";
+   import ActorSpeed from "~/actor/sheet/ActorSpeed.svelte";
+   import ActorAttribute from "../../sheet/ActorAttribute.svelte";
 
    // Setup
    export let elementRoot;
@@ -64,34 +66,55 @@
                </div>
             {/each}
          </div>
+
+         <!--Speeds-->
+         <div class="speeds">
+            {#each Object.entries($document.system.speed) as [key]}
+               <div class="speed">
+                  <ActorSpeed bind:key />
+               </div>
+            {/each}
+         </div>
       </div>
       <!--Main Sheet-->
       <div class="main">
          <!--Header -->
          <div class="header">
-            <!--Actor name Sheet-->
-            <div class="actor-name">
-               <DocumentTextInput bind:value={$document.name} />
+            <!--Name and EXP-->
+            <div class="row">
+               <!--Actor name Sheet-->
+               <div class="actor-name">
+                  <DocumentTextInput bind:value={$document.name} />
+               </div>
+
+               <!--Exp-->
+               <div class="exp">
+                  <!--Available-->
+                  <div class="available" data-tooltip={localize("LOCAL.expAvailable.label")}>
+                     {$document.system.exp.available} /
+                  </div>
+
+                  <!--Earned Input-->
+                  <div class="earned" data-tooltip={localize("LOCAL.expEarned.label")}>
+                     <DocumentTextInput bind:value={$document.system.exp.earned} type="integer" />
+                  </div>
+
+                  <!--Label-->
+                  <div class="label">{localize("LOCAL.exp.label")}</div>
+               </div>
             </div>
 
-            <!--Exp-->
-            <div class="exp">
-               <!--Available-->
-               <div class="available" data-tooltip={localize("LOCAL.expAvailable.label")}>
-                  {$document.system.exp.available} /
-               </div>
-
-               <!--Earned Input-->
-               <div class="earned" data-tooltip={localize("LOCAL.expEarned.label")}>
-                  <DocumentTextInput bind:value={$document.system.exp.earned} type="integer" />
-               </div>
-
-               <!--Label-->
-               <div class="label">{localize("LOCAL.exp.label")}</div>
+            <!--Attributes-->
+            <div class="row">
+               {#each Object.entries($document.system.attribute) as [key]}
+                  <div class="attribute">
+                     <ActorAttribute bind:key />
+                  </div>
+               {/each}
             </div>
          </div>
          <!--Tab Content-->
-         <div class="tab-content" />
+         <div class="tab-content">TEst</div>
       </div>
    </div>
 </ApplicationShell>
@@ -189,60 +212,93 @@
                }
             }
          }
+
+         .speeds {
+            @include flex-column;
+            @include flex-group-top;
+            width: 100%;
+            margin-top: 0.5rem;
+
+            .speed {
+               width: 100%;
+               margin-top: 0.25rem;
+
+               &:not(:last-child) {
+                  @include border-bottom-normal;
+                  padding-bottom: 0.25rem;
+               }
+            }
+         }
       }
 
       .main {
          display: flex;
          flex: 1;
+         @include flex-column;
 
          .header {
             @include border-normal;
-            @include flex-row;
+            @include flex-column;
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            height: 4rem;
             padding: 0.5rem;
 
-            .actor-name {
-               font-family: var(--font-family);
-               font-size: 1.6rem;
-               width: 50%;
-               --height-input: 2.5rem;
-               --border-radius-input: 10px;
-               --font-size: 1.5rem;
-            }
+            .row {
+               @include flex-row;
+               @include flex-space-between;
+               width: 100%;
 
-            .exp {
-               margin-right: 1rem;
-               display: flex;
-               width: 7rem;
-               align-items: center;
-               text-align: center;
-               justify-content: flex-end;
-
-               .available {
-                  font-family: var(--font-family);
-                  font-weight: bold;
-                  font-size: 1.1rem;
-                  display: flex;
-                  margin-right: 0.25rem;
+               &:not(:first-child) {
+                  margin-top: 0.5rem;
                }
 
-               .earned {
+               .actor-name {
                   font-family: var(--font-family);
-                  display: flex;
-                  margin-right: 0.5rem;
-                  width: 3rem;
+                  font-size: 1.6rem;
+                  width: 50%;
+                  --height-input: 2.5rem;
                   --border-radius-input: 10px;
-                  --height-input: 1.8rem;
+                  --font-size: 1.5rem;
                }
 
-               .label {
-                  font-family: var(--font-family);
-                  font-weight: bold;
+               .exp {
+                  margin-right: 0.5rem;
+                  display: flex;
+                  width: 10rem;
+                  align-items: center;
+                  text-align: center;
+                  justify-content: flex-end;
+
+                  .available {
+                     font-family: var(--font-family);
+                     font-weight: bold;
+                     font-size: 1.1rem;
+                     display: flex;
+                     margin-right: 0.25rem;
+                  }
+
+                  .earned {
+                     font-family: var(--font-family);
+                     display: flex;
+                     margin-right: 0.5rem;
+                     width: 3rem;
+                     --border-radius-input: 10px;
+                     --height-input: 1.8rem;
+                  }
+
+                  .label {
+                     font-family: var(--font-family);
+                     font-weight: bold;
+                  }
                }
             }
+         }
+
+         .tab-content {
+            display: flex;
+            flex: 1;
+            height: 10rem;
          }
       }
    }

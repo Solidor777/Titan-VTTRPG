@@ -128,7 +128,6 @@
             @include border-normal;
             background-color: var(--color-background-highlight);
             font-weight: bold;
-            font-size: 1.1rem;
             width: 3.2rem;
             height: 100%;
             text-align: center;
