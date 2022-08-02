@@ -229,6 +229,8 @@
   "LOCAL.maxValue.label": "Max Value",
   "LOCAL.minValue.label": "Min Value",
   "LOCAL.woundsTaken.label": "Wounds Taken",
+  "LOCAL.mod.label": "Mod",
+  "LOCAL.base.label": "Base",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

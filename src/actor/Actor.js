@@ -1,3 +1,4 @@
+import TitanUtility from "../helpers/Utility.js";
 import TitanAttributeCheck from "../check/AttributeCheck.js";
 import TitanSkillCheck from "../check/skill-check/SkillCheck.js";
 import TitanResistanceCheck from "../check/resistance-check/ResistanceCheck.js";
@@ -5,7 +6,6 @@ import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
 import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
-import TitanUtility from "../helpers/Utility.js";
 
 export class TitanActor extends Actor {
 

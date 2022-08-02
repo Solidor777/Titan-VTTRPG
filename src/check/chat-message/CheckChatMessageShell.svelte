@@ -5,10 +5,27 @@
 
    // Context object
    export let chatContext = void 0;
+
+   function getLabelClass() {
+      switch (chatContext.type) {
+         case "resistanceCheck": {
+            return chatContext.parameters.resistance;
+         }
+         case "attributeCheck": {
+            return chatContext.parameters.attribute;
+         }
+         case "skillCheck": {
+            return chatContext.parameters.attribute;
+         }
+         default: {
+            return "";
+         }
+      }
+   }
 </script>
 
 <div class="check-chat-message">
-   <div class="label {chatContext.parameters.resistance}">
+   <div class="label {getLabelClass()}">
       <CheckLabel label={chatContext.label} typeLabel={chatContext.typeLabel} />
    </div>
    <CheckDiceContainer dice={chatContext.results.dice} />
@@ -20,7 +37,21 @@
    @import "../../styles/Variables.scss";
 
    .check-chat-message {
+      @include flex-column;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
+
       .label {
+         &.body {
+            --color-background-label: var(--color-body-bright);
+         }
+         &.mind {
+            --color-background-label: var(--color-mind-bright);
+         }
+         &.soul {
+            --color-background-label: var(--color-soul-bright);
+         }
          &.reflexes {
             --color-background-label: var(--color-reflexes-bright);
          }
@@ -31,9 +62,5 @@
             --color-background-label: var(--color-willpower-bright);
          }
       }
-      @include flex-column;
-      align-items: flex-start;
-      justify-content: center;
-      width: 100%;
    }
 </style>

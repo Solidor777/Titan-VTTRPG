@@ -105,9 +105,9 @@
                <!--Attributes-->
                <div class="attributes">
                   <div class="label">
-                     <div class="name">Attribute</div>
-                     <div class="base">Base</div>
-                     <div class="mod">Mod</div>
+                     <div class="name">{localize("LOCAL.attribute.label")}</div>
+                     <div class="base">{localize("LOCAL.base.label")}</div>
+                     <div class="mod">{localize("LOCAL.mod.label")}</div>
                   </div>
                   {#each Object.entries($document.system.attribute) as [key]}
                      <div class="attribute">
@@ -122,9 +122,9 @@
                <!--Resistances-->
                <div class="resistances">
                   <div class="label">
-                     <div class="name">Resistance</div>
-                     <div class="base">Base</div>
-                     <div class="mod">Mod</div>
+                     <div class="name">{localize("LOCAL.attribute.label")}</div>
+                     <div class="base">{localize("LOCAL.base.label")}</div>
+                     <div class="mod">{localize("LOCAL.mod.label")}</div>
                   </div>
                   {#each Object.entries($document.system.resistance) as [key]}
                      <div class="resistance">

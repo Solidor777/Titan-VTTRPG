@@ -2,7 +2,7 @@
    // Main label
    export let label = void 0;
 
-   // Sublabel
+   // Type label
    export let typeLabel = void 0;
 </script>
 
