@@ -1,5 +1,5 @@
 import TitanUtility from "../helpers/Utility.js";
-import TitanSkillCheck from "./SkillCheck.js";
+import TitanSkillCheck from "./skill-check/SkillCheck.js";
 
 export default class TitanAttackCheck extends TitanSkillCheck {
   _ensureValidConstruction(options) {

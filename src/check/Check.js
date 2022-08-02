@@ -267,6 +267,6 @@ export default class TitanCheck {
   }
 
   _getTypeLabel() {
-    return `${game.i18n.localize(CONFIG.TITAN.local.check)} (${this.parameters.difficulty}:${this.parameters.complexity})`;
+    return `${game.i18n.localize(CONFIG.TITAN.local.check)} ${this.parameters.difficulty}:${this.parameters.complexity}`;
   }
 }

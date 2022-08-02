@@ -1,10 +1,10 @@
 import TitanAttributeCheck from "../check/AttributeCheck.js";
-import TitanSkillCheck from "../check/SkillCheck.js";
+import TitanSkillCheck from "../check/skill-check/SkillCheck.js";
 import TitanResistanceCheck from "../check/resistance-check/ResistanceCheck.js";
 import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
-import { ResistanceCheckDialog } from "../check/resistance-check/dialog/ResistanceCheckDialog.js";
+import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
 import TitanUtility from "../helpers/Utility.js";
 
 export class TitanActor extends Actor {
@@ -197,57 +197,55 @@ export class TitanActor extends Actor {
   }
 
   // Get a skill check from the actor
-  async getSkillCheck(options) {
-    // Initialize options
-    let checkOptions = options;
-
-    // Check if the attribute set to default
-    if (checkOptions.attribute === "default") {
-      // If so, ensure the attribute is set
-      checkOptions.attribute =
-        this.system.skill[checkOptions.skill].defaultAttribute;
-    }
-
-    // Get the options from a dialog if appropriate
-    if (options?.getOptions) {
-      checkOptions = await TitanSkillCheck.getOptionsFromDialog(checkOptions);
-
-      // Return if cancelled
-      if (checkOptions.cancelled) {
-        return;
-      }
-    }
+  async getAttributeCheck(options) {
 
     // Get the actor check data
     const actorCheckData = this.getCheckData();
-    checkOptions.actorCheckData = actorCheckData;
+    options.actorCheckData = actorCheckData;
 
     // Check if the skill is none
-    if (checkOptions.skill === "none") {
+    if (options.skill === "none") {
       // If so, do an attribute check
-      delete checkOptions.skill;
-      delete checkOptions.trainingMod;
-      const attributeCheck = new TitanAttributeCheck(checkOptions);
+      delete options.skill;
+      delete options.trainingMod;
+      const attributeCheck = new TitanAttributeCheck(options);
       return attributeCheck;
     }
 
     // Otherwise, do a skill check
-    const skillCheck = new TitanSkillCheck(checkOptions);
+    const skillCheck = new TitanSkillCheck(options);
     return skillCheck;
+  }
+
+  async rollAttributeCheck(options) {
+    // If get options, then create a dialog for setting options.
+    if (options?.getOptions === true) {
+      const dialog = new ResistanceCheckDialog(this, options);
+      dialog.render(true);
+      return;
+    }
+
+    // Otherwise, get a simple check
+    const attributeCheck = await this.getAttributeCheck(options);
+    if (attributeCheck && attributeCheck.isValid) {
+      await attributeCheck.evaluateCheck();
+      await attributeCheck.sendToChat({
+        user: game.user.id,
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        rollMode: game.settings.get("core", "rollMode"),
+      });
+    }
   }
 
   // Get a resistance check at the actor
   async getResistanceCheck(options) {
 
-    // Get a check from the actor
-    const checkOptions = options;
-
     // Get the actor check data
     const actorCheckData = this.getCheckData();
-    checkOptions.actorCheckData = actorCheckData;
+    options.actorCheckData = actorCheckData;
 
     // Perform the roll
-    const resistanceCheck = new TitanResistanceCheck(checkOptions);
+    const resistanceCheck = new TitanResistanceCheck(options);
 
     // Return the data
     return resistanceCheck;
@@ -255,8 +253,7 @@ export class TitanActor extends Actor {
 
   async rollResistanceCheck(options) {
     // If get options, then create a dialog for setting options.
-    const getOptions = options?.getOptions;
-    if (getOptions === true) {
+    if (options?.getOptions === true) {
       const dialog = new ResistanceCheckDialog(this, options);
       dialog.render(true);
       return;

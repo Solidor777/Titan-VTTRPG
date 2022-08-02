@@ -3,9 +3,9 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   import ResistanceSelect from "../components/ResistanceSelect.svelte";
-   import CheckDifficultySelect from "../../components/CheckDifficultySelect.svelte";
-   import IntegerInput from "../../../helpers/svelte-components/IntegerInput.svelte";
+   import ResistanceSelect from "~/helpers/svelte-components/ResistanceSelect.svelte";
+   import CheckDifficultySelect from "~/check/components/CheckDifficultySelect.svelte";
+   import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
    // The actor document making this check
    export let actor;
@@ -94,7 +94,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import "../../styles/Mixins.scss";
 
    .resistance-check-dialog {
       @include flex-column;

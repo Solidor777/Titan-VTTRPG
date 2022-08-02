@@ -52,4 +52,12 @@ export default class TitanAttributeCheck extends TitanCheck {
 
     return;
   }
+
+  _getCheckType() {
+    return "attributeCheck";
+  }
+
+  _getTypeLabel() {
+    return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} ${this.parameters.difficulty}:${this.parameters.complexity}`;
+  }
 }

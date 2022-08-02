@@ -55,17 +55,6 @@
               "staticMod": 0
             }
           },
-          "beastHandling": {
-            "defaultAttribute": "soul",
-            "training": {
-              "baseValue": 0,
-              "staticMod": 0
-            },
-            "expertise": {
-              "baseValue": 0,
-              "staticMod": 0
-            }
-          },
           "deception": {
             "defaultAttribute": "mind",
             "training": {
@@ -165,6 +154,17 @@
               "staticMod": 0
             }
           },
+          "nature": {
+            "defaultAttribute": "mind",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
           "perception": {
             "defaultAttribute": "mind",
             "training": {
@@ -211,17 +211,6 @@
           },
           "stealth": {
             "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "staticMod": 0
-            },
-            "expertise": {
-              "baseValue": 0,
-              "staticMod": 0
-            }
-          },
-          "survival": {
-            "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
               "staticMod": 0

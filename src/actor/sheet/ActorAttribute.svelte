@@ -13,10 +13,10 @@
    // The attribute data
    $: attribute = $document.system.attribute[key];
 
-   async function rollattribute(attribute) {
-      $document.rollattributeCheck({
+   async function rollAttributeCheck(attribute) {
+      $document.rollAttributeCheck({
          attribute: attribute,
-         getOptions: true,
+         skill: "none",
       });
    }
 </script>
@@ -26,7 +26,7 @@
    <button
       class="attribute-roll {key}"
       data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
-      on:click={rollattribute(key)}
+      on:click={rollAttributeCheck(key)}
       on:mousedown={preventDefault}
    >
       {localize(`LOCAL.${key}.label`)}

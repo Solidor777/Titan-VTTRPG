@@ -1,6 +1,6 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import Select from "../../../helpers/svelte-components/Select.svelte";
+   import Select from "~/helpers/svelte-components/Select.svelte";
 
    // Value
    export let value = void 0;
