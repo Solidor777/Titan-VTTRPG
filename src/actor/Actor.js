@@ -5,7 +5,7 @@ import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
 import { ResistanceCheckDialog } from "../check/resistance-check/dialog/ResistanceCheckDialog.js";
-import TitanUtility from "../helpers/Utility.mjs";
+import TitanUtility from "../helpers/Utility.js";
 
 export class TitanActor extends Actor {
 
@@ -82,7 +82,7 @@ export class TitanActor extends Actor {
         systemData.skill.perception.training.value +
         systemData.skill.dexterity.training.value) / 2);
 
-    // Awareness = (Mind + Awareness) / 2 rounded up
+    // Awareness = (Mind + Perception) / 2 rounded up
     systemData.rating.awareness.baseValue =
       Math.ceil((systemData.attribute.mind.value +
         systemData.skill.perception.training.value) / 2);
@@ -97,7 +97,7 @@ export class TitanActor extends Actor {
       Math.ceil((systemData.attribute.mind.value +
         systemData.skill.rangedWeapons.training.value) / 2);
 
-    // Melee = (Body + Training in Melee Weapons) / 2 rounded up (+ Mod)
+    // Melee = (Body + Training in Melee Weapons) / 2 rounded up
     systemData.rating.melee.baseValue =
       Math.ceil((systemData.attribute.body.value +
         systemData.skill.meleeWeapons.training.value) / 2);
@@ -108,7 +108,7 @@ export class TitanActor extends Actor {
     }
 
     // Calculate resistance base values
-    // Reflexeses = (Mind + (Body / 2) rounded up)
+    // Reflexes = (Mind + (Body / 2) rounded up)
     systemData.resistance.reflexes.baseValue =
       systemData.attribute.mind.value +
       Math.ceil(systemData.attribute.body.value / 2);

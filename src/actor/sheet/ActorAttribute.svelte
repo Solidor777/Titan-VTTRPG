@@ -74,16 +74,16 @@
          font-size: 1rem;
          border-color: var(--border-color-normal);
 
-         &.reflexes {
-            background-color: var(--color-reflexes-bright);
+         &.body {
+            background-color: var(--color-body-bright);
          }
 
-         &.resilience {
-            background-color: var(--color-resilience-bright);
+         &.mind {
+            background-color: var(--color-mind-bright);
          }
 
-         &.willpower {
-            background-color: var(--color-willpower-bright);
+         &.soul {
+            background-color: var(--color-soul-bright);
          }
       }
 

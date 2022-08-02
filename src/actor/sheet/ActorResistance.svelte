@@ -13,10 +13,12 @@
    // The resistance data
    $: resistance = $document.system.resistance[key];
 
-   async function rollResistance(resistance) {
+   async function rollResistance(event, resistance) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
+
       $document.rollResistanceCheck({
          resistance: resistance,
-         getOptions: true,
+         getOptions: getOptions,
       });
    }
 </script>
@@ -26,7 +28,7 @@
    <button
       class="resistance-roll {key}"
       data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
-      on:click={rollResistance(key)}
+      on:click={(event) => rollResistance(event, key)}
       on:mousedown={preventDefault}
    >
       {localize(`LOCAL.${key}.label`)}

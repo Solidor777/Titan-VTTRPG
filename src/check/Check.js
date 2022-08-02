@@ -1,4 +1,4 @@
-import TitanUtility from "../helpers/Utility.mjs";
+import TitanUtility from "../helpers/Utility.js";
 
 export default class TitanCheck {
   // Constructor

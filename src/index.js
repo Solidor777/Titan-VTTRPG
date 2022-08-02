@@ -1,8 +1,9 @@
 import { TitanActor } from "./actor/Actor";
-import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
-import { TITANCONSTANTS } from "./helpers/Constants.mjs";
-import { TITANLOCAL } from "./helpers/Local.mjs";
+import { TITANCONSTANTS } from "./helpers/Constants.js";
+import { TITANLOCAL } from "./helpers/Local.js";
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
+import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
+import { registerSystemSettings } from "./helpers/RegisterSystemSettings.js";
 import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Global.scss';
@@ -25,6 +26,9 @@ Hooks.once("init", async () => {
       types: ["player"],
       makeDefault: true,
    });
+
+   // Register system settings
+   registerSystemSettings();
 
    return;
 });
