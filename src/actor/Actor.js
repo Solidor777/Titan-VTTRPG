@@ -94,7 +94,7 @@ export class TitanActor extends Actor {
 
     // Accuracy = (Mind + Training in Ranged Weapons) / 2 rounded up
     systemData.rating.accuracy.baseValue =
-      Math.ceil((systemData.attribute.mind.value,
+      Math.ceil((systemData.attribute.mind.value +
         systemData.skill.rangedWeapons.training.value) / 2);
 
     // Melee = (Body + Training in Melee Weapons) / 2 rounded up (+ Mod)
