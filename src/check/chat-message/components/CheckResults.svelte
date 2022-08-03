@@ -30,6 +30,14 @@
          {localize(`LOCAL.succeeded.label`)}
       </div>
    {/if}
+
+   <!--Expertise Remaining-->
+   {#if results.expertiseRemaining}
+      <div class="expertise-remaining">
+         {results.expertiseRemaining}
+         {localize(`LOCAL.expertiseRemaining.label`)}
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -42,6 +50,10 @@
       width: 100%;
       padding: 0.5rem;
       background-color: var(--color-background-label);
+
+      :not(:first-child) {
+         margin-top: 0.25rem;
+      }
 
       .successes {
          font-weight: bold;
@@ -65,6 +77,11 @@
       }
 
       .extra-successes {
+         font-weight: bold;
+         font-size: 1rem;
+      }
+
+      .expertise-remaining {
          font-weight: bold;
          font-size: 1rem;
       }

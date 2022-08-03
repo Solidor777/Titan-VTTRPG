@@ -9,6 +9,8 @@ export default class TitanSkillCheck extends TitanAttributeCheck {
     parameters.skill = options.skill ?? "athletics";
     parameters.trainingMod = options.trainingMod ?? 0;
     parameters.doubleTraining = options.doubleTraining ?? false;
+    parameters.expertiseMod = options.expertiseMod ?? 0;
+    parameters.doubleExpertise ?? false;
 
     return parameters;
   }

@@ -36,8 +36,6 @@ export default class TitanCheck {
         TitanUtility.clamp(options.difficulty, 2, 6) : 4,
       complexity: options.complexity ? Math.max(0, options.complexity) : 0,
       diceMod: options.diceMod ?? 0,
-      expertiseMod: options.expertiseMod ?? 0,
-      doubleExpertise: options.doubleExpertise ?? false,
       maximizeSuccesses: options.maximizeSuccesses ?? false,
       extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
       extraFailureOnCritical: options.extraFailureOnCritical ?? false,
@@ -54,9 +52,7 @@ export default class TitanCheck {
   // Calculate the final total dice and expertise
   _calculateTotalDiceAndExpertise() {
     this.parameters.totalDice = this.parameters.diceMod;
-    this.parameters.totalExpertise = this.parameters.doubleExpertise ?
-      this.parameters.expertiseMod * 2 :
-      this.parameters.expertiseMod;
+    this.parameters.totalExpertise = 0;
 
     return;
   }
@@ -81,7 +77,7 @@ export default class TitanCheck {
       criticalFailures: 0,
       criticalSuccesses: 0,
       successes: 0,
-      expertiseRemaining: this.parameters.totalExpertise,
+      expertiseRemaining: this.parameters.totalExpertise ? this.parameters.totalExpertise : 0
     };
 
     // Sort the dice from the check from largest to smallist

@@ -42,9 +42,7 @@ export default class TitanResistanceCheck extends TitanCheck {
     // Add the training dice to the total dice
     this.parameters.totalDice =
       this.parameters.diceMod + this.parameters.resistanceDice;
-    this.parameters.totalExpertise = this.parameters.doubleExpertise ?
-      this.parameters.expertiseMod * 2 :
-      this.parameters.expertiseMod;
+    this.parameters.totalExpertise = 0;
 
     return;
   }

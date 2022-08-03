@@ -42,13 +42,7 @@ export default class TitanAttributeCheck extends TitanCheck {
     // Add the training dice to the total dice
     this.parameters.totalDice =
       this.parameters.diceMod + this.parameters.attributeDice;
-
-    // Calculcate the total expertise
-    let totalExpertise = this.parameters.expertiseMod;
-    if (this.parameters.doubleExpertise) {
-      totalExpertise *= 2;
-    }
-    this.parameters.totalExpertise = totalExpertise;
+    this.parameters.totalExpertise = 0;
 
     return;
   }

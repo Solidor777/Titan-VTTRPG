@@ -16,9 +16,9 @@
 
    function getDieNumber(die) {
       if (die.expertiseApplied) {
-         return `${die.final} + ${die.expertiseApplied}`;
+         return `${die.base} + ${die.expertiseApplied}`;
       } else {
-         return `${die.final}`;
+         return `${die.base}`;
       }
    }
 </script>

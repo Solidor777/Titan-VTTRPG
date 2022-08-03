@@ -120,6 +120,7 @@
   "LOCAL.doubleTraining.label": "Double Training",
   "LOCAL.expertise.label": "Expertise",
   "LOCAL.expertiseMod.label": "Expertise Bonus / Penalty",
+  "LOCAL.expertiseRemaining.label": "Expertise Remaining",
   "LOCAL.doubleExpertise.label": "Double Expertise",
   "LOCAL.totalExpertise.label": "Total Expertise",
   "LOCAL.check.label": "Check",
