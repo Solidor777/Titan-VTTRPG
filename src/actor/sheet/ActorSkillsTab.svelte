@@ -4,7 +4,6 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
-   import ActorAttribute from "./ActorAttribute.svelte";
 
    const document = getContext("DocumentSheetObject");
 
@@ -30,23 +29,68 @@
          <!--Each skill-->
          {#each Object.entries($document.system.skill) as [key, skill]}
             <div class="skill">
-               <button on:click={rollSkillCheck(key)} on:mousedown={preventDefault}>
-                  {localize(`LOCAL.${key}.label`)}
-               </button>
-               <div class="text">
-                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].training.baseValue} />
+               <!--Button and Attribute-->
+               <div class="column">
+                  <!--Button for rolling the skill-->
+                  <div class="skill-button">
+                     <button on:click={rollSkillCheck(key)} on:mousedown={preventDefault}>
+                        {localize(`LOCAL.${key}.label`)}
+                     </button>
+                  </div>
+                  <!--Default Attribute Select-->
+                  <div class="default-attribute">
+                     <div class="label">
+                        {localize("LOCAL.defaultAttribute.label")}
+                     </div>
+                     <div class="select">
+                        <AttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
+                     </div>
+                  </div>
                </div>
-               <div class="text">
-                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].training.staticMod} />
-               </div>
-               <div class="text">
-                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].expertise.baseValue} />
-               </div>
-               <div class="text">
-                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].expertise.staticMod} />
-               </div>
-               <div class="select">
-                  <AttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
+               <!--Training and Expertise-->
+               <div class="column">
+                  <!--Header row for rolling the skill-->
+                  <div class="row">
+                     <div class="label" />
+                     <div class="value">{localize("LOCAL.base.label")}</div>
+                     <div class="op" />
+                     <div class="value">{localize("LOCAL.mod.label")}</div>
+                     <div class="op" />
+                     <div class="value" />
+                  </div>
+                  <!--Training row-->
+                  <div class="row">
+                     <div class="label">{localize("LOCAL.training.label")}</div>
+                     <div class="value">
+                        <DocumentTextInput bind:value={$document.system.skill[key].training.baseValue} />
+                     </div>
+                     <div class="op">+</div>
+                     <div class="value">
+                        <DocumentTextInput bind:value={$document.system.skill[key].training.staticMod} />
+                     </div>
+                     <div class="op">=</div>
+                     <div class="value">
+                        {`${$document.system.skill[key].training.value} (${
+                           $document.system.skill[key].training.value +
+                           $document.system.attribute[$document.system.skill[key].defaultAttribute].value
+                        })`}
+                     </div>
+                  </div>
+                  <!--Expertise Row-->
+                  <div class="row">
+                     <div class="label">Expertise</div>
+                     <div class="value">
+                        <DocumentTextInput bind:value={$document.system.skill[key].expertise.baseValue} />
+                     </div>
+                     <div class="op">+</div>
+                     <div class="value">
+                        <DocumentTextInput bind:value={$document.system.skill[key].expertise.staticMod} />
+                     </div>
+                     <div class="op">=</div>
+                     <div class="value">
+                        {$document.system.skill[key].expertise.value}
+                     </div>
+                  </div>
                </div>
             </div>
          {/each}
@@ -83,27 +127,79 @@
 
       .skill {
          @include flex-row;
-         @include flex-space-evenly;
-         padding: 0.25rem;
          width: 100%;
-         height: 100%;
          border-style: var(--border-style-normal);
          border-width: var(--border-width-normal);
          border-color: var(--border-color-normal);
+         padding: 0.5rem;
+
+         .column {
+            @include flex-column;
+            height: 100%;
+            &:not(:first-child) {
+               margin-left: 0.5rem;
+            }
+
+            .row {
+               @include flex-row;
+               @include flex-group-center;
+               &:not(:first-child) {
+                  margin-top: 0.5rem;
+               }
+               width: 100%;
+               font-weight: bold;
+
+               .label {
+                  @include flex-row;
+                  @include flex-group-right;
+                  height: 100%;
+                  width: 5rem;
+                  text-align: right;
+               }
+               .value {
+                  @include flex-row;
+                  @include flex-group-center;
+                  height: 100%;
+                  width: 3.2rem;
+                  margin-left: 0.5rem;
+               }
+               .op {
+                  @include flex-row;
+                  @include flex-group-center;
+                  height: 100%;
+                  width: 0.5rem;
+                  margin-left: 0.5rem;
+               }
+            }
+         }
 
          button {
             @include border-normal;
-            @include flex-row;
-            @include flex-group-center;
+            width: 10rem;
             font-size: 1rem;
             font-weight: bold;
-            width: 10rem;
          }
-
-         .text {
+         .default-attribute {
             @include flex-row;
             @include flex-group-center;
-            width: 1.8rem;
+            height: 100%;
+            width: 100%;
+
+            .label {
+               @include flex-row;
+               @include flex-group-center;
+               height: 100%;
+               width: 100%;
+               font-weight: bold;
+            }
+
+            .select {
+               @include flex-row;
+               @include flex-group-center;
+               margin-left: 0.25rem;
+               height: 100%;
+               width: 100%;
+            }
          }
       }
    }
