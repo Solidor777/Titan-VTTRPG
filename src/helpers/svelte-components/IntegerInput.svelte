@@ -29,8 +29,6 @@
          event.preventDefault();
       } else if (event.key === "-" && (positive || input.length > 0)) {
          event.preventDefault();
-      } else if (event.key === "0" && input.length < 2) {
-         event.preventDefault();
       } else if (/[\.,]/.test(event.key)) {
          event.preventDefault();
       }

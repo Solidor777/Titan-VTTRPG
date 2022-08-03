@@ -23,7 +23,7 @@
       trainingMod: options.trainingMod ? options.trainingMod : 0,
       doubleTraining: options.doubleTraining ? options.doubleTraining : false,
       expertiseMod: options.expertiseMod ? options.expertiseMod : 0,
-      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : false,
+      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : true,
       diceMod: options.diceMod ? options.diceMod : 0,
    };
 
@@ -40,11 +40,22 @@
       return;
    }
 
+   // Calculates the total dice
    function getTotalDice(checkParameters, actor) {
+      // Get the attribute dice
       let retVal = actor.system.attribute[checkParameters.attribute].value + checkParameters.diceMod;
+
+      // If there is a skill set
       if (checkParameters.skill !== "none") {
-         retVal += actor.system.skill[checkParameters.skill].training.value;
-         retVal += checkParameters.trainingMod;
+         // Get the training dice
+         let trainingDice = actor.system.skill[checkParameters.skill].training.value;
+         trainingDice += checkParameters.trainingMod;
+
+         // Double training if appropriate
+         if (checkParameters.doubleTraining === true) {
+            trainingDice *= 2;
+         }
+         retVal += trainingDice;
       }
 
       return retVal;
@@ -136,7 +147,7 @@
             {localize("LOCAL.doubleTraining.label")}
          </div>
          <div class="input">
-            <input type="checkbox" bind:value={checkParameters.doubleTraining} />
+            <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
          </div>
       </div>
 
@@ -148,7 +159,7 @@
             {localize("LOCAL.doubleExpertise.label")}
          </div>
          <div class="input">
-            <input type="checkbox" bind:value={checkParameters.doubleExpertise} />
+            <input type="checkbox" bind:checked={checkParameters.doubleExpertise} />
          </div>
       </div>
    </div>
@@ -206,7 +217,6 @@
       }
 
       .divider {
-         @include flex-column;
          height: 1.75rem;
          width: 0;
          border-left: var(--border-style-normal);
@@ -217,6 +227,7 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
+         width: 100%;
          margin-left: 0.25rem;
          margin-right: 0.25rem;
       }
