@@ -131,12 +131,24 @@
 
    <div class="row">
       <!--Double Training-->
-      <div class="field">
+      <div class="field-horizontal">
          <div class="label">
             {localize("LOCAL.doubleTraining.label")}
          </div>
          <div class="input">
             <input type="checkbox" bind:value={checkParameters.doubleTraining} />
+         </div>
+      </div>
+
+      <div class="divider" />
+
+      <!--Double Expertise-->
+      <div class="field-horizontal">
+         <div class="label">
+            {localize("LOCAL.doubleExpertise.label")}
+         </div>
+         <div class="input">
+            <input type="checkbox" bind:value={checkParameters.doubleExpertise} />
          </div>
       </div>
    </div>
@@ -186,16 +198,32 @@
             margin-left: 0.5rem;
          }
 
-         .label {
-            font-weight: bold;
-            height: 100;
-         }
-
          .input {
             width: 100%;
             margin-top: 0.25rem;
             --height-input: 1.8rem;
          }
+      }
+
+      .divider {
+         @include flex-column;
+         height: 1.75rem;
+         width: 0;
+         border-left: var(--border-style-normal);
+         border-width: var(--border-width-normal);
+      }
+
+      .field-horizontal {
+         @include flex-row;
+         @include flex-group-center;
+         height: 100%;
+         margin-left: 0.25rem;
+         margin-right: 0.25rem;
+      }
+
+      .label {
+         font-weight: bold;
+         height: 100;
       }
 
       .total-dice {

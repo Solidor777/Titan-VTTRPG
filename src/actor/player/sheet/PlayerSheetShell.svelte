@@ -417,9 +417,8 @@
                }
 
                .divider {
-                  //width: var(--border-width-normal);
                   height: 100%;
-                  width: --border-width-normal;
+                  width: var(--border-width-normal);
                   border-left: var(--border-style-normal);
                   border-width: var(--border-width-normal);
                }
