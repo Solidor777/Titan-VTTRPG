@@ -27,7 +27,7 @@
    {:else if results.failed}
       <!--Failed-->
       <div class="result failed">
-         {localize(`LOCAL.succeeded.label`)}
+         {localize(`LOCAL.failed.label`)}
       </div>
    {/if}
 
