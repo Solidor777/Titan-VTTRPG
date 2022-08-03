@@ -437,12 +437,10 @@
          }
 
          .tabs {
-            box-sizing: border-box;
-            margin-top: 0.5rem;
+            @include flex-column;
             position: relative;
-            top: 0;
-            bottom: 0;
-            left: 0;
+            height: 100%;
+            width: 100;
          }
       }
    }

@@ -24,11 +24,17 @@
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
    .skill-tab {
-      flex-grow: 1;
-      overflow: auto;
-      max-height: 100%;
+      @include flex-column;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0; /*stretch from top to bottom w.r.t .main section*/
+      overflow-y: scroll;
       font-size: 1rem;
       padding: 0.5rem;
+      height: 100%;
+      max-height: inherit;
 
       .skill {
          @include flex-row;

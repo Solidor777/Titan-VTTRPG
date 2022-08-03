@@ -78,6 +78,8 @@
 
    .tab-content {
       @include flex-column;
+      position: relative;
       width: 100%;
+      height: 100%;
    }
 </style>
