@@ -2,6 +2,9 @@
    import { getContext } from "svelte";
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
+   import ActorAttribute from "./ActorAttribute.svelte";
 
    const document = getContext("DocumentSheetObject");
 
@@ -15,7 +18,7 @@
 
 <div class="skill-tab">
    <!--Header-->
-   <div class="skill header">
+   <div class="header">
       <div class="name">
          {localize("LOCAL.skill.label")}
       </div>
@@ -30,6 +33,21 @@
                <button on:click={rollSkillCheck(key)} on:mousedown={preventDefault}>
                   {localize(`LOCAL.${key}.label`)}
                </button>
+               <div class="text">
+                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].training.baseValue} />
+               </div>
+               <div class="text">
+                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].training.staticMod} />
+               </div>
+               <div class="text">
+                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].expertise.baseValue} />
+               </div>
+               <div class="text">
+                  <DocumentTextInput type="integer" bind:value={$document.system.skill[key].expertise.staticMod} />
+               </div>
+               <div class="select">
+                  <AttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
+               </div>
             </div>
          {/each}
       </div>
@@ -65,18 +83,27 @@
 
       .skill {
          @include flex-row;
-         @include flex-group-left;
+         @include flex-space-evenly;
          padding: 0.25rem;
          width: 100%;
+         height: 100%;
          border-style: var(--border-style-normal);
          border-width: var(--border-width-normal);
          border-color: var(--border-color-normal);
 
          button {
             @include border-normal;
+            @include flex-row;
+            @include flex-group-center;
             font-size: 1rem;
             font-weight: bold;
             width: 10rem;
+         }
+
+         .text {
+            @include flex-row;
+            @include flex-group-center;
+            width: 1.8rem;
          }
       }
    }
