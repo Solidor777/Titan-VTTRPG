@@ -3,7 +3,8 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   import ResistanceSelect from "~/helpers/svelte-components/ResistanceSelect.svelte";
+   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
+   import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
    import CheckDifficultySelect from "~/check/components/CheckDifficultySelect.svelte";
    import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
@@ -15,16 +16,19 @@
 
    // Initialize check parameters
    let checkParameters = {
-      resistance: options.resistance ? options.resistance : "reflexes",
+      attribute: options.attribute ? options.attribute : "body",
+      skill: options.skill ? options.skill : "athletics",
       difficulty: options.difficulty ? options.difficulty : 4,
       complexity: options.complexity ? options.complexity : 0,
+      trainingMod: options.trainingMod ? options.trainingMod : 0,
+      expertiseMod: options.expertiseMod ? options.expertiseMod : 0,
       diceMod: options.diceMod ? options.diceMod : 0,
    };
 
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.rollResistanceCheck(checkParameters);
+      await actor.rollAttributeCheck(checkParameters);
       application.close();
       return;
    }
@@ -33,17 +37,38 @@
       application.close();
       return;
    }
+
+   function getTotalDice(checkParameters, actor) {
+      let retVal = actor.system.attribute[checkParameters.attribute].value + checkParameters.diceMod;
+      if (checkParameters.skill !== "none") {
+         retVal += actor.system.skill[checkParameters.skill].training.value;
+         retVal += checkParameters.trainingMod;
+      }
+
+      return retVal;
+   }
+
+   $: totalDice = getTotalDice(checkParameters, actor);
 </script>
 
-<div class="resistance-check-dialog">
+<div class="skill-check-dialog">
    <div class="row">
-      <!--Resistance-->
+      <!--Attribute-->
       <div class="field">
          <div class="label">
-            {localize("LOCAL.resistance.label")}
+            {localize("LOCAL.skill.label")}
          </div>
          <div class="input">
-            <ResistanceSelect bind:value={checkParameters.resistance} />
+            <AttributeSelect bind:value={checkParameters.attribute} />
+         </div>
+      </div>
+      <!--Skill-->
+      <div class="field">
+         <div class="label">
+            {localize("LOCAL.skill.label")}
+         </div>
+         <div class="input">
+            <SkillSelect bind:value={checkParameters.skill} />
          </div>
       </div>
    </div>
@@ -84,7 +109,7 @@
    <div class="row">
       <div class="total-dice">
          {localize("LOCAL.totalDice.label") + ": "}
-         {actor.system.resistance[checkParameters.resistance].value + checkParameters.diceMod}
+         {totalDice}
       </div>
    </div>
 
@@ -98,7 +123,7 @@
 <style lang="scss">
    @import "../../styles/Mixins.scss";
 
-   .resistance-check-dialog {
+   .skill-check-dialog {
       @include flex-column;
       justify-items: flex-end;
 

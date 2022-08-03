@@ -16,6 +16,7 @@
    async function rollAttributeCheck(attribute) {
       $document.rollAttributeCheck({
          attribute: attribute,
+         getOptions: true,
          skill: "none",
       });
    }

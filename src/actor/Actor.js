@@ -6,6 +6,7 @@ import TitanAttackCheck from "../check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
 import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
+import { SkillCheckDialog } from "~/check/skill-check/SkillCheckDialog.js";
 
 export class TitanActor extends Actor {
 
@@ -220,7 +221,7 @@ export class TitanActor extends Actor {
   async rollAttributeCheck(options) {
     // If get options, then create a dialog for setting options.
     if (options?.getOptions === true) {
-      const dialog = new ResistanceCheckDialog(this, options);
+      const dialog = new SkillCheckDialog(this, options);
       dialog.render(true);
       return;
     }

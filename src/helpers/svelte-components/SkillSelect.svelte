@@ -96,12 +96,12 @@
          value: "stealth",
       },
       {
-         label: localize("LOCAL.survival.label"),
-         value: "survival",
-      },
-      {
          label: localize("LOCAL.theology.label"),
          value: "theology",
+      },
+      {
+         label: localize("LOCAL.none.label"),
+         value: "none",
       },
    ];
 </script>

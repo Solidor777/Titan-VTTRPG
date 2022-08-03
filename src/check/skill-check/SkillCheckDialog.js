@@ -1,5 +1,5 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-import SkillCheckDialogShell from "SkillCheckDialogShell.svelte";
+import SkillCheckDialogShell from "./SkillCheckDialogShell.svelte";
 export class SkillCheckDialog extends TJSDialog {
   constructor(actor, options) {
     super(
@@ -15,7 +15,7 @@ export class SkillCheckDialog extends TJSDialog {
       },
       {
         width: 320,
-        height: 250,
+        height: 350,
       }
     );
   }
