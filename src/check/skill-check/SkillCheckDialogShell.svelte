@@ -21,7 +21,9 @@
       difficulty: options.difficulty ? options.difficulty : 4,
       complexity: options.complexity ? options.complexity : 0,
       trainingMod: options.trainingMod ? options.trainingMod : 0,
+      doubleTraining: options.doubleTraining ? options.doubleTraining : false,
       expertiseMod: options.expertiseMod ? options.expertiseMod : 0,
+      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : false,
       diceMod: options.diceMod ? options.diceMod : 0,
    };
 
@@ -101,6 +103,40 @@
          </div>
          <div class="input">
             <IntegerInput bind:value={checkParameters.diceMod} />
+         </div>
+      </div>
+   </div>
+
+   <div class="row">
+      <!--Training Mod-->
+      <div class="field">
+         <div class="label">
+            {localize("LOCAL.trainingMod.label")}
+         </div>
+         <div class="input">
+            <IntegerInput bind:value={checkParameters.trainingMod} />
+         </div>
+      </div>
+
+      <!--Expertise Mod-->
+      <div class="field">
+         <div class="label">
+            {localize("LOCAL.expertiseMod.label")}
+         </div>
+         <div class="input">
+            <IntegerInput bind:value={checkParameters.expertiseMod} />
+         </div>
+      </div>
+   </div>
+
+   <div class="row">
+      <!--Double Training-->
+      <div class="field">
+         <div class="label">
+            {localize("LOCAL.doubleTraining.label")}
+         </div>
+         <div class="input">
+            <input type="checkbox" bind:value={checkParameters.doubleTraining} />
          </div>
       </div>
    </div>
