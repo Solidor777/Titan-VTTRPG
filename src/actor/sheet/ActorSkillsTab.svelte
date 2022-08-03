@@ -16,85 +16,75 @@
 </script>
 
 <div class="skill-tab">
-   <!--Header-->
-   <div class="header">
-      <div class="name">
-         {localize("LOCAL.skill.label")}
-      </div>
-   </div>
-   <!--Box for relative scrolling-->
-   <div class="relative-box">
-      <!--Skils-->
-      <div class="skills-container">
-         <!--Each skill-->
-         {#each Object.entries($document.system.skill) as [key, skill]}
-            <div class="skill">
-               <!--Button and Attribute-->
-               <div class="column">
-                  <!--Button for rolling the skill-->
-                  <div class="skill-button">
-                     <button on:click={rollSkillCheck(key)} on:mousedown={preventDefault}>
-                        {localize(`LOCAL.${key}.label`)}
-                     </button>
-                  </div>
-                  <!--Default Attribute Select-->
-                  <div class="default-attribute">
-                     <div class="label">
-                        {localize("LOCAL.defaultAttribute.label")}
-                     </div>
-                     <div class="select">
-                        <AttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
-                     </div>
-                  </div>
+   <div class="skills-container">
+      <!--Each skill-->
+      {#each Object.entries($document.system.skill) as [key, skill]}
+         <div class="skill">
+            <!--Button and Attribute-->
+            <div class="column">
+               <!--Button for rolling the skill-->
+               <div class="skill-button">
+                  <button on:click={rollSkillCheck(key)} on:mousedown={preventDefault}>
+                     {localize(`LOCAL.${key}.label`)}
+                  </button>
                </div>
-               <!--Training and Expertise-->
-               <div class="column">
-                  <!--Header row for rolling the skill-->
-                  <div class="row">
-                     <div class="label" />
-                     <div class="value">{localize("LOCAL.base.label")}</div>
-                     <div class="op" />
-                     <div class="value">{localize("LOCAL.mod.label")}</div>
-                     <div class="op" />
-                     <div class="value" />
+               <!--Default Attribute Select-->
+               <div class="default-attribute">
+                  <div class="label">
+                     {localize("LOCAL.defaultAttribute.label")}
                   </div>
-                  <!--Training row-->
-                  <div class="row">
-                     <div class="label">{localize("LOCAL.training.label")}</div>
-                     <div class="value">
-                        <DocumentTextInput bind:value={$document.system.skill[key].training.baseValue} />
-                     </div>
-                     <div class="op">+</div>
-                     <div class="value">
-                        <DocumentTextInput bind:value={$document.system.skill[key].training.staticMod} />
-                     </div>
-                     <div class="op">=</div>
-                     <div class="value">
-                        {`${$document.system.skill[key].training.value} (${
-                           $document.system.skill[key].training.value +
-                           $document.system.attribute[$document.system.skill[key].defaultAttribute].value
-                        })`}
-                     </div>
-                  </div>
-                  <!--Expertise Row-->
-                  <div class="row">
-                     <div class="label">Expertise</div>
-                     <div class="value">
-                        <DocumentTextInput bind:value={$document.system.skill[key].expertise.baseValue} />
-                     </div>
-                     <div class="op">+</div>
-                     <div class="value">
-                        <DocumentTextInput bind:value={$document.system.skill[key].expertise.staticMod} />
-                     </div>
-                     <div class="op">=</div>
-                     <div class="value">
-                        {$document.system.skill[key].expertise.value}
-                     </div>
+                  <div class="select">
+                     <AttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
                   </div>
                </div>
             </div>
-         {/each}
-      </div>
+            <!--Training and Expertise-->
+            <div class="column">
+               <!--Header row for rolling the skill-->
+               <div class="row">
+                  <div class="label" />
+                  <div class="value">{localize("LOCAL.base.label")}</div>
+                  <div class="op" />
+                  <div class="value">{localize("LOCAL.mod.label")}</div>
+                  <div class="op" />
+                  <div class="value" />
+               </div>
+               <!--Training row-->
+               <div class="row">
+                  <div class="label">{localize("LOCAL.training.label")}</div>
+                  <div class="value">
+                     <DocumentTextInput bind:value={$document.system.skill[key].training.baseValue} />
+                  </div>
+                  <div class="op">+</div>
+                  <div class="value">
+                     <DocumentTextInput bind:value={$document.system.skill[key].training.staticMod} />
+                  </div>
+                  <div class="op">=</div>
+                  <div class="value">
+                     {`${$document.system.skill[key].training.value} (${
+                        $document.system.skill[key].training.value +
+                        $document.system.attribute[$document.system.skill[key].defaultAttribute].value
+                     })`}
+                  </div>
+               </div>
+               <!--Expertise Row-->
+               <div class="row">
+                  <div class="label">Expertise</div>
+                  <div class="value">
+                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.baseValue} />
+                  </div>
+                  <div class="op">+</div>
+                  <div class="value">
+                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.staticMod} />
+                  </div>
+                  <div class="op">=</div>
+                  <div class="value">
+                     {$document.system.skill[key].expertise.value}
+                  </div>
+               </div>
+            </div>
+         </div>
+      {/each}
    </div>
 
    <!--Each skill-->
@@ -104,34 +94,31 @@
    @import "../../Styles/Mixins.scss";
    .skill-tab {
       @include flex-column;
+      position: relative;
       width: 100%;
       height: 100%;
       font-size: 1rem;
-      padding: 0.5rem;
 
-      .relative-box {
-         position: relative;
+      .skills-container {
+         @include flex-column;
          width: 100%;
-         height: 100%;
-
-         .skills-container {
-            @include flex-column;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            overflow-y: scroll;
-         }
+         position: absolute;
+         top: 0;
+         left: 0;
+         bottom: 0;
+         overflow-y: scroll;
+         padding: 0.25rem;
       }
 
       .skill {
          @include flex-row;
+         @include border-normal;
          width: 100%;
-         border-style: var(--border-style-normal);
-         border-width: var(--border-width-normal);
-         border-color: var(--border-color-normal);
          padding: 0.5rem;
+
+         &:not(:first-child) {
+            margin-top: 0.5rem;
+         }
 
          .column {
             @include flex-column;
@@ -147,13 +134,13 @@
                   margin-top: 0.5rem;
                }
                width: 100%;
-               font-weight: bold;
 
                .label {
                   @include flex-row;
                   @include flex-group-right;
                   height: 100%;
                   width: 5rem;
+                  font-weight: bold;
                   text-align: right;
                }
                .value {
@@ -162,6 +149,7 @@
                   height: 100%;
                   width: 3.2rem;
                   margin-left: 0.5rem;
+                  font-weight: bold;
                }
                .op {
                   @include flex-row;
