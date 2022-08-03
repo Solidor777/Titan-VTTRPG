@@ -127,7 +127,7 @@
             @include flex-row;
             @include flex-group-center;
             @include border-normal;
-            background-color: var(--color-background-highlight);
+            background-color: var(--color-background-static-label);
             width: 3.2rem;
             height: 100%;
             text-align: center;

@@ -70,7 +70,6 @@
          border-radius: 25px;
          width: 6rem;
          font-size: 1rem;
-         border-color: var(--border-color-normal);
          font-weight: bold;
          &.reflexes {
             background-color: var(--color-reflexes-bright);

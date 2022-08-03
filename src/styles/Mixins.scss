@@ -17,22 +17,26 @@
   border-style: var(--border-style-normal);
   border-radius: var(--border-radius-normal);
   border-width: var(--border-width-normal);
+  border-color: var(--border-color-normal);
 }
 
 @mixin border-top-normal {
   border-top: var(--border-style-normal);
   border-width: var(--border-width-normal);
+  border-color: var(--border-color-normal);
 }
 
 @mixin border-bottom-normal {
   border-bottom: var(--border-style-normal);
   border-width: var(--border-width-normal);
+  border-color: var(--border-color-normal);
 }
 
 @mixin border-input {
   border-style: var(--border-style-input);
   border-radius: var(--border-radius-input);
   border-width: var(--border-width-input);
+  border-color: var(--border-color-normal);
 }
 
 @mixin flex-row {

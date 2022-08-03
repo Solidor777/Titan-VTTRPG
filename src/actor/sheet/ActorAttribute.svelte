@@ -73,7 +73,6 @@
          width: 6rem;
          font-weight: bold;
          font-size: 1rem;
-         border-color: var(--border-color-normal);
 
          &.body {
             background-color: var(--color-body-bright);

@@ -11,13 +11,22 @@
    import ActorResistance from "~/actor/sheet/ActorResistance.svelte";
    import ActorRating from "~/actor/sheet/ActorRating.svelte";
    import ActorSpeed from "~/actor/sheet/ActorSpeed.svelte";
-   import ActorAttribute from "../../sheet/ActorAttribute.svelte";
+   import ActorAttribute from "~/actor/sheet/ActorAttribute.svelte";
+   import ActorSkillsTab from "~/actor/sheet/ActorSkillsTab.svelte";
+   import ActorInventoryTab from "~/actor/sheet/ActorInventoryTab.svelte";
+   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
 
    // Setup
    export let elementRoot;
    export let storeDoc;
    setContext("DocumentSheetObject", storeDoc);
    const document = getContext("DocumentSheetObject");
+
+   let tabs = [
+      { label: "Skills", id: "skills", component: ActorSkillsTab },
+      { label: "Inventory", id: "inventory", component: ActorInventoryTab },
+   ];
+   let activeTab = "skills";
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -135,7 +144,9 @@
             </div>
          </div>
          <!--Tab Content-->
-         <div class="tab-content">TEst</div>
+         <div class="tabs">
+            <Tabs {tabs} {activeTab} />
+         </div>
       </div>
    </div>
 </ApplicationShell>
@@ -425,10 +436,13 @@
             }
          }
 
-         .tab-content {
-            display: flex;
-            flex: 1;
-            height: 10rem;
+         .tabs {
+            @include flex-column;
+            box-sizing: border-box;
+            margin-top: 0.5rem;
+            width: 100%;
+            height: 100%;
+            --var-font-size: 1rem;
          }
       }
    }
