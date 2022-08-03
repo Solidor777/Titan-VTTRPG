@@ -86,7 +86,7 @@
 
 <div class="skill-check-dialog">
    <!--Attribute-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.attribute.label")}
       </div>
@@ -95,7 +95,7 @@
       </div>
    </div>
    <!--Skill-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.skill.label")}
       </div>
@@ -105,7 +105,7 @@
    </div>
 
    <!--Difficulty-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.difficulty.label")}
       </div>
@@ -115,7 +115,7 @@
    </div>
 
    <!--Complexity-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.complexity.label")}
       </div>
@@ -125,7 +125,7 @@
    </div>
 
    <!--Dice Mod-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.bonusPenaltyDice.label")}
       </div>
@@ -135,7 +135,7 @@
    </div>
 
    <!--Training Mod-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.trainingMod.label")}
       </div>
@@ -145,7 +145,7 @@
    </div>
 
    <!--Expertise Mod-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.expertiseMod.label")}
       </div>
@@ -155,7 +155,7 @@
    </div>
 
    <!--Double Training-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.doubleTraining.label")}
       </div>
@@ -165,7 +165,7 @@
    </div>
 
    <!--Double Expertise-->
-   <div class="field">
+   <div class="row">
       <div class="label">
          {localize("LOCAL.doubleExpertise.label")}
       </div>
@@ -177,13 +177,13 @@
    <!--Summary-->
    <div class="row">
       <!--Total Dice-->
-      <div class="label">
+      <div class="summary">
          {localize("LOCAL.totalDice.label") + ": "}
          {totalDice}
       </div>
 
       <!--Total Expertise-->
-      <div class="label">
+      <div class="summary">
          {localize("LOCAL.totalExpertise.label") + ": "}
          {totalExpertise}
       </div>
@@ -204,7 +204,7 @@
       justify-items: flex-end;
       font-size: 1rem;
 
-      .field {
+      .row {
          @include flex-row;
          @include flex-group-center;
          height: 100%;
@@ -233,21 +233,11 @@
             --height-input: 1.8rem;
             --width-input: 100%;
          }
-      }
 
-      .row {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-top-normal;
-         margin-top: 0.25rem;
-         padding-top: 0.25rem;
-         height: 100%;
-         width: 100%;
-         font-size: 1rem;
-
-         .label {
+         .summary {
             @include flex-group-center;
             font-weight: bold;
+            font-size: 1.1rem;
             height: 100%;
             width: 100%;
             margin-right: 0.5rem;
@@ -256,11 +246,6 @@
          button {
             font-size: 1rem;
          }
-      }
-
-      .summary {
-         font-weight: bold;
-         font-size: 1.1rem;
       }
    }
 </style>

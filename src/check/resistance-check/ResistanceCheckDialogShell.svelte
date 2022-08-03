@@ -38,7 +38,7 @@
 <div class="resistance-check-dialog">
    <div class="row">
       <!--Resistance-->
-      <div class="field">
+      <div class="row">
          <div class="label">
             {localize("LOCAL.resistance.label")}
          </div>
@@ -48,41 +48,39 @@
       </div>
    </div>
 
+   <!--Difficulty-->
    <div class="row">
-      <!--Difficulty-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.difficulty.label")}
-         </div>
-         <div class="input">
-            <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
-         </div>
+      <div class="label">
+         {localize("LOCAL.difficulty.label")}
       </div>
-
-      <!--Complexity-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.complexity.label")}
-         </div>
-         <div class="input">
-            <IntegerInput bind:value={checkParameters.complexity} positive={true} />
-         </div>
+      <div class="input">
+         <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
       </div>
+   </div>
 
-      <!--Dice Mod-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.bonusPenaltyDice.label")}
-         </div>
-         <div class="input">
-            <IntegerInput bind:value={checkParameters.diceMod} />
-         </div>
+   <!--Complexity-->
+   <div class="row">
+      <div class="label">
+         {localize("LOCAL.complexity.label")}
+      </div>
+      <div class="input">
+         <IntegerInput bind:value={checkParameters.complexity} positive={true} />
+      </div>
+   </div>
+
+   <!--Dice Mod-->
+   <div class="row">
+      <div class="label">
+         {localize("LOCAL.bonusPenaltyDice.label")}
+      </div>
+      <div class="input">
+         <IntegerInput bind:value={checkParameters.diceMod} />
       </div>
    </div>
 
    <!--Total Dice-->
    <div class="row">
-      <div class="total-dice">
+      <div class="summary">
          {localize("LOCAL.totalDice.label") + ": "}
          {actor.system.resistance[checkParameters.resistance].value + checkParameters.diceMod}
       </div>
@@ -101,45 +99,50 @@
    .resistance-check-dialog {
       @include flex-column;
       justify-items: flex-end;
+      font-size: 1rem;
 
       .row {
          @include flex-row;
-         justify-content: center;
-         align-items: flex-end;
-
+         @include flex-group-center;
          height: 100%;
          width: 100%;
 
          &:not(:first-child) {
-            margin-top: 0.5rem;
-            @include border-top-normal;
+            border-top: solid;
             padding-top: 0.25rem;
-         }
-      }
-
-      .field {
-         @include flex-column;
-         @include flex-group-center;
-         height: 100%;
-         &:not(:first-child) {
-            margin-left: 0.5rem;
+            margin-top: 0.25rem;
+            border-width: var(--border-width-normal);
          }
 
          .label {
+            @include flex-group-right;
             font-weight: bold;
-            height: 100;
+            height: 100%;
+            width: 100%;
+            margin-right: 0.5rem;
          }
 
          .input {
+            @include flex-group-center;
+            margin-left: 0.5rem;
+            height: 100%;
             width: 100%;
-            margin-top: 0.25rem;
             --height-input: 1.8rem;
+            --width-input: 100%;
          }
-      }
 
-      .total-dice {
-         font-weight: bold;
-         font-size: 1rem;
+         .summary {
+            @include flex-group-center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            height: 100%;
+            width: 100%;
+            margin-right: 0.5rem;
+         }
+
+         button {
+            font-size: 1rem;
+         }
       }
    }
 </style>
