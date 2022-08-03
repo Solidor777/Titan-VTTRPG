@@ -76,6 +76,10 @@
          value: "meleeWeapons",
       },
       {
+         label: localize("LOCAL.nature.label"),
+         value: "nature",
+      },
+      {
          label: localize("LOCAL.perception.label"),
          value: "perception",
       },
