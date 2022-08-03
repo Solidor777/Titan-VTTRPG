@@ -69,7 +69,7 @@
       <!--Attribute-->
       <div class="field">
          <div class="label">
-            {localize("LOCAL.skill.label")}
+            {localize("LOCAL.attribute.label")}
          </div>
          <div class="input">
             <AttributeSelect bind:value={checkParameters.attribute} />
@@ -185,6 +185,7 @@
    .skill-check-dialog {
       @include flex-column;
       justify-items: flex-end;
+      font-size: 1rem;
 
       .row {
          @include flex-row;
