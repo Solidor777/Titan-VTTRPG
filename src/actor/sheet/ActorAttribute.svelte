@@ -14,9 +14,11 @@
    $: attribute = $document.system.attribute[key];
 
    async function rollAttributeCheck(attribute) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
+
       $document.rollAttributeCheck({
          attribute: attribute,
-         getOptions: true,
+         getOptions: getOptions,
          skill: "none",
       });
    }
