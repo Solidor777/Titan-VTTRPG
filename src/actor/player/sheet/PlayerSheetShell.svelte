@@ -23,8 +23,8 @@
    const document = getContext("DocumentSheetObject");
 
    let tabs = [
-      { label: "Skills", id: "skills", component: ActorSkillsTab },
-      { label: "Inventory", id: "inventory", component: ActorInventoryTab },
+      { label: localize("LOCAL.skills.label"), id: "skills", component: ActorSkillsTab },
+      { label: localize("LOCAL.inventory.label"), id: "inventory", component: ActorInventoryTab },
    ];
    let activeTab = "skills";
 </script>
@@ -42,7 +42,7 @@
          <!--Resources-->
          <div class="resources">
             <!--Each Resource Meter-->
-            {#each Object.entries($document.system.resource) as [key, resource]}
+            {#each Object.entries($document.system.resource) as [key]}
                <div class="resource {key}">
                   <ActorResourceMeter
                      bind:value={$document.system.resource[key].value}
@@ -70,9 +70,9 @@
          <!--Speeds-->
          <div class="speeds">
             <div class="label">
-               <div class="name">Speed</div>
-               <div class="base">Base</div>
-               <div class="mod">Mod</div>
+               <div class="name">{localize("LOCAL.name.label")}</div>
+               <div class="base">{localize("LOCAL.base.label")}</div>
+               <div class="mod">{localize("LOCAL.mod.label")}</div>
             </div>
             {#each Object.entries($document.system.speed) as [key]}
                <div class="speed">
@@ -437,12 +437,12 @@
          }
 
          .tabs {
-            @include flex-column;
             box-sizing: border-box;
             margin-top: 0.5rem;
-            width: 100%;
-            height: 100%;
-            --var-font-size: 1rem;
+            position: relative;
+            top: 0;
+            bottom: 0;
+            left: 0;
          }
       }
    }

@@ -58,9 +58,16 @@
       }
 
       li {
+         @include flex-row;
+         width: 100%;
          button {
-            @include border-normal;
+            @include flex-row;
+            @include flex-group-center;
             font-size: var(--font-size);
+            width: 100%;
+            border-style: var(--border-style-normal);
+            border-width: var(--border-width-normal);
+            border-color: var(--border-color-normal);
 
             &.active {
                background-color: var(--color-background-highlight);
@@ -70,7 +77,7 @@
    }
 
    .tab-content {
+      @include flex-column;
       width: 100%;
-      height: 100%;
    }
 </style>
