@@ -89,7 +89,7 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         margin-left: 0.75rem;
+         margin-left: 1rem;
 
          :not(:first-child) {
             margin-left: 0.5rem;

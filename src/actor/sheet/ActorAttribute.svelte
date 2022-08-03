@@ -35,7 +35,7 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
+      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editBaseValue.label`)}>
          <DocumentTextInput bind:value={$document.system.attribute[key].baseValue} type="integer" />
       </div>
       <div class="label">+</div>
@@ -91,7 +91,7 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         margin-left: 0.25rem;
+         margin-left: 0.5rem;
 
          :not(:first-child) {
             margin-left: 0.5rem;

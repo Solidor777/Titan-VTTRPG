@@ -16,7 +16,7 @@
 <!--Speeds-->
 <div class="speed">
    <!--Label-->
-   <div class="label">
+   <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
       <!--Icon-->
       {localize(`LOCAL.${key}.label`)}
    </div>
@@ -24,7 +24,7 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
+      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editBaseValue.label`)}>
          <DocumentTextInput bind:value={$document.system.speed[key].baseValue} type="integer" />
       </div>
       <div class="label">+</div>

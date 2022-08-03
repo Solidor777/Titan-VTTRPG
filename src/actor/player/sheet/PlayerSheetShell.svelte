@@ -122,7 +122,7 @@
                <!--Resistances-->
                <div class="resistances">
                   <div class="label">
-                     <div class="name">{localize("LOCAL.attribute.label")}</div>
+                     <div class="name">{localize("LOCAL.resistance.label")}</div>
                      <div class="base">{localize("LOCAL.base.label")}</div>
                      <div class="mod">{localize("LOCAL.mod.label")}</div>
                   </div>
@@ -350,15 +350,17 @@
                      .name {
                         @include flex-row;
                         @include flex-group-center;
-                        width: 6rem;
+                        width: 5.5rem;
+                        margin-left: 0.5rem;
                      }
                      .base {
+                        margin-left: 0.25rem;
                         width: 2.5rem;
                      }
 
                      .mod {
                         width: 2.5rem;
-                        margin-left: 0.4rem;
+                        margin-left: 0.75rem;
                      }
                   }
 
@@ -393,6 +395,7 @@
                      }
 
                      .base {
+                        margin-left: 0.25rem;
                         width: 2.5rem;
                      }
 
