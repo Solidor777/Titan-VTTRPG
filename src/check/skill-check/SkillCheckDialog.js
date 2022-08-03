@@ -14,8 +14,8 @@ export class SkillCheckDialog extends TJSDialog {
         },
       },
       {
-        width: 320,
-        height: 400,
+        width: 350,
+        height: 470,
       }
     );
   }

@@ -75,6 +75,12 @@
   text-align: center;
 }
 
+@mixin flex-space-evenly {
+  align-items: center;
+  justify-content: space-evenly;
+  text-align: center;
+}
+
 @mixin grid($column-count) {
   display: grid;
   gap: 0.5rem;

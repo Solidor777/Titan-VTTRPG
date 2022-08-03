@@ -121,6 +121,7 @@
   "LOCAL.expertise.label": "Expertise",
   "LOCAL.expertiseMod.label": "Expertise Bonus / Penalty",
   "LOCAL.doubleExpertise.label": "Double Expertise",
+  "LOCAL.totalExpertise.label": "Total Expertise",
   "LOCAL.check.label": "Check",
   "LOCAL.succeeded.label": "Succeeded",
   "LOCAL.failed.label": "Failed",

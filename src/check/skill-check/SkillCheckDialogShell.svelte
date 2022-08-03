@@ -23,7 +23,7 @@
       trainingMod: options.trainingMod ? options.trainingMod : 0,
       doubleTraining: options.doubleTraining ? options.doubleTraining : false,
       expertiseMod: options.expertiseMod ? options.expertiseMod : 0,
-      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : true,
+      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : false,
       diceMod: options.diceMod ? options.diceMod : 0,
    };
 
@@ -61,114 +61,131 @@
       return retVal;
    }
 
+   // Calculates the total expertise
+   function getTotalExpertise(checkParameters, actor) {
+      let retVal = 0;
+
+      // If there is a skill set
+      if (checkParameters.skill !== "none") {
+         // Get the training expertise
+         retVal += actor.system.skill[checkParameters.skill].expertise.value;
+         retVal += checkParameters.expertiseMod;
+
+         // Double training if appropriate
+         if (checkParameters.doubleExpertise === true) {
+            retVal *= 2;
+         }
+      }
+
+      return retVal;
+   }
+
    $: totalDice = getTotalDice(checkParameters, actor);
+   $: totalExpertise = getTotalExpertise(checkParameters, actor);
 </script>
 
 <div class="skill-check-dialog">
-   <div class="row">
-      <!--Attribute-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.attribute.label")}
-         </div>
-         <div class="input">
-            <AttributeSelect bind:value={checkParameters.attribute} />
-         </div>
+   <!--Attribute-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.attribute.label")}
       </div>
-      <!--Skill-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.skill.label")}
-         </div>
-         <div class="input">
-            <SkillSelect bind:value={checkParameters.skill} />
-         </div>
+      <div class="input">
+         <AttributeSelect bind:value={checkParameters.attribute} />
+      </div>
+   </div>
+   <!--Skill-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.skill.label")}
+      </div>
+      <div class="input">
+         <SkillSelect bind:value={checkParameters.skill} />
       </div>
    </div>
 
-   <div class="row">
-      <!--Difficulty-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.difficulty.label")}
-         </div>
-         <div class="input">
-            <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
-         </div>
+   <!--Difficulty-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.difficulty.label")}
       </div>
-
-      <!--Complexity-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.complexity.label")}
-         </div>
-         <div class="input">
-            <IntegerInput bind:value={checkParameters.complexity} positive={true} />
-         </div>
-      </div>
-
-      <!--Dice Mod-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.bonusPenaltyDice.label")}
-         </div>
-         <div class="input">
-            <IntegerInput bind:value={checkParameters.diceMod} />
-         </div>
+      <div class="input">
+         <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
       </div>
    </div>
 
-   <div class="row">
-      <!--Training Mod-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.trainingMod.label")}
-         </div>
-         <div class="input">
-            <IntegerInput bind:value={checkParameters.trainingMod} />
-         </div>
+   <!--Complexity-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.complexity.label")}
       </div>
-
-      <!--Expertise Mod-->
-      <div class="field">
-         <div class="label">
-            {localize("LOCAL.expertiseMod.label")}
-         </div>
-         <div class="input">
-            <IntegerInput bind:value={checkParameters.expertiseMod} />
-         </div>
+      <div class="input">
+         <IntegerInput bind:value={checkParameters.complexity} positive={true} />
       </div>
    </div>
 
-   <div class="row">
-      <!--Double Training-->
-      <div class="field-horizontal">
-         <div class="label">
-            {localize("LOCAL.doubleTraining.label")}
-         </div>
-         <div class="input">
-            <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
-         </div>
+   <!--Dice Mod-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.bonusPenaltyDice.label")}
       </div>
-
-      <div class="divider" />
-
-      <!--Double Expertise-->
-      <div class="field-horizontal">
-         <div class="label">
-            {localize("LOCAL.doubleExpertise.label")}
-         </div>
-         <div class="input">
-            <input type="checkbox" bind:checked={checkParameters.doubleExpertise} />
-         </div>
+      <div class="input">
+         <IntegerInput bind:value={checkParameters.diceMod} />
       </div>
    </div>
 
-   <!--Total Dice-->
+   <!--Training Mod-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.trainingMod.label")}
+      </div>
+      <div class="input">
+         <IntegerInput bind:value={checkParameters.trainingMod} />
+      </div>
+   </div>
+
+   <!--Expertise Mod-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.expertiseMod.label")}
+      </div>
+      <div class="input">
+         <IntegerInput bind:value={checkParameters.expertiseMod} />
+      </div>
+   </div>
+
+   <!--Double Training-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.doubleTraining.label")}
+      </div>
+      <div class="input">
+         <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
+      </div>
+   </div>
+
+   <!--Double Expertise-->
+   <div class="field">
+      <div class="label">
+         {localize("LOCAL.doubleExpertise.label")}
+      </div>
+      <div class="input">
+         <input type="checkbox" bind:checked={checkParameters.doubleExpertise} />
+      </div>
+   </div>
+
+   <!--Summary-->
    <div class="row">
-      <div class="total-dice">
+      <!--Total Dice-->
+      <div class="label">
          {localize("LOCAL.totalDice.label") + ": "}
          {totalDice}
+      </div>
+
+      <!--Total Expertise-->
+      <div class="label">
+         {localize("LOCAL.totalExpertise.label") + ": "}
+         {totalExpertise}
       </div>
    </div>
 
@@ -187,60 +204,63 @@
       justify-items: flex-end;
       font-size: 1rem;
 
-      .row {
+      .field {
          @include flex-row;
-         justify-content: center;
-         align-items: flex-end;
-
+         @include flex-group-center;
          height: 100%;
          width: 100%;
 
          &:not(:first-child) {
-            margin-top: 0.5rem;
-            @include border-top-normal;
+            border-top: solid;
             padding-top: 0.25rem;
+            margin-top: 0.25rem;
+            border-width: var(--border-width-normal);
          }
-      }
 
-      .field {
-         @include flex-column;
-         @include flex-group-center;
-         height: 100%;
-         &:not(:first-child) {
-            margin-left: 0.5rem;
+         .label {
+            @include flex-group-right;
+            font-weight: bold;
+            height: 100%;
+            width: 100%;
+            margin-right: 0.5rem;
          }
 
          .input {
+            @include flex-group-center;
+            margin-left: 0.5rem;
+            height: 100%;
             width: 100%;
-            margin-top: 0.25rem;
             --height-input: 1.8rem;
+            --width-input: 100%;
          }
       }
 
-      .divider {
-         height: 1.75rem;
-         width: 0;
-         border-left: var(--border-style-normal);
-         border-width: var(--border-width-normal);
-      }
-
-      .field-horizontal {
+      .row {
          @include flex-row;
          @include flex-group-center;
+         @include border-top-normal;
+         margin-top: 0.25rem;
+         padding-top: 0.25rem;
          height: 100%;
          width: 100%;
-         margin-left: 0.25rem;
-         margin-right: 0.25rem;
-      }
-
-      .label {
-         font-weight: bold;
-         height: 100;
-      }
-
-      .total-dice {
-         font-weight: bold;
          font-size: 1rem;
+
+         .label {
+            @include flex-group-center;
+            font-weight: bold;
+            height: 100%;
+            width: 100%;
+            margin-right: 0.5rem;
+         }
+
+         button {
+            font-size: 1rem;
+         }
+      }
+
+      .summary {
+         font-weight: bold;
+         font-size: 1.1rem;
       }
    }
 </style>
