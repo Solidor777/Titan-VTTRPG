@@ -1,7 +1,7 @@
 import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
-import PlayerSheetShell from './PlayerSheetShell.svelte';
+import WeaponSheetShell from './WeaponSheetShell.svelte';
 
-export default class TitanPlayerSheet extends SvelteDocumentSheet {
+export default class TitanWeaponSheet extends SvelteDocumentSheet {
    /**
     * Default Application options
     *
@@ -10,10 +10,10 @@ export default class TitanPlayerSheet extends SvelteDocumentSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 750,
-         height: 800,
+         width: 600,
+         height: 450,
          svelte: {
-            class: PlayerSheetShell,
+            class: WeaponSheetShell,
             target: document.body
          }
       });

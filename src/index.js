@@ -1,13 +1,15 @@
-import { TitanActor } from "./actor/Actor";
-import { TITANCONSTANTS } from "./helpers/Constants.js";
-import { TITANLOCAL } from "./helpers/Local.js";
-import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
-import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
-import { registerSystemSettings } from "./helpers/RegisterSystemSettings.js";
 import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Global.scss';
 import './styles/Mixins.scss';
+import { TITANCONSTANTS } from "./helpers/Constants.js";
+import { TITANLOCAL } from "./helpers/Local.js";
+import { registerSystemSettings } from "./helpers/RegisterSystemSettings.js";
+import { TitanActor } from "./actor/Actor";
+import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
+import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet";
+import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
+
 
 Hooks.once("init", async () => {
    console.log("TITAN | Starting Titan VTTRPG System");
@@ -24,6 +26,10 @@ Hooks.once("init", async () => {
    // Register Sheet Classes
    Actors.registerSheet("titan", TitanPlayerSheet, {
       types: ["player"],
+      makeDefault: true,
+   });
+   Items.registerSheet("titan", TitanWeaponSheet, {
+      types: ["weapon"],
       makeDefault: true,
    });
 
