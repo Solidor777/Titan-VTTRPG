@@ -1,11 +1,10 @@
 <script>
    import { autoScroll } from "~/helpers/svelte-actions/AutoScroll.js";
-   import { getContext } from "svelte";
    import CheckChatMessageShell from "../check/chat-message/CheckChatMessageShell.svelte";
 
    // Context object
+   export let message = void 0;
    export let chatContext = void 0;
-   const application = getContext("external");
 
    // Selector for the chat message type
    function selectComponent() {

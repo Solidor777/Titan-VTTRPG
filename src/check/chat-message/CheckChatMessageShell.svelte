@@ -22,6 +22,10 @@
          }
       }
    }
+
+   function doubleSucceses() {
+      chatContext.results.successes *= 2;
+   }
 </script>
 
 <div class="check-chat-message">
@@ -30,6 +34,7 @@
    </div>
    <CheckDiceContainer dice={chatContext.results.dice} />
    <CheckResults results={chatContext.results} />
+   <button on:click={doubleSucceses}>Double successes</button>
 </div>
 
 <style lang="scss">

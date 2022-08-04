@@ -4,7 +4,7 @@
 
 <div class="header-with-scrolling-sidebar">
    <div class="sidebar">
-      <ScrollingContainer><slot name="sidebar">Sidebar</slot></ScrollingContainer>
+      <slot name="sidebar">Sidebar</slot>
    </div>
    <div class="main">
       <div class="header">

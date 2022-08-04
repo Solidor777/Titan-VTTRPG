@@ -5,7 +5,8 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import HeaderWithScrollingSidebar from "~/helpers/svelte-components/HeaderWithScrollingSidebar.svelte";
+   import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
+   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
    // Setup
    export let elementRoot;
@@ -16,11 +17,13 @@
 
 <ApplicationShell bind:elementRoot>
    <div class="weapon-sheet">
-      <HeaderWithScrollingSidebar>
-         <div slot="sidebar">Weapon Sidebar</div>
+      <HeaderWithSidebar>
+         <div slot="sidebar">
+            <ScrollingContainer>Weapon Sidebar</ScrollingContainer>
+         </div>
          <div slot="header">Weapon Header</div>
          <div slot="content">Weapon Content</div>
-      </HeaderWithScrollingSidebar>
+      </HeaderWithSidebar>
    </div>
 </ApplicationShell>
 

@@ -44,8 +44,14 @@ Hooks.on('renderChatMessage', (message, html) => {
    const messageData = message.getFlag('titan', 'data');
    const validTypes = new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck']);
    if (validTypes.has(messageData?.chatContext?.type)) {
-      // If so, display the message
-      new ChatMessageShell({ target: html[0], props: messageData });
+      // If so, create the chat message shell and display the message
+      new ChatMessageShell({
+         target: html[0],
+         props: {
+            message: message,
+            chatContext: messageData.chatContext,
+         }
+      });
    }
 });
 
