@@ -46,11 +46,11 @@ Hooks.on('renderChatMessage', (message, html) => {
    const validTypes = new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck']);
    if (validTypes.has(messageData?.chatContext?.type)) {
       // If so, create the chat message shell and display the message
-      const storeDoc = new TJSDocument(message, { delete: message.delete.bind(message) });
+      const documentStore = new TJSDocument(message, { delete: message._onDelete.bind(message) });
       new ChatMessageShell({
          target: html[0],
          props: {
-            storeDoc: storeDoc,
+            documentStore: documentStore,
          }
       });
    }

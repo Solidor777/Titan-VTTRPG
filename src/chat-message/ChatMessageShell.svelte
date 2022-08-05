@@ -5,10 +5,10 @@
    import CheckChatMessageShell from "../check/chat-message/CheckChatMessageShell.svelte";
 
    // Context object
-   export let storeDoc = void 0;
+   export let documentStore = void 0;
 
    // Setup
-   setContext("DocumentSheetObject", storeDoc);
+   setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
 
    // Selector for the chat message type

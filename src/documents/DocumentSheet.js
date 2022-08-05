@@ -7,7 +7,7 @@ export class SvelteDocumentSheet extends SvelteApplication {
     *
     * @type {TJSDocument<foundry.abstract.Document>}
     */
-   #storeDoc = new TJSDocument(void 0, { delete: this.close.bind(this) });
+   #documentStore = new TJSDocument(void 0, { delete: this.close.bind(this) });
 
    /**
     * Holds the document unsubscription function.
@@ -26,9 +26,9 @@ export class SvelteDocumentSheet extends SvelteApplication {
        * @memberof SvelteReactive#
        */
       Object.defineProperty(this.reactive, "document", {
-         get: () => this.#storeDoc.get(),
+         get: () => this.#documentStore.get(),
          set: (document) => {
-            this.#storeDoc.set(document);
+            this.#documentStore.set(document);
          },
       });
       this.reactive.document = object;
@@ -53,7 +53,7 @@ export class SvelteDocumentSheet extends SvelteApplication {
             target: document.body,
             // You can assign a function that is invoked with MyItemApp instance as `this`.
             props: function () {
-               return { storeDoc: this.#storeDoc };
+               return { documentStore: this.#documentStore };
             },
          },
       });
@@ -300,7 +300,7 @@ export class SvelteDocumentSheet extends SvelteApplication {
 
    render(force = false, options = {}) {
       if (!this.#storeUnsubscribe) {
-         this.#storeUnsubscribe = this.#storeDoc.subscribe(this.#handleDocUpdate.bind(this));
+         this.#storeUnsubscribe = this.#documentStore.subscribe(this.#handleDocUpdate.bind(this));
       }
       super.render(force, options);
       return this;

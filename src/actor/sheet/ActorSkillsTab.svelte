@@ -53,11 +53,11 @@
                <div class="row">
                   <div class="label">{localize("LOCAL.training.label")}</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].training.baseValue} />
+                     <DocumentTextInput bind:value={$document.system.skill[key].training.baseValue} type="integer" />
                   </div>
                   <div class="op">+</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].training.staticMod} />
+                     <DocumentTextInput bind:value={$document.system.skill[key].training.staticMod} type="integer" />
                   </div>
                   <div class="op">=</div>
                   <div class="value">
@@ -71,11 +71,11 @@
                <div class="row">
                   <div class="label">Expertise</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.baseValue} />
+                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.baseValue} type="integer" />
                   </div>
                   <div class="op">+</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.staticMod} />
+                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.staticMod} type="integer" />
                   </div>
                   <div class="op">=</div>
                   <div class="value">

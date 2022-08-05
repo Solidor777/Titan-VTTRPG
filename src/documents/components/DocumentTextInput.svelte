@@ -12,9 +12,6 @@
    // Text or Number
    export let type = "text";
 
-   // Input
-   let input;
-
    // Document reference
    const document = getContext("DocumentSheetObject");
 
@@ -30,17 +27,19 @@
    }
 
    function validateInput(medium) {
-      let retVal = type === "integer" ? parseInt(medium) : parseFloat(medium);
-      if (isNaN(retVal)) {
-         retVal = 0;
+      if (type !== "text") {
+         let retVal = type === "integer" ? parseInt(medium) : parseFloat(medium);
+         if (isNaN(retVal)) {
+            retVal = 0;
+         }
+         return retVal;
+      } else {
+         return medium;
       }
-      return retVal;
    }
 
    // Filter the value appropriately
-   $: if (type !== "text") {
-      value = validateInput(medium);
-   }
+   $: value = validateInput(medium);
 
    /**
     * If number, only allow numbers.
@@ -66,11 +65,12 @@
 </script>
 
 <input
-   bind:this={input}
    bind:value={medium}
    on:keypress={(event) => checkInput(event)}
    on:change={() => {
+      console.log($document.name);
       $document.update(data);
+      console.log($document.name);
    }}
 />
 

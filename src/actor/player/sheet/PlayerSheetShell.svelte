@@ -18,8 +18,8 @@
 
    // Setup
    export let elementRoot;
-   export let storeDoc;
-   setContext("DocumentSheetObject", storeDoc);
+   export let documentStore;
+   setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
 
    let tabs = [
