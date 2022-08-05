@@ -1,6 +1,9 @@
 <script>
+   import { getContext } from "svelte";
+   const document = getContext("DocumentSheetObject");
+
    // Results
-   export let dice = void 0;
+   let dice = $document.flags.titan.data.chatContext.results.dice;
 
    function getDieTypeClass(die) {
       if (die.criticalSuccess) {

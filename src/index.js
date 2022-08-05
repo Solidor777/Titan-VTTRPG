@@ -6,6 +6,7 @@ import { TITANCONSTANTS } from "./helpers/Constants.js";
 import { TITANLOCAL } from "./helpers/Local.js";
 import { registerSystemSettings } from "./helpers/RegisterSystemSettings.js";
 import { TitanActor } from "./actor/Actor";
+import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import TitanPlayerSheet from "./actor/player/sheet/PlayerSheet";
 import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet";
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
@@ -45,11 +46,11 @@ Hooks.on('renderChatMessage', (message, html) => {
    const validTypes = new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck']);
    if (validTypes.has(messageData?.chatContext?.type)) {
       // If so, create the chat message shell and display the message
+      const storeDoc = new TJSDocument(message, { delete: message.delete.bind(message) });
       new ChatMessageShell({
          target: html[0],
          props: {
-            message: message,
-            chatContext: messageData.chatContext,
+            storeDoc: storeDoc,
          }
       });
    }

@@ -1,10 +1,15 @@
 <script>
    import { autoScroll } from "~/helpers/svelte-actions/AutoScroll.js";
+   import { setContext } from "svelte";
+   import { getContext } from "svelte";
    import CheckChatMessageShell from "../check/chat-message/CheckChatMessageShell.svelte";
 
    // Context object
-   export let message = void 0;
-   export let chatContext = void 0;
+   export let storeDoc = void 0;
+
+   // Setup
+   setContext("DocumentSheetObject", storeDoc);
+   const document = getContext("DocumentSheetObject");
 
    // Selector for the chat message type
    function selectComponent() {
@@ -13,10 +18,10 @@
          skillCheck: CheckChatMessageShell,
          resistanceCheck: CheckChatMessageShell,
       };
-      return chatComponents[chatContext.type];
+      return chatComponents[$document.flags.titan.data.chatContext.type];
    }
 </script>
 
 <div use:autoScroll>
-   <svelte:component this={selectComponent()} {chatContext} />
+   <svelte:component this={selectComponent()} />
 </div>

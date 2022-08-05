@@ -1,12 +1,33 @@
 <script>
+   import { getContext } from "svelte";
+   const document = getContext("DocumentSheetObject");
+
    // Main label
-   export let label = void 0;
+   let label = $document.flags.titan.data.chatContext.label;
 
    // Type label
-   export let typeLabel = void 0;
+   let typeLabel = $document.flags.titan.data.chatContext.typeLabel;
+
+   function getLabelClass() {
+      const chatContext = $document.flags.titan.data.chatContext;
+      switch (chatContext.type) {
+         case "resistanceCheck": {
+            return chatContext.parameters.resistance;
+         }
+         case "attributeCheck": {
+            return chatContext.parameters.attribute;
+         }
+         case "skillCheck": {
+            return chatContext.parameters.attribute;
+         }
+         default: {
+            return "";
+         }
+      }
+   }
 </script>
 
-<div class="label">
+<div class="label {getLabelClass()}">
    <!--Main Label -->
    <div class="main-label">
       {label}
@@ -27,6 +48,26 @@
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;
+
+      &.body {
+         --color-background-label: var(--color-body-bright);
+      }
+      &.mind {
+         --color-background-label: var(--color-mind-bright);
+      }
+      &.soul {
+         --color-background-label: var(--color-soul-bright);
+      }
+      &.reflexes {
+         --color-background-label: var(--color-reflexes-bright);
+      }
+      &.resilience {
+         --color-background-label: var(--color-resilience-bright);
+      }
+      &.willpower {
+         --color-background-label: var(--color-willpower-bright);
+      }
+
       background-color: var(--color-background-label);
 
       .main-label {
