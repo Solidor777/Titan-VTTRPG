@@ -14,8 +14,8 @@
       font-size: 1.6rem;
       width: 100%;
       height: 100%;
-      --height-input: 2.5rem;
-      --border-radius-input: 10px;
+      --input-height: 2.5rem;
+      --input-border-radius: 10px;
       --font-size: 1.5rem;
    }
 </style>

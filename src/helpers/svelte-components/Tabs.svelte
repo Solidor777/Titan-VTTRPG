@@ -65,12 +65,12 @@
             @include flex-group-center;
             font-size: var(--font-size);
             width: 100%;
-            border-style: var(--border-style-normal);
-            border-width: var(--border-width-normal);
+            border-style: var(--border-style);
+            border-width: var(--border-width);
             border-color: var(--border-color-normal);
 
             &.active {
-               background-color: var(--color-background-highlight);
+               background-color: var(--highlight-background-color);
             }
          }
       }

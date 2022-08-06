@@ -29,15 +29,15 @@
 <style lang="scss">
    .attribute-select {
       &.body {
-         --color-background-input: var(--color-body-bright);
+         --input-background-color: var(--body-color-bright);
       }
 
       &.mind {
-         --color-background-input: var(--color-mind-bright);
+         --input-background-color: var(--mind-color-bright);
       }
 
       &.soul {
-         --color-background-input: var(--color-soul-bright);
+         --input-background-color: var(--soul-color-bright);
       }
    }
 </style>

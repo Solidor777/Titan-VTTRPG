@@ -57,19 +57,19 @@
          margin: 0.25rem;
 
          &.critical-success {
-            background-color: var(--color-critical-success-bright);
+            background-color: var(--critical-success-color-bright);
          }
 
          &.success {
-            background-color: var(--color-success-bright);
+            background-color: var(--success-color-bright);
          }
 
          &.failure {
-            background-color: var(--color-failure-bright);
+            background-color: var(--failure-color-bright);
          }
 
          &.critical-failure {
-            background-color: var(--color-critical-failure-bright);
+            background-color: var(--critical-failure-color-bright);
          }
       }
    }

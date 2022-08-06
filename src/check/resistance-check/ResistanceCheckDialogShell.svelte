@@ -111,7 +111,7 @@
             border-top: solid;
             padding-top: 0.25rem;
             margin-top: 0.25rem;
-            border-width: var(--border-width-normal);
+            border-width: var(--border-width);
          }
 
          .label {
@@ -127,8 +127,8 @@
             margin-left: 0.5rem;
             height: 100%;
             width: 100%;
-            --height-input: 1.8rem;
-            --width-input: 100%;
+            --input-height: 1.8rem;
+            --input-width: 100%;
          }
 
          .summary {

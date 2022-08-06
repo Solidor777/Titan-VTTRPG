@@ -51,7 +51,7 @@
       @include flex-group-center;
       width: 100%;
       padding: 0.5rem;
-      background-color: var(--color-background-label);
+      background-color: var(--label-background-color);
 
       :not(:first-child) {
          margin-top: 0.25rem;
@@ -70,11 +70,11 @@
          font-size: 1.2rem;
 
          &.succeeded {
-            color: var(--color-succeeded-dark);
+            color: var(--succeeded-color-dark);
          }
 
          &.failed {
-            color: var(--color-failed-dark);
+            color: var(--failed-color-dark);
          }
       }
 

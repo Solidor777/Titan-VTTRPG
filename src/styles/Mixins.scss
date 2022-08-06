@@ -1,21 +1,21 @@
 @mixin input {
   box-sizing: border-box;
-  border-style: var(--border-style-input);
-  border-radius: var(--border-radius-input);
-  border-width: var(--border-width-input);
-  border-color: var(--color-border-input);
-  background-color: var(--color-background-input);
+  border-style: var(--input-border-style);
+  border-radius: var(--input-border-radius);
+  border-width: var(--input-border-width);
+  border-color: var(--input-border-color);
+  background-color: var(--input-background-color);
   font-size: var(--font-size);
   font-family: var(--font-family);
   text-align: var(--text-alignment);
-  height: var(--height-input);
-  width: var(--width-input);
+  height: var(--input-height);
+  width: var(--input-width);
 }
 
 @mixin border-normal {
-  border-style: var(--border-style-normal);
-  border-radius: var(--border-radius-normal);
-  border-width: var(--border-width-normal);
+  border-style: var(--border-style);
+  border-radius: var(--border-radius);
+  border-width: var(--border-width);
   border-color: var(--border-color-normal);
 }
 
@@ -26,13 +26,13 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  border-style: var(--border-style-button);
-  border-radius: var(--border-radius-button);
-  border-width: var(--border-width-button);
+  border-style: var(--button-border-style);
+  border-radius: var(--button-border-radius);
+  border-width: var(--button-border-width);
   border-color: var(--border-color-button);
-  background-color: var(--color-background-button-normal);
-  font-size: var(--font-size-button);
-  font-weight: var(--font-weight-button);
+  background-color: var(--button-background-color);
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
   padding: var(--button-padding);
   margin: 0;
 }
@@ -44,31 +44,31 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  border-style: var(--border-style-icon-button);
-  border-radius: var(--border-radius-icon-button);
-  border-width: var(--border-width-icon-button);
+  border-style: var(--icon-button-border-style);
+  border-radius: var(--icon-button-border-radius);
+  border-width: var(--icon-button-border-width);
   border-color: var(--border-color-icon-button);
-  background-color: var(--color-background-icon-button-normal);
+  background-color: var(--icon-button-background-color);
   padding: var(--icon-button-padding);
   margin: 0;
 }
 
 @mixin border-top-normal {
-  border-top: var(--border-style-normal);
-  border-width: var(--border-width-normal);
+  border-top: var(--border-style);
+  border-width: var(--border-width);
   border-color: var(--border-color-normal);
 }
 
 @mixin border-bottom-normal {
-  border-bottom: var(--border-style-normal);
-  border-width: var(--border-width-normal);
+  border-bottom: var(--border-style);
+  border-width: var(--border-width);
   border-color: var(--border-color-normal);
 }
 
 @mixin border-input {
-  border-style: var(--border-style-input);
-  border-radius: var(--border-radius-input);
-  border-width: var(--border-width-input);
+  border-style: var(--input-border-style);
+  border-radius: var(--input-border-radius);
+  border-width: var(--input-border-width);
   border-color: var(--border-color-normal);
 }
 

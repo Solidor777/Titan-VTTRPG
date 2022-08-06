@@ -37,7 +37,7 @@
 
 <style>
    img {
-      border-style: var(--border-style-normal);
+      border-style: var(--border-style);
       cursor: pointer;
    }
 </style>

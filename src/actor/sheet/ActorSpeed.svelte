@@ -73,7 +73,7 @@
 
          .input {
             width: 1.7rem;
-            --border-radius-input: 10px;
+            --input-border-radius: 10px;
          }
       }
    }

@@ -147,7 +147,7 @@
 
          .portrait {
             width: 8rem;
-            --border-style-normal: none;
+            --border-style: none;
          }
 
          .attacks {

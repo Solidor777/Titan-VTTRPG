@@ -67,15 +67,15 @@
          width: 6rem;
 
          &.reflexes {
-            --color-background-button-normal: var(--color-reflexes-bright);
+            --button-background-color: var(--reflexes-color-bright);
          }
 
          &.resilience {
-            --color-background-button-normal: var(--color-resilience-bright);
+            --button-background-color: var(--resilience-color-bright);
          }
 
          &.willpower {
-            --color-background-button-normal: var(--color-willpower-bright);
+            --button-background-color: var(--willpower-color-bright);
          }
       }
 
@@ -95,7 +95,7 @@
             height: 100%;
             height: 100%;
             width: 1.7rem;
-            --border-radius-input: 10px;
+            --input-border-radius: 10px;
          }
 
          .label {

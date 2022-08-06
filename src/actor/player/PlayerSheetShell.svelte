@@ -172,7 +172,7 @@
 
          .portrait {
             width: 10rem;
-            --border-style-normal: none;
+            --border-style: none;
          }
 
          .resources {
@@ -195,15 +195,15 @@
                }
 
                &.stamina {
-                  --meter-color: var(--color-stamina-dark);
+                  --meter-color: var(--stamina-color-dark);
                }
 
                &.wounds {
-                  --meter-color: var(--color-wounds-dark);
+                  --meter-color: var(--wounds-color-dark);
                }
 
                &.resolve {
-                  --meter-color: var(--color-resolve-dark);
+                  --meter-color: var(--resolve-color-dark);
                }
             }
          }
@@ -335,8 +335,8 @@
                      display: flex;
                      margin-right: 0.5rem;
                      width: 3rem;
-                     --border-radius-input: 10px;
-                     --height-input: 1.8rem;
+                     --input-border-radius: 10px;
+                     --input-height: 1.8rem;
                   }
 
                   .label {
@@ -426,8 +426,8 @@
                .divider {
                   height: 100%;
                   width: 0;
-                  border-left: var(--border-style-normal);
-                  border-width: var(--border-width-normal);
+                  border-left: var(--border-style);
+                  border-width: var(--border-width);
                }
             }
          }

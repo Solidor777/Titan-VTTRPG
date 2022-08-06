@@ -39,8 +39,8 @@
    }
 
    button:hover {
-      //background: var(--color-background-button-highlight);
-      background: radial-gradient(var(--color-background-button-highlight), var(--color-background-button-normal));
+      //background: var(--button-background-color-highlight);
+      background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
       clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
    }
 </style>

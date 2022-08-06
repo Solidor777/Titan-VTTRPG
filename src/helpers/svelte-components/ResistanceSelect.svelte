@@ -29,15 +29,15 @@
 <style lang="scss">
    .resistance-select {
       &.reflexes {
-         --color-background-input: var(--color-reflexes-bright);
+         --input-background-color: var(--reflexes-color-bright);
       }
 
       &.resilience {
-         --color-background-input: var(--color-resilience-bright);
+         --input-background-color: var(--resilience-color-bright);
       }
 
       &.willpower {
-         --color-background-input: var(--color-willpower-bright);
+         --input-background-color: var(--willpower-color-bright);
       }
    }
 </style>

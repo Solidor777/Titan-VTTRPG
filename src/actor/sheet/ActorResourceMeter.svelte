@@ -94,8 +94,8 @@
          }
 
          .input {
-            --width-input: 2rem;
-            --border-radius-input: 10px;
+            --input-width: 2rem;
+            --input-border-radius: 10px;
             margin-left: 0.25rem;
          }
 
@@ -127,7 +127,7 @@
             @include flex-row;
             @include flex-group-center;
             @include border-normal;
-            background-color: var(--color-background-static-label);
+            background-color: var(--static-label-background-color);
             width: 3.2rem;
             height: 100%;
             text-align: center;

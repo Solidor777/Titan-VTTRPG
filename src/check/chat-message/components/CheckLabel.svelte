@@ -50,25 +50,25 @@
       align-items: flex-start;
 
       &.body {
-         --color-background-label: var(--color-body-bright);
+         --label-background-color: var(--body-color-bright);
       }
       &.mind {
-         --color-background-label: var(--color-mind-bright);
+         --label-background-color: var(--mind-color-bright);
       }
       &.soul {
-         --color-background-label: var(--color-soul-bright);
+         --label-background-color: var(--soul-color-bright);
       }
       &.reflexes {
-         --color-background-label: var(--color-reflexes-bright);
+         --label-background-color: var(--reflexes-color-bright);
       }
       &.resilience {
-         --color-background-label: var(--color-resilience-bright);
+         --label-background-color: var(--resilience-color-bright);
       }
       &.willpower {
-         --color-background-label: var(--color-willpower-bright);
+         --label-background-color: var(--willpower-color-bright);
       }
 
-      background-color: var(--color-background-label);
+      background-color: var(--label-background-color);
 
       .main-label {
          font-size: 1.2rem;

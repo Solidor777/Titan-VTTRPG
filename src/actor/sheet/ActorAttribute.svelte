@@ -70,15 +70,15 @@
       .button {
          width: 6rem;
          &.body {
-            --color-background-button-normal: var(--color-body-bright);
+            --button-background-color: var(--body-color-bright);
          }
 
          &.mind {
-            --color-background-button-normal: var(--color-mind-bright);
+            --button-background-color: var(--mind-color-bright);
          }
 
          &.soul {
-            --color-background-button-normal: var(--color-soul-bright);
+            --button-background-color: var(--soul-color-bright);
          }
       }
 
@@ -98,7 +98,7 @@
             height: 100%;
             height: 100%;
             width: 1.7rem;
-            --border-radius-input: 10px;
+            --input-border-radius: 10px;
          }
 
          .label {
