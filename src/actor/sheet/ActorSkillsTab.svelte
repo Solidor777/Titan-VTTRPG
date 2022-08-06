@@ -16,10 +16,10 @@
 </script>
 
 <div class="skill-tab">
-   <div class="skills-container">
+   <ol>
       <!--Each skill-->
       {#each Object.entries($document.system.skill) as [key, skill]}
-         <div class="skill">
+         <li>
             <!--Button and Attribute-->
             <div class="column">
                <!--Button for rolling the skill-->
@@ -83,9 +83,9 @@
                   </div>
                </div>
             </div>
-         </div>
+         </li>
       {/each}
-   </div>
+   </ol>
 
    <!--Each skill-->
 </div>
@@ -99,8 +99,9 @@
       height: 100%;
       font-size: 1rem;
 
-      .skills-container {
+      ol {
          @include flex-column;
+         list-style: none;
          width: 100%;
          position: absolute;
          top: 0;
@@ -108,85 +109,85 @@
          bottom: 0;
          overflow-y: scroll;
          padding: 0.25rem;
-      }
 
-      .skill {
-         @include flex-row;
-         @include border-normal;
-         width: 100%;
-         padding: 0.5rem;
+         li {
+            @include flex-row;
+            @include border-normal;
+            width: 100%;
+            padding: 0.5rem;
 
-         &:not(:first-child) {
-            margin-top: 0.5rem;
-         }
-
-         .column {
-            @include flex-column;
-            height: 100%;
             &:not(:first-child) {
-               margin-left: 0.5rem;
+               margin-top: 0.5rem;
             }
 
-            .row {
+            .column {
+               @include flex-column;
+               height: 100%;
+               &:not(:first-child) {
+                  margin-left: 0.5rem;
+               }
+
+               .row {
+                  @include flex-row;
+                  @include flex-group-center;
+                  &:not(:first-child) {
+                     margin-top: 0.5rem;
+                  }
+                  width: 100%;
+
+                  .label {
+                     @include flex-row;
+                     @include flex-group-right;
+                     height: 100%;
+                     width: 5rem;
+                     font-weight: bold;
+                     text-align: right;
+                  }
+                  .value {
+                     @include flex-row;
+                     @include flex-group-center;
+                     height: 100%;
+                     width: 3.2rem;
+                     margin-left: 0.5rem;
+                     font-weight: bold;
+                  }
+                  .op {
+                     @include flex-row;
+                     @include flex-group-center;
+                     height: 100%;
+                     width: 0.5rem;
+                     margin-left: 0.5rem;
+                  }
+               }
+            }
+
+            button {
+               @include border-normal;
+               width: 10rem;
+               font-size: 1rem;
+               font-weight: bold;
+            }
+            .default-attribute {
                @include flex-row;
                @include flex-group-center;
-               &:not(:first-child) {
-                  margin-top: 0.5rem;
-               }
+               height: 100%;
                width: 100%;
 
                .label {
                   @include flex-row;
-                  @include flex-group-right;
-                  height: 100%;
-                  width: 5rem;
-                  font-weight: bold;
-                  text-align: right;
-               }
-               .value {
-                  @include flex-row;
                   @include flex-group-center;
                   height: 100%;
-                  width: 3.2rem;
-                  margin-left: 0.5rem;
+                  width: 100%;
                   font-weight: bold;
                }
-               .op {
+
+               .select {
                   @include flex-row;
                   @include flex-group-center;
+                  margin-left: 0.25rem;
                   height: 100%;
-                  width: 0.5rem;
-                  margin-left: 0.5rem;
+                  width: 100%;
                }
-            }
-         }
-
-         button {
-            @include border-normal;
-            width: 10rem;
-            font-size: 1rem;
-            font-weight: bold;
-         }
-         .default-attribute {
-            @include flex-row;
-            @include flex-group-center;
-            height: 100%;
-            width: 100%;
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               height: 100%;
-               width: 100%;
-               font-weight: bold;
-            }
-
-            .select {
-               @include flex-row;
-               @include flex-group-center;
-               margin-left: 0.25rem;
-               height: 100%;
-               width: 100%;
             }
          }
       }
