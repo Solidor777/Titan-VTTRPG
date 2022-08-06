@@ -7,10 +7,6 @@
    // The value of the input
    export let value;
 
-   // The type of input
-   // Text or Number
-   export let type = "text";
-
    // Document reference
    const document = getContext("DocumentSheetObject");
 
@@ -28,7 +24,6 @@
 
 <input
    bind:value
-   on:keypress={(event) => checkInput(event)}
    on:change={async () => {
       $document.update(data);
    }}
