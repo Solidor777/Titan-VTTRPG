@@ -5,8 +5,6 @@
   --font-awesome: "Lato";
   --font-family: "Lato";
   --font-size: 1rem;
-  --font-size-button: 1rem;
-  --font-weight-button: bold;
 
   // Normal border
   --border-style-normal: solid;
@@ -20,12 +18,26 @@
   --border-width-input: 0.1rem;
   --color-border-input: black;
 
-  // Button border
+  // Button Styling
   --border-style-button: solid;
   --border-radius-button: 25px;
   --border-width-button: 0.1rem;
   --color-border-button: black;
   --button-padding: 0.1rem 0.25rem;
+  --color-background-button-normal: rgba(255, 255, 240, 0.8);
+  --color-background-button-highlight: rgb(255, 233, 174);
+  --font-size-button: 1rem;
+  --font-weight-button: bold;
+
+  // Icon Button Styling
+  --border-style-icon-button: solid;
+  --border-radius-icon-button: 50%;
+  --border-width-icon-button: 0.1rem;
+  --color-border-icon-button: black;
+  --icon-button-padding: 0.1rem;
+  --color-background-icon-button-normal: rgba(255, 255, 240, 0.8);
+  --color-background-icon-button-highlight: rgb(255, 233, 174);
+  --icon-button-radius: 2rem;
 
   // Tool tip delay
   --tooltip-delay-normal: 0.6s;
@@ -61,8 +73,6 @@
   --color-background-input: whitesmoke;
   --color-background-highlight: rgb(255, 233, 174);
   --color-background-static-label: rgb(208, 208, 208);
-  --color-background-button-normal: rgba(255, 255, 240, 0.8);
-  --color-background-button-highlight: rgb(255, 233, 174);
 
   // Sizes
   --height-input: 1.5rem;

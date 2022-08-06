@@ -5,6 +5,8 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
+   import { AttackTraitSelectDialog } from "./AttackTraitSelectDialog.js";
    import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
@@ -12,10 +14,9 @@
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
-   import DocumentCheckboxInput from "../../../documents/components/DocumentCheckboxInput.svelte";
-   import { TJSIconButton } from "@typhonjs-fvtt/svelte-standard/component";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
+   import DocumentName from "~/documents/components/DocumentName.svelte";
+   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
 
    // Setup
    export let elementRoot;
@@ -23,16 +24,17 @@
    setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
 
-   const addTraitsButton = {
-      icon: "fas fa-circle-plus",
-      efx: ripple(),
-      title: "LOCAL.addTraits.label",
-   };
+   function editAttackTraits(attackIdx) {
+      console.trace();
+      console.log("clicked");
+      return;
+   }
 
-   const testButton = {
-      icon: "fas fa-circle-plus",
+   const editAttackTraitsButton = {
+      icon: "fas fa-pen-to-square",
       efx: ripple(),
       title: "LOCAL.addTraits.label",
+      onClickPropagate: false,
    };
 </script>
 
@@ -92,9 +94,14 @@
 
                            <!--Traits-->
                            <div class="attack-traits">
-                              <div class="label">
+                              <div class="attack-straits">
                                  {localize("LOCAL.traits.label")}
-                                 <TJSIconButton button={addTraitsButton} />
+                                 <IconButton
+                                    button={editAttackTraitsButton}
+                                    on:click={() => {
+                                       console.log("Clicked");
+                                    }}
+                                 />
                               </div>
                               <div class="traits-container">
                                  {#each Object.entries(attack.traits) as trait}
@@ -114,17 +121,16 @@
             <div class="row">
                <!--Item name Sheet-->
                <div class="item-name">
-                  <DocumentTextInput bind:value={$document.name} />
+                  <DocumentName />
                </div>
             </div>
          </div>
-         <div class="content" slot="content"><EfxButton button={testButton} /></div>
       </HeaderWithSidebar>
    </div>
 </ApplicationShell>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .weapon-sheet {
       font-size: 1rem;

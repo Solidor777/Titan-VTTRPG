@@ -5,9 +5,9 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
+   import DocumentName from "~/documents/components/DocumentName.svelte";
    import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
    import ActorResistance from "~/actor/sheet/ActorResistance.svelte";
    import ActorRating from "~/actor/sheet/ActorRating.svelte";
@@ -90,7 +90,7 @@
             <div class="row">
                <!--Actor name Sheet-->
                <div class="actor-name">
-                  <DocumentTextInput bind:value={$document.name} />
+                  <DocumentName />
                </div>
 
                <!--Exp-->
@@ -153,7 +153,7 @@
 </ApplicationShell>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .player-sheet {
       display: flex;
@@ -311,12 +311,7 @@
                }
 
                .actor-name {
-                  font-family: var(--font-family);
-                  font-size: 1.6rem;
                   width: 50%;
-                  --height-input: 2.5rem;
-                  --border-radius-input: 10px;
-                  --font-size: 1.5rem;
                }
 
                .exp {

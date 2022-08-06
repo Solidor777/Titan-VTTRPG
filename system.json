@@ -14,8 +14,9 @@
   "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
   "changelog": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/",
   "version": "0.0.0",
-  "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "10",
+  "compatibility": {
+    "minimum": "10"
+  },
   "esmodules": [
     "index.js"
   ],
@@ -30,7 +31,6 @@
     }
   ],
   "system": [],
-  "dependencies": [],
   "socket": false,
   "manifest": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/download/system.json",
   "download": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/0.0.0/module.zip",

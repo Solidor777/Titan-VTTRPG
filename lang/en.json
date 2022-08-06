@@ -243,6 +243,7 @@
   "LOCAL.plusSuccess.label": "+S",
   "LOCAL.traits.label": "Traits",
   "LOCAL.editTraits.label": "Edit Traits",
+  "LOCAL.editAttackTraits.label": "Edit Attack Traits",
   "LOCAL.versus.label": "vs.",
   "LOCAL.sendToChat.label": "Send to Chat",
   "LOCAL.damageTaken.label": "Damage Taken",

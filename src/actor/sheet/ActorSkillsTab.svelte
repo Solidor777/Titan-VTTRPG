@@ -9,9 +9,12 @@
    const document = getContext("DocumentSheetObject");
 
    async function rollSkillCheck(skill) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
+
       $document.rollAttributeCheck({
          attribute: $document.system.skill[skill].defaultAttribute,
          skill: skill,
+         getOptions: getOptions,
       });
    }
 </script>

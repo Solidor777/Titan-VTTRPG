@@ -37,6 +37,22 @@
   margin: 0;
 }
 
+@mixin icon-button {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-style: var(--border-style-icon-button);
+  border-radius: var(--border-radius-icon-button);
+  border-width: var(--border-width-icon-button);
+  border-color: var(--border-color-icon-button);
+  background-color: var(--color-background-icon-button-normal);
+  padding: var(--icon-button-padding);
+  margin: 0;
+}
+
 @mixin border-top-normal {
   border-top: var(--border-style-normal);
   border-width: var(--border-width-normal);

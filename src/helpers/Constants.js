@@ -28,8 +28,8 @@ export const TITANCONSTANTS = Object.freeze({
     },
   },
 
-  attack: {
-    trait: {
+  trait: {
+    attack: {
       blast: {
         type: "number"
       },
@@ -90,6 +90,6 @@ export const TITANCONSTANTS = Object.freeze({
       twoHanded: {
         type: "bool"
       },
-    },
+    }
   },
 });

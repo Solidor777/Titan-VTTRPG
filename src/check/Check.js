@@ -247,13 +247,17 @@ export default class TitanCheck {
           roll: this.roll,
           type: CONST.CHAT_MESSAGE_TYPES.OTHER,
           sound: CONFIG.sounds.dice,
+          flags: {
+            titan: {
+              data: { chatContext: chatContext }
+            }
+          }
         },
         options.rollMode ?
           options.rollMode :
           game.settings.get("core", "rollMode")
       )
     );
-    await this.chatMessage.setFlag('titan', 'data', { chatContext: chatContext });
 
     return this.chatMessage;
   }

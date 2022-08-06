@@ -1,7 +1,6 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { autoScroll } from "~/helpers/svelte-actions/AutoScroll.js";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import CheckChatMessageShell from "../check/chat-message/CheckChatMessageShell.svelte";
@@ -28,6 +27,6 @@
    }
 </script>
 
-<div use:autoScroll>
+<div>
    <svelte:component this={selectComponent()} />
 </div>
