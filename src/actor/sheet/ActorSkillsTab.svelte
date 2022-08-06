@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
 
    const document = getContext("DocumentSheetObject");
@@ -53,11 +53,11 @@
                <div class="row">
                   <div class="label">{localize("LOCAL.training.label")}</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].training.baseValue} type="integer" />
+                     <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue} />
                   </div>
                   <div class="op">+</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].training.staticMod} type="integer" />
+                     <DocumentIntegerInput bind:value={$document.system.skill[key].training.staticMod} />
                   </div>
                   <div class="op">=</div>
                   <div class="value">
@@ -69,13 +69,13 @@
                </div>
                <!--Expertise Row-->
                <div class="row">
-                  <div class="label">Expertise</div>
+                  <div class="label">{localize("LOCAL.expertise.label")}</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.baseValue} type="integer" />
+                     <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.baseValue} />
                   </div>
                   <div class="op">+</div>
                   <div class="value">
-                     <DocumentTextInput bind:value={$document.system.skill[key].expertise.staticMod} type="integer" />
+                     <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.staticMod} />
                   </div>
                   <div class="op">=</div>
                   <div class="value">

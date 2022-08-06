@@ -1,7 +1,7 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
 
    // The key / name of the Rating
    export let key;
@@ -40,7 +40,7 @@
 
       <!--Static Mod-->
       <div class="static-mod" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
-         <DocumentTextInput bind:value={$document.system.rating[key].staticMod} type="integer" />
+         <DocumentIntegerInput bind:value={$document.system.rating[key].staticMod} />
       </div>
       <div class="label">=</div>
 

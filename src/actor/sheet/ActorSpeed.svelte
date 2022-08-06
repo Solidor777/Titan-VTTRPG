@@ -1,7 +1,7 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
 
    // The key / name of the speed
    export let key;
@@ -25,13 +25,13 @@
    <div class="stats">
       <!--Base Value-->
       <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editBaseValue.label`)}>
-         <DocumentTextInput bind:value={$document.system.speed[key].baseValue} type="integer" />
+         <DocumentIntegerInput bind:value={$document.system.speed[key].baseValue} />
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
       <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
-         <DocumentTextInput bind:value={$document.system.speed[key].staticMod} type="integer" />
+         <DocumentIntegerInput bind:value={$document.system.speed[key].staticMod} />
       </div>
       <div class="label">=</div>
 

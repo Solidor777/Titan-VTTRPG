@@ -6,6 +6,7 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
    import ActorResistance from "~/actor/sheet/ActorResistance.svelte";
@@ -101,7 +102,7 @@
 
                   <!--Earned Input-->
                   <div class="earned" data-tooltip={localize("LOCAL.expEarned.label")}>
-                     <DocumentTextInput bind:value={$document.system.exp.earned} type="integer" />
+                     <DocumentIntegerInput bind:value={$document.system.exp.earned} />
                   </div>
 
                   <!--Label-->

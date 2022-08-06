@@ -1,5 +1,5 @@
 <script>
-   import DocumentTextInput from "../../documents/components/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
 
    // Label of the mater
    export let label;
@@ -36,7 +36,7 @@
       <div class="static-mod">
          +
          <div class="input" data-titan-tooltip={editStaticModTooltip}>
-            <DocumentTextInput bind:value={staticMod} type="integer" />
+            <DocumentIntegerInput bind:value={staticMod} />
          </div>
       </div>
    </div>
@@ -44,7 +44,7 @@
    <!--Meter bar row-->
    <div class="row">
       <!--Current Value Input-->
-      <div class="input" data-titan-tooltip={editValueTooltip}><DocumentTextInput bind:value type="integer" /></div>
+      <div class="input" data-titan-tooltip={editValueTooltip}><DocumentIntegerInput bind:value /></div>
 
       <!--The Meter-->
       <div class="meter" data-titan-tooltip={valueTooltip}>

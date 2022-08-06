@@ -2,7 +2,7 @@
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
 
    // The key / name of the resistance
    export let key;
@@ -43,7 +43,7 @@
 
       <!--Static Mod-->
       <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
-         <DocumentTextInput bind:value={$document.system.resistance[key].staticMod} type="integer" />
+         <DocumentIntegerInput bind:value={$document.system.resistance[key].staticMod} />
       </div>
       <div class="label">=</div>
 
