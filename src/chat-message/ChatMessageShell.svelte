@@ -1,8 +1,14 @@
+<svelte:options accessors={true} />
+
 <script>
    import { autoScroll } from "~/helpers/svelte-actions/AutoScroll.js";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import CheckChatMessageShell from "../check/chat-message/CheckChatMessageShell.svelte";
+   import { current_component } from "svelte/internal";
+
+   // Store this component reference.
+   const local = current_component;
 
    // Context object
    export let documentStore = void 0;

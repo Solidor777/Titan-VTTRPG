@@ -2,13 +2,12 @@ import { TitanWeapon } from "./weapon/Weapon";
 export class TitanItem extends Item {
    prepareDerivedData() {
       // Prepare universal character data
-      this._prepareCharacterData();
 
       // Create type component if necessary
       if (!this.system.typeComponent) {
          switch (this.type) {
             // Weapon
-            case "player": {
+            case "weapon": {
                this.typeComponent = new TitanWeapon(this);
                this.weapon = this.typeComponent;
                break;

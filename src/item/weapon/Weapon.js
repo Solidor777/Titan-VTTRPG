@@ -1,9 +1,6 @@
-import { TitanTypeComponent } from "./type-component.mjs";
+import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
 
 export class TitanWeapon extends TitanTypeComponent {
-   getChatTemplate() {
-      return "systems/titan/templates/item/spell/spell-chat-message.hbs";
-   }
 
    getAttackTemplate() {
       return {

@@ -96,12 +96,12 @@
                <!--Exp-->
                <div class="exp">
                   <!--Available-->
-                  <div class="available" data-tooltip={localize("LOCAL.expAvailable.label")}>
+                  <div class="available" data-titan-tooltip={localize("LOCAL.expAvailable.label")}>
                      {$document.system.exp.available} /
                   </div>
 
                   <!--Earned Input-->
-                  <div class="earned" data-tooltip={localize("LOCAL.expEarned.label")}>
+                  <div class="earned" data-titan-tooltip={localize("LOCAL.expEarned.label")}>
                      <DocumentIntegerInput bind:value={$document.system.exp.earned} />
                   </div>
 
