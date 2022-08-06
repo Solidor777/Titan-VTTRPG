@@ -24,7 +24,7 @@
             <!--Button and Attribute-->
             <div class="column">
                <!--Button for rolling the skill-->
-               <div class="skill-button">
+               <div class="skill-button" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
                   <EfxButton on:click={rollSkillCheck(key)} efx={ripple()}>
                      {localize(`LOCAL.${key}.label`)}
                   </EfxButton>

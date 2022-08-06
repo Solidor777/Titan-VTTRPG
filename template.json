@@ -198,7 +198,7 @@
               "staticMod": 0
             }
           },
-          "sleightOfHand": {
+          "subterfuge": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
@@ -530,7 +530,7 @@
           "perception": false,
           "performance": false,
           "rangedWeapons": false,
-          "sleightOfHand": false,
+          "subterfuge": false,
           "stealth": false,
           "survival": false,
           "theology": false
@@ -560,7 +560,7 @@
           "perception": false,
           "performance": false,
           "rangedWeapons": false,
-          "sleightOfHand": false,
+          "subterfuge": false,
           "stealth": false,
           "survival": false,
           "theology": false

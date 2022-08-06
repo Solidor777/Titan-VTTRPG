@@ -92,8 +92,8 @@
          value: "rangedWeapons",
       },
       {
-         label: localize("LOCAL.sleightOfHand.label"),
-         value: "sleightOfHand",
+         label: localize("LOCAL.subterfuge.label"),
+         value: "subterfuge",
       },
       {
          label: localize("LOCAL.stealth.label"),
