@@ -6,7 +6,7 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import { AttackTraitSelectDialog } from "./AttackTraitSelectDialog.js";
+   import { EditAttackTraitsDialog } from "./EditAttackTraitsDialog.js";
    import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
@@ -25,8 +25,8 @@
    const document = getContext("DocumentSheetObject");
 
    function editAttackTraits(attackIdx) {
-      console.trace();
-      console.log("clicked");
+      const dialog = new EditAttackTraitsDialog($document, attackIdx);
+      dialog.render(true);
       return;
    }
 
@@ -94,14 +94,10 @@
 
                            <!--Traits-->
                            <div class="attack-traits">
-                              <div class="attack-straits">
+                              <!--Header-->
+                              <div class="attack-traits-header">
                                  {localize("LOCAL.traits.label")}
-                                 <IconButton
-                                    button={editAttackTraitsButton}
-                                    on:click={() => {
-                                       console.log("Clicked");
-                                    }}
-                                 />
+                                 <IconButton button={editAttackTraitsButton} on:click={editAttackTraits(key)} />
                               </div>
                               <div class="traits-container">
                                  {#each Object.entries(attack.traits) as trait}
@@ -191,6 +187,11 @@
                      @include border-top-normal;
                      margin-top: 0.25rem;
                      padding-top: 0.25rem;
+
+                     .attack-traits-header {
+                        font-weight: bold;
+                        font-size: 0.9rem;
+                     }
                   }
                }
             }
