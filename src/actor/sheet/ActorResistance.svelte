@@ -1,8 +1,9 @@
 <script>
-   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import EfxButton from "~/helpers/svelte-components/EFXButton.svelte";
 
    // The key / name of the resistance
    export let key;
@@ -13,7 +14,7 @@
    // The resistance data
    $: resistance = $document.system.resistance[key];
 
-   async function rollResistance(event, resistance) {
+   async function rollResistance(resistance) {
       const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
 
       $document.rollResistanceCheck({
@@ -25,14 +26,11 @@
 
 <div class="resistance" data-resistance={key}>
    <!--Resistance Label-->
-   <button
-      class="resistance-roll {key}"
-      data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
-      on:click={(event) => rollResistance(event, key)}
-      on:mousedown={preventDefault}
-   >
-      {localize(`LOCAL.${key}.label`)}
-   </button>
+   <div class="button {key}" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+      <EfxButton on:click={rollResistance(key)} efx={ripple()}>
+         {localize(`LOCAL.${key}.label`)}
+      </EfxButton>
+   </div>
 
    <div class="stats">
       <!--Base Value-->
@@ -65,22 +63,19 @@
       box-sizing: border-box;
       font-size: 1rem;
 
-      button {
-         @include border-normal;
-         border-radius: 25px;
+      .button {
          width: 6rem;
-         font-size: 1rem;
-         font-weight: bold;
+
          &.reflexes {
-            background-color: var(--color-reflexes-bright);
+            --color-background-button-normal: var(--color-reflexes-bright);
          }
 
          &.resilience {
-            background-color: var(--color-resilience-bright);
+            --color-background-button-normal: var(--color-resilience-bright);
          }
 
          &.willpower {
-            background-color: var(--color-willpower-bright);
+            --color-background-button-normal: var(--color-willpower-bright);
          }
       }
 

@@ -1,8 +1,9 @@
 <script>
-   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // The key / name of the attribute
    export let key;
@@ -26,14 +27,11 @@
 
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
-   <button
-      class="attribute-roll {key}"
-      data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}
-      on:click={rollAttributeCheck(key)}
-      on:mousedown={preventDefault}
-   >
-      {localize(`LOCAL.${key}.label`)}
-   </button>
+   <div class="button {key}" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+      <EfxButton on:click={rollAttributeCheck(key)} efx={ripple()}>
+         {localize(`LOCAL.${key}.label`)}
+      </EfxButton>
+   </div>
 
    <!--Stats-->
    <div class="stats">
@@ -69,23 +67,18 @@
       font-size: 1rem;
       box-sizing: border-box;
 
-      button {
-         @include border-normal;
-         border-radius: 25px;
+      .button {
          width: 6rem;
-         font-weight: bold;
-         font-size: 1rem;
-
          &.body {
-            background-color: var(--color-body-bright);
+            --color-background-button-normal: var(--color-body-bright);
          }
 
          &.mind {
-            background-color: var(--color-mind-bright);
+            --color-background-button-normal: var(--color-mind-bright);
          }
 
          &.soul {
-            background-color: var(--color-soul-bright);
+            --color-background-button-normal: var(--color-soul-bright);
          }
       }
 

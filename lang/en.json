@@ -222,6 +222,7 @@
   "LOCAL.damage.label": "Damage",
   "LOCAL.name.label": "Name",
   "LOCAL.plusExtraSuccessDamage.label": "+ES Damage",
+  "LOCAL.plusSuccess.label": "+S",
   "LOCAL.traits.label": "Traits",
   "LOCAL.editTraits.label": "Edit Traits",
   "LOCAL.versus.label": "vs.",
@@ -266,6 +267,7 @@
   "LOCAL.mod.label": "Mod",
   "LOCAL.base.label": "Base",
   "LOCAL.defaultAttribute.label": "Attribute",
+  "LOCAL.addTraits.label": "Add Traits",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

@@ -2,6 +2,7 @@
 
 <script>
    import { getContext } from "svelte";
+   import { text } from "svelte/internal";
 
    // The value of the input
    export let value;
@@ -22,7 +23,8 @@
 </script>
 
 <input
-   bind:value
+   type="checkbox"
+   bind:checked={value}
    on:change={async () => {
       $document.update(data);
    }}

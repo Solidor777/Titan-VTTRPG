@@ -1,9 +1,10 @@
 <script>
    import { getContext } from "svelte";
-   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
+   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    const document = getContext("DocumentSheetObject");
 
@@ -24,9 +25,9 @@
             <div class="column">
                <!--Button for rolling the skill-->
                <div class="skill-button">
-                  <button on:click={rollSkillCheck(key)} on:mousedown={preventDefault}>
+                  <EfxButton on:click={rollSkillCheck(key)} efx={ripple()}>
                      {localize(`LOCAL.${key}.label`)}
-                  </button>
+                  </EfxButton>
                </div>
                <!--Default Attribute Select-->
                <div class="default-attribute">
@@ -161,11 +162,8 @@
                }
             }
 
-            button {
-               @include border-normal;
+            .skill-button {
                width: 10rem;
-               font-size: 1rem;
-               font-weight: bold;
             }
             .default-attribute {
                @include flex-row;

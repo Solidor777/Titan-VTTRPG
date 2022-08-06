@@ -19,6 +19,24 @@
   border-color: var(--border-color-normal);
 }
 
+@mixin button-normal {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-style: var(--border-style-button);
+  border-radius: var(--border-radius-button);
+  border-width: var(--border-width-button);
+  border-color: var(--border-color-button);
+  background-color: var(--color-background-button-normal);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-button);
+  padding: var(--button-padding);
+  margin: 0;
+}
+
 @mixin border-top-normal {
   border-top: var(--border-style-normal);
   border-width: var(--border-width-normal);
