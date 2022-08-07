@@ -3,8 +3,8 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
-   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
 
    const document = getContext("DocumentSheetObject");
 
@@ -38,7 +38,7 @@
                      {localize("LOCAL.defaultAttribute.label")}
                   </div>
                   <div class="select">
-                     <AttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
+                     <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
                   </div>
                </div>
             </div>

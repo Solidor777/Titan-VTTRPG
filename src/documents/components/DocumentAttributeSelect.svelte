@@ -1,6 +1,5 @@
-<svelte:options accessors={true} />
-
 <script>
+   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import { getContext } from "svelte";
 
    // The value of the input
@@ -9,7 +8,6 @@
    // Document reference
    const document = getContext("DocumentSheetObject");
 
-   // Copy of the document data
    let data;
    $: {
       data = {
@@ -21,18 +19,9 @@
    }
 </script>
 
-<input
-   type="checkbox"
-   bind:checked={value}
+<AttributeSelect
+   bind:value
    on:change={async () => {
       $document.update(data);
    }}
 />
-
-<style lang="scss">
-   @import "../../styles/Mixins.scss";
-
-   input {
-      @include input;
-   }
-</style>

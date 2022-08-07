@@ -22,7 +22,7 @@
    ];
 </script>
 
-<div class="attribute-select {value}">
+<div class="attribute-select {value}" on:change>
    <Select options={attributeOptions} bind:value />
 </div>
 

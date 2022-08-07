@@ -6,15 +6,15 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
+   import { slide } from "svelte/transition";
    import { EditAttackTraitsDialog } from "./EditAttackTraitsDialog.js";
-   import { fade } from "svelte/transition";
    import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
-   import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
+   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
+   import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
@@ -34,9 +34,29 @@
    const editAttackTraitsButton = {
       icon: "fas fa-pen-to-square",
       efx: ripple(),
-      title: "LOCAL.addTraits.label",
-      onClickPropagate: false,
    };
+
+   const deleteAttackButton = {
+      icon: "fas fa-trash",
+      efx: ripple(),
+   };
+
+   const isCollapsed = {};
+
+   function getExpandIcon(id) {
+      if (isCollapsed[id]) {
+         return "fas fa-angle-double-down";
+      }
+      return "fas fa-angle-double-up";
+   }
+
+   function collapseElement(id) {
+      isCollapsed[id] = true;
+   }
+
+   function expandElement(id) {
+      isCollapsed[id] = false;
+   }
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -63,59 +83,84 @@
                         <li>
                            <!--Attack header-->
                            <div class="attack-header">
-                              <DocumentTextInput bind:value={$document.system.attack[key].name} />
-                           </div>
+                              <div>
+                                 {#if isCollapsed[key]}
+                                    <IconButton icon="fas fa-angle-double-down" on:click={expandElement(key)} />
+                                 {:else}
+                                    <IconButton icon="fas fa-angle-double-up" on:click={collapseElement(key)} />
+                                 {/if}
+                              </div>
 
-                           <!--Attribute select-->
-                           <div class="attack-field">
-                              <div class="label">{localize("LOCAL.attribute.label")};</div>
-                              <AttributeSelect value={$document.system.attack[key].attribute} />
-                           </div>
-
-                           <!--Skill select-->
-                           <div class="attack-field">
-                              <div class="label">{localize("LOCAL.skill.label")};</div>
-                              <SkillSelect value={$document.system.attack[key].skill} />
-                           </div>
-
-                           <!--Damage-->
-                           <div class="attack-field">
-                              <div class="label">{localize("LOCAL.damage.label")}</div>
-                              <div class="input-row">
-                                 <div class="input">
-                                    <DocumentIntegerInput value={$document.system.attack[key].damage} />
-                                 </div>
-                                 <div class="input">
-                                    {localize("LOCAL.plusSuccess.label")}
-                                    <DocumentCheckboxInput value={$document.system.attack[key].plusSuccessDamage} />
-                                 </div>
+                              <div>
+                                 <DocumentTextInput bind:value={$document.system.attack[key].name} />
+                              </div>
+                              <div>
+                                 <IconButton
+                                    button={deleteAttackButton}
+                                    on:click={$document.weapon.deleteAttack(key)}
+                                 />
                               </div>
                            </div>
 
-                           <!--Traits-->
-                           <div class="attack-traits">
-                              <!--Header-->
-                              <div class="attack-traits-header">
-                                 <div />
-                                 <div>
-                                    {localize("LOCAL.traits.label")}
+                           {#if !isCollapsed[key]}
+                              <div transition:slide>
+                                 <!--Attribute select-->
+                                 <div class="attack-field">
+                                    <div class="label">{localize("LOCAL.attribute.label")};</div>
+                                    <DocumentAttributeSelect bind:value={$document.system.attack[key].attribute} />
                                  </div>
-                                 <div>
-                                    <IconButton button={editAttackTraitsButton} on:click={editAttackTraits(key)} />
+
+                                 <!--Skill select-->
+                                 <div class="attack-field">
+                                    <div class="label">{localize("LOCAL.skill.label")};</div>
+                                    <DocumentSkillSelect bind:value={$document.system.attack[key].skill} />
                                  </div>
-                              </div>
-                              <div class="attack-traits-container">
-                                 <!--Each trait-->
-                                 {#each Object.entries(attack.traits) as [key, trait]}
-                                    <div class="attack-trait">
-                                       {localize(`LOCAL.${key}.label`)}
-                                       {#if typeof trait === "number"}
-                                          {trait}
-                                       {/if}
+
+                                 <!--Damage-->
+                                 <div class="attack-field">
+                                    <div class="label">{localize("LOCAL.damage.label")}</div>
+                                    <div class="input-row">
+                                       <div class="input">
+                                          <DocumentIntegerInput value={$document.system.attack[key].damage} />
+                                       </div>
+                                       <div class="input">
+                                          {localize("LOCAL.plusSuccess.label")}
+                                          <DocumentCheckboxInput
+                                             value={$document.system.attack[key].plusSuccessDamage}
+                                          />
+                                       </div>
                                     </div>
-                                 {/each}
+                                 </div>
+
+                                 <!--Traits-->
+                                 <div class="attack-traits">
+                                    <!--Header-->
+                                    <div class="attack-traits-header">
+                                       <div />
+                                       <div>
+                                          {localize("LOCAL.traits.label")}
+                                       </div>
+                                       <div>
+                                          <IconButton
+                                             button={editAttackTraitsButton}
+                                             on:click={editAttackTraits(key)}
+                                          />
+                                       </div>
+                                    </div>
+                                    <div class="attack-traits-container">
+                                       <!--Each trait-->
+                                       {#each Object.entries(attack.traits) as [key, trait]}
+                                          <div class="attack-trait">
+                                             {localize(`LOCAL.${key}.label`)}
+                                             {#if typeof trait === "number"}
+                                                {trait}
+                                             {/if}
+                                          </div>
+                                       {/each}
+                                    </div>
+                                 </div>
                               </div>
-                           </div>
+                           {/if}
                         </li>
                      {/each}
                   </ol>
@@ -176,6 +221,15 @@
                li {
                   @include border;
                   padding: 0.5rem;
+
+                  .attack-header {
+                     @include flex-row;
+                     @include flex-group-center;
+
+                     :not(:first-child) {
+                        margin-left: 0.5rem;
+                     }
+                  }
 
                   .attack-field {
                      @include border-top-normal;
