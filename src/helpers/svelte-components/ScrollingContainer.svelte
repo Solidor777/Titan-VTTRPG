@@ -1,5 +1,34 @@
+<script>
+   let scrollClass = "";
+   function scrollFade(event) {
+      /*       const node = event.target;
+      const isScrollable = node.scrollHeight > node.clientHeight;
+
+      // GUARD: If element is not scrollable, remove all classes
+      if (!isScrollable) {
+         node.classList.remove("is-bottom-overflowing", "is-top-overflowing");
+         return;
+      }
+
+      // Otherwise, the element is overflowing!
+      // Now we just need to find out which direction it is overflowing to (can be both)
+      const isScrolledToBottom = node.scrollHeight <= node.clientHeight + node.scrollTop;
+      const isScroledlToTop = node.scrollTop === 0;
+      if (!isScrolledToBottom) {
+         scrollClass = " faded bottom-overflowing";
+         if (!isScroledlToTop) {
+            scrollClass += " top-overflowing";
+         }
+      } else if (!isScroledlToTop) {
+         scrollClass = " faded top-overflowing";
+      } else {
+         scrollClass = "";
+      } */
+   }
+</script>
+
 <div class="container">
-   <div class="content">
+   <div class="content{scrollClass}" on:scroll={scrollFade}>
       <slot>Scrolling Content</slot>
    </div>
 </div>
@@ -22,6 +51,31 @@
          bottom: 0;
          overflow-y: scroll;
          padding: 0.25rem;
+
+         /*          &.top-overflowing {
+            --top-mask-size: 12px;
+         }
+
+         &.bottom-overflowing {
+            --bottom-mask-size: 12px;
+         }
+
+         &.faded {
+            -webkit-mask-image: linear-gradient(
+               to bottom,
+               transparent 0,
+               black var(--top-mask-size, 0),
+               black calc(100% - var(--bottom-mask-size, 0)),
+               transparent 100%
+            );
+            mask-image: linear-gradient(
+               to bottom,
+               transparent 0,
+               black var(--top-mask-size, 0),
+               black calc(100% - var(--bottom-mask-size, 0)),
+               transparent 100%
+            );
+         } */
       }
    }
 </style>

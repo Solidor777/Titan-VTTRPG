@@ -7,6 +7,7 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { EditAttackTraitsDialog } from "./EditAttackTraitsDialog.js";
+   import { fade } from "svelte/transition";
    import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
@@ -50,12 +51,11 @@
 
             <!--Attacks-->
             <div class="attacks">
+               <!--Attacks Label-->
+               <div class="attacks-header">
+                  {localize("LOCAL.attacks.label")}
+               </div>
                <ScrollingContainer>
-                  <!--Attacks Label-->
-                  <div class="label">
-                     {localize("LOCAL.attacks.label")}
-                  </div>
-
                   <!--List of attacks-->
                   <ol class="attack-list">
                      <!--For Each attack-->
@@ -161,11 +161,17 @@
             @include flex-column;
             width: 100%;
             height: 100%;
+            margin-top: 0.5rem;
+
+            .attacks-header {
+               font-weight: bold;
+               margin-bottom: 0.5rem;
+            }
 
             ol {
                list-style: none;
                padding: 0;
-               margin: 0.5rem 0 0 0;
+               margin: 0;
 
                li {
                   @include border;
