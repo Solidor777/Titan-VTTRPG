@@ -39,16 +39,14 @@ export class TitanWeapon extends TitanTypeComponent {
       // If we have no more attacks, ensure we have at least one
       if (attack.length <= 0) {
          this.addAttack();
+      }
 
-      }
-      // Otherwise, update the item
-      else {
-         await this.parent.update({
-            system: {
-               attack: attack,
-            },
-         });
-      }
+      // Update the item
+      await this.parent.update({
+         system: {
+            attack: attack,
+         },
+      });
 
       return;
    }

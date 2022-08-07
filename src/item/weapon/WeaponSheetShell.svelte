@@ -25,37 +25,54 @@
    setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
 
+   // Initialize collapsed state
+   const application = getContext("external").application;
+   const isCollapsed = application.isCollapsed;
+   isCollapsed.desc = isCollapsed.desc ?? { attack: [] };
+   for (const [key, value] of Object.entries($document.system.attack)) {
+      isCollapsed.desc.attack[key] = isCollapsed.desc.attack[key] ?? false;
+   }
+
+   // Opens the attack traits edit dialog
    function editAttackTraits(attackIdx) {
       const dialog = new EditAttackTraitsDialog($document, attackIdx);
       dialog.render(true);
       return;
    }
 
+   // Button info for edit attack traits
    const editAttackTraitsButton = {
       icon: "fas fa-pen-to-square",
       efx: ripple(),
    };
 
+   // Button info for delete attack
    const deleteAttackButton = {
       icon: "fas fa-trash",
       efx: ripple(),
    };
 
-   const isCollapsed = {};
+   // Button info for add attack button
+   const addAttackButton = {
+      icon: "fas fa-circle-plus",
+      efx: ripple(),
+   };
 
-   function getExpandIcon(id) {
-      if (isCollapsed[id]) {
-         return "fas fa-angle-double-down";
+   // Handles deleting an attack
+   async function deleteAttack(key) {
+      if (isCollapsed.desc.attack.length === 1) {
+         isCollapsed.desc.attack[0] = false;
+      } else {
+         isCollapsed.desc.attack.splice(key, 1);
       }
-      return "fas fa-angle-double-up";
+      await $document.weapon.deleteAttack(key);
+      return;
    }
 
-   function collapseElement(id) {
-      isCollapsed[id] = true;
-   }
-
-   function expandElement(id) {
-      isCollapsed[id] = false;
+   // Handles adding an attack
+   async function addAttack() {
+      await $document.weapon.addAttack();
+      return;
    }
 </script>
 
@@ -84,25 +101,35 @@
                            <!--Attack header-->
                            <div class="attack-header">
                               <div>
-                                 {#if isCollapsed[key]}
-                                    <IconButton icon="fas fa-angle-double-down" on:click={expandElement(key)} />
+                                 {#if isCollapsed.desc.attack[key]}
+                                    <!--Collapse button-->
+                                    <IconButton
+                                       icon="fas fa-angle-double-down"
+                                       on:click={() => {
+                                          isCollapsed.desc.attack[key] = false;
+                                       }}
+                                    />
                                  {:else}
-                                    <IconButton icon="fas fa-angle-double-up" on:click={collapseElement(key)} />
+                                    <!--Expand button-->
+                                    <IconButton
+                                       icon="fas fa-angle-double-up"
+                                       on:click={() => {
+                                          isCollapsed.desc.attack[key] = true;
+                                       }}
+                                    />
                                  {/if}
                               </div>
-
                               <div>
+                                 <!--Attack Name-->
                                  <DocumentTextInput bind:value={$document.system.attack[key].name} />
                               </div>
                               <div>
-                                 <IconButton
-                                    button={deleteAttackButton}
-                                    on:click={$document.weapon.deleteAttack(key)}
-                                 />
+                                 <!--Delete button-->
+                                 <IconButton button={deleteAttackButton} on:click={deleteAttack(key)} />
                               </div>
                            </div>
 
-                           {#if !isCollapsed[key]}
+                           {#if !isCollapsed.desc.attack[key]}
                               <div transition:slide>
                                  <!--Attribute select-->
                                  <div class="attack-field">
@@ -164,6 +191,10 @@
                         </li>
                      {/each}
                   </ol>
+                  <!--Add attack button-->
+                  <div class="add-attack-button">
+                     <IconButton button={addAttackButton} on:click={addAttack} />
+                  </div>
                </ScrollingContainer>
             </div>
          </div>
@@ -221,6 +252,10 @@
                li {
                   @include border;
                   padding: 0.5rem;
+
+                  &:not(:first-child) {
+                     margin-top: 0.5rem;
+                  }
 
                   .attack-header {
                      @include flex-row;
@@ -287,6 +322,13 @@
                      }
                   }
                }
+            }
+
+            .add-attack-button {
+               @include flex-row;
+               @include flex-group-center;
+               width: 100%;
+               margin-top: 0.5rem;
             }
          }
       }

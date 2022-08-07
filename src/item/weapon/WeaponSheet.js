@@ -18,4 +18,6 @@ export default class TitanWeaponSheet extends SvelteDocumentSheet {
          }
       });
    }
+
+   isCollapsed = {};
 }
