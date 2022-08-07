@@ -15,7 +15,7 @@ export class EditAttackTraitsDialog extends TJSDialog {
       },
       {
         width: 320,
-        height: 275,
+        height: 570,
       }
     );
   }

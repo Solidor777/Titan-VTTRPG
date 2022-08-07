@@ -96,12 +96,23 @@
                            <div class="attack-traits">
                               <!--Header-->
                               <div class="attack-traits-header">
-                                 {localize("LOCAL.traits.label")}
-                                 <IconButton button={editAttackTraitsButton} on:click={editAttackTraits(key)} />
+                                 <div />
+                                 <div>
+                                    {localize("LOCAL.traits.label")}
+                                 </div>
+                                 <div>
+                                    <IconButton button={editAttackTraitsButton} on:click={editAttackTraits(key)} />
+                                 </div>
                               </div>
-                              <div class="traits-container">
-                                 {#each Object.entries(attack.traits) as trait}
-                                    {localize(`LOCAL.${trait.label}`)}
+                              <div class="attack-traits-container">
+                                 <!--Each trait-->
+                                 {#each Object.entries(attack.traits) as [key, trait]}
+                                    <div class="attack-trait">
+                                       {localize(`LOCAL.${key}.label`)}
+                                       {#if typeof trait === "number"}
+                                          {trait}
+                                       {/if}
+                                    </div>
                                  {/each}
                               </div>
                            </div>
@@ -136,7 +147,7 @@
       .sidebar {
          @include flex-column;
          @include flex-group-top;
-         @include border-normal;
+         @include border;
          padding: 0.25rem;
          height: 100%;
          margin-right: 0.5rem;
@@ -157,7 +168,7 @@
                margin: 0.5rem 0 0 0;
 
                li {
-                  @include border-normal;
+                  @include border;
                   padding: 0.5rem;
 
                   .attack-field {
@@ -189,8 +200,30 @@
                      padding-top: 0.25rem;
 
                      .attack-traits-header {
+                        @include grid(3);
                         font-weight: bold;
-                        font-size: 0.9rem;
+                        font-size: 1rem;
+
+                        div {
+                           @include flex-row;
+                           @include flex-group-center;
+                           height: 100%;
+                           width: 100%;
+                        }
+                     }
+
+                     .attack-traits-container {
+                        @include flex-row;
+                        @include flex-group-center;
+                        flex-wrap: wrap;
+                        width: 100%;
+
+                        .attack-trait {
+                           @include border;
+                           font-weight: bold;
+                           margin: 0.25rem;
+                           padding: 0.25rem;
+                        }
                      }
                   }
                }
@@ -201,7 +234,7 @@
       .header {
          @include flex-column;
          @include flex-group-center;
-         @include border-normal;
+         @include border;
          padding: 0.5rem;
          height: 100%;
          .row {
@@ -214,7 +247,7 @@
       .content {
          @include flex-column;
          @include flex-group-top;
-         @include border-normal;
+         @include border;
          padding: 0.5rem;
          height: 100%;
          margin-top: 0.5rem;

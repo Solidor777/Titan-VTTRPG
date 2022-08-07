@@ -160,7 +160,7 @@
       flex: 1;
 
       .sidebar {
-         @include border-normal;
+         @include border;
          @include flex-column;
          @include flex-group-top;
 
@@ -292,7 +292,7 @@
          @include flex-column;
 
          .header {
-            @include border-normal;
+            @include border;
             @include flex-column;
             align-items: center;
             justify-content: space-between;

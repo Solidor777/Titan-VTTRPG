@@ -28,7 +28,7 @@
    @import "../../styles/Mixins.scss";
 
    button {
-      @include button-normal;
+      @include button;
       cursor: pointer;
       position: relative;
       overflow: hidden;

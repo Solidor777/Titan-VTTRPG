@@ -133,6 +133,7 @@
 
          .summary {
             @include flex-group-center;
+            margin-top: 0.5rem;
             font-weight: bold;
             font-size: 1.1rem;
             height: 100%;
@@ -141,6 +142,7 @@
          }
 
          button {
+            margin-top: 0.5rem;
             font-size: 1rem;
          }
       }

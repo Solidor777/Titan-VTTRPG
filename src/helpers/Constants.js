@@ -30,66 +30,26 @@ export const TITANCONSTANTS = Object.freeze({
 
   trait: {
     attack: {
-      blast: {
-        type: "number"
-      },
-      cleave: {
-        type: "bool"
-      },
-      close: {
-        type: "bool"
-      },
-      crushing: {
-        type: "bool"
-      },
-      dualAttack: {
-        type: "bool"
-      },
-      defensive: {
-        type: "bool"
-      },
-      ineffective: {
-        type: "bool"
-      },
-      loud: {
-        type: "bool"
-      },
-      magical: {
-        type: "bool"
-      },
-      penetrating: {
-        type: "bool"
-      },
-      piercing: {
-        type: "bool"
-      },
-      range: {
-        type: "bool"
-      },
-      reload: {
-        type: "bool"
-      },
-      rend: {
-        type: "bool"
-      },
-      restraining: {
-        type: "bool"
-      },
-      slashing: {
-        type: "bool"
-      },
-      spread: {
-        type: "number"
-      },
-      subtle: {
-        type: "bool"
-      },
-      thrown: {
-        type: "bool"
-      },
-      twoHanded: {
-        type: "bool"
-      },
+      blast: 0,
+      cleave: false,
+      close: false,
+      crushing: false,
+      dualAttack: false,
+      defensive: false,
+      ineffective: false,
+      loud: false,
+      magical: false,
+      penetrating: false,
+      piercing: false,
+      range: false,
+      reload: false,
+      rend: false,
+      restraining: false,
+      slashing: false,
+      spread: 0,
+      subtle: false,
+      thrown: false,
+      twoHanded: false,
     }
   },
 });

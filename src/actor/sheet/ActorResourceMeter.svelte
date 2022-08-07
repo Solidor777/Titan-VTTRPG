@@ -126,7 +126,7 @@
             box-sizing: border-box;
             @include flex-row;
             @include flex-group-center;
-            @include border-normal;
+            @include border;
             background-color: var(--static-label-background-color);
             width: 3.2rem;
             height: 100%;

@@ -46,7 +46,7 @@
    @import "../../../styles/Mixins.scss";
 
    .results {
-      @include border-normal;
+      @include border;
       @include flex-column;
       @include flex-group-center;
       width: 100%;

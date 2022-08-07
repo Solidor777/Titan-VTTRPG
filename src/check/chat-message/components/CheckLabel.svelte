@@ -44,7 +44,7 @@
 <style lang="scss">
    @import "../../../styles/mixins.scss";
    .label {
-      @include border-normal;
+      @include border;
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;

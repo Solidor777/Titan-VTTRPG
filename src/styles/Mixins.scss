@@ -12,14 +12,14 @@
   width: var(--input-width);
 }
 
-@mixin border-normal {
+@mixin border {
   border-style: var(--border-style);
   border-radius: var(--border-radius);
   border-width: var(--border-width);
   border-color: var(--border-color-normal);
 }
 
-@mixin button-normal {
+@mixin button {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;

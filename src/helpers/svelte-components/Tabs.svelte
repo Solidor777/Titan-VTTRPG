@@ -43,7 +43,7 @@
    .tabs {
       @include flex-column;
       @include flex-group-top;
-      @include border-normal;
+      @include border;
       height: 100%;
 
       ul {

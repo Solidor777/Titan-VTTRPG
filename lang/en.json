@@ -286,7 +286,7 @@
   "LOCAL.mod.label": "Mod",
   "LOCAL.base.label": "Base",
   "LOCAL.defaultAttribute.label": "Attribute",
-  "LOCAL.addTraits.label": "Add Traits",
+  "LOCAL.applyEdits.label": "Apply Edits",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
