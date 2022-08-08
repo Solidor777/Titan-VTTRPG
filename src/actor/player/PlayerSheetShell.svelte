@@ -23,11 +23,13 @@
    setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
 
-   let tabs = [
+   // Tabs
+   const tabs = [
       { label: localize("LOCAL.skills.label"), id: "skills", component: ActorSkillsTab },
       { label: localize("LOCAL.inventory.label"), id: "inventory", component: ActorInventoryTab },
    ];
-   let activeTab = "skills";
+   const application = getContext("external").application;
+   application.activeTab = application.activeTab ?? "skills";
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -146,7 +148,7 @@
          </div>
          <!--Tab Content-->
          <div class="tabs">
-            <Tabs {tabs} {activeTab} />
+            <Tabs {tabs} bind:activeTab={application.activeTab} />
          </div>
       </div>
    </div>

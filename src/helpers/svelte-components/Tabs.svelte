@@ -4,7 +4,7 @@
    export let tabs = [];
 
    // The active tab
-   export let activeTab;
+   export let activeTab = void 0;
 </script>
 
 <!--List of tabs-->
@@ -45,6 +45,7 @@
       @include flex-group-top;
       @include border;
       height: 100%;
+      width: 100%;
 
       ul {
          @include flex-row;

@@ -37,18 +37,20 @@ export class TitanWeapon extends TitanTypeComponent {
       attack.splice(idx, 1);
 
       // If we have no more attacks, ensure we have at least one
+      // This will hand the update on its on
       if (attack.length <= 0) {
          this.addAttack();
       }
 
-      // Update the item
-      await this.parent.update({
-         system: {
-            attack: attack,
-         },
-      });
+      // Otherwise, update the item
+      else {
+         await this.parent.update({
+            system: {
+               attack: attack,
+            },
+         });
 
-      return;
+         return;
+      }
    }
-
 }
