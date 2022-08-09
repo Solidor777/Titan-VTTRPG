@@ -1,8 +1,9 @@
 <script>
    import { getContext } from "svelte";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import AttackSheetVertical from "./AttackSheetVertical.svelte";
+   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
 
    // Reference to the weapon item
    const document = getContext("DocumentSheetObject");
@@ -12,17 +13,14 @@
 </script>
 
 <div class="weapon-attacks-tab">
-   <div class="scrolling-content">
-      <ScrollingContainer>
-         <ol class="attack-list">
-            <!--For Each attack-->
-            {#each Object.entries($document.system.attack) as [attackIdx, attack]}
-               <li transition:slide|local>
-                  <AttackSheetVertical {attackIdx} bind:isCollapsedObject={application.isCollapsed.attacks.attack} />
-               </li>
-            {/each}
-         </ol></ScrollingContainer
-      >
+   <!--For Each attack-->
+   {#each Object.entries($document.system.attack) as [attackIdx, attack]}
+      <div transition:slide|local>
+         <AttackSheetVertical {attackIdx} bind:isCollapsedObject={application.isCollapsed.attacks.attack} />
+      </div>
+   {/each}
+   <div class="add-attack-button">
+      <IconButton icon={"fas fa-circle-plus"} efx={ripple()} on:click={application.addAttack.bind(application)} />
    </div>
 </div>
 
@@ -30,14 +28,16 @@
    @import "../../Styles/Mixins.scss";
 
    .weapon-attacks-tab {
-      @include flex-column;
-      @include flex-group-center;
+      display: grid;
+      gap: 0.5rem;
+      margin: 0.5rem 0.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 13rem));
       height: 100%;
       width: 100%;
 
-      .scrolling-content {
-         height: 100%;
-         width: 100%;
+      .add-attack-button {
+         @include flex-column;
+         @include flex-group-top;
       }
    }
 </style>

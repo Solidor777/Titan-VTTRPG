@@ -436,9 +436,9 @@
 
          .tabs {
             @include flex-column;
-            position: relative;
+            margin-top: 0.5rem;
             height: 100%;
-            width: 100;
+            width: 100%;
          }
       }
    }

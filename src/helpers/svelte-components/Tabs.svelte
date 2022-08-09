@@ -55,21 +55,24 @@
          width: 100%;
          margin: 0;
          padding: 0.25rem;
-      }
+         height: 100%;
+         flex: 0;
 
-      li {
-         @include flex-row;
-         width: 100%;
-         button {
+         li {
             @include flex-row;
-            @include flex-group-center;
-            font-size: var(--font-size);
-            border-style: var(--border-style);
-            border-width: var(--border-width);
-            border-color: var(--border-color-normal);
+            width: 100%;
+            button {
+               @include flex-row;
+               @include flex-group-center;
+               font-size: var(--font-size);
+               border-style: var(--border-style);
+               border-width: var(--border-width);
+               border-color: var(--border-color-normal);
+               height: 100%;
 
-            &.active {
-               background-color: var(--highlight-background-color);
+               &.active {
+                  background-color: var(--highlight-background-color);
+               }
             }
          }
       }
@@ -77,6 +80,7 @@
 
    .tab-content {
       @include flex-column;
+      flex: 2;
       height: 100%;
       width: 100%;
    }

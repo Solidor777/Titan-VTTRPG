@@ -5,17 +5,11 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import { slide } from "svelte/transition";
-   import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import WeaponAttacksTab from "./WeaponAttacksTab.svelte";
    import WeaponDescriptionTab from "./WeaponDescriptionTab.svelte";
-   import AttackSheetVertical from "./AttackSheetVertical.svelte";
 
    // Setup
    export let elementRoot;
@@ -42,59 +36,23 @@
 
 <ApplicationShell bind:elementRoot>
    <div class="weapon-sheet">
-      <HeaderWithSidebar>
-         <!--Sidebar-->
-         <div class="sidebar" slot="sidebar">
+      <!--Header-->
+      <div class="header">
+         <div class="row">
             <!--Item portrait-->
             <div class="portrait">
                <DocumentImagePicker path={"img"} alt={"item portrait"} />
             </div>
-
-            <!--Attacks-->
-            <div class="attacks">
-               <!--Attacks Label-->
-               <div class="attacks-header">
-                  {localize("LOCAL.attacks.label")}
-               </div>
-               <ScrollingContainer>
-                  <!--List of attacks-->
-                  <ol class="attack-list">
-                     <!--For Each attack-->
-                     {#each Object.entries($document.system.attack) as [attackIdx, attack]}
-                        <li transition:slide|local>
-                           <AttackSheetVertical
-                              {attackIdx}
-                              bind:isCollapsedObject={application.isCollapsed.desc.attack}
-                           />
-                        </li>
-                     {/each}
-                  </ol>
-                  <!--Add attack button-->
-                  <div class="add-attack-button">
-                     <IconButton
-                        icon={"fas fa-circle-plus"}
-                        efx={ripple()}
-                        on:click={application.addAttack.bind(application)}
-                     />
-                  </div>
-               </ScrollingContainer>
+            <!--Item name Sheet-->
+            <div class="item-name">
+               <DocumentName />
             </div>
          </div>
-
-         <!--Header-->
-         <div class="header" slot="header">
-            <div class="row">
-               <!--Item name Sheet-->
-               <div class="item-name">
-                  <DocumentName />
-               </div>
-            </div>
-         </div>
-         <!--Tab Content-->
-         <div class="tabs" slot="content">
-            <Tabs {tabs} bind:activeTab={application.activeTab} />
-         </div>
-      </HeaderWithSidebar>
+      </div>
+      <!--Tab Content-->
+      <div class="tabs">
+         <Tabs {tabs} bind:activeTab={application.activeTab} />
+      </div>
    </div>
 </ApplicationShell>
 
@@ -103,73 +61,37 @@
 
    .weapon-sheet {
       font-size: 1rem;
-      --sidebar-width: 13rem;
       --header-height: 10rem;
-
-      .sidebar {
-         @include flex-column;
-         @include flex-group-top;
-         @include border;
-         padding: 0.25rem;
-         height: 100%;
-         margin-right: 0.5rem;
-
-         .portrait {
-            width: 8rem;
-            --border-style: none;
-         }
-
-         .attacks {
-            @include flex-column;
-            width: 100%;
-            height: 100%;
-            margin-top: 0.5rem;
-
-            .attacks-header {
-               font-weight: bold;
-               margin-bottom: 0.5rem;
-            }
-
-            ol {
-               list-style: none;
-               padding: 0;
-               margin: 0;
-
-               li {
-                  &:not(:first-child) {
-                     margin-top: 0.5rem;
-                  }
-               }
-            }
-
-            .add-attack-button {
-               @include flex-row;
-               @include flex-group-center;
-               width: 100%;
-               margin-top: 0.5rem;
-            }
-         }
-      }
+      display: flex;
+      flex: 1;
+      @include flex-column;
 
       .header {
-         @include flex-column;
-         @include flex-group-center;
          @include border;
+         @include flex-column;
+         align-items: center;
+         justify-content: space-between;
+         width: 100%;
          padding: 0.5rem;
-         height: 100%;
+
          .row {
             @include flex-row;
             @include flex-group-left;
             width: 100%;
          }
+
+         .portrait {
+            width: 8rem;
+            --border-style: none;
+         }
       }
 
       .tabs {
-         @include flex-row;
-         @include flex-group-center;
+         @include flex-column;
+         margin-top: 0.5rem;
+         position: relative;
          height: 100%;
          width: 100%;
-         margin-top: 0.5rem;
       }
 
       .label {

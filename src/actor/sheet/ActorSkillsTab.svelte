@@ -113,6 +113,7 @@
          bottom: 0;
          overflow-y: scroll;
          padding: 0.25rem;
+         margin: 0;
 
          li {
             @include flex-row;
