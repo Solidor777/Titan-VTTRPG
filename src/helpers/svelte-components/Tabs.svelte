@@ -51,7 +51,6 @@
          @include flex-row;
          @include flex-space-evenly;
          @include border-bottom-normal;
-
          list-style: none;
          width: 100%;
          margin: 0;
@@ -65,7 +64,6 @@
             @include flex-row;
             @include flex-group-center;
             font-size: var(--font-size);
-            width: 100%;
             border-style: var(--border-style);
             border-width: var(--border-width);
             border-color: var(--border-color-normal);
@@ -79,8 +77,7 @@
 
    .tab-content {
       @include flex-column;
-      position: relative;
-      width: 100%;
       height: 100%;
+      width: 100%;
    }
 </style>

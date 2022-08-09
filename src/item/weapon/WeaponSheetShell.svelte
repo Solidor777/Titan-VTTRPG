@@ -7,7 +7,6 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import { EditAttackTraitsDialog } from "./EditAttackTraitsDialog.js";
    import HeaderWithSidebar from "~/helpers/svelte-components/HeaderWithSidebar.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
@@ -30,6 +29,7 @@
    isCollapsed.desc = isCollapsed.desc ?? { attack: [] };
    for (const [key, value] of Object.entries($document.system.attack)) {
       isCollapsed.desc.attack[key] = isCollapsed.desc.attack[key] ?? false;
+      isCollapsed.attacks.attack[key] = isCollapsed.attacks.attack[key] ?? false;
    }
 
    // Tabs
@@ -38,36 +38,6 @@
       { label: localize("LOCAL.attacks.label"), id: "attacks", component: WeaponAttacksTab },
    ];
    application.activeTab = application.activeTab ?? "description";
-
-   // Button info for add attack button
-   const addAttackButton = {
-      icon: "fas fa-circle-plus",
-      efx: ripple(),
-   };
-
-   // Handles deleting an attack
-   async function deleteAttack(key) {
-      if (isCollapsed.desc.attack.length === 1) {
-         isCollapsed.desc.attack[0] = false;
-      } else {
-         isCollapsed.desc.attack.splice(key, 1);
-      }
-      await $document.weapon.deleteAttack(key);
-      return;
-   }
-
-   // Handles adding an attack
-   async function addAttack() {
-      await $document.weapon.addAttack();
-      return;
-   }
-
-   // Opens the attack traits edit dialog
-   function editAttackTraits(attackIdx) {
-      const dialog = new EditAttackTraitsDialog($document, attackIdx);
-      dialog.render(true);
-      return;
-   }
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -91,14 +61,8 @@
                   <ol class="attack-list">
                      <!--For Each attack-->
                      {#each Object.entries($document.system.attack) as [attackIdx, attack]}
-                        <li transition:slide>
+                        <li transition:slide|local>
                            <AttackSheetVertical
-                              deleteAttack={() => {
-                                 deleteAttack(attackIdx);
-                              }}
-                              editAttackTraits={() => {
-                                 editAttackTraits(attackIdx);
-                              }}
                               {attackIdx}
                               bind:isCollapsedObject={application.isCollapsed.desc.attack}
                            />
@@ -107,7 +71,11 @@
                   </ol>
                   <!--Add attack button-->
                   <div class="add-attack-button">
-                     <IconButton button={addAttackButton} on:click={addAttack} />
+                     <IconButton
+                        icon={"fas fa-circle-plus"}
+                        efx={ripple()}
+                        on:click={application.addAttack.bind(application)}
+                     />
                   </div>
                </ScrollingContainer>
             </div>

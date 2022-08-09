@@ -16,11 +16,7 @@
    // Attack idx
    export let attackIdx = void 0;
 
-   // Delete attack function
-   export let deleteAttack = void 0;
-
-   // Edit attack traits function
-   export let editAttackTraits = void 0;
+   const application = getContext("external").application;
 
    // Document ref
    const document = getContext("DocumentSheetObject");
@@ -54,13 +50,17 @@
          </div>
          <div>
             <!--Delete button-->
-            <IconButton icon={"fas fa-trash"} efx={ripple} on:click={deleteAttack} />
+            <IconButton
+               icon={"fas fa-trash"}
+               efx={ripple}
+               on:click={application.deleteAttack.bind(application, attackIdx)}
+            />
          </div>
       </div>
 
       <!--Collapsible data-->
       {#if !isCollapsedObject[attackIdx]}
-         <div transition:slide>
+         <div transition:slide|local>
             <!--Attribute select-->
             <div class="attack-field">
                <div class="label">{localize("LOCAL.attribute.label")};</div>
@@ -96,7 +96,11 @@
                      {localize("LOCAL.traits.label")}
                   </div>
                   <div>
-                     <IconButton icon={"fas fa-pen-to-square"} efx={ripple} on:click={editAttackTraits} />
+                     <IconButton
+                        icon={"fas fa-pen-to-square"}
+                        efx={ripple}
+                        on:click={application.editAttackTraits(attackIdx)}
+                     />
                   </div>
                </div>
                <div class="attack-traits-container">
