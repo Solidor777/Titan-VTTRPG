@@ -25,27 +25,22 @@
          </div>
          <div class="scrolling-content">
             <ScrollingContainer>
-               <div class="attack-list">
-                  <!--List of attacks-->
-                  <ol>
-                     <!--For Each attack-->
-                     {#each Object.entries($document.system.attack) as [attackIdx, attack]}
-                        <li transition:slide|local>
-                           <AttackSheetVertical
-                              {attackIdx}
-                              bind:isCollapsedObject={application.isCollapsed.desc.attack}
-                           />
-                        </li>
-                     {/each}
-                  </ol>
-                  <!--Add attack button-->
-                  <div class="add-attack-button">
-                     <IconButton
-                        icon={"fas fa-circle-plus"}
-                        efx={ripple()}
-                        on:click={application.addAttack.bind(application)}
-                     />
-                  </div>
+               <!--List of attacks-->
+               <ol>
+                  <!--For Each attack-->
+                  {#each Object.entries($document.system.attack) as [attackIdx, attack]}
+                     <li transition:slide|local>
+                        <AttackSheetVertical {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
+                     </li>
+                  {/each}
+               </ol>
+               <!--Add attack button-->
+               <div class="add-attack-button">
+                  <IconButton
+                     icon={"fas fa-circle-plus"}
+                     efx={ripple()}
+                     on:click={application.addAttack.bind(application)}
+                  />
                </div>
             </ScrollingContainer>
          </div>
@@ -85,9 +80,6 @@
                height: 100%;
                width: 100%;
                margin-top: 0.5rem;
-
-               .attack-list {
-               }
 
                ol {
                   @include flex-column;

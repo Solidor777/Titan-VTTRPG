@@ -11,8 +11,8 @@ export default class TitanWeaponSheet extends SvelteDocumentSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 650,
+         width: 680,
+         height: 630,
          svelte: {
             class: WeaponSheetShell,
             target: document.body

@@ -81,7 +81,7 @@
          }
 
          .portrait {
-            width: 8rem;
+            width: 5rem;
             --border-style: none;
          }
       }
@@ -92,10 +92,6 @@
          position: relative;
          height: 100%;
          width: 100%;
-      }
-
-      .label {
-         font-weight: bold;
       }
    }
 </style>
