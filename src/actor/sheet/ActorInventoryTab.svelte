@@ -4,17 +4,38 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
-   import BareButton from "~/helpers/svelte-components/BareButton.svelte";
    import EfxButton from "../../helpers/svelte-components/EfxButton.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
 
    // Items
-   const items = $document.items;
+   $: items = $document.items;
 
    // Weapons
-   const weapons = items.filter((item) => item.type === "weapon");
+   $: weapons = items.filter((item) => item.type === "weapon");
+
+   function editItem(id) {
+      const item = items.get(id);
+      item.sheet.render(true);
+      return;
+   }
+
+   function deleteItem(id) {
+      $document.deleteItem(id);
+      return;
+   }
+
+   function addItem(type) {
+      let itemData = {
+         name: localize(`LOCAL.new.${type}.label`),
+         type: type,
+      };
+
+      $document.createEmbeddedDocuments("Item", [itemData]);
+
+      return;
+   }
 </script>
 
 <div class="inventory-tab">
@@ -27,6 +48,7 @@
             <div class="category-header">
                {localize("LOCAL.weapons.label")}
             </div>
+
             <!--Weapon List-->
             <ol>
                <!--Each Weapon-->
@@ -43,18 +65,37 @@
                         </div>
                         <!--Controls-->
                         <div class="item-controls">
+                           <!--Edit Button-->
                            <div class="button">
-                              <IconButton icon={"fas fa-pen-to-square"} />
+                              <IconButton
+                                 icon={"fas fa-pen-to-square"}
+                                 on:click={() => {
+                                    editItem(weapon._id);
+                                 }}
+                              />
                            </div>
 
+                           <!--Delete Button-->
                            <div class="button">
-                              <IconButton icon={"fas fa-trash"} />
+                              <IconButton
+                                 icon={"fas fa-trash"}
+                                 on:click={() => {
+                                    deleteItem(weapon._id);
+                                 }}
+                              />
                            </div>
                         </div>
                      </div>
                   </li>
                {/each}
             </ol>
+            <div class="add-entry-button">
+               <EfxButton
+                  on:click={() => {
+                     addItem("weapon");
+                  }}><i class="fas fa-plus" /></EfxButton
+               >
+            </div>
          </div>
       </div>
    </ScrollingContainer>
@@ -77,11 +118,13 @@
          .category {
             @include flex-column;
             @include flex-group-top;
+            @include border;
             width: 100%;
+            padding: 0.26rem;
 
             .category-header {
                @include flex-row;
-               margin-left: 1rem;
+               @include flex-group-center;
                width: 100%;
                font-weight: bold;
                font-size: 1rem;
@@ -136,6 +179,10 @@
                      }
                   }
                }
+            }
+
+            .add-entry-button {
+               width: 100%;
             }
          }
       }
