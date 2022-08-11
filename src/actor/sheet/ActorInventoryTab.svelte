@@ -66,7 +66,7 @@
                         <!--Controls-->
                         <div class="item-controls">
                            <!--Edit Button-->
-                           <div class="button">
+                           <div class="item-control-button">
                               <IconButton
                                  icon={"fas fa-pen-to-square"}
                                  on:click={() => {
@@ -76,7 +76,7 @@
                            </div>
 
                            <!--Delete Button-->
-                           <div class="button">
+                           <div class="item-control-button">
                               <IconButton
                                  icon={"fas fa-trash"}
                                  on:click={() => {
@@ -171,7 +171,7 @@
                         @include flex-group-right;
                         height: 100%;
 
-                        .button {
+                        .item-control-button {
                            &:not(:first-child) {
                               margin-left: 0.5rem;
                            }
@@ -182,7 +182,13 @@
             }
 
             .add-entry-button {
+               @include flex-row;
+
                width: 100%;
+
+               .fas {
+                  padding: 0.25rem;
+               }
             }
          }
       }
