@@ -13,7 +13,17 @@
    $: items = $document.items;
 
    // Weapons
-   $: weapons = items.filter((item) => item.type === "weapon");
+   $: weapons = items
+      .filter((item) => item.type === "weapon")
+      .sort((a, b) => {
+         if (a.sort < b.sort) {
+            return -1;
+         }
+         if (a.sort > b.sort) {
+            return 1;
+         }
+         return 0;
+      });
 
    function editItem(id) {
       const item = items.get(id);
@@ -36,6 +46,17 @@
 
       return;
    }
+
+   function dragItemStart(event, id) {
+      const item = $document.items.get(id);
+      const dragData = item.toDragData();
+
+      if (!dragData) return;
+
+      event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+      return;
+   }
 </script>
 
 <div class="inventory-tab">
@@ -53,7 +74,14 @@
             <ol>
                <!--Each Weapon-->
                {#each weapons as weapon}
-                  <li class="weapon">
+                  <li
+                     data-item-id={weapon._id}
+                     class="weapon"
+                     draggable={true}
+                     on:dragstart={() => {
+                        dragItemStart(event, weapon._id);
+                     }}
+                  >
                      <!--Header-->
                      <div class="item-header">
                         <!--Name-->

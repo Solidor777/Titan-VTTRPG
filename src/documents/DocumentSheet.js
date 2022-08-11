@@ -233,21 +233,23 @@ export class SvelteDocumentSheet extends SvelteApplication {
       const siblings = [];
       for (let el of dropTarget.parentElement.children) {
          const siblingId = el.dataset.itemId;
-         if (siblingId && siblingId !== source.id) {
+         if (siblingId && (siblingId !== source.id)) {
             siblings.push(items.get(el.dataset.itemId));
          }
       }
 
       // Perform the sort
       const sortUpdates = SortingHelpers.performIntegerSort(source, { target, siblings });
+      console.log(sortUpdates);
       const updateData = sortUpdates.map((u) => {
          const update = u.update;
-         update._id = u.target.data._id;
+         update._id = u.target._id;
          return update;
       });
 
       // Perform the update
       return actor.updateEmbeddedDocuments("Item", updateData);
+
    }
 
    _onConfigureSheet(event) {
