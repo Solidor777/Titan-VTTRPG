@@ -1,11 +1,9 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import ActorWeaponSheet from "./ActorWeaponSheet.svelte";
+   import ActorInventoryWeaponSheet from "./ActorInventoryWeaponSheet.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -82,7 +80,7 @@
                         dragHovering = "none";
                      }}
                   >
-                     <ActorWeaponSheet bind:id={weapon._id} />
+                     <ActorInventoryWeaponSheet bind:id={weapon._id} />
                   </li>
                {/each}
             </ol>

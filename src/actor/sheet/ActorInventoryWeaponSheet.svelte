@@ -15,42 +15,42 @@
    export let id = void 0;
 
    $: weapon = $document.items.get(id);
-
-   $: equippedClass = weapon.system.equipped ? "fas fa-square-check" : "fas fa-square";
 </script>
 
 <!--Header-->
-<div class="item-header">
-   <!--Name-->
-   <div class="item-name">
-      <EfxButton efx={ripple}>
-         {weapon.name}
-         <i class="fas fa-angle-double-down" />
-      </EfxButton>
-   </div>
-
-   <!--Controls-->
-   <div class="item-controls">
-      <!--Toggle Eqipped button-->
-      <div class="item-control-button">
-         <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, weapon._id)}>
-            {localize("LOCAL.equipped.label")}:
-            <div class="spacer" />
-            <i class={equippedClass} />
+{#if weapon}
+   <div class="item-header">
+      <!--Name-->
+      <div class="item-name">
+         <EfxButton efx={ripple}>
+            {weapon.name}
+            <i class="fas fa-angle-double-down" />
          </EfxButton>
       </div>
 
-      <!--Edit Button-->
-      <div class="item-control-button">
-         <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, weapon._id)} />
-      </div>
+      <!--Controls-->
+      <div class="item-controls">
+         <!--Toggle Eqipped button-->
+         <div class="item-control-button">
+            <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, weapon._id)}>
+               {localize("LOCAL.equipped.label")}:
+               <div class="spacer" />
+               <i class={weapon.system.equipped ? "fas fa-square-check" : "fas fa-square"} />
+            </EfxButton>
+         </div>
 
-      <!--Delete Button-->
-      <div class="item-control-button">
-         <IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, weapon._id)} />
+         <!--Edit Button-->
+         <div class="item-control-button">
+            <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, weapon._id)} />
+         </div>
+
+         <!--Delete Button-->
+         <div class="item-control-button">
+            <IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, weapon._id)} />
+         </div>
       </div>
    </div>
-</div>
+{/if}
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
