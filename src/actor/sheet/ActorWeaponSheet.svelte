@@ -14,9 +14,9 @@
    // Reference to the weapon id
    export let id = void 0;
 
-   const weapon = $document.items.get(id);
+   $: weapon = $document.items.get(id);
 
-   $: equippedClass = $document.items.get(id).system.equipped ? "fas fa-square-check" : "fas fa-square";
+   $: equippedClass = weapon.system.equipped ? "fas fa-square-check" : "fas fa-square";
 </script>
 
 <!--Header-->
