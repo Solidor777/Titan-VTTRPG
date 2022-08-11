@@ -2,6 +2,7 @@
 
 <script>
    import { getContext } from "svelte";
+   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
 
    // The value of the input
    export let value;
@@ -21,17 +22,9 @@
    }
 </script>
 
-<input
+<TextInput
    bind:value
    on:change={async () => {
       $document.update(data);
    }}
 />
-
-<style lang="scss">
-   @import "../../styles/Mixins.scss";
-
-   input {
-      @include input;
-   }
-</style>
