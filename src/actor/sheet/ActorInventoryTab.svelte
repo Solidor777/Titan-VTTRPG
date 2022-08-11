@@ -1,7 +1,11 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
+   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import BareButton from "~/helpers/svelte-components/BareButton.svelte";
+   import EfxButton from "../../helpers/svelte-components/EfxButton.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -28,8 +32,25 @@
                <!--Each Weapon-->
                {#each weapons as weapon}
                   <li class="weapon">
+                     <!--Header-->
                      <div class="item-header">
-                        {weapon.name}
+                        <!--Name-->
+                        <div class="item-name">
+                           <EfxButton efx={ripple}>
+                              {weapon.name}
+                              <i class="fas fa-angle-double-down" />
+                           </EfxButton>
+                        </div>
+                        <!--Controls-->
+                        <div class="item-controls">
+                           <div class="button">
+                              <IconButton icon={"fas fa-pen-to-square"} />
+                           </div>
+
+                           <div class="button">
+                              <IconButton icon={"fas fa-trash"} />
+                           </div>
+                        </div>
                      </div>
                   </li>
                {/each}
@@ -81,14 +102,38 @@
                   width: 100%;
                   padding: 0.5rem;
 
-                  :not(:first-child) {
+                  &:not(:first-child) {
                      margin-top: 0.5rem;
                   }
 
                   .item-header {
                      @include flex-row;
+                     @include flex-space-between;
+                     width: 100%;
                      font-size: 1rem;
                      font-weight: bold;
+
+                     .item-name {
+                        @include flex-row;
+                        @include flex-group-left;
+                        width: 15rem;
+
+                        .fas {
+                           margin-left: 0.5rem;
+                        }
+                     }
+
+                     .item-controls {
+                        @include flex-row;
+                        @include flex-group-right;
+                        height: 100%;
+
+                        .button {
+                           &:not(:first-child) {
+                              margin-left: 0.5rem;
+                           }
+                        }
+                     }
                   }
                }
             }

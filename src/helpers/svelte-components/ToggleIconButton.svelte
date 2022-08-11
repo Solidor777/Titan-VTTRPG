@@ -1,29 +1,19 @@
 <script>
-   export let button = void 0;
-   export let icon = void 0;
+   export let trueIcon = void 0;
+   export let falseIcon = void 0;
    export let efx = void 0;
+   export let value = void 0;
 
-   $: icon =
-      typeof button === "object" && typeof button.icon === "string"
-         ? button.icon
-         : typeof icon === "string"
-         ? icon
-         : "";
-   $: styles =
-      typeof button === "object" && typeof button.styles === "object"
-         ? button.styles
-         : typeof styles === "object"
-         ? styles
-         : void 0;
-   $: efx =
-      typeof button === "object" && typeof button.efx === "function"
-         ? button.efx
-         : typeof efx === "function"
-         ? efx
-         : () => {};
+   $: icon = value === true ? trueIcon : falseIcon;
 </script>
 
-<div on:click class="button" use:efx>
+<div
+   on:click={() => {
+      value = !value;
+   }}
+   class="button"
+   use:efx
+>
    <i class={icon} />
 </div>
 
