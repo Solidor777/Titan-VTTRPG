@@ -240,7 +240,6 @@ export class SvelteDocumentSheet extends SvelteApplication {
 
       // Perform the sort
       const sortUpdates = SortingHelpers.performIntegerSort(source, { target, siblings });
-      console.log(sortUpdates);
       const updateData = sortUpdates.map((u) => {
          const update = u.update;
          update._id = u.target._id;

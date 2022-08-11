@@ -25,6 +25,9 @@
          return 0;
       });
 
+   let dragHovered = "none";
+   let dragHovering = "none";
+
    function editItem(id) {
       const item = items.get(id);
       item.sheet.render(true);
@@ -73,13 +76,24 @@
             <!--Weapon List-->
             <ol>
                <!--Each Weapon-->
-               {#each weapons as weapon}
+               {#each weapons as weapon, key}
                   <li
+                     class="weapon{dragHovered === weapon._id ? ' drag-hovered' : ''}"
                      data-item-id={weapon._id}
-                     class="weapon"
                      draggable={true}
                      on:dragstart={() => {
+                        dragHovered = weapon._id;
+                        dragHovering = "weapon";
                         dragItemStart(event, weapon._id);
+                     }}
+                     on:dragenter={(event) => {
+                        if (dragHovering === "weapon") {
+                           dragHovered = weapon._id;
+                        }
+                     }}
+                     on:drop={() => {
+                        dragHovered = "none";
+                        dragHovering = "none";
                      }}
                   >
                      <!--Header-->
@@ -172,6 +186,14 @@
                   @include border;
                   width: 100%;
                   padding: 0.5rem;
+
+                  &:active {
+                     box-shadow: 0 0 8px red;
+                  }
+
+                  &.drag-hovered {
+                     background: var(--highlight-background-color);
+                  }
 
                   &:not(:first-child) {
                      margin-top: 0.5rem;
