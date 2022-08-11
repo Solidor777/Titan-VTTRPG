@@ -3,9 +3,9 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import AttackSheetVertical from "./AttackSheetVertical.svelte";
+   import WeaponAttackSheet from "./WeaponAttackSheet.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -30,17 +30,15 @@
                   <!--For Each attack-->
                   {#each Object.entries($document.system.attack) as [attackIdx, attack]}
                      <li transition:slide|local>
-                        <AttackSheetVertical {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
+                        <WeaponAttackSheet {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
                      </li>
                   {/each}
                </ol>
                <!--Add attack button-->
                <div class="add-attack-button">
-                  <IconButton
-                     icon={"fas fa-circle-plus"}
-                     efx={ripple()}
-                     on:click={application.addAttack.bind(application)}
-                  />
+                  <EfxButton efx={ripple()} on:click={application.addAttack.bind(application)}>
+                     <i class="fas fa-circle-plus" />
+                  </EfxButton>
                </div>
             </ScrollingContainer>
          </div>
@@ -98,6 +96,10 @@
                   @include flex-row;
                   @include flex-group-center;
                   margin-top: 0.5rem;
+
+                  .fas {
+                     padding: 0.25rem;
+                  }
                }
             }
          }

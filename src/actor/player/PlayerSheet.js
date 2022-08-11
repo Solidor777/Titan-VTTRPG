@@ -1,7 +1,8 @@
 import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
 import PlayerSheetShell from './PlayerSheetShell.svelte';
+import TitanActorSheet from '../sheet/ActorSheet';
 
-export default class TitanPlayerSheet extends SvelteDocumentSheet {
+export default class TitanPlayerSheet extends TitanActorSheet {
    /**
     * Default Application options
     *

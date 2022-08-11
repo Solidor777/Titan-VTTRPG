@@ -4,10 +4,14 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
-   import EfxButton from "../../helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import ActorWeaponSheet from "./ActorWeaponSheet.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
+
+   // Reference to the application
+   const application = getContext("external").application;
 
    // Items
    $: items = $document.items;
@@ -25,36 +29,18 @@
          return 0;
       });
 
+   // Drag hover state
    let dragHovered = "none";
    let dragHovering = "none";
 
-   function editItem(id) {
-      const item = items.get(id);
-      item.sheet.render(true);
-      return;
-   }
-
-   function deleteItem(id) {
-      $document.deleteItem(id);
-      return;
-   }
-
-   function addItem(type) {
-      let itemData = {
-         name: localize(`LOCAL.new.${type}.label`),
-         type: type,
-      };
-
-      $document.createEmbeddedDocuments("Item", [itemData]);
-
-      return;
-   }
-
+   // Drag start item
    function dragItemStart(event, id) {
       const item = $document.items.get(id);
       const dragData = item.toDragData();
 
-      if (!dragData) return;
+      if (!dragData) {
+         return;
+      }
 
       event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
 
@@ -91,52 +77,19 @@
                            dragHovered = weapon._id;
                         }
                      }}
-                     on:drop={() => {
+                     on:dragend={() => {
                         dragHovered = "none";
                         dragHovering = "none";
                      }}
                   >
-                     <!--Header-->
-                     <div class="item-header">
-                        <!--Name-->
-                        <div class="item-name">
-                           <EfxButton efx={ripple}>
-                              {weapon.name}
-                              <i class="fas fa-angle-double-down" />
-                           </EfxButton>
-                        </div>
-                        <!--Controls-->
-                        <div class="item-controls">
-                           <!--Edit Button-->
-                           <div class="item-control-button">
-                              <IconButton
-                                 icon={"fas fa-pen-to-square"}
-                                 on:click={() => {
-                                    editItem(weapon._id);
-                                 }}
-                              />
-                           </div>
-
-                           <!--Delete Button-->
-                           <div class="item-control-button">
-                              <IconButton
-                                 icon={"fas fa-trash"}
-                                 on:click={() => {
-                                    deleteItem(weapon._id);
-                                 }}
-                              />
-                           </div>
-                        </div>
-                     </div>
+                     <ActorWeaponSheet bind:id={weapon._id} />
                   </li>
                {/each}
             </ol>
             <div class="add-entry-button">
-               <EfxButton
-                  on:click={() => {
-                     addItem("weapon");
-                  }}><i class="fas fa-plus" /></EfxButton
-               >
+               <EfxButton on:click={application.addItem.bind(application, "weapon")}
+                  ><i class="fas fa-circle-plus" />
+               </EfxButton>
             </div>
          </div>
       </div>
@@ -187,46 +140,12 @@
                   width: 100%;
                   padding: 0.5rem;
 
-                  &:active {
-                     box-shadow: 0 0 8px red;
-                  }
-
                   &.drag-hovered {
                      background: var(--highlight-background-color);
                   }
 
                   &:not(:first-child) {
                      margin-top: 0.5rem;
-                  }
-
-                  .item-header {
-                     @include flex-row;
-                     @include flex-space-between;
-                     width: 100%;
-                     font-size: 1rem;
-                     font-weight: bold;
-
-                     .item-name {
-                        @include flex-row;
-                        @include flex-group-left;
-                        width: 15rem;
-
-                        .fas {
-                           margin-left: 0.5rem;
-                        }
-                     }
-
-                     .item-controls {
-                        @include flex-row;
-                        @include flex-group-right;
-                        height: 100%;
-
-                        .item-control-button {
-                           &:not(:first-child) {
-                              margin-left: 0.5rem;
-                           }
-                        }
-                     }
                   }
                }
             }

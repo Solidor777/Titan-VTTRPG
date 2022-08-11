@@ -222,6 +222,9 @@ export class SvelteDocumentSheet extends SvelteApplication {
       const items = actor.items;
       const source = items.get(itemData._id);
       const dropTarget = event.target.closest("[data-item-id]");
+      if (!dropTarget) {
+         return;
+      }
       const target = items.get(dropTarget.dataset.itemId);
 
       // Don't sort on yourself
