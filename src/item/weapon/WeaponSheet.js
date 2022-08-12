@@ -20,6 +20,7 @@ export default class TitanWeaponSheet extends SvelteDocumentSheet {
       });
    }
 
+   // Is collapsed object
    isCollapsed = {
       desc: {
          attack: []

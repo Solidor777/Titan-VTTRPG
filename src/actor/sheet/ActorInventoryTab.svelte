@@ -5,6 +5,7 @@
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorInventoryWeaponSheet from "./ActorInventoryWeapon.svelte";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
+   import { slide } from "svelte/transition";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -70,7 +71,7 @@
             <!--Weapon List-->
             <ol>
                <!--Each Weapon-->
-               {#each weapons as weapon, key}
+               {#each weapons as weapon}
                   <li
                      class="weapon{dragHovered === weapon._id ? ' drag-hovered' : ''}"
                      data-item-id={weapon._id}
@@ -89,8 +90,12 @@
                         dragHovered = "none";
                         dragHovering = "none";
                      }}
+                     transition:slide|local
                   >
-                     <ActorInventoryWeaponSheet bind:id={weapon._id} />
+                     <ActorInventoryWeaponSheet
+                        bind:id={weapon._id}
+                        bind:isExpandedObject={application.isExpanded.inventory.weapons}
+                     />
                   </li>
                {/each}
             </ol>

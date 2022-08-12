@@ -20,8 +20,7 @@
    // Initialize collapsed state
    const application = getContext("external").application;
    const isCollapsed = application.isCollapsed;
-   isCollapsed.desc = isCollapsed.desc ?? { attack: [] };
-   for (const [key, value] of Object.entries($document.system.attack)) {
+   for (const [key] of Object.entries($document.system.attack)) {
       isCollapsed.desc.attack[key] = isCollapsed.desc.attack[key] ?? false;
       isCollapsed.attacks.attack[key] = isCollapsed.attacks.attack[key] ?? false;
    }

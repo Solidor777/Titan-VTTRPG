@@ -14,6 +14,13 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       });
    }
 
+   // Is Expanded data
+   isExpanded = {
+      inventory: {
+         weapons: []
+      }
+   };
+
    // Embedded item edit
    async editItem(id) {
       const item = this.reactive.document.items.get(id);

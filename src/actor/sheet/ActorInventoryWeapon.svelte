@@ -2,6 +2,7 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
+   import { slide } from "svelte/transition";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
@@ -13,6 +14,9 @@
 
    // Reference to the weapon id
    export let id = void 0;
+
+   // Collapsed object
+   export let isExpandedObject = void 0;
 
    // Weapon list
    $: weapon = $document.items.get(id);
