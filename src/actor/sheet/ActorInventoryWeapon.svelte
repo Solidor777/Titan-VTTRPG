@@ -14,6 +14,7 @@
    // Reference to the weapon id
    export let id = void 0;
 
+   // Weapon list
    $: weapon = $document.items.get(id);
 </script>
 

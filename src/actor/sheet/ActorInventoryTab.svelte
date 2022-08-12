@@ -4,6 +4,7 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorInventoryWeaponSheet from "./ActorInventoryWeapon.svelte";
+   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -14,9 +15,12 @@
    // Items
    $: items = $document.items;
 
+   // Filter
+   let inventoryFilter = "";
+
    // Weapons
    $: weapons = items
-      .filter((item) => item.type === "weapon")
+      .filter((item) => item.type === "weapon" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
       .sort((a, b) => {
          if (a.sort < b.sort) {
             return -1;
@@ -26,6 +30,8 @@
          }
          return 0;
       });
+
+   // Weapon filter
 
    // Drag hover state
    let dragHovered = "none";
@@ -47,6 +53,10 @@
 </script>
 
 <div class="inventory-tab">
+   <div class="inventory-filter">
+      <div class="inventory-filter-label">{localize("LOCAL.filter.label")}</div>
+      <div class="inventory-filter-input"><TextInput bind:value={inventoryFilter} /></div>
+   </div>
    <!--Scrolling Containers-->
    <ScrollingContainer>
       <div class="scrolling-content">
@@ -54,7 +64,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.weapons.label")}
+               {localize("LOCAL.weapons.label")}:
             </div>
 
             <!--Weapon List-->
@@ -102,11 +112,25 @@
       height: 100%;
       width: 100%;
 
+      .inventory-filter {
+         @include flex-row;
+         @include flex-group-center;
+         font-size: 1rem;
+         font-weight: bold;
+         margin-top: 0.5rem;
+
+         .inventory-filter-input {
+            font-size: 1rem;
+            margin-left: 0.5rem;
+         }
+      }
+
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;
          width: 100%;
          height: 100%;
+         margin-top: 0.5rem;
 
          .category {
             @include flex-column;
@@ -118,7 +142,6 @@
             .category-header {
                @include flex-row;
                @include flex-group-center;
-               width: 100%;
                font-weight: bold;
                font-size: 1rem;
             }
