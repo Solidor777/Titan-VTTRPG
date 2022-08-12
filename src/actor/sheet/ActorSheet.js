@@ -66,4 +66,42 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
       return;
    }
+
+   // Check rolls
+   async rollResistanceCheck(resistance) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+
+      await this.reactive.document.rollResistanceCheck({
+         resistance: resistance,
+         getOptions: getOptions,
+      });
+
+      return;
+   }
+
+   // Function for rolling a skill check
+   async rollSkillCheck(skill) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+
+      await this.reactive.document.rollAttributeCheck({
+         attribute: this.reactive.document.system.skill[skill].defaultAttribute,
+         skill: skill,
+         getOptions: getOptions,
+      });
+
+      return;
+   }
+
+   // Function for rolling a straight attribute check
+   async rollAttributeCheck(attribute) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+
+      await this.reactive.document.rollAttributeCheck({
+         attribute: attribute,
+         getOptions: getOptions,
+         skill: "none",
+      });
+
+      return;
+   }
 }

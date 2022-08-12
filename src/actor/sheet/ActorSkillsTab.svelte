@@ -8,24 +8,20 @@
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
+   // Reference to the document
    const document = getContext("DocumentSheetObject");
 
+   // Application reference
+   const application = getContext("external").application;
+
+   // Search filter
    let filter = "";
 
+   // Filtered Skill list
    const skillList = $document.system.skill;
    $: filteredList = Object.entries(skillList).filter(
       ([key, value]) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
    );
-
-   async function rollSkillCheck(skill) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
-
-      $document.rollAttributeCheck({
-         attribute: $document.system.skill[skill].defaultAttribute,
-         skill: skill,
-         getOptions: getOptions,
-      });
-   }
 </script>
 
 <div class="skill-tab">
@@ -42,7 +38,7 @@
                <div class="column">
                   <!--Button for rolling the skill-->
                   <div class="skill-button" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
-                     <EfxButton on:click={rollSkillCheck(key)} efx={ripple()}>
+                     <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
                         {localize(`LOCAL.${key}.label`)}
                      </EfxButton>
                   </div>

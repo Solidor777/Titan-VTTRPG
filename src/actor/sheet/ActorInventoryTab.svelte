@@ -3,7 +3,7 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import ActorInventoryWeaponSheet from "./ActorInventoryWeaponSheet.svelte";
+   import ActorInventoryWeaponSheet from "./ActorInventoryWeapon.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -65,12 +65,12 @@
                      class="weapon{dragHovered === weapon._id ? ' drag-hovered' : ''}"
                      data-item-id={weapon._id}
                      draggable={true}
-                     on:dragstart={() => {
+                     on:dragstart={(event) => {
                         dragHovered = weapon._id;
                         dragHovering = "weapon";
                         dragItemStart(event, weapon._id);
                      }}
-                     on:dragenter={(event) => {
+                     on:dragenter={() => {
                         if (dragHovering === "weapon") {
                            dragHovered = weapon._id;
                         }

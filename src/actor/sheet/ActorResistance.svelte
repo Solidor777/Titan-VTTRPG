@@ -11,23 +11,17 @@
    // The Actor Data
    const document = getContext("DocumentSheetObject");
 
-   // The resistance data
+   // Application reference
+   const application = getContext("external").application;
+
+   // Reactive resistance data
    $: resistance = $document.system.resistance[key];
-
-   async function rollResistance(resistance) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
-
-      $document.rollResistanceCheck({
-         resistance: resistance,
-         getOptions: getOptions,
-      });
-   }
 </script>
 
 <div class="resistance" data-resistance={key}>
    <!--Resistance Label-->
    <div class="button {key}" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
-      <EfxButton on:click={rollResistance(key)} efx={ripple()}>
+      <EfxButton on:click={application.rollResistanceCheck.bind(application, key)} efx={ripple()}>
          {localize(`LOCAL.${key}.label`)}
       </EfxButton>
    </div>

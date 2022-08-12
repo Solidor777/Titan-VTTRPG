@@ -11,24 +11,17 @@
    // The Actor Data
    const document = getContext("DocumentSheetObject");
 
+   // Application reference
+   const application = getContext("external").application;
+
    // The attribute data
    $: attribute = $document.system.attribute[key];
-
-   async function rollAttributeCheck(attribute) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") == true || event.shiftKey;
-
-      $document.rollAttributeCheck({
-         attribute: attribute,
-         getOptions: getOptions,
-         skill: "none",
-      });
-   }
 </script>
 
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
    <div class="button {key}" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
-      <EfxButton on:click={rollAttributeCheck(key)} efx={ripple()}>
+      <EfxButton on:click={application.rollAttributeCheck.bind(application, key)} efx={ripple()}>
          {localize(`LOCAL.${key}.label`)}
       </EfxButton>
    </div>

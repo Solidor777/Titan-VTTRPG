@@ -28,6 +28,8 @@
       { label: localize("LOCAL.skills.label"), id: "skills", component: ActorSkillsTab },
       { label: localize("LOCAL.inventory.label"), id: "inventory", component: ActorInventoryTab },
    ];
+
+   // Application reference
    const application = getContext("external").application;
    application.activeTab = application.activeTab ?? "skills";
 </script>
