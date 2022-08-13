@@ -150,6 +150,7 @@
   "LOCAL.complexity.label": "Complexity",
   "LOCAL.dieMod.label": "Die Mod",
   "LOCAL.bonusPenaltyDice.label": "Bonus / Penalty Dice",
+  "LOCAL.dice.label": "Dice",
   "LOCAL.totalDice.label": "Total Dice",
   "LOCAL.rarity.label": "Rarity",
   "LOCAL.common.label": "Common",

@@ -67,26 +67,50 @@
             <!--Attack Description-->
             <div class="attack-description">Temporary Attack Description</div>
 
-            <!--Attacks-->
-            <div class="attacks">
-               <!--Attacks header-->
-               <div class="attacks-header">
-                  {localize("LOCAL.attacks.label")}
-               </div>
-
-               <!--Attacks list-->
-               <ol>
-                  <!--Each Attack-->
-                  {#each Object.entries(item.system.attack) as [attackIdx, attack]}
-                     <li>
+            <!--Attacks list-->
+            <ol>
+               <!--Each Attack-->
+               {#each Object.entries(item.system.attack) as [attackIdx, attack]}
+                  <li>
+                     <!--Attack Button-->
+                     <div class="attack-button">
                         <EfxButton efx={ripple}>
                            <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
                            {attack.name}
                         </EfxButton>
-                     </li>
-                  {/each}
-               </ol>
-            </div>
+                     </div>
+                     <!--Dice Pool-->
+                     <div class="attack-stat">
+                        <i class="fas fa-dice-d6" />
+                        {localize("LOCAL.dice.label")}:
+                        {$document.system.attribute[attack.attribute].value +
+                           $document.system.skill[attack.skill].training.value}
+                     </div>
+                     <!--Expertise-->
+                     <div class="attack-stat">
+                        <i class="fas fa-graduation-cap" />
+                        {localize("LOCAL.expertise.label")}:
+                        {$document.system.skill[attack.skill].expertise.value}
+                     </div>
+
+                     <!--Range-->
+                     <div class="attack-stat">
+                        <i class="fas fa-ruler" />
+                        {localize("LOCAL.range.label")}:
+                        {attack.range}
+                     </div>
+
+                     <!--Damage-->
+                     <div class="attack-stat">
+                        <i class="fas fa-bolt" />
+                        {localize("LOCAL.damage.label")}:
+                        {`${attack.damage}${
+                           attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
+                        } `}
+                     </div>
+                  </li>
+               {/each}
+            </ol>
          </div>
       {/if}
    </div>
@@ -156,18 +180,23 @@
             font-size: 0.9rem;
          }
 
-         .attacks {
-            ol {
+         ol {
+            @include flex-row;
+            @include flex-group-left;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            flex-wrap: wrap;
+
+            li {
                @include flex-row;
                @include flex-group-left;
-               margin: 0;
-               padding: 0;
-               list-style: none;
-               flex-wrap: wrap;
+               @include border;
+               padding: 0.25rem;
+               background-color: var(--label-background-color);
 
-               li {
-                  padding: 0.25rem;
-                  display: inline-block;
+               .attack-stat {
+                  margin-left: 0.5rem;
                }
             }
          }
