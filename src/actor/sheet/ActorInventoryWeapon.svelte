@@ -79,6 +79,11 @@
 
             <!--Footer-->
             <div class="item-footer">
+               <!--Rarity-->
+               <div class="item-footer-field {item.system.rarity}">
+                  {localize(`LOCAL.${item.system.rarity}.label`)}
+               </div>
+
                <!--Value-->
                <div class="item-footer-field">
                   <div class="item-footer-label">
@@ -86,16 +91,6 @@
                   </div>
                   <div class="item-footer-value">
                      {item.system.value}
-                  </div>
-               </div>
-
-               <!--Rarity-->
-               <div class="item-footer-field {item.system.rarity}">
-                  <div class="item-footer-label">
-                     {localize("LOCAL.rarity.label")}:
-                  </div>
-                  <div class="item-footer-value">
-                     {localize(`LOCAL.${item.system.rarity}.label`)}
                   </div>
                </div>
             </div>
