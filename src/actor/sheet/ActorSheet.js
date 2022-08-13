@@ -16,7 +16,10 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Is Expanded data
    isExpanded = {
-      inventory: {}
+      inventory: {},
+      actions: {
+         items: {}
+      }
    };
 
    // Embedded item edit
@@ -29,6 +32,15 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
    // Delete Item
    async deleteItem(id) {
       this.reactive.document.deleteItem(id);
+
+      if (this.isExpanded.inventory[id]) {
+         delete this.isExpanded.inventory[id];
+      }
+
+      if (this.isExpanded.actions[id]) {
+         delete this.isExpanded.actions.items[id];
+      }
+
       return;
    }
 

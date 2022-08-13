@@ -16,6 +16,7 @@
    import ActorSkillsTab from "~/actor/sheet/ActorSkillsTab.svelte";
    import ActorInventoryTab from "~/actor/sheet/ActorInventoryTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
+   import ActorActionsTab from "~/actor/sheet/ActorActionsTab.svelte";
 
    // Setup
    export let elementRoot;
@@ -26,12 +27,13 @@
    // Tabs
    const tabs = [
       { label: localize("LOCAL.skills.label"), id: "skills", component: ActorSkillsTab },
+      { label: localize("LOCAL.actions.label"), id: "actions", component: ActorActionsTab },
       { label: localize("LOCAL.inventory.label"), id: "inventory", component: ActorInventoryTab },
    ];
 
    // Application reference
    const application = getContext("external").application;
-   application.activeTab = application.activeTab ?? "skills";
+   application.activeTab = application.activeTab ?? "actions";
 </script>
 
 <ApplicationShell bind:elementRoot>

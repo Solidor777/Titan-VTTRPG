@@ -16,8 +16,8 @@
    const ratingIcons = {
       awareness: "eye",
       defense: "shield",
-      melee: "hand-fist",
-      accuracy: "crosshairs",
+      melee: "sword",
+      accuracy: "bow-arrow",
       initiative: "clock",
    };
 </script>

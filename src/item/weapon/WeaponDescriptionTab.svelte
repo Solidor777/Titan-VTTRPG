@@ -28,7 +28,7 @@
                <!--List of attacks-->
                <ol>
                   <!--For Each attack-->
-                  {#each Object.entries($document.system.attack) as [attackIdx, attack]}
+                  {#each Object.entries($document.system.attack) as [attackIdx]}
                      <li transition:slide|local>
                         <WeaponAttackSheet {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
                      </li>

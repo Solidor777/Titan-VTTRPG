@@ -9,6 +9,8 @@
    import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import DocumentRangeTypeSelect from "~/documents/components/DocumentRangeTypeSelect.svelte";
+   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
 
    // Collapsed object
    export let isCollapsedObject = void 0;
@@ -61,16 +63,18 @@
       <!--Collapsible data-->
       {#if !isCollapsedObject[attackIdx]}
          <div transition:slide|local>
-            <!--Attribute select-->
+            <!--Type-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.attribute.label")};</div>
-               <DocumentAttributeSelect bind:value={$document.system.attack[attackIdx].attribute} />
+               <div class="label">{localize("LOCAL.type.label")}</div>
+               <DocumentRangeTypeSelect bind:value={$document.system.attack[attackIdx].type} />
             </div>
 
-            <!--Skill select-->
+            <!--Range-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.skill.label")};</div>
-               <DocumentSkillSelect bind:value={$document.system.attack[attackIdx].skill} />
+               <div class="label">{localize("LOCAL.range.label")}</div>
+               <div class="input">
+                  <DocumentIntegerInput bind:value={$document.system.attack[attackIdx].range} />
+               </div>
             </div>
 
             <!--Damage-->
@@ -85,6 +89,18 @@
                      <DocumentCheckboxInput bind:value={$document.system.attack[attackIdx].plusSuccessDamage} />
                   </div>
                </div>
+            </div>
+
+            <!--Attribute select-->
+            <div class="attack-field">
+               <div class="label">{localize("LOCAL.attribute.label")};</div>
+               <DocumentAttributeSelect bind:value={$document.system.attack[attackIdx].attribute} />
+            </div>
+
+            <!--Skill select-->
+            <div class="attack-field">
+               <div class="label">{localize("LOCAL.skill.label")}</div>
+               <DocumentSkillSelect bind:value={$document.system.attack[attackIdx].skill} />
             </div>
 
             <!--Traits-->

@@ -1,6 +1,6 @@
 <script>
-   import RaritySelect from "~/helpers/svelte-components/RaritySelect.svelte";
    import { getContext } from "svelte";
+   import RangeTypeSelect from "~/helpers/svelte-components/RangeTypeSelect.svelte";
 
    // The value of the input
    export let value;
@@ -19,9 +19,9 @@
    }
 </script>
 
-<RaritySelect
+<RangeTypeSelect
    bind:value
    on:change={async () => {
-      await $document.update(data);
+      $document.update(data);
    }}
 />

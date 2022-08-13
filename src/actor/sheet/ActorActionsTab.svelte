@@ -1,11 +1,11 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import ActorInventoryWeapon from "./ActorInventoryWeapon.svelte";
+   import ActorActionsWeapon from "./ActorActionsWeapon.svelte";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
-   import { slide } from "svelte/transition";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -21,7 +21,12 @@
 
    // Weapons
    $: weapons = items
-      .filter((item) => item.type === "weapon" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
+      .filter(
+         (item) =>
+            item.type === "weapon" &&
+            item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1 &&
+            item.system.equipped === true
+      )
       .sort((a, b) => {
          if (a.sort < b.sort) {
             return -1;
@@ -97,7 +102,7 @@
                      }}
                      transition:slide|local
                   >
-                     <ActorInventoryWeapon
+                     <ActorActionsWeapon
                         bind:id={weapon._id}
                         bind:isExpandedObject={application.isExpanded.inventory}
                      />

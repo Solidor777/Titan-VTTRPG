@@ -14,11 +14,12 @@
 
 <div class="weapon-attacks-tab">
    <!--For Each attack-->
-   {#each Object.entries($document.system.attack) as [attackIdx, attack]}
+   {#each Object.entries($document.system.attack) as [attackIdx]}
       <div class="attack-sheet" transition:slide|local>
          <WeaponAttackSheet {attackIdx} bind:isCollapsedObject={application.isCollapsed.attacks.attack} />
       </div>
    {/each}
+
    <div class="add-attack-button">
       <EfxButton efx={ripple()} on:click={application.addAttack.bind(application)}>
          <i class="fas fa-circle-plus" />

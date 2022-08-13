@@ -49,15 +49,6 @@
 
          <!--Controls-->
          <div class="item-controls">
-            <!--Toggle Eqipped button-->
-            <div class="item-control-button">
-               <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, item._id)}>
-                  {localize("LOCAL.equipped.label")}:
-                  <div class="spacer" />
-                  <i class={item.system.equipped ? "fas fa-square-check" : "fas fa-square"} />
-               </EfxButton>
-            </div>
-
             <!--Edit Button-->
             <div class="item-control-button">
                <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, item._id)} />
@@ -73,28 +64,28 @@
       <!--Expandable content-->
       {#if isExpandedObject[id] === true}
          <div class="item-expandable-content" transition:slide|local>
-            <!--Item Description-->
-            <div class="item-description">Temporary Description</div>
-
             <!--Attack Description-->
             <div class="attack-description">Temporary Attack Description</div>
 
-            <!--Footer-->
-            <div class="item-footer">
-               <!--Rarity-->
-               <div class="item-footer-field {item.system.rarity}">
-                  {localize(`LOCAL.${item.system.rarity}.label`)}
+            <!--Attacks-->
+            <div class="attacks">
+               <!--Attacks header-->
+               <div class="attacks-header">
+                  {localize("LOCAL.attacks.label")}
                </div>
 
-               <!--Value-->
-               <div class="item-footer-field">
-                  <div class="item-footer-label">
-                     {localize("LOCAL.value.label")}:
-                  </div>
-                  <div class="item-footer-value">
-                     {item.system.value}
-                  </div>
-               </div>
+               <!--Attacks list-->
+               <ol>
+                  <!--Each Attack-->
+                  {#each Object.entries(item.system.attack) as [attackIdx, attack]}
+                     <li>
+                        <EfxButton efx={ripple}>
+                           <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
+                           {attack.name}
+                        </EfxButton>
+                     </li>
+                  {/each}
+               </ol>
             </div>
          </div>
       {/if}
@@ -160,46 +151,23 @@
       }
 
       .item-expandable-content {
-         .item-description {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-         }
-
          .attack-description {
-            @include border-top;
-            @include border-bottom;
-            padding: 0.5rem;
             margin-top: 0.5rem;
             font-size: 0.9rem;
          }
 
-         .item-footer {
-            @include flex-row;
-            @include flex-space-evenly;
-            font-size: 0.9rem;
-            font-weight: bold;
-
-            .item-footer-field {
+         .attacks {
+            ol {
                @include flex-row;
-               @include border;
-               margin-top: 0.5rem;
-               padding: 0.25rem;
-               background-color: var(--label-background-color);
+               @include flex-group-left;
+               margin: 0;
+               padding: 0;
+               list-style: none;
+               flex-wrap: wrap;
 
-               &.uncommon {
-                  background-color: var(--uncommon-color-bright);
-               }
-
-               &.rare {
-                  background-color: var(--rare-color-bright);
-               }
-
-               &.unique {
-                  background-color: var(--unique-color-bright);
-               }
-
-               .item-footer-value {
-                  margin-left: 0.5rem;
+               li {
+                  padding: 0.25rem;
+                  display: inline-block;
                }
             }
          }
