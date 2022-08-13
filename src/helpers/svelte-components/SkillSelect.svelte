@@ -110,6 +110,6 @@
    ];
 </script>
 
-<div class="skill-select {value}">
+<div class="skill-select {value}" on:change>
    <Select options={skillOptions} bind:value />
 </div>

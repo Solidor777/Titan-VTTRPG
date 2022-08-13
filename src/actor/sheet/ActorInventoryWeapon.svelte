@@ -19,76 +19,187 @@
    export let isExpandedObject = void 0;
 
    // Weapon list
-   $: weapon = $document.items.get(id);
+   $: item = $document.items.get(id);
 </script>
 
-<!--Header-->
-{#if weapon}
-   <div class="item-header">
-      <!--Name-->
-      <div class="item-name">
-         <EfxButton efx={ripple}>
-            {weapon.name}
-            <i class="fas fa-angle-double-down" />
-         </EfxButton>
-      </div>
-
-      <!--Controls-->
-      <div class="item-controls">
-         <!--Toggle Eqipped button-->
-         <div class="item-control-button">
-            <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, weapon._id)}>
-               {localize("LOCAL.equipped.label")}:
-               <div class="spacer" />
-               <i class={weapon.system.equipped ? "fas fa-square-check" : "fas fa-square"} />
+{#if item}
+   <div class="actor-inventory-weapon-sheet">
+      <!--Header-->
+      <div class="item-header">
+         <!--Name-->
+         <div class="item-expand-button">
+            <EfxButton
+               efx={ripple}
+               on:click={() => {
+                  isExpandedObject[id] = !isExpandedObject[id];
+               }}
+            >
+               <div class="item-expand-button-inner">
+                  <img class="item-image" src={item.img} alt="item" />
+                  <div>
+                     {item.name}
+                     <i class="fas fa-angle-double-down" />
+                  </div>
+                  <div />
+               </div>
             </EfxButton>
          </div>
 
-         <!--Edit Button-->
-         <div class="item-control-button">
-            <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, weapon._id)} />
-         </div>
+         <!--Controls-->
+         <div class="item-controls">
+            <!--Toggle Eqipped button-->
+            <div class="item-control-button">
+               <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, item._id)}>
+                  {localize("LOCAL.equipped.label")}:
+                  <div class="spacer" />
+                  <i class={item.system.equipped ? "fas fa-square-check" : "fas fa-square"} />
+               </EfxButton>
+            </div>
 
-         <!--Delete Button-->
-         <div class="item-control-button">
-            <IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, weapon._id)} />
+            <!--Edit Button-->
+            <div class="item-control-button">
+               <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, item._id)} />
+            </div>
+
+            <!--Delete Button-->
+            <div class="item-control-button">
+               <IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, item._id)} />
+            </div>
          </div>
       </div>
+
+      <!--Expandable content-->
+      {#if isExpandedObject[id] === true}
+         <div class="item-expandable-content" transition:slide|local>
+            <!--Item Description-->
+            <div class="item-description">Temporary Description</div>
+
+            <!--Attack Description-->
+            <div class="attack-description">Temporary Attack Description</div>
+
+            <!--Footer-->
+            <div class="item-footer">
+               <!--Value-->
+               <div class="item-footer-field">
+                  <div class="item-footer-label">
+                     {localize("LOCAL.value.label")}:
+                  </div>
+                  <div class="item-footer-value">
+                     {item.system.value}
+                  </div>
+               </div>
+
+               <!--Rarity-->
+               <div class="item-footer-field {item.system.rarity}">
+                  <div class="item-footer-label">
+                     {localize("LOCAL.rarity.label")}:
+                  </div>
+                  <div class="item-footer-value">
+                     {localize(`LOCAL.${item.system.rarity}.label`)}
+                  </div>
+               </div>
+            </div>
+         </div>
+      {/if}
    </div>
 {/if}
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .item-header {
-      @include flex-row;
-      @include flex-space-between;
+   .actor-inventory-weapon-sheet {
+      @include flex-column;
       width: 100%;
-      font-size: 1rem;
-      font-weight: bold;
 
-      .item-name {
+      .item-header {
          @include flex-row;
-         @include flex-group-left;
-         width: 15rem;
+         @include flex-space-between;
+         width: 100%;
+         font-size: 1rem;
+         font-weight: bold;
 
-         .fas {
-            margin-left: 0.5rem;
+         .item-expand-button {
+            @include flex-row;
+
+            width: 15rem;
+
+            .item-expand-button-inner {
+               @include flex-row;
+               @include flex-space-between;
+               width: 100%;
+               height: 100%;
+
+               .item-image {
+                  @include flex-row;
+                  @include flex-group-center;
+                  margin-left: 0.25rem;
+                  width: 2rem;
+                  border: none;
+                  border-radius: 10px;
+                  padding: 0.1rem;
+                  background-color: black;
+               }
+            }
+         }
+
+         .item-controls {
+            @include flex-row;
+            @include flex-group-right;
+            height: 100%;
+
+            .item-control-button {
+               &:not(:first-child) {
+                  margin-left: 0.5rem;
+               }
+
+               .spacer {
+                  width: 0.5rem;
+               }
+            }
          }
       }
 
-      .item-controls {
-         @include flex-row;
-         @include flex-group-right;
-         height: 100%;
+      .item-expandable-content {
+         .item-description {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+         }
+         .attack-description {
+            @include border-top;
+            @include border-bottom;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+         }
 
-         .item-control-button {
-            &:not(:first-child) {
-               margin-left: 0.5rem;
-            }
+         .item-footer {
+            @include flex-row;
+            @include flex-space-evenly;
+            font-size: 0.9rem;
+            font-weight: bold;
 
-            .spacer {
-               width: 0.5rem;
+            .item-footer-field {
+               @include flex-row;
+               @include border;
+               margin-top: 0.5rem;
+               padding: 0.25rem;
+               background-color: var(--label-background-color);
+
+               &.uncommon {
+                  background-color: var(--uncommon-color-bright);
+               }
+
+               &.rare {
+                  background-color: var(--rare-color-bright);
+               }
+
+               &.unique {
+                  background-color: var(--unique-color-bright);
+               }
+
+               .item-footer-value {
+                  margin-left: 0.5rem;
+               }
             }
          }
       }

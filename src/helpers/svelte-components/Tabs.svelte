@@ -50,7 +50,7 @@
       ul {
          @include flex-row;
          @include flex-space-evenly;
-         @include border-bottom-normal;
+         @include border-bottom;
          list-style: none;
          width: 100%;
          margin: 0;

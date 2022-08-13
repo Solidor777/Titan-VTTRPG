@@ -182,7 +182,7 @@
          .resources {
             @include flex-column;
             @include flex-group-top;
-            @include border-bottom-normal;
+            @include border-bottom;
             width: 100%;
             padding-bottom: 0.25rem;
 
@@ -195,7 +195,7 @@
 
                &:not(:last-child) {
                   padding-bottom: 0.25rem;
-                  @include border-bottom-normal;
+                  @include border-bottom;
                }
 
                &.stamina {
@@ -215,7 +215,7 @@
          .resistances {
             @include flex-column;
             @include flex-group-top;
-            @include border-bottom-normal;
+            @include border-bottom;
             width: 100%;
             margin-top: 0.5rem;
             padding-bottom: 0.5rem;
@@ -225,7 +225,7 @@
                margin-top: 0.25rem;
 
                &:not(:last-child) {
-                  @include border-bottom-normal;
+                  @include border-bottom;
                   padding-bottom: 0.25rem;
                }
             }
@@ -234,7 +234,7 @@
          .ratings {
             @include flex-column;
             @include flex-group-top;
-            @include border-bottom-normal;
+            @include border-bottom;
             width: 100%;
             margin-top: 0.5rem;
             padding-bottom: 0.5rem;
@@ -244,7 +244,7 @@
                margin-top: 0.25rem;
 
                &:not(:last-child) {
-                  @include border-bottom-normal;
+                  @include border-bottom;
                   padding-bottom: 0.25rem;
                }
             }
@@ -283,7 +283,7 @@
                margin-top: 0.25rem;
 
                &:not(:last-child) {
-                  @include border-bottom-normal;
+                  @include border-bottom;
                   padding-bottom: 0.25rem;
                }
             }
@@ -309,7 +309,7 @@
                width: 100%;
 
                &:not(:first-child) {
-                  @include border-top-normal;
+                  @include border-top;
                   margin-top: 0.5rem;
                   padding-top: 0.5rem;
                }
@@ -382,7 +382,7 @@
                      }
 
                      &:not(:last-child) {
-                        @include border-bottom-normal;
+                        @include border-bottom;
                         padding-bottom: 0.25rem;
                      }
                   }
@@ -421,7 +421,7 @@
                      margin-top: 0.25rem;
 
                      &:not(:last-child) {
-                        @include border-bottom-normal;
+                        @include border-bottom;
                         padding-bottom: 0.25rem;
                      }
                   }

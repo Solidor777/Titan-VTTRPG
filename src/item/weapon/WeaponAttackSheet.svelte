@@ -137,7 +137,7 @@
       }
 
       .attack-field {
-         @include border-top-normal;
+         @include border-top;
          margin-top: 0.25rem;
          padding-top: 0.25rem;
 
@@ -160,7 +160,7 @@
       }
 
       .attack-traits {
-         @include border-top-normal;
+         @include border-top;
          margin-top: 0.25rem;
          padding-top: 0.25rem;
 

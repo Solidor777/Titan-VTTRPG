@@ -10,6 +10,8 @@
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import WeaponAttacksTab from "./WeaponAttacksTab.svelte";
    import WeaponDescriptionTab from "./WeaponDescriptionTab.svelte";
+   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
 
    // Setup
    export let elementRoot;
@@ -38,13 +40,31 @@
       <!--Header-->
       <div class="header">
          <div class="row">
-            <!--Item portrait-->
-            <div class="portrait">
-               <DocumentImagePicker path={"img"} alt={"item portrait"} />
+            <div class="label">
+               <!--Item portrait-->
+               <div class="portrait">
+                  <DocumentImagePicker path={"img"} alt={"item portrait"} />
+               </div>
+               <!--Item name-->
+               <div class="name">
+                  <DocumentName />
+               </div>
             </div>
-            <!--Item name Sheet-->
-            <div class="item-name">
-               <DocumentName />
+
+            <div class="stats">
+               <div class="stat-label">
+                  {localize("LOCAL.rarity.label")}
+               </div>
+               <div class="stat-input">
+                  <DocumentRaritySelect bind:value={$document.system.rarity} />
+               </div>
+
+               <div class="stat-label">
+                  {localize("LOCAL.value.label")}
+               </div>
+               <div class="stat-input">
+                  <DocumentIntegerInput bind:value={$document.system.value} />
+               </div>
             </div>
          </div>
       </div>
@@ -75,13 +95,32 @@
 
          .row {
             @include flex-row;
-            @include flex-group-left;
+            @include flex-space-between;
             width: 100%;
-         }
 
-         .portrait {
-            width: 5rem;
-            --border-style: none;
+            .label {
+               @include flex-row;
+               @include flex-group-center;
+               width: 100%;
+
+               .portrait {
+                  width: 5rem;
+                  --border-style: none;
+               }
+            }
+
+            .stats {
+               @include grid(2);
+               width: 100%;
+               box-sizing: border-box;
+               margin-left: 0.5rem;
+
+               .stat-label {
+                  @include flex-row;
+                  @include flex-group-right;
+                  font-weight: bold;
+               }
+            }
          }
       }
 

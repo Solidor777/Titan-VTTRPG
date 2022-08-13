@@ -16,9 +16,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Is Expanded data
    isExpanded = {
-      inventory: {
-         weapons: []
-      }
+      inventory: {}
    };
 
    // Embedded item edit

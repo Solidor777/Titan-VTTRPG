@@ -1,18 +1,14 @@
-<svelte:options accessors={true} />
-
 <script>
+   import RaritySelect from "~/helpers/svelte-components/RaritySelect.svelte";
    import { getContext } from "svelte";
-   import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
    // The value of the input
    export let value;
 
-   export let positive = false;
-
    // Document reference
    const document = getContext("DocumentSheetObject");
+   console.log($document);
 
-   // Copy of the document data
    let data;
    $: {
       data = {
@@ -24,10 +20,9 @@
    }
 </script>
 
-<IntegerInput
+<RaritySelect
    bind:value
-   bind:positive
    on:change={async () => {
-      $document.update(data);
+      await $document.update(data);
    }}
 />

@@ -22,7 +22,7 @@
    ];
 </script>
 
-<div class="resistance-select {value}">
+<div class="resistance-select {value}" on:change>
    <Select options={resistanceOptions} bind:value />
 </div>
 

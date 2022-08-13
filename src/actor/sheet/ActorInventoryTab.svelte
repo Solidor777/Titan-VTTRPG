@@ -32,11 +32,15 @@
          return 0;
       });
 
-   // Weapon filter
+   // Initialize expanded object
+   /// Weapons
+   for (let [key] of Object.entries($document.items)) {
+      application.isExpanded[key] = application.isExpanded[key] ?? false;
+   }
 
    // Drag hover state
-   let dragHovered = "none";
-   let dragHovering = "none";
+   let dragHovered = "";
+   let dragHovering = "";
 
    // Drag start item
    function dragItemStart(event, id) {
@@ -54,6 +58,7 @@
 </script>
 
 <div class="inventory-tab">
+   <!--Filter-->
    <div class="inventory-filter">
       <div class="inventory-filter-label">{localize("LOCAL.filter.label")}</div>
       <div class="inventory-filter-input"><TextInput bind:value={inventoryFilter} /></div>
@@ -87,14 +92,14 @@
                         }
                      }}
                      on:dragend={() => {
-                        dragHovered = "none";
-                        dragHovering = "none";
+                        dragHovered = "";
+                        dragHovering = "";
                      }}
                      transition:slide|local
                   >
                      <ActorInventoryWeaponSheet
                         bind:id={weapon._id}
-                        bind:isExpandedObject={application.isExpanded.inventory.weapons}
+                        bind:isExpandedObject={application.isExpanded.inventory}
                      />
                   </li>
                {/each}
