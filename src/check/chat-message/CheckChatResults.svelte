@@ -43,7 +43,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import "../../styles/Mixins.scss";
 
    .results {
       @include border;

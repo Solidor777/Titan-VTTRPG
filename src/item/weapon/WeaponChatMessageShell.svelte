@@ -1,13 +1,24 @@
 <script>
+   import ItemChatLabel from "../chat-message/ItemChatLabel.svelte";
+   import ItemChatDescription from "../chat-message/ItemChatDescription.svelte";
+   import WeaponChatAttackDescription from "./WeaponChatAttackDescription.svelte";
+   import ItemChatFooter from "../chat-message/ItemChatFooter.svelte";
+   import WeaponChatAttacks from "./WeaponChatAttacks.svelte";
 </script>
 
-<div class="item-chat-message">Item</div>
+<div class="weapon-chat-message">
+   <ItemChatLabel />
+   <ItemChatDescription />
+   <WeaponChatAttackDescription />
+   <WeaponChatAttacks />
+   <ItemChatFooter />
+</div>
 
 <style lang="scss">
    @import "../../styles/Mixins.scss";
    @import "../../styles/Variables.scss";
 
-   .item-chat-message {
+   .weapon-chat-message {
       @include flex-column;
       align-items: flex-start;
       justify-content: center;

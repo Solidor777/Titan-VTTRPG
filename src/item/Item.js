@@ -31,10 +31,11 @@ export class TitanItem extends Item {
 
       // Create the context object
       const chatContext = {
+         type: "weapon",
+         img: this.img,
          name: this.name,
          flags: this.flags,
          system: this.system,
-         type: "weapon"
       };
 
       // Create and post the message

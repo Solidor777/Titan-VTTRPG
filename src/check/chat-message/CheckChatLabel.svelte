@@ -42,7 +42,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import "../../styles/mixins.scss";
    .label {
       @include border;
       @include flex-column;

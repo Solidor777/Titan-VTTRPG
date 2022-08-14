@@ -36,7 +36,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import "../../styles/Mixins.scss";
 
    .container {
       @include flex-row;

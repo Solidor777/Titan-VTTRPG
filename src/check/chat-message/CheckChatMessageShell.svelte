@@ -1,13 +1,13 @@
 <script>
-   import CheckLabel from "./components/CheckLabel.svelte";
-   import CheckDiceContainer from "./components/CheckDiceContainer.svelte";
-   import CheckResults from "./components/CheckResults.svelte";
+   import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
+   import CheckChatLabel from "./CheckChatLabel.svelte";
+   import CheckChatResults from "./CheckChatResults.svelte";
 </script>
 
 <div class="check-chat-message">
-   <CheckLabel />
-   <CheckDiceContainer />
-   <CheckResults />
+   <CheckChatLabel />
+   <CheckChatDiceContainer />
+   <CheckChatResults />
 </div>
 
 <style lang="scss">
