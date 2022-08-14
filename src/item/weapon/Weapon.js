@@ -6,7 +6,7 @@ export class TitanWeapon extends TitanTypeComponent {
       return {
          name: "Attack",
          type: "melee",
-         range: 0,
+         range: 1,
          attribute: "body",
          skill: "meleeWeapons",
          damage: 1,

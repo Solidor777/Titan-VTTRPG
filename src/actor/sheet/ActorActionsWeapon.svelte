@@ -72,7 +72,7 @@
                <!--Each Attack-->
                {#each Object.entries(item.system.attack) as [attackIdx, attack]}
                   <li>
-                     <div class="row">
+                     <div class="row header">
                         <!--Attack Button-->
                         <div class="attack-button">
                            <EfxButton efx={ripple}>
@@ -82,36 +82,65 @@
                         </div>
                      </div>
 
-                     <div class="row">
+                     <div class="row stats">
                         <!--Dice Pool-->
-                        <div class="attack-stat">
-                           <i class="fas fa-dice-d6" />
-                           {localize("LOCAL.dice.label")}:
-                           {$document.system.attribute[attack.attribute].value +
-                              $document.system.skill[attack.skill].training.value}
+                        <div class="stat">
+                           <div class="label">
+                              <i class="fas fa-dice-d6" />
+                              {localize("LOCAL.dice.label")}:
+                           </div>
+                           <div class="value">
+                              {$document.system.attribute[attack.attribute].value +
+                                 $document.system.skill[attack.skill].training.value}
+                           </div>
                         </div>
+
                         <!--Expertise-->
-                        <div class="attack-stat">
-                           <i class="fas fa-graduation-cap" />
-                           {localize("LOCAL.expertise.label")}:
-                           {$document.system.skill[attack.skill].expertise.value}
+                        <div class="stat">
+                           <div class="label">
+                              <i class="fas fa-graduation-cap" />
+                              {localize("LOCAL.expertise.label")}:
+                           </div>
+                           <div class="value">
+                              {$document.system.skill[attack.skill].expertise.value}
+                           </div>
                         </div>
 
                         <!--Range-->
-                        <div class="attack-stat">
-                           <i class="fas fa-ruler" />
-                           {localize("LOCAL.range.label")}:
-                           {attack.range}
+                        <div class="stat">
+                           <div class="label">
+                              <i class="fas fa-ruler" />
+                              {localize("LOCAL.range.label")}:
+                           </div>
+                           <div class="value">
+                              {attack.range}
+                           </div>
                         </div>
 
                         <!--Damage-->
-                        <div class="attack-stat">
-                           <i class="fas fa-bolt" />
-                           {localize("LOCAL.damage.label")}:
-                           {`${attack.damage}${
-                              attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
-                           } `}
+                        <div class="stat">
+                           <div class="label">
+                              <i class="fas fa-bolt" />
+                              {localize("LOCAL.damage.label")}
+                           </div>
+                           <div class="value">
+                              {`${attack.damage}${
+                                 attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
+                              } `}
+                           </div>
                         </div>
+                     </div>
+
+                     <!--Traits-->
+                     <div class="row traits">
+                        {#each Object.entries(attack.traits) as [key, trait]}
+                           <div class="trait">
+                              {localize(`LOCAL.${key}.label`)}
+                              {#if typeof trait === "number"}
+                                 : {trait}
+                              {/if}
+                           </div>
+                        {/each}
                      </div>
                   </li>
                {/each}
@@ -200,17 +229,47 @@
 
                .row {
                   @include flex-row;
-                  @include flex-space-between;
                   width: 100%;
+
+                  &.header {
+                     @include flex-group-center;
+                  }
+
+                  &.stats {
+                     @include flex-space-between;
+                  }
+
+                  &.traits {
+                     @include flex-group-left;
+                  }
 
                   &:not(:first-child) {
                      margin-top: 0.25rem;
                   }
 
-                  .attack-stat {
+                  .stat {
+                     @include flex-row;
+                     @include flex-group-center;
                      @include border;
+                     margin: 0.25rem;
                      padding: 0.25rem;
-                     margin-left: 0.5rem;
+
+                     .label {
+                        font-weight: bold;
+                     }
+
+                     .value {
+                        margin-left: 0.25rem;
+                     }
+                  }
+
+                  .trait {
+                     @include flex-row;
+                     @include flex-group-center;
+                     @include border;
+                     margin: 0.25rem;
+                     padding: 0.25rem;
+                     font-weight: bold;
                   }
                }
             }
