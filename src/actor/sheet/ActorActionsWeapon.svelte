@@ -72,41 +72,46 @@
                <!--Each Attack-->
                {#each Object.entries(item.system.attack) as [attackIdx, attack]}
                   <li>
-                     <!--Attack Button-->
-                     <div class="attack-button">
-                        <EfxButton efx={ripple}>
-                           <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
-                           {attack.name}
-                        </EfxButton>
-                     </div>
-                     <!--Dice Pool-->
-                     <div class="attack-stat">
-                        <i class="fas fa-dice-d6" />
-                        {localize("LOCAL.dice.label")}:
-                        {$document.system.attribute[attack.attribute].value +
-                           $document.system.skill[attack.skill].training.value}
-                     </div>
-                     <!--Expertise-->
-                     <div class="attack-stat">
-                        <i class="fas fa-graduation-cap" />
-                        {localize("LOCAL.expertise.label")}:
-                        {$document.system.skill[attack.skill].expertise.value}
+                     <div class="row">
+                        <!--Attack Button-->
+                        <div class="attack-button">
+                           <EfxButton efx={ripple}>
+                              <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
+                              {attack.name}
+                           </EfxButton>
+                        </div>
                      </div>
 
-                     <!--Range-->
-                     <div class="attack-stat">
-                        <i class="fas fa-ruler" />
-                        {localize("LOCAL.range.label")}:
-                        {attack.range}
-                     </div>
+                     <div class="row">
+                        <!--Dice Pool-->
+                        <div class="attack-stat">
+                           <i class="fas fa-dice-d6" />
+                           {localize("LOCAL.dice.label")}:
+                           {$document.system.attribute[attack.attribute].value +
+                              $document.system.skill[attack.skill].training.value}
+                        </div>
+                        <!--Expertise-->
+                        <div class="attack-stat">
+                           <i class="fas fa-graduation-cap" />
+                           {localize("LOCAL.expertise.label")}:
+                           {$document.system.skill[attack.skill].expertise.value}
+                        </div>
 
-                     <!--Damage-->
-                     <div class="attack-stat">
-                        <i class="fas fa-bolt" />
-                        {localize("LOCAL.damage.label")}:
-                        {`${attack.damage}${
-                           attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
-                        } `}
+                        <!--Range-->
+                        <div class="attack-stat">
+                           <i class="fas fa-ruler" />
+                           {localize("LOCAL.range.label")}:
+                           {attack.range}
+                        </div>
+
+                        <!--Damage-->
+                        <div class="attack-stat">
+                           <i class="fas fa-bolt" />
+                           {localize("LOCAL.damage.label")}:
+                           {`${attack.damage}${
+                              attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
+                           } `}
+                        </div>
                      </div>
                   </li>
                {/each}
@@ -166,10 +171,6 @@
                &:not(:first-child) {
                   margin-left: 0.5rem;
                }
-
-               .spacer {
-                  width: 0.5rem;
-               }
             }
          }
       }
@@ -189,14 +190,28 @@
             flex-wrap: wrap;
 
             li {
-               @include flex-row;
-               @include flex-group-left;
+               @include flex-column;
+               @include flex-group-center;
                @include border;
+               width: 100%;
+               margin-top: 0.5rem;
                padding: 0.25rem;
                background-color: var(--label-background-color);
 
-               .attack-stat {
-                  margin-left: 0.5rem;
+               .row {
+                  @include flex-row;
+                  @include flex-space-between;
+                  width: 100%;
+
+                  &:not(:first-child) {
+                     margin-top: 0.25rem;
+                  }
+
+                  .attack-stat {
+                     @include border;
+                     padding: 0.25rem;
+                     margin-left: 0.5rem;
+                  }
                }
             }
          }
