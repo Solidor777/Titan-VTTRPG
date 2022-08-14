@@ -59,10 +59,8 @@
                   {`${attack.damage}${attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""} `}
                </div>
             </div>
-         </div>
 
-         <!--Traits-->
-         <div class="row traits">
+            <!--Traits-->
             {#each Object.entries(attack.traits) as [key, trait]}
                <div class="trait">
                   {localize(`LOCAL.${key}.label`)}
@@ -82,7 +80,7 @@
    ol {
       @include border-top;
       list-style: none;
-      margin: 0;
+      margin: 0 0 0.5rem 0;
       padding: 0;
       font-size: 0.9rem;
 
