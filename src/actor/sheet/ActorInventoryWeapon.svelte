@@ -49,7 +49,7 @@
 
          <!--Controls-->
          <div class="item-controls">
-            <!--Toggle Eqipped button-->
+            <!--Toggle Equipped button-->
             <div class="item-control-button">
                <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, item._id)}>
                   {localize("LOCAL.equipped.label")}:

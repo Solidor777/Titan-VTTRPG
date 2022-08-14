@@ -49,6 +49,11 @@
 
          <!--Controls-->
          <div class="item-controls">
+            <!--Send to Chat button-->
+            <div class="item-control-button">
+               <IconButton icon={"fas fa-comment"} on:click={$document.sendItemToChat(item._id)} />
+            </div>
+
             <!--Edit Button-->
             <div class="item-control-button">
                <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, item._id)} />
@@ -64,6 +69,16 @@
       <!--Expandable content-->
       {#if isExpandedObject[id] === true}
          <div class="item-expandable-content" transition:slide|local>
+            <div class="multi-attack">
+               <!--Multi attack -->
+               <div>
+                  <EfxButton efx={ripple} on:click={application.toggleMultiAttack.bind(application, item._id)}>
+                     {localize("LOCAL.multiAttack.label")}:
+                     <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
+                  </EfxButton>
+               </div>
+            </div>
+
             <!--Attack Description-->
             <div class="attack-description">Temporary Attack Description</div>
 
@@ -75,7 +90,7 @@
                      <div class="row header">
                         <!--Attack Button-->
                         <div class="attack-button">
-                           <EfxButton efx={ripple}>
+                           <EfxButton efx={ripple} on:click={application.rollAttackCheck(item._id, attackIdx)}>
                               <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
                               {attack.name}
                            </EfxButton>
@@ -205,6 +220,16 @@
       }
 
       .item-expandable-content {
+         .multi-attack {
+            @include flex-row;
+            @include flex-group-right;
+            margin-top: 0.5rem;
+
+            i {
+               margin-left: 0.25rem;
+            }
+         }
+
          .attack-description {
             margin-top: 0.5rem;
             font-size: 0.9rem;

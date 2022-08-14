@@ -75,7 +75,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.weapons.label")}:
+               {localize("LOCAL.weapons.label")}
             </div>
 
             <!--Weapon List-->
@@ -109,11 +109,6 @@
                   </li>
                {/each}
             </ol>
-            <div class="add-entry-button">
-               <EfxButton on:click={application.addItem.bind(application, "weapon")}
-                  ><i class="fas fa-circle-plus" />
-               </EfxButton>
-            </div>
          </div>
       </div>
    </ScrollingContainer>

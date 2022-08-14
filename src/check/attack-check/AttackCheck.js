@@ -1,5 +1,5 @@
-import TitanUtility from "../helpers/Utility.js";
-import TitanSkillCheck from "./skill-check/SkillCheck.js";
+import TitanUtility from "../../helpers/Utility.js";
+import TitanSkillCheck from "../skill-check/SkillCheck.js";
 
 export default class TitanAttackCheck extends TitanSkillCheck {
   _ensureValidConstruction(options) {
@@ -127,9 +127,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     }
 
     // Calculate whether this is a multi-attack
-    if (this.parameters.multiAttack === null) {
-      this.parameters.multiAttack = weaponCheckData.multiAttack;
-    }
+    this.parameters.multiAttack = this.parameters.multiAttack ?? weaponCheckData.multiAttack;
 
     // Calculate whether this is a dual attack
     if (this.parameters.multiAttack) {
@@ -201,107 +199,5 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     }
 
     return results;
-  }
-
-  // Creates a dialog for getting options for this skill check
-  static async getOptionsFromDialog(initialOptions) {
-    // Initialize dialog data
-    const dialogData = {
-      attribute: initialOptions?.attribute ?? "body",
-      skill: initialOptions?.skill ?? "athletics",
-      difficulty: initialOptions?.difficulty ?
-        TitanUtility.clamp(initialOptions.difficulty, 2, 6) :
-        4,
-      complexity: initialOptions?.complexity ?
-        Math.max(checkOptions.complexity, 0) :
-        0,
-      diceMod: initialOptions?.diceMod ?? 0,
-      trainingMod: initialOptions?.trainingMod ?? 0,
-      expertiseMod: initialOptions?.expertiseMod ?? 0,
-      doubleExpertise: initialOptions?.doubleExpertise ?? false,
-      maximizeSuccesses: initialOptions?.maximizeSuccesses ?? false,
-      extraSuccessOnCritical: initialOptions?.extraSuccessOnCritical ?? false,
-      extraFailureOnCritical: initialOptions?.extraFailureOnCritical ?? false,
-      attributeOptions: {},
-      skillOptions: {},
-    };
-
-    // Add each attribute as an option to the data
-    for (let [k, v] of Object.entries(CONFIG.TITAN.attribute.option)) {
-      dialogData.attributeOptions[k] = game.i18n.localize(v.label);
-    }
-    // Add default as an attribute option
-    dialogData.skillOptions.default = game.i18n.localize(
-      CONFIG.TITAN.default.label
-    );
-
-    // Add each skill as an option to the data
-    for (let [k, v] of Object.entries(CONFIG.TITAN.skill.option)) {
-      dialogData.skillOptions[k] = game.i18n.localize(v.label);
-    }
-    // Add default as a skill option
-    dialogData.skillOptions.default = game.i18n.localize(
-      CONFIG.TITAN.default.label
-    );
-
-    // Create the html template
-    const html = await renderTemplate(
-      "systems/titan/templates/checks/attack-check-dialog.hbs",
-      dialogData
-    );
-
-    // Proccesses the results of a skill check dialog
-    function _processSkillCheckOptions(form) {
-      return {
-        attribute: form.attribute.value,
-        skill: form.skill.value,
-        difficulty: parseInt(form.difficulty.value),
-        complexity: parseInt(form.complexity.value),
-        diceMod: parseInt(form.diceMod.value),
-        expertiseMod: parseInt(form.expertiseMod.value),
-      };
-    }
-
-    // Create the dialog
-    const checkOptions = await new Promise((resolve) => {
-      const data = {
-        title: game.i18n.localize(CONFIG.TITAN.check.label),
-        content: html,
-        buttons: {
-          roll: {
-            label: game.i18n.localize(CONFIG.TITAN.roll.label),
-            callback: (event) =>
-              resolve(_processSkillCheckOptions(event[0].querySelector("form"))),
-          },
-          cancel: {
-            label: game.i18n.localize(CONFIG.TITAN.cancel.label),
-            callback: () => resolve({ cancelled: true }),
-          },
-        },
-        default: "roll",
-        close: () => resolve({ cancelled: true }),
-      };
-
-      new Dialog(data, null).render(true);
-    });
-
-    // Validate the results if appropriate
-    if (!checkOptions.cancelled) {
-      // Validate difficulty
-      checkOptions.difficulty = TitanUtility.clamp(
-        checkOptions.difficulty,
-        2,
-        6
-      );
-
-      // Validate complexity
-      checkOptions.complexity = Math.max(checkOptions.complexity, 0);
-    }
-
-    return checkOptions;
-  }
-
-  _getChatTemplate() {
-    return "systems/titan/templates/checks/attack-check-chat-message.hbs";
   }
 }

@@ -104,10 +104,6 @@
                @include flex-space-evenly;
             }
 
-            &.traits {
-               @include flex-space-evenly;
-            }
-
             .attack-name {
                font-size: 1rem;
                font-weight: bold;

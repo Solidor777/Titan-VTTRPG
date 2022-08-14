@@ -84,6 +84,20 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       return;
    }
 
+   // Toggle multi attack
+   async toggleMultiAttack(id) {
+      const item = this.reactive.document.items.get(id);
+      const updateData = {
+         system: {
+            multiAttack: !item.system.multiAttack,
+         },
+      };
+
+      item.update(updateData);
+
+      return;
+   }
+
    // Check rolls
    async rollResistanceCheck(resistance) {
       const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
@@ -117,6 +131,19 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          attribute: attribute,
          getOptions: getOptions,
          skill: "none",
+      });
+
+      return;
+   }
+
+   // Function for rolling an attack check
+   async rollAttackCheck(itemId, attackIdx) {
+      const getOptions = false;
+
+      await this.reactive.document.rollAttackCheck({
+         itemId: itemId,
+         attackIdx: attackIdx,
+         getOptions: getOptions,
       });
 
       return;

@@ -2,7 +2,7 @@ import TitanUtility from "../helpers/Utility.js";
 import TitanAttributeCheck from "../check/AttributeCheck.js";
 import TitanSkillCheck from "../check/skill-check/SkillCheck.js";
 import TitanResistanceCheck from "../check/resistance-check/ResistanceCheck.js";
-import TitanAttackCheck from "../check/AttackCheck.js";
+import TitanAttackCheck from "../check/attack-check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
 import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
@@ -201,7 +201,7 @@ export class TitanActor extends Actor {
   async getAttributeCheck(options) {
 
     // Get the actor check data
-    const actorCheckData = this.getCheckData();
+    const actorCheckData = this.getRollData();
     options.actorCheckData = actorCheckData;
 
     // Check if the skill is none
@@ -242,7 +242,7 @@ export class TitanActor extends Actor {
   async getResistanceCheck(options) {
 
     // Get the actor check data
-    const actorCheckData = this.getCheckData();
+    const actorCheckData = this.getRollData();
     options.actorCheckData = actorCheckData;
 
     // Perform the roll
@@ -280,7 +280,7 @@ export class TitanActor extends Actor {
     const checkWeapon = this.items.get(options?.itemId);
     if (!checkWeapon) {
       console.error(
-        "TITAN | Attack check failed. Invalid weapon ID provided to actor"
+        "TITAN | Attack check failed. Invalid weapon ID provided to actor."
       );
 
       return false;
@@ -290,22 +290,12 @@ export class TitanActor extends Actor {
     let checkOptions = options;
     checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
-    // Get the options from a dialog if appropriate
-    if (options.getOptions) {
-      checkOptions = await TitanAttackCheck.getOptionsFromDialog(checkOptions);
-
-      // Return if cancelled
-      if (checkOptions.cancelled) {
-        return;
-      }
-    }
-
     // Add the actor check data to the check options
-    const actorCheckData = this.getCheckData();
+    const actorCheckData = this.getRollData();
     checkOptions.actorCheckData = actorCheckData;
 
     // Add the weapon data to the check options
-    const weaponCheckData = checkWeapon.getCheckData();
+    const weaponCheckData = checkWeapon.getRollData();
     checkOptions.weaponCheckData = weaponCheckData;
     checkOptions.weaponName = checkWeapon.name;
 
@@ -314,9 +304,10 @@ export class TitanActor extends Actor {
     if (userTargets.length < 1 && game.user.isGM) {
       userTargets = Array.from(canvas.tokens.controlled);
     }
+
     if (userTargets[0]) {
-      const targetCheckData = userTargets[0].document.actor.getCheckData();
-      checkOptions.targetCheckData = targetCheckData;
+      const targetRollData = userTargets[0].document.actor.getRollData();
+      checkOptions.targetRollData = targetRollData;
     }
 
     // Perform the attack
@@ -324,10 +315,36 @@ export class TitanActor extends Actor {
     return attackCheck;
   }
 
-  // Get the check data 
-  getCheckData() {
-    const checkData = this.system;
-    return checkData;
+  async rollAttackCheck(options) {
+    // Get the weapon check data.
+    const checkWeapon = this.items.get(options?.itemId);
+    if (!checkWeapon) {
+      console.error(
+        "TITAN | Attack check failed. Invalid weapon ID provided to actor."
+      );
+
+      return false;
+    }
+
+    // If get options, then create a dialog for setting options.
+    if (options?.getOptions === true) {
+      const dialog = new ResistanceCheckDialog(this, options);
+      dialog.render(true);
+      return;
+    }
+
+    // Otherwise, get a simple check
+    const attackCHeck = await this.getAttackCheck(options);
+    if (attackCHeck && attackCHeck.isValid) {
+      await attackCHeck.evaluateCheck();
+      await attackCHeck.sendToChat({
+        user: game.user.id,
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        rollMode: game.settings.get("core", "rollMode"),
+      });
+    }
+
+    return;
   }
 
   // Apply damage to the actor

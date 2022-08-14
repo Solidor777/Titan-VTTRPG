@@ -70,7 +70,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.weapons.label")}:
+               {localize("LOCAL.weapons.label")}
             </div>
 
             <!--Weapon List-->
