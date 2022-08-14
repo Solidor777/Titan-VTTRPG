@@ -45,7 +45,7 @@ Hooks.once("init", async () => {
 Hooks.on('renderChatMessage', (message, html) => {
    // Check if this is a valid titan chat message
    const messageData = message.getFlag('titan', 'data');
-   const validTypes = new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck']);
+   const validTypes = new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck', 'weapon']);
    if (validTypes.has(messageData?.chatContext?.type)) {
       // If so, create the chat message shell and display the message
       const documentStore = new TJSDocument(message);

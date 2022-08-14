@@ -58,6 +58,11 @@
                </EfxButton>
             </div>
 
+            <!--Send to Chat button-->
+            <div class="item-control-button">
+               <IconButton icon={"fas fa-comment"} on:click={$document.sendItemToChat(item._id)} />
+            </div>
+
             <!--Edit Button-->
             <div class="item-control-button">
                <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, item._id)} />
@@ -117,7 +122,7 @@
 
          .item-expand-button {
             @include flex-row;
-            width: 15rem;
+            width: 13rem;
 
             .item-expand-button-inner {
                @include flex-row;

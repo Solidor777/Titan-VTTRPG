@@ -253,7 +253,7 @@ export default class TitanCheck {
             }
           }
         },
-        options.rollMode ?
+        options?.rollMode ?
           options.rollMode :
           game.settings.get("core", "rollMode")
       )

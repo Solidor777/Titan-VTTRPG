@@ -461,4 +461,15 @@ export class TitanActor extends Actor {
 
     return;
   }
+
+  async sendItemToChat(id) {
+    const item = this.items.get(id);
+    await item.sendToChat({
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      rollMode: game.settings.get("core", "rollMode"),
+    });
+
+    return;
+  }
 }

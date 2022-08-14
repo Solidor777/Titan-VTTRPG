@@ -166,7 +166,7 @@
 
          .item-expand-button {
             @include flex-row;
-            width: 15rem;
+            width: 13rem;
 
             .item-expand-button-inner {
                @include flex-row;
