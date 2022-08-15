@@ -82,7 +82,7 @@
          efx={ripple}
          on:click={() => {
             applyDamage(Math.ceil(results.damage / 2), false);
-         }}><i class="fas fa-circle-half-stroke" /></EfxButton
+         }}><i class="fas fa-heart-half-stroke" /></EfxButton
       >
    </div>
 
@@ -90,7 +90,7 @@
    <!--Apply half damage button-->
    <div class="button" data-titan-tooltip={localize("LOCAL.healDamage.label")}>
       <EfxButton
-         efx={ripple}
+         efx="{ripple}1"
          on:click={() => {
             healDamage(results.damage);
          }}><i class="fas fa-heart" /></EfxButton
