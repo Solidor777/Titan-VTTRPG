@@ -137,16 +137,11 @@
                .item-image {
                   @include flex-row;
                   @include flex-group-center;
-                  margin-left: 0.25rem;
                   width: 2rem;
                   border: none;
                   border-radius: 10px;
                   padding: 0.1rem;
                   background-color: black;
-               }
-
-               .fas {
-                  margin-right: 0.25rem;
                }
             }
          }

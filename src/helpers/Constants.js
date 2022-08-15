@@ -18,10 +18,10 @@ export const TITANCONSTANTS = Object.freeze({
 
   resource: {
     resolve: {
-      maxBaseMulti: 1.0,
+      maxBaseMulti: 0.5,
     },
     stamina: {
-      maxBaseMulti: 0.5,
+      maxBaseMulti: 1.0,
     },
     wounds: {
       maxBaseMulti: 0.5,

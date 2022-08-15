@@ -40,6 +40,14 @@
          {localize(`LOCAL.expertiseRemaining.label`)}
       </div>
    {/if}
+
+   <!--Damage-->
+   {#if results.damage}
+      <div class="damage">
+         {localize(`LOCAL.damage.label`)}
+         {results.damage}
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -84,6 +92,11 @@
       }
 
       .expertise-remaining {
+         font-weight: bold;
+         font-size: 1rem;
+      }
+
+      .damage {
          font-weight: bold;
          font-size: 1rem;
       }

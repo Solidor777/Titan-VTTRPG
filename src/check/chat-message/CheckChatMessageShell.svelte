@@ -2,12 +2,20 @@
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
    import CheckChatResults from "./CheckChatResults.svelte";
+   import { getContext } from "svelte";
+   import CheckDamageButtons from "./CheckDamageButtons.svelte";
+
+   // Document reference
+   const document = getContext("DocumentSheetObject");
 </script>
 
 <div class="check-chat-message">
    <CheckChatLabel />
    <CheckChatDiceContainer />
    <CheckChatResults />
+   {#if $document.flags.titan.data.chatContext.results.damage && game.user.isGM}
+      <CheckDamageButtons />
+   {/if}
 </div>
 
 <style lang="scss">

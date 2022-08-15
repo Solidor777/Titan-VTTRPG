@@ -152,7 +152,7 @@ export class TitanActor extends Actor {
 
     // Calculate mods
     for (let [k, v] of Object.entries(systemData.mod)) {
-      systemData.mod[k].value = v.baseValue + v.staticMod;
+      systemData.mod[k].value = v.staticMod;
     }
 
     // Calculate effects
@@ -409,17 +409,17 @@ export class TitanActor extends Actor {
       messageData
     );
 
-    // Send the damage report to chat
-    const messageClass = getDocumentClass("ChatMessage");
-    await messageClass.create({
-      user: game.user.id,
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      content: messageContent,
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-      whisper: game.users.filter((user) =>
-        this.testUserPermission(user, "OWNER")
-      ),
-    });
+    /*     // Send the damage report to chat
+        const messageClass = getDocumentClass("ChatMessage");
+        await messageClass.create({
+          user: game.user.id,
+          speaker: ChatMessage.getSpeaker({ actor: this }),
+          content: messageContent,
+          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          whisper: game.users.filter((user) =>
+            this.testUserPermission(user, "OWNER")
+          ),
+        }); */
 
     return;
   }
