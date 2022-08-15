@@ -182,16 +182,6 @@
                   }
                }
             }
-
-            .add-entry-button {
-               @include flex-row;
-
-               width: 100%;
-
-               .fas {
-                  padding: 0.25rem;
-               }
-            }
          }
       }
    }
