@@ -33,6 +33,26 @@
 
       return;
    }
+
+   async function healDamage(healing) {
+      // Get the targets
+      let userTargets = Array.from(game.user.targets);
+      if (userTargets.length < 1) {
+         userTargets = Array.from(canvas.tokens.controlled);
+      }
+
+      // For each target
+      for (let idx = 0; idx < userTargets.length; idx++) {
+         // If the target is valid
+         const target = userTargets[idx]?.actor;
+         if (target) {
+            // Apply damage to the target
+            await target.healDamage(healing);
+         }
+      }
+
+      return;
+   }
 </script>
 
 <div class="damage-buttons">
@@ -41,7 +61,7 @@
       <EfxButton
          efx={ripple}
          on:click={() => {
-            applyDamage($document.flags.titan.data.chatContext.results.damage, false);
+            applyDamage(results.damage, false);
          }}><i class="fas fa-bolt" /></EfxButton
       >
    </div>
@@ -51,18 +71,29 @@
       <EfxButton
          efx={ripple}
          on:click={() => {
-            applyDamage($document.flags.titan.data.chatContext.results.damage, true);
+            applyDamage(results.damage, true);
          }}><i class="fas fa-shield-slash" /></EfxButton
       >
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" data-titan-tooltip={localize("LOCAL.applyDamageIgnoreArmor.label")}>
+   <div class="button" data-titan-tooltip={localize("LOCAL.applyHalfDamage.label")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
-            applyDamage(Math.ceil($document.flags.titan.data.chatContext.results.damage / 2), false);
+            applyDamage(Math.ceil(results.damage / 2), false);
          }}><i class="fas fa-circle-half-stroke" /></EfxButton
+      >
+   </div>
+
+   <!--Apply healing button-->
+   <!--Apply half damage button-->
+   <div class="button" data-titan-tooltip={localize("LOCAL.healDamage.label")}>
+      <EfxButton
+         efx={ripple}
+         on:click={() => {
+            healDamage(results.damage);
+         }}><i class="fas fa-heart" /></EfxButton
       >
    </div>
 </div>

@@ -6,6 +6,7 @@
    import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
    import WeaponChatMessageShell from "~/item/weapon/WeaponChatMessageShell.svelte";
    import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
+   import HealingReportChatMessageShell from "./HealingReportChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -23,6 +24,7 @@
          attackCheck: CheckChatMessageShell,
          weapon: WeaponChatMessageShell,
          damageReport: DamageReportChatMessageShell,
+         healingReport: HealingReportChatMessageShell,
       };
       return chatComponents[$document.flags.titan.data.chatContext.type];
    }

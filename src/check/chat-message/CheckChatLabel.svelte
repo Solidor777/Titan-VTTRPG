@@ -1,15 +1,12 @@
 <script>
    import { getContext } from "svelte";
+   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    const document = getContext("DocumentSheetObject");
 
-   // Main label
-   let label = $document.flags.titan.data.chatContext.label;
-
-   // Type label
-   let typeLabel = $document.flags.titan.data.chatContext.typeLabel;
+   // Chat context
+   const chatContext = $document.flags.titan.data.chatContext;
 
    function getLabelClass() {
-      const chatContext = $document.flags.titan.data.chatContext;
       switch (chatContext.type) {
          case "resistanceCheck": {
             return chatContext.parameters.resistance;
@@ -33,13 +30,28 @@
 <div class="label {getLabelClass()}">
    <!--Main Label -->
    <div class="main-label">
-      {label}
+      {chatContext.label}
    </div>
 
    <!--Sub Label -->
-   {#if typeLabel}
+   {#if chatContext.typeLabel}
       <div class="sub-label">
-         {typeLabel}
+         {chatContext.typeLabel}
+      </div>
+   {/if}
+
+   {#if chatContext.type === "attackCheck" && chatContext.parameters.targetDefense !== false}
+      <div class="sub-label">
+         {#if chatContext.parameters.type === "melee"}
+            {localize("LOCAL.melee.label")}
+            ({chatContext.parameters.attackerMelee})
+         {:else}
+            {localize("LOCAL.accuracy.label")}
+            ({chatContext.parameters.attackerAccuracy})
+         {/if}
+         {localize("LOCAL.versus.label")}
+         {localize("LOCAL.defense.label")}
+         ({chatContext.parameters.targetDefense})
       </div>
    {/if}
 </div>

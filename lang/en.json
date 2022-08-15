@@ -249,6 +249,8 @@
   "LOCAL.damageTaken.label": "Damage Taken",
   "LOCAL.applyDamage.label": "Apply Damage",
   "LOCAL.applyDamageIgnoreArmor.label": "Apply Damage (Ignore Armor)",
+  "LOCAL.applyHalfDamage.label": "Apply Damage (Halved)",
+  "LOCAL.healDamage.label": "Heal Damage",
   "LOCAL.light.label": "Light",
   "LOCAL.heavy.label": "Heavy",
   "LOCAL.equip.label": "Equip",
@@ -291,6 +293,8 @@
   "LOCAL.newWeapon.label": "New Weapon",
   "LOCAL.equipped.label": "Equipped",
   "LOCAL.damageReport.label": "Damage Report",
+  "LOCAL.healingReport.label": "Healing Report",
+  "LOCAL.staminaHealed.label": "Stamina Healed",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
