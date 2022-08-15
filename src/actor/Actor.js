@@ -397,6 +397,7 @@ export class TitanActor extends Actor {
 
     // Create the damage report message
     const chatContext = {
+      type: "damageReport",
       baseDamage: baseDamage,
       damage: damage,
       ignoreArmor: damageData.ignoreArmor ?? null,

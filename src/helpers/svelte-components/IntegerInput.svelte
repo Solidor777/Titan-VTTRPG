@@ -4,17 +4,8 @@
    // The value of the input
    export let value = void 0;
    export let positive = false;
-   let medium = value;
 
-   function validateInput(medium) {
-      let retVal = parseInt(medium);
-      if (isNaN(retVal)) {
-         retVal = 0;
-      }
-      return retVal;
-   }
-
-   $: value = validateInput(medium);
+   $: value = parseInt(value);
 
    /**
     * If number, only allow numbers.
@@ -35,7 +26,7 @@
    }
 </script>
 
-<input type="number" on:change bind:value={medium} on:keypress={(event) => checkInput(event)} />
+<input type="number" on:change bind:value on:keypress={(event) => checkInput(event)} />
 
 <style lang="scss">
    @import "../../styles/Mixins.scss";

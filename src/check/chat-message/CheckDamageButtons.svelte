@@ -38,37 +38,31 @@
 <div class="damage-buttons">
    <!--Apply damage button-->
    <div class="button" data-titan-tooltip={localize("LOCAL.applyDamage.label")}>
-      <EfxButton efx={ripple}
-         ><i
-            class="fas fa-bolt"
-            on:click={() => {
-               applyDamage($document.flags.titan.data.chatContext.results.damage, false);
-            }}
-         /></EfxButton
+      <EfxButton
+         efx={ripple}
+         on:click={() => {
+            applyDamage($document.flags.titan.data.chatContext.results.damage, false);
+         }}><i class="fas fa-bolt" /></EfxButton
       >
    </div>
 
    <!--Apply damage ignore armor button-->
    <div class="button" data-titan-tooltip={localize("LOCAL.applyDamageIgnoreArmor.label")}>
-      <EfxButton efx={ripple}
-         ><i
-            class="fas fa-shield-slash"
-            on:click={() => {
-               applyDamage($document.flags.titan.data.chatContext.results.damage, true);
-            }}
-         /></EfxButton
+      <EfxButton
+         efx={ripple}
+         on:click={() => {
+            applyDamage($document.flags.titan.data.chatContext.results.damage, true);
+         }}><i class="fas fa-shield-slash" /></EfxButton
       >
    </div>
 
    <!--Apply half damage button-->
    <div class="button" data-titan-tooltip={localize("LOCAL.applyDamageIgnoreArmor.label")}>
-      <EfxButton efx={ripple}
-         ><i
-            class="fas fa-circle-half-stroke"
-            on:click={() => {
-               applyDamage(Math.ceil($document.flags.titan.data.chatContext.results.damage / 2), false);
-            }}
-         /></EfxButton
+      <EfxButton
+         efx={ripple}
+         on:click={() => {
+            applyDamage(Math.ceil($document.flags.titan.data.chatContext.results.damage / 2), false);
+         }}><i class="fas fa-circle-half-stroke" /></EfxButton
       >
    </div>
 </div>
