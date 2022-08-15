@@ -182,13 +182,17 @@
 
          .item-expand-button {
             @include flex-row;
-            width: 13rem;
 
             .item-expand-button-inner {
                @include flex-row;
                @include flex-space-between;
                width: 100%;
                height: 100%;
+               flex-wrap: wrap;
+
+               :not(:first-child) {
+                  margin-left: 0.5rem;
+               }
 
                .item-image {
                   @include flex-row;

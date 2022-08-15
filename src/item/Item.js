@@ -31,7 +31,7 @@ export class TitanItem extends Item {
 
       // Create the context object
       const chatContext = {
-         type: "weapon",
+         type: this.type,
          img: this.img,
          name: this.name,
          flags: this.flags,

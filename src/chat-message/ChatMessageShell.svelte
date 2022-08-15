@@ -19,6 +19,7 @@
          attributeCheck: CheckChatMessageShell,
          skillCheck: CheckChatMessageShell,
          resistanceCheck: CheckChatMessageShell,
+         attackCheck: CheckChatMessageShell,
          weapon: WeaponChatMessageShell,
       };
       return chatComponents[$document.flags.titan.data.chatContext.type];

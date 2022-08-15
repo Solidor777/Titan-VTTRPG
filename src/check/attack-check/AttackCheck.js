@@ -200,4 +200,24 @@ export default class TitanAttackCheck extends TitanSkillCheck {
 
     return results;
   }
+
+  _getChatContext(options) {
+    // Create the context object
+    const chatContext = {
+      label: this.parameters.weaponName,
+      typeLabel: this._getTypeLabel(),
+      parameters: this.parameters,
+      results: this.results,
+      type: this._getCheckType(),
+    };
+    if (options?.label) {
+      chatContext.typeLabel = this._getTypeLabel();
+    }
+
+    return chatContext;
+  }
+
+  _getCheckType() {
+    return "attackCheck";
+  }
 }

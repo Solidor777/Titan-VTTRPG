@@ -52,4 +52,6 @@ export const TITANCONSTANTS = Object.freeze({
       twoHanded: false,
     }
   },
+
+  validChatMessageTypes: new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck', 'weapon']),
 });

@@ -38,7 +38,7 @@
       });
 
    // Initialize expanded object
-   /// Weapons
+   // Weapons
    $document.items
       .filter((item) => item.type === "weapon")
       .forEach((item) => {

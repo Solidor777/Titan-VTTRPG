@@ -20,6 +20,9 @@
          case "skillCheck": {
             return chatContext.parameters.attribute;
          }
+         case "attackCheck": {
+            return chatContext.parameters.attribute;
+         }
          default: {
             return "";
          }
@@ -76,6 +79,7 @@
       }
 
       .sub-label {
+         font-weight: bold;
          margin-top: 0.25rem;
          font-size: 0.9rem;
       }
