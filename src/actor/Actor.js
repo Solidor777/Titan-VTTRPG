@@ -201,8 +201,8 @@ export class TitanActor extends Actor {
   async getAttributeCheck(options) {
 
     // Get the actor check data
-    const actorCheckData = this.getRollData();
-    options.actorCheckData = actorCheckData;
+    const actorRollData = this.getRollData();
+    options.actorRollData = actorRollData;
 
     // Check if the skill is none
     if (options.skill === "none") {
@@ -242,8 +242,8 @@ export class TitanActor extends Actor {
   async getResistanceCheck(options) {
 
     // Get the actor check data
-    const actorCheckData = this.getRollData();
-    options.actorCheckData = actorCheckData;
+    const actorRollData = this.getRollData();
+    options.actorRollData = actorRollData;
 
     // Perform the roll
     const resistanceCheck = new TitanResistanceCheck(options);
@@ -291,12 +291,12 @@ export class TitanActor extends Actor {
     checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
     // Add the actor check data to the check options
-    const actorCheckData = this.getRollData();
-    checkOptions.actorCheckData = actorCheckData;
+    const actorRollData = this.getRollData();
+    checkOptions.actorRollData = actorRollData;
 
     // Add the weapon data to the check options
-    const weaponCheckData = checkWeapon.getRollData();
-    checkOptions.weaponCheckData = weaponCheckData;
+    const weaponRollData = checkWeapon.getRollData();
+    checkOptions.weaponRollData = weaponRollData;
     checkOptions.weaponName = checkWeapon.name;
 
     // Get the target check data

@@ -8,7 +8,7 @@ export default class TitanResistanceCheck extends TitanCheck {
     }
 
     // Check if actor check data is valid
-    if (!inData?.actorCheckData) {
+    if (!inData?.actorRollData) {
       console.error(
         "TITAN | Resistance Check failed during construction. No provided Actor Check Data."
       );
@@ -29,11 +29,11 @@ export default class TitanResistanceCheck extends TitanCheck {
 
   _calculateDerivedData(inData) {
     super._calculateDerivedData(inData);
-    const actorCheckData = inData.actorCheckData;
+    const actorRollData = inData.actorRollData;
 
     // Get the resistance value
     this.parameters.resistanceDice =
-      actorCheckData.resistance[this.parameters.resistance].value;
+      actorRollData.resistance[this.parameters.resistance].value;
 
     return;
   }

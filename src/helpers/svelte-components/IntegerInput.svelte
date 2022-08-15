@@ -35,7 +35,7 @@
    }
 </script>
 
-<input type="number" bind:value={medium} on:keypress={(event) => checkInput(event)} />
+<input type="number" on:change bind:value={medium} on:keypress={(event) => checkInput(event)} />
 
 <style lang="scss">
    @import "../../styles/Mixins.scss";

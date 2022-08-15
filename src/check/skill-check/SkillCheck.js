@@ -17,10 +17,10 @@ export default class TitanSkillCheck extends TitanAttributeCheck {
 
   _calculateDerivedData(options) {
     super._calculateDerivedData(options);
-    const actorCheckData = options.actorCheckData;
+    const actorRollData = options.actorRollData;
 
     // Get the skill training and expertise values
-    const skill = actorCheckData.skill[this.parameters.skill];
+    const skill = actorRollData.skill[this.parameters.skill];
     this.parameters.skillTrainingDice = skill.training.value;
     this.parameters.skillExpertise = skill.expertise.value;
 

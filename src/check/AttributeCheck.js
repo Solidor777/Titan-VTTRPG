@@ -7,7 +7,7 @@ export default class TitanAttributeCheck extends TitanCheck {
     }
 
     // Check if actor check data is valid
-    if (!options?.actorCheckData) {
+    if (!options?.actorRollData) {
       console.error(
         "TITAN | Attribute Check failed during construction. No provided Actor Check Data."
       );
@@ -28,11 +28,11 @@ export default class TitanAttributeCheck extends TitanCheck {
 
   _calculateDerivedData(options) {
     super._calculateDerivedData(options);
-    const actorCheckData = options.actorCheckData;
+    const actorRollData = options.actorRollData;
 
     // Get the attribute dice
     this.parameters.attributeDice =
-      actorCheckData.attribute[this.parameters.attribute].value;
+      actorRollData.attribute[this.parameters.attribute].value;
 
     return;
   }

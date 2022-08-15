@@ -8,8 +8,8 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     }
 
     // Check if the weapon is valid
-    const weaponCheckData = options.weaponCheckData;
-    if (!weaponCheckData) {
+    const weaponRollData = options.weaponRollData;
+    if (!weaponRollData) {
       console.log(
         `TITAN | Attack Check failed during construction. Invalid Data. ${options}`
       );
@@ -17,7 +17,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     }
 
     // Check if the attack is valid
-    const checkAttack = weaponCheckData.attack[options.attackIdx];
+    const checkAttack = weaponRollData.attack[options.attackIdx];
     if (!checkAttack) {
       console.log(
         `TITAN | Attack Check failed during construction. Attack IDX. ${options}`
@@ -57,14 +57,14 @@ export default class TitanAttackCheck extends TitanSkillCheck {
 
   _calculateDerivedData(options) {
     // Get the weapon reference
-    const actorCheckData = options.actorCheckData;
-    const weaponCheckData = options.weaponCheckData;
-    const targetCheckData = options.targetCheckData;
-    const checkAttack = weaponCheckData.attack[options.attackIdx];
+    const actorRollData = options.actorRollData;
+    const weaponRollData = options.weaponRollData;
+    const targetRollData = options.targetRollData;
+    const checkAttack = weaponRollData.attack[options.attackIdx];
 
     // Get the attack description
-    if (weaponCheckData.attackDescription) {
-      this.parameters.attackDescription = weaponCheckData.attackDescription;
+    if (weaponRollData.attackDescription) {
+      this.parameters.attackDescription = weaponRollData.attackDescription;
     }
 
     // Get the skill
@@ -84,7 +84,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     this.parameters.attack = checkAttack;
 
     // Get the skill training and expertise value
-    const skill = actorCheckData.skill[this.parameters.skill];
+    const skill = actorRollData.skill[this.parameters.skill];
     this.parameters.skillTrainingDice = skill.training.value;
     this.parameters.skillExpertise = skill.expertise.value;
 
@@ -95,13 +95,13 @@ export default class TitanAttackCheck extends TitanSkillCheck {
 
     // Calculate ratings
     if (!this.parameters.attackerMelee) {
-      this.parameters.attackerMelee = actorCheckData.rating.melee.value;
+      this.parameters.attackerMelee = actorRollData.rating.melee.value;
     }
     if (!this.parameters.attackerAccuracy) {
-      this.parameters.attackerAccuracy = actorCheckData.rating.accuracy.value;
+      this.parameters.attackerAccuracy = actorRollData.rating.accuracy.value;
     }
-    if (!this.parameters.targetDefense && targetCheckData) {
-      this.parameters.targetDefense = targetCheckData.rating.defense.value;
+    if (!this.parameters.targetDefense && targetRollData) {
+      this.parameters.targetDefense = targetRollData.rating.defense.value;
     }
 
     // Calculate the difficulty if difficulty was not provided
@@ -127,7 +127,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     }
 
     // Calculate whether this is a multi-attack
-    this.parameters.multiAttack = this.parameters.multiAttack ?? weaponCheckData.multiAttack;
+    this.parameters.multiAttack = this.parameters.multiAttack ?? weaponRollData.multiAttack;
 
     // Calculate whether this is a dual attack
     if (this.parameters.multiAttack) {
@@ -143,9 +143,9 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     return;
   }
 
-  _calculateTotalDiceAndExpertise(checkData) {
+  _calculateTotalDiceAndExpertise(rollData) {
     // Calculate the final total dice and expertise
-    super._calculateTotalDiceAndExpertise(checkData);
+    super._calculateTotalDiceAndExpertise(rollData);
 
     // Calculate the total training dice
     let totalTrainingDice =
