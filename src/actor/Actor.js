@@ -396,7 +396,7 @@ export class TitanActor extends Actor {
     await this.update(updateData);
 
     // Create the damage report message
-    const messageData = {
+    const chatContext = {
       baseDamage: baseDamage,
       damage: damage,
       ignoreArmor: damageData.ignoreArmor ?? null,
@@ -404,22 +404,19 @@ export class TitanActor extends Actor {
       stamina: this.system.resource.stamina,
       wounds: this.system.resource.wounds,
     };
-    const messageContent = await renderTemplate(
-      "/systems/titan/templates/chat-message/damage-report-chat-message.hbs",
-      messageData
-    );
 
-    /*     // Send the damage report to chat
-        const messageClass = getDocumentClass("ChatMessage");
-        await messageClass.create({
-          user: game.user.id,
-          speaker: ChatMessage.getSpeaker({ actor: this }),
-          content: messageContent,
-          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-          whisper: game.users.filter((user) =>
-            this.testUserPermission(user, "OWNER")
-          ),
-        }); */
+    // Send the damage report to chat
+    await ChatMessage.create({
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      sound: CONFIG.sounds.notification,
+      flags: {
+        titan: {
+          data: { chatContext: chatContext }
+        }
+      }
+    });
 
     return;
   }
