@@ -53,5 +53,5 @@ export const TITANCONSTANTS = Object.freeze({
     }
   },
 
-  validChatMessageTypes: new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck', 'weapon']),
+  validChatMessageTypes: new Set(['attributeCheck', 'skillCheck', 'resistanceCheck', 'attackCheck', 'weapon', 'damageReport']),
 });

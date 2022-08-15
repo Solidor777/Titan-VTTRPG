@@ -398,6 +398,7 @@ export class TitanActor extends Actor {
     // Create the damage report message
     const chatContext = {
       type: "damageReport",
+      actorName: this.name,
       baseDamage: baseDamage,
       damage: damage,
       ignoreArmor: damageData.ignoreArmor ?? null,
@@ -412,11 +413,15 @@ export class TitanActor extends Actor {
       speaker: ChatMessage.getSpeaker({ actor: this }),
       type: CONST.CHAT_MESSAGE_TYPES.OTHER,
       sound: CONFIG.sounds.notification,
+      whisper: game.users.filter((user) =>
+        this.testUserPermission(user, "OWNER")
+      ),
       flags: {
         titan: {
           data: { chatContext: chatContext }
         }
       }
+
     });
 
     return;

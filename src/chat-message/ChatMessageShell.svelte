@@ -5,6 +5,7 @@
    import { getContext } from "svelte";
    import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
    import WeaponChatMessageShell from "~/item/weapon/WeaponChatMessageShell.svelte";
+   import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -21,6 +22,7 @@
          resistanceCheck: CheckChatMessageShell,
          attackCheck: CheckChatMessageShell,
          weapon: WeaponChatMessageShell,
+         damageReport: DamageReportChatMessageShell,
       };
       return chatComponents[$document.flags.titan.data.chatContext.type];
    }

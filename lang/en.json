@@ -290,6 +290,7 @@
   "LOCAL.filter.label": "Filter",
   "LOCAL.newWeapon.label": "New Weapon",
   "LOCAL.equipped.label": "Equipped",
+  "LOCAL.damageReport.label": "Damage Report",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
