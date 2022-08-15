@@ -37,7 +37,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          delete this.isExpanded.inventory[id];
       }
 
-      if (this.isExpanded.actions[id]) {
+      if (this.isExpanded.actions.items[id]) {
          delete this.isExpanded.actions.items[id];
       }
 

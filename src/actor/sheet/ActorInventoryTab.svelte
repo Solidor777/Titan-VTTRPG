@@ -33,10 +33,9 @@
       });
 
    // Initialize expanded object
-   /// Weapons
-   for (let [key] of Object.entries($document.items)) {
-      application.isExpanded[key] = application.isExpanded[key] ?? false;
-   }
+   $document.items.forEach((item) => {
+      application.isExpanded.inventory[item._id] = application.isExpanded.inventory[item._id] ?? false;
+   });
 
    // Drag hover state
    let dragHovered = "";

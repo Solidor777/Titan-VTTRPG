@@ -32,6 +32,7 @@
                efx={ripple}
                on:click={() => {
                   isExpandedObject[id] = !isExpandedObject[id];
+                  console.log(isExpandedObject);
                }}
             >
                <div class="item-expand-button-inner">

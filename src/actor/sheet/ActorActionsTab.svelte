@@ -39,9 +39,11 @@
 
    // Initialize expanded object
    /// Weapons
-   for (let [key] of Object.entries($document.items)) {
-      application.isExpanded[key] = application.isExpanded[key] ?? false;
-   }
+   $document.items
+      .filter((item) => item.type === "weapon")
+      .forEach((item) => {
+         application.isExpanded.actions.items[item._id] = application.isExpanded.actions.items[item._id] ?? true;
+      });
 
    // Drag hover state
    let dragHovered = "";
@@ -104,7 +106,7 @@
                   >
                      <ActorActionsWeapon
                         bind:id={weapon._id}
-                        bind:isExpandedObject={application.isExpanded.inventory}
+                        bind:isExpandedObject={application.isExpanded.actions.items}
                      />
                   </li>
                {/each}
