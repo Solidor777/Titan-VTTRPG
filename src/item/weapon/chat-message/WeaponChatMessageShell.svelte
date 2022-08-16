@@ -1,8 +1,8 @@
 <script>
-   import ItemChatLabel from "../chat-message/ItemChatLabel.svelte";
-   import ItemChatDescription from "../chat-message/ItemChatDescription.svelte";
+   import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
+   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
+   import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import WeaponChatAttackDescription from "./WeaponChatAttackDescription.svelte";
-   import ItemChatFooter from "../chat-message/ItemChatFooter.svelte";
    import WeaponChatAttacks from "./WeaponChatAttacks.svelte";
 </script>
 
@@ -15,8 +15,8 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
-   @import "../../styles/Variables.scss";
+   @import "../../../styles/Mixins.scss";
+   @import "../../../styles/Variables.scss";
 
    .weapon-chat-message {
       @include flex-column;

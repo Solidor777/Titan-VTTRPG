@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import WeaponAttackSheet from "./WeaponAttackSheet.svelte";
+   import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // Reference to the weapon item
@@ -16,7 +16,7 @@
    <!--For Each attack-->
    {#each Object.entries($document.system.attack) as [attackIdx]}
       <div class="attack-sheet" transition:slide|local>
-         <WeaponAttackSheet {attackIdx} bind:isCollapsedObject={application.isCollapsed.attacks.attack} />
+         <WeaponSheetAttack {attackIdx} bind:isCollapsedObject={application.isCollapsed.attacks.attack} />
       </div>
    {/each}
 
@@ -28,7 +28,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    .weapon-attacks-tab {
       display: grid;

@@ -3,7 +3,7 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import WeaponAttackSheet from "./WeaponAttackSheet.svelte";
+   import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
@@ -30,7 +30,7 @@
                   <!--For Each attack-->
                   {#each Object.entries($document.system.attack) as [attackIdx]}
                      <li transition:slide|local>
-                        <WeaponAttackSheet {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
+                        <WeaponSheetAttack {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
                      </li>
                   {/each}
                </ol>
@@ -48,7 +48,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
    .weapon-description-tab {
       @include flex-row;
       height: 100%;

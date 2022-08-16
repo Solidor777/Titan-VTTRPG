@@ -75,7 +75,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
+   @import "../../../styles/mixins.scss";
 
    ol {
       @include border-top;

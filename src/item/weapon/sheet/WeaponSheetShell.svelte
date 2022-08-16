@@ -5,13 +5,13 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
-   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import WeaponAttacksTab from "./WeaponAttacksTab.svelte";
-   import WeaponDescriptionTab from "./WeaponDescriptionTab.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
+   import WeaponSheetAttacksTab from "./WeaponSheetAttacksTab.svelte";
+   import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
 
    // Setup
    export let elementRoot;
@@ -29,8 +29,8 @@
 
    // Tabs
    const tabs = [
-      { label: localize("LOCAL.description.label"), id: "description", component: WeaponDescriptionTab },
-      { label: localize("LOCAL.attacks.label"), id: "attacks", component: WeaponAttacksTab },
+      { label: localize("LOCAL.description.label"), id: "description", component: WeaponSheetDescriptionTab },
+      { label: localize("LOCAL.attacks.label"), id: "attacks", component: WeaponSheetAttacksTab },
    ];
    application.activeTab = application.activeTab ?? "description";
 </script>
@@ -76,7 +76,7 @@
 </ApplicationShell>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    .weapon-sheet {
       font-size: 1rem;

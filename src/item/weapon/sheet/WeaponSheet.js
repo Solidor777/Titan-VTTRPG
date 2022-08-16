@@ -1,5 +1,5 @@
 import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
-import { EditAttackTraitsDialog } from "./EditAttackTraitsDialog.js";
+import { WeaponEditAttackTraitsDialog } from "./WeaponEditAttackTraitsDialog.js";
 import WeaponSheetShell from './WeaponSheetShell.svelte';
 
 export default class TitanWeaponSheet extends SvelteDocumentSheet {
@@ -52,7 +52,7 @@ export default class TitanWeaponSheet extends SvelteDocumentSheet {
 
    // Opens the attack traits edit dialog
    editAttackTraits(attackIdx) {
-      const dialog = new EditAttackTraitsDialog(this.reactive.document, attackIdx);
+      const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
       dialog.render(true);
       return;
    }

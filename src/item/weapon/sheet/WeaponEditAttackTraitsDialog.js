@@ -1,6 +1,6 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-import EditAttackTraitsDialogShell from "./EditAttackTraitsDialogShell.svelte";
-export class EditAttackTraitsDialog extends TJSDialog {
+import EditAttackTraitsDialogShell from "./WeaponEditAttackTraitsDialogShell.svelte";
+export class WeaponEditAttackTraitsDialog extends TJSDialog {
   constructor(item, attackIdx) {
     super(
       {

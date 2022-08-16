@@ -97,7 +97,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import "../../../styles/Mixins.scss";
    .attack-trait-dialog {
       ol {
          list-style: none;

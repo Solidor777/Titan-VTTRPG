@@ -4,7 +4,7 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
-   import WeaponChatMessageShell from "~/item/weapon/WeaponChatMessageShell.svelte";
+   import WeaponChatMessageShell from "~/item/weapon/chat-message/WeaponChatMessageShell.svelte";
    import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
    import HealingReportChatMessageShell from "./HealingReportChatMessageShell.svelte";
 

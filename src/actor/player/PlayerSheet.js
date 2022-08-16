@@ -1,4 +1,3 @@
-import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
 import PlayerSheetShell from './PlayerSheetShell.svelte';
 import TitanActorSheet from '../sheet/ActorSheet';
 

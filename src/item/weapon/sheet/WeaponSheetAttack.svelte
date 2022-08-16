@@ -137,7 +137,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    .attack-sheet {
       @include border;

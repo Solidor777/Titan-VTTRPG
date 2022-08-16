@@ -9,7 +9,7 @@ import { TitanActor } from "./actor/Actor.js";
 import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import TitanPlayerSheet from "./actor/player/PlayerSheet.js";
-import TitanWeaponSheet from "./item/weapon/WeaponSheet.js";
+import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet.js";
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
 
 
