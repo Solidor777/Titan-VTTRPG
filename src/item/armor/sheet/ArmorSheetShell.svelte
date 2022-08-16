@@ -5,38 +5,20 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
-   import WeaponSheetAttacksTab from "./WeaponSheetAttacksTab.svelte";
-   import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
 
    // Setup
    export let elementRoot;
    export let documentStore;
    setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
-
-   // Initialize collapsed state
-   const application = getContext("external").application;
-   const isExpanded = application.isExpanded;
-   for (const [key] of Object.entries($document.system.attack)) {
-      isExpanded.desc.attack[key] = isExpanded.desc.attack[key] ?? true;
-      isExpanded.attacks.attack[key] = isExpanded.attacks.attack[key] ?? true;
-   }
-
-   // Tabs
-   const tabs = [
-      { label: localize("LOCAL.description.label"), id: "description", component: WeaponSheetDescriptionTab },
-      { label: localize("LOCAL.attacks.label"), id: "attacks", component: WeaponSheetAttacksTab },
-   ];
-   application.activeTab = application.activeTab ?? "description";
 </script>
 
 <ApplicationShell bind:elementRoot>
-   <div class="weapon-sheet">
+   <div class="armor-sheet">
       <!--Header-->
       <div class="header">
          <div class="row">
@@ -70,9 +52,11 @@
             </div>
          </div>
       </div>
-      <!--Tab Content-->
-      <div class="tabs">
-         <Tabs {tabs} bind:activeTab={application.activeTab} />
+
+      <!--Content-->
+      <div class="content">
+         <div class="sidebar">Sidebar</div>
+         <div class="description">Description</div>
       </div>
    </div>
 </ApplicationShell>
@@ -80,7 +64,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .weapon-sheet {
+   .armor-sheet {
       @include flex-column;
       font-size: 1rem;
       display: flex;
@@ -125,12 +109,30 @@
          }
       }
 
-      .tabs {
-         @include flex-column;
-         margin-top: 0.5rem;
-         position: relative;
+      .content {
+         @include flex-row;
          height: 100%;
          width: 100%;
+
+         .sidebar {
+            @include flex-column;
+            @include flex-group-top;
+            @include border;
+            box-sizing: border-box;
+            width: 13rem;
+            min-width: 13rem;
+            margin: 0.5rem;
+         }
+
+         .description {
+            @include flex-column;
+            @include flex-group-top;
+            @include border;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            padding: 0.5rem;
+         }
       }
    }
 </style>

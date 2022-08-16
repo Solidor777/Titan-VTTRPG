@@ -30,7 +30,7 @@
                   <!--For Each attack-->
                   {#each Object.entries($document.system.attack) as [attackIdx]}
                      <li transition:slide|local>
-                        <WeaponSheetAttack {attackIdx} bind:isCollapsedObject={application.isCollapsed.desc.attack} />
+                        <WeaponSheetAttack {attackIdx} bind:isExpandedObject={application.isExpanded.desc.attack} />
                      </li>
                   {/each}
                </ol>
@@ -53,7 +53,6 @@
       @include flex-row;
       height: 100%;
       width: 100%;
-      --sidebar-width: 13rem;
 
       .sidebar {
          @include flex-column;

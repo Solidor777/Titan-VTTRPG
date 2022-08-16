@@ -13,16 +13,16 @@ export class TitanItem extends Item {
                break;
             }
 
-            // Default is an error
             default: {
-               console.error("TITAN: Invalid item type when preparing derived data.");
                break;
             }
          }
       }
 
       // Prepare type specific data
-      this.typeComponent.prepareDerivedData();
+      if (this.typeComponent) {
+         this.typeComponent.prepareDerivedData();
+      }
 
       return;
    }

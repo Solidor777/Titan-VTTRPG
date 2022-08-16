@@ -10,6 +10,7 @@ import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import TitanPlayerSheet from "./actor/player/PlayerSheet.js";
 import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet.js";
+import TitanArmorSheet from './item/armor/sheet/ArmorSheet';
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
 
 
@@ -33,6 +34,10 @@ Hooks.once("init", async () => {
    });
    Items.registerSheet("titan", TitanWeaponSheet, {
       types: ["weapon"],
+      makeDefault: true,
+   });
+   Items.registerSheet("titan", TitanArmorSheet, {
+      types: ["armor"],
       makeDefault: true,
    });
 

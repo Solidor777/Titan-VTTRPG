@@ -21,7 +21,7 @@ export default class TitanWeaponSheet extends SvelteDocumentSheet {
    }
 
    // Is collapsed object
-   isCollapsed = {
+   isExpanded = {
       desc: {
          attack: []
       },
@@ -34,11 +34,11 @@ export default class TitanWeaponSheet extends SvelteDocumentSheet {
 
    // Handles deleting an attack
    async deleteAttack(key) {
-      if (this.isCollapsed.desc.attack.length === 1) {
-         this.isCollapsed.desc.attack[0] = false;
+      if (this.isExpanded.desc.attack.length === 1) {
+         this.isExpanded.desc.attack[0] = false;
       }
       else {
-         this.isCollapsed.desc.attack.splice(key, 1);
+         this.isExpanded.desc.attack.splice(key, 1);
       }
       await this.reactive.document.weapon.deleteAttack(key);
       return;

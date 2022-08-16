@@ -10,10 +10,9 @@
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentRangeTypeSelect from "~/documents/components/DocumentRangeTypeSelect.svelte";
-   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
 
    // Collapsed object
-   export let isCollapsedObject = void 0;
+   export let isExpandedObject = void 0;
 
    // Attack idx
    export let attackIdx = void 0;
@@ -28,12 +27,12 @@
    <div class="attack-sheet">
       <div class="attack-header">
          <div>
-            {#if isCollapsedObject[attackIdx]}
+            {#if isExpandedObject[attackIdx]}
                <!--Collapse button-->
                <IconButton
                   icon="fas fa-angle-double-down"
                   on:click={() => {
-                     isCollapsedObject[attackIdx] = false;
+                     isExpandedObject[attackIdx] = false;
                   }}
                />
             {:else}
@@ -41,7 +40,7 @@
                <IconButton
                   icon="fas fa-angle-double-up"
                   on:click={() => {
-                     isCollapsedObject[attackIdx] = true;
+                     isExpandedObject[attackIdx] = true;
                   }}
                />
             {/if}
@@ -60,8 +59,8 @@
          </div>
       </div>
 
-      <!--Collapsible data-->
-      {#if !isCollapsedObject[attackIdx]}
+      <!--Expandable data-->
+      {#if isExpandedObject[attackIdx]}
          <div transition:slide|local>
             <!--Type-->
             <div class="attack-field">

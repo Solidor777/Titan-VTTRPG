@@ -16,7 +16,7 @@
    <!--For Each attack-->
    {#each Object.entries($document.system.attack) as [attackIdx]}
       <div class="attack-sheet" transition:slide|local>
-         <WeaponSheetAttack {attackIdx} bind:isCollapsedObject={application.isCollapsed.attacks.attack} />
+         <WeaponSheetAttack {attackIdx} bind:isExpandedObject={application.isExpanded.attacks.attack} />
       </div>
    {/each}
 
