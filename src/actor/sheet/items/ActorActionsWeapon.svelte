@@ -3,15 +3,11 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorItemExpandButton from "./ActorItemExpandButton.svelte";
-   import ActorItemEquipButton from "./ActorItemEquipButton.svelte";
    import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
-   import ActorItemValueRarityFooter from "./ActorInventoryItemValueRarityFooter.svelte";
-   import ActorInventoryItemValueRarityFooter from "./ActorInventoryItemValueRarityFooter.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
 
    // Reference to the docuement
@@ -170,32 +166,6 @@
          width: 100%;
          font-size: 1rem;
          font-weight: bold;
-
-         .item-expand-button {
-            @include flex-row;
-
-            .item-expand-button-inner {
-               @include flex-row;
-               @include flex-space-between;
-               flex-wrap: wrap;
-               width: 100%;
-               height: 100%;
-
-               :not(:first-child) {
-                  margin-left: 0.5rem;
-               }
-
-               .item-image {
-                  @include flex-row;
-                  @include flex-group-center;
-                  width: 2rem;
-                  border: none;
-                  border-radius: 10px;
-                  padding: 0.1rem;
-                  background-color: black;
-               }
-            }
-         }
 
          .item-controls {
             @include flex-row;
