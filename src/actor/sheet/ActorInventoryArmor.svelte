@@ -12,18 +12,18 @@
    // Reference to the application
    const application = getContext("external").application;
 
-   // Reference to the weapon id
+   // Reference to the armor id
    export let id = void 0;
 
    // Collapsed object
    export let isExpandedObject = void 0;
 
-   // Weapon list
+   // Armor list
    $: item = $document.items.get(id);
 </script>
 
 {#if item}
-   <div class="actor-inventory-weapon-sheet">
+   <div class="actor-inventory-armor-sheet">
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
@@ -109,7 +109,7 @@
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .actor-inventory-weapon-sheet {
+   .actor-inventory-armor-sheet {
       @include flex-column;
       width: 100%;
 

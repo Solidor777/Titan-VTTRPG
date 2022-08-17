@@ -3,7 +3,7 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import ActorInventoryWeapon from "./ActorInventoryWeapon.svelte";
+   import ActorInventoryWeapon from "./Items/ActorInventoryWeapon.svelte";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
    import { slide } from "svelte/transition";
 
@@ -22,6 +22,18 @@
    // Weapons
    $: weapons = items
       .filter((item) => item.type === "weapon" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
+      .sort((a, b) => {
+         if (a.sort < b.sort) {
+            return -1;
+         }
+         if (a.sort > b.sort) {
+            return 1;
+         }
+         return 0;
+      });
+
+   $: armor = items
+      .filter((item) => item.type === "armor" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
       .sort((a, b) => {
          if (a.sort < b.sort) {
             return -1;
@@ -98,7 +110,7 @@
                   >
                      <ActorInventoryWeapon
                         bind:id={weapon._id}
-                        bind:isExpandedObject={application.isExpanded.inventory}
+                        bind:isExpanded={application.isExpanded.inventory[weapon._id]}
                      />
                   </li>
                {/each}
