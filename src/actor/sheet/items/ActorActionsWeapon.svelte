@@ -5,6 +5,14 @@
    import { slide } from "svelte/transition";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import ActorItemExpandButton from "./ActorItemExpandButton.svelte";
+   import ActorItemEquipButton from "./ActorItemEquipButton.svelte";
+   import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
+   import ActorItemEditButton from "./ActorItemEditButton.svelte";
+   import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
+   import ActorItemValueRarityFooter from "./ActorInventoryItemValueRarityFooter.svelte";
+   import ActorInventoryItemValueRarityFooter from "./ActorInventoryItemValueRarityFooter.svelte";
+   import ActorItemDescription from "./ActorItemDescription.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -16,7 +24,7 @@
    export let id = void 0;
 
    // Collapsed object
-   export let isExpandedObject = void 0;
+   export let isExpanded = void 0;
 
    // Weapon list
    $: item = $document.items.get(id);
@@ -27,51 +35,32 @@
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
-         <div class="item-expand-button">
-            <EfxButton
-               efx={ripple}
-               on:click={() => {
-                  isExpandedObject[id] = !isExpandedObject[id];
-                  console.log(isExpandedObject);
-               }}
-            >
-               <div class="item-expand-button-inner">
-                  <!--Image-->
-                  <img class="item-image" src={item.img} alt="item" />
-
-                  <!--Name-->
-                  <div>{item.name}</div>
-
-                  <!--Icon-->
-                  <i class="fas fa-angle-double-down" />
-               </div>
-            </EfxButton>
-         </div>
+         <ActorItemExpandButton {item} bind:isExpanded />
 
          <!--Controls-->
          <div class="item-controls">
             <!--Send to Chat button-->
             <div class="item-control-button">
-               <IconButton icon={"fas fa-comment"} on:click={$document.sendItemToChat(item._id)} />
+               <ActorItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
             <div class="item-control-button">
-               <IconButton icon={"fas fa-pen-to-square"} on:click={application.editItem.bind(application, item._id)} />
+               <ActorItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
             <div class="item-control-button">
-               <IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, item._id)} />
+               <ActorItemDeleteButton itemId={item._id} />
             </div>
          </div>
       </div>
 
       <!--Expandable content-->
-      {#if isExpandedObject[id] === true}
+      {#if isExpanded === true}
          <div class="item-expandable-content" transition:slide|local>
             <div class="multi-attack">
-               <!--Multi attack -->
+               <!--Multi attack` -->
                <div>
                   <EfxButton efx={ripple} on:click={application.toggleMultiAttack.bind(application, item._id)}>
                      {localize("LOCAL.multiAttack.label")}:
@@ -80,8 +69,10 @@
                </div>
             </div>
 
-            <!--Attack Description-->
-            <div class="attack-description">Temporary Attack Description</div>
+            <!--Item Description-->
+            <div class="attack-description">
+               <ActorItemDescription description={"Temporary Attack Description"} />
+            </div>
 
             <!--Attacks list-->
             <ol>
@@ -167,7 +158,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    .actor-inventory-weapon-sheet {
       @include flex-column;
@@ -231,7 +222,10 @@
          }
 
          .attack-description {
+            @include border-top;
             margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            padding-bottom: 00.25rem;
             font-size: 0.9rem;
          }
 

@@ -4,7 +4,7 @@
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import ActorActionsWeapon from "./ActorActionsWeapon.svelte";
+   import ActorActionsWeapon from "./items/ActorActionsWeapon.svelte";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
 
    // Actor reference
@@ -106,7 +106,7 @@
                   >
                      <ActorActionsWeapon
                         bind:id={weapon._id}
-                        bind:isExpandedObject={application.isExpanded.actions.items}
+                        bind:isExpanded={application.isExpanded.actions.items[weapon._id]}
                      />
                   </li>
                {/each}
