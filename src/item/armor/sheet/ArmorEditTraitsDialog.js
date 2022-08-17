@@ -14,7 +14,7 @@ export class ArmorEditTraitsDialog extends TJSDialog {
          },
          {
             width: 320,
-            height: 570,
+            height: 135,
          }
       );
    }
