@@ -5,16 +5,19 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
+   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
 
    // Setup
    export let elementRoot;
    export let documentStore;
    setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
+   const application = getContext("external").application;
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -55,7 +58,54 @@
 
       <!--Content-->
       <div class="content">
-         <div class="sidebar">Sidebar</div>
+         <div class="sidebar">
+            <div class="stats">
+               <!--Armor-->
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     {localize("LOCAL.armor.label")}
+                  </div>
+                  <!--Input-->
+                  <div class="input">
+                     <DocumentIntegerInput bind:value={$document.system.armor} />
+                  </div>
+               </div>
+            </div>
+
+            <!--Traits-->
+            <div class="armor-traits">
+               <!--Header-->
+               <div class="armor-traits-header">
+                  <div />
+                  <!--Label-->
+                  <div>
+                     {localize("LOCAL.traits.label")}
+                  </div>
+                  <!--Edit button-->
+                  <div>
+                     <IconButton
+                        icon={"fas fa-pen-to-square"}
+                        efx={ripple}
+                        on:click={() => {
+                           application.editArmorTraits();
+                        }}
+                     />
+                  </div>
+               </div>
+               <div class="armor-traits-container">
+                  <!--Each trait-->
+                  {#each $document.system.armorTraits as trait}
+                     <div class="armor-trait">
+                        {localize(`LOCAL.${trait.name}.label`)}
+                        {#if trait.type === "number"}
+                           {trait.value}
+                        {/if}
+                     </div>
+                  {/each}
+               </div>
+            </div>
+         </div>
          <div class="description">Description</div>
       </div>
    </div>
@@ -118,10 +168,72 @@
             @include flex-column;
             @include flex-group-top;
             @include border;
+            padding: 0.5rem;
             box-sizing: border-box;
             width: 13rem;
             min-width: 13rem;
             margin: 0.5rem;
+
+            .stats {
+               @include flex-column;
+               @include flex-group-top;
+               width: 100%;
+
+               .stat {
+                  @include flex-column;
+                  @include flex-group-top;
+                  width: 100%;
+
+                  &:not(:first-child) {
+                     @include border-top;
+                     padding-top: 0.5rem;
+                     margin-top: 0.5rem;
+                  }
+
+                  .label {
+                     @include flex-column;
+                     @include flex-group-center;
+                     font-size: 1rem;
+                     font-weight: bold;
+                  }
+               }
+            }
+
+            .armor-traits {
+               @include flex-column;
+               @include flex-group-top;
+               @include border-top;
+               width: 100%;
+               margin-top: 0.25rem;
+               padding-top: 0.25rem;
+
+               .armor-traits-header {
+                  @include grid(3);
+                  width: 100%;
+                  font-weight: bold;
+
+                  div {
+                     @include flex-row;
+                     @include flex-group-center;
+                     height: 100%;
+                     width: 100%;
+                  }
+               }
+            }
+
+            .armor-traits-container {
+               @include flex-row;
+               @include flex-group-center;
+               flex-wrap: wrap;
+               width: 100%;
+
+               .armor-trait {
+                  @include border;
+                  font-weight: bold;
+                  margin: 0.25rem;
+                  padding: 0.25rem;
+               }
+            }
          }
 
          .description {

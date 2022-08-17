@@ -395,8 +395,7 @@
       ],
       "multiAttack": false,
       "attackDescription": "",
-      "resistanceChecks": [],
-      "weaponTraits": []
+      "resistanceChecks": []
     },
     "spell": {
       "templates": [

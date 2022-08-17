@@ -1,4 +1,5 @@
 import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
+import { ArmorEditTraitsDialog } from './ArmorEditTraitsDialog';
 import ArmorSheetShell from './ArmorSheetShell.svelte';
 
 export default class TitanArmorSheet extends SvelteDocumentSheet {
@@ -17,5 +18,11 @@ export default class TitanArmorSheet extends SvelteDocumentSheet {
             target: document.body
          }
       });
+   }
+
+   editArmorTraits() {
+      const dialog = new ArmorEditTraitsDialog(this.reactive.document);
+      dialog.render(true);
+      return;
    }
 }

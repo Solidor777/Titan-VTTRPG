@@ -8,8 +8,8 @@
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
    import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentRangeTypeSelect from "~/documents/components/DocumentRangeTypeSelect.svelte";
+   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
 
    // Collapsed object
    export let isExpandedObject = void 0;
@@ -120,11 +120,11 @@
                </div>
                <div class="attack-traits-container">
                   <!--Each trait-->
-                  {#each Object.entries($document.system.attack[attackIdx].traits) as [attackIdx, trait]}
+                  {#each $document.system.attack[attackIdx].traits as trait}
                      <div class="attack-trait">
-                        {localize(`LOCAL.${attackIdx}.label`)}
-                        {#if typeof trait === "number"}
-                           {trait}
+                        {localize(`LOCAL.${trait.name}.label`)}
+                        {#if trait.type === "number"}
+                           {trait.value}
                         {/if}
                      </div>
                   {/each}
