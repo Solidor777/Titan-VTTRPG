@@ -58,10 +58,14 @@
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Description-->
-            <ActorItemDescription description={"Temporary Item Description"} />
+            <div class="item-expandable-content">
+               <ActorItemDescription description={"Temporary Item Description"} />
+            </div>
 
-            <!--Item Description-->
-            <ActorItemDescription description={"Temporary Attack Description"} />
+            <!--Attack description-->
+            <div class="item-expandable-content">
+               <ActorItemDescription description={"Temporary Attack Description"} />
+            </div>
 
             <!--Footer-->
             <div class="item-expandable-content">
