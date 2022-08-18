@@ -133,8 +133,8 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     if (this.parameters.multiAttack) {
       const traits = checkAttack.traits;
       for (let idx = 0; idx < traits.length; idx++) {
-        if (traits[idx].name === "dualAttack") {
-          this.parameters.dualAttack = true;
+        if (traits[idx].name === "multiAttack") {
+          this.parameters.multiAttack = true;
           break;
         }
       }
@@ -172,7 +172,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     if (this.parameters.multiAttack) {
       // Round the total dice up if this is a dual attack
       // Otherwise, round down
-      this.parameters.totalDice = this.parameters.dualAttack ?
+      this.parameters.totalDice = this.parameters.multiAttack ?
         Math.ceil(this.parameters.totalDice / 2) :
         Math.floor(this.parameters.totalDice / 2);
 
