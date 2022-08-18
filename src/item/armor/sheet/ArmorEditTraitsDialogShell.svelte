@@ -12,7 +12,7 @@
 </script>
 
 <div class="armor-edit-trait-dialog">
-   <DocumentEditTraitsDialog bind:document bind:documentTraits={document.system.armorTraits} bind:traitOptions />
+   <DocumentEditTraitsDialog bind:document bind:documentTraits={document.system.traits} bind:traitOptions />
 </div>
 
 <style lang="scss">

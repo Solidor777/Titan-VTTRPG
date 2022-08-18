@@ -4,7 +4,7 @@
    const document = getContext("DocumentSheetObject");
 
    // Results
-   let results = $document.flags.titan.data.chatContext.results;
+   let results = $document.flags.titan.chatContext.results;
 </script>
 
 <div class="results">

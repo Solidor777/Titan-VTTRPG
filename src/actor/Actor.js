@@ -418,7 +418,7 @@ export class TitanActor extends Actor {
          ),
          flags: {
             titan: {
-               data: { chatContext: chatContext }
+               chatContext: chatContext
             }
          }
 

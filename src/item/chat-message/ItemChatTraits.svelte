@@ -6,10 +6,7 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="label">
-   <img src={chatContext.img} alt="item" />
-   <div class="name">{chatContext.name}</div>
-</div>
+<div class="traits">traits</div>
 
 <style lang="scss">
    @import "../../styles/mixins.scss";

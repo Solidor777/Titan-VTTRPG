@@ -4,7 +4,7 @@
 
    // Document reference
    const document = getContext("DocumentSheetObject");
-   const chatContext = $document.flags.titan.data.chatContext;
+   const chatContext = $document.flags.titan.chatContext;
 </script>
 
 <div class="healing-report">

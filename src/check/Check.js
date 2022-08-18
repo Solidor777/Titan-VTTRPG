@@ -241,7 +241,7 @@ export default class TitanCheck {
           sound: CONFIG.sounds.dice,
           flags: {
             titan: {
-              data: { chatContext: chatContext }
+              chatContext: chatContext
             }
           }
         },

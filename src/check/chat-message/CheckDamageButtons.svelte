@@ -6,7 +6,7 @@
    const document = getContext("DocumentSheetObject");
 
    // Results
-   let results = $document.flags.titan.data.chatContext.results;
+   let results = $document.flags.titan.chatContext.results;
 
    async function applyDamage(damage, ignoreArmor) {
       // Parse the damage data

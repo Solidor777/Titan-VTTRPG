@@ -13,6 +13,16 @@ import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet.js";
 import TitanArmorSheet from './item/armor/sheet/ArmorSheet';
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
 
+const validChatMessageTypes = Object.freeze(new Set([
+   'attributeCheck',
+   'skillCheck',
+   'resistanceCheck',
+   'attackCheck',
+   'armor',
+   'weapon',
+   'damageReport',
+   'healingReport'
+]));
 
 Hooks.once("init", async () => {
    console.log("TITAN | Starting Titan VTTRPG System");
@@ -49,9 +59,9 @@ Hooks.once("init", async () => {
 
 Hooks.on('renderChatMessage', (message, html) => {
    // Check if this is a valid titan chat message
-   const messageData = message.getFlag('titan', 'data');
+   const chatContext = message.getFlag('titan', 'chatContext');
 
-   if (CONFIG.TITAN.constants.validChatMessageTypes.has(messageData?.chatContext?.type)) {
+   if (validChatMessageTypes.has(chatContext?.type)) {
       // If so, create the chat message shell and display the message
       const documentStore = new TJSDocument(message);
       message._svelteComponent = new ChatMessageShell({

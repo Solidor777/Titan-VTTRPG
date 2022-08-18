@@ -3,7 +3,7 @@
    const document = getContext("DocumentSheetObject");
 
    // Results
-   let dice = $document.flags.titan.data.chatContext.results.dice;
+   let dice = $document.flags.titan.chatContext.results.dice;
 
    function getDieTypeClass(die) {
       if (die.criticalSuccess) {

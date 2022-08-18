@@ -95,7 +95,7 @@
                </div>
                <div class="armor-traits-container">
                   <!--Each trait-->
-                  {#each $document.system.armorTraits as trait}
+                  {#each $document.system.traits as trait}
                      <div class="armor-trait">
                         {localize(`LOCAL.${trait.name}.label`)}
                         {#if trait.type === "number"}

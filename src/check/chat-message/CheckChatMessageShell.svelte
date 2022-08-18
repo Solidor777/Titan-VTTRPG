@@ -15,7 +15,7 @@
    <CheckChatDiceContainer />
    <CheckChatResults />
    <!-- svelte-ignore missing-declaration -->
-   {#if $document.flags.titan.data.chatContext.results.damage && game.user.isGM}
+   {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
       <CheckDamageButtons />
    {/if}
 </div>

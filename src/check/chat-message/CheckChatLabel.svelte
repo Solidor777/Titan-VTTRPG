@@ -4,7 +4,7 @@
    const document = getContext("DocumentSheetObject");
 
    // Chat context
-   const chatContext = $document.flags.titan.data.chatContext;
+   const chatContext = $document.flags.titan.chatContext;
 
    function getLabelClass() {
       switch (chatContext.type) {

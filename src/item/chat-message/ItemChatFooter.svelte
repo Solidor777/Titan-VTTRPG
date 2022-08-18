@@ -4,7 +4,7 @@
    const document = getContext("DocumentSheetObject");
 
    // Chat context reference
-   const chatContext = $document.flags.titan.data.chatContext;
+   const chatContext = $document.flags.titan.chatContext;
 </script>
 
 <div class="footer">

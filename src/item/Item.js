@@ -48,7 +48,7 @@ export class TitanItem extends Item {
                sound: CONFIG.sounds.notification,
                flags: {
                   titan: {
-                     data: { chatContext: chatContext }
+                     chatContext: chatContext
                   }
                }
             },

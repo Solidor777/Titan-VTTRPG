@@ -372,8 +372,7 @@
         "value",
         "equipped"
       ],
-      "armor": 2,
-      "armorTraits": []
+      "armor": 2
     },
     "weapon": {
       "templates": [

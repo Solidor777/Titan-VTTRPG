@@ -5,6 +5,7 @@
    import { getContext } from "svelte";
    import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
    import WeaponChatMessageShell from "~/item/weapon/chat-message/WeaponChatMessageShell.svelte";
+   import ArmorChatMessageShell from "~/item/armor/chat-message/ArmorChatMessageShell.svelte";
    import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
    import HealingReportChatMessageShell from "./HealingReportChatMessageShell.svelte";
 
@@ -22,11 +23,12 @@
          skillCheck: CheckChatMessageShell,
          resistanceCheck: CheckChatMessageShell,
          attackCheck: CheckChatMessageShell,
+         armor: ArmorChatMessageShell,
          weapon: WeaponChatMessageShell,
          damageReport: DamageReportChatMessageShell,
          healingReport: HealingReportChatMessageShell,
       };
-      return chatComponents[$document.flags.titan.data.chatContext.type];
+      return chatComponents[$document.flags.titan.chatContext.type];
    }
 </script>
 
