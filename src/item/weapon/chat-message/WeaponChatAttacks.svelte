@@ -78,7 +78,6 @@
    @import "../../../styles/mixins.scss";
 
    ol {
-      @include border-top;
       list-style: none;
       margin: 0 0 0.5rem 0;
       padding: 0;

@@ -27,7 +27,6 @@
    .stats {
       @include flex-row;
       @include flex-group-center;
-      @include border-top;
       width: 100%;
       flex-wrap: wrap;
       font-weight: bold;

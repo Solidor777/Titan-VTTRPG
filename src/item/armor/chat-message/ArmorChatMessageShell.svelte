@@ -1,16 +1,23 @@
 <script>
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
+   import ItemChatRarityValue from "~/item/chat-message/ItemChatRarityValue.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import ArmorChatStats from "./ArmorChatStats.svelte";
 </script>
 
-Armor
 <div class="armor-chat-message">
    <ItemChatLabel />
-   <ItemChatDescription />
-   <ArmorChatStats />
-   <ItemChatFooter />
+   <div class="info-container">
+      <div class="info">
+         <ArmorChatStats />
+      </div>
+      <div class="info">
+         <ItemChatDescription />
+      </div>
+      <div class="info">
+         <ItemChatRarityValue />
+      </div>
+   </div>
 </div>
 
 <style lang="scss">
@@ -22,5 +29,14 @@ Armor
       align-items: flex-start;
       justify-content: center;
       width: 100%;
+
+      .info-container {
+         width: 100%;
+         .info {
+            &:not(:first-child) {
+               @include border-top;
+            }
+         }
+      }
    }
 </style>

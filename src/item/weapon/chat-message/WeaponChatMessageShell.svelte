@@ -1,6 +1,6 @@
 <script>
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
+   import ItemChatRarityValue from "~/item/chat-message/ItemChatRarityValue.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import WeaponChatAttackDescription from "./WeaponChatAttackDescription.svelte";
    import WeaponChatAttacks from "./WeaponChatAttacks.svelte";
@@ -8,10 +8,20 @@
 
 <div class="weapon-chat-message">
    <ItemChatLabel />
-   <ItemChatDescription />
-   <WeaponChatAttackDescription />
-   <WeaponChatAttacks />
-   <ItemChatFooter />
+   <div class="info-container">
+      <div class="info">
+         <ItemChatDescription />
+      </div>
+      <div class="info">
+         <WeaponChatAttackDescription />
+      </div>
+      <div class="info">
+         <WeaponChatAttacks />
+      </div>
+      <div class="info">
+         <ItemChatRarityValue />
+      </div>
+   </div>
 </div>
 
 <style lang="scss">
@@ -23,5 +33,14 @@
       align-items: flex-start;
       justify-content: center;
       width: 100%;
+
+      .info-container {
+         width: 100%;
+         .info {
+            &:not(:first-child) {
+               @include border-top;
+            }
+         }
+      }
    }
 </style>
