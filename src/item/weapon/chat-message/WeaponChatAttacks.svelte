@@ -61,11 +61,11 @@
             </div>
 
             <!--Traits-->
-            {#each Object.entries(attack.traits) as [key, trait]}
+            {#each attack.traits as trait}
                <div class="trait">
-                  {localize(`LOCAL.${key}.label`)}
-                  {#if typeof trait === "number"}
-                     : {trait}
+                  {localize(`LOCAL.${trait.name}.label`)}
+                  {#if trait.type === "number"}
+                     {trait.value}
                   {/if}
                </div>
             {/each}

@@ -95,5 +95,6 @@ export const TITANLOCAL = Object.freeze({
   light: "LOCAL.light.label",
   heavy: "LOCAL.heavy.label",
   sendToChat: "LOCAL.sendToChat.label",
-  newWeapon: "LOCAL.newWeapon.label"
+  newWeapon: "LOCAL.newWeapon.label",
+  openSheetConfigurator: "LOCAL.openSheetConfigurator.label"
 });

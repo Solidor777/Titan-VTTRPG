@@ -1,8 +1,8 @@
-import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
+import TitanItemSheet from '~/item/sheet/ItemSheet';
 import { WeaponEditAttackTraitsDialog } from "./WeaponEditAttackTraitsDialog.js";
 import WeaponSheetShell from './WeaponSheetShell.svelte';
 
-export default class TitanWeaponSheet extends SvelteDocumentSheet {
+export default class TitanWeaponSheet extends TitanItemSheet {
    /**
     * Default Application options
     *

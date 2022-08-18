@@ -64,20 +64,9 @@ export class SvelteDocumentSheet extends SvelteApplication {
       buttons.unshift({
          class: "configure-sheet",
          icon: "fas fa-cog",
-         title: "open sheet configurator",
+         title: game.i18n.localize(CONFIG.TITAN.local.openSheetConfigurator),
          onclick: (ev) => this._onConfigureSheet(ev),
       });
-      const canConfigure = game.user.isGM || (this.reactive.document.isOwner && game.user.can("TOKEN_CONFIGURE"));
-      if (this.reactive.document.documentName === "Actor") {
-         if (canConfigure) {
-            buttons.splice(1, 0, {
-               label: this.token ? "Token" : "TOKEN.TitlePrototype",
-               class: "configure-token",
-               icon: "fas fa-user-circle",
-               onclick: (ev) => this._onConfigureToken(ev),
-            });
-         }
-      }
       return buttons;
    }
 

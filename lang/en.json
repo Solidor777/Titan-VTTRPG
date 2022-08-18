@@ -295,6 +295,7 @@
   "LOCAL.damageReport.label": "Damage Report",
   "LOCAL.healingReport.label": "Healing Report",
   "LOCAL.staminaHealed.label": "Stamina Healed",
+  "LOCAL.openSheetConfigurator.label": "Open Sheet Configurator",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
