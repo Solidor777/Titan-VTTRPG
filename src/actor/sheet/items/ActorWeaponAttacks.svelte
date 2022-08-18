@@ -71,7 +71,9 @@
                   {localize("LOCAL.damage.label")}
                </div>
                <div class="value">
-                  {`${attack.damage}${attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""} `}
+                  {`${attack.damage + $document.system.mod.damage.value}${
+                     attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
+                  } `}
                </div>
             </div>
          </div>

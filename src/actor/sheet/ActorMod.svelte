@@ -17,7 +17,6 @@
       armor: "helmet-battle",
       damage: "bolt",
    };
-   console.log($document.system.mod[key]);
 </script>
 
 <div class="mod">
