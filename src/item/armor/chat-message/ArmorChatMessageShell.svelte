@@ -2,14 +2,14 @@
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
    import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
-   import ItemChatTraits from "~/item/chat-message/ItemChatTraits.svelte";
+   import ArmorChatStats from "./ArmorChatStats.svelte";
 </script>
 
 Armor
 <div class="armor-chat-message">
    <ItemChatLabel />
    <ItemChatDescription />
-   <ItemChatTraits />
+   <ArmorChatStats />
    <ItemChatFooter />
 </div>
 

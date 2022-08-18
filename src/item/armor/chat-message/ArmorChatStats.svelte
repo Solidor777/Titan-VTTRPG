@@ -7,9 +7,13 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="traits">
+<div class="stats">
+   <div class="stat">
+      {localize(`LOCAL.armor.label`)}: {chatContext.system.armor}
+   </div>
+
    {#each chatContext.system.traits as trait}
-      <div class="trait">
+      <div class="stat">
          {localize(`LOCAL.${trait.name}.label`)}
          {#if trait.type === "number"}
             {trait.value}
@@ -19,8 +23,8 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
-   .traits {
+   @import "../../../styles/mixins.scss";
+   .stats {
       @include flex-row;
       @include flex-group-center;
       @include border-top;
@@ -29,7 +33,7 @@
       font-weight: bold;
       padding: 0.25rem;
 
-      .trait {
+      .stat {
          @include flex-row;
          @include flex-group-center;
          @include border;
