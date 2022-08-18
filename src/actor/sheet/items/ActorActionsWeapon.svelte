@@ -136,9 +136,9 @@
 
                      <!--Traits-->
                      <div class="row traits">
-                        {#each Object.entries(attack.traits) as [key, trait]}
+                        {#each attack.traits as trait}
                            <div class="trait">
-                              {localize(`LOCAL.${key}.label`)}
+                              {localize(`LOCAL.${trait.name}.label`)}
                               {#if typeof trait === "number"}
                                  : {trait}
                               {/if}
