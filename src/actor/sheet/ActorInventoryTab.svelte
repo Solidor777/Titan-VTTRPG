@@ -1,11 +1,12 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import ActorInventoryWeapon from "./Items/ActorInventoryWeapon.svelte";
+   import ActorInventoryWeapon from "./items/ActorInventoryWeapon.svelte";
+   import ActorInventoryArmor from "./items/ActorInventoryArmor.svelte";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
-   import { slide } from "svelte/transition";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -32,7 +33,8 @@
          return 0;
       });
 
-   $: armor = items
+   // Armors
+   $: armors = items
       .filter((item) => item.type === "armor" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
       .sort((a, b) => {
          if (a.sort < b.sort) {
@@ -117,6 +119,43 @@
             </ol>
             <div class="add-entry-button">
                <EfxButton on:click={application.addItem.bind(application, "weapon")}
+                  ><i class="fas fa-circle-plus" />
+               </EfxButton>
+            </div>
+
+            <!--Armor List-->
+            <ol>
+               <!--Each Armor-->
+               {#each armors as armor}
+                  <li
+                     class="armor{dragHovered === armor._id ? ' drag-hovered' : ''}"
+                     data-item-id={armor._id}
+                     draggable={true}
+                     on:dragstart={(event) => {
+                        dragHovered = armor._id;
+                        dragHovering = "armor";
+                        dragItemStart(event, armor._id);
+                     }}
+                     on:dragenter={() => {
+                        if (dragHovering === "armor") {
+                           dragHovered = armor._id;
+                        }
+                     }}
+                     on:dragend={() => {
+                        dragHovered = "";
+                        dragHovering = "";
+                     }}
+                     transition:slide|local
+                  >
+                     <ActorInventoryArmor
+                        bind:id={armor._id}
+                        bind:isExpanded={application.isExpanded.inventory[armor._id]}
+                     />
+                  </li>
+               {/each}
+            </ol>
+            <div class="add-entry-button">
+               <EfxButton on:click={application.addItem.bind(application, "armor")}
                   ><i class="fas fa-circle-plus" />
                </EfxButton>
             </div>

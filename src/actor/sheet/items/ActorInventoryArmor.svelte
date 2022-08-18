@@ -7,24 +7,24 @@
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemRarityValue from "./ActorItemRarityValue.svelte";
-   import ActorInventoryItemValueRarityFooter from "./ActorItemRarityValue.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
+   import ActorItemArmorStats from "./ActorArmorStats.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
 
-   // Reference to the weapon id
+   // Reference to the armor id
    export let id = void 0;
 
    // Collapsed object
    export let isExpanded = void 0;
 
-   // Weapon list
+   // Armor list
    $: item = $document.items.get(id);
 </script>
 
 {#if item}
-   <div class="actor-inventory-weapon-sheet">
+   <div class="actor-inventory-armor-sheet">
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
@@ -57,14 +57,14 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
+            <!--Armor Stats-->
+            <div class="item-expandable-content">
+               <ActorItemArmorStats bind:item />
+            </div>
+
             <!--Item Description-->
             <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Item Description"} />
-            </div>
-
-            <!--Attack description-->
-            <div class="item-expandable-content">
-               <ActorItemDescription description={"Temporary Attack Description"} />
             </div>
 
             <!--Footer-->
@@ -79,7 +79,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .actor-inventory-weapon-sheet {
+   .actor-inventory-armor-sheet {
       @include flex-column;
       width: 100%;
 
