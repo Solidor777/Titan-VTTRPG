@@ -152,18 +152,22 @@ export class TitanActor extends Actor {
       }
 
       // Calculate mods
-      for (let [k, v] of Object.entries(systemData.mod)) {
-         systemData.mod[k].value = v.staticMod;
-      }
-
-      // Calculate effects
       // Add armor from the equipped armor if appropriate
+      systemData.mod.armor.baseValue = 0;
       const armorId = this.system.equipped.armor;
       if (armorId) {
          const armor = this.items.get(armorId);
          if (armor) {
-            systemData.mod.armor.value += armor.system.armor;
+            systemData.mod.armor.baseValue = armor.system.armor;
          }
+      }
+
+      // Damage
+      systemData.mod.damage.baseValue = 0;
+
+      // Final mods
+      for (let [k, v] of Object.entries(systemData.mod)) {
+         systemData.mod[k].value = v.baseValue + v.staticMod;
       }
 
       return;

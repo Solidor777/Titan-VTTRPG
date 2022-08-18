@@ -17,6 +17,7 @@
    import ActorInventoryTab from "~/actor/sheet/ActorInventoryTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import ActorActionsTab from "~/actor/sheet/ActorActionsTab.svelte";
+   import ActorMod from "../sheet/ActorMod.svelte";
 
    // Setup
    export let elementRoot;
@@ -61,6 +62,15 @@
                      valueTooltip={localize(`LOCAL.${key}.valueDesc.label`)}
                      maxTooltip={localize(`LOCAL.${key}.max.label`)}
                   />
+               </div>
+            {/each}
+         </div>
+
+         <!--Ratings-->
+         <div class="mods">
+            {#each Object.entries($document.system.mod) as [key]}
+               <div class="mod">
+                  <ActorMod bind:key />
                </div>
             {/each}
          </div>
@@ -214,7 +224,7 @@
             }
          }
 
-         .resistances {
+         .mods {
             @include flex-column;
             @include flex-group-top;
             @include border-bottom;
@@ -222,7 +232,7 @@
             margin-top: 0.5rem;
             padding-bottom: 0.5rem;
 
-            .resistance {
+            .mod {
                width: 100%;
                margin-top: 0.25rem;
 
@@ -280,6 +290,7 @@
                   margin-left: 0.875rem;
                }
             }
+
             .speed {
                width: 100%;
                margin-top: 0.25rem;

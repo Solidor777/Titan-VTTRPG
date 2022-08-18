@@ -9,24 +9,22 @@
    // The Actor Data
    const document = getContext("DocumentSheetObject");
 
-   // The rating data
-   $: rating = $document.system.rating[key];
+   // The mod data
+   $: mod = $document.system.mod[key];
 
-   // Map of icons to use for the ratings
-   const ratingIcons = {
-      awareness: "eye",
-      defense: "shield",
-      melee: "sword",
-      accuracy: "bow-arrow",
-      initiative: "clock",
+   // Map of icons to use for the mods
+   const modIcons = {
+      armor: "helmet-battle",
+      damage: "bolt",
    };
+   console.log($document.system.mod[key]);
 </script>
 
-<div class="rating">
+<div class="mod">
    <!--Label-->
    <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
       <!--Icon-->
-      <i class="fas fa-{ratingIcons[key]}" />
+      <i class="fas fa-{modIcons[key]}" />
       {localize(`LOCAL.${key}.label`)}
    </div>
 
@@ -34,19 +32,19 @@
    <div class="stats">
       <!--Base Value-->
       <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.baseValue.label`)}>
-         {rating.baseValue}
+         {mod.baseValue}
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
       <div class="static-mod" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
-         <DocumentIntegerInput bind:value={$document.system.rating[key].staticMod} />
+         <DocumentIntegerInput bind:value={$document.system.mod[key].staticMod} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
       <div class="label final" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
-         {rating.value}
+         {mod.value}
       </div>
    </div>
 </div>
@@ -54,7 +52,7 @@
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .rating {
+   .mod {
       @include flex-row;
       @include flex-space-between;
       width: 100%;

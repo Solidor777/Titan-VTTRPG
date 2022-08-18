@@ -11,7 +11,7 @@ export default class TitanPlayerSheet extends TitanActorSheet {
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
          width: 750,
-         height: 800,
+         height: 835,
          svelte: {
             class: PlayerSheetShell,
             target: document.body
