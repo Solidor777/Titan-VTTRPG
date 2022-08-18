@@ -369,8 +369,7 @@
     "armor": {
       "templates": [
         "base",
-        "value",
-        "equipped"
+        "value"
       ],
       "armor": 2
     },

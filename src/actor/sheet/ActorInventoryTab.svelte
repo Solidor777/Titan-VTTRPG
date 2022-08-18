@@ -122,6 +122,14 @@
                   ><i class="fas fa-circle-plus" />
                </EfxButton>
             </div>
+         </div>
+
+         <!--Armor-->
+         <div class="category">
+            <!--List Header-->
+            <div class="category-header">
+               {localize("LOCAL.armor.label")}
+            </div>
 
             <!--Armor List-->
             <ol>
@@ -190,7 +198,6 @@
          @include flex-group-top;
          width: 100%;
          height: 100%;
-         margin-top: 0.5rem;
 
          .category {
             @include flex-column;
@@ -198,6 +205,7 @@
             @include border;
             width: 100%;
             padding: 0.26rem;
+            margin-top: 0.5rem;
 
             .category-header {
                @include flex-row;

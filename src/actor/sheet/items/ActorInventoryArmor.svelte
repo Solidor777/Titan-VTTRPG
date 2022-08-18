@@ -34,7 +34,7 @@
          <div class="item-controls">
             <!--Toggle Equipped button-->
             <div class="item-control-button">
-               <ActorItemEquipButton {item} />
+               <ActorItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
             </div>
 
             <!--Send to Chat button-->

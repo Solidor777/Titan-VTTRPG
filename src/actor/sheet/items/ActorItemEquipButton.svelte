@@ -9,13 +9,15 @@
 
    // Collapsed object
    export let item = void 0;
+
+   export let equipped = void 0;
 </script>
 
 <div class="item-equip-button">
    <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, item._id)}>
       {localize("LOCAL.equipped.label")}:
       <div class="spacer" />
-      <i class={item.system.equipped ? "fas fa-square-check" : "fas fa-square"} />
+      <i class={equipped ? "fas fa-square-check" : "fas fa-square"} />
    </EfxButton>
 </div>
 

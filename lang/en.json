@@ -291,6 +291,7 @@
   "LOCAL.applyEdits.label": "Apply Edits",
   "LOCAL.filter.label": "Filter",
   "LOCAL.newWeapon.label": "New Weapon",
+  "LOCAL.newArmor.label": "New Armor",
   "LOCAL.equipped.label": "Equipped",
   "LOCAL.damageReport.label": "Damage Report",
   "LOCAL.healingReport.label": "Healing Report",

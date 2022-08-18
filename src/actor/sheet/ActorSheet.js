@@ -69,6 +69,10 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
             itemName = game.i18n.localize(CONFIG.TITAN.local.newWeapon);
             break;
          }
+         case "armor": {
+            itemName = game.i18n.localize(CONFIG.TITAN.local.newArmor);
+            break;
+         }
          default: {
             itemName = "New Item";
             break;
@@ -86,17 +90,36 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
    }
 
    // Toggle equipped
-   async toggleEquipped(id) {
-      const item = this.reactive.document.items.get(id);
-      const updateData = {
-         system: {
-            equipped: !item.system.equipped,
-         },
-      };
+   async toggleEquipped(itemId) {
+      const item = this.reactive.document.items.get(itemId);
+      // If the item is valid
+      if (item) {
+         // If the item is armor
+         if (item.type === "armor") {
+            // If the armor is equipped, un-equip it
+            if (this.reactive.document.system.equipped.armor === itemId) {
+               this.reactive.document.unEquipArmor();
+            }
 
-      item.update(updateData);
+            // Else, equip it
+            else {
+               this.reactive.document.equipArmor(itemId);
+            }
+         }
 
+         // Otherwise, update the equipped value on the item
+         else {
+            const updateData = {
+               system: {
+                  equipped: !item.system.equipped,
+               },
+            };
+
+            item.update(updateData);
+         }
+      }
       return;
+
    }
 
    // Toggle multi attack

@@ -7,7 +7,6 @@
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemRarityValue from "./ActorItemRarityValue.svelte";
-   import ActorInventoryItemValueRarityFooter from "./ActorItemRarityValue.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
 
    // Reference to the docuement
@@ -34,7 +33,7 @@
          <div class="item-controls">
             <!--Toggle Equipped button-->
             <div class="item-control-button">
-               <ActorItemEquipButton {item} />
+               <ActorItemEquipButton {item} equipped={item.system.equipped} />
             </div>
 
             <!--Send to Chat button-->
