@@ -176,7 +176,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Function for rolling an attack check
    async rollAttackCheck(itemId, attackIdx) {
-      const getOptions = false;
+      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
 
       await this.reactive.document.rollAttackCheck({
          itemId: itemId,

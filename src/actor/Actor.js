@@ -1,12 +1,13 @@
-import TitanUtility from "../helpers/Utility.js";
-import TitanAttributeCheck from "../check/AttributeCheck.js";
-import TitanSkillCheck from "../check/skill-check/SkillCheck.js";
-import TitanResistanceCheck from "../check/resistance-check/ResistanceCheck.js";
-import TitanAttackCheck from "../check/attack-check/AttackCheck.js";
 import { TitanPlayerComponent } from "./player/Player.js";
 import { TitanNPCComponent } from "./npc/NPC.js";
 import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
 import { SkillCheckDialog } from "~/check/skill-check/SkillCheckDialog.js";
+import { AttackCheckDialog } from "~/check/attack-check/AttackCheckDialog.js";
+import TitanUtility from "../helpers/Utility.js";
+import TitanAttributeCheck from "~/check/AttributeCheck.js";
+import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
+import TitanResistanceCheck from "~/check/resistance-check/ResistanceCheck.js";
+import TitanAttackCheck from "~/check/attack-check/AttackCheck.js";
 
 export class TitanActor extends Actor {
 
@@ -328,7 +329,24 @@ export class TitanActor extends Actor {
 
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
-         const dialog = new ResistanceCheckDialog(this, options);
+         // Get the damage mod
+         options.damageMod = options.damageMod ?? this.system.mod.damage.value;
+
+         // Get the attacker melee and accuracy
+         options.attackerMelee = this.system.rating.melee.value;
+         options.attackerAccuracy = this.system.rating.accuracy.value;
+
+         // Get the target dfense
+         let userTargets = Array.from(game.user.targets);
+         if (userTargets.length < 1 && game.user.isGM) {
+            userTargets = Array.from(canvas.tokens.controlled);
+         }
+         if (userTargets[0]) {
+            options.targetDefense = userTargets[0].system.rating.defense.value;
+         }
+
+         // Create the dialog
+         const dialog = new AttackCheckDialog(this, options);
          dialog.render(true);
          return;
       }

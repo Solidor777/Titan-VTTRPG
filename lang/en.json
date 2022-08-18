@@ -177,6 +177,7 @@
   "LOCAL.twoHanded.label": "Two-Handed",
   "LOCAL.unarmed.label": "Unarmed",
   "LOCAL.attack.label": "Attack",
+  "LOCAL.attackCheck.label": "Attack Check",
   "LOCAL.attacks.label": "Attacks",
   "LOCAL.normalAttack.label": "Normal Attack",
   "LOCAL.ranged.label": "Ranged",

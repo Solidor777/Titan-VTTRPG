@@ -1,9 +1,6 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorItemExpandButton from "./ActorItemExpandButton.svelte";
    import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
