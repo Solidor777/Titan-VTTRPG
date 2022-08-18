@@ -77,7 +77,7 @@
          <!--Speeds-->
          <div class="speeds">
             <div class="label">
-               <div class="name">{localize("LOCAL.name.label")}</div>
+               <div class="name">{localize("LOCAL.speed.label")}</div>
                <div class="base">{localize("LOCAL.base.label")}</div>
                <div class="mod">{localize("LOCAL.mod.label")}</div>
             </div>

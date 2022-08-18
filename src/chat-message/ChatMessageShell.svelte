@@ -33,5 +33,7 @@
 </script>
 
 <div>
-   <svelte:component this={selectComponent()} />
+   {#if $document}
+      <svelte:component this={selectComponent()} />
+   {/if}
 </div>
