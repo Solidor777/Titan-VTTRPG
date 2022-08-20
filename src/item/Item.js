@@ -1,4 +1,6 @@
 import { TitanWeapon } from "./weapon/Weapon";
+import { TitanSpell } from "./spell/Spell";
+
 export class TitanItem extends Item {
    prepareDerivedData() {
       // Prepare universal character data
@@ -6,6 +8,13 @@ export class TitanItem extends Item {
       // Create type component if necessary
       if (!this.system.typeComponent) {
          switch (this.type) {
+            // Spell
+            case "spell": {
+               this.typeComponent = new TitanSpell(this);
+               this.spell = this.typeComponent;
+               break;
+            }
+
             // Weapon
             case "weapon": {
                this.typeComponent = new TitanWeapon(this);
