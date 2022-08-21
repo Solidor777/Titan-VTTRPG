@@ -1,27 +1,22 @@
 <script>
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
 
-   export let button = void 0;
    export let efx = void 0;
-   export let click = void 0;
-
-   $: efx =
-      typeof button === "object" && typeof button.efx === "function"
-         ? button.efx
-         : typeof efx === "function"
-         ? efx
-         : () => {};
-
-   $: click =
-      typeof button === "object" && typeof button.click === "function"
-         ? button.click
-         : typeof click === "function"
-         ? click
-         : () => {};
+   export let value = void 0;
 </script>
 
-<button on:click on:mousedown={preventDefault} use:efx>
-   <slot />
+<button
+   on:click={() => {
+      value = !value;
+   }}
+   on:mousedown={preventDefault}
+   use:efx
+>
+   {#if value === true}
+      <slot name="true" />
+   {:else}
+      <slot name="false" />
+   {/if}
 </button>
 
 <style lang="scss">

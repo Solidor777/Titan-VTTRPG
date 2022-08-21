@@ -7,19 +7,18 @@
    $: icon = value === true ? trueIcon : falseIcon;
 </script>
 
-<div
+<button
    on:click={() => {
       value = !value;
    }}
-   class="button"
    use:efx
 >
-   <i class={icon} />
-</div>
+   <div><i class={icon} /></div>
+</button>
 
 <style lang="scss">
    @import "../../styles/Mixins.scss";
-   .button {
+   button {
       @include icon-button;
       cursor: pointer;
       position: relative;
@@ -30,7 +29,7 @@
       height: var(--icon-button-radius);
    }
 
-   .button:hover {
+   button:hover {
       background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
       clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
    }

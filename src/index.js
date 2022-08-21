@@ -10,8 +10,8 @@ import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import TitanPlayerSheet from "./actor/player/PlayerSheet.js";
 import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet.js";
-import TitanArmorSheet from './item/armor/sheet/ArmorSheet';
-import TitanSpellSheet from './item/spell/sheet/SpellSheet';
+import TitanArmorSheet from './item/armor/sheet/ArmorSheet.js';
+import TitanSpellSheet from './item/spell/sheet/SpellSheet.js';
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
 
 const validChatMessageTypes = Object.freeze(new Set([

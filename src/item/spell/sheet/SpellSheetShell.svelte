@@ -5,12 +5,12 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import SpellSheetStandardDescriptionTab from "./SpellSheetStandardDescriptionTab.svelte";
+   import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
+   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
 
    // Setup
    export let elementRoot;
@@ -18,6 +18,13 @@
    setContext("DocumentSheetObject", documentStore);
    const document = getContext("DocumentSheetObject");
    const application = getContext("external").application;
+
+   // Tabs
+   const tabs = [
+      { label: localize("LOCAL.description.label"), id: "description", component: SpellSheetStandardDescriptionTab },
+      { label: localize("LOCAL.aspects.label"), id: "aspects", component: SpellSheetStandardAspectsTab },
+   ];
+   application.activeTab = application.activeTab ?? "aspects";
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -53,7 +60,9 @@
          <div class="sidebar">
             <div class="stats">Sidebar</div>
          </div>
-         <div class="description">Description</div>
+         <div class="description">
+            <Tabs {tabs} bind:activeTab={application.activeTab} />
+         </div>
       </div>
    </div>
 </ApplicationShell>
@@ -120,67 +129,6 @@
             width: 13rem;
             min-width: 13rem;
             margin: 0.5rem;
-
-            .stats {
-               @include flex-column;
-               @include flex-group-top;
-               width: 100%;
-
-               .stat {
-                  @include flex-column;
-                  @include flex-group-top;
-                  width: 100%;
-
-                  &:not(:first-child) {
-                     @include border-top;
-                     padding-top: 0.5rem;
-                     margin-top: 0.5rem;
-                  }
-
-                  .label {
-                     @include flex-column;
-                     @include flex-group-center;
-                     font-size: 1rem;
-                     font-weight: bold;
-                  }
-               }
-            }
-
-            .spell-traits {
-               @include flex-column;
-               @include flex-group-top;
-               @include border-top;
-               width: 100%;
-               margin-top: 0.25rem;
-               padding-top: 0.25rem;
-
-               .spell-traits-header {
-                  @include grid(3);
-                  width: 100%;
-                  font-weight: bold;
-
-                  div {
-                     @include flex-row;
-                     @include flex-group-center;
-                     height: 100%;
-                     width: 100%;
-                  }
-               }
-            }
-
-            .spell-traits-container {
-               @include flex-row;
-               @include flex-group-center;
-               flex-wrap: wrap;
-               width: 100%;
-
-               .spell-trait {
-                  @include border;
-                  font-weight: bold;
-                  margin: 0.25rem;
-                  padding: 0.25rem;
-               }
-            }
          }
 
          .description {

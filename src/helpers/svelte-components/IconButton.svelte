@@ -1,4 +1,6 @@
 <script>
+   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
+
    export let button = void 0;
    export let icon = void 0;
    export let efx = void 0;
@@ -23,13 +25,13 @@
          : () => {};
 </script>
 
-<div on:click class="button" use:efx>
-   <i class={icon} />
-</div>
+<button on:click on:mousedown={preventDefault} use:efx>
+   <div><i class={icon} /></div>
+</button>
 
 <style lang="scss">
    @import "../../styles/Mixins.scss";
-   .button {
+   button {
       @include icon-button;
       cursor: pointer;
       position: relative;
@@ -40,7 +42,7 @@
       height: var(--icon-button-radius);
    }
 
-   .button:hover {
+   button:hover {
       background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
       clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
    }
