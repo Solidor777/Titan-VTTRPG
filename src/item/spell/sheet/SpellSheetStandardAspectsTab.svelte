@@ -59,7 +59,7 @@
          <div class="aspect-enable">
             <SpellSheetEnableAspectButton
                bind:enabled={$document.system.standardAspects.range.enabled}
-               label={localize("LOCAL.range.label")}
+               label={localize(`LOCAL.range.label`)}
                cost={$document.system.standardAspects.range.cost}
             />
          </div>
@@ -70,22 +70,6 @@
                   <!--Range Options-->
                   <div>
                      <DocumentSelect bind:value={$document.system.standardAspects.range.value} options={rangeOptions} />
-                  </div>
-
-                  <!--Divider-->
-                  <div class="divider" />
-
-                  <!--Cost-->
-                  <div class="stat">
-                     <!--Label-->
-                     <div class="label">
-                        {localize("LOCAL.cost.label")}:
-                     </div>
-
-                     <!--Value-->
-                     <div class="value">
-                        {$document.system.standardAspects.range.cost}
-                     </div>
                   </div>
                </div>
             </div>
@@ -157,6 +141,18 @@
                bind:enabled={$document.system.standardAspects.healing.enabled}
                label={localize("LOCAL.healing.label")}
                cost={$document.system.standardAspects.healing.cost}
+            />
+         </div>
+      </div>
+
+      <!--Rounds-->
+      <div class="aspect">
+         <!--Enable-->
+         <div class="aspect-enable">
+            <SpellSheetEnableAspectButton
+               bind:enabled={$document.system.standardAspects.rounds.enabled}
+               label={localize("LOCAL.rounds.label")}
+               cost={$document.system.standardAspects.rounds.cost}
             />
          </div>
       </div>

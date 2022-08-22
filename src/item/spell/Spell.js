@@ -86,5 +86,14 @@ export class TitanSpell extends TitanTypeComponent {
       else {
          healing.cost = 0;
       }
+
+      // rounds
+      const rounds = standardAspects.rounds;
+      if (rounds.enabled) {
+         rounds.cost = 1;
+      }
+      else {
+         rounds.cost = 0;
+      }
    }
 }

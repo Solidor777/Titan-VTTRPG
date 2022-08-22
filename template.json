@@ -412,28 +412,47 @@
         },
         "damage": {
           "enabled": true,
+          "resistance": "none",
           "ignoreArmor": false
         },
         "healing": {
-          "enabled": false
-        }
+          "enabled": false,
+          "resistance": "none"
+        },
+        "enabled": false,
+        "resistance": "none"
+      },
+      "inflictCondition": {
+        "enabled": false,
+        "resistance": "none",
+        "blinded": false,
+        "charged": false,
+        "deafened": false,
+        "frightened": false,
+        "incapacitated": false,
+        "poisoned": false,
+        "prone": false,
+        "restrained": false,
+        "stunned": false,
+        "unconscious": false
       }
-    },
-    "miracle": {
-      "templates": [
-        "base",
-        "resolveCost",
-        "expCost"
-      ],
-      "source": "",
-      "resistanceChecks": []
-    },
-    "ability": {
-      "templates": [
-        "base",
-        "resolveCost",
-        "expCost"
-      ]
     }
+  },
+  "miracle": {
+    "templates": [
+      "base",
+      "resolveCost",
+      "expCost"
+    ],
+    "source": "",
+    "resistanceChecks": []
+  },
+  "ability": {
+    "templates": [
+      "base",
+      "resolveCost",
+      "expCost"
+    ]
   }
+}
 }

@@ -307,6 +307,7 @@
   "LOCAL.30m.label": "30m",
   "LOCAL.50m.label": "50m",
   "LOCAL.cost.label": "Cost",
+  "LOCAL.rounds.label": "Rounds",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
