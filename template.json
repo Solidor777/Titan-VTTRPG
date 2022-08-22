@@ -408,7 +408,7 @@
         },
         "target": {
           "enabled": true,
-          "type": "target"
+          "value": "target"
         },
         "damage": {
           "enabled": true,

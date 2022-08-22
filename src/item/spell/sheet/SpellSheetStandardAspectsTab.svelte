@@ -2,7 +2,9 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
+   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
+   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
 
    // Setup
@@ -31,39 +33,135 @@
          label: localize("LOCAL.50m.label"),
       },
    ];
+
+   // Target Options
+   const targetOptions = [
+      {
+         value: "target",
+         label: localize("LOCAL.target.label"),
+      },
+      {
+         value: "5mRadius",
+         label: localize("LOCAL.5mRadius.label"),
+      },
+      {
+         value: "10mRadius",
+         label: localize("LOCAL.10mRadius.label"),
+      },
+   ];
 </script>
 
-<div class="aspects-tab">
-   <!--Range-->
-   <div class="aspect">
-      <!--Enable-->
-      <div class="aspect-enable">
-         <SpellSheetEnableAspectButton
-            bind:enabled={$document.system.standardAspects.range.enabled}
-            label={localize("LOCAL.range.label")}
-         />
-      </div>
-      {#if $document.system.standardAspects.range.enabled}
-         <!--Content-->
-         <div class="aspect-content" transition:slide>
-            <div class="row">
-               <div>
-                  <DocumentSelect bind:value={$document.system.standardAspects.range.value} options={rangeOptions} />
-               </div>
-               <div class="divider" />
-               <div class="stat">
-                  <div class="label">
-                     {localize("LOCAL.cost.label")}:
+<ScrollingContainer>
+   <div class="aspects-tab">
+      <!--Range-->
+      <div class="aspect">
+         <!--Enable-->
+         <div class="aspect-enable">
+            <SpellSheetEnableAspectButton
+               bind:enabled={$document.system.standardAspects.range.enabled}
+               label={localize("LOCAL.range.label")}
+               cost={$document.system.standardAspects.range.cost}
+            />
+         </div>
+         {#if $document.system.standardAspects.range.enabled}
+            <!--Content-->
+            <div class="aspect-content" transition:slide|local>
+               <div class="row">
+                  <!--Range Options-->
+                  <div>
+                     <DocumentSelect bind:value={$document.system.standardAspects.range.value} options={rangeOptions} />
                   </div>
-                  <div class="value">
-                     {$document.system.standardAspects.range.cost}
+
+                  <!--Divider-->
+                  <div class="divider" />
+
+                  <!--Cost-->
+                  <div class="stat">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.cost.label")}:
+                     </div>
+
+                     <!--Value-->
+                     <div class="value">
+                        {$document.system.standardAspects.range.cost}
+                     </div>
                   </div>
                </div>
             </div>
+         {/if}
+      </div>
+
+      <!--Target-->
+      <div class="aspect">
+         <!--Enable-->
+         <div class="aspect-enable">
+            <SpellSheetEnableAspectButton
+               bind:enabled={$document.system.standardAspects.target.enabled}
+               label={localize("LOCAL.target.label")}
+               cost={$document.system.standardAspects.target.cost}
+            />
          </div>
-      {/if}
+         {#if $document.system.standardAspects.target.enabled}
+            <!--Content-->
+            <div class="aspect-content" transition:slide|local>
+               <div class="row">
+                  <!--Range Options-->
+                  <div>
+                     <DocumentSelect
+                        bind:value={$document.system.standardAspects.target.value}
+                        options={targetOptions}
+                     />
+                  </div>
+               </div>
+            </div>
+         {/if}
+      </div>
+
+      <!--Damage-->
+      <div class="aspect">
+         <!--Enable-->
+         <div class="aspect-enable">
+            <SpellSheetEnableAspectButton
+               bind:enabled={$document.system.standardAspects.damage.enabled}
+               label={localize("LOCAL.damage.label")}
+               cost={$document.system.standardAspects.damage.cost}
+            />
+         </div>
+         {#if $document.system.standardAspects.damage.enabled}
+            <!--Content-->
+            <div class="aspect-content" transition:slide|local>
+               <div class="row">
+                  <!--Ignore Armor-->
+                  <div class="stat">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.ignoreArmor.label")}:
+                     </div>
+
+                     <!--Value-->
+                     <div class="input">
+                        <DocumentCheckboxInput bind:value={$document.system.standardAspects.damage.ignoreArmor} />
+                     </div>
+                  </div>
+               </div>
+            </div>
+         {/if}
+      </div>
+
+      <!--Healing-->
+      <div class="aspect">
+         <!--Enable-->
+         <div class="aspect-enable">
+            <SpellSheetEnableAspectButton
+               bind:enabled={$document.system.standardAspects.healing.enabled}
+               label={localize("LOCAL.healing.label")}
+               cost={$document.system.standardAspects.healing.cost}
+            />
+         </div>
+      </div>
    </div>
-</div>
+</ScrollingContainer>
 
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
@@ -120,7 +218,7 @@
                @include border;
                background-color: var(--static-label-background-color);
                width: 1.5rem;
-               padding: 0.25rem;
+               padding: 0.1rem;
                margin-left: 0.25rem;
             }
          }

@@ -10,8 +10,8 @@ export default class TitanSpellSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 600,
-         height: 500,
+         width: 650,
+         height: 650,
          svelte: {
             class: SpellSheetShell,
             target: document.body
