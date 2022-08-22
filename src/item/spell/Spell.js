@@ -67,7 +67,7 @@ export class TitanSpell extends TitanTypeComponent {
       // Damage
       const damage = standardAspects.damage;
       if (damage.enabled) {
-         if (damage.ignoreArmor === false) {
+         if (damage.ignoreArmor === false || damage.resistance !== "none") {
             damage.cost = 1;
          }
          else {
@@ -87,13 +87,22 @@ export class TitanSpell extends TitanTypeComponent {
          healing.cost = 0;
       }
 
-      // rounds
+      // Rounds
       const rounds = standardAspects.rounds;
       if (rounds.enabled) {
          rounds.cost = 1;
       }
       else {
          rounds.cost = 0;
+      }
+
+      // Inflict Condition
+      const inflictCondition = standardAspects.inflictCondition;
+      if (inflictCondition.enabled) {
+         inflictCondition.cost = 1;
+      }
+      else {
+         inflictCondition.cost = 0;
       }
    }
 }

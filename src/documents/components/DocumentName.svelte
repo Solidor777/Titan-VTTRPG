@@ -4,9 +4,11 @@
    const document = getContext("DocumentSheetObject");
 </script>
 
-<div class="document-name">
-   <DocumentTextInput bind:value={$document.name} />
-</div>
+{#if $document.name !== null}
+   <div class="document-name">
+      <DocumentTextInput bind:value={$document.name} />
+   </div>
+{/if}
 
 <style lang="scss">
    .document-name {

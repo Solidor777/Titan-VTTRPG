@@ -5,8 +5,9 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
+   import DocumentToggleButton from "~/documents/components/DocumentToggleButton.svelte";
+   import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
 
    // Setup
    const document = getContext("DocumentSheetObject");
@@ -132,7 +133,7 @@
 
                   <div class="divider" />
 
-                  <!--Ignore Armor-->
+                  <!--Resistance Armor-->
                   <div class="stat">
                      <!--Label-->
                      <div class="label">
@@ -173,6 +174,47 @@
                cost={$document.system.standardAspects.rounds.cost}
             />
          </div>
+      </li>
+
+      <!--Inflict Condition-->
+      <li class="aspect">
+         <!--Enable-->
+         <div class="aspect-enable">
+            <SpellSheetEnableAspectButton
+               bind:enabled={$document.system.standardAspects.inflictCondition.enabled}
+               label={localize("LOCAL.inflictCondition.label")}
+               cost={$document.system.standardAspects.inflictCondition.cost}
+            />
+         </div>
+
+         {#if $document.system.standardAspects.inflictCondition.enabled}
+            <!--Content-->
+            <div class="aspect-details" transition:slide|local>
+               <div class="row">
+                  <!--Resistance Armor-->
+                  <div class="stat">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.resistance.label")}:
+                     </div>
+
+                     <!--Value-->
+                     <div class="input">
+                        <DocumentResistanceSelectAllowNone
+                           bind:value={$document.system.standardAspects.inflictCondition.resistance}
+                        />
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  {#each Object.entries($document.system.standardAspects.inflictCondition.conditions) as [condition, enabled]}
+                     <div>
+                        {condition}
+                     </div>
+                  {/each}
+               </div>
+            </div>
+         {/if}
       </li>
    </ol>
 </ScrollingContainer>

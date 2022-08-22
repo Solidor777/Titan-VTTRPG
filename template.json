@@ -416,27 +416,27 @@
           "ignoreArmor": false
         },
         "healing": {
-          "enabled": false,
-          "resistance": "none"
+          "enabled": false
         },
         "rounds": {
+          "enabled": false
+        },
+        "inflictCondition": {
           "enabled": false,
-          "resistance": "none"
+          "conditions": {
+            "resistance": "none",
+            "blinded": false,
+            "charged": false,
+            "deafened": false,
+            "frightened": false,
+            "incapacitated": false,
+            "poisoned": false,
+            "prone": false,
+            "restrained": false,
+            "stunned": false,
+            "unconscious": false
+          }
         }
-      },
-      "inflictCondition": {
-        "enabled": false,
-        "resistance": "none",
-        "blinded": false,
-        "charged": false,
-        "deafened": false,
-        "frightened": false,
-        "incapacitated": false,
-        "poisoned": false,
-        "prone": false,
-        "restrained": false,
-        "stunned": false,
-        "unconscious": false
       }
     }
   },
