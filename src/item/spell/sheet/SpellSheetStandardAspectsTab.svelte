@@ -6,6 +6,7 @@
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
+   import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
 
    // Setup
    const document = getContext("DocumentSheetObject");
@@ -52,9 +53,9 @@
 </script>
 
 <ScrollingContainer>
-   <div class="aspects-tab">
+   <ol class="aspects-tab">
       <!--Range-->
-      <div class="aspect">
+      <li class="aspect">
          <!--Enable-->
          <div class="aspect-enable">
             <SpellSheetEnableAspectButton
@@ -65,7 +66,7 @@
          </div>
          {#if $document.system.standardAspects.range.enabled}
             <!--Content-->
-            <div class="aspect-content" transition:slide|local>
+            <div class="aspect-details" transition:slide|local>
                <div class="row">
                   <!--Range Options-->
                   <div>
@@ -74,10 +75,10 @@
                </div>
             </div>
          {/if}
-      </div>
+      </li>
 
       <!--Target-->
-      <div class="aspect">
+      <li class="aspect">
          <!--Enable-->
          <div class="aspect-enable">
             <SpellSheetEnableAspectButton
@@ -88,7 +89,7 @@
          </div>
          {#if $document.system.standardAspects.target.enabled}
             <!--Content-->
-            <div class="aspect-content" transition:slide|local>
+            <div class="aspect-details" transition:slide|local>
                <div class="row">
                   <!--Range Options-->
                   <div>
@@ -100,10 +101,10 @@
                </div>
             </div>
          {/if}
-      </div>
+      </li>
 
       <!--Damage-->
-      <div class="aspect">
+      <li class="aspect">
          <!--Enable-->
          <div class="aspect-enable">
             <SpellSheetEnableAspectButton
@@ -114,7 +115,7 @@
          </div>
          {#if $document.system.standardAspects.damage.enabled}
             <!--Content-->
-            <div class="aspect-content" transition:slide|local>
+            <div class="aspect-details" transition:slide|local>
                <div class="row">
                   <!--Ignore Armor-->
                   <div class="stat">
@@ -128,13 +129,30 @@
                         <DocumentCheckboxInput bind:value={$document.system.standardAspects.damage.ignoreArmor} />
                      </div>
                   </div>
+
+                  <div class="divider" />
+
+                  <!--Ignore Armor-->
+                  <div class="stat">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.resistance.label")}:
+                     </div>
+
+                     <!--Value-->
+                     <div class="input">
+                        <DocumentResistanceSelectAllowNone
+                           bind:value={$document.system.standardAspects.damage.resistance}
+                        />
+                     </div>
+                  </div>
                </div>
             </div>
          {/if}
-      </div>
+      </li>
 
       <!--Healing-->
-      <div class="aspect">
+      <li class="aspect">
          <!--Enable-->
          <div class="aspect-enable">
             <SpellSheetEnableAspectButton
@@ -143,10 +161,10 @@
                cost={$document.system.standardAspects.healing.cost}
             />
          </div>
-      </div>
+      </li>
 
       <!--Rounds-->
-      <div class="aspect">
+      <li class="aspect">
          <!--Enable-->
          <div class="aspect-enable">
             <SpellSheetEnableAspectButton
@@ -155,8 +173,8 @@
                cost={$document.system.standardAspects.rounds.cost}
             />
          </div>
-      </div>
-   </div>
+      </li>
+   </ol>
 </ScrollingContainer>
 
 <style lang="scss">
@@ -166,6 +184,8 @@
       @include flex-column;
       @include flex-group-top;
       width: 100%;
+      margin: 0;
+      padding: 0;
 
       .aspect {
          @include flex-column;
@@ -179,7 +199,7 @@
             width: 100%;
          }
 
-         .aspect-content {
+         .aspect-details {
             @include flex-column;
             @include flex-group-top;
             background-color: var(--label-background-color);
@@ -190,32 +210,31 @@
             border-bottom-left-radius: var(--border-radius);
             border-width: var(--border-width);
             border-color: var(--border-color-normal);
+            font-size: 0.9rem;
+            --font-size: 0.9rem;
          }
 
          .row {
             @include flex-row;
-            @include flex-space-evenly;
+            @include flex-group-center;
             width: 100%;
 
             .divider {
-               @include border-left;
+               @include border-right;
                height: 100%;
+               padding-right: 0.5rem;
+               margin-right: 0.5rem;
+               margin-left: 0.5rem;
             }
-         }
 
-         .stat {
-            @include flex-row;
-            @include flex-group-center;
-            font-weight: bold;
-
-            .value {
+            .stat {
                @include flex-row;
                @include flex-group-center;
-               @include border;
-               background-color: var(--static-label-background-color);
-               width: 1.5rem;
-               padding: 0.1rem;
-               margin-left: 0.25rem;
+               font-weight: bold;
+
+               .input {
+                  margin-left: 0.25rem;
+               }
             }
          }
       }

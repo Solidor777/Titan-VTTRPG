@@ -419,8 +419,10 @@
           "enabled": false,
           "resistance": "none"
         },
-        "enabled": false,
-        "resistance": "none"
+        "rounds": {
+          "enabled": false,
+          "resistance": "none"
+        }
       },
       "inflictCondition": {
         "enabled": false,
@@ -454,5 +456,4 @@
       "expCost"
     ]
   }
-}
 }

@@ -124,11 +124,11 @@
             @include flex-column;
             @include flex-group-top;
             @include border;
-            padding: 0.5rem;
             box-sizing: border-box;
             width: 13rem;
             min-width: 13rem;
-            margin: 0.5rem;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
          }
 
          .description {
@@ -137,7 +137,7 @@
             @include border;
             box-sizing: border-box;
             width: 100%;
-            margin: 0.5rem 0.5rem 0.5rem 0;
+            margin: 0.5rem 0 0 0.5rem;
             padding: 0.5rem;
          }
       }
