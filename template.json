@@ -423,10 +423,10 @@
         },
         "inflictCondition": {
           "enabled": false,
+          "resistance": "none",
           "conditions": {
-            "resistance": "none",
             "blinded": false,
-            "charged": false,
+            "charmed": false,
             "deafened": false,
             "frightened": false,
             "incapacitated": false,

@@ -98,11 +98,50 @@ export class TitanSpell extends TitanTypeComponent {
 
       // Inflict Condition
       const inflictCondition = standardAspects.inflictCondition;
+      inflictCondition.cost = 0;
       if (inflictCondition.enabled) {
-         inflictCondition.cost = 1;
-      }
-      else {
-         inflictCondition.cost = 0;
+
+         const conditions = inflictCondition.conditions;
+
+         if (conditions.blinded) {
+            inflictCondition.cost += 4;
+         }
+
+         if (conditions.charmed) {
+            inflictCondition.cost += 2;
+         }
+
+         if (conditions.deafened) {
+            inflictCondition.cost += 1;
+         }
+
+         if (conditions.frightened) {
+            inflictCondition.cost += 3;
+         }
+
+         if (conditions.incapacitated) {
+            inflictCondition.cost += 6;
+         }
+
+         if (conditions.poisoned) {
+            inflictCondition.cost += 4;
+         }
+
+         if (conditions.prone) {
+            inflictCondition.cost += 2;
+         }
+
+         if (conditions.restrained) {
+            inflictCondition.cost += 5;
+         }
+
+         if (conditions.stunned) {
+            inflictCondition.cost += 4;
+         }
+
+         if (conditions.unconscious) {
+            inflictCondition.cost += 7;
+         }
       }
    }
 }

@@ -66,11 +66,12 @@
   border-style: var(--button-border-style);
   border-radius: var(--button-border-radius);
   border-width: var(--button-border-width);
-  border-color: var(--border-color-button);
+  border-color: var(--button-border-color);
   background-color: var(--button-background-color);
   font-size: var(--button-font-size);
   font-weight: var(--button-font-weight);
   padding: var(--button-padding);
+  color: var(--button-text-color);
   margin: 0;
 }
 
@@ -151,4 +152,13 @@
 
 @mixin grid-span($column-count) {
   grid-column-end: span $column-count;
+}
+
+@mixin z-index-app {
+  translate: 0;
+  z-index: var(--z-index-app);
+
+  * {
+    z-index: var(--z-index-app);
+  }
 }
