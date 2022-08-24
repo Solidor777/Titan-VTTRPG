@@ -453,6 +453,20 @@
             "unconscious": false
           }
         },
+        "increaseMod": {
+          "enabled": false,
+          "rating": {
+            "armor": false,
+            "damage": false
+          }
+        },
+        "decreaseMod": {
+          "enabled": false,
+          "rating": {
+            "armor": false,
+            "damage": false
+          }
+        },
         "increaseRating": {
           "enabled": false,
           "rating": {
@@ -468,8 +482,71 @@
             "defense": false,
             "melee": false
           }
+        },
+        "increaseAttribute": {
+          "enabled": false,
+          "attribute": {
+            "body": false,
+            "mind": false,
+            "soul": false
+          }
+        },
+        "decreaseAttribute": {
+          "enabled": false,
+          "attribute": {
+            "body": false,
+            "mind": false,
+            "soul": false
+          }
+        },
+        "increaseSkill": {
+          "enabled": false,
+          "skill": {
+            "arcana": false,
+            "athletics": false,
+            "deception": false,
+            "dexterity": false,
+            "diplomacy": false,
+            "engineering": false,
+            "intimidation": false,
+            "investigation": false,
+            "lore": false,
+            "medicine": false,
+            "meleeWeapons": false,
+            "nature": false,
+            "perception": false,
+            "performance": false,
+            "rangedWeapons": false,
+            "subterfuge": false,
+            "stealth": false,
+            "theology": false
+          }
+        },
+        "decreaseSkill": {
+          "enabled": false,
+          "skill": {
+            "arcana": false,
+            "athletics": false,
+            "deception": false,
+            "dexterity": false,
+            "diplomacy": false,
+            "engineering": false,
+            "intimidation": false,
+            "investigation": false,
+            "lore": false,
+            "medicine": false,
+            "meleeWeapons": false,
+            "nature": false,
+            "perception": false,
+            "performance": false,
+            "rangedWeapons": false,
+            "subterfuge": false,
+            "stealth": false,
+            "theology": false
+          }
         }
-      }
+      },
+      "customAspects": []
     }
   },
   "miracle": {

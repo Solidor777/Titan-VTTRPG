@@ -159,5 +159,27 @@ export class TitanSpell extends TitanTypeComponent {
             }
          }
       }
+
+      // Increase Rating
+      const increaseRating = standardAspects.increaseRating;
+      increaseRating.cost = 0;
+      if (increaseRating.enabled) {
+         for (const [key, value] of Object.entries(increaseRating.rating)) {
+            if (value === true) {
+               increaseRating.cost += 2;
+            }
+         }
+      }
+
+      // Decrease Rating
+      const decreaseRating = standardAspects.decreaseRating;
+      decreaseRating.cost = 0;
+      if (decreaseRating.enabled) {
+         for (const [key, value] of Object.entries(decreaseRating.rating)) {
+            if (value === true) {
+               decreaseRating.cost += 2;
+            }
+         }
+      }
    }
 }
