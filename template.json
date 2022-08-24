@@ -544,6 +544,24 @@
             "stealth": false,
             "theology": false
           }
+        },
+        "increaseSpeed": {
+          "enabled": true,
+          "speed": {
+            "stride": false,
+            "fly": false,
+            "swim": false,
+            "burrow": false
+          }
+        },
+        "decreaseSpeed": {
+          "enabled": true,
+          "speed": {
+            "stride": false,
+            "fly": false,
+            "swim": false,
+            "burrow": false
+          }
         }
       },
       "customAspects": []
