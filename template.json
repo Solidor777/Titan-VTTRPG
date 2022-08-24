@@ -436,6 +436,23 @@
             "stunned": false,
             "unconscious": false
           }
+        },
+        "removeCondition": {
+          "enabled": false,
+          "resistance": "none",
+          "all": false,
+          "conditions": {
+            "blinded": false,
+            "charmed": false,
+            "deafened": false,
+            "frightened": false,
+            "incapacitated": false,
+            "poisoned": false,
+            "prone": false,
+            "restrained": false,
+            "stunned": false,
+            "unconscious": false
+          }
         }
       }
     }

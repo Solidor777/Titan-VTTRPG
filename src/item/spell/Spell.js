@@ -143,5 +143,21 @@ export class TitanSpell extends TitanTypeComponent {
             inflictCondition.cost += 7;
          }
       }
+
+      // Remove Condition
+      const removeCondition = standardAspects.removeCondition;
+      removeCondition.cost = 0;
+      if (removeCondition.enabled) {
+         if (removeCondition.all) {
+            removeCondition.cost = 5;
+         }
+         else {
+            for (const [key, value] of Object.entries(removeCondition.conditions)) {
+               if (value === true & removeCondition.cost < 5) {
+                  removeCondition.cost = Math.min(removeCondition.cost + 2, 5);
+               }
+            }
+         }
+      }
    }
 }

@@ -197,7 +197,7 @@
                <!--Content-->
                <div class="aspect-details" transition:slide|local>
                   <div class="row">
-                     <!--Resistance Armor-->
+                     <!--Resistance-->
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
@@ -212,6 +212,8 @@
                         </div>
                      </div>
                   </div>
+
+                  <!--Condition toggles-->
                   <div class="toggles">
                      {#each Object.entries($document.system.standardAspects.inflictCondition.conditions) as [condition]}
                         <SpellSheetToggleAspectOptionButton
@@ -220,6 +222,50 @@
                         />
                      {/each}
                   </div>
+               </div>
+            {/if}
+         </div>
+
+         <!--Remove Condition-->
+         <div class="aspect">
+            <!--Enable-->
+            <div class="aspect-enable">
+               <SpellSheetEnableAspectButton
+                  bind:enabled={$document.system.standardAspects.removeCondition.enabled}
+                  label={localize("LOCAL.removeCondition.label")}
+                  cost={$document.system.standardAspects.removeCondition.cost}
+               />
+            </div>
+
+            {#if $document.system.standardAspects.removeCondition.enabled}
+               <!--Content-->
+               <div class="aspect-details" transition:slide|local>
+                  <div class="row">
+                     <!--Resistance-->
+                     <div class="stat">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.all.label")}:
+                        </div>
+
+                        <!--Value-->
+                        <div class="input">
+                           <DocumentCheckboxInput bind:value={$document.system.standardAspects.removeCondition.all} />
+                        </div>
+                     </div>
+                  </div>
+
+                  {#if !$document.system.standardAspects.removeCondition.all}
+                     <!--Condition toggles-->
+                     <div class="toggles">
+                        {#each Object.entries($document.system.standardAspects.removeCondition.conditions) as [condition]}
+                           <SpellSheetToggleAspectOptionButton
+                              label={localize(`LOCAL.${condition}.label`)}
+                              bind:enabled={$document.system.standardAspects.removeCondition.conditions[condition]}
+                           />
+                        {/each}
+                     </div>
+                  {/if}
                </div>
             {/if}
          </div>
@@ -242,7 +288,6 @@
          .aspect {
             @include flex-column;
             @include flex-group-top;
-            @include z-index-app;
             width: 100%;
             margin: 0.25rem;
 
