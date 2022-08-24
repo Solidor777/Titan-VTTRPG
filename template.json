@@ -424,7 +424,7 @@
         "inflictCondition": {
           "enabled": false,
           "resistance": "none",
-          "conditions": {
+          "condition": {
             "blinded": false,
             "charmed": false,
             "deafened": false,
@@ -439,9 +439,8 @@
         },
         "removeCondition": {
           "enabled": false,
-          "resistance": "none",
           "all": false,
-          "conditions": {
+          "condition": {
             "blinded": false,
             "charmed": false,
             "deafened": false,
@@ -452,6 +451,22 @@
             "restrained": false,
             "stunned": false,
             "unconscious": false
+          }
+        },
+        "increaseRating": {
+          "enabled": false,
+          "rating": {
+            "accuracy": false,
+            "defense": false,
+            "melee": false
+          }
+        },
+        "decreaseRating": {
+          "enabled": false,
+          "rating": {
+            "accuracy": false,
+            "defense": false,
+            "melee": false
           }
         }
       }

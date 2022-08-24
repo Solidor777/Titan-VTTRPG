@@ -101,45 +101,45 @@ export class TitanSpell extends TitanTypeComponent {
       inflictCondition.cost = 0;
       if (inflictCondition.enabled) {
 
-         const conditions = inflictCondition.conditions;
+         const condition = inflictCondition.condition;
 
-         if (conditions.blinded) {
+         if (condition.blinded) {
             inflictCondition.cost += 4;
          }
 
-         if (conditions.charmed) {
+         if (condition.charmed) {
             inflictCondition.cost += 2;
          }
 
-         if (conditions.deafened) {
+         if (condition.deafened) {
             inflictCondition.cost += 1;
          }
 
-         if (conditions.frightened) {
+         if (condition.frightened) {
             inflictCondition.cost += 3;
          }
 
-         if (conditions.incapacitated) {
+         if (condition.incapacitated) {
             inflictCondition.cost += 6;
          }
 
-         if (conditions.poisoned) {
+         if (condition.poisoned) {
             inflictCondition.cost += 4;
          }
 
-         if (conditions.prone) {
+         if (condition.prone) {
             inflictCondition.cost += 2;
          }
 
-         if (conditions.restrained) {
+         if (condition.restrained) {
             inflictCondition.cost += 5;
          }
 
-         if (conditions.stunned) {
+         if (condition.stunned) {
             inflictCondition.cost += 4;
          }
 
-         if (conditions.unconscious) {
+         if (condition.unconscious) {
             inflictCondition.cost += 7;
          }
       }
@@ -152,7 +152,7 @@ export class TitanSpell extends TitanTypeComponent {
             removeCondition.cost = 5;
          }
          else {
-            for (const [key, value] of Object.entries(removeCondition.conditions)) {
+            for (const [key, value] of Object.entries(removeCondition.condition)) {
                if (value === true & removeCondition.cost < 5) {
                   removeCondition.cost = Math.min(removeCondition.cost + 2, 5);
                }

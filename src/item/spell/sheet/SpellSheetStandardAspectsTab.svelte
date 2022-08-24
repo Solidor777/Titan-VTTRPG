@@ -215,10 +215,10 @@
 
                   <!--Condition toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.inflictCondition.conditions) as [condition]}
+                     {#each Object.entries($document.system.standardAspects.inflictCondition.condition) as [condition]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${condition}.label`)}
-                           bind:enabled={$document.system.standardAspects.inflictCondition.conditions[condition]}
+                           bind:enabled={$document.system.standardAspects.inflictCondition.condition[condition]}
                         />
                      {/each}
                   </div>
@@ -258,10 +258,10 @@
                   {#if !$document.system.standardAspects.removeCondition.all}
                      <!--Condition toggles-->
                      <div class="toggles">
-                        {#each Object.entries($document.system.standardAspects.removeCondition.conditions) as [condition]}
+                        {#each Object.entries($document.system.standardAspects.removeCondition.condition) as [condition]}
                            <SpellSheetToggleAspectOptionButton
                               label={localize(`LOCAL.${condition}.label`)}
-                              bind:enabled={$document.system.standardAspects.removeCondition.conditions[condition]}
+                              bind:enabled={$document.system.standardAspects.removeCondition.condition[condition]}
                            />
                         {/each}
                      </div>
