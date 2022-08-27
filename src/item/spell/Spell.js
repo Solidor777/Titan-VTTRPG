@@ -146,6 +146,56 @@ export class TitanSpell extends TitanTypeComponent {
          }
       }
 
+      // Decrease Attribute
+      const decreaseAttribute = standardAspects.decreaseAttribute;
+      decreaseAttribute.cost = 0;
+      if (decreaseAttribute.enabled) {
+         for (const [key, value] of Object.entries(decreaseAttribute.attribute)) {
+            if (value === true) {
+               decreaseAttribute.cost += 4;
+            }
+         }
+         if (decreaseAttribute.resistance !== "none") {
+            decreaseAttribute.cost = Math.ceil(decreaseAttribute.cost / 2);
+         }
+      }
+
+      // Increase Attribute
+      const increaseAttribute = standardAspects.increaseAttribute;
+      increaseAttribute.cost = 0;
+      if (increaseAttribute.enabled) {
+         for (const [key, value] of Object.entries(increaseAttribute.attribute)) {
+            if (value === true) {
+               increaseAttribute.cost += 4;
+            }
+         }
+      }
+
+      // Decrease Skill
+      const decreaseSkill = standardAspects.decreaseSkill;
+      decreaseSkill.cost = 0;
+      if (decreaseSkill.enabled) {
+         for (const [key, value] of Object.entries(decreaseSkill.skill)) {
+            if (value === true) {
+               decreaseSkill.cost += 1;
+            }
+         }
+         if (decreaseSkill.resistance !== "none") {
+            decreaseSkill.cost = Math.ceil(decreaseSkill.cost / 2);
+         }
+      }
+
+      // Increase Skill
+      const increaseSkill = standardAspects.increaseSkill;
+      increaseSkill.cost = 0;
+      if (increaseSkill.enabled) {
+         for (const [key, value] of Object.entries(increaseSkill.skill)) {
+            if (value === true) {
+               increaseSkill.cost += 1;
+            }
+         }
+      }
+
       // Inflict Condition
       const inflictCondition = standardAspects.inflictCondition;
       inflictCondition.cost = 0;
