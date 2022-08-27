@@ -421,6 +421,121 @@
         "rounds": {
           "enabled": false
         },
+        "decreaseMod": {
+          "enabled": false,
+          "resistance": "none",
+          "mod": {
+            "armor": false,
+            "damage": false
+          }
+        },
+        "increaseMod": {
+          "enabled": false,
+          "mod": {
+            "armor": false,
+            "damage": false
+          }
+        },
+        "decreaseRating": {
+          "enabled": false,
+          "resistance": "none",
+          "rating": {
+            "accuracy": false,
+            "defense": false,
+            "melee": false
+          }
+        },
+        "increaseRating": {
+          "enabled": false,
+          "rating": {
+            "accuracy": false,
+            "defense": false,
+            "melee": false
+          }
+        },
+        "decreaseAttribute": {
+          "enabled": false,
+          "resistance": "none",
+          "attribute": {
+            "body": false,
+            "mind": false,
+            "soul": false
+          }
+        },
+        "increaseAttribute": {
+          "enabled": false,
+          "attribute": {
+            "body": false,
+            "mind": false,
+            "soul": false
+          }
+        },
+        "decreaseSkill": {
+          "enabled": false,
+          "resistance": "none",
+          "skill": {
+            "arcana": false,
+            "athletics": false,
+            "deception": false,
+            "dexterity": false,
+            "diplomacy": false,
+            "engineering": false,
+            "intimidation": false,
+            "investigation": false,
+            "lore": false,
+            "medicine": false,
+            "meleeWeapons": false,
+            "nature": false,
+            "perception": false,
+            "performance": false,
+            "rangedWeapons": false,
+            "subterfuge": false,
+            "stealth": false,
+            "theology": false
+          }
+        },
+        "increaseSkill": {
+          "enabled": false,
+          "skill": {
+            "arcana": false,
+            "athletics": false,
+            "deception": false,
+            "dexterity": false,
+            "diplomacy": false,
+            "engineering": false,
+            "intimidation": false,
+            "investigation": false,
+            "lore": false,
+            "medicine": false,
+            "meleeWeapons": false,
+            "nature": false,
+            "perception": false,
+            "performance": false,
+            "rangedWeapons": false,
+            "subterfuge": false,
+            "stealth": false,
+            "theology": false
+          }
+        },
+        "decreaseSpeed": {
+          "enabled": true,
+          "resistance": "none",
+          "speed": {
+            "stride": false,
+            "fly": false,
+            "swim": false,
+            "burrow": false
+          }
+        },
+        "increaseSpeed": {
+          "enabled": true,
+          "speed": {
+            "stride": false,
+            "fly": false,
+            "swim": false,
+            "burrow": false
+          }
+        },
         "inflictCondition": {
           "enabled": false,
           "resistance": "none",
@@ -451,116 +566,6 @@
             "restrained": false,
             "stunned": false,
             "unconscious": false
-          }
-        },
-        "increaseMod": {
-          "enabled": false,
-          "rating": {
-            "armor": false,
-            "damage": false
-          }
-        },
-        "decreaseMod": {
-          "enabled": false,
-          "rating": {
-            "armor": false,
-            "damage": false
-          }
-        },
-        "increaseRating": {
-          "enabled": false,
-          "rating": {
-            "accuracy": false,
-            "defense": false,
-            "melee": false
-          }
-        },
-        "decreaseRating": {
-          "enabled": false,
-          "rating": {
-            "accuracy": false,
-            "defense": false,
-            "melee": false
-          }
-        },
-        "increaseAttribute": {
-          "enabled": false,
-          "attribute": {
-            "body": false,
-            "mind": false,
-            "soul": false
-          }
-        },
-        "decreaseAttribute": {
-          "enabled": false,
-          "attribute": {
-            "body": false,
-            "mind": false,
-            "soul": false
-          }
-        },
-        "increaseSkill": {
-          "enabled": false,
-          "skill": {
-            "arcana": false,
-            "athletics": false,
-            "deception": false,
-            "dexterity": false,
-            "diplomacy": false,
-            "engineering": false,
-            "intimidation": false,
-            "investigation": false,
-            "lore": false,
-            "medicine": false,
-            "meleeWeapons": false,
-            "nature": false,
-            "perception": false,
-            "performance": false,
-            "rangedWeapons": false,
-            "subterfuge": false,
-            "stealth": false,
-            "theology": false
-          }
-        },
-        "decreaseSkill": {
-          "enabled": false,
-          "skill": {
-            "arcana": false,
-            "athletics": false,
-            "deception": false,
-            "dexterity": false,
-            "diplomacy": false,
-            "engineering": false,
-            "intimidation": false,
-            "investigation": false,
-            "lore": false,
-            "medicine": false,
-            "meleeWeapons": false,
-            "nature": false,
-            "perception": false,
-            "performance": false,
-            "rangedWeapons": false,
-            "subterfuge": false,
-            "stealth": false,
-            "theology": false
-          }
-        },
-        "increaseSpeed": {
-          "enabled": true,
-          "speed": {
-            "stride": false,
-            "fly": false,
-            "swim": false,
-            "burrow": false
-          }
-        },
-        "decreaseSpeed": {
-          "enabled": true,
-          "speed": {
-            "stride": false,
-            "fly": false,
-            "swim": false,
-            "burrow": false
           }
         }
       },

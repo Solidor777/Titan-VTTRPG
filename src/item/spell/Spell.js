@@ -96,11 +96,60 @@ export class TitanSpell extends TitanTypeComponent {
          rounds.cost = 0;
       }
 
+      // Decrease Mod
+      const decreaseMod = standardAspects.decreaseMod;
+      decreaseMod.cost = 0;
+      if (decreaseMod.enabled) {
+         for (const [key, value] of Object.entries(decreaseMod.mod)) {
+            if (value === true) {
+               decreaseMod.cost += 2;
+            }
+         }
+         if (decreaseMod.resistance !== "none") {
+            decreaseMod.cost = Math.ceil(decreaseMod.cost / 2);
+         }
+      }
+
+      // Increase Mod
+      const increaseMod = standardAspects.increaseMod;
+      increaseMod.cost = 0;
+      if (increaseMod.enabled) {
+         for (const [key, value] of Object.entries(increaseMod.mod)) {
+            if (value === true) {
+               increaseMod.cost += 2;
+            }
+         }
+      }
+
+      // Decrease Rating
+      const decreaseRating = standardAspects.decreaseRating;
+      decreaseRating.cost = 0;
+      if (decreaseRating.enabled) {
+         for (const [key, value] of Object.entries(decreaseRating.rating)) {
+            if (value === true) {
+               decreaseRating.cost += 1;
+            }
+         }
+         if (decreaseRating.resistance !== "none") {
+            decreaseRating.cost = Math.ceil(decreaseRating.cost / 2);
+         }
+      }
+
+      // Increase Rating
+      const increaseRating = standardAspects.increaseRating;
+      increaseRating.cost = 0;
+      if (increaseRating.enabled) {
+         for (const [key, value] of Object.entries(increaseRating.rating)) {
+            if (value === true) {
+               increaseRating.cost += 1;
+            }
+         }
+      }
+
       // Inflict Condition
       const inflictCondition = standardAspects.inflictCondition;
       inflictCondition.cost = 0;
       if (inflictCondition.enabled) {
-
          const condition = inflictCondition.condition;
 
          if (condition.blinded) {
@@ -142,6 +191,10 @@ export class TitanSpell extends TitanTypeComponent {
          if (condition.unconscious) {
             inflictCondition.cost += 7;
          }
+
+         if (inflictCondition.resistance !== "none") {
+            inflictCondition.cost = Math.ceil(inflictCondition.cost / 2);
+         }
       }
 
       // Remove Condition
@@ -156,28 +209,6 @@ export class TitanSpell extends TitanTypeComponent {
                if (value === true & removeCondition.cost < 5) {
                   removeCondition.cost = Math.min(removeCondition.cost + 2, 5);
                }
-            }
-         }
-      }
-
-      // Increase Rating
-      const increaseRating = standardAspects.increaseRating;
-      increaseRating.cost = 0;
-      if (increaseRating.enabled) {
-         for (const [key, value] of Object.entries(increaseRating.rating)) {
-            if (value === true) {
-               increaseRating.cost += 2;
-            }
-         }
-      }
-
-      // Decrease Rating
-      const decreaseRating = standardAspects.decreaseRating;
-      decreaseRating.cost = 0;
-      if (decreaseRating.enabled) {
-         for (const [key, value] of Object.entries(decreaseRating.rating)) {
-            if (value === true) {
-               decreaseRating.cost += 2;
             }
          }
       }

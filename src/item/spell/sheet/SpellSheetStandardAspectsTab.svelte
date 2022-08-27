@@ -182,6 +182,77 @@
             </div>
          </div>
 
+         <!--Decrease Mod-->
+         <div class="aspect">
+            <!--Enable-->
+            <div class="aspect-enable">
+               <SpellSheetEnableAspectButton
+                  bind:enabled={$document.system.standardAspects.decreaseMod.enabled}
+                  label={localize("LOCAL.decreaseMod.label")}
+                  cost={$document.system.standardAspects.decreaseMod.cost}
+               />
+            </div>
+
+            {#if $document.system.standardAspects.decreaseMod.enabled}
+               <!--Content-->
+               <div class="aspect-details" transition:slide|local>
+                  <div class="row">
+                     <!--Resistance-->
+                     <div class="stat">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.resistance.label")}:
+                        </div>
+
+                        <!--Value-->
+                        <div class="input">
+                           <DocumentResistanceSelectAllowNone
+                              bind:value={$document.system.standardAspects.decreaseMod.resistance}
+                           />
+                        </div>
+                     </div>
+                  </div>
+
+                  <!--Mod toggles-->
+                  <div class="toggles">
+                     {#each Object.entries($document.system.standardAspects.decreaseMod.mod) as [mod]}
+                        <SpellSheetToggleAspectOptionButton
+                           label={localize(`LOCAL.${mod}.label`)}
+                           bind:enabled={$document.system.standardAspects.decreaseMod.mod[mod]}
+                        />
+                     {/each}
+                  </div>
+               </div>
+            {/if}
+         </div>
+
+         <!--Increase Mod-->
+         <div class="aspect">
+            <!--Enable-->
+            <div class="aspect-enable">
+               <SpellSheetEnableAspectButton
+                  bind:enabled={$document.system.standardAspects.increaseMod.enabled}
+                  label={localize("LOCAL.increaseMod.label")}
+                  cost={$document.system.standardAspects.increaseMod.cost}
+               />
+            </div>
+
+            {#if $document.system.standardAspects.increaseMod.enabled}
+               <!--Content-->
+               <div class="aspect-details" transition:slide|local>
+                  <!--Mod toggles-->
+                  <div class="toggles">
+                     {#each Object.entries($document.system.standardAspects.increaseMod.mod) as [mod]}
+                        <SpellSheetToggleAspectOptionButton
+                           label={localize(`LOCAL.${mod}.label`)}
+                           bind:enabled={$document.system.standardAspects.increaseMod.mod[mod]}
+                        />
+                     {/each}
+                  </div>
+               </div>
+            {/if}
+         </div>
+
          <!--Inflict Condition-->
          <div class="aspect">
             <!--Enable-->
@@ -257,7 +328,7 @@
 
                   {#if !$document.system.standardAspects.removeCondition.all}
                      <!--Condition toggles-->
-                     <div class="toggles">
+                     <div class="toggles" transition:slide|local>
                         {#each Object.entries($document.system.standardAspects.removeCondition.condition) as [condition]}
                            <SpellSheetToggleAspectOptionButton
                               label={localize(`LOCAL.${condition}.label`)}
@@ -299,6 +370,7 @@
             .aspect-details {
                @include flex-column;
                @include flex-group-top;
+               @include z-index-app;
                padding: 0.5rem;
                width: calc(100% - 30px);
                background-color: var(--label-background-color);
