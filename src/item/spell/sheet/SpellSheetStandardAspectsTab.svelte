@@ -25,16 +25,16 @@
          label: localize("LOCAL.touch.label"),
       },
       {
-         value: "10m",
-         label: localize("LOCAL.10m.label"),
+         value: "m10",
+         label: localize("LOCAL.m10.label"),
       },
       {
-         value: "30m",
-         label: localize("LOCAL.30m.label"),
+         value: "m30",
+         label: localize("LOCAL.m30.label"),
       },
       {
-         value: "50m",
-         label: localize("LOCAL.50m.label"),
+         value: "m50",
+         label: localize("LOCAL.m50.label"),
       },
    ];
 
@@ -45,12 +45,12 @@
          label: localize("LOCAL.target.label"),
       },
       {
-         value: "5mRadius",
-         label: localize("LOCAL.5mRadius.label"),
+         value: "m5Radius",
+         label: localize("LOCAL.m5Radius.label"),
       },
       {
-         value: "10mRadius",
-         label: localize("LOCAL.10mRadius.label"),
+         value: "m10Radius",
+         label: localize("LOCAL.m10Radius.label"),
       },
    ];
 </script>
@@ -143,13 +143,13 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.resistance.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
                         <div class="input">
                            <DocumentResistanceSelectAllowNone
-                              bind:value={$document.system.standardAspects.damage.resistance}
+                              bind:value={$document.system.standardAspects.damage.resistanceCheck}
                            />
                         </div>
                      </div>
@@ -201,13 +201,13 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.resistance.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
                         <div class="input">
                            <DocumentResistanceSelectAllowNone
-                              bind:value={$document.system.standardAspects.decreaseMod.resistance}
+                              bind:value={$document.system.standardAspects.decreaseMod.resistanceCheck}
                            />
                         </div>
                      </div>
@@ -215,10 +215,10 @@
 
                   <!--Mod toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.decreaseMod.mod) as [mod]}
+                     {#each Object.entries($document.system.standardAspects.decreaseMod.option) as [mod]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${mod}.label`)}
-                           bind:enabled={$document.system.standardAspects.decreaseMod.mod[mod]}
+                           bind:enabled={$document.system.standardAspects.decreaseMod.option[mod]}
                         />
                      {/each}
                   </div>
@@ -242,10 +242,10 @@
                <div class="aspect-details" transition:slide|local>
                   <!--Mod toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.increaseMod.mod) as [mod]}
+                     {#each Object.entries($document.system.standardAspects.increaseMod.option) as [mod]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${mod}.label`)}
-                           bind:enabled={$document.system.standardAspects.increaseMod.mod[mod]}
+                           bind:enabled={$document.system.standardAspects.increaseMod.option[mod]}
                         />
                      {/each}
                   </div>
@@ -272,13 +272,13 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.resistance.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
                         <div class="input">
                            <DocumentResistanceSelectAllowNone
-                              bind:value={$document.system.standardAspects.decreaseRating.resistance}
+                              bind:value={$document.system.standardAspects.decreaseRating.resistanceCheck}
                            />
                         </div>
                      </div>
@@ -286,10 +286,10 @@
 
                   <!--Rating toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.decreaseRating.rating) as [rating]}
+                     {#each Object.entries($document.system.standardAspects.decreaseRating.option) as [rating]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${rating}.label`)}
-                           bind:enabled={$document.system.standardAspects.decreaseRating.rating[rating]}
+                           bind:enabled={$document.system.standardAspects.decreaseRating.option[rating]}
                         />
                      {/each}
                   </div>
@@ -313,10 +313,10 @@
                <div class="aspect-details" transition:slide|local>
                   <!--Rating toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.increaseRating.rating) as [rating]}
+                     {#each Object.entries($document.system.standardAspects.increaseRating.option) as [rating]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${rating}.label`)}
-                           bind:enabled={$document.system.standardAspects.increaseRating.rating[rating]}
+                           bind:enabled={$document.system.standardAspects.increaseRating.option[rating]}
                         />
                      {/each}
                   </div>
@@ -343,13 +343,13 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.resistance.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
                         <div class="input">
                            <DocumentResistanceSelectAllowNone
-                              bind:value={$document.system.standardAspects.decreaseAttribute.resistance}
+                              bind:value={$document.system.standardAspects.decreaseAttribute.resistanceCheck}
                            />
                         </div>
                      </div>
@@ -357,10 +357,10 @@
 
                   <!--Attribute toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.decreaseAttribute.attribute) as [attribute]}
+                     {#each Object.entries($document.system.standardAspects.decreaseAttribute.option) as [attribute]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${attribute}.label`)}
-                           bind:enabled={$document.system.standardAspects.decreaseAttribute.attribute[attribute]}
+                           bind:enabled={$document.system.standardAspects.decreaseAttribute.option[attribute]}
                         />
                      {/each}
                   </div>
@@ -384,10 +384,10 @@
                <div class="aspect-details" transition:slide|local>
                   <!--Attribute toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.increaseAttribute.attribute) as [attribute]}
+                     {#each Object.entries($document.system.standardAspects.increaseAttribute.option) as [attribute]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${attribute}.label`)}
-                           bind:enabled={$document.system.standardAspects.increaseAttribute.attribute[attribute]}
+                           bind:enabled={$document.system.standardAspects.increaseAttribute.option[attribute]}
                         />
                      {/each}
                   </div>
@@ -414,13 +414,13 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.resistance.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
                         <div class="input">
                            <DocumentResistanceSelectAllowNone
-                              bind:value={$document.system.standardAspects.decreaseSkill.resistance}
+                              bind:value={$document.system.standardAspects.decreaseSkill.resistanceCheck}
                            />
                         </div>
                      </div>
@@ -428,10 +428,10 @@
 
                   <!--Skill toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.decreaseSkill.skill) as [skill]}
+                     {#each Object.entries($document.system.standardAspects.decreaseSkill.option) as [skill]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${skill}.label`)}
-                           bind:enabled={$document.system.standardAspects.decreaseSkill.skill[skill]}
+                           bind:enabled={$document.system.standardAspects.decreaseSkill.option[skill]}
                         />
                      {/each}
                   </div>
@@ -455,10 +455,10 @@
                <div class="aspect-details" transition:slide|local>
                   <!--Skill toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.increaseSkill.skill) as [skill]}
+                     {#each Object.entries($document.system.standardAspects.increaseSkill.option) as [skill]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${skill}.label`)}
-                           bind:enabled={$document.system.standardAspects.increaseSkill.skill[skill]}
+                           bind:enabled={$document.system.standardAspects.increaseSkill.option[skill]}
                         />
                      {/each}
                   </div>
@@ -485,13 +485,13 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.resistance.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
                         <div class="input">
                            <DocumentResistanceSelectAllowNone
-                              bind:value={$document.system.standardAspects.inflictCondition.resistance}
+                              bind:value={$document.system.standardAspects.inflictCondition.resistanceCheck}
                            />
                         </div>
                      </div>
@@ -499,10 +499,10 @@
 
                   <!--Condition toggles-->
                   <div class="toggles">
-                     {#each Object.entries($document.system.standardAspects.inflictCondition.condition) as [condition]}
+                     {#each Object.entries($document.system.standardAspects.inflictCondition.option) as [condition]}
                         <SpellSheetToggleAspectOptionButton
                            label={localize(`LOCAL.${condition}.label`)}
-                           bind:enabled={$document.system.standardAspects.inflictCondition.condition[condition]}
+                           bind:enabled={$document.system.standardAspects.inflictCondition.option[condition]}
                         />
                      {/each}
                   </div>
@@ -534,18 +534,20 @@
 
                         <!--Value-->
                         <div class="input">
-                           <DocumentCheckboxInput bind:value={$document.system.standardAspects.removeCondition.all} />
+                           <DocumentCheckboxInput
+                              bind:value={$document.system.standardAspects.removeCondition.allOptions}
+                           />
                         </div>
                      </div>
                   </div>
 
-                  {#if !$document.system.standardAspects.removeCondition.all}
+                  {#if !$document.system.standardAspects.removeCondition.allOptions}
                      <!--Condition toggles-->
                      <div class="toggles" transition:slide|local>
-                        {#each Object.entries($document.system.standardAspects.removeCondition.condition) as [condition]}
+                        {#each Object.entries($document.system.standardAspects.removeCondition.option) as [condition]}
                            <SpellSheetToggleAspectOptionButton
                               label={localize(`LOCAL.${condition}.label`)}
-                              bind:enabled={$document.system.standardAspects.removeCondition.condition[condition]}
+                              bind:enabled={$document.system.standardAspects.removeCondition.option[condition]}
                            />
                         {/each}
                      </div>

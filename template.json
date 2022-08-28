@@ -411,9 +411,11 @@
           "value": "target"
         },
         "damage": {
-          "enabled": true,
-          "resistance": "none",
-          "ignoreArmor": false
+          "enabled": false,
+          "resistanceCheck": "none",
+          "option": {
+            "ignoreArmor": false
+          }
         },
         "healing": {
           "enabled": false
@@ -423,23 +425,23 @@
         },
         "decreaseMod": {
           "enabled": false,
-          "resistance": "none",
-          "mod": {
+          "resistanceCheck": "none",
+          "option": {
             "armor": false,
             "damage": false
           }
         },
         "increaseMod": {
           "enabled": false,
-          "mod": {
+          "option": {
             "armor": false,
             "damage": false
           }
         },
         "decreaseRating": {
           "enabled": false,
-          "resistance": "none",
-          "rating": {
+          "resistanceCheck": "none",
+          "option": {
             "accuracy": false,
             "defense": false,
             "melee": false
@@ -447,16 +449,33 @@
         },
         "increaseRating": {
           "enabled": false,
-          "rating": {
+          "option": {
             "accuracy": false,
             "defense": false,
             "melee": false
           }
         },
+        "decreaseResistance": {
+          "enabled": false,
+          "resistanceCheck": "none",
+          "option": {
+            "reflexes": false,
+            "resilience": false,
+            "willpower": false
+          }
+        },
+        "increaseResistance": {
+          "enabled": false,
+          "option": {
+            "reflexes": false,
+            "resilience": false,
+            "willpower": false
+          }
+        },
         "decreaseAttribute": {
           "enabled": false,
-          "resistance": "none",
-          "attribute": {
+          "resistanceCheck": "none",
+          "option": {
             "body": false,
             "mind": false,
             "soul": false
@@ -464,7 +483,7 @@
         },
         "increaseAttribute": {
           "enabled": false,
-          "attribute": {
+          "option": {
             "body": false,
             "mind": false,
             "soul": false
@@ -472,8 +491,8 @@
         },
         "decreaseSkill": {
           "enabled": false,
-          "resistance": "none",
-          "skill": {
+          "resistanceCheck": "none",
+          "option": {
             "arcana": false,
             "athletics": false,
             "deception": false,
@@ -496,7 +515,7 @@
         },
         "increaseSkill": {
           "enabled": false,
-          "skill": {
+          "option": {
             "arcana": false,
             "athletics": false,
             "deception": false,
@@ -519,8 +538,8 @@
         },
         "decreaseSpeed": {
           "enabled": true,
-          "resistance": "none",
-          "speed": {
+          "resistanceCheck": "none",
+          "option": {
             "stride": false,
             "fly": false,
             "swim": false,
@@ -529,7 +548,7 @@
         },
         "increaseSpeed": {
           "enabled": true,
-          "speed": {
+          "option": {
             "stride": false,
             "fly": false,
             "swim": false,
@@ -538,8 +557,8 @@
         },
         "inflictCondition": {
           "enabled": false,
-          "resistance": "none",
-          "condition": {
+          "resistanceCheck": "none",
+          "option": {
             "blinded": false,
             "charmed": false,
             "deafened": false,
@@ -554,8 +573,8 @@
         },
         "removeCondition": {
           "enabled": false,
-          "all": false,
-          "condition": {
+          "allOptions": false,
+          "option": {
             "blinded": false,
             "charmed": false,
             "deafened": false,

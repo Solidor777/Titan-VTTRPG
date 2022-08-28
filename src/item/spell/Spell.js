@@ -2,264 +2,191 @@ import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
 
 export class TitanSpell extends TitanTypeComponent {
    prepareDerivedData() {
-      // Auto calculate aspect cost
+      // Reset aspects array
+      this.parent.system.aspects = [];
+
+      // Reference to standard aspects
       const standardAspects = this.parent.system.standardAspects;
+
       // Range
-      const range = standardAspects.range;
-      if (range.enabled) {
-         switch (standardAspects.range.value) {
-            case "self": {
-               range.cost = 0;
-               break;
-            }
-            case "touch": {
-               range.cost = 1;
-               break;
-            }
-            case "10m": {
-               range.cost = 2;
-               break;
-            }
-            case "30m": {
-               range.cost = 3;
-               break;
-            }
-            case "50m": {
-               range.cost = 4;
-               break;
-            }
-            default: {
-               console.error(`TITAN | Invalid Range Case for Spell (${this.parent.name})`);
-               break;
-            }
-         }
-      }
-      else {
-         range.cost = 0;
-      }
+      const rangeCosts = {
+         self: 0,
+         touch: 1,
+         m10: 2,
+         m30: 3,
+         m50: 4
+      };
+      this._calculateStandardAspectCost(standardAspects.range, rangeCosts, 0);
+      this._prepareStandardAspectData(standardAspects.range, game.i18n.localize("LOCAL.range.label"), false, false, false);
 
       // Target
-      const target = standardAspects.target;
-      if (target.enabled) {
-         switch (standardAspects.target.value) {
-            case "target": {
-               target.cost = 1;
-               break;
-            }
-            case "5mRadius": {
-               target.cost = 3;
-               break;
-            }
-            case "10mRadius": {
-               target.cost = 6;
-               break;
-            }
-            default: {
-               console.error(`TITAN | Invalid Target Case for Spell (${this.parent.name})`);
-               break;
-            }
-         }
-      }
-      else {
-         target.cost = 0;
-      }
+      const targetCosts = {
+         target: 0,
+         m5Radius: 3,
+         m10Radius: 6,
+      };
+      this._calculateStandardAspectCost(standardAspects.target, targetCosts, 0);
+      this._prepareStandardAspectData(standardAspects.target, game.i18n.localize("LOCAL.target.label"), false, false, false);
 
       // Damage
-      const damage = standardAspects.damage;
-      if (damage.enabled) {
-         if (damage.ignoreArmor === false || damage.resistance !== "none") {
-            damage.cost = 1;
-         }
-         else {
-            damage.cost = 2;
-         }
-      }
-      else {
-         damage.cost = 0;
-      }
+      this._calculateStandardAspectCost(standardAspects.damage, 1, 1);
+      this._prepareStandardAspectData(standardAspects.damage, game.i18n.localize("LOCAL.damage.label"), true, false, 1);
 
       // Healing
-      const healing = standardAspects.healing;
-      if (healing.enabled) {
-         healing.cost = 1;
-      }
-      else {
-         healing.cost = 0;
-      }
+      this._calculateStandardAspectCost(standardAspects.healing, 1);
+      this._prepareStandardAspectData(standardAspects.healing, game.i18n.localize("LOCAL.healing.label"), true, false, 1);
 
       // Rounds
-      const rounds = standardAspects.rounds;
-      if (rounds.enabled) {
-         rounds.cost = 1;
-      }
-      else {
-         rounds.cost = 0;
-      }
+      this._calculateStandardAspectCost(standardAspects.rounds, 1);
+      this._prepareStandardAspectData(standardAspects.rounds, game.i18n.localize("LOCAL.rounds.label"), true, false, 1);
 
       // Decrease Mod
-      const decreaseMod = standardAspects.decreaseMod;
-      decreaseMod.cost = 0;
-      if (decreaseMod.enabled) {
-         for (const [key, value] of Object.entries(decreaseMod.mod)) {
-            if (value === true) {
-               decreaseMod.cost += 2;
-            }
-         }
-         if (decreaseMod.resistance !== "none") {
-            decreaseMod.cost = Math.ceil(decreaseMod.cost / 2);
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.decreaseMod, 0, 2);
+      this._prepareStandardAspectData(standardAspects.decreaseMod, game.i18n.localize("LOCAL.decreaseMod.label"), true, true, 1);
 
       // Increase Mod
-      const increaseMod = standardAspects.increaseMod;
-      increaseMod.cost = 0;
-      if (increaseMod.enabled) {
-         for (const [key, value] of Object.entries(increaseMod.mod)) {
-            if (value === true) {
-               increaseMod.cost += 2;
-            }
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.increaseMod, 0, 2);
+      this._prepareStandardAspectData(standardAspects.increaseMod, game.i18n.localize("LOCAL.increaseMod.label"), true, true, 1);
 
       // Decrease Rating
-      const decreaseRating = standardAspects.decreaseRating;
-      decreaseRating.cost = 0;
-      if (decreaseRating.enabled) {
-         for (const [key, value] of Object.entries(decreaseRating.rating)) {
-            if (value === true) {
-               decreaseRating.cost += 1;
-            }
-         }
-         if (decreaseRating.resistance !== "none") {
-            decreaseRating.cost = Math.ceil(decreaseRating.cost / 2);
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.decreaseRating, 0, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseRating, game.i18n.localize("LOCAL.decreaseRating.label"), true, true, 1);
 
       // Increase Rating
-      const increaseRating = standardAspects.increaseRating;
-      increaseRating.cost = 0;
-      if (increaseRating.enabled) {
-         for (const [key, value] of Object.entries(increaseRating.rating)) {
-            if (value === true) {
-               increaseRating.cost += 1;
-            }
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.increaseRating, 0, 1);
+      this._prepareStandardAspectData(standardAspects.increaseRating, game.i18n.localize("LOCAL.increaseRating.label"), true, true, 1);
+
+      // Decrease Resistance
+      this._calculateStandardAspectCost(standardAspects.decreaseResistance, 0, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseResistance, game.i18n.localize("LOCAL.decreaseResistance.label"), true, true, 1);
+
+      // Increase Resistance
+      this._calculateStandardAspectCost(standardAspects.increaseResistance, 0, 1);
+      this._prepareStandardAspectData(standardAspects.increaseResistance, game.i18n.localize("LOCAL.increaseResistance.label"), true, true, 1);
 
       // Decrease Attribute
-      const decreaseAttribute = standardAspects.decreaseAttribute;
-      decreaseAttribute.cost = 0;
-      if (decreaseAttribute.enabled) {
-         for (const [key, value] of Object.entries(decreaseAttribute.attribute)) {
-            if (value === true) {
-               decreaseAttribute.cost += 4;
-            }
-         }
-         if (decreaseAttribute.resistance !== "none") {
-            decreaseAttribute.cost = Math.ceil(decreaseAttribute.cost / 2);
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.decreaseAttribute, 0, 4);
+      this._prepareStandardAspectData(standardAspects.decreaseAttribute, game.i18n.localize("LOCAL.decreaseAttribute.label"), true, true, 1);
 
       // Increase Attribute
-      const increaseAttribute = standardAspects.increaseAttribute;
-      increaseAttribute.cost = 0;
-      if (increaseAttribute.enabled) {
-         for (const [key, value] of Object.entries(increaseAttribute.attribute)) {
-            if (value === true) {
-               increaseAttribute.cost += 4;
-            }
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.increaseAttribute, 0, 4);
+      this._prepareStandardAspectData(standardAspects.increaseAttribute, game.i18n.localize("LOCAL.increaseAttribute.label"), true, true, 1);
 
       // Decrease Skill
-      const decreaseSkill = standardAspects.decreaseSkill;
-      decreaseSkill.cost = 0;
-      if (decreaseSkill.enabled) {
-         for (const [key, value] of Object.entries(decreaseSkill.skill)) {
-            if (value === true) {
-               decreaseSkill.cost += 1;
-            }
-         }
-         if (decreaseSkill.resistance !== "none") {
-            decreaseSkill.cost = Math.ceil(decreaseSkill.cost / 2);
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.decreaseSkill, 0, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseSkill, game.i18n.localize("LOCAL.decreaseSkill.label"), true, true, 1);
 
       // Increase Skill
-      const increaseSkill = standardAspects.increaseSkill;
-      increaseSkill.cost = 0;
-      if (increaseSkill.enabled) {
-         for (const [key, value] of Object.entries(increaseSkill.skill)) {
-            if (value === true) {
-               increaseSkill.cost += 1;
-            }
-         }
-      }
+      this._calculateStandardAspectCost(standardAspects.increaseSkill, 0, 1);
+      this._prepareStandardAspectData(standardAspects.increaseSkill, game.i18n.localize("LOCAL.increaseSkill.label"), true, true, 1);
 
       // Inflict Condition
-      const inflictCondition = standardAspects.inflictCondition;
-      inflictCondition.cost = 0;
-      if (inflictCondition.enabled) {
-         const condition = inflictCondition.condition;
-
-         if (condition.blinded) {
-            inflictCondition.cost += 4;
-         }
-
-         if (condition.charmed) {
-            inflictCondition.cost += 2;
-         }
-
-         if (condition.deafened) {
-            inflictCondition.cost += 1;
-         }
-
-         if (condition.frightened) {
-            inflictCondition.cost += 3;
-         }
-
-         if (condition.incapacitated) {
-            inflictCondition.cost += 6;
-         }
-
-         if (condition.poisoned) {
-            inflictCondition.cost += 4;
-         }
-
-         if (condition.prone) {
-            inflictCondition.cost += 2;
-         }
-
-         if (condition.restrained) {
-            inflictCondition.cost += 5;
-         }
-
-         if (condition.stunned) {
-            inflictCondition.cost += 4;
-         }
-
-         if (condition.unconscious) {
-            inflictCondition.cost += 7;
-         }
-
-         if (inflictCondition.resistance !== "none") {
-            inflictCondition.cost = Math.ceil(inflictCondition.cost / 2);
-         }
-      }
+      const inflictConditionCosts = {
+         blinded: 4,
+         charmed: 2,
+         deafened: 1,
+         frightened: 3,
+         incapacitated: 6,
+         poisoned: 4,
+         prone: 2,
+         restrained: 5,
+         stunned: 4,
+         unconscious: 7
+      };
+      this._calculateStandardAspectCost(standardAspects.inflictCondition, 0, inflictConditionCosts);
+      this._prepareStandardAspectData(standardAspects.inflictCondition, game.i18n.localize("LOCAL.inflictCondition.label"), false, true, false);
 
       // Remove Condition
-      const removeCondition = standardAspects.removeCondition;
-      removeCondition.cost = 0;
-      if (removeCondition.enabled) {
-         if (removeCondition.all) {
-            removeCondition.cost = 5;
+      this._calculateStandardAspectCost(standardAspects.removeCondition, 0, 2, 5);
+      this._prepareStandardAspectData(standardAspects.removeCondition, game.i18n.localize("LOCAL.removeCondition.label"), false, true, false);
+
+
+      console.log(this.parent.system.aspects);
+   }
+
+   _calculateStandardAspectCost(aspect, enabledCost, optionCost, allOptionCost) {
+      // If enabled
+      if (aspect.enabled) {
+         // If all options
+         if (aspect.allOptions) {
+            aspect.cost = allOptionCost;
          }
+
+         // Otherwise
          else {
-            for (const [key, value] of Object.entries(removeCondition.condition)) {
-               if (value === true & removeCondition.cost < 5) {
-                  removeCondition.cost = Math.min(removeCondition.cost + 2, 5);
+            // Initialize enabled cost
+            aspect.cost = typeof enabledCost === `object` ? enabledCost[aspect.value] : enabledCost;
+
+            // Calculate option cost
+            if (aspect.option) {
+               for (const [key, value] of Object.entries(aspect.option)) {
+                  if (value === true) {
+                     aspect.cost += typeof optionCost === 'object' ? optionCost[key] : optionCost;
+                  }
                }
             }
+
+            // Cap the action cost
+            if (allOptionCost) {
+               aspect.cost = Math.min(aspect.cost, allOptionCost);
+            }
+         }
+
+         // Halve cost if a resistance is set
+         if (aspect.resistanceCheck && aspect.resistanceCheck !== "none") {
+            aspect.cost = Math.ceil(aspect.cost / 2);
+         }
+      }
+      else {
+         aspect.cost = 0;
+      }
+   }
+
+   _prepareStandardAspectData(aspect, label, overcast, requireOptions, initialValue,) {
+      if (aspect.enabled) {
+         // Check for options
+         const option = [];
+         if (aspect.option) {
+            for (const [key, value] of Object.entries(aspect.option)) {
+               if (value === true) {
+                  option.push(key);
+               }
+            }
+         }
+
+         if (!requireOptions || option.length > 0) {
+            // Initialize aspect entry
+            const aspectEntry = {
+               label: label,
+               cost: aspect.cost,
+            };
+
+            // Overcast
+            if (overcast) {
+               aspectEntry.overcast = true;
+            }
+
+            // Initial value
+            if (overcast === true) {
+               aspectEntry.initialValue = initialValue;
+            }
+            else if (aspect.value) {
+               aspectEntry.initialValue = aspect.value;
+            }
+
+            // Options
+            if (option.length > 0) {
+               aspectEntry.option = option;
+            }
+
+            // Resistance check
+            if (aspect.resistanceCheck && aspect.resistanceCheck !== "none") {
+               aspectEntry.resistanceCheck = aspect.resistanceCheck;
+            }
+
+            // Push to the aspects array
+            this.parent.system.aspects.push(aspectEntry);
+
          }
       }
    }
