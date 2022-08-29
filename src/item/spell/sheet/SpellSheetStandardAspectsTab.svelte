@@ -212,6 +212,9 @@
                   @include flex-row;
                   @include flex-group-center;
                   width: 100%;
+                  &:not(:first-child) {
+                     margin-top: 0.5rem;
+                  }
 
                   .divider {
                      @include border-right;
