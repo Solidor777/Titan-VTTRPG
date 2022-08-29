@@ -56,6 +56,17 @@
 <div class="aspects-tab">
    <ScrollingContainer>
       <ol class="aspects-list">
+         {#each Object.entries($document.system.standardAspects) as [key, aspect]}
+            <li class="aspect">
+               <div class="aspect-enable">
+                  <SpellSheetEnableAspectButton
+                     bind:enabled={$document.system.standardAspects[key].enabled}
+                     label={localize(`LOCAL.${key}.label`)}
+                     cost={$document.system.standardAspects[key].cost}
+                  />
+               </div>
+            </li>
+         {/each}
          <!--Range-->
          <li class="aspect">
             <!--Enable-->

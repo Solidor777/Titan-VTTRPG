@@ -3,7 +3,7 @@ import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
 export class TitanSpell extends TitanTypeComponent {
    prepareDerivedData() {
       // Reset aspects array
-      this.parent.system.aspects = [];
+      this.parent.aspects = [];
 
       // Reference to standard aspects
       const standardAspects = this.parent.system.standardAspects;
@@ -100,8 +100,16 @@ export class TitanSpell extends TitanTypeComponent {
       this._calculateStandardAspectCost(standardAspects.removeCondition, 0, 2, 5);
       this._prepareStandardAspectData(standardAspects.removeCondition, game.i18n.localize("LOCAL.removeCondition.label"), false, true, false);
 
+      // Decrease Speed
+      this._calculateStandardAspectCost(standardAspects.decreaseSpeed, 0, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseSpeed, game.i18n.localize("LOCAL.decreaseSpeed.label"), true, true, 1);
 
-      console.log(this.parent.system.aspects);
+      // Increase Speed
+      this._calculateStandardAspectCost(standardAspects.increaseSpeed, 0, 1);
+      this._prepareStandardAspectData(standardAspects.increaseSpeed, game.i18n.localize("LOCAL.increaseSpeed.label"), true, true, 1);
+
+
+      console.log(this.parent.aspects);
    }
 
    _calculateStandardAspectCost(aspect, enabledCost, optionCost, allOptionCost) {
@@ -185,8 +193,7 @@ export class TitanSpell extends TitanTypeComponent {
             }
 
             // Push to the aspects array
-            this.parent.system.aspects.push(aspectEntry);
-
+            this.parent.aspects.push(aspectEntry);
          }
       }
    }

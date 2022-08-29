@@ -310,6 +310,8 @@
   "LOCAL.wounds.max.label": "Max Wounds = (Body + Mind + Soul) / 2, rounded up.",
   "LOCAL.wounds.valueDesc.label": "Wounds Taken. Mortally Wounded when Max Wounds are Taken.",
   "LOCAL.zone.label": "Zone",
+  "LOCAL.decreaseSpeed.label": "Decrease Speed",
+  "LOCAL.increaseSpeed.label": "Increase Speed",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
