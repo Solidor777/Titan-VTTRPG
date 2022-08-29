@@ -3,7 +3,7 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
    import { getSpellRangeOptions } from "~/item/spell/SpellRangeOptions.js";
-   import { getSpellTargetOptions } from "~/item/spell/SpellTargetOptions.js";
+   import { getSpellRadiusOptions } from "~/item/spell/SpellRadiusOptions.js";
    import { getSpellIncreaseDecreaseSpeedOptions } from "~/item/spell/SpellIncreaseDecreaseSpeedOptions.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
@@ -18,7 +18,7 @@
    // Initialize select options
    const selectOptions = {
       range: getSpellRangeOptions(),
-      target: getSpellTargetOptions(),
+      radius: getSpellRadiusOptions(),
    };
    for (const [key, value] of Object.entries(selectOptions)) {
       value.forEach((element) => {

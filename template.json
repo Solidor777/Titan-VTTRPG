@@ -406,9 +406,9 @@
           "enabled": true,
           "value": "self"
         },
-        "target": {
-          "enabled": true,
-          "value": "target"
+        "radius": {
+          "enabled": false,
+          "value": "m5"
         },
         "damage": {
           "enabled": false,

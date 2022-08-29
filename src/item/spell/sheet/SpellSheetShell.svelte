@@ -73,21 +73,23 @@
                      </div>
 
                      <!--Options-->
-                     <div class="aspect-options">
-                        {#if aspect.allOptions}
-                           <!--All Options-->
-                           <div class="aspect-option">
-                              {localize("LOCAL.all.label")}
-                           </div>
-                        {:else if aspect.option}
-                           {#each aspect.option as option}
-                              <!--Each option-->
+                     {#if aspect.option}
+                        <div class="aspect-options">
+                           {#if aspect.allOptions}
+                              <!--All Options-->
                               <div class="aspect-option">
-                                 {localize(`LOCAL.${option}.label`)}
+                                 {localize("LOCAL.all.label")}
                               </div>
-                           {/each}
-                        {/if}
-                     </div>
+                           {:else}
+                              {#each aspect.option as option}
+                                 <!--Each option-->
+                                 <div class="aspect-option">
+                                    {localize(`LOCAL.${option}.label`)}
+                                 </div>
+                              {/each}
+                           {/if}
+                        </div>
+                     {/if}
 
                      <!--Initial Value-->
                      {#if aspect.initialValue}
@@ -187,17 +189,36 @@
                .aspect {
                   @include flex-column;
                   @include flex-group-top;
-                  @include border;
                   width: 100%;
-                  padding: 0.25rem;
 
                   &:not(:first-child) {
+                     @include border-top;
+                     padding-top: 0.25rem;
                      margin-top: 0.25rem;
                   }
 
                   .aspect-label {
+                     @include flex-row;
+                     @include flex-group-center;
                      font-size: 1rem;
                      font-weight: bold;
+                  }
+
+                  .aspect-options {
+                     @include flex-row;
+                     @include flex-group-center;
+                     margin-top: 0.25rem;
+                     margin-bottom: 0.25rem;
+                     flex-wrap: wrap;
+                     width: 100%;
+
+                     .aspect-option {
+                        @include border;
+                        font-size: 0.9rem;
+                        font-weight: bold;
+                        margin: 0.25rem;
+                        padding: 0.25rem;
+                     }
                   }
                }
             }

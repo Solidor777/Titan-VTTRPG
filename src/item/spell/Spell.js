@@ -21,12 +21,11 @@ export class TitanSpell extends TitanTypeComponent {
 
       // Target
       const targetCosts = {
-         target: 0,
-         m5Radius: 3,
-         m10Radius: 6,
+         m5: 3,
+         m10: 6,
       };
-      this._calculateStandardAspectCost(standardAspects.target, targetCosts, 0);
-      this._prepareStandardAspectData(standardAspects.target, game.i18n.localize("LOCAL.target.label"), false, false, false);
+      this._calculateStandardAspectCost(standardAspects.radius, targetCosts, 0);
+      this._prepareStandardAspectData(standardAspects.radius, game.i18n.localize("LOCAL.radius.label"), false, false, false);
 
       // Damage
       this._calculateStandardAspectCost(standardAspects.damage, 1, 1);
