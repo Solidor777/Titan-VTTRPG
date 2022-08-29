@@ -1,5 +1,5 @@
 <script>
-   import NumberSelect from "../../helpers/svelte-components/NumberSelect.svelte";
+   import NumberSelect from "~/helpers/svelte-components/NumberSelect.svelte";
 
    // Value
    export let difficulty = void 0;

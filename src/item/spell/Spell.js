@@ -93,7 +93,7 @@ export class TitanSpell extends TitanTypeComponent {
          stunned: 4,
          unconscious: 7
       };
-      this._calculateStandardAspectCost(standardAspects.inflictCondition, 0, inflictConditionCosts);
+      this._calculateStandardAspectCost(standardAspects.inflictCondition, 0, inflictConditionCosts, false, true);
       this._prepareStandardAspectData(standardAspects.inflictCondition, game.i18n.localize("LOCAL.inflictCondition.label"), false, true, false);
 
       // Remove Condition
@@ -101,18 +101,18 @@ export class TitanSpell extends TitanTypeComponent {
       this._prepareStandardAspectData(standardAspects.removeCondition, game.i18n.localize("LOCAL.removeCondition.label"), false, true, false);
 
       // Decrease Speed
-      this._calculateStandardAspectCost(standardAspects.decreaseSpeed, 0, 1);
+      const speedCosts = new Map();
+      speedCosts.set(5, 1);
+      speedCosts.set(10, 3);
+      this._calculateStandardAspectCost(standardAspects.decreaseSpeed, 0, speedCosts);
       this._prepareStandardAspectData(standardAspects.decreaseSpeed, game.i18n.localize("LOCAL.decreaseSpeed.label"), true, true, 1);
 
       // Increase Speed
-      this._calculateStandardAspectCost(standardAspects.increaseSpeed, 0, 1);
+      this._calculateStandardAspectCost(standardAspects.increaseSpeed, 0, speedCosts);
       this._prepareStandardAspectData(standardAspects.increaseSpeed, game.i18n.localize("LOCAL.increaseSpeed.label"), true, true, 1);
-
-
-      console.log(this.parent.aspects);
    }
 
-   _calculateStandardAspectCost(aspect, enabledCost, optionCost, allOptionCost) {
+   _calculateStandardAspectCost(aspect, enabledCost, optionCost, allOptionCost, uniqueOptionCost) {
       // If enabled
       if (aspect.enabled) {
          // If all options
@@ -129,7 +129,12 @@ export class TitanSpell extends TitanTypeComponent {
             if (aspect.option) {
                for (const [key, value] of Object.entries(aspect.option)) {
                   if (value === true) {
-                     aspect.cost += typeof optionCost === 'object' ? optionCost[key] : optionCost;
+                     if (uniqueOptionCost) {
+                        aspect.cost += optionCost[key];
+                     }
+                     else {
+                        aspect.cost += typeof optionCost === 'object' ? optionCost.get(aspect.value) : optionCost;
+                     }
                   }
                }
             }

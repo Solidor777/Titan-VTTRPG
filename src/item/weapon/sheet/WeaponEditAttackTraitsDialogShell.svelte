@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { WeaponAttackTraits } from "~/item/weapon/WeaponAttackTraits";
+   import { getWeaponAttackTraits } from "~/item/weapon/WeaponAttackTraits";
    import DocumentEditTraitsDialog from "~/documents/components/DocumentEditTraitsDialog.svelte";
 
    // The weapon document owning the attack
@@ -11,7 +11,7 @@
    export let attackIdx = void 0;
 
    // The trait options
-   let traitOptions = structuredClone(WeaponAttackTraits);
+   let traitOptions = getWeaponAttackTraits();
 </script>
 
 <div class="weapon-edit-trait-dialog">

@@ -1,5 +1,5 @@
-export const WeaponAttackTraits = Object.freeze(
-   [
+export function getWeaponAttackTraits() {
+   return [
       {
          name: "blast",
          type: "number",
@@ -95,5 +95,5 @@ export const WeaponAttackTraits = Object.freeze(
          type: "boolean",
          value: false,
       },
-   ]
-);
+   ];
+}

@@ -312,6 +312,7 @@
   "LOCAL.zone.label": "Zone",
   "LOCAL.decreaseSpeed.label": "Decrease Speed",
   "LOCAL.increaseSpeed.label": "Increase Speed",
+  "LOCAL.allOptions.label": "All Options",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

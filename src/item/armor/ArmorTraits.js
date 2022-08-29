@@ -1,9 +1,9 @@
-export const ArmorTraits = Object.freeze(
-   [
+export function getArmorTraits() {
+   return [
       {
          name: "magical",
          type: "boolean",
          value: false,
       }
-   ]
-);
+   ];
+}

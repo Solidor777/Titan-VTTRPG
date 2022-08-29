@@ -538,6 +538,7 @@
         },
         "decreaseSpeed": {
           "enabled": true,
+          "value": 5,
           "resistanceCheck": "none",
           "option": {
             "stride": false,
@@ -548,6 +549,7 @@
         },
         "increaseSpeed": {
           "enabled": true,
+          "value": 5,
           "option": {
             "stride": false,
             "fly": false,

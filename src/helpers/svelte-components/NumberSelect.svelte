@@ -3,7 +3,7 @@
    export let value = void 0;
 </script>
 
-<select bind:value selected={value}>
+<select bind:value selected={value} on:change>
    {#each options as option}
       <option value={option}>
          {option}
