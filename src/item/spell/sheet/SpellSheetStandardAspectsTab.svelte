@@ -1,13 +1,11 @@
 <script>
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
 
@@ -57,9 +55,9 @@
 
 <div class="aspects-tab">
    <ScrollingContainer>
-      <div class="aspects-list">
+      <ol class="aspects-list">
          <!--Range-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -82,10 +80,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Target-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -108,10 +106,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Damage-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -156,10 +154,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Healing-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -168,10 +166,10 @@
                   cost={$document.system.standardAspects.healing.cost}
                />
             </div>
-         </div>
+         </li>
 
          <!--Rounds-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -180,10 +178,10 @@
                   cost={$document.system.standardAspects.rounds.cost}
                />
             </div>
-         </div>
+         </li>
 
          <!--Decrease Mod-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -224,10 +222,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Increase Mod-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -251,10 +249,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Decrease Rating-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -295,10 +293,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Increase Rating-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -322,10 +320,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Decrease Attribute-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -366,10 +364,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Increase Attribute-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -393,10 +391,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Decrease Skill-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -437,10 +435,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Increase Skill-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -464,10 +462,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Inflict Condition-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -508,10 +506,10 @@
                   </div>
                </div>
             {/if}
-         </div>
+         </li>
 
          <!--Remove Condition-->
-         <div class="aspect">
+         <li class="aspect">
             <!--Enable-->
             <div class="aspect-enable">
                <SpellSheetEnableAspectButton
@@ -554,8 +552,8 @@
                   {/if}
                </div>
             {/if}
-         </div>
-      </div>
+         </li>
+      </ol>
    </ScrollingContainer>
 </div>
 
@@ -569,6 +567,9 @@
       .aspects-list {
          @include flex-column;
          @include flex-group-top;
+         list-style: none;
+         padding: 0;
+         margin: 0;
          width: 100%;
 
          .aspect {
