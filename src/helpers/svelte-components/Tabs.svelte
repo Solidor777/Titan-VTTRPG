@@ -61,6 +61,7 @@
          li {
             @include flex-row;
             width: 100%;
+            height: 100%;
             button {
                @include flex-row;
                @include flex-group-center;

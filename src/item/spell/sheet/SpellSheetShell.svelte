@@ -10,6 +10,7 @@
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
    import SpellSheetStandardDescriptionTab from "./SpellSheetStandardDescriptionTab.svelte";
    import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
+   import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
 
    // Setup
@@ -22,11 +23,14 @@
    // Tabs
    const tabs = [
       { label: localize("LOCAL.description.label"), id: "description", component: SpellSheetStandardDescriptionTab },
-      { label: localize("LOCAL.aspects.label"), id: "aspects", component: SpellSheetStandardAspectsTab },
+      {
+         label: localize("LOCAL.standardAspects.label"),
+         id: "standardAspects",
+         component: SpellSheetStandardAspectsTab,
+      },
+      { label: localize("LOCAL.customAspects.label"), id: "customAspects", component: SpellSheetCustomAspectsTab },
    ];
-   application.activeTab = application.activeTab ?? "aspects";
-
-   console.log($document.aspects);
+   application.activeTab = application.activeTab ?? "standardAspects";
 </script>
 
 <ApplicationShell bind:elementRoot>

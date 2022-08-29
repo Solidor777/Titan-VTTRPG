@@ -315,6 +315,10 @@
   "LOCAL.increaseSpeed.label": "Increase Speed",
   "LOCAL.allOptions.label": "All Options",
   "LOCAL.radius.label": "Radius",
+  "LOCAL.standardAspects.label": "Standard Aspects",
+  "LOCAL.customAspects.label": "Custom Aspects",
+  "LOCAL.customAspect.label": "Custom Aspect",
+  "LOCAL.addCustomAspect.label": "Add Custom Aspect",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

@@ -201,4 +201,25 @@ export class TitanSpell extends TitanTypeComponent {
          }
       }
    }
+
+   getCustomAspectTemplate() {
+      return {
+         label: game.i18n.localize("LOCAL.customAspect.label"),
+         overcast: true,
+         initialValue: 1,
+         cost: 1,
+         resistanceCheck: "none",
+      };
+   }
+
+   addCustomAspect() {
+      const system = this.parent.system;
+      system.customAspects.push(this.getCustomAspectTemplate());
+      this.parent.update({
+         system: system
+      });
+      console.log(this.parent.system.customAspects);
+   }
+
+
 }

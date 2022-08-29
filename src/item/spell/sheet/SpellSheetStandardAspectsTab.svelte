@@ -40,7 +40,7 @@
    }
 </script>
 
-<div class="aspects-tab">
+<div class="standard-aspects-tab">
    <ScrollingContainer>
       <ol class="aspects-list">
          <!--Each Aspect-->
@@ -128,7 +128,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .aspects-tab {
+   .standard-aspects-tab {
       width: 100%;
       height: 100%;
 
