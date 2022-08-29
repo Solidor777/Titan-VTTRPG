@@ -116,6 +116,7 @@
   "LOCAL.expertise.label": "Expertise",
   "LOCAL.exp.label": "EXP",
   "LOCAL.extraSuccesses.label": "Extra Successes",
+  "LOCAL.extraSuccesses.short.label": "ES",
   "LOCAL.extreme.label": "Extreme",
   "LOCAL.failed.label": "Failed",
   "LOCAL.filter.label": "Filter",

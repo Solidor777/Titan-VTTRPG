@@ -25,6 +25,8 @@
       { label: localize("LOCAL.aspects.label"), id: "aspects", component: SpellSheetStandardAspectsTab },
    ];
    application.activeTab = application.activeTab ?? "aspects";
+
+   console.log($document.aspects);
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -58,7 +60,51 @@
       <!--Content-->
       <div class="content">
          <div class="sidebar">
-            <div class="stats">Sidebar</div>
+            <div class="stats" />
+
+            <!--Aspects List-->
+            <ol class="aspects-list">
+               {#each $document.aspects as aspect}
+                  <!--Each Aspect-->
+                  <li class="aspect">
+                     <!--Label-->
+                     <div class="aspect-label">
+                        {aspect.label}
+                     </div>
+
+                     <!--Options-->
+                     <div class="aspect-options">
+                        {#if aspect.allOptions}
+                           <!--All Options-->
+                           <div class="aspect-option">
+                              {localize("LOCAL.all.label")}
+                           </div>
+                        {:else if aspect.option}
+                           {#each aspect.option as option}
+                              <!--Each option-->
+                              <div class="aspect-option">
+                                 {localize(`LOCAL.${option}.label`)}
+                              </div>
+                           {/each}
+                        {/if}
+                     </div>
+
+                     <!--Initial Value-->
+                     {#if aspect.initialValue}
+                        <div class="aspect-value">
+                           {typeof aspect.initialValue === `string`
+                              ? localize(`LOCAL.${aspect.initialValue}.label`)
+                              : aspect.initialValue}
+                           {#if aspect.overcast}
+                              {`+ ${aspect.cost > 1 ? `${aspect.cost} / ` : ``} ${localize(
+                                 "LOCAL.extraSuccesses.short.label"
+                              )}`}
+                           {/if}
+                        </div>
+                     {/if}
+                  </li>
+               {/each}
+            </ol>
          </div>
          <div class="description">
             <Tabs {tabs} bind:activeTab={application.activeTab} />
@@ -129,6 +175,32 @@
             min-width: 13rem;
             padding: 0.5rem;
             margin-top: 0.5rem;
+
+            .aspects-list {
+               @include flex-column;
+               @include flex-group-top;
+               list-style: none;
+               padding: 0;
+               margin: 0;
+               width: 100%;
+
+               .aspect {
+                  @include flex-column;
+                  @include flex-group-top;
+                  @include border;
+                  width: 100%;
+                  padding: 0.25rem;
+
+                  &:not(:first-child) {
+                     margin-top: 0.25rem;
+                  }
+
+                  .aspect-label {
+                     font-size: 1rem;
+                     font-weight: bold;
+                  }
+               }
+            }
          }
 
          .description {

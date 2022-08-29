@@ -31,46 +31,6 @@
    });
    selectOptions.decreaseSpeed = selectOptions.increaseSpeed;
 
-   // Range Options
-   const rangeOptions = [
-      {
-         value: "self",
-         label: localize("LOCAL.self.label"),
-      },
-      {
-         value: "touch",
-         label: localize("LOCAL.touch.label"),
-      },
-      {
-         value: "m10",
-         label: localize("LOCAL.m10.label"),
-      },
-      {
-         value: "m30",
-         label: localize("LOCAL.m30.label"),
-      },
-      {
-         value: "m50",
-         label: localize("LOCAL.m50.label"),
-      },
-   ];
-
-   // Target Options
-   const targetOptions = [
-      {
-         value: "target",
-         label: localize("LOCAL.target.label"),
-      },
-      {
-         value: "m5Radius",
-         label: localize("LOCAL.m5Radius.label"),
-      },
-      {
-         value: "m10Radius",
-         label: localize("LOCAL.m10Radius.label"),
-      },
-   ];
-
    function hasDetails(key) {
       return (
          $document.system.standardAspects[key].option ||
@@ -214,14 +174,6 @@
                   width: 100%;
                   &:not(:first-child) {
                      margin-top: 0.5rem;
-                  }
-
-                  .divider {
-                     @include border-right;
-                     height: 100%;
-                     padding-right: 0.5rem;
-                     margin-right: 0.5rem;
-                     margin-left: 0.5rem;
                   }
 
                   .stat {
