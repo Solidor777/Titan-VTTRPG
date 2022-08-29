@@ -108,6 +108,18 @@
                            {/if}
                         </div>
                      {/if}
+
+                     <!--Resistance Check-->
+                     {#if aspect.resistanceCheck}
+                        <div class="aspect-resistance-check">
+                           <div class="resistance-check-label">
+                              {localize("LOCAL.resistedBy.label")}
+                           </div>
+                           <div class="resistance-check-value {aspect.resistanceCheck}">
+                              {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
+                           </div>
+                        </div>
+                     {/if}
                   </li>
                {/each}
             </ol>
@@ -222,6 +234,35 @@
                         font-weight: bold;
                         margin: 0.25rem;
                         padding: 0.25rem;
+                     }
+                  }
+
+                  .aspect-resistance-check {
+                     @include flex-column;
+                     @include flex-group-top;
+                     margin-top: 0.5rem;
+
+                     .resistance-check-label {
+                        font-size: 0.9rem;
+                        font-weight: bold;
+                     }
+
+                     .resistance-check-value {
+                        @include border;
+                        margin-top: 0.25rem;
+                        padding: 0.25rem;
+
+                        &.reflexes {
+                           background-color: var(--reflexes-color-bright);
+                        }
+
+                        &.resilience {
+                           background-color: var(--resilience-color-bright);
+                        }
+
+                        &.willpower {
+                           background-color: var(--willpower-color-bright);
+                        }
                      }
                   }
                }

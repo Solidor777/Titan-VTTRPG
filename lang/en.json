@@ -319,6 +319,7 @@
   "LOCAL.customAspects.label": "Custom Aspects",
   "LOCAL.customAspect.label": "Custom Aspect",
   "LOCAL.addCustomAspect.label": "Add Custom Aspect",
+  "LOCAL.resistedBy.label": "Resisted by",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
