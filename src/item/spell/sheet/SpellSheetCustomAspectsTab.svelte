@@ -13,13 +13,11 @@
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
-   console.log($document.system.customAspects);
-   function addCustomAspect() {
-      $document.spell.addCustomAspect();
-   }
 </script>
 
 <div class="aspects-tab">
@@ -30,14 +28,28 @@
             <li class="aspect">
                <!--Enable Header-->
                <div class="aspect-header">
-                  {$document.system.customAspects[idx].label}
+                  <div class="label-input">
+                     <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
+                  </div>
+                  <div>
+                     <IconButton
+                        icon={"fas fa-trash"}
+                        efx={ripple}
+                        on:click={() => {
+                           $document.spell.removeCustomAspect(idx);
+                        }}
+                     />
+                  </div>
                </div>
             </li>
          {/each}
       </ol>
       <div class="add-aspect-button">
-         <EfxButton efx={ripple} on:click={addCustomAspect}
-            >{localize("LOCAL.addCustomAspect.label")}<i class="fas fa-circle-plus" /></EfxButton
+         <EfxButton
+            efx={ripple}
+            on:click={() => {
+               $document.spell.addCustomAspect();
+            }}>{localize("LOCAL.addCustomAspect.label")}<i class="fas fa-circle-plus" /></EfxButton
          >
       </div>
    </ScrollingContainer>
@@ -61,63 +73,35 @@
          .aspect {
             @include flex-column;
             @include flex-group-top;
+            @include border;
             width: 100%;
-            margin: 0.25rem;
+            font-size: 1rem;
 
-            .aspect-enable {
+            .aspect-header {
                @include flex-row;
+               @include flex-space-between;
+               box-sizing: border-box;
                width: 100%;
+               font-weight: bold;
+               padding: 0.25rem;
+
+               .label-input {
+                  @include flex-row;
+                  @include flex-group-center;
+                  height: 100%;
+                  --input-height: 100%;
+               }
             }
 
-            .aspect-details {
-               @include flex-column;
-               @include flex-group-top;
-               @include z-index-app;
-               padding: 0.5rem;
-               width: calc(100% - 30px);
-               background-color: var(--label-background-color);
-               border-right: var(--border-style);
-               border-left: var(--border-style);
-               border-bottom: var(--border-style);
-               border-bottom-right-radius: var(--border-radius);
-               border-bottom-left-radius: var(--border-radius);
-               border-width: var(--border-width);
-               border-color: var(--border-color-normal);
-               font-size: 0.9rem;
-               --font-size: 0.9rem;
-
-               .row {
-                  @include flex-row;
-                  @include flex-group-center;
-                  width: 100%;
-                  &:not(:first-child) {
-                     margin-top: 0.5rem;
-                  }
-
-                  .stat {
-                     @include flex-row;
-                     @include flex-group-center;
-                     font-weight: bold;
-
-                     .input {
-                        margin-left: 0.25rem;
-                     }
-                  }
-               }
-
-               .toggles {
-                  @include flex-row;
-                  @include flex-group-center;
-                  margin-top: 0.5rem;
-                  flex-wrap: wrap;
-                  width: 100%;
-               }
+            &:not(:first-child) {
+               margin-top: 0.25rem;
             }
          }
       }
 
       .add-aspect-button {
          @include flex-row;
+         margin-top: 0.25rem;
 
          .fas {
             margin-left: 0.25rem;

@@ -144,7 +144,10 @@
             @include flex-column;
             @include flex-group-top;
             width: 100%;
-            margin: 0.25rem;
+
+            &:not(:first-child) {
+               margin-top: 0.25rem;
+            }
 
             .aspect-enable {
                @include flex-row;

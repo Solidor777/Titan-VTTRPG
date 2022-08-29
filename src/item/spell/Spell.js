@@ -218,8 +218,17 @@ export class TitanSpell extends TitanTypeComponent {
       this.parent.update({
          system: system
       });
-      console.log(this.parent.system.customAspects);
+
+      return;
    }
 
+   removeCustomAspect(idx) {
+      const system = this.parent.system;
+      system.customAspects.splice(idx, 1);
+      this.parent.update({
+         system: system
+      });
 
+      return;
+   }
 }
