@@ -254,8 +254,6 @@ export class TitanSpell extends TitanTypeComponent {
          aspectEntry.resistanceCheck = aspect.resistanceCheck;
       }
 
-      console.log(aspectEntry);
-
       this.parent.aspects.push(aspectEntry);
 
       return;

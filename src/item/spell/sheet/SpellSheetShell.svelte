@@ -5,6 +5,7 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
@@ -67,64 +68,66 @@
             <div class="stats" />
 
             <!--Aspects List-->
-            <ol class="aspects-list">
-               {#each $document.aspects as aspect}
-                  <!--Each Aspect-->
-                  <li class="aspect">
-                     <!--Label-->
-                     <div class="aspect-label">
-                        {aspect.label}
-                     </div>
-
-                     <!--Options-->
-                     {#if aspect.option}
-                        <div class="aspect-options">
-                           {#if aspect.allOptions}
-                              <!--All Options-->
-                              <div class="aspect-option">
-                                 {localize("LOCAL.all.label")}
-                              </div>
-                           {:else}
-                              {#each aspect.option as option}
-                                 <!--Each option-->
-                                 <div class="aspect-option">
-                                    {localize(`LOCAL.${option}.label`)}
-                                 </div>
-                              {/each}
-                           {/if}
+            <ScrollingContainer>
+               <ol class="aspects-list">
+                  {#each $document.aspects as aspect}
+                     <!--Each Aspect-->
+                     <li class="aspect">
+                        <!--Label-->
+                        <div class="aspect-label">
+                           {aspect.label}
                         </div>
-                     {/if}
 
-                     <!--Initial Value-->
-                     {#if aspect.initialValue}
-                        <div class="aspect-value">
-                           {typeof aspect.initialValue === `string`
-                              ? localize(`LOCAL.${aspect.initialValue}.label`)
-                              : aspect.initialValue} +
-                           {#if aspect.overcast}
-                              {#if aspect.cost > 1}
-                                 {localize(`(${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`)}
-                              {:else}
-                                 {localize("LOCAL.extraSuccesses.short.label")}
+                        <!--Initial Value-->
+                        {#if aspect.initialValue}
+                           <div class="aspect-value">
+                              {typeof aspect.initialValue === `string`
+                                 ? localize(`LOCAL.${aspect.initialValue}.label`)
+                                 : aspect.initialValue}
+                              {#if aspect.overcast}
+                                 {#if aspect.cost > 1}
+                                    {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
+                                 {:else}
+                                    {`+ ${localize("LOCAL.extraSuccesses.short.label")}`}
+                                 {/if}
                               {/if}
-                           {/if}
-                        </div>
-                     {/if}
+                           </div>
+                        {/if}
 
-                     <!--Resistance Check-->
-                     {#if aspect.resistanceCheck}
-                        <div class="aspect-resistance-check">
-                           <div class="resistance-check-label">
-                              {localize("LOCAL.resistedBy.label")}
+                        <!--Options-->
+                        {#if aspect.option}
+                           <div class="aspect-options">
+                              {#if aspect.allOptions}
+                                 <!--All Options-->
+                                 <div class="aspect-option">
+                                    {localize("LOCAL.all.label")}
+                                 </div>
+                              {:else}
+                                 {#each aspect.option as option}
+                                    <!--Each option-->
+                                    <div class="aspect-option">
+                                       {localize(`LOCAL.${option}.label`)}
+                                    </div>
+                                 {/each}
+                              {/if}
                            </div>
-                           <div class="resistance-check-value {aspect.resistanceCheck}">
-                              {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
+                        {/if}
+
+                        <!--Resistance Check-->
+                        {#if aspect.resistanceCheck}
+                           <div class="aspect-resistance-check">
+                              <div class="resistance-check-label">
+                                 {localize("LOCAL.resistedBy.label")}
+                              </div>
+                              <div class="resistance-check-value {aspect.resistanceCheck}">
+                                 {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
+                              </div>
                            </div>
-                        </div>
-                     {/if}
-                  </li>
-               {/each}
-            </ol>
+                        {/if}
+                     </li>
+                  {/each}
+               </ol>
+            </ScrollingContainer>
          </div>
          <div class="description">
             <Tabs {tabs} bind:activeTab={application.activeTab} />
@@ -212,7 +215,7 @@
                   &:not(:first-child) {
                      @include border-top;
                      padding-top: 0.25rem;
-                     margin-top: 0.25rem;
+                     margin-top: 0.5rem;
                   }
 
                   .aspect-label {
@@ -226,7 +229,6 @@
                      @include flex-row;
                      @include flex-group-center;
                      margin-top: 0.25rem;
-                     margin-bottom: 0.25rem;
                      flex-wrap: wrap;
                      width: 100%;
 

@@ -2,16 +2,10 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
-   import { getSpellRangeOptions } from "~/item/spell/SpellRangeOptions.js";
-   import { getSpellRadiusOptions } from "~/item/spell/SpellRadiusOptions.js";
-   import { getSpellIncreaseDecreaseSpeedOptions } from "~/item/spell/SpellIncreaseDecreaseSpeedOptions.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
-   import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
-   import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
