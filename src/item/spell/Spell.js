@@ -109,6 +109,13 @@ export class TitanSpell extends TitanTypeComponent {
       // Increase Speed
       this._calculateStandardAspectCost(standardAspects.increaseSpeed, 0, speedCosts);
       this._prepareStandardAspectData(standardAspects.increaseSpeed, game.i18n.localize("LOCAL.increaseSpeed.label"), true, true, 1);
+
+      // Process custom aspects
+      this.parent.system.customAspects.forEach((element) => {
+         this._prepareCustomAspectData(element);
+      });
+
+      return;
    }
 
    _calculateStandardAspectCost(aspect, enabledCost, optionCost, allOptionCost, uniqueOptionCost) {
@@ -228,6 +235,28 @@ export class TitanSpell extends TitanTypeComponent {
       this.parent.update({
          system: system
       });
+
+      return;
+   }
+
+   _prepareCustomAspectData(aspect) {
+      const aspectEntry = {
+         label: aspect.label,
+         cost: Math.max(1, aspect.cost)
+      };
+
+      if (aspect.overcast && aspect.initialValue) {
+         aspectEntry.overcast = true;
+         aspectEntry.initialValue = Math.max(0, aspect.initialValue);
+      }
+
+      if (aspect.resistanceCheck !== "none") {
+         aspectEntry.resistanceCheck = aspect.resistanceCheck;
+      }
+
+      console.log(aspectEntry);
+
+      this.parent.aspects.push(aspectEntry);
 
       return;
    }

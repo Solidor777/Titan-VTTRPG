@@ -100,11 +100,13 @@
                         <div class="aspect-value">
                            {typeof aspect.initialValue === `string`
                               ? localize(`LOCAL.${aspect.initialValue}.label`)
-                              : aspect.initialValue}
+                              : aspect.initialValue} +
                            {#if aspect.overcast}
-                              {`+ ${aspect.cost > 1 ? `${aspect.cost} / ` : ``} ${localize(
-                                 "LOCAL.extraSuccesses.short.label"
-                              )}`}
+                              {#if aspect.cost > 1}
+                                 {localize(`(${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`)}
+                              {:else}
+                                 {localize("LOCAL.extraSuccesses.short.label")}
+                              {/if}
                            {/if}
                         </div>
                      {/if}

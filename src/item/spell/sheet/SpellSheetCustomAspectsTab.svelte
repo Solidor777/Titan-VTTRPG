@@ -15,6 +15,7 @@
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
@@ -25,12 +26,28 @@
       <ol class="aspects-list">
          <!--Each Aspect-->
          {#each $document.system.customAspects as aspect, idx}
-            <li class="aspect">
-               <!--Enable Header-->
+            <li class="aspect" transition:slide|local>
+               <!--Header-->
                <div class="aspect-header">
+                  <!--Label-->
                   <div class="label-input">
                      <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
                   </div>
+
+                  <!--Cost-->
+                  <div class="aspect-cost">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.cost.label")}:
+                     </div>
+
+                     <!--Input-->
+                     <div class="input">
+                        <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} positive={true} />
+                     </div>
+                  </div>
+
+                  <!--Delete button-->
                   <div>
                      <IconButton
                         icon={"fas fa-trash"}
@@ -41,8 +58,59 @@
                      />
                   </div>
                </div>
-            </li>
-         {/each}
+
+               <div class="row">
+                  <!--Resistance Check-->
+                  <div class="stat">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.resistanceCheck.label")}:
+                     </div>
+
+                     <!--Value-->
+                     <div class="input">
+                        <DocumentResistanceSelectAllowNone
+                           bind:value={$document.system.customAspects[idx].resistanceCheck}
+                        />
+                     </div>
+                  </div>
+
+                  <div class="divider" />
+
+                  <!--Overcast-->
+                  <div class="stat">
+                     <!--Label-->
+                     <div class="label">
+                        {localize("LOCAL.overcast.label")}:
+                     </div>
+
+                     <!--Value-->
+                     <div class="input checkbox">
+                        <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].overcast} />
+                     </div>
+                  </div>
+               </div>
+
+               <!--Initial value-->
+               {#if $document.system.customAspects[idx].overcast}
+                  <div class="row" transition:slide|local>
+                     <div class="stat">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.initialValue.label")}:
+                        </div>
+
+                        <!--Value-->
+                        <div class="input number">
+                           <DocumentIntegerInput
+                              bind:value={$document.system.customAspects[idx].initialValue}
+                              positive={true}
+                           />
+                        </div>
+                     </div>
+                  </div>
+               {/if}
+            </li>{/each}
       </ol>
       <div class="add-aspect-button">
          <EfxButton
@@ -76,6 +144,8 @@
             @include border;
             width: 100%;
             font-size: 1rem;
+            padding: 0.25rem;
+            background-color: var(--label-background-color);
 
             .aspect-header {
                @include flex-row;
@@ -85,11 +155,56 @@
                font-weight: bold;
                padding: 0.25rem;
 
+               .aspect-cost {
+                  @include flex-row;
+                  @include flex-group-center;
+                  height: 100%;
+
+                  .input {
+                     margin-left: 0.25rem;
+                     width: 3rem;
+                  }
+               }
+
                .label-input {
                   @include flex-row;
                   @include flex-group-center;
                   height: 100%;
                   --input-height: 100%;
+               }
+            }
+
+            .row {
+               @include flex-row;
+               @include flex-group-center;
+               font-size: 0.9rem;
+               --font-size: 0.9rem;
+               margin-top: 0.25rem;
+
+               .stat {
+                  @include flex-row;
+                  @include flex-group-center;
+
+                  .label {
+                     font-weight: bold;
+                  }
+
+                  .input {
+                     &:not(.checkbox) {
+                        margin-left: 0.5rem;
+                     }
+
+                     &.number {
+                        width: 3rem;
+                     }
+                  }
+               }
+
+               .divider {
+                  @include border-left;
+                  height: 100%;
+                  margin-left: 0.5rem;
+                  padding-right: 0.5rem;
                }
             }
 
