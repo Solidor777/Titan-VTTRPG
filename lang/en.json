@@ -57,6 +57,7 @@
   "LOCAL.burrow.label": "Burrow",
   "LOCAL.burrow.value.label": "Total Burrow speed.",
   "LOCAL.calculateSuccessCost.label": "Calculate Success Cost",
+  "LOCAL.autoCalculateDifficulty.label": "Auto-Calculate Difficulty",
   "LOCAL.cancel.label": "Cancel",
   "LOCAL.charmed.label": "Charmed",
   "LOCAL.check.label": "Check",
@@ -321,6 +322,8 @@
   "LOCAL.customAspect.label": "Custom Aspect",
   "LOCAL.addCustomAspect.label": "Add Custom Aspect",
   "LOCAL.resistedBy.label": "Resisted by",
+  "LOCAL.suggestedValueAndComplexity.label": "Suggested Value & Complexity",
+  "LOCAL.aspectCosts.label": "Aspect Costs",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

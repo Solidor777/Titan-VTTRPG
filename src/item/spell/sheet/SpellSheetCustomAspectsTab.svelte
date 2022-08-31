@@ -37,7 +37,7 @@
 
                      <!--Input-->
                      <div class="input">
-                        <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} positive={true} />
+                        <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} min={0} />
                      </div>
                   </div>
 
@@ -98,7 +98,7 @@
                         <div class="input number">
                            <DocumentIntegerInput
                               bind:value={$document.system.customAspects[idx].initialValue}
-                              positive={true}
+                              min={0}
                            />
                         </div>
                      </div>

@@ -64,7 +64,7 @@
          {localize("LOCAL.complexity.label")}
       </div>
       <div class="input">
-         <IntegerInput bind:value={checkParameters.complexity} positive={true} />
+         <IntegerInput bind:value={checkParameters.complexity} min={0} />
       </div>
    </div>
 

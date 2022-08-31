@@ -26,6 +26,15 @@
   width: var(--input-width);
 }
 
+@mixin input-disabled {
+  border-style: var(--input-border-style);
+  border-width: var(--input-border-width);
+  border-color: var(--input-border-color);
+  color: var(--font-color);
+  background-color: var(--static-label-background-color);
+  opacity: var(--disabled-opacity);
+}
+
 @mixin border {
   border-style: var(--border-style);
   border-radius: var(--border-radius);

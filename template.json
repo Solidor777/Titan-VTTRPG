@@ -400,6 +400,9 @@
         "base",
         "duration"
       ],
+      "autoCalculateDifficulty": true,
+      "difficulty": 4,
+      "complexity": 1,
       "tradition": "Common",
       "standardAspects": {
         "range": {

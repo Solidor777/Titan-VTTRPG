@@ -1,12 +1,14 @@
 <script>
    import { getContext } from "svelte";
-   import NumberSelect from "~/helpers/svelte-components/NumberSelect.svelte";
+   import IntegerSelect from "~/helpers/svelte-components/IntegerSelect.svelte";
 
    // The value of the input
    export let value = void 0;
 
    // The options for the select
    export let options = void 0;
+
+   export let disabled = false;
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -22,9 +24,10 @@
    }
 </script>
 
-<NumberSelect
+<IntegerSelect
    bind:value
    {options}
+   {disabled}
    on:change={async () => {
       $document.update(data);
    }}

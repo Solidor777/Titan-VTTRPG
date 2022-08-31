@@ -120,6 +120,32 @@ export class TitanSpell extends TitanTypeComponent {
          this._prepareCustomAspectData(element);
       });
 
+      // Calculate total cost
+      let totalAspectCost = 0;
+      this.parent.aspects.forEach((element) => {
+         totalAspectCost += element.cost;
+      });
+      this.parent.totalAspectCost = totalAspectCost;
+
+      // Calculate suggested complexity and difficulty
+      let suggestedDifficulty = totalAspectCost;
+      let suggestedComplexity = 1;
+      if (suggestedDifficulty > 6) {
+         suggestedComplexity += totalAspectCost - 6;
+         suggestedDifficulty = 6;
+      }
+      else {
+         suggestedDifficulty = Math.max(suggestedDifficulty, 4);
+      }
+      this.parent.suggestedDifficulty = suggestedDifficulty;
+      this.parent.suggestedComplexity = suggestedComplexity;
+
+      // Auto calculate difficulty and complexity if appropriate
+      if (this.parent.system.autoCalculateDifficulty) {
+         this.parent.system.difficulty = suggestedDifficulty;
+         this.parent.system.complexity = suggestedComplexity;
+      }
+
       return;
    }
 

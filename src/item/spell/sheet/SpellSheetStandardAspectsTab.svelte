@@ -29,7 +29,7 @@
          },
          {
             value: "m30",
-            label: localize("LOCAL.m40.label"),
+            label: localize("LOCAL.m30.label"),
          },
          {
             value: "m50",

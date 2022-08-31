@@ -5,6 +5,7 @@
   --font-awesome: "Lato";
   --font-family: "Lato";
   --font-size: 1rem;
+  --font-color: black;
 
   // Border styling
   --border-style: solid;
@@ -82,4 +83,7 @@
   --uncommon-color-bright: #d0ffbb;
   --rare-color-bright: #acdcff;
   --unique-color-bright: #ffcfe9;
+
+  // Opacity
+  --disabled-opacity: 1;
 }

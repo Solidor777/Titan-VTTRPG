@@ -9,10 +9,12 @@
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
-   import SpellSheetStandardDescriptionTab from "./SpellSheetStandardDescriptionTab.svelte";
+   import SpellSheetDescriptionTab from "./SpellSheetDescriptionTab.svelte";
+   import SpellSheetDifficultyTab from "./SpellSheetDifficultyTab.svelte";
    import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
    import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
+   import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
 
    // Setup
    export let elementRoot;
@@ -23,15 +25,28 @@
 
    // Tabs
    const tabs = [
-      { label: localize("LOCAL.description.label"), id: "description", component: SpellSheetStandardDescriptionTab },
+      {
+         label: localize("LOCAL.description.label"),
+         id: "description",
+         component: SpellSheetDescriptionTab,
+      },
       {
          label: localize("LOCAL.standardAspects.label"),
          id: "standardAspects",
          component: SpellSheetStandardAspectsTab,
       },
-      { label: localize("LOCAL.customAspects.label"), id: "customAspects", component: SpellSheetCustomAspectsTab },
+      {
+         label: localize("LOCAL.customAspects.label"),
+         id: "customAspects",
+         component: SpellSheetCustomAspectsTab,
+      },
+      {
+         label: localize("LOCAL.difficulty.label"),
+         id: "difficulty",
+         component: SpellSheetDifficultyTab,
+      },
    ];
-   application.activeTab = application.activeTab ?? "standardAspects";
+   application.activeTab = application.activeTab ?? "difficulty";
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -57,6 +72,14 @@
                </div>
                <div class="stat-input">
                   <DocumentRaritySelect bind:value={$document.system.rarity} />
+               </div>
+
+               <!--Tradition-->
+               <div class="stat-label">
+                  {localize("LOCAL.tradition.label")}
+               </div>
+               <div class="stat-input">
+                  <DocumentTextInput bind:value={$document.system.tradition} />
                </div>
             </div>
          </div>

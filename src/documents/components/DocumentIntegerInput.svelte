@@ -7,7 +7,11 @@
    // The value of the input
    export let value;
 
-   export let positive = false;
+   export let min = false;
+
+   export let max = false;
+
+   export let disabled = false;
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -26,7 +30,9 @@
 
 <IntegerInput
    bind:value
-   bind:positive
+   {min}
+   {max}
+   {disabled}
    on:change={async () => {
       $document.update(data);
    }}

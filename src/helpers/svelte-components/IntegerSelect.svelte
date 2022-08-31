@@ -1,9 +1,10 @@
 <script>
    export let options = void 0;
    export let value = void 0;
+   export let disabled = false;
 </script>
 
-<select bind:value selected={value} on:change>
+<select bind:value selected={value} on:change {disabled}>
    {#each options as option}
       <option value={option}>
          {option}
@@ -16,5 +17,9 @@
 
    select {
       @include input;
+
+      &:disabled {
+         @include input-disabled;
+      }
    }
 </style>
