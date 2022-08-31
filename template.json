@@ -420,8 +420,9 @@
         "healing": {
           "enabled": false
         },
-        "rounds": {
-          "enabled": false
+        "duration": {
+          "enabled": false,
+          "value": "rounds"
         },
         "decreaseMod": {
           "enabled": false,

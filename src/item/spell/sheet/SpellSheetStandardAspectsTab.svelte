@@ -2,9 +2,6 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
-   import { getSpellRangeOptions } from "~/item/spell/SpellRangeOptions.js";
-   import { getSpellRadiusOptions } from "~/item/spell/SpellRadiusOptions.js";
-   import { getSpellIncreaseDecreaseSpeedOptions } from "~/item/spell/SpellIncreaseDecreaseSpeedOptions.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
@@ -17,18 +14,59 @@
 
    // Initialize select options
    const selectOptions = {
-      range: getSpellRangeOptions(),
-      radius: getSpellRadiusOptions(),
+      range: [
+         {
+            value: "self",
+            label: localize("LOCAL.self.label"),
+         },
+         {
+            value: "touch",
+            label: localize("LOCAL.touch.label"),
+         },
+         {
+            value: "m10",
+            label: localize("LOCAL.m10.label"),
+         },
+         {
+            value: "m30",
+            label: localize("LOCAL.m40.label"),
+         },
+         {
+            value: "m50",
+            label: localize("LOCAL.m50.label"),
+         },
+      ],
+      radius: [
+         {
+            value: "m5",
+            label: localize("LOCAL.m5.label"),
+         },
+         {
+            value: "m10",
+            label: localize("LOCAL.m10.label"),
+         },
+      ],
+      duration: [
+         {
+            value: "rounds",
+            label: localize("LOCAL.rounds.label"),
+         },
+         {
+            value: "minutes",
+            label: localize("LOCAL.minutes.label"),
+         },
+      ],
+      increaseSpeed: [
+         {
+            value: "m5",
+            label: localize("LOCAL.m5.label"),
+         },
+         {
+            value: "m10",
+            label: localize("LOCAL.10.label"),
+         },
+      ],
    };
-   for (const [key, value] of Object.entries(selectOptions)) {
-      value.forEach((element) => {
-         element.label = localize(`LOCAL.${element.value}.label`);
-      });
-   }
-   selectOptions.increaseSpeed = getSpellIncreaseDecreaseSpeedOptions();
-   selectOptions.increaseSpeed.forEach((element) => {
-      element.label = localize(`LOCAL.m${element.value}.label`);
-   });
    selectOptions.decreaseSpeed = selectOptions.increaseSpeed;
 
    function hasDetails(key) {

@@ -35,9 +35,13 @@ export class TitanSpell extends TitanTypeComponent {
       this._calculateStandardAspectCost(standardAspects.healing, 1);
       this._prepareStandardAspectData(standardAspects.healing, game.i18n.localize("LOCAL.healing.label"), true, false, 1);
 
-      // Rounds
-      this._calculateStandardAspectCost(standardAspects.rounds, 1);
-      this._prepareStandardAspectData(standardAspects.rounds, game.i18n.localize("LOCAL.rounds.label"), true, false, 1);
+      // Duration
+      const durationCosts = {
+         rounds: 1,
+         minutes: 4
+      };
+      this._calculateStandardAspectCost(standardAspects.duration, durationCosts);
+      this._prepareStandardAspectData(standardAspects.duration, game.i18n.localize("LOCAL.rounds.label"), true, false, 1);
 
       // Decrease Mod
       this._calculateStandardAspectCost(standardAspects.decreaseMod, 0, 2);
@@ -100,9 +104,10 @@ export class TitanSpell extends TitanTypeComponent {
       this._prepareStandardAspectData(standardAspects.removeCondition, game.i18n.localize("LOCAL.removeCondition.label"), false, true, false);
 
       // Decrease Speed
-      const speedCosts = new Map();
-      speedCosts.set(5, 1);
-      speedCosts.set(10, 3);
+      const speedCosts = {
+         m5: 1,
+         m10: 3
+      };
       this._calculateStandardAspectCost(standardAspects.decreaseSpeed, 0, speedCosts);
       this._prepareStandardAspectData(standardAspects.decreaseSpeed, game.i18n.localize("LOCAL.decreaseSpeed.label"), true, true, 1);
 

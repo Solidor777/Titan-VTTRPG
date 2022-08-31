@@ -315,6 +315,7 @@
   "LOCAL.increaseSpeed.label": "Increase Speed",
   "LOCAL.allOptions.label": "All Options",
   "LOCAL.radius.label": "Radius",
+  "LOCAL.minutes.label": "Minutes",
   "LOCAL.standardAspects.label": "Standard Aspects",
   "LOCAL.customAspects.label": "Custom Aspects",
   "LOCAL.customAspect.label": "Custom Aspect",
