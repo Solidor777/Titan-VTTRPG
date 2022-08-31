@@ -190,8 +190,9 @@
          .header {
             @include flex-row;
             @include flex-group-center;
+            @include border-bottom;
+            padding-bottom: 0.25rem;
             margin-top: 0.5rem;
-            padding: 0.25rem;
             width: 100%;
             font-weight: bold;
          }
@@ -199,8 +200,7 @@
          ol {
             @include grid(2);
             list-style: none;
-            margin: 0 0.5 0 0;
-            padding: 0;
+            margin: 0.25rem 0 0 0;
 
             li {
                @include flex-row;
