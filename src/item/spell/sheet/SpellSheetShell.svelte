@@ -14,7 +14,8 @@
    import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
    import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
+   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import SpellSheetSidebar from "./SpellSheetSidebar.svelte";
 
    // Setup
    export let elementRoot;
@@ -87,81 +88,8 @@
 
       <!--Content-->
       <div class="content">
-         <div class="sidebar">
-            <!--Casting Check-->
-            <div class="casting-check">
-               <!--Label-->
-               <div class="label">
-                  {localize("LOCAL.castingCheck.label")}:
-               </div>
-               <!--Value-->
-               <div class="value">
-                  {$document.system.check.difficulty}:{$document.system.check.complexity}
-               </div>
-            </div>
-            <!--Aspects List-->
-            <ScrollingContainer>
-               <ol class="aspects-list">
-                  {#each $document.aspects as aspect}
-                     <!--Each Aspect-->
-                     <li class="aspect">
-                        <!--Label-->
-                        <div class="aspect-label">
-                           {aspect.label}
-                        </div>
-
-                        <!--Initial Value-->
-                        {#if aspect.initialValue}
-                           <div class="aspect-value">
-                              {typeof aspect.initialValue === `string`
-                                 ? localize(`LOCAL.${aspect.initialValue}.label`)
-                                 : aspect.initialValue}
-                              {#if aspect.overcast}
-                                 {#if aspect.cost > 1}
-                                    {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
-                                 {:else}
-                                    {`+ ${localize("LOCAL.extraSuccesses.short.label")}`}
-                                 {/if}
-                              {/if}
-                           </div>
-                        {/if}
-
-                        <!--Options-->
-                        {#if aspect.option}
-                           <div class="aspect-options">
-                              {#if aspect.allOptions}
-                                 <!--All Options-->
-                                 <div class="aspect-option">
-                                    {localize("LOCAL.all.label")}
-                                 </div>
-                              {:else}
-                                 {#each aspect.option as option}
-                                    <!--Each option-->
-                                    <div class="aspect-option">
-                                       {localize(`LOCAL.${option}.label`)}
-                                    </div>
-                                 {/each}
-                              {/if}
-                           </div>
-                        {/if}
-
-                        <!--Resistance Check-->
-                        {#if aspect.resistanceCheck}
-                           <div class="aspect-resistance-check">
-                              <div class="resistance-check-label">
-                                 {localize("LOCAL.resistedBy.label")}
-                              </div>
-                              <div class="resistance-check-value {aspect.resistanceCheck}">
-                                 {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
-                              </div>
-                           </div>
-                        {/if}
-                     </li>
-                  {/each}
-               </ol>
-            </ScrollingContainer>
-         </div>
-         <div class="description">
+         <SpellSheetSidebar />
+         <div class="tabs">
             <Tabs {tabs} bind:activeTab={application.activeTab} />
          </div>
       </div>
@@ -318,7 +246,7 @@
             }
          }
 
-         .description {
+         .tabs {
             @include flex-column;
             @include flex-group-top;
             @include border;
