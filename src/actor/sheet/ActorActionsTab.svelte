@@ -127,9 +127,11 @@
       .inventory-filter {
          @include flex-row;
          @include flex-group-center;
+         @include border-bottom;
+         width: 100%;
          font-size: 1rem;
          font-weight: bold;
-         margin-top: 0.5rem;
+         padding: 0.25rem;
 
          .inventory-filter-input {
             font-size: 1rem;
@@ -142,7 +144,6 @@
          @include flex-group-top;
          width: 100%;
          height: 100%;
-         margin-top: 0.5rem;
 
          .category {
             @include flex-column;
@@ -150,6 +151,10 @@
             @include border;
             width: 100%;
             padding: 0.26rem;
+
+            &:not(:first-child) {
+               margin-top: 0.5rem;
+            }
 
             .category-header {
                @include flex-row;

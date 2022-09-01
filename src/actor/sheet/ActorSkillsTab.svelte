@@ -26,13 +26,13 @@
 
 <div class="skill-tab">
    <div class="filter">
-      <div class="filter-label">{localize("LOCAL.filter.label")}:</div>
+      <div class="filter-label">{localize("LOCAL.filter.label")}</div>
       <div class="filter-field"><TextInput bind:value={filter} /></div>
    </div>
    <ScrollingContainer>
       <ol>
          <!--Each skill-->
-         {#each filteredList as [key, skill]}
+         {#each filteredList as [key]}
             <li>
                <!--Button and Attribute-->
                <div class="column">
@@ -118,11 +118,11 @@
       .filter {
          @include flex-row;
          @include flex-group-center;
-         @include border;
+         @include border-bottom;
+         width: 100%;
          box-sizing: border-box;
          font-weight: bold;
-         padding: 0.5rem;
-         margin-top: 0.5rem;
+         padding: 0.25rem;
 
          :not(:first-child) {
             margin-left: 0.5rem;
