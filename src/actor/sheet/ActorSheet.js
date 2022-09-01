@@ -34,7 +34,8 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       inventory: {},
       actions: {
          items: {}
-      }
+      },
+      spells: {},
    };
 
    // Embedded item edit

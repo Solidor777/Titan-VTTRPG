@@ -13,30 +13,6 @@
    // Reference to the application
    const application = getContext("external").application;
 
-   // Items
-   $: items = $document.items;
-
-   // Filter
-   let inventoryFilter = "";
-
-   // Weapons
-   $: weapons = items
-      .filter(
-         (item) =>
-            item.type === "weapon" &&
-            item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1 &&
-            item.system.equipped === true
-      )
-      .sort((a, b) => {
-         if (a.sort < b.sort) {
-            return -1;
-         }
-         if (a.sort > b.sort) {
-            return 1;
-         }
-         return 0;
-      });
-
    // Initialize expanded object
    // Weapons
    $document.items
@@ -62,13 +38,34 @@
 
       return;
    }
+
+   // Filter actions
+   let filter = "";
+
+   // Weapons
+   $: weapons = $document.items
+      .filter(
+         (item) =>
+            item.type === "weapon" &&
+            item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 &&
+            item.system.equipped === true
+      )
+      .sort((a, b) => {
+         if (a.sort < b.sort) {
+            return -1;
+         }
+         if (a.sort > b.sort) {
+            return 1;
+         }
+         return 0;
+      });
 </script>
 
 <div class="inventory-tab">
    <!--Filter-->
    <div class="inventory-filter">
       <div class="inventory-filter-label">{localize("LOCAL.filter.label")}</div>
-      <div class="inventory-filter-input"><TextInput bind:value={inventoryFilter} /></div>
+      <div class="inventory-filter-input"><TextInput bind:value={filter} /></div>
    </div>
    <!--Scrolling Containers-->
    <ScrollingContainer>

@@ -14,43 +14,6 @@
    // Reference to the application
    const application = getContext("external").application;
 
-   // Items
-   $: items = $document.items;
-
-   // Filter
-   let inventoryFilter = "";
-
-   // Weapons
-   $: weapons = items
-      .filter((item) => item.type === "weapon" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
-      .sort((a, b) => {
-         if (a.sort < b.sort) {
-            return -1;
-         }
-         if (a.sort > b.sort) {
-            return 1;
-         }
-         return 0;
-      });
-
-   // Armors
-   $: armors = items
-      .filter((item) => item.type === "armor" && item.name.toLowerCase().indexOf(inventoryFilter.toLowerCase()) !== -1)
-      .sort((a, b) => {
-         if (a.sort < b.sort) {
-            return -1;
-         }
-         if (a.sort > b.sort) {
-            return 1;
-         }
-         return 0;
-      });
-
-   // Initialize expanded object
-   $document.items.forEach((item) => {
-      application.isExpanded.inventory[item._id] = application.isExpanded.inventory[item._id] ?? false;
-   });
-
    // Drag hover state
    let dragHovered = "";
    let dragHovering = "";
@@ -68,13 +31,47 @@
 
       return;
    }
+
+   // Filter
+   let filter = "";
+
+   // Weapons
+   $: weapons = $document.items
+      .filter((item) => item.type === "weapon" && item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+      .sort((a, b) => {
+         if (a.sort < b.sort) {
+            return -1;
+         }
+         if (a.sort > b.sort) {
+            return 1;
+         }
+         return 0;
+      });
+
+   // Armors
+   $: armors = $document.items
+      .filter((item) => item.type === "armor" && item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+      .sort((a, b) => {
+         if (a.sort < b.sort) {
+            return -1;
+         }
+         if (a.sort > b.sort) {
+            return 1;
+         }
+         return 0;
+      });
+
+   // Initialize expanded object
+   $document.items.forEach((item) => {
+      application.isExpanded.inventory[item._id] = application.isExpanded.inventory[item._id] ?? false;
+   });
 </script>
 
 <div class="inventory-tab">
    <!--Filter-->
    <div class="inventory-filter">
       <div class="inventory-filter-label">{localize("LOCAL.filter.label")}</div>
-      <div class="inventory-filter-input"><TextInput bind:value={inventoryFilter} /></div>
+      <div class="inventory-filter-input"><TextInput bind:value={filter} /></div>
    </div>
    <!--Scrolling Containers-->
    <ScrollingContainer>
