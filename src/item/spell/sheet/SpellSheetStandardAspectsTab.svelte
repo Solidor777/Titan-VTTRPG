@@ -8,6 +8,7 @@
    import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
+   import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
@@ -89,6 +90,7 @@
    };
    selectOptions.decreaseSpeed = selectOptions.increaseSpeed;
 
+   // Determines whether an aspect should have a details div
    function hasDetails(key) {
       return (
          $document.system.standardAspects[key].option ||
@@ -96,89 +98,105 @@
          $document.system.standardAspects[key].resistanceCheck
       );
    }
+
+   // Filter for the aspects to display
+   let filter = "";
 </script>
 
 <div class="standard-aspects-tab">
+   <div class="filter">
+      <div class="label">
+         {localize("LOCAL.filter.label")}
+      </div>
+      <div class="input">
+         <DocumentTextInput bind:value={filter} />
+      </div>
+   </div>
    <ScrollingContainer>
       <ol class="aspects-list">
          <!--Each Aspect-->
          {#each Object.entries($document.system.standardAspects) as [key]}
-            <li class="aspect">
-               <!--Enable Header-->
-               <div class="aspect-enable">
-                  <SpellSheetEnableAspectButton
-                     bind:enabled={$document.system.standardAspects[key].enabled}
-                     label={localize(`LOCAL.${key}.label`)}
-                     cost={$document.system.standardAspects[key].cost}
-                  />
-               </div>
-               {#if $document.system.standardAspects[key].enabled && hasDetails(key)}
-                  <!--Content-->
-                  <div class="aspect-details" transition:slide|local>
-                     {#if $document.system.standardAspects[key].value}
-                        <!--Select Options-->
-                        <div class="row">
-                           <div>
-                              <!--Select Value-->
-                              <DocumentSelect
-                                 bind:value={$document.system.standardAspects[key].value}
-                                 options={selectOptions[key]}
-                              />
-                           </div>
-                        </div>
-                     {/if}
-
-                     {#if $document.system.standardAspects[key].resistanceCheck}
-                        <!--Resistance Check-->
-                        <div class="row">
-                           <div class="stat">
-                              <!--Label-->
-                              <div class="label">
-                                 {localize("LOCAL.resistanceCheck.label")}:
-                              </div>
-
-                              <!--Value-->
-                              <div class="input">
-                                 <DocumentResistanceSelect
-                                    bind:value={$document.system.standardAspects[key].resistanceCheck}
-                                    options={resistanceSelectOptions}
+            <!--Filter the Aspects-->
+            {#if localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1}
+               <li class="aspect">
+                  <!--Enable Header-->
+                  <div class="aspect-enable">
+                     <SpellSheetEnableAspectButton
+                        bind:enabled={$document.system.standardAspects[key].enabled}
+                        label={localize(`LOCAL.${key}.label`)}
+                        cost={$document.system.standardAspects[key].cost}
+                     />
+                  </div>
+                  {#if $document.system.standardAspects[key].enabled && hasDetails(key)}
+                     <!--Content-->
+                     <div class="aspect-details" transition:slide|local>
+                        {#if $document.system.standardAspects[key].value}
+                           <!--Select Options-->
+                           <div class="row">
+                              <div>
+                                 <!--Select Value-->
+                                 <DocumentSelect
+                                    bind:value={$document.system.standardAspects[key].value}
+                                    options={selectOptions[key]}
                                  />
                               </div>
                            </div>
-                        </div>
-                     {/if}
+                        {/if}
 
-                     {#if $document.system.standardAspects[key].allOptions !== undefined}
-                        <!--All Options-->
-                        <div class="row">
-                           <div class="stat">
-                              <!--Label-->
-                              <div class="label">
-                                 {localize("LOCAL.allOptions.label")}:
-                              </div>
+                        {#if $document.system.standardAspects[key].resistanceCheck}
+                           <!--Resistance Check-->
+                           <div class="row">
+                              <div class="stat">
+                                 <!--Label-->
+                                 <div class="label">
+                                    {localize("LOCAL.resistanceCheck.label")}:
+                                 </div>
 
-                              <!--Value-->
-                              <div class="input">
-                                 <DocumentCheckboxInput bind:value={$document.system.standardAspects[key].allOptions} />
+                                 <!--Value-->
+                                 <div class="input">
+                                    <DocumentResistanceSelect
+                                       bind:value={$document.system.standardAspects[key].resistanceCheck}
+                                       options={resistanceSelectOptions}
+                                    />
+                                 </div>
                               </div>
                            </div>
-                        </div>
-                     {/if}
+                        {/if}
 
-                     {#if $document.system.standardAspects[key].option}
-                        <!--Option Toggles-->
-                        <div class="toggles">
-                           {#each Object.entries($document.system.standardAspects[key].option) as [option]}
-                              <SpellSheetToggleAspectOptionButton
-                                 label={localize(`LOCAL.${option}.label`)}
-                                 bind:enabled={$document.system.standardAspects[key].option[option]}
-                              />
-                           {/each}
-                        </div>
-                     {/if}
-                  </div>
-               {/if}
-            </li>
+                        {#if $document.system.standardAspects[key].allOptions !== undefined}
+                           <!--All Options-->
+                           <div class="row">
+                              <div class="stat">
+                                 <!--Label-->
+                                 <div class="label">
+                                    {localize("LOCAL.allOptions.label")}:
+                                 </div>
+
+                                 <!--Value-->
+                                 <div class="input">
+                                    <DocumentCheckboxInput
+                                       bind:value={$document.system.standardAspects[key].allOptions}
+                                    />
+                                 </div>
+                              </div>
+                           </div>
+                        {/if}
+
+                        {#if $document.system.standardAspects[key].option}
+                           <!--Option Toggles-->
+                           <div class="toggles">
+                              {#each Object.entries($document.system.standardAspects[key].option) as [option]}
+                                 <SpellSheetToggleAspectOptionButton
+                                    label={localize(`LOCAL.${option}.label`)}
+                                    bind:enabled={$document.system.standardAspects[key].option[option]}
+                                 />
+                              {/each}
+                           </div>
+                        {/if}
+                     </div>
+                  {/if}
+               </li>
+            {/if}
          {/each}
       </ol>
    </ScrollingContainer>
