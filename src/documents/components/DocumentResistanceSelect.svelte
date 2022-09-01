@@ -6,20 +6,7 @@
    export let value = void 0;
 
    // The options for the select
-   export let options = [
-      {
-         label: localize("LOCAL.reflexes.label"),
-         value: "reflexes",
-      },
-      {
-         label: localize("LOCAL.resilience.label"),
-         value: "resilience",
-      },
-      {
-         label: localize("LOCAL.willpower.label"),
-         value: "willpower",
-      },
-   ];
+   export let options = void 0;
 
    // Document reference
    const document = getContext("DocumentSheetObject");

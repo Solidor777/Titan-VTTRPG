@@ -83,7 +83,7 @@
          },
          {
             value: "m10",
-            label: localize("LOCAL.10.label"),
+            label: localize("LOCAL.m10.label"),
          },
       ],
    };

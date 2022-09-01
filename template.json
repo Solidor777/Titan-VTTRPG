@@ -554,8 +554,8 @@
           }
         },
         "decreaseSpeed": {
-          "enabled": true,
-          "value": 5,
+          "enabled": false,
+          "value": "m5",
           "resistanceCheck": "none",
           "option": {
             "stride": false,
@@ -565,8 +565,8 @@
           }
         },
         "increaseSpeed": {
-          "enabled": true,
-          "value": 5,
+          "enabled": false,
+          "value": "m5",
           "option": {
             "stride": false,
             "fly": false,
