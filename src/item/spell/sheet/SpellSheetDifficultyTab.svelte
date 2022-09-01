@@ -2,13 +2,8 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentIntegerSelect from "~/documents/components/DocumentIntegerSelect.svelte";
 
@@ -27,7 +22,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.autoCalculateDifficulty.label")}
+               {localize("LOCAL.autoCalculateCastingCheck.label")}
             </div>
 
             <!--Checkbox-->
@@ -82,7 +77,7 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("LOCAL.suggestedValueAndComplexity.label")}:
+                  {localize("LOCAL.suggestedDifficultyAndComplexity.label")}:
                </div>
 
                <!--Value-->

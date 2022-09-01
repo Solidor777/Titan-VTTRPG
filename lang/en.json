@@ -321,8 +321,10 @@
   "LOCAL.customAspects.label": "Custom Aspects",
   "LOCAL.customAspect.label": "Custom Aspect",
   "LOCAL.addCustomAspect.label": "Add Custom Aspect",
+  "LOCAL.castingCheck.label": "Casting Check",
+  "LOCAL.autoCalculateCastingCheck.label": "Auto Calculate Casting Check",
   "LOCAL.resistedBy.label": "Resisted by",
-  "LOCAL.suggestedValueAndComplexity.label": "Suggested Value & Complexity",
+  "LOCAL.suggestedDifficultyAndComplexity.label": "Suggested Difficulty & Complexity",
   "LOCAL.aspectCosts.label": "Aspect Costs",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",

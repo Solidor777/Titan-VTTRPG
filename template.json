@@ -403,7 +403,7 @@
       "autoCalculateDifficulty": true,
       "difficulty": 4,
       "complexity": 1,
-      "tradition": "Common",
+      "tradition": "Any",
       "standardAspects": {
         "range": {
           "enabled": true,

@@ -41,12 +41,12 @@
          component: SpellSheetCustomAspectsTab,
       },
       {
-         label: localize("LOCAL.difficulty.label"),
-         id: "difficulty",
+         label: localize("LOCAL.castingCheck.label"),
+         id: "castingCheck",
          component: SpellSheetDifficultyTab,
       },
    ];
-   application.activeTab = application.activeTab ?? "difficulty";
+   application.activeTab = application.activeTab ?? "description";
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -88,8 +88,17 @@
       <!--Content-->
       <div class="content">
          <div class="sidebar">
-            <div class="stats" />
-
+            <!--Casting Check-->
+            <div class="casting-check">
+               <!--Label-->
+               <div class="label">
+                  {localize("LOCAL.castingCheck.label")}:
+               </div>
+               <!--Value-->
+               <div class="value">
+                  {$document.system.difficulty}:{$document.system.complexity}
+               </div>
+            </div>
             <!--Aspects List-->
             <ScrollingContainer>
                <ol class="aspects-list">
@@ -222,12 +231,25 @@
             padding: 0.5rem;
             margin-top: 0.5rem;
 
+            .casting-check {
+               @include flex-row;
+               @include flex-group-center;
+               @include border-bottom;
+               width: 100%;
+               padding-bottom: 0.5rem;
+
+               .label {
+                  font-weight: bold;
+                  margin-right: 0.25rem;
+               }
+            }
+
             .aspects-list {
                @include flex-column;
                @include flex-group-top;
                list-style: none;
                padding: 0;
-               margin: 0;
+               margin: 0 0 0 0;
                width: 100%;
 
                .aspect {
