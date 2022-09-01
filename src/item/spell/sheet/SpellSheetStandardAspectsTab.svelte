@@ -112,167 +112,191 @@
          <DocumentTextInput bind:value={filter} />
       </div>
    </div>
-   <ScrollingContainer>
-      <ol class="aspects-list">
-         <!--Each Aspect-->
-         {#each Object.entries($document.system.standardAspects) as [key]}
-            <!--Filter the Aspects-->
-            {#if localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1}
-               <li class="aspect">
-                  <!--Enable Header-->
-                  <div class="aspect-enable">
-                     <SpellSheetEnableAspectButton
-                        bind:enabled={$document.system.standardAspects[key].enabled}
-                        label={localize(`LOCAL.${key}.label`)}
-                        cost={$document.system.standardAspects[key].cost}
-                     />
-                  </div>
-                  {#if $document.system.standardAspects[key].enabled && hasDetails(key)}
-                     <!--Content-->
-                     <div class="aspect-details" transition:slide|local>
-                        {#if $document.system.standardAspects[key].value}
-                           <!--Select Options-->
-                           <div class="row">
-                              <div>
-                                 <!--Select Value-->
-                                 <DocumentSelect
-                                    bind:value={$document.system.standardAspects[key].value}
-                                    options={selectOptions[key]}
-                                 />
-                              </div>
-                           </div>
-                        {/if}
-
-                        {#if $document.system.standardAspects[key].resistanceCheck}
-                           <!--Resistance Check-->
-                           <div class="row">
-                              <div class="stat">
-                                 <!--Label-->
-                                 <div class="label">
-                                    {localize("LOCAL.resistanceCheck.label")}:
-                                 </div>
-
-                                 <!--Value-->
-                                 <div class="input">
-                                    <DocumentResistanceSelect
-                                       bind:value={$document.system.standardAspects[key].resistanceCheck}
-                                       options={resistanceSelectOptions}
-                                    />
-                                 </div>
-                              </div>
-                           </div>
-                        {/if}
-
-                        {#if $document.system.standardAspects[key].allOptions !== undefined}
-                           <!--All Options-->
-                           <div class="row">
-                              <div class="stat">
-                                 <!--Label-->
-                                 <div class="label">
-                                    {localize("LOCAL.allOptions.label")}:
-                                 </div>
-
-                                 <!--Value-->
-                                 <div class="input">
-                                    <DocumentCheckboxInput
-                                       bind:value={$document.system.standardAspects[key].allOptions}
-                                    />
-                                 </div>
-                              </div>
-                           </div>
-                        {/if}
-
-                        {#if $document.system.standardAspects[key].option}
-                           <!--Option Toggles-->
-                           <div class="toggles">
-                              {#each Object.entries($document.system.standardAspects[key].option) as [option]}
-                                 <SpellSheetToggleAspectOptionButton
-                                    label={localize(`LOCAL.${option}.label`)}
-                                    bind:enabled={$document.system.standardAspects[key].option[option]}
-                                 />
-                              {/each}
-                           </div>
-                        {/if}
+   <div class="scrolling-content">
+      <ScrollingContainer>
+         <ol class="aspects-list">
+            <!--Each Aspect-->
+            {#each Object.entries($document.system.standardAspects) as [key]}
+               <!--Filter the Aspects-->
+               {#if localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1}
+                  <li class="aspect">
+                     <!--Enable Header-->
+                     <div class="aspect-enable">
+                        <SpellSheetEnableAspectButton
+                           bind:enabled={$document.system.standardAspects[key].enabled}
+                           label={localize(`LOCAL.${key}.label`)}
+                           cost={$document.system.standardAspects[key].cost}
+                        />
                      </div>
-                  {/if}
-               </li>
-            {/if}
-         {/each}
-      </ol>
-   </ScrollingContainer>
+                     {#if $document.system.standardAspects[key].enabled && hasDetails(key)}
+                        <!--Content-->
+                        <div class="aspect-details" transition:slide|local>
+                           {#if $document.system.standardAspects[key].value}
+                              <!--Select Options-->
+                              <div class="row">
+                                 <div>
+                                    <!--Select Value-->
+                                    <DocumentSelect
+                                       bind:value={$document.system.standardAspects[key].value}
+                                       options={selectOptions[key]}
+                                    />
+                                 </div>
+                              </div>
+                           {/if}
+
+                           {#if $document.system.standardAspects[key].resistanceCheck}
+                              <!--Resistance Check-->
+                              <div class="row">
+                                 <div class="stat">
+                                    <!--Label-->
+                                    <div class="label">
+                                       {localize("LOCAL.resistanceCheck.label")}:
+                                    </div>
+
+                                    <!--Value-->
+                                    <div class="input">
+                                       <DocumentResistanceSelect
+                                          bind:value={$document.system.standardAspects[key].resistanceCheck}
+                                          options={resistanceSelectOptions}
+                                       />
+                                    </div>
+                                 </div>
+                              </div>
+                           {/if}
+
+                           {#if $document.system.standardAspects[key].allOptions !== undefined}
+                              <!--All Options-->
+                              <div class="row">
+                                 <div class="stat">
+                                    <!--Label-->
+                                    <div class="label">
+                                       {localize("LOCAL.allOptions.label")}:
+                                    </div>
+
+                                    <!--Value-->
+                                    <div class="input">
+                                       <DocumentCheckboxInput
+                                          bind:value={$document.system.standardAspects[key].allOptions}
+                                       />
+                                    </div>
+                                 </div>
+                              </div>
+                           {/if}
+
+                           {#if $document.system.standardAspects[key].option}
+                              <!--Option Toggles-->
+                              <div class="toggles">
+                                 {#each Object.entries($document.system.standardAspects[key].option) as [option]}
+                                    <SpellSheetToggleAspectOptionButton
+                                       label={localize(`LOCAL.${option}.label`)}
+                                       bind:enabled={$document.system.standardAspects[key].option[option]}
+                                    />
+                                 {/each}
+                              </div>
+                           {/if}
+                        </div>
+                     {/if}
+                  </li>
+               {/if}
+            {/each}
+         </ol>
+      </ScrollingContainer>
+   </div>
 </div>
 
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
    .standard-aspects-tab {
+      @include flex-column;
+      @include flex-group-top;
       width: 100%;
       height: 100%;
 
-      .aspects-list {
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-bottom;
+         width: 100%;
+         padding: 0.25rem;
+
+         .label {
+            font-weight: bold;
+            margin-right: 0.25rem;
+         }
+      }
+
+      .scrolling-content {
          @include flex-column;
          @include flex-group-top;
-         list-style: none;
-         padding: 0;
-         margin: 0;
          width: 100%;
+         height: 100%;
 
-         .aspect {
+         .aspects-list {
             @include flex-column;
             @include flex-group-top;
+            list-style: none;
+            padding: 0;
+            margin: 0;
             width: 100%;
 
-            &:not(:first-child) {
-               margin-top: 0.25rem;
-            }
-
-            .aspect-enable {
-               @include flex-row;
-               width: 100%;
-            }
-
-            .aspect-details {
+            .aspect {
                @include flex-column;
                @include flex-group-top;
-               @include z-index-app;
-               padding: 0.5rem;
-               width: calc(100% - 30px);
-               background-color: var(--label-background-color);
-               border-right: var(--border-style);
-               border-left: var(--border-style);
-               border-bottom: var(--border-style);
-               border-bottom-right-radius: var(--border-radius);
-               border-bottom-left-radius: var(--border-radius);
-               border-width: var(--border-width);
-               border-color: var(--border-color-normal);
-               font-size: 0.9rem;
-               --font-size: 0.9rem;
+               width: 100%;
 
-               .row {
-                  @include flex-row;
-                  @include flex-group-center;
-                  width: 100%;
-                  &:not(:first-child) {
-                     margin-top: 0.5rem;
-                  }
-
-                  .stat {
-                     @include flex-row;
-                     @include flex-group-center;
-                     font-weight: bold;
-
-                     .input {
-                        margin-left: 0.25rem;
-                     }
-                  }
+               &:not(:first-child) {
+                  margin-top: 0.25rem;
                }
 
-               .toggles {
+               .aspect-enable {
                   @include flex-row;
-                  @include flex-group-center;
-                  margin-top: 0.5rem;
-                  flex-wrap: wrap;
                   width: 100%;
+               }
+
+               .aspect-details {
+                  @include flex-column;
+                  @include flex-group-top;
+                  @include z-index-app;
+                  padding: 0.5rem;
+                  width: calc(100% - 30px);
+                  background-color: var(--label-background-color);
+                  border-right: var(--border-style);
+                  border-left: var(--border-style);
+                  border-bottom: var(--border-style);
+                  border-bottom-right-radius: var(--border-radius);
+                  border-bottom-left-radius: var(--border-radius);
+                  border-width: var(--border-width);
+                  border-color: var(--border-color-normal);
+                  font-size: 0.9rem;
+                  --font-size: 0.9rem;
+
+                  .row {
+                     @include flex-row;
+                     @include flex-group-center;
+                     width: 100%;
+                     &:not(:first-child) {
+                        margin-top: 0.5rem;
+                     }
+
+                     .stat {
+                        @include flex-row;
+                        @include flex-group-center;
+                        font-weight: bold;
+
+                        .input {
+                           margin-left: 0.25rem;
+                        }
+                     }
+                  }
+
+                  .toggles {
+                     @include flex-row;
+                     @include flex-group-center;
+                     margin-top: 0.5rem;
+                     flex-wrap: wrap;
+                     width: 100%;
+                  }
                }
             }
          }

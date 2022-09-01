@@ -22,66 +22,68 @@
       </div>
    </div>
    <!--Aspects List-->
-   <ScrollingContainer>
-      <ol class="aspects-list">
-         {#each $document.aspects as aspect}
-            <!--Each Aspect-->
-            <li class="aspect">
-               <!--Label-->
-               <div class="aspect-label">
-                  {aspect.label}
-               </div>
+   <div class="scrolling-content">
+      <ScrollingContainer>
+         <ol class="aspects-list">
+            {#each $document.aspects as aspect}
+               <!--Each Aspect-->
+               <li class="aspect">
+                  <!--Label-->
+                  <div class="aspect-label">
+                     {aspect.label}
+                  </div>
 
-               <!--Initial Value-->
-               {#if aspect.initialValue}
-                  <div class="aspect-value">
-                     {typeof aspect.initialValue === `string`
-                        ? localize(`LOCAL.${aspect.initialValue}.label`)
-                        : aspect.initialValue}
-                     {#if aspect.overcast}
-                        {#if aspect.cost > 1}
-                           {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
-                        {:else}
-                           {`+ ${localize("LOCAL.extraSuccesses.short.label")}`}
+                  <!--Initial Value-->
+                  {#if aspect.initialValue}
+                     <div class="aspect-value">
+                        {typeof aspect.initialValue === `string`
+                           ? localize(`LOCAL.${aspect.initialValue}.label`)
+                           : aspect.initialValue}
+                        {#if aspect.overcast}
+                           {#if aspect.cost > 1}
+                              {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
+                           {:else}
+                              {`+ ${localize("LOCAL.extraSuccesses.short.label")}`}
+                           {/if}
                         {/if}
-                     {/if}
-                  </div>
-               {/if}
+                     </div>
+                  {/if}
 
-               <!--Options-->
-               {#if aspect.option}
-                  <div class="aspect-options">
-                     {#if aspect.allOptions}
-                        <!--All Options-->
-                        <div class="aspect-option">
-                           {localize("LOCAL.all.label")}
-                        </div>
-                     {:else}
-                        {#each aspect.option as option}
-                           <!--Each option-->
+                  <!--Options-->
+                  {#if aspect.option}
+                     <div class="aspect-options">
+                        {#if aspect.allOptions}
+                           <!--All Options-->
                            <div class="aspect-option">
-                              {localize(`LOCAL.${option}.label`)}
+                              {localize("LOCAL.all.label")}
                            </div>
-                        {/each}
-                     {/if}
-                  </div>
-               {/if}
+                        {:else}
+                           {#each aspect.option as option}
+                              <!--Each option-->
+                              <div class="aspect-option">
+                                 {localize(`LOCAL.${option}.label`)}
+                              </div>
+                           {/each}
+                        {/if}
+                     </div>
+                  {/if}
 
-               <!--Resistance Check-->
-               {#if aspect.resistanceCheck}
-                  <div class="aspect-resistance-check">
-                     <div class="resistance-check-label">
-                        {localize("LOCAL.resistedBy.label")}
+                  <!--Resistance Check-->
+                  {#if aspect.resistanceCheck}
+                     <div class="aspect-resistance-check">
+                        <div class="resistance-check-label">
+                           {localize("LOCAL.resistedBy.label")}
+                        </div>
+                        <div class="resistance-check-value {aspect.resistanceCheck}">
+                           {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
+                        </div>
                      </div>
-                     <div class="resistance-check-value {aspect.resistanceCheck}">
-                        {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
-                     </div>
-                  </div>
-               {/if}
-            </li>
-         {/each}
-      </ol>
-   </ScrollingContainer>
+                  {/if}
+               </li>
+            {/each}
+         </ol>
+      </ScrollingContainer>
+   </div>
 </div>
 
 <style lang="scss">
