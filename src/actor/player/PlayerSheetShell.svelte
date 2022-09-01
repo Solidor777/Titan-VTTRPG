@@ -36,7 +36,7 @@
 
    // Application reference
    const application = getContext("external").application;
-   application.activeTab = application.activeTab ?? "spells";
+   application.activeTab = application.activeTab ?? "inventory";
 </script>
 
 <ApplicationShell bind:elementRoot>

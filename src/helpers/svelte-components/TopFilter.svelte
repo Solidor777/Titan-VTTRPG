@@ -1,0 +1,32 @@
+<script>
+   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
+
+   // Filter Items
+   export let filter = void 0;
+</script>
+
+<!--Filter-->
+<div class="filter">
+   <div class="label">{localize("LOCAL.filter.label")}</div>
+   <div class="input"><TextInput bind:value={filter} /></div>
+</div>
+
+<style lang="scss">
+   @import "../../Styles/Mixins.scss";
+
+   .filter {
+      @include flex-row;
+      @include flex-group-center;
+      @include border-bottom;
+      width: 100%;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0.25rem;
+
+      .input {
+         font-size: 1rem;
+         margin-left: 0.5rem;
+      }
+   }
+</style>

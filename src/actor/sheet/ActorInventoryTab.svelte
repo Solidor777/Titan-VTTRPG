@@ -1,12 +1,14 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorInventoryWeapon from "./items/ActorInventoryWeapon.svelte";
    import ActorInventoryArmor from "./items/ActorInventoryArmor.svelte";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
+   import ActorItemList from "./ActorItemList.svelte";
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import ActorAddItemEntryButton from "./ActorAddItemEntryButton.svelte";
 
    // Actor reference
    const document = getContext("DocumentSheetObject");
@@ -14,52 +16,8 @@
    // Reference to the application
    const application = getContext("external").application;
 
-   // Drag hover state
-   let dragHovered = "";
-   let dragHovering = "";
-
-   // Drag start item
-   function dragItemStart(event, id) {
-      const item = $document.items.get(id);
-      const dragData = item.toDragData();
-
-      if (!dragData) {
-         return;
-      }
-
-      event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-
-      return;
-   }
-
-   // Filter
+   // Filter Items
    let filter = "";
-
-   // Weapons
-   $: weapons = $document.items
-      .filter((item) => item.type === "weapon" && item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
-      .sort((a, b) => {
-         if (a.sort < b.sort) {
-            return -1;
-         }
-         if (a.sort > b.sort) {
-            return 1;
-         }
-         return 0;
-      });
-
-   // Armors
-   $: armors = $document.items
-      .filter((item) => item.type === "armor" && item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
-      .sort((a, b) => {
-         if (a.sort < b.sort) {
-            return -1;
-         }
-         if (a.sort > b.sort) {
-            return 1;
-         }
-         return 0;
-      });
 
    // Initialize expanded object
    $document.items.forEach((item) => {
@@ -69,13 +27,11 @@
 
 <div class="inventory-tab">
    <!--Filter-->
-   <div class="inventory-filter">
-      <div class="inventory-filter-label">{localize("LOCAL.filter.label")}</div>
-      <div class="inventory-filter-input"><TextInput bind:value={filter} /></div>
-   </div>
+   <TopFilter bind:filter />
+
    <!--Scrolling Containers-->
-   <ScrollingContainer>
-      <div class="scrolling-content">
+   <div class="scrolling-content">
+      <ScrollingContainer>
          <!--Weapons-->
          <div class="category">
             <!--List Header-->
@@ -84,41 +40,17 @@
             </div>
 
             <!--Weapon List-->
-            <ol>
-               <!--Each Weapon-->
-               {#each weapons as weapon}
-                  <li
-                     class="weapon{dragHovered === weapon._id ? ' drag-hovered' : ''}"
-                     data-item-id={weapon._id}
-                     draggable={true}
-                     on:dragstart={(event) => {
-                        dragHovered = weapon._id;
-                        dragHovering = "weapon";
-                        dragItemStart(event, weapon._id);
-                     }}
-                     on:dragenter={() => {
-                        if (dragHovering === "weapon") {
-                           dragHovered = weapon._id;
-                        }
-                     }}
-                     on:dragend={() => {
-                        dragHovered = "";
-                        dragHovering = "";
-                     }}
-                     transition:slide|local
-                  >
-                     <ActorInventoryWeapon
-                        bind:id={weapon._id}
-                        bind:isExpanded={application.isExpanded.inventory[weapon._id]}
-                     />
-                  </li>
-               {/each}
-            </ol>
-            <div class="add-entry-button">
-               <EfxButton on:click={application.addItem.bind(application, "weapon")}
-                  ><i class="fas fa-circle-plus" />
-               </EfxButton>
-            </div>
+            <ActorItemList
+               itemComponent={ActorInventoryWeapon}
+               filterFunction={(item) => {
+                  return item.type === "weapon";
+               }}
+               {filter}
+               isExpandedMap={application.isExpanded.inventory}
+            />
+
+            <!--Add Weapon Button-->
+            <ActorAddItemEntryButton itemType={"weapon"} />
          </div>
 
          <!--Armor-->
@@ -128,45 +60,21 @@
                {localize("LOCAL.armor.label")}
             </div>
 
-            <!--Armor List-->
-            <ol>
-               <!--Each Armor-->
-               {#each armors as armor}
-                  <li
-                     class="armor{dragHovered === armor._id ? ' drag-hovered' : ''}"
-                     data-item-id={armor._id}
-                     draggable={true}
-                     on:dragstart={(event) => {
-                        dragHovered = armor._id;
-                        dragHovering = "armor";
-                        dragItemStart(event, armor._id);
-                     }}
-                     on:dragenter={() => {
-                        if (dragHovering === "armor") {
-                           dragHovered = armor._id;
-                        }
-                     }}
-                     on:dragend={() => {
-                        dragHovered = "";
-                        dragHovering = "";
-                     }}
-                     transition:slide|local
-                  >
-                     <ActorInventoryArmor
-                        bind:id={armor._id}
-                        bind:isExpanded={application.isExpanded.inventory[armor._id]}
-                     />
-                  </li>
-               {/each}
-            </ol>
-            <div class="add-entry-button">
-               <EfxButton on:click={application.addItem.bind(application, "armor")}
-                  ><i class="fas fa-circle-plus" />
-               </EfxButton>
-            </div>
+            <!--Armor list-->
+            <ActorItemList
+               itemComponent={ActorInventoryArmor}
+               filterFunction={(item) => {
+                  return item.type === "armor";
+               }}
+               {filter}
+               isExpandedMap={application.isExpanded.inventory}
+            />
+
+            <!--Add Armor Button-->
+            <ActorAddItemEntryButton itemType={"weapon"} />
          </div>
-      </div>
-   </ScrollingContainer>
+      </ScrollingContainer>
+   </div>
 </div>
 
 <style lang="scss">
@@ -214,41 +122,6 @@
                @include flex-group-center;
                font-weight: bold;
                font-size: 1rem;
-            }
-
-            ol {
-               @include flex-column;
-               @include flex-group-top;
-               width: 100%;
-               margin: 0, 0, 0, 0.5rem;
-               padding: 0;
-               list-style: none;
-
-               li {
-                  @include flex-row;
-                  @include flex-space-between;
-                  @include border;
-                  width: 100%;
-                  padding: 0.5rem;
-
-                  &.drag-hovered {
-                     background: var(--highlight-background-color);
-                  }
-
-                  &:not(:first-child) {
-                     margin-top: 0.5rem;
-                  }
-               }
-            }
-
-            .add-entry-button {
-               @include flex-row;
-
-               width: 100%;
-
-               .fas {
-                  padding: 0.25rem;
-               }
             }
          }
       }

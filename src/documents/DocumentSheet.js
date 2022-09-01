@@ -212,7 +212,6 @@ export class SvelteDocumentSheet extends SvelteApplication {
       const source = items.get(itemData._id);
       const dropTarget = event.target.closest("[data-item-id]");
       if (!dropTarget) {
-         console.log("No drop");
          return;
       }
       const target = items.get(dropTarget.dataset.itemId);

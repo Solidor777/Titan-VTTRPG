@@ -23,7 +23,7 @@
 
    // Drag hover state
    let dragHovered = "";
-   let dragHovering = "";
+   let dragType = "";
 
    // Drag start item
    function dragItemStart(event, id) {
@@ -87,17 +87,17 @@
                      draggable={true}
                      on:dragstart={(event) => {
                         dragHovered = weapon._id;
-                        dragHovering = "weapon";
+                        dragType = "weapon";
                         dragItemStart(event, weapon._id);
                      }}
                      on:dragenter={() => {
-                        if (dragHovering === "weapon") {
+                        if (dragType === "weapon") {
                            dragHovered = weapon._id;
                         }
                      }}
                      on:dragend={() => {
                         dragHovered = "";
-                        dragHovering = "";
+                        dragType = "";
                      }}
                      transition:slide|local
                   >
