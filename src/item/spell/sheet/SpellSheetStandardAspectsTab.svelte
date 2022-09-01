@@ -267,16 +267,10 @@
                   @include flex-column;
                   @include flex-group-top;
                   @include z-index-app;
+                  @include border-bottom-sides;
                   padding: 0.5rem;
                   width: calc(100% - 30px);
                   background-color: var(--label-background-color);
-                  border-right: var(--border-style);
-                  border-left: var(--border-style);
-                  border-bottom: var(--border-style);
-                  border-bottom-right-radius: var(--border-radius);
-                  border-bottom-left-radius: var(--border-radius);
-                  border-width: var(--border-width);
-                  border-color: var(--border-color-normal);
                   font-size: 0.9rem;
                   --font-size: 0.9rem;
 

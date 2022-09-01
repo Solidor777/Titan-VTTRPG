@@ -6,6 +6,8 @@
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentIntegerSelect from "~/documents/components/DocumentIntegerSelect.svelte";
+   import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
+   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
@@ -13,12 +15,12 @@
    const difficultyOptions = [2, 3, 4, 5, 6];
 </script>
 
-<div class="difficulty-tab">
-   <!--Difficulty Settings-->
-   <div class="difficulty-settings">
-      <!--Auto Calculate Difficulty-->
+<div class="check-tab">
+   <!--check Settings-->
+   <div class="check-settings">
+      <!--Auto Calculate check-->
       <div class="row">
-         <!--Difficulty-->
+         <!--check-->
          <div class="stat">
             <!--Label-->
             <div class="label">
@@ -87,6 +89,33 @@
             </div>
          </div>
       {/if}
+
+      <!--Attribute and skill-->
+      <div class="row">
+         <!--Attribute-->
+         <div class="stat">
+            <div class="label">
+               {localize("LOCAL.attribute.label")}
+            </div>
+
+            <div class="select">
+               <DocumentAttributeSelect bind:value={$document.system.check.attribute} />
+            </div>
+         </div>
+
+         <div class="divider" />
+
+         <!--Skill-->
+         <div class="stat">
+            <div class="label">
+               {localize("LOCAL.skill.label")}
+            </div>
+
+            <div class="select">
+               <DocumentSkillSelect bind:value={$document.system.check.skill} />
+            </div>
+         </div>
+      </div>
    </div>
 
    <!--Aspects-->
@@ -115,9 +144,10 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .difficulty-tab {
+   .check-tab {
       @include flex-column;
       height: 100%;
+      width: 100%;
 
       .row {
          @include flex-row;
@@ -135,11 +165,11 @@
          }
       }
 
-      .difficulty-settings {
+      .check-settings {
          @include flex-column;
          @include flex-group-top;
-         @include border;
-         margin-top: 0.5rem;
+         @include border-bottom-sides;
+         width: 100%;
          background-color: var(--label-background-color);
 
          .stat {

@@ -54,6 +54,16 @@
   border-color: var(--border-color-normal);
 }
 
+@mixin border-bottom-sides {
+  border-right: var(--border-style);
+  border-left: var(--border-style);
+  border-bottom: var(--border-style);
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+  border-width: var(--border-width);
+  border-color: var(--border-color-normal);
+}
+
 @mixin border-left {
   border-left: var(--border-style);
   border-width: var(--border-width);
