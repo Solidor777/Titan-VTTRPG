@@ -57,7 +57,7 @@
   "LOCAL.burrow.label": "Burrow",
   "LOCAL.burrow.value.label": "Total Burrow speed.",
   "LOCAL.calculateSuccessCost.label": "Calculate Success Cost",
-  "LOCAL.autoCalculateDifficulty.label": "Auto-Calculate Difficulty",
+  "LOCAL.autoCalculateCheck.label": "Auto-Calculate Difficulty",
   "LOCAL.cancel.label": "Cancel",
   "LOCAL.charmed.label": "Charmed",
   "LOCAL.check.label": "Check",

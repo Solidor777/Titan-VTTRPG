@@ -96,7 +96,7 @@
                </div>
                <!--Value-->
                <div class="value">
-                  {$document.system.difficulty}:{$document.system.complexity}
+                  {$document.system.check.difficulty}:{$document.system.check.complexity}
                </div>
             </div>
             <!--Aspects List-->

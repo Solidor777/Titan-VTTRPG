@@ -6,7 +6,7 @@
    export let value = void 0;
 
    // Options
-   const resistanceOptions = [
+   export let options = [
       {
          label: localize("LOCAL.reflexes.label"),
          value: "reflexes",
@@ -23,7 +23,7 @@
 </script>
 
 <div class="resistance-select {value}" on:change>
-   <Select options={resistanceOptions} bind:value />
+   <Select {options} bind:value />
 </div>
 
 <style lang="scss">

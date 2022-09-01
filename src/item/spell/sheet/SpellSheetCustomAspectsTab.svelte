@@ -5,11 +5,30 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
+   import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+
+   const resistanceSelectOptions = [
+      {
+         label: localize("LOCAL.reflexes.label"),
+         value: "reflexes",
+      },
+      {
+         label: localize("LOCAL.resilience.label"),
+         value: "resilience",
+      },
+      {
+         label: localize("LOCAL.willpower.label"),
+         value: "willpower",
+      },
+      {
+         label: localize("LOCAL.none.label"),
+         value: "none",
+      },
+   ];
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
@@ -63,8 +82,9 @@
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentResistanceSelectAllowNone
+                        <DocumentResistanceSelect
                            bind:value={$document.system.customAspects[idx].resistanceCheck}
+                           options={resistanceSelectOptions}
                         />
                      </div>
                   </div>

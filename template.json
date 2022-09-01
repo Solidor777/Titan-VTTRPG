@@ -301,9 +301,10 @@
         "version": 1.0
       },
       "casting": {
-        "attribute": "mind",
-        "skill": "arcana",
-        "traditions": []
+        "tradition": []
+      },
+      "invocation": {
+        "tradition": []
       }
     },
     "player": {
@@ -355,6 +356,12 @@
       },
       "resolveCost": {
         "resolveCost": 0
+      },
+      "check": {
+        "difficulty": 4,
+        "complexity": 1,
+        "attribute": "mind",
+        "skill": "arcana"
       }
     },
     "gear": {
@@ -403,11 +410,12 @@
     "spell": {
       "templates": [
         "base",
-        "duration"
+        "duration",
+        "check"
       ],
-      "autoCalculateDifficulty": true,
-      "difficulty": 4,
-      "complexity": 1,
+      "check": {
+        "autoCalculateCheck": true
+      },
       "tradition": "Any",
       "standardAspects": {
         "range": {

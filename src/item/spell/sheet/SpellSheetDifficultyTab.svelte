@@ -27,7 +27,7 @@
 
             <!--Checkbox-->
             <div class="checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.autoCalculateDifficulty} />
+               <DocumentCheckboxInput bind:value={$document.system.check.autoCalculateCheck} />
             </div>
          </div>
       </div>
@@ -44,8 +44,8 @@
             <div class="select">
                <DocumentIntegerSelect
                   options={difficultyOptions}
-                  bind:value={$document.system.difficulty}
-                  disabled={$document.system.autoCalculateDifficulty}
+                  bind:value={$document.system.check.difficulty}
+                  disabled={$document.system.check.autoCalculateCheck}
                />
             </div>
          </div>
@@ -62,16 +62,16 @@
             <!--Input-->
             <div class="input">
                <DocumentIntegerInput
-                  bind:value={$document.system.complexity}
+                  bind:value={$document.system.check.complexity}
                   min={1}
                   max={16}
-                  disabled={$document.system.autoCalculateDifficulty}
+                  disabled={$document.system.check.autoCalculateCheck}
                />
             </div>
          </div>
       </div>
 
-      {#if !$document.system.autoCalculateDifficulty}
+      {#if !$document.system.check.autoCalculateCheck}
          <div class="row" transition:slide|local>
             <!--Difficulty-->
             <div class="stat">

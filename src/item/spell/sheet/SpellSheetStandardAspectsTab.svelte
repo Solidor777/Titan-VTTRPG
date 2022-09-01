@@ -5,12 +5,32 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentResistanceSelectAllowNone from "~/documents/components/DocumentResistanceSelectAllowNone.svelte";
+   import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
+
+   // Resistance select options
+   const resistanceSelectOptions = [
+      {
+         label: localize("LOCAL.reflexes.label"),
+         value: "reflexes",
+      },
+      {
+         label: localize("LOCAL.resilience.label"),
+         value: "resilience",
+      },
+      {
+         label: localize("LOCAL.willpower.label"),
+         value: "willpower",
+      },
+      {
+         label: localize("LOCAL.none.label"),
+         value: "none",
+      },
+   ];
 
    // Initialize select options
    const selectOptions = {
@@ -119,8 +139,9 @@
 
                               <!--Value-->
                               <div class="input">
-                                 <DocumentResistanceSelectAllowNone
+                                 <DocumentResistanceSelect
                                     bind:value={$document.system.standardAspects[key].resistanceCheck}
+                                    options={resistanceSelectOptions}
                                  />
                               </div>
                            </div>
