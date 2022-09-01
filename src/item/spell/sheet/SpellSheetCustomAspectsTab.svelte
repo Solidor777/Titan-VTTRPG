@@ -10,6 +10,7 @@
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import { element } from "svelte/internal";
 
    const resistanceSelectOptions = [
       {
@@ -32,208 +33,259 @@
 
    // Document Setup
    const document = getContext("DocumentSheetObject");
+
+   // Filter for the aspects to display
+   let filter = "";
+   let filteredAspects = [];
+   $: {
+      filteredAspects = [];
+      $document.system.customAspects.forEach((aspect, idx) => {
+         if (aspect.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1) {
+            filteredAspects.push(idx);
+         }
+      });
+   }
 </script>
 
-<div class="aspects-tab">
-   <ScrollingContainer>
-      <ol class="aspects-list">
-         <!--Each Aspect-->
-         {#each $document.system.customAspects as aspect, idx}
-            <li class="aspect" transition:slide|local>
-               <!--Header-->
-               <div class="aspect-header">
-                  <!--Label-->
-                  <div class="label-input">
-                     <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
-                  </div>
+<div class="custom-aspects-tab">
+   <!-- Filter-->
+   <div class="filter">
+      <!--Label-->
+      <div class="label">
+         {localize("LOCAL.filter.label")}
+      </div>
 
-                  <!--Cost-->
-                  <div class="aspect-cost">
+      <!--Input-->
+      <div class="input">
+         <DocumentTextInput bind:value={filter} />
+      </div>
+   </div>
+
+   <!--Scrolling Aspects list-->
+   <div class="scrolling-content">
+      <ScrollingContainer>
+         <ol class="aspects-list">
+            <!--Each Aspect-->
+            {#each filteredAspects as idx}
+               <li class="aspect" transition:slide|local>
+                  <!--Header-->
+                  <div class="aspect-header">
                      <!--Label-->
-                     <div class="label">
-                        {localize("LOCAL.cost.label")}:
+                     <div class="label-input">
+                        <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
                      </div>
 
-                     <!--Input-->
-                     <div class="input">
-                        <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} min={0} />
-                     </div>
-                  </div>
+                     <!--Cost-->
+                     <div class="aspect-cost">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.cost.label")}:
+                        </div>
 
-                  <!--Delete button-->
-                  <div>
-                     <IconButton
-                        icon={"fas fa-trash"}
-                        efx={ripple}
-                        on:click={() => {
-                           $document.spell.removeCustomAspect(idx);
-                        }}
-                     />
-                  </div>
-               </div>
-
-               <div class="row">
-                  <!--Resistance Check-->
-                  <div class="stat">
-                     <!--Label-->
-                     <div class="label">
-                        {localize("LOCAL.resistanceCheck.label")}:
+                        <!--Input-->
+                        <div class="input">
+                           <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} min={0} />
+                        </div>
                      </div>
 
-                     <!--Value-->
-                     <div class="input">
-                        <DocumentResistanceSelect
-                           bind:value={$document.system.customAspects[idx].resistanceCheck}
-                           options={resistanceSelectOptions}
+                     <!--Delete button-->
+                     <div>
+                        <IconButton
+                           icon={"fas fa-trash"}
+                           efx={ripple}
+                           on:click={() => {
+                              $document.spell.removeCustomAspect(idx);
+                           }}
                         />
                      </div>
                   </div>
 
-                  <div class="divider" />
-
-                  <!--Overcast-->
-                  <div class="stat">
-                     <!--Label-->
-                     <div class="label">
-                        {localize("LOCAL.overcast.label")}:
-                     </div>
-
-                     <!--Value-->
-                     <div class="input checkbox">
-                        <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].overcast} />
-                     </div>
-                  </div>
-               </div>
-
-               <!--Initial value-->
-               {#if $document.system.customAspects[idx].overcast}
-                  <div class="row" transition:slide|local>
+                  <div class="row">
+                     <!--Resistance Check-->
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.initialValue.label")}:
+                           {localize("LOCAL.resistanceCheck.label")}:
                         </div>
 
                         <!--Value-->
-                        <div class="input number">
-                           <DocumentIntegerInput
-                              bind:value={$document.system.customAspects[idx].initialValue}
-                              min={0}
+                        <div class="input">
+                           <DocumentResistanceSelect
+                              bind:value={$document.system.customAspects[idx].resistanceCheck}
+                              options={resistanceSelectOptions}
                            />
                         </div>
                      </div>
+
+                     <div class="divider" />
+
+                     <!--Overcast-->
+                     <div class="stat">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.overcast.label")}:
+                        </div>
+
+                        <!--Value-->
+                        <div class="input checkbox">
+                           <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].overcast} />
+                        </div>
+                     </div>
                   </div>
-               {/if}
-            </li>{/each}
-      </ol>
-      <div class="add-aspect-button">
-         <EfxButton
-            efx={ripple}
-            on:click={() => {
-               $document.spell.addCustomAspect();
-            }}>{localize("LOCAL.addCustomAspect.label")}<i class="fas fa-circle-plus" /></EfxButton
-         >
-      </div>
-   </ScrollingContainer>
+
+                  <!--Initial value-->
+                  {#if $document.system.customAspects[idx].overcast}
+                     <div class="row" transition:slide|local>
+                        <div class="stat">
+                           <!--Label-->
+                           <div class="label">
+                              {localize("LOCAL.initialValue.label")}:
+                           </div>
+
+                           <!--Value-->
+                           <div class="input number">
+                              <DocumentIntegerInput
+                                 bind:value={$document.system.customAspects[idx].initialValue}
+                                 min={0}
+                              />
+                           </div>
+                        </div>
+                     </div>
+                  {/if}
+               </li>
+            {/each}
+         </ol>
+         <div class="add-aspect-button">
+            <EfxButton
+               efx={ripple}
+               on:click={() => {
+                  $document.spell.addCustomAspect();
+               }}>{localize("LOCAL.addCustomAspect.label")}<i class="fas fa-circle-plus" /></EfxButton
+            >
+         </div>
+      </ScrollingContainer>
+   </div>
 </div>
 
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .aspects-tab {
+   .custom-aspects-tab {
+      @include flex-column;
+      @include flex-group-top;
       width: 100%;
       height: 100%;
 
-      .aspects-list {
-         @include flex-column;
-         @include flex-group-top;
-         list-style: none;
-         padding: 0;
-         margin: 0;
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-bottom;
          width: 100%;
+         padding: 0.25rem;
 
-         .aspect {
-            @include flex-column;
-            @include flex-group-top;
-            @include border;
-            width: 100%;
-            font-size: 1rem;
-            padding: 0.25rem;
-            background-color: var(--label-background-color);
-
-            .aspect-header {
-               @include flex-row;
-               @include flex-space-between;
-               box-sizing: border-box;
-               width: 100%;
-               font-weight: bold;
-               padding: 0.25rem;
-
-               .aspect-cost {
-                  @include flex-row;
-                  @include flex-group-center;
-                  height: 100%;
-
-                  .input {
-                     margin-left: 0.25rem;
-                     width: 3rem;
-                  }
-               }
-
-               .label-input {
-                  @include flex-row;
-                  @include flex-group-center;
-                  height: 100%;
-                  --input-height: 100%;
-               }
-            }
-
-            .row {
-               @include flex-row;
-               @include flex-group-center;
-               font-size: 0.9rem;
-               --font-size: 0.9rem;
-               margin-top: 0.25rem;
-
-               .stat {
-                  @include flex-row;
-                  @include flex-group-center;
-
-                  .label {
-                     font-weight: bold;
-                  }
-
-                  .input {
-                     &:not(.checkbox) {
-                        margin-left: 0.5rem;
-                     }
-
-                     &.number {
-                        width: 3rem;
-                     }
-                  }
-               }
-
-               .divider {
-                  @include border-left;
-                  height: 100%;
-                  margin-left: 0.5rem;
-                  padding-right: 0.5rem;
-               }
-            }
-
-            &:not(:first-child) {
-               margin-top: 0.25rem;
-            }
+         .label {
+            font-weight: bold;
+            margin-right: 0.25rem;
          }
       }
 
-      .add-aspect-button {
-         @include flex-row;
-         margin-top: 0.25rem;
+      .scrolling-content {
+         @include flex-column;
+         @include flex-group-top;
+         width: 100%;
+         height: 100%;
 
-         .fas {
-            margin-left: 0.25rem;
+         .aspects-list {
+            @include flex-column;
+            @include flex-group-top;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+
+            .aspect {
+               @include flex-column;
+               @include flex-group-top;
+               @include border;
+               width: 100%;
+               font-size: 1rem;
+               padding: 0.25rem;
+               background-color: var(--label-background-color);
+
+               .aspect-header {
+                  @include flex-row;
+                  @include flex-space-between;
+                  box-sizing: border-box;
+                  width: 100%;
+                  font-weight: bold;
+                  padding: 0.25rem;
+
+                  .aspect-cost {
+                     @include flex-row;
+                     @include flex-group-center;
+                     height: 100%;
+
+                     .input {
+                        margin-left: 0.25rem;
+                        width: 3rem;
+                     }
+                  }
+
+                  .label-input {
+                     @include flex-row;
+                     @include flex-group-center;
+                     height: 100%;
+                     --input-height: 100%;
+                  }
+               }
+
+               .row {
+                  @include flex-row;
+                  @include flex-group-center;
+                  font-size: 0.9rem;
+                  --font-size: 0.9rem;
+                  margin-top: 0.25rem;
+
+                  .stat {
+                     @include flex-row;
+                     @include flex-group-center;
+
+                     .label {
+                        font-weight: bold;
+                     }
+
+                     .input {
+                        &:not(.checkbox) {
+                           margin-left: 0.5rem;
+                        }
+
+                        &.number {
+                           width: 3rem;
+                        }
+                     }
+                  }
+
+                  .divider {
+                     @include border-left;
+                     height: 100%;
+                     margin-left: 0.5rem;
+                     padding-right: 0.5rem;
+                  }
+               }
+
+               &:not(:first-child) {
+                  margin-top: 0.25rem;
+               }
+            }
+         }
+
+         .add-aspect-button {
+            @include flex-row;
+            margin-top: 0.25rem;
+
+            .fas {
+               margin-left: 0.25rem;
+            }
          }
       }
    }

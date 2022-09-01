@@ -21,6 +21,7 @@
          {$document.system.check.difficulty}:{$document.system.check.complexity}
       </div>
    </div>
+
    <!--Aspects List-->
    <div class="scrolling-content">
       <ScrollingContainer>
@@ -111,73 +112,80 @@
          }
       }
 
-      .aspects-list {
+      .scrolling-content {
          @include flex-column;
          @include flex-group-top;
-         list-style: none;
-         padding: 0;
-         margin: 0 0 0 0;
          width: 100%;
+         height: 100%;
 
-         .aspect {
+         .aspects-list {
             @include flex-column;
             @include flex-group-top;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0 0;
             width: 100%;
 
-            &:not(:first-child) {
-               @include border-top;
-               padding-top: 0.25rem;
-               margin-top: 0.5rem;
-            }
-
-            .aspect-label {
-               @include flex-row;
-               @include flex-group-center;
-               font-size: 1rem;
-               font-weight: bold;
-            }
-
-            .aspect-options {
-               @include flex-row;
-               @include flex-group-center;
-               margin-top: 0.25rem;
-               flex-wrap: wrap;
-               width: 100%;
-
-               .aspect-option {
-                  @include border;
-                  font-size: 0.9rem;
-                  font-weight: bold;
-                  margin: 0.25rem;
-                  padding: 0.25rem;
-               }
-            }
-
-            .aspect-resistance-check {
+            .aspect {
                @include flex-column;
                @include flex-group-top;
-               margin-top: 0.5rem;
+               width: 100%;
 
-               .resistance-check-label {
-                  font-size: 0.9rem;
+               &:not(:first-child) {
+                  @include border-top;
+                  padding-top: 0.25rem;
+                  margin-top: 0.5rem;
+               }
+
+               .aspect-label {
+                  @include flex-row;
+                  @include flex-group-center;
+                  font-size: 1rem;
                   font-weight: bold;
                }
 
-               .resistance-check-value {
-                  @include border;
+               .aspect-options {
+                  @include flex-row;
+                  @include flex-group-center;
                   margin-top: 0.25rem;
-                  padding: 0.25rem;
+                  flex-wrap: wrap;
+                  width: 100%;
 
-                  &.reflexes {
-                     background-color: var(--reflexes-color-bright);
+                  .aspect-option {
+                     @include border;
+                     font-size: 0.9rem;
+                     font-weight: bold;
+                     margin: 0.25rem;
+                     padding: 0.25rem;
+                  }
+               }
+
+               .aspect-resistance-check {
+                  @include flex-column;
+                  @include flex-group-top;
+                  margin-top: 0.5rem;
+
+                  .resistance-check-label {
+                     font-size: 0.9rem;
+                     font-weight: bold;
                   }
 
-                  &.resilience {
-                     background-color: var(--resilience-color-bright);
-                  }
+                  .resistance-check-value {
+                     @include border;
+                     margin-top: 0.25rem;
+                     padding: 0.25rem;
 
-                  &.willpower {
-                     background-color: var(--willpower-color-bright);
+                     &.reflexes {
+                        background-color: var(--reflexes-color-bright);
+                     }
+
+                     &.resilience {
+                        background-color: var(--resilience-color-bright);
+                     }
+
+                     &.willpower {
+                        background-color: var(--willpower-color-bright);
+                     }
                   }
                }
             }
