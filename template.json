@@ -299,6 +299,11 @@
         "size": "",
         "tags": [],
         "version": 1.0
+      },
+      "casting": {
+        "attribute": "mind",
+        "skill": "arcana",
+        "traditions": []
       }
     },
     "player": {
