@@ -10,16 +10,11 @@
 </script>
 
 <div class="sidebar">
-   <!--Casting Check-->
-   <div class="casting-check">
-      <!--Label-->
-      <div class="label">
-         {localize("LOCAL.castingCheck.label")}:
-      </div>
-      <!--Value-->
-      <div class="value">
-         {$document.system.check.difficulty}:{$document.system.check.complexity}
-      </div>
+   <!--Header-->
+   <div class="header {$document.system.check.attribute}">
+      {`${localize(`LOCAL.${$document.system.check.attribute}.label`)} (${localize(
+         `LOCAL.${$document.system.check.skill}.label`
+      )}) ${$document.system.check.difficulty}:${$document.system.check.complexity}`}
    </div>
 
    <!--Aspects List-->
@@ -99,16 +94,25 @@
       padding: 0.5rem;
       margin-top: 0.5rem;
 
-      .casting-check {
+      .header {
          @include flex-row;
          @include flex-group-center;
-         @include border-bottom;
+         @include border;
+         border-radius: 0;
+         padding: 0.5rem;
+         font-weight: bold;
          width: 100%;
-         padding-bottom: 0.5rem;
 
-         .label {
-            font-weight: bold;
-            margin-right: 0.25rem;
+         &.body {
+            background-color: var(--body-color-bright);
+         }
+
+         &.mind {
+            background-color: var(--mind-color-bright);
+         }
+
+         &.soul {
+            background-color: var(--soul-color-bright);
          }
       }
 
