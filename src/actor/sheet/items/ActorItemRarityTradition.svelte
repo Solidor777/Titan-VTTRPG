@@ -3,6 +3,8 @@
 
    // Reference to the item
    export let item = void 0;
+
+   console.log(item.system);
 </script>
 
 <!--Footer-->

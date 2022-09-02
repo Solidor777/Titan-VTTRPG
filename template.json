@@ -364,6 +364,9 @@
           "attribute": "mind",
           "skill": "arcana"
         }
+      },
+      "tradition": {
+        "tradition": "Any"
       }
     },
     "gear": {
@@ -413,7 +416,8 @@
       "templates": [
         "base",
         "duration",
-        "check"
+        "check",
+        "tradition"
       ],
       "check": {
         "skill": "arcana",
