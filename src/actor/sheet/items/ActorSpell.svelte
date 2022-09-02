@@ -2,11 +2,9 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import ActorItemExpandButton from "./ActorItemExpandButton.svelte";
-   import ActorItemEquipButton from "./ActorItemEquipButton.svelte";
    import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
-   import ActorItemRarityValue from "./ActorItemRarityValue.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
    import ActorItemRarityTradition from "./ActorItemRarityTradition.svelte";
 
@@ -32,11 +30,6 @@
 
          <!--Controls-->
          <div class="item-controls">
-            <!--Toggle Equipped button-->
-            <div class="item-control-button">
-               <ActorItemEquipButton {item} equipped={item.system.equipped} />
-            </div>
-
             <!--Send to Chat button-->
             <div class="item-control-button">
                <ActorItemSendToChatButton {item} />

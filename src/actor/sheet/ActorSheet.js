@@ -32,9 +32,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
    // Is Expanded data
    isExpanded = {
       inventory: {},
-      actions: {
-         items: {}
-      },
+      actions: {},
       spells: {},
    };
 
@@ -53,8 +51,8 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          delete this.isExpanded.inventory[id];
       }
 
-      if (this.isExpanded.actions.items[id]) {
-         delete this.isExpanded.actions.items[id];
+      if (this.isExpanded.actions[id]) {
+         delete this.isExpanded.actions[id];
       }
 
       return;
@@ -72,6 +70,10 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          }
          case "armor": {
             itemName = game.i18n.localize(CONFIG.TITAN.local.newArmor);
+            break;
+         }
+         case "spell": {
+            itemName = game.i18n.localize(CONFIG.TITAN.local.newSpell);
             break;
          }
          default: {

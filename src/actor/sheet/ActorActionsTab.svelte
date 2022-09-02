@@ -34,7 +34,7 @@
                   return item.type === "weapon" && item.system.equipped === true;
                }}
                {filter}
-               isExpandedMap={application.isExpanded.inventory.actions.items}
+               isExpandedMap={application.isExpanded.actions}
             />
          </div>
       </div>

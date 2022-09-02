@@ -38,6 +38,7 @@ export const TITANLOCAL = Object.freeze({
   skillCheck: "LOCAL.skillCheck.label",
   resistanceCheck: "LOCAL.resistanceCheck.label",
   attackCheck: "LOCAL.attackCheck.label",
+  attack: "LOCAL.attack.label",
   roll: "LOCAL.roll.label",
   traits: "LOCAL.traits.label",
   cancel: "LOCAL.cancel.label",
@@ -97,5 +98,6 @@ export const TITANLOCAL = Object.freeze({
   sendToChat: "LOCAL.sendToChat.label",
   newWeapon: "LOCAL.newWeapon.label",
   newArmor: "LOCAL.newArmor.label",
+  newSpell: "LOCAL.newSpell.label",
   openSheetConfigurator: "LOCAL.openSheetConfigurator.label"
 });

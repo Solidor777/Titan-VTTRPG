@@ -4,7 +4,7 @@ export class TitanWeapon extends TitanTypeComponent {
 
    getAttackTemplate() {
       return {
-         name: "Attack",
+         name: game.i18n.localize(CONFIG.TITAN.local.attack),
          type: "melee",
          range: 1,
          attribute: "body",

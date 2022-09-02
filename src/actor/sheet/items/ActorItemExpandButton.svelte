@@ -7,6 +7,9 @@
 
    // Item
    export let item = void 0;
+
+   // Optional override for the name teext
+   export let name = false;
 </script>
 
 <div class="item-expand-button">
@@ -21,7 +24,7 @@
          <img class="item-image" src={item.img} alt="item" />
 
          <!--Name-->
-         <div>{item.name}</div>
+         <div>{name === false ? item.name : name}</div>
 
          <!--Icon-->
          <i class="fas fa-angle-double-down" />
