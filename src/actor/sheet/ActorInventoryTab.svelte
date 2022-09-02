@@ -2,27 +2,17 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorInventoryWeapon from "./items/ActorInventoryWeapon.svelte";
    import ActorInventoryArmor from "./items/ActorInventoryArmor.svelte";
-   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
    import ActorItemList from "./ActorItemList.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import ActorAddItemEntryButton from "./ActorAddItemEntryButton.svelte";
-
-   // Actor reference
-   const document = getContext("DocumentSheetObject");
 
    // Reference to the application
    const application = getContext("external").application;
 
    // Filter Items
    let filter = "";
-
-   // Initialize expanded object
-   $document.items.forEach((item) => {
-      application.isExpanded.inventory[item._id] = application.isExpanded.inventory[item._id] ?? false;
-   });
 </script>
 
 <div class="inventory-tab">
@@ -84,21 +74,6 @@
       @include flex-group-top;
       height: 100%;
       width: 100%;
-
-      .inventory-filter {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-bottom;
-         width: 100%;
-         font-size: 1rem;
-         font-weight: bold;
-         padding: 0.25rem;
-
-         .inventory-filter-input {
-            font-size: 1rem;
-            margin-left: 0.5rem;
-         }
-      }
 
       .scrolling-content {
          @include flex-column;

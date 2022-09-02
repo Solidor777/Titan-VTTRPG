@@ -1,72 +1,22 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorActionsWeapon from "./items/ActorActionsWeapon.svelte";
-   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
-
-   // Actor reference
-   const document = getContext("DocumentSheetObject");
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import ActorItemList from "./ActorItemList.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
 
-   // Initialize expanded object
-   // Weapons
-   $document.items
-      .filter((item) => item.type === "weapon")
-      .forEach((item) => {
-         application.isExpanded.actions.items[item._id] = application.isExpanded.actions.items[item._id] ?? true;
-      });
-
-   // Drag hover state
-   let dragHovered = "";
-   let dragType = "";
-
-   // Drag start item
-   function dragItemStart(event, id) {
-      const item = $document.items.get(id);
-      const dragData = item.toDragData();
-
-      if (!dragData) {
-         return;
-      }
-
-      event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-
-      return;
-   }
-
    // Filter actions
    let filter = "";
-
-   // Weapons
-   $: weapons = $document.items
-      .filter(
-         (item) =>
-            item.type === "weapon" &&
-            item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 &&
-            item.system.equipped === true
-      )
-      .sort((a, b) => {
-         if (a.sort < b.sort) {
-            return -1;
-         }
-         if (a.sort > b.sort) {
-            return 1;
-         }
-         return 0;
-      });
 </script>
 
 <div class="inventory-tab">
    <!--Filter-->
-   <div class="inventory-filter">
-      <div class="inventory-filter-label">{localize("LOCAL.filter.label")}</div>
-      <div class="inventory-filter-input"><TextInput bind:value={filter} /></div>
-   </div>
+   <TopFilter bind:filter />
+
    <!--Scrolling Containers-->
    <ScrollingContainer>
       <div class="scrolling-content">
@@ -78,36 +28,14 @@
             </div>
 
             <!--Weapon List-->
-            <ol>
-               <!--Each Weapon-->
-               {#each weapons as weapon}
-                  <li
-                     class="weapon{dragHovered === weapon._id ? ' drag-hovered' : ''}"
-                     data-item-id={weapon._id}
-                     draggable={true}
-                     on:dragstart={(event) => {
-                        dragHovered = weapon._id;
-                        dragType = "weapon";
-                        dragItemStart(event, weapon._id);
-                     }}
-                     on:dragenter={() => {
-                        if (dragType === "weapon") {
-                           dragHovered = weapon._id;
-                        }
-                     }}
-                     on:dragend={() => {
-                        dragHovered = "";
-                        dragType = "";
-                     }}
-                     transition:slide|local
-                  >
-                     <ActorActionsWeapon
-                        bind:id={weapon._id}
-                        bind:isExpanded={application.isExpanded.actions.items[weapon._id]}
-                     />
-                  </li>
-               {/each}
-            </ol>
+            <ActorItemList
+               itemComponent={ActorActionsWeapon}
+               filterFunction={(item) => {
+                  return item.type === "weapon" && item.system.equipped === true;
+               }}
+               {filter}
+               isExpandedMap={application.isExpanded.inventory.actions.items}
+            />
          </div>
       </div>
    </ScrollingContainer>
@@ -120,21 +48,6 @@
       @include flex-group-top;
       height: 100%;
       width: 100%;
-
-      .inventory-filter {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-bottom;
-         width: 100%;
-         font-size: 1rem;
-         font-weight: bold;
-         padding: 0.25rem;
-
-         .inventory-filter-input {
-            font-size: 1rem;
-            margin-left: 0.5rem;
-         }
-      }
 
       .scrolling-content {
          @include flex-column;
@@ -158,31 +71,6 @@
                @include flex-group-center;
                font-weight: bold;
                font-size: 1rem;
-            }
-
-            ol {
-               @include flex-column;
-               @include flex-group-top;
-               width: 100%;
-               margin: 0, 0, 0, 0.5rem;
-               padding: 0;
-               list-style: none;
-
-               li {
-                  @include flex-row;
-                  @include flex-space-between;
-                  @include border;
-                  width: 100%;
-                  padding: 0.5rem;
-
-                  &.drag-hovered {
-                     background: var(--highlight-background-color);
-                  }
-
-                  &:not(:first-child) {
-                     margin-top: 0.5rem;
-                  }
-               }
             }
          }
       }

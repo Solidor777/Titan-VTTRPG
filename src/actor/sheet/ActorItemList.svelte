@@ -20,9 +20,6 @@
    // Actor reference
    const document = getContext("DocumentSheetObject");
 
-   // Reference to the application
-   const application = getContext("external").application;
-
    // Currently drag hovered state
    let isDragHovering = false;
    let hoveredItemId = "";
