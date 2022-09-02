@@ -22,7 +22,8 @@
          return;
       }}
    >
-      {localize("LOCAL.multiAttack.label")}:
+      <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
+      {localize("LOCAL.multi.label")}:
       <div class="spacer" />
       <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
    </EfxButton>
@@ -33,7 +34,7 @@
 
    .item-equip-button {
       .spacer {
-         width: 0.5rem;
+         width: 0.25rem;
       }
    }
 </style>

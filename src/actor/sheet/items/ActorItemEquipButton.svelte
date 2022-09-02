@@ -26,7 +26,7 @@
 
    .item-equip-button {
       .spacer {
-         width: 0.5rem;
+         width: 0.25rem;
       }
    }
 </style>

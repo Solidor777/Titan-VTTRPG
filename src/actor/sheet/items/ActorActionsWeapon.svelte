@@ -34,6 +34,11 @@
 
          <!--Controls-->
          <div class="item-controls">
+            <!--Multi attack -->
+            <div class="item-expandable-content">
+               <ActorWeaponMultiAttackButton {item} />
+            </div>
+
             <!--Send to Chat button-->
             <div class="item-control-button">
                <ActorItemSendToChatButton {item} />
@@ -54,11 +59,6 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
-            <!--Multi attack -->
-            <div class="item-expandable-content">
-               <ActorWeaponMultiAttackButton {item} />
-            </div>
-
             <!--Item Description-->
             <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Attack Description"} />
