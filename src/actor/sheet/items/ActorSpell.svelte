@@ -8,12 +8,12 @@
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemRarityValue from "./ActorItemRarityValue.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
-   import ActorItemArmorStats from "./ActorArmorStats.svelte";
+   import ActorItemRarityTradition from "./ActorItemRarityTradition.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
 
-   // Reference to the armor id
+   // Reference to the weapon id
    export let id = void 0;
 
    // Collapsed object
@@ -24,7 +24,7 @@
 </script>
 
 {#if item}
-   <div class="actor-inventory-armor">
+   <div class="actor-spell">
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
@@ -34,7 +34,7 @@
          <div class="item-controls">
             <!--Toggle Equipped button-->
             <div class="item-control-button">
-               <ActorItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
+               <ActorItemEquipButton {item} equipped={item.system.equipped} />
             </div>
 
             <!--Send to Chat button-->
@@ -57,11 +57,6 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
-            <!--Armor Stats-->
-            <div class="item-expandable-content">
-               <ActorItemArmorStats {item} />
-            </div>
-
             <!--Item Description-->
             <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Item Description"} />
@@ -69,7 +64,7 @@
 
             <!--Footer-->
             <div class="item-expandable-content">
-               <ActorItemRarityValue {item} />
+               <ActorItemRarityTradition {item} />
             </div>
          </div>
       {/if}
@@ -79,7 +74,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .actor-inventory-armor {
+   .actor-spell {
       @include flex-column;
       width: 100%;
 

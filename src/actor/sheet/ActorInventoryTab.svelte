@@ -61,7 +61,7 @@
             />
 
             <!--Add Armor Button-->
-            <ActorAddItemEntryButton itemType={"weapon"} />
+            <ActorAddItemEntryButton itemType={"armor"} />
          </div>
       </ScrollingContainer>
    </div>

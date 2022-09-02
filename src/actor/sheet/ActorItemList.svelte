@@ -17,6 +17,8 @@
    // Whether the object should be expanded by default
    export let isExpandedDefault = false;
 
+   console.log(isExpandedMap);
+
    // Actor reference
    const document = getContext("DocumentSheetObject");
 

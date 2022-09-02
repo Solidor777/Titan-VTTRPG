@@ -26,7 +26,7 @@
 </script>
 
 {#if item}
-   <div class="actor-inventory-weapon-sheet">
+   <div class="actor-inventory-weapon">
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
@@ -76,7 +76,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .actor-inventory-weapon-sheet {
+   .actor-inventory-weapon {
       @include flex-column;
       width: 100%;
 

@@ -18,12 +18,12 @@
    // Collapsed object
    export let isExpanded = void 0;
 
-   // Weapon list
+   // Item reference
    $: item = $document.items.get(id);
 </script>
 
 {#if item}
-   <div class="actor-inventory-weapon-sheet">
+   <div class="actor-inventory-weapon">
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
@@ -68,7 +68,7 @@
 
             <!--Footer-->
             <div class="item-expandable-content">
-               <ActorItemRarityValue bind:item />
+               <ActorItemRarityValue {item} />
             </div>
          </div>
       {/if}
@@ -78,7 +78,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .actor-inventory-weapon-sheet {
+   .actor-inventory-weapon {
       @include flex-column;
       width: 100%;
 
