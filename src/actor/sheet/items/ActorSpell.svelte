@@ -7,6 +7,7 @@
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
    import ActorItemRarityTradition from "./ActorItemRarityTradition.svelte";
+   import ActorItemCheckLabel from "./ActorItemCheckLabel.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -30,6 +31,10 @@
 
          <!--Controls-->
          <div class="item-controls">
+            <div>
+               <ActorItemCheckLabel {item} />
+            </div>
+
             <!--Send to Chat button-->
             <div class="item-control-button">
                <ActorItemSendToChatButton {item} />

@@ -39,7 +39,7 @@
                   <!--Button for rolling the skill-->
                   <div class="skill-button" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
                      <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
-                        {localize(`LOCAL.${key}.label`)}
+                        {localize(`LOCAL.${key}.label`)}<i class="fas fa-dice" />
                      </EfxButton>
                   </div>
                   <!--Default Attribute Select-->
@@ -188,7 +188,10 @@
             }
 
             .skill-button {
-               width: 10rem;
+               width: 11rem;
+               i {
+                  margin-left: 0.25rem;
+               }
             }
             .default-attribute {
                @include flex-row;

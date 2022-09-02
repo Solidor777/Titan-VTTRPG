@@ -358,10 +358,12 @@
         "resolveCost": 0
       },
       "check": {
-        "difficulty": 4,
-        "complexity": 1,
-        "attribute": "mind",
-        "skill": "arcana"
+        "check": {
+          "difficulty": 4,
+          "complexity": 1,
+          "attribute": "mind",
+          "skill": "arcana"
+        }
       }
     },
     "gear": {
@@ -414,9 +416,13 @@
         "check"
       ],
       "check": {
+        "skill": "arcana",
+        "attribute": "mind",
         "autoCalculateCheck": true
       },
-      "tradition": "Any",
+      "difficulty": 4,
+      "complexity": 1,
+      "autoCalculateCheck": true,
       "standardAspects": {
         "range": {
           "enabled": true,

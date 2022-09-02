@@ -182,3 +182,17 @@
     z-index: var(--z-index-app);
   }
 }
+
+@mixin attribute-colors {
+  &.body {
+    background-color: var(--body-color-bright);
+  }
+
+  &.mind {
+    background-color: var(--mind-color-bright);
+  }
+
+  &.soul {
+    background-color: var(--soul-color-bright);
+  }
+}
