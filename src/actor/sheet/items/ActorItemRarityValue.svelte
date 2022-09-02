@@ -31,6 +31,7 @@
       @include flex-space-evenly;
       font-size: 0.9rem;
       font-weight: bold;
+      width: 100%;
 
       .item-footer-field {
          @include flex-row;

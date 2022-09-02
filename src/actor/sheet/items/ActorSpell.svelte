@@ -7,6 +7,7 @@
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
    import ActorItemRarityTradition from "./ActorItemRarityTradition.svelte";
+   import ActorItemCheckButtonSmall from "./ActorItemCheckButtonSmall.svelte";
    import ActorItemCheckLabel from "./ActorItemCheckLabel.svelte";
 
    // Reference to the docuement
@@ -32,7 +33,7 @@
          <!--Controls-->
          <div class="item-controls">
             <div>
-               <ActorItemCheckLabel {item} />
+               <ActorItemCheckButtonSmall {item} />
             </div>
 
             <!--Send to Chat button-->
@@ -55,6 +56,11 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
+            <!--Item Description-->
+            <div class="item-expandable-content">
+               <ActorItemCheckLabel {item} />
+            </div>
+
             <!--Item Description-->
             <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Item Description"} />
@@ -100,6 +106,10 @@
          margin-top: 0.5rem;
 
          .item-expandable-content {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+
             &:not(:first-child) {
                @include border-top;
                margin-top: 0.5rem;
