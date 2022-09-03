@@ -6,8 +6,10 @@
    import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
-   import ActorItemRarityValue from "./ActorItemRarityValue.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
+   import ActorItemFooter from "./ActorItemFooter.svelte";
+   import ActorItemRarity from "./ActorItemRarity.svelte";
+   import ActorItemValue from "./ActorItemValue.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -68,7 +70,10 @@
 
             <!--Footer-->
             <div class="item-expandable-content">
-               <ActorItemRarityValue {item} />
+               <ActorItemFooter>
+                  <ActorItemRarity {item} />
+                  <ActorItemValue {item} />
+               </ActorItemFooter>
             </div>
          </div>
       {/if}

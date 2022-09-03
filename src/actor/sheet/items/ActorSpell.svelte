@@ -6,9 +6,11 @@
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
-   import ActorItemRarityTradition from "./ActorItemRarityTradition.svelte";
    import ActorItemCheckButtonSmall from "./ActorItemCheckButtonSmall.svelte";
    import ActorItemCheckLabel from "./ActorItemCheckLabel.svelte";
+   import ActorItemFooter from "./ActorItemFooter.svelte";
+   import ActorItemRarity from "./ActorItemRarity.svelte";
+   import ActorItemTradition from "./ActorItemTradition.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -58,17 +60,16 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Description-->
             <div class="item-expandable-content">
-               <ActorItemCheckLabel {item} />
-            </div>
-
-            <!--Item Description-->
-            <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Item Description"} />
             </div>
 
             <!--Footer-->
             <div class="item-expandable-content">
-               <ActorItemRarityTradition {item} />
+               <ActorItemFooter>
+                  <ActorItemRarity {item} />
+                  <ActorItemTradition {item} />
+                  <ActorItemCheckLabel {item} />
+               </ActorItemFooter>
             </div>
          </div>
       {/if}

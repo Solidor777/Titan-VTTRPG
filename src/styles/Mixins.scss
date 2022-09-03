@@ -196,3 +196,21 @@
     background-color: var(--soul-color-bright);
   }
 }
+
+@mixin rarity-colors {
+  &.common {
+    background-color: var(--label-background-color);
+  }
+
+  &.uncommon {
+    background-color: var(--uncommon-color-bright);
+  }
+
+  &.rare {
+    background-color: var(--rare-color-bright);
+  }
+
+  &.unique {
+    background-color: var(--unique-color-bright);
+  }
+}
