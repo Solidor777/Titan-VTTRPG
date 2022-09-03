@@ -6,11 +6,12 @@
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
    import ActorItemDeleteButton from "./ActorItemDeleteButton.svelte";
    import ActorItemDescription from "./ActorItemDescription.svelte";
-   import ActorItemCheckButtonSmall from "./ActorItemCheckButtonSmall.svelte";
-   import ActorItemCheckLabel from "./ActorItemCheckLabel.svelte";
    import ActorItemFooter from "./ActorItemFooter.svelte";
    import ActorItemRarity from "./ActorItemRarity.svelte";
    import ActorItemTradition from "./ActorItemTradition.svelte";
+   import ActorCheckLabel from "~/actor/sheet/ActorCheckLabel.svelte";
+   import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
+   import ActorDicePool from "../ActorDicePool.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -35,7 +36,7 @@
          <!--Controls-->
          <div class="item-controls">
             <div>
-               <ActorItemCheckButtonSmall {item} />
+               <ActorCheckButtonSmall check={item.system.check} />
             </div>
 
             <!--Send to Chat button-->
@@ -68,7 +69,8 @@
                <ActorItemFooter>
                   <ActorItemRarity {item} />
                   <ActorItemTradition {item} />
-                  <ActorItemCheckLabel {item} />
+                  <ActorCheckLabel check={item.system.check} />
+                  <ActorDicePool attribute={item.system.check.attribute} skill={item.system.check.skill} />
                </ActorItemFooter>
             </div>
          </div>

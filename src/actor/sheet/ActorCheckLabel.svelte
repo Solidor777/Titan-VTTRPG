@@ -1,28 +1,29 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
-   export let item = void 0;
+   export let check = {
+      attribute: "body",
+      skill: "athletics",
+      difficulty: 4,
+      complexity: 0,
+   };
 </script>
 
 <!--Check label-->
-<div class="check-label {item.system.check.attribute}">
+<div class="check-label {check.attribute}">
    <!--Skill & Attribute-->
    <div class="skill-attribute">
-      {`${localize(`LOCAL.${item.system.check.attribute}.label`)} (${localize(
-         `LOCAL.${item.system.check.skill}.label`
-      )})`}
+      {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
    </div>
-
-   <div class="divider" />
 
    <!--DC-->
    <div class="difficulty-complexity">
-      {item.system.difficulty}:{item.system.complexity}
+      {check.difficulty}:{check.complexity}
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .check-label {
       @include flex-row;
@@ -36,16 +37,12 @@
          @include flex-group-top;
       }
 
-      .divider {
-         @include border-left;
-         height: 1rem;
-         margin-left: 0.25rem;
-         padding-right: 0.25rem;
-      }
-
       .difficulty-complexity {
+         @include border-left;
          @include flex-row;
          @include flex-group-center;
+         margin-left: 0.25rem;
+         padding-left: 0.25rem;
       }
    }
 </style>
