@@ -41,7 +41,7 @@ export class TitanSpell extends TitanTypeComponent {
          minutes: 4
       };
       this._calculateStandardAspectCost(standardAspects.duration, durationCosts);
-      this._prepareStandardAspectData(standardAspects.duration, game.i18n.localize("LOCAL.rounds.label"), true, false, 1);
+      this._prepareStandardAspectData(standardAspects.duration, game.i18n.localize("LOCAL.duration.label"), true, false, 1);
 
       // Decrease Mod
       this._calculateStandardAspectCost(standardAspects.decreaseMod, 0, 2);
@@ -170,7 +170,7 @@ export class TitanSpell extends TitanTypeComponent {
                         aspect.cost += optionCost[key];
                      }
                      else {
-                        aspect.cost += typeof optionCost === 'object' ? optionCost.get(aspect.value) : optionCost;
+                        aspect.cost += typeof optionCost === 'object' ? optionCost[aspect.value] : optionCost;
                      }
                   }
                }
@@ -219,6 +219,9 @@ export class TitanSpell extends TitanTypeComponent {
             // Initial value
             if (overcast === true) {
                aspectEntry.initialValue = initialValue;
+               if (aspect.value) {
+                  aspectEntry.label += ` (${game.i18n.localize(`LOCAL.${aspect.value}.label`)})`;
+               }
             }
             else if (aspect.value) {
                aspectEntry.initialValue = aspect.value;
