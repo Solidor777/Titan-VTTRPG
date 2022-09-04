@@ -1,5 +1,5 @@
-import TitanUtility from "../../helpers/Utility.js";
-import TitanSkillCheck from "../skill-check/SkillCheck.js";
+import TitanUtility from "~/helpers/Utility.js";
+import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
 
 export default class TitanAttackCheck extends TitanSkillCheck {
   _ensureValidConstruction(options) {
@@ -10,7 +10,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     // Check if the weapon is valid
     const weaponRollData = options.weaponRollData;
     if (!weaponRollData) {
-      console.log(
+      console.error(
         `TITAN | Attack Check failed during construction. Invalid Data. ${options}`
       );
       return false;
@@ -19,7 +19,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     // Check if the attack is valid
     const checkAttack = weaponRollData.attack[options.attackIdx];
     if (!checkAttack) {
-      console.log(
+      console.error(
         `TITAN | Attack Check failed during construction. Attack IDX. ${options}`
       );
       return false;
@@ -33,22 +33,20 @@ export default class TitanAttackCheck extends TitanSkillCheck {
       attribute: options.attribute ?? false,
       skill: options.skill ?? false,
       type: options.type ?? false,
-      targetDefense: options.targetDefense ?? 1,
-      attackerMelee: options.attackerMelee ?? 1,
-      attackerAccuracy: options.attackerAccuracy ?? 1,
+      targetDefense: options.targetDefense ?? false,
+      attackerMelee: options.attackerMelee ?? options.actorRollData.rating.melee.value,
+      attackerAccuracy: options.attackerAccuracy ?? options.actorRollData.rating.accuracy.value,
       difficulty: options.difficulty ?? false,
+      damageMod: options.damageMod ?? options.actorRollData.mod.damage.value,
       complexity: 1,
       diceMod: options.diceMod ?? 0,
       trainingMod: options.trainingMod ?? 0,
       expertiseMod: options.expertiseMod ?? 0,
-      damageMod: options.damageMod ?? 0,
       doubleExpertise: options.doubleExpertise ?? false,
       maximizeSuccesses: options.maximizeSuccesses ?? false,
       extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
       extraFailureOnCritical: options.extraFailureOnCritical ?? false,
-      weaponName:
-        options.weaponName ??
-        game.i18n.localize(CONFIG.TITAN.weapon.unarmed.label),
+      weaponName: options.weaponRollData.name,
       multiAttack: options.multiAttack ?? null,
     };
 
@@ -57,15 +55,9 @@ export default class TitanAttackCheck extends TitanSkillCheck {
 
   _calculateDerivedData(options) {
     // Get the weapon reference
-    const actorRollData = options.actorRollData;
     const weaponRollData = options.weaponRollData;
     const targetRollData = options.targetRollData;
     const checkAttack = weaponRollData.attack[options.attackIdx];
-
-    // Get the attack description
-    if (weaponRollData.attackDescription) {
-      this.parameters.attackDescription = weaponRollData.attackDescription;
-    }
 
     // Get the skill
     if (!this.parameters.skill) {
@@ -77,29 +69,23 @@ export default class TitanAttackCheck extends TitanSkillCheck {
       this.parameters.attribute = checkAttack.attribute;
     }
 
-    // Get the actor data
+    // Get the skill training and expertise value
     super._calculateDerivedData(options);
 
     // Cache the attack info
     this.parameters.attack = checkAttack;
 
-    // Get the skill training and expertise value
-    const skill = actorRollData.skill[this.parameters.skill];
-    this.parameters.skillTrainingDice = skill.training.value;
-    this.parameters.skillExpertise = skill.expertise.value;
+    // Get the attack description
+    if (weaponRollData.attackDescription && weaponRollData.attackDescription.length > 0) {
+      this.parameters.attackDescription = weaponRollData.attackDescription;
+    }
 
     // Get the attack type
     if (!this.parameters.type) {
       this.parameters.type = checkAttack.type;
     }
 
-    // Calculate ratings
-    if (!this.parameters.attackerMelee) {
-      this.parameters.attackerMelee = actorRollData.rating.melee.value;
-    }
-    if (!this.parameters.attackerAccuracy) {
-      this.parameters.attackerAccuracy = actorRollData.rating.accuracy.value;
-    }
+    // Calculate defense rating ratings
     if (!this.parameters.targetDefense && targetRollData) {
       this.parameters.targetDefense = targetRollData.rating.defense.value;
     }

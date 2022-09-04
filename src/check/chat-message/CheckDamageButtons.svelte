@@ -87,10 +87,9 @@
    </div>
 
    <!--Apply healing button-->
-   <!--Apply half damage button-->
    <div class="button" data-titan-tooltip={localize("LOCAL.healDamage.label")}>
       <EfxButton
-         efx="{ripple}1"
+         efx={ripple}
          on:click={() => {
             healDamage(results.damage);
          }}><i class="fas fa-heart" /></EfxButton

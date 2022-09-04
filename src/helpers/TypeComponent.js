@@ -6,4 +6,8 @@ export class TitanTypeComponent {
   prepareDerivedData() {
     return;
   }
+
+  getRollData(rollData) {
+    return rollData;
+  }
 }
