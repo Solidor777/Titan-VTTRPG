@@ -2,31 +2,31 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
 
-   export let attribute = "body";
-   export let skill = void 0;
+   export let skill = "athletics";
+   export let attribute = "";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
 </script>
 
 <!--Dice Pool-->
-<div class="dice-pool {attribute}">
+<div class="expertise {attribute}">
    <!--Label-->
    <div class="label">
-      <i class="fas fa-dice-d6" />
-      {localize("LOCAL.dice.label")}:
+      <i class="fas fa-graduation-cap" />
+      {localize("LOCAL.expertise.label")}:
    </div>
 
    <!--Value-->
    <div class="value">
-      {$document.system.attribute[attribute].value + (skill ? $document.system.skill[skill].training.value : 0)}
+      {$document.system.skill[skill].expertise.value}
    </div>
 </div>
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .dice-pool {
+   .expertise {
       @include flex-row;
       @include flex-group-center;
       @include border;

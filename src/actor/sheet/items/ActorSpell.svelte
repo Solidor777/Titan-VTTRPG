@@ -12,6 +12,8 @@
    import ActorCheckLabel from "~/actor/sheet/ActorCheckLabel.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
    import ActorDicePool from "../ActorDicePool.svelte";
+   import ActorExpertise from "../ActorExpertise.svelte";
+   import ActorCheckLabelLong from "../ActorCheckLabelLong.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -59,6 +61,11 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
+            <!--Item Check Data-->
+            <div class="item-expandable-content">
+               <ActorCheckLabelLong check={item.system.check} />
+            </div>
+
             <!--Item Description-->
             <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Item Description"} />
@@ -69,8 +76,6 @@
                <ActorItemFooter>
                   <ActorItemRarity {item} />
                   <ActorItemTradition {item} />
-                  <ActorCheckLabel check={item.system.check} />
-                  <ActorDicePool attribute={item.system.check.attribute} skill={item.system.check.skill} />
                </ActorItemFooter>
             </div>
          </div>

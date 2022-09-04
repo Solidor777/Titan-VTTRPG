@@ -17,12 +17,25 @@
 <div class="item-check-button {check.attribute}">
    <EfxButton>
       <div class="button-inner">
-         {check.difficulty}:{check.complexity}
-         <div class="pool">
-            ({$document.system.attribute[check.attribute].value +
-               (check.skill ? $document.system.skill[check.skill].training.value : 0)})
+         <!--DC-->
+         <div class="dc">
+            {check.difficulty}:{check.complexity}
          </div>
-         <i class="fas fa-dice" />
+
+         <!--Pool-->
+         <div class="pool">
+            <i class="fas fa-dice-d6" />
+            {$document.system.attribute[check.attribute].value +
+               (check.skill ? $document.system.skill[check.skill].training.value : 0)}
+         </div>
+
+         <!--Expertise-->
+         {#if check.skill && $document.system.skill[check.skill].expertise.value > 0}
+            <div class="expertise">
+               <i class="fa fa-graduation-cap" />
+               {$document.system.skill[check.skill].expertise.value}
+            </div>
+         {/if}
       </div>
    </EfxButton>
 </div>
@@ -53,13 +66,23 @@
          padding: 0.25rem;
          font-size: 1rem;
 
+         i {
+            margin-right: 0.25rem;
+         }
+
          .pool {
+            @include flex-row;
+            @include flex-group-center;
             @include border-left;
             padding-left: 0.25rem;
             margin-left: 0.25rem;
          }
 
-         i {
+         .expertise {
+            @include flex-row;
+            @include flex-group-center;
+            @include border-left;
+            padding-left: 0.25rem;
             margin-left: 0.25rem;
          }
       }

@@ -1,0 +1,113 @@
+<script>
+   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { getContext } from "svelte";
+
+   // Reference to the docuement
+   const document = getContext("DocumentSheetObject");
+
+   export let check = {
+      attribute: "body",
+      skill: "athletics",
+      difficulty: 4,
+      complexity: 0,
+   };
+</script>
+
+<!--Check label-->
+<div class="check-label {check.attribute}">
+   <!--Skill & Attribute-->
+   <div class="skill-attribute">
+      {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
+   </div>
+
+   <!--DC-->
+   <div class="stat">
+      {check.difficulty}:{check.complexity}
+   </div>
+
+   <!--Pool-->
+   <div class="stat">
+      <!--Label-->
+      <div class="label">
+         <i class="fas fa-dice-d6" />
+         {localize("LOCAL.dice.label")}:
+      </div>
+
+      <!--Value-->
+      <div class="value">
+         {$document.system.attribute[check.attribute].value +
+            (check.skill ? $document.system.skill[check.skill].training.value : 0)}
+      </div>
+   </div>
+
+   <!--Skill stats-->
+   {#if check.skill}
+      <!--Expertise-->
+      {#if $document.system.skill[check.skill].expertise.value > 0}
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               <i class="fas fa-graduation-cap" />
+               {localize("LOCAL.expertise.label")}:
+            </div>
+
+            <!--Value-->
+            <div class="value">
+               {$document.system.skill[check.skill].expertise.value}
+            </div>
+         </div>
+      {/if}
+
+      <!--Training-->
+      {#if $document.system.skill[check.skill].expertise.value > 0}
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               <i class="fas fa-dumbbell" />
+               {localize("LOCAL.training.label")}:
+            </div>
+
+            <!--Value-->
+            <div class="value">
+               {$document.system.skill[check.skill].training.value}
+            </div>
+         </div>
+      {/if}
+   {/if}
+</div>
+
+<style lang="scss">
+   @import "../../Styles/Mixins.scss";
+
+   .check-label {
+      @include flex-row;
+      @include flex-group-center;
+      @include attribute-colors;
+      @include border;
+      padding: 0.25rem;
+      flex-wrap: wrap;
+
+      .skill-attribute {
+         @include flex-row;
+         @include flex-group-top;
+      }
+
+      .stat {
+         @include border-left;
+         @include flex-row;
+         @include flex-group-center;
+         margin-left: 0.25rem;
+         padding-left: 0.25rem;
+
+         .label {
+            @include flex-row;
+            @include flex-group-center;
+            margin-right: 0.25rem;
+
+            i {
+               margin-right: 0.25rem;
+            }
+         }
+      }
+   }
+</style>
