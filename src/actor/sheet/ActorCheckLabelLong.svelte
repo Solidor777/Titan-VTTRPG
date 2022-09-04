@@ -21,7 +21,7 @@
    </div>
 
    <!--DC-->
-   <div class="stat">
+   <div class="stat label">
       {check.difficulty}:{check.complexity}
    </div>
 
@@ -89,7 +89,15 @@
 
       .skill-attribute {
          @include flex-row;
-         @include flex-group-top;
+         @include flex-group-center;
+         font-weight: bold;
+      }
+
+      .label {
+         @include flex-row;
+         @include flex-group-center;
+         margin-right: 0.25rem;
+         font-weight: bold;
       }
 
       .stat {
@@ -100,8 +108,6 @@
          padding-left: 0.25rem;
 
          .label {
-            @include flex-row;
-            @include flex-group-center;
             margin-right: 0.25rem;
 
             i {

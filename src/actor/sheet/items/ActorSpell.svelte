@@ -9,11 +9,10 @@
    import ActorItemFooter from "./ActorItemFooter.svelte";
    import ActorItemRarity from "./ActorItemRarity.svelte";
    import ActorItemTradition from "./ActorItemTradition.svelte";
-   import ActorCheckLabel from "~/actor/sheet/ActorCheckLabel.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
-   import ActorDicePool from "../ActorDicePool.svelte";
-   import ActorExpertise from "../ActorExpertise.svelte";
    import ActorCheckLabelLong from "../ActorCheckLabelLong.svelte";
+   import ActorSpellAspect from "./ActorSpellAspect.svelte";
+   import ActorSpellAspects from "./ActorSpellAspects.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -65,6 +64,12 @@
             <div class="item-expandable-content">
                <ActorCheckLabelLong check={item.system.check} />
             </div>
+
+            {#if item.aspects}
+               <div class="item-expandable-content">
+                  <ActorSpellAspects aspects={item.aspects} />
+               </div>
+            {/if}
 
             <!--Item Description-->
             <div class="item-expandable-content">
