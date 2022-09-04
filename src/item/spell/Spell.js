@@ -220,7 +220,7 @@ export class TitanSpell extends TitanTypeComponent {
             if (overcast === true) {
                aspectEntry.initialValue = initialValue;
                if (aspect.value) {
-                  aspectEntry.label += ` (${game.i18n.localize(`LOCAL.${aspect.value}.label`)})`;
+                  aspectEntry.label = game.i18n.localize(`LOCAL.${aspect.value}.label`);
                }
             }
             else if (aspect.value) {

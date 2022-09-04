@@ -22,10 +22,13 @@
          return;
       }}
    >
-      <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
-      {localize("LOCAL.multi.label")}:
-      <div class="spacer" />
-      <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
+      <div class="button-inner">
+         <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
+         <div class="label">
+            {localize("LOCAL.multi.label")}
+         </div>
+         <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
+      </div>
    </EfxButton>
 </div>
 
@@ -33,8 +36,14 @@
    @import "../../../Styles/Mixins.scss";
 
    .item-equip-button {
-      .spacer {
-         width: 0.25rem;
+      .button-inner {
+         @include flex-row;
+         @include flex-group-center;
+         height: 100%;
+
+         :not(:first-child) {
+            margin-left: 0.25rem;
+         }
       }
    }
 </style>
