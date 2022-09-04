@@ -303,7 +303,6 @@ export class TitanActor extends Actor {
       // Add the weapon data to the check options
       const weaponRollData = checkWeapon.getRollData();
       checkOptions.weaponRollData = weaponRollData;
-      checkOptions.weaponName = checkWeapon.name;
 
       // Get the target check data
       let userTargets = Array.from(game.user.targets);
@@ -361,6 +360,76 @@ export class TitanActor extends Actor {
       if (attackCHeck && attackCHeck.isValid) {
          await attackCHeck.evaluateCheck();
          await attackCHeck.sendToChat({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this }),
+            rollMode: game.settings.get("core", "rollMode"),
+         });
+      }
+
+      return;
+   }
+
+   async getCastingCheck(options) {
+      // Get the weapon check data.
+      const checkSpell = this.items.get(options?.itemId);
+      if (!checkSpell || checkSpell.type !== "spell") {
+         console.error(
+            "TITAN | Casting check failed. Invalid Spell ID provided to actor."
+         );
+
+         return false;
+      }
+
+      // Initialize check options
+      let checkOptions = options;
+      checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
+
+      // Add the actor check data to the check options
+      const actorRollData = this.getRollData();
+      checkOptions.actorRollData = actorRollData;
+
+      // Add the weapon data to the check options
+      const spellRollData = checkSpell.getRollData();
+      checkOptions.spellRollData = spellRollData;
+
+      // Get the target check data
+      let userTargets = Array.from(game.user.targets);
+      if (userTargets.length < 1 && game.user.isGM) {
+         userTargets = Array.from(canvas.tokens.controlled);
+      }
+
+      // Perform the attack
+      const castingCheck = new TitanCastingCheck(checkOptions);
+      return castingCheck;
+   }
+
+   async rollCastingCheck(options) {
+      // If get options, then create a dialog for setting options.
+      if (options?.getOptions === true) {
+         // Get the spell check data.
+         const checkSpell = this.items.get(options?.itemId);
+         if (!checkSpell || checkSpell.type !== "spell") {
+            console.error(
+               "TITAN | Casting check failed. Invalid Spell ID provided to actor."
+            );
+
+            return false;
+         }
+
+         // Get the damage mod
+         options.damageMod = options.damageMod ?? this.system.mod.damage.value;
+
+         // Create the dialog
+         // const dialog = new CastingCheckDialog(this, options);
+         // dialog.render(true);
+         return;
+      }
+
+      // Otherwise, get a check
+      const castingCHeck = await this.getCastingCheck(options);
+      if (castingCHeck && castingCHeck.isValid) {
+         await castingCHeck.evaluateCheck();
+         await castingCHeck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
             rollMode: game.settings.get("core", "rollMode"),
@@ -491,78 +560,6 @@ export class TitanActor extends Actor {
          }
 
       });
-
-      return;
-   }
-
-   async getCastingCheck(options) {
-      // Get the weapon check data.
-      const checkSpell = this.items.get(options?.itemId);
-      if (!checkSpell || checkSpell.type !== "spell") {
-         console.error(
-            "TITAN | Casting check failed. Invalid Spell ID provided to actor."
-         );
-
-         return false;
-      }
-
-      // Initialize check options
-      let checkOptions = options;
-      checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
-
-      // Add the actor check data to the check options
-      const actorRollData = this.getRollData();
-      checkOptions.actorRollData = actorRollData;
-
-      // Add the weapon data to the check options
-      const spellRollData = checkSpell.getRollData();
-      checkOptions.spellRollData = spellRollData;
-      checkOptions.spellName = checkSpell.name;
-      checkOptions.spellAspects = checkSpell.aspects;
-
-      // Get the target check data
-      let userTargets = Array.from(game.user.targets);
-      if (userTargets.length < 1 && game.user.isGM) {
-         userTargets = Array.from(canvas.tokens.controlled);
-      }
-
-      // Perform the attack
-      const castingCheck = new TitanCastingCheck(checkOptions);
-      return castingCheck;
-   }
-
-   async rollCastingCheck(options) {
-      // If get options, then create a dialog for setting options.
-      if (options?.getOptions === true) {
-         // Get the spell check data.
-         const checkSpell = this.items.get(options?.itemId);
-         if (!checkSpell || checkSpell.type !== "spell") {
-            console.error(
-               "TITAN | Casting check failed. Invalid Spell ID provided to actor."
-            );
-
-            return false;
-         }
-
-         // Get the damage mod
-         options.damageMod = options.damageMod ?? this.system.mod.damage.value;
-
-         // Create the dialog
-         // const dialog = new CastingCheckDialog(this, options);
-         // dialog.render(true);
-         return;
-      }
-
-      // Otherwise, get a check
-      const castingCHeck = await this.getCastingCheck(options);
-      if (castingCHeck && castingCHeck.isValid) {
-         await castingCHeck.evaluateCheck();
-         await castingCHeck.sendToChat({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this }),
-            rollMode: game.settings.get("core", "rollMode"),
-         });
-      }
 
       return;
    }

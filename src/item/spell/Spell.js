@@ -292,4 +292,10 @@ export class TitanSpell extends TitanTypeComponent {
 
       return;
    }
+
+   getRollData(rollData) {
+      rollData.aspects = this.parent.aspects;
+
+      return rollData;
+   }
 }

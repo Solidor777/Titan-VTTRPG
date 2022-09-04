@@ -72,7 +72,7 @@ export class TitanItem extends Item {
       let rollData = super.getRollData();
       rollData.name = this.name;
       if (this.typeComponent) {
-         rollData = this.typeComponent.getRollData(rollData);
+         return this.typeComponent.getRollData(rollData);
       }
 
       return rollData;

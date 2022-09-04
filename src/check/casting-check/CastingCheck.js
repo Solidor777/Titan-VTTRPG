@@ -31,10 +31,8 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          maximizeSuccesses: options.maximizeSuccesses ?? false,
          extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
-         spellName:
-            options.spellName ??
-            game.i18n.localize(CONFIG.TITAN.spell.label),
-         spellAspects: options.spellAspects ?? false
+         spellName: options.spellRollData.name,
+         spellAspects: options.spellRollData.aspects
       };
 
       return parameters;
