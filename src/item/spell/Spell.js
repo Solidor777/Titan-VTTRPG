@@ -109,11 +109,11 @@ export class TitanSpell extends TitanTypeComponent {
          m10: 3
       };
       this._calculateStandardAspectCost(standardAspects.decreaseSpeed, 0, speedCosts);
-      this._prepareStandardAspectData(standardAspects.decreaseSpeed, game.i18n.localize("LOCAL.decreaseSpeed.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseSpeed, game.i18n.localize("LOCAL.decreaseSpeed.label"), false, true);
 
       // Increase Speed
       this._calculateStandardAspectCost(standardAspects.increaseSpeed, 0, speedCosts);
-      this._prepareStandardAspectData(standardAspects.increaseSpeed, game.i18n.localize("LOCAL.increaseSpeed.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.increaseSpeed, game.i18n.localize("LOCAL.increaseSpeed.label"), false, true);
 
       // Process custom aspects
       this.parent.system.customAspects.forEach((element) => {
