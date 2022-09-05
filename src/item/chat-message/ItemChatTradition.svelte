@@ -8,4 +8,4 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<ItemChatTag label={`${localize("LOCAL.value.label")}: ${chatContext.system.value}`} />
+<ItemChatTag label={`${localize("LOCAL.tradition.label")}: ${chatContext.system.tradition}`} />

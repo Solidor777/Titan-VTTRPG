@@ -41,6 +41,7 @@
 
       .info-container {
          width: 100%;
+
          .info {
             &:not(:first-child) {
                @include border-top;
