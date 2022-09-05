@@ -21,9 +21,11 @@
    </div>
 
    <!--DC-->
-   <div class="stat label">
-      {check.difficulty}:{check.complexity}
-   </div>
+   {#if check.difficulty}
+      <div class="stat label">
+         {check.difficulty}:{check.complexity}
+      </div>
+   {/if}
 
    <!--Pool-->
    <div class="stat">

@@ -101,15 +101,6 @@
             .stat {
                margin: 0.25rem;
             }
-
-            .trait {
-               @include flex-row;
-               @include flex-group-center;
-               @include border;
-               font-weight: bold;
-               margin: 0.25rem;
-               padding: 0.25rem;
-            }
          }
       }
    }

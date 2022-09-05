@@ -1,5 +1,5 @@
 <script>
-   import ActorSpellAspect from "./ActorSpellAspect.svelte";
+   import SpellAspect from "./SpellAspect.svelte";
 
    // Aspects list
    export let aspects = void 0;
@@ -39,14 +39,14 @@
    {#each aspectSizeMap as aspectSizeMap}
       {#if aspects[aspectSizeMap.idx]}
          <div class="aspect">
-            <ActorSpellAspect aspect={aspects[aspectSizeMap.idx]} />
+            <SpellAspect aspect={aspects[aspectSizeMap.idx]} />
          </div>
       {/if}
    {/each}
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .aspects {
       @include flex-row;

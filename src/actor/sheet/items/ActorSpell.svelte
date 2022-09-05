@@ -10,9 +10,8 @@
    import ActorItemRarity from "./ActorItemRarity.svelte";
    import ActorItemTradition from "./ActorItemTradition.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
-   import ActorCheckLabelLong from "../ActorCheckLabelLong.svelte";
-   import ActorSpellAspect from "./ActorSpellAspect.svelte";
-   import ActorSpellAspects from "./ActorSpellAspects.svelte";
+   import CheckLabelLong from "~/helpers/svelte-components/CheckLabelLong.svelte";
+   import SpellAspects from "~/item/spell/SpellAspects.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
@@ -70,12 +69,12 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Check Data-->
             <div class="item-expandable-content">
-               <ActorCheckLabelLong check={item.system.check} />
+               <CheckLabelLong check={item.system.check} />
             </div>
 
             {#if item.aspects}
                <div class="item-expandable-content">
-                  <ActorSpellAspects aspects={item.aspects} />
+                  <SpellAspects aspects={item.aspects} />
                </div>
             {/if}
 
