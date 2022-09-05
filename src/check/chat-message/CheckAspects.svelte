@@ -29,6 +29,7 @@
       margin-top: 0.5rem;
       padding: 0.5rem;
       width: 100%;
+      background-color: var(--label-background-color);
 
       .aspect {
          @include flex-row;
