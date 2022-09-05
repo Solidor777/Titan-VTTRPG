@@ -20,7 +20,7 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.spells}>
          <!--Spells-->
          <div class="category">
             <!--List Header-->

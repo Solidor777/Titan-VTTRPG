@@ -29,11 +29,19 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       return buttons;
    }
 
-   // Is Expanded data
+   // Is Expanded State
    isExpanded = {
       inventory: {},
       actions: {},
       spells: {},
+   };
+
+   // Scroll State
+   scrollTop = {
+      skills: 0,
+      actions: 0,
+      inventory: 0,
+      spells: 0
    };
 
    // Embedded item edit

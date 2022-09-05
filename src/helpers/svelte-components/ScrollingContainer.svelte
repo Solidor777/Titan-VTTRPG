@@ -25,10 +25,22 @@
          scrollClass = "";
       } */
    }
+
+   export let scrollTop = 0;
+
+   function onScroll(event) {
+      scrollTop = event.target.scrollTop;
+   }
+
+   function initialScroll(node) {
+      node.scrollTop = scrollTop;
+
+      return;
+   }
 </script>
 
 <div class="container">
-   <div class="content{scrollClass}" on:scroll={scrollFade}>
+   <div class="content{scrollClass}" on:scroll={onScroll} use:initialScroll>
       <slot>Scrolling Content</slot>
    </div>
 </div>

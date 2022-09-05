@@ -21,7 +21,7 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.inventory}>
          <!--Weapons-->
          <div class="category">
             <!--List Header-->

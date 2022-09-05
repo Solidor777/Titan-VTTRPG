@@ -49,7 +49,7 @@
       {/if}
 
       <!--Training-->
-      {#if $document.system.skill[attack.skill].expertise.value > 0}
+      {#if $document.system.skill[attack.skill].training.value > 0}
          <div class="stat">
             <!--Label-->
             <div class="label">

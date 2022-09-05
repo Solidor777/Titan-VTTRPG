@@ -61,7 +61,7 @@
       {/if}
 
       <!--Training-->
-      {#if $document.system.skill[check.skill].expertise.value > 0}
+      {#if $document.system.skill[check.skill].training.value > 0}
          <div class="stat">
             <!--Label-->
             <div class="label">

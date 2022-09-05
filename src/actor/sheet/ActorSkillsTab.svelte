@@ -29,7 +29,7 @@
       <div class="filter-label">{localize("LOCAL.filter.label")}</div>
       <div class="filter-field"><TextInput bind:value={filter} /></div>
    </div>
-   <ScrollingContainer>
+   <ScrollingContainer bind:scrollTop={application.scrollTop.skills}>
       <ol>
          <!--Each skill-->
          {#each filteredList as [key]}

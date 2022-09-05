@@ -18,7 +18,7 @@
    <TopFilter bind:filter />
 
    <!--Scrolling Containers-->
-   <ScrollingContainer>
+   <ScrollingContainer bind:scrollTop={application.scrollTop.actions}>
       <div class="scrolling-content">
          <!--Weapons-->
          <div class="category">
@@ -35,6 +35,7 @@
                }}
                {filter}
                isExpandedMap={application.isExpanded.actions}
+               isExpandedDefault={true}
             />
          </div>
       </div>
