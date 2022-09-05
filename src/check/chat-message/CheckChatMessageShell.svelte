@@ -10,6 +10,7 @@
    // Document reference
    const document = getContext("DocumentSheetObject");
    const chatContext = $document.flags.titan.chatContext;
+   const isOwner = $document.constructor.getSpeakerActor($document.speaker).isOwner;
 </script>
 
 <div class="check-chat-message">
@@ -17,9 +18,10 @@
    <CheckChatDiceContainer />
    <CheckChatResults />
 
-   {#if chatContext.results.extraSuccesses !== undefined && chatContext.parameters.aspects}
+   {#if chatContext.parameters.aspects && chatContext.results.extraSuccesses !== undefined && isOwner}
       <CheckAspects />
    {/if}
+
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.damage !== undefined && game.user.isGM}
       <CheckDamageButtons />
