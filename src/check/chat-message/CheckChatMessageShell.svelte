@@ -1,11 +1,11 @@
 <script>
    import { getContext } from "svelte";
    import CheckAspects from "./CheckAspects.svelte";
-
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
    import CheckChatResults from "./CheckChatResults.svelte";
    import CheckDamageButtons from "./CheckDamageButtons.svelte";
+   import CheckHealingButton from "./CheckHealingButton.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -21,8 +21,13 @@
       <CheckAspects />
    {/if}
    <!-- svelte-ignore missing-declaration -->
-   {#if chatContext.results.damage && game.user.isGM}
+   {#if chatContext.results.damage !== undefined && game.user.isGM}
       <CheckDamageButtons />
+   {/if}
+
+   <!-- svelte-ignore missing-declaration -->
+   {#if chatContext.results.healing !== undefined && game.user.isGM}
+      <CheckHealingButton />
    {/if}
 </div>
 

@@ -79,12 +79,12 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("LOCAL.suggestedDifficultyAndComplexity.label")}:
+                  {localize("LOCAL.totalCost.label")}:
                </div>
 
                <!--Value-->
                <div class="value">
-                  {$document.suggestedDifficulty}:{$document.suggestedComplexity}
+                  {$document.totalAspectCost}
                </div>
             </div>
          </div>

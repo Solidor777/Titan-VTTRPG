@@ -144,6 +144,7 @@
       @include flex-space-between;
       font-size: 1rem;
       width: 100%;
+      min-height: 2rem;
       height: 100%;
 
       .label {

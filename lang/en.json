@@ -50,6 +50,7 @@
   "LOCAL.body.editStaticMod.label": "Edit bonus or penalty to Body.",
   "LOCAL.body.label": "Body",
   "LOCAL.body.value.label": "Total Body score.",
+  "LOCAL.totalCost.label": "Total Cost",
   "LOCAL.bonusPenaltyDice.label": "Bonus / Penalty Dice",
   "LOCAL.burrow.desc.label": "Burrowing through earth and rock.",
   "LOCAL.burrow.editBaseValue.label": "Edit Burrow speed.",
