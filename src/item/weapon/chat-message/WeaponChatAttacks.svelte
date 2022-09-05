@@ -1,7 +1,8 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import ItemChatStat from "../../chat-message/ItemChatStat.svelte";
+   import StatTag from "~/helpers/svelte-components/StatTag.svelte";
+   import Tag from "../../../helpers/svelte-components/Tag.svelte";
    const document = getContext("DocumentSheetObject");
 
    // Chat context reference
@@ -23,25 +24,22 @@
          <div class="row stats">
             <!--Range-->
             <div class="stat">
-               <ItemChatStat label={localize("LOCAL.range.label")} value={attack.range} />
+               <StatTag label={localize("LOCAL.range.label")} value={attack.range} />
             </div>
 
             <!--Attribute-->
             <div class="stat">
-               <ItemChatStat
-                  label={localize("LOCAL.attribute.label")}
-                  value={localize(`LOCAL.${attack.attribute}.label`)}
-               />
+               <StatTag label={localize("LOCAL.attribute.label")} value={localize(`LOCAL.${attack.attribute}.label`)} />
             </div>
 
             <!--Skill-->
             <div class="stat">
-               <ItemChatStat label={localize("LOCAL.skill.label")} value={localize(`LOCAL.${attack.skill}.label`)} />
+               <StatTag label={localize("LOCAL.skill.label")} value={localize(`LOCAL.${attack.skill}.label`)} />
             </div>
 
             <!--Damage-->
             <div class="stat">
-               <ItemChatStat
+               <StatTag
                   label={localize("LOCAL.damage.label")}
                   value={`${attack.damage}${
                      attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
@@ -51,10 +49,11 @@
 
             <!--Traits-->
             {#each attack.traits as trait}
-               <div class="trait">
-                  {localize(`LOCAL.${trait.name}.label`)}
+               <div class="stat">
                   {#if trait.type === "number"}
-                     {trait.value}
+                     <StatTag label={localize(`LOCAL.${trait.name}.label`)} value={trait.value} />
+                  {:else}
+                     <Tag label={localize(`LOCAL.${trait.name}.label`)} />
                   {/if}
                </div>
             {/each}
@@ -101,7 +100,6 @@
 
             .stat {
                margin: 0.25rem;
-               padding: 0.25rem;
             }
 
             .trait {
