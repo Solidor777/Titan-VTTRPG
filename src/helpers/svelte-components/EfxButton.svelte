@@ -3,9 +3,10 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
 
    export let efx = ripple;
+   export let disabled = false;
 </script>
 
-<button on:click on:mousedown={preventDefault} use:efx>
+<button on:click on:mousedown={preventDefault} use:efx {disabled}>
    <slot />
 </button>
 
@@ -14,7 +15,6 @@
 
    button {
       @include button;
-      cursor: pointer;
       position: relative;
       overflow: hidden;
       clip-path: var(--tjs-icon-button-clip-path, none);
@@ -24,7 +24,8 @@
    }
 
    button:hover {
-      background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
-      clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
+      &:not(:disabled) {
+         clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
+      }
    }
 </style>

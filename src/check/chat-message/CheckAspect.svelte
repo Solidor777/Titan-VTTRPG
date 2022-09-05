@@ -62,13 +62,14 @@
 
    function resetAspect() {
       // Get the aspect delta
-      const delta = (aspect.currentValue - aspect.initialValue) * aspect.cost;
+      const delta = aspect.currentValue - aspect.initialValue;
+      const cost = delta * aspect.cost;
 
       // Reset the aspect to its original value
       aspect.currentValue = aspect.initialValue;
 
       // Reset the extra successes
-      chatContext.results.extraSuccesses += delta;
+      chatContext.results.extraSuccesses += cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
@@ -100,40 +101,41 @@
 <div class="aspect">
    <!--Label and value-->
    <div class="label">
-      {aspect.label}: {aspect.currentValue} + {getExtraSuccessCostLabel()}
+      <div class="label-inner">
+         {aspect.label}: {aspect.currentValue}
+      </div>
+      <div>
+         + {getExtraSuccessCostLabel()}
+      </div>
    </div>
 
    <div class="controls">
-      {#if aspect.currentValue > aspect.initialValue}
-         <!--Reset Button-->
-         <div class="control">
-            <EfxButton on:click={resetAspect}>
-               <div class="button-inner">
-                  <i class="fas fa-arrow-rotate-left" />
-               </div>
-            </EfxButton>
-         </div>
+      <!--Reset Button-->
+      <div class="control">
+         <EfxButton on:click={resetAspect} disabled={aspect.currentValue <= aspect.initialValue}>
+            <div class="button-inner">
+               <i class="fas fa-arrow-rotate-left" />
+            </div>
+         </EfxButton>
+      </div>
 
-         <!--Decrease Button-->
-         <div class="control">
-            <EfxButton on:click={decreaseAspect}>
-               <div class="button-inner">
-                  <i class="fas fa-minus" />
-               </div>
-            </EfxButton>
-         </div>
-      {/if}
+      <!--Decrease Button-->
+      <div class="control">
+         <EfxButton on:click={decreaseAspect} disabled={aspect.currentValue <= aspect.initialValue}>
+            <div class="button-inner">
+               <i class="fas fa-minus" />
+            </div>
+         </EfxButton>
+      </div>
 
       <!--Increase Button-->
-      {#if chatContext.results.extraSuccesses && chatContext.results.extraSuccesses >= aspect.cost}
-         <div class="control">
-            <EfxButton on:click={increaseAspect}>
-               <div class="button-inner">
-                  <i class="fas fa-plus" />
-               </div>
-            </EfxButton>
-         </div>
-      {/if}
+      <div class="control">
+         <EfxButton on:click={increaseAspect} disabled={chatContext.results.extraSuccesses < aspect.cost}>
+            <div class="button-inner">
+               <i class="fas fa-plus" />
+            </div>
+         </EfxButton>
+      </div>
    </div>
 </div>
 
@@ -146,12 +148,24 @@
       width: 100%;
       min-height: 2rem;
       height: 100%;
+      font-size: 1rem;
 
       .label {
-         @include flex-row;
-         @include flex-group-left;
+         @include flex-column;
+         @include flex-group-top;
+         height: 100%;
+         width: 100%;
          flex-wrap: wrap;
          font-weight: bold;
+         margin-right: 0.5rem;
+
+         .label-inner {
+            @include flex-row;
+            @include flex-group-center;
+            margin-right: 0.25rem;
+            height: 100%;
+            margin-bottom: 0.25rem;
+         }
       }
 
       .controls {

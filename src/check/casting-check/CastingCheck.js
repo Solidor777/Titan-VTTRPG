@@ -101,8 +101,11 @@ export default class TitanCastingCheck extends TitanSkillCheck {
       // Check if damage or healing is among the aspects
       if (results.succeeded) {
 
+         let overcastCount = 0;
+         let overcastIdx = -1;
+
          // Adjust aspect results
-         this.parameters.aspects.forEach((aspect) => {
+         this.parameters.aspects.forEach((aspect, idx) => {
             // Damage
             if (aspect.isDamage) {
                results.damage = results.damage ? results.damage + aspect.initialValue : aspect.initialValue;
@@ -115,7 +118,36 @@ export default class TitanCastingCheck extends TitanSkillCheck {
 
             // Current value
             aspect.currentValue = aspect.initialValue;
+
+            // Overcast
+            if (aspect.overcast) {
+               overcastCount += 1;
+               overcastIdx = idx;
+            }
          });
+
+         // If there is only one overcast
+         if (overcastCount === 1 &&
+            results.extraSuccesses &&
+            results.extraSuccesses >= this.parameters.aspects[overcastIdx].cost) {
+
+            // Maximize the aspect
+            const aspect = this.parameters.aspects[overcastIdx];
+            const delta = Math.floor(results.extraSuccesses / aspect.cost);
+            const cost = delta * aspect.cost;
+            aspect.currentValue += delta;
+            results.extraSuccesses -= cost;
+
+            // Update damage
+            if (aspect.isDamage) {
+               results.damage += delta;
+            }
+
+            // Update healing
+            if (aspect.isHealing) {
+               results.healing += delta;
+            }
+         }
 
          // Adjust final damage
          if (results.damage) {

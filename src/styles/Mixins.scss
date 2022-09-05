@@ -93,6 +93,17 @@
   padding: var(--button-padding);
   color: var(--button-text-color);
   margin: 0;
+
+  &:disabled {
+    cursor: default;
+    background-color: var(--button-background-color-disabled);
+  }
+
+  &:hover {
+    &:not(:disabled) {
+      background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
+    }
+  }
 }
 
 @mixin icon-button {
