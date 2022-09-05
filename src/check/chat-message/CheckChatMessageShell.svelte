@@ -1,5 +1,6 @@
 <script>
    import { getContext } from "svelte";
+   import CheckAspects from "./CheckAspects.svelte";
 
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
@@ -8,6 +9,7 @@
 
    // Document reference
    const document = getContext("DocumentSheetObject");
+   const chatContext = $document.flags.titan.chatContext;
 </script>
 
 <div class="check-chat-message">
@@ -15,8 +17,12 @@
    <CheckChatDiceContainer />
    <CheckChatResults />
    <!-- svelte-ignore missing-declaration -->
-   {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
+   {#if chatContext.results.damage && game.user.isGM}
       <CheckDamageButtons />
+   {/if}
+
+   {#if chatContext.results.extraSuccesses !== undefined && chatContext.parameters.aspects}
+      <CheckAspects />
    {/if}
 </div>
 

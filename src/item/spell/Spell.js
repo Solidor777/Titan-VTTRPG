@@ -29,11 +29,11 @@ export class TitanSpell extends TitanTypeComponent {
 
       // Damage
       this._calculateStandardAspectCost(standardAspects.damage, 1, 1);
-      this._prepareStandardAspectData(standardAspects.damage, game.i18n.localize("LOCAL.damage.label"), true, false, 1);
+      this._prepareStandardAspectData(standardAspects.damage, game.i18n.localize("LOCAL.damage.label"), true, false, 1, true, false);
 
       // Healing
       this._calculateStandardAspectCost(standardAspects.healing, 1);
-      this._prepareStandardAspectData(standardAspects.healing, game.i18n.localize("LOCAL.healing.label"), true, false, 1);
+      this._prepareStandardAspectData(standardAspects.healing, game.i18n.localize("LOCAL.healing.label"), true, false, 1, false, true);
 
       // Duration
       const durationCosts = {
@@ -192,7 +192,7 @@ export class TitanSpell extends TitanTypeComponent {
       }
    }
 
-   _prepareStandardAspectData(aspect, label, overcast, requireOptions, initialValue,) {
+   _prepareStandardAspectData(aspect, label, overcast, requireOptions, initialValue, isDamage, isHealing) {
       if (aspect.enabled) {
          // Check for options
          const option = [];
@@ -237,6 +237,16 @@ export class TitanSpell extends TitanTypeComponent {
                aspectEntry.resistanceCheck = aspect.resistanceCheck;
             }
 
+            // Damage
+            if (isDamage) {
+               aspectEntry.isDamage = true;
+            }
+
+            // Healing
+            if (isHealing) {
+               aspectEntry.isHealing = true;
+            }
+
             // Push to the aspects array
             this.parent.aspects.push(aspectEntry);
          }
@@ -250,6 +260,8 @@ export class TitanSpell extends TitanTypeComponent {
          initialValue: 1,
          cost: 1,
          resistanceCheck: "none",
+         isDamage: false,
+         isHealing: false
       };
    }
 
@@ -274,18 +286,31 @@ export class TitanSpell extends TitanTypeComponent {
    }
 
    _prepareCustomAspectData(aspect) {
+      // Initialize aspect entry
       const aspectEntry = {
          label: aspect.label,
          cost: Math.max(1, aspect.cost)
       };
 
+      // Initial value
       if (aspect.overcast && aspect.initialValue) {
          aspectEntry.overcast = true;
          aspectEntry.initialValue = Math.max(0, aspect.initialValue);
       }
 
+      // Resistance check
       if (aspect.resistanceCheck !== "none") {
          aspectEntry.resistanceCheck = aspect.resistanceCheck;
+      }
+
+      // Damage
+      if (aspect.isDamage) {
+         aspectEntry.isDamage = true;
+      }
+
+      // Healing
+      if (aspect.isHealing) {
+         aspectEntry.isHealing = true;
       }
 
       this.parent.aspects.push(aspectEntry);

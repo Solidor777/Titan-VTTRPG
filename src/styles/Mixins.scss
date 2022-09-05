@@ -198,8 +198,6 @@
 }
 
 @mixin resistance-colors {
-  background-color: var(--label-background-color);
-
   &.reflexes {
     background-color: var(--reflexes-color-bright);
   }

@@ -23,6 +23,7 @@
          skillCheck: CheckChatMessageShell,
          resistanceCheck: CheckChatMessageShell,
          attackCheck: CheckChatMessageShell,
+         castingCheck: CheckChatMessageShell,
          armor: ArmorChatMessageShell,
          weapon: WeaponChatMessageShell,
          damageReport: DamageReportChatMessageShell,

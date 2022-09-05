@@ -20,6 +20,9 @@
          case "attackCheck": {
             return chatContext.parameters.attribute;
          }
+         case "castingCheck": {
+            return chatContext.parameters.attribute;
+         }
          default: {
             return "";
          }
@@ -63,27 +66,9 @@
       @include flex-column;
       padding: 0.5rem;
       align-items: flex-start;
-
-      &.body {
-         --label-background-color: var(--body-color-bright);
-      }
-      &.mind {
-         --label-background-color: var(--mind-color-bright);
-      }
-      &.soul {
-         --label-background-color: var(--soul-color-bright);
-      }
-      &.reflexes {
-         --label-background-color: var(--reflexes-color-bright);
-      }
-      &.resilience {
-         --label-background-color: var(--resilience-color-bright);
-      }
-      &.willpower {
-         --label-background-color: var(--willpower-color-bright);
-      }
-
       background-color: var(--label-background-color);
+      @include resistance-colors;
+      @include attribute-colors;
 
       .main-label {
          font-size: 1.2rem;

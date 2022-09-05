@@ -116,14 +116,40 @@
                            />
                         </div>
                      </div>
+                  </div>
 
-                     <div class="divider" />
+                  <div class="row">
+                     <!--Damage-->
+                     <div class="stat">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.damage.label")}?
+                        </div>
+
+                        <!--Value-->
+                        <div class="input checkbox">
+                           <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isDamage} />
+                        </div>
+                     </div>
+
+                     <!--Healing-->
+                     <div class="stat">
+                        <!--Label-->
+                        <div class="label">
+                           {localize("LOCAL.healing.label")}?
+                        </div>
+
+                        <!--Value-->
+                        <div class="input checkbox">
+                           <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isHealing} />
+                        </div>
+                     </div>
 
                      <!--Overcast-->
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.overcast.label")}:
+                           {localize("LOCAL.overcast.label")}
                         </div>
 
                         <!--Value-->
@@ -250,6 +276,13 @@
                      @include flex-row;
                      @include flex-group-center;
 
+                     &:not(:first-child) {
+                        @include border-left;
+                        height: 100%;
+                        margin-left: 0.5rem;
+                        padding-left: 0.5rem;
+                     }
+
                      .label {
                         font-weight: bold;
                      }
@@ -263,13 +296,6 @@
                            width: 3rem;
                         }
                      }
-                  }
-
-                  .divider {
-                     @include border-left;
-                     height: 100%;
-                     margin-left: 0.5rem;
-                     padding-right: 0.5rem;
                   }
                }
 

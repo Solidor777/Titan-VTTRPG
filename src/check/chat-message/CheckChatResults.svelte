@@ -20,7 +20,7 @@
          {localize(`LOCAL.succeeded.label`)}
       </div>
       <!--Extra Successes-->
-      {#if results.extraSuccesses}
+      {#if results.extraSuccesses !== undefined}
          <div class="extra-successes">
             {results.extraSuccesses}
             {localize(`LOCAL.extraSuccesses.label`)}

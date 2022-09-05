@@ -19,6 +19,7 @@ const validChatMessageTypes = Object.freeze(new Set([
    'skillCheck',
    'resistanceCheck',
    'attackCheck',
+   'castingCheck',
    'armor',
    'weapon',
    'damageReport',

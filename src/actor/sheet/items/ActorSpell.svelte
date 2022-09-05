@@ -36,8 +36,16 @@
 
          <!--Controls-->
          <div class="item-controls">
+            <!--Cast Spell-->
             <div>
-               <ActorCheckButtonSmall check={item.system.check} />
+               <ActorCheckButtonSmall
+                  check={item.system.check}
+                  on:click={() => {
+                     $document.rollCastingCheck({
+                        itemId: id,
+                     });
+                  }}
+               />
             </div>
 
             <!--Send to Chat button-->

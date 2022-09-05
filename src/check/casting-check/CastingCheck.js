@@ -32,7 +32,8 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
          spellName: options.spellRollData.name,
-         spellAspects: options.spellRollData.aspects
+         aspects: options.spellRollData.aspects,
+         damageMod: options.damageMod ?? options.actorRollData.mod.damage.value,
       };
 
       return parameters;
@@ -40,7 +41,6 @@ export default class TitanCastingCheck extends TitanSkillCheck {
 
    _calculateDerivedData(options) {
       // Get the spell reference
-      const actorRollData = options.actorRollData;
       const spellRollData = options.spellRollData;
 
       // Get the skill training and expertise value
@@ -50,9 +50,6 @@ export default class TitanCastingCheck extends TitanSkillCheck {
       if (spellRollData.spellDescription) {
          this.parameters.spellDescription = spellRollData.spellDescription;
       }
-
-      // Get the damage mod
-      this.parameters.damageMod = options.DamageMod ?? actorRollData.system.mod.damage.value;
 
       return;
    }
@@ -101,14 +98,28 @@ export default class TitanCastingCheck extends TitanSkillCheck {
 
    _calculateResults() {
       const results = super._calculateResults();
-      // Add the damage to the results
+      // Check if damage or healing is among the aspects
       if (results.succeeded) {
-         results.damage =
-            this.parameters.casting.damage + this.parameters.damageMod + 1;
 
-         // Add extra damage if appropriate
-         if (results.extraSuccesses && this.parameters.casting.plusSuccessDamage) {
-            results.damage += results.extraSuccesses;
+         // Adjust aspect results
+         this.parameters.aspects.forEach((aspect) => {
+            // Damage
+            if (aspect.isDamage) {
+               results.damage = results.damage ? results.damage + aspect.initialValue : aspect.initialValue;
+            }
+
+            // Healing
+            if (aspect.isHealing === true) {
+               results.healing = results.healing ? results.healing + aspect.initialValue : aspect.initialValue;
+            }
+
+            // Current value
+            aspect.currentValue = aspect.initialValue;
+         });
+
+         // Adjust final damage
+         if (results.damage) {
+            results.damage += this.parameters.damageMod;
          }
       }
 

@@ -37,9 +37,11 @@
 
 <div class="aspects">
    {#each aspectSizeMap as aspectSizeMap}
-      <div class="aspect">
-         <ActorSpellAspect aspect={aspects[aspectSizeMap.idx]} />
-      </div>
+      {#if aspects[aspectSizeMap.idx]}
+         <div class="aspect">
+            <ActorSpellAspect aspect={aspects[aspectSizeMap.idx]} />
+         </div>
+      {/if}
    {/each}
 </div>
 

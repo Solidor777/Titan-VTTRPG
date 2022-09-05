@@ -15,7 +15,7 @@
 </script>
 
 <div class="item-check-button {check.attribute}">
-   <EfxButton>
+   <EfxButton on:click>
       <div class="button-inner">
          <!--DC-->
          <div class="dc">
