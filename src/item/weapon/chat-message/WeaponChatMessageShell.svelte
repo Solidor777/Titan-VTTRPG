@@ -1,9 +1,11 @@
 <script>
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ItemChatRarityValue from "~/item/chat-message/ItemChatRarityValue.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import WeaponChatAttackDescription from "./WeaponChatAttackDescription.svelte";
    import WeaponChatAttacks from "./WeaponChatAttacks.svelte";
+   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
+   import ItemChatValue from "~/item/chat-message/ItemChatValue.svelte";
+   import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
 </script>
 
 <div class="weapon-chat-message">
@@ -19,7 +21,10 @@
          <WeaponChatAttacks />
       </div>
       <div class="info">
-         <ItemChatRarityValue />
+         <ItemChatFooter>
+            <ItemChatValue />
+            <ItemChatRarity />
+         </ItemChatFooter>
       </div>
    </div>
 </div>

@@ -8,6 +8,7 @@
    import ArmorChatMessageShell from "~/item/armor/chat-message/ArmorChatMessageShell.svelte";
    import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
    import HealingReportChatMessageShell from "./HealingReportChatMessageShell.svelte";
+   import SpellChatMessageShell from "~/item/spell/chat-message/SpellChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -26,6 +27,7 @@
          castingCheck: CheckChatMessageShell,
          armor: ArmorChatMessageShell,
          weapon: WeaponChatMessageShell,
+         spell: SpellChatMessageShell,
          damageReport: DamageReportChatMessageShell,
          healingReport: HealingReportChatMessageShell,
       };

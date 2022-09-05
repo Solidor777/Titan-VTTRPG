@@ -1,8 +1,10 @@
 <script>
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ItemChatRarityValue from "~/item/chat-message/ItemChatRarityValue.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import ArmorChatStats from "./ArmorChatStats.svelte";
+   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
+   import ItemChatValue from "~/item/chat-message/ItemChatValue.svelte";
+   import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
 </script>
 
 <div class="armor-chat-message">
@@ -15,7 +17,10 @@
          <ItemChatDescription />
       </div>
       <div class="info">
-         <ItemChatRarityValue />
+         <ItemChatFooter>
+            <ItemChatValue />
+            <ItemChatRarity />
+         </ItemChatFooter>
       </div>
    </div>
 </div>
