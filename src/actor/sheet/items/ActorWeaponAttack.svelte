@@ -4,9 +4,8 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import ActorWeaponAttackCheckLabel from "./ActorWeaponAttackCheckLabel.svelte";
-
-   // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   import StatTag from "~/helpers/svelte-components/StatTag.svelte";
+   import Tag from "~/helpers/svelte-components/Tag.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -18,7 +17,7 @@
    export let attackIdx = void 0;
 
    // Attack reference
-   let attack = item.system.attack[attackIdx];
+   $: attack = item.system.attack[attackIdx];
 </script>
 
 <div class="attack">
@@ -37,70 +36,26 @@
       </div>
    </div>
 
-   <div class="stats">
-      <!--Check Label-->
-      <div class="stat">
-         <ActorWeaponAttackCheckLabel {attack} />
-      </div>
-
-      <!--Dice Pool-->
-      <div class="stat">
-         <div class="label">
-            <i class="fas fa-dice-d6" />
-            {localize("LOCAL.dice.label")}:
-         </div>
-         <div class="value">
-            {$document.system.attribute[attack.attribute].value + $document.system.skill[attack.skill].training.value}
-         </div>
-      </div>
-
-      <!--Expertise-->
-      <div class="stat">
-         <div class="label">
-            <i class="fas fa-graduation-cap" />
-            {localize("LOCAL.expertise.label")}:
-         </div>
-         <div class="value">
-            {$document.system.skill[attack.skill].expertise.value}
-         </div>
-      </div>
-
-      <!--Range-->
-      <div class="stat">
-         <div class="label">
-            <i class="fas fa-ruler" />
-            {localize("LOCAL.range.label")}:
-         </div>
-         <div class="value">
-            {attack.range}
-         </div>
-      </div>
-
-      <!--Damage-->
-      <div class="stat">
-         <div class="label">
-            <i class="fas fa-bolt" />
-            {localize("LOCAL.damage.label")}
-         </div>
-         <div class="value">
-            {`${attack.damage + $document.system.mod.damage.value}${
-               attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
-            } `}
-         </div>
-      </div>
+   <!--Check Label-->
+   <div class="check-label">
+      <ActorWeaponAttackCheckLabel {attack} />
    </div>
 
    <!--Traits-->
-   <div class="row traits">
-      {#each attack.traits as trait}
-         <div class="trait">
-            {localize(`LOCAL.${trait.name}.label`)}
-            {#if typeof trait === "number"}
-               : {trait}
-            {/if}
-         </div>
-      {/each}
-   </div>
+   {#if attack.traits.length > 0}
+      <div class="traits">
+         <!--Each trait -->
+         {#each attack.traits as trait}
+            <div class="trait">
+               {#if trait.type === "number"}
+                  <StatTag label={localize(`LOCAL.${trait.name}.label`)} value={trait.value} />
+               {:else}
+                  <Tag label={localize(`LOCAL.${trait.name}.label`)} />
+               {/if}
+            </div>
+         {/each}
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -109,18 +64,19 @@
    .attack {
       @include flex-column;
       @include flex-group-center;
-      @include border;
       width: 100%;
-      padding: 0.25rem;
-      background-color: var(--label-background-color);
 
-      .stats {
+      .check-label {
+         margin-top: 0.5rem;
+      }
+
+      .traits {
          @include flex-row;
-         @include flex-space-between;
+         @include flex-space-evenly;
          flex-wrap: wrap;
          width: 100%;
 
-         .stat {
+         .trait {
             margin: 0.25rem;
          }
       }

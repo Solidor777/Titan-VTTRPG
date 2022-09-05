@@ -66,11 +66,11 @@
                   <!--Training row-->
                   <div class="row">
                      <div class="label">{localize("LOCAL.training.label")}</div>
-                     <div class="value">
+                     <div class="input">
                         <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue} />
                      </div>
                      <div class="op">+</div>
-                     <div class="value">
+                     <div class="input">
                         <DocumentIntegerInput bind:value={$document.system.skill[key].training.staticMod} />
                      </div>
                      <div class="op">=</div>
@@ -84,11 +84,11 @@
                   <!--Expertise Row-->
                   <div class="row">
                      <div class="label">{localize("LOCAL.expertise.label")}</div>
-                     <div class="value">
+                     <div class="input">
                         <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.baseValue} />
                      </div>
                      <div class="op">+</div>
-                     <div class="value">
+                     <div class="input">
                         <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.staticMod} />
                      </div>
                      <div class="op">=</div>
@@ -139,6 +139,8 @@
          li {
             @include flex-row;
             @include border;
+            @include z-index-app;
+            background-color: var(--label-background-color);
             width: 100%;
             padding: 0.5rem;
 
@@ -168,6 +170,14 @@
                      width: 5rem;
                      font-weight: bold;
                      text-align: right;
+                  }
+                  .input {
+                     @include flex-row;
+                     @include flex-group-center;
+                     height: 100%;
+                     width: 2.5rem;
+                     margin-left: 0.5rem;
+                     font-weight: bold;
                   }
                   .value {
                      @include flex-row;

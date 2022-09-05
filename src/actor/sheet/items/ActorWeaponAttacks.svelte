@@ -21,10 +21,12 @@
    ol {
       @include flex-row;
       @include flex-group-left;
+      @include border;
       margin: 0;
-      padding: 0;
+      padding: 0.5rem;
       list-style: none;
       flex-wrap: wrap;
+      background-color: var(--label-background-color);
 
       li {
          width: 100%;

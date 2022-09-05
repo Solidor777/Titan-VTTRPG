@@ -2,10 +2,10 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import StatTag from "~/helpers/svelte-components/StatTag.svelte";
-   import Tag from "../../../helpers/svelte-components/Tag.svelte";
-   const document = getContext("DocumentSheetObject");
+   import Tag from "~/helpers/svelte-components/Tag.svelte";
 
    // Chat context reference
+   const document = getContext("DocumentSheetObject");
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
