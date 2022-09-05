@@ -9,7 +9,7 @@
       @include flex-row;
       @include flex-space-evenly;
       width: 100%;
-      padding: 0.5rem;
+      padding: 0 0.5rem 0 0.5rem;
       font-size: 0.9rem;
    }
 </style>

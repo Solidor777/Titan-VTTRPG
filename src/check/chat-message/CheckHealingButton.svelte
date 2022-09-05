@@ -48,7 +48,6 @@
    .healing-button {
       @include flex-row;
       width: 100%;
-      margin-top: 0.5rem;
       --button-border-radius: 10px;
       font-size: 1rem;
    }

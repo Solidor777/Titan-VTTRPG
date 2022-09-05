@@ -34,6 +34,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          spellName: options.spellRollData.name,
          aspects: options.spellRollData.aspects,
          damageMod: options.damageMod ?? options.actorRollData.mod.damage.value,
+         img: options.spellRollData.img ?? false,
       };
 
       return parameters;
@@ -166,10 +167,8 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          parameters: this.parameters,
          results: this.results,
          type: this._getCheckType(),
+         img: this.parameters.img
       };
-      if (options?.label) {
-         chatContext.typeLabel = this._getTypeLabel();
-      }
 
       return chatContext;
    }

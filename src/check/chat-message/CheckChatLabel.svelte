@@ -31,54 +31,76 @@
 </script>
 
 <div class="label {getLabelClass()}">
+   <!--Image-->
+   {#if chatContext.img}
+      <img src={chatContext.img} alt="item" />
+   {/if}
+
    <!--Main Label -->
-   <div class="main-label">
-      {chatContext.label}
+   <div class="label-text">
+      <div class="main-label">
+         {chatContext.label}
+      </div>
+
+      <!--Sub Label -->
+      {#if chatContext.typeLabel}
+         <div class="sub-label">
+            {chatContext.typeLabel}
+         </div>
+      {/if}
+
+      <!--Attack CHeck label-->
+      {#if chatContext.type === "attackCheck" && chatContext.parameters.targetDefense !== false}
+         <div class="sub-label">
+            {#if chatContext.parameters.type === "melee"}
+               {localize("LOCAL.melee.label")}
+               ({chatContext.parameters.attackerMelee})
+            {:else}
+               {localize("LOCAL.accuracy.label")}
+               ({chatContext.parameters.attackerAccuracy})
+            {/if}
+            {localize("LOCAL.versus.label")}
+            {localize("LOCAL.defense.label")}
+            ({chatContext.parameters.targetDefense})
+         </div>
+      {/if}
    </div>
-
-   <!--Sub Label -->
-   {#if chatContext.typeLabel}
-      <div class="sub-label">
-         {chatContext.typeLabel}
-      </div>
-   {/if}
-
-   {#if chatContext.type === "attackCheck" && chatContext.parameters.targetDefense !== false}
-      <div class="sub-label">
-         {#if chatContext.parameters.type === "melee"}
-            {localize("LOCAL.melee.label")}
-            ({chatContext.parameters.attackerMelee})
-         {:else}
-            {localize("LOCAL.accuracy.label")}
-            ({chatContext.parameters.attackerAccuracy})
-         {/if}
-         {localize("LOCAL.versus.label")}
-         {localize("LOCAL.defense.label")}
-         ({chatContext.parameters.targetDefense})
-      </div>
-   {/if}
 </div>
 
 <style lang="scss">
    @import "../../styles/mixins.scss";
    .label {
+      @include flex-row;
+      @include flex-group-left;
       @include border;
-      @include flex-column;
-      padding: 0.5rem;
-      align-items: flex-start;
-      background-color: var(--label-background-color);
-      @include resistance-colors;
       @include attribute-colors;
+      @include resistance-colors;
+      padding: 0.5rem;
+      font-weight: bold;
 
-      .main-label {
-         font-size: 1.2rem;
-         font-weight: bold;
+      .label-text {
+         @include flex-column;
+         align-items: flex-start;
+         justify-content: center;
+
+         .main-label {
+            @include flex-row;
+            @include flex-group-center;
+            height: 100%;
+            font-size: 1.2rem;
+            font-weight: bold;
+         }
+
+         .sub-label {
+            margin-top: 0.25rem;
+         }
       }
 
-      .sub-label {
-         font-weight: bold;
-         margin-top: 0.25rem;
-         font-size: 0.9rem;
+      img {
+         margin-right: 0.5rem;
+         background-color: black;
+         border-radius: 10px;
+         width: 2.5rem;
       }
    }
 </style>

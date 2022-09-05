@@ -71,10 +71,6 @@
       padding: 0.5rem;
       background-color: var(--label-background-color);
 
-      :not(:first-child) {
-         margin-top: 0.25rem;
-      }
-
       .result {
          @include flex-row;
          @include flex-group-center;
@@ -88,6 +84,12 @@
 
          &.failed {
             color: var(--failed-color-dark);
+         }
+      }
+
+      .stat {
+         &:not(:first-child) {
+            margin-top: 0.25rem;
          }
       }
    }

@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import ItemChatStat from "../../chat-message/ItemChatStat.svelte";
    const document = getContext("DocumentSheetObject");
 
    // Chat context reference
@@ -22,42 +23,30 @@
          <div class="row stats">
             <!--Range-->
             <div class="stat">
-               <div class="label">
-                  {localize("LOCAL.range.label")}:
-               </div>
-               <div class="value">
-                  {attack.range}
-               </div>
+               <ItemChatStat label={localize("LOCAL.range.label")} value={attack.range} />
             </div>
 
             <!--Attribute-->
             <div class="stat">
-               <div class="label">
-                  {localize("LOCAL.attribute.label")}:
-               </div>
-               <div class="value">
-                  {localize(`LOCAL.${attack.attribute}.label`)}
-               </div>
+               <ItemChatStat
+                  label={localize("LOCAL.attribute.label")}
+                  value={localize(`LOCAL.${attack.attribute}.label`)}
+               />
             </div>
 
             <!--Skill-->
             <div class="stat">
-               <div class="label">
-                  {localize("LOCAL.skill.label")}:
-               </div>
-               <div class="value">
-                  {localize(`LOCAL.${attack.skill}.label`)}
-               </div>
+               <ItemChatStat label={localize("LOCAL.skill.label")} value={localize(`LOCAL.${attack.skill}.label`)} />
             </div>
 
             <!--Damage-->
             <div class="stat">
-               <div class="label">
-                  {localize("LOCAL.damage.label")}:
-               </div>
-               <div class="value">
-                  {`${attack.damage}${attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""} `}
-               </div>
+               <ItemChatStat
+                  label={localize("LOCAL.damage.label")}
+                  value={`${attack.damage}${
+                     attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
+                  }`}
+               />
             </div>
 
             <!--Traits-->
@@ -79,7 +68,7 @@
 
    ol {
       list-style: none;
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 0 0;
       padding: 0;
       font-size: 0.9rem;
 
@@ -87,8 +76,10 @@
          @include flex-column;
          @include border;
          padding: 0.25rem;
-         margin-top: 0.5rem;
          background-color: var(--label-background-color);
+         &:not(:first-child) {
+            margin-top: 0.5rem;
+         }
 
          .row {
             @include flex-row;
@@ -109,16 +100,8 @@
             }
 
             .stat {
-               @include flex-row;
-               @include flex-group-center;
-               @include border;
-               font-weight: bold;
                margin: 0.25rem;
                padding: 0.25rem;
-
-               .value {
-                  margin-left: 0.25rem;
-               }
             }
 
             .trait {

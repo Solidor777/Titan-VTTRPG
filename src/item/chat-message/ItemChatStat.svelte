@@ -1,0 +1,32 @@
+<script>
+   export let label = void 0;
+   export let value = void 0;
+</script>
+
+<div class="stat">
+   <div class="label">
+      {label}
+   </div>
+   <div class="value">
+      {value}
+   </div>
+</div>
+
+<style lang="scss">
+   @import "../../styles/mixins.scss";
+
+   .stat {
+      @include flex-row;
+      @include flex-group-center;
+      @include border;
+      padding: 0.25rem;
+      background: var(--label-background-color);
+
+      .label {
+         @include border-right;
+         font-weight: bold;
+         padding-right: 0.25rem;
+         margin-right: 0.25rem;
+      }
+   }
+</style>

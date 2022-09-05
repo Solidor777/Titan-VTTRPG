@@ -27,7 +27,6 @@
       width: 100%;
       flex-wrap: wrap;
       font-weight: bold;
-      padding: 0.25rem;
 
       .trait {
          @include flex-row;

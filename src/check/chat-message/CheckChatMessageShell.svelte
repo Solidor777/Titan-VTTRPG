@@ -14,22 +14,36 @@
 </script>
 
 <div class="check-chat-message">
-   <CheckChatLabel />
-   <CheckChatDiceContainer />
-   <CheckChatResults />
+   <div class="label">
+      <CheckChatLabel />
+   </div>
+
+   <div class="info">
+      <CheckChatDiceContainer />
+   </div>
+
+   <div class="info">
+      <CheckChatResults />
+   </div>
 
    {#if chatContext.parameters.aspects && chatContext.results.extraSuccesses !== undefined && isOwner}
-      <CheckAspects />
+      <div class="info top-padding">
+         <CheckAspects />
+      </div>
    {/if}
 
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.damage !== undefined && game.user.isGM}
-      <CheckDamageButtons />
+      <div class="info top-padding">
+         <CheckDamageButtons />
+      </div>
    {/if}
 
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.healing !== undefined && game.user.isGM}
-      <CheckHealingButton />
+      <div class="info top-padding">
+         <CheckHealingButton />
+      </div>
    {/if}
 </div>
 
@@ -42,5 +56,15 @@
       align-items: flex-start;
       justify-content: center;
       width: 100%;
+
+      .info {
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+      }
+
+      .top-padding {
+         margin-top: 0.5rem;
+      }
    }
 </style>

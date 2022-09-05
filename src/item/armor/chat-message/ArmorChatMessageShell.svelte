@@ -36,10 +36,19 @@
       width: 100%;
 
       .info-container {
+         @include flex-column;
+         @include flex-group-top;
          width: 100%;
+
          .info {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+            margin-top: 0.5rem;
+
             &:not(:first-child) {
                @include border-top;
+               padding-top: 0.5rem;
             }
          }
       }
