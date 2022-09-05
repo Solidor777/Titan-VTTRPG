@@ -9,7 +9,7 @@
 
 <div class="results">
    <!--Successes-->
-   <div class="successes">
+   <div class="stat">
       {results.successes}
       {localize(`LOCAL.successes.label`)}
    </div>
@@ -21,9 +21,9 @@
       </div>
       <!--Extra Successes-->
       {#if results.extraSuccesses !== undefined}
-         <div class="extra-successes">
+         <div class="stat">
+            {localize(`LOCAL.extraSuccesses.label`)}:
             {results.extraSuccesses}
-            {localize(`LOCAL.extraSuccesses.label`)}
          </div>
       {/if}
    {:else if results.failed}
@@ -35,17 +35,25 @@
 
    <!--Expertise Remaining-->
    {#if results.expertiseRemaining}
-      <div class="expertise-remaining">
+      <div class="stat">
+         {localize(`LOCAL.expertiseRemaining.label`)}:
          {results.expertiseRemaining}
-         {localize(`LOCAL.expertiseRemaining.label`)}
       </div>
    {/if}
 
    <!--Damage-->
-   {#if results.damage}
-      <div class="damage">
-         {localize(`LOCAL.damage.label`)}
+   {#if results.damage !== undefined}
+      <div class="stat">
+         {localize(`LOCAL.damage.label`)}:
          {results.damage}
+      </div>
+   {/if}
+
+   <!--Healing-->
+   {#if results.healing !== undefined}
+      <div class="stat">
+         {localize(`LOCAL.healing.label`)}:
+         {results.healing}
       </div>
    {/if}
 </div>
@@ -57,17 +65,14 @@
       @include border;
       @include flex-column;
       @include flex-group-center;
+      font-weight: bold;
+      font-size: 1rem;
       width: 100%;
       padding: 0.5rem;
       background-color: var(--label-background-color);
 
       :not(:first-child) {
          margin-top: 0.25rem;
-      }
-
-      .successes {
-         font-weight: bold;
-         font-size: 1rem;
       }
 
       .result {
@@ -84,21 +89,6 @@
          &.failed {
             color: var(--failed-color-dark);
          }
-      }
-
-      .extra-successes {
-         font-weight: bold;
-         font-size: 1rem;
-      }
-
-      .expertise-remaining {
-         font-weight: bold;
-         font-size: 1rem;
-      }
-
-      .damage {
-         font-weight: bold;
-         font-size: 1rem;
       }
    }
 </style>

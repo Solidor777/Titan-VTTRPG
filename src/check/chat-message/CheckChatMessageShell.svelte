@@ -16,13 +16,13 @@
    <CheckChatLabel />
    <CheckChatDiceContainer />
    <CheckChatResults />
-   <!-- svelte-ignore missing-declaration -->
-   {#if chatContext.results.damage && game.user.isGM}
-      <CheckDamageButtons />
-   {/if}
 
    {#if chatContext.results.extraSuccesses !== undefined && chatContext.parameters.aspects}
       <CheckAspects />
+   {/if}
+   <!-- svelte-ignore missing-declaration -->
+   {#if chatContext.results.damage && game.user.isGM}
+      <CheckDamageButtons />
    {/if}
 </div>
 

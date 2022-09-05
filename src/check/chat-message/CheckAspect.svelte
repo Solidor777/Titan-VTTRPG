@@ -1,5 +1,6 @@
 <script>
    import { getContext } from "svelte";
+   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // Aspect
@@ -86,13 +87,20 @@
 
       return;
    }
+
+   function getExtraSuccessCostLabel() {
+      if (aspect.cost > 1) {
+         return `(${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`;
+      }
+      return localize("LOCAL.extraSuccesses.short.label");
+   }
 </script>
 
 <!--Aspect-->
 <div class="aspect">
    <!--Label and value-->
    <div class="label">
-      {aspect.label}: {aspect.currentValue}
+      {aspect.label}: {aspect.currentValue} + {getExtraSuccessCostLabel()}
    </div>
 
    <div class="controls">
@@ -136,7 +144,7 @@
       @include flex-space-between;
       font-size: 1rem;
       width: 100%;
-      height: 2rem;
+      height: 100%;
 
       .label {
          @include flex-row;
@@ -148,11 +156,13 @@
       .controls {
          @include flex-row;
          @include flex-group-right;
+         flex-wrap: nowrap;
          height: 100%;
          --button-border-radius: 10px;
 
          .control {
-            height: 100%;
+            height: 2rem;
+
             &:not(:first-child) {
                margin-left: 0.25rem;
             }

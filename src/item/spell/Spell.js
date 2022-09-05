@@ -121,7 +121,7 @@ export class TitanSpell extends TitanTypeComponent {
       });
 
       // Calculate total cost
-      let totalAspectCost = 0;
+      let totalAspectCost = 1;
       this.parent.aspects.forEach((element) => {
          totalAspectCost += element.cost;
       });
