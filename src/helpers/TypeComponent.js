@@ -10,4 +10,8 @@ export class TitanTypeComponent {
   getRollData(rollData) {
     return rollData;
   }
+
+  getChatContext(chatContext) {
+    return chatContext;
+  }
 }

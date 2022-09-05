@@ -1,14 +1,24 @@
 <script>
+   import { getContext } from "svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
    import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
    import ItemChatTradition from "../../chat-message/ItemChatTradition.svelte";
+   import ActorSpellAspects from "../../../actor/sheet/items/ActorSpellAspects.svelte";
+
+   // Chat context reference
+   const document = getContext("DocumentSheetObject");
+   const chatContext = $document.flags.titan.chatContext;
 </script>
 
 <div class="spell-chat-message">
    <ItemChatLabel />
    <div class="info-container">
+      <div class="info">
+         <ActorSpellAspects aspects={chatContext.aspects} />
+      </div>
+
       <div class="info">
          <ItemChatDescription />
       </div>

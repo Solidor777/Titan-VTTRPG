@@ -323,4 +323,10 @@ export class TitanSpell extends TitanTypeComponent {
 
       return rollData;
    }
+
+   getChatContext(chatContext) {
+      chatContext.aspects = this.parent.aspects;
+
+      return chatContext;
+   }
 }

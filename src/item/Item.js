@@ -39,13 +39,17 @@ export class TitanItem extends Item {
    async sendToChat(options) {
 
       // Create the context object
-      const chatContext = {
+      let chatContext = {
          type: this.type,
          img: this.img,
          name: this.name,
          flags: this.flags,
          system: this.system,
       };
+
+      if (this.typeComponent) {
+         chatContext = this.typeComponent.getChatContext(chatContext);
+      }
 
       // Create and post the message
       return await ChatMessage.create(
