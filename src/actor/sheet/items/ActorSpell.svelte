@@ -10,7 +10,7 @@
    import ActorItemRarity from "./ActorItemRarity.svelte";
    import ActorItemTradition from "./ActorItemTradition.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
-   import CheckLabelLong from "~/helpers/svelte-components/CheckLabelLong.svelte";
+   import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
    import SpellAspects from "~/item/spell/SpellAspects.svelte";
 
    // Reference to the docuement
@@ -69,7 +69,7 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Check Data-->
             <div class="item-expandable-content">
-               <CheckLabelLong check={item.system.check} />
+               <ActorCheckLabelLong check={item.system.check} />
             </div>
 
             {#if item.aspects}
