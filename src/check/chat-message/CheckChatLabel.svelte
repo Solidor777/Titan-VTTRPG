@@ -43,26 +43,12 @@
       </div>
 
       <!--Sub Label -->
-      {#if chatContext.typeLabel}
-         <div class="sub-label">
-            {chatContext.typeLabel}
-         </div>
-      {/if}
-
-      <!--Attack CHeck label-->
-      {#if chatContext.type === "attackCheck" && chatContext.parameters.targetDefense !== false}
-         <div class="sub-label">
-            {#if chatContext.parameters.type === "melee"}
-               {localize("LOCAL.melee.label")}
-               ({chatContext.parameters.attackerMelee})
-            {:else}
-               {localize("LOCAL.accuracy.label")}
-               ({chatContext.parameters.attackerAccuracy})
-            {/if}
-            {localize("LOCAL.versus.label")}
-            {localize("LOCAL.defense.label")}
-            ({chatContext.parameters.targetDefense})
-         </div>
+      {#if chatContext.subLabels}
+         {#each chatContext.subLabels as subLabel}
+            <div class="sub-label">
+               {subLabel}
+            </div>
+         {/each}
       {/if}
    </div>
 </div>

@@ -263,7 +263,7 @@ export default class TitanCheck {
       type: this._getCheckType(),
     };
     if (options?.label) {
-      chatContext.typeLabel = this._getTypeLabel();
+      chatContext.subLabels = [this._getTypeLabel()];
     }
 
     return chatContext;

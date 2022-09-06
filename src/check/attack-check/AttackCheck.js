@@ -76,6 +76,9 @@ export default class TitanAttackCheck extends TitanSkillCheck {
     // Cache the attack info
     this.parameters.attack = checkAttack;
 
+    // Cache the attack name
+    this.parameters.attackName = checkAttack.name;
+
     // Get the attack description
     if (weaponRollData.attackDescription && weaponRollData.attackDescription.length > 0) {
       this.parameters.attackDescription = weaponRollData.attackDescription;
@@ -191,13 +194,27 @@ export default class TitanAttackCheck extends TitanSkillCheck {
   _getChatContext(options) {
     // Create the context object
     const chatContext = {
-      label: this.parameters.weaponName,
-      typeLabel: this._getTypeLabel(),
+      label: this.parameters.attackName,
+      subLabels: [this.parameters.weaponName, this._getTypeLabel()],
       parameters: this.parameters,
       results: this.results,
       type: this._getCheckType(),
       img: this.parameters.img
     };
+    if (this.parameters.targetDefense) {
+      let subLabel = "";
+
+      if (this.parameters.type === "melee") {
+        subLabel = `${game.i18n.localize(`LOCAL.melee.label`)} (${this.parameters.attackerMelee})`;
+      }
+      else {
+        subLabel = `${game.i18n.localize(`LOCAL.accuracy.label`)} (${this.parameters.attackerAccuracy})`;
+      }
+
+      subLabel += ` vs. ${game.i18n.localize(`LOCAL.defense.label`)} (${this.parameters.targetDefense})`;
+      chatContext.subLabels.push(subLabel);
+    }
+
 
     return chatContext;
   }
