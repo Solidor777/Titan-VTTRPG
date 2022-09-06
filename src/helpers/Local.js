@@ -99,5 +99,6 @@ export const TITANLOCAL = Object.freeze({
   newWeapon: "LOCAL.newWeapon.label",
   newArmor: "LOCAL.newArmor.label",
   newSpell: "LOCAL.newSpell.label",
-  openSheetConfigurator: "LOCAL.openSheetConfigurator.label"
+  openSheetConfigurator: "LOCAL.openSheetConfigurator.label",
+  castingCheck: "LOCAL.castingCheck.label"
 });

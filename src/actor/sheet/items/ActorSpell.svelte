@@ -13,6 +13,9 @@
    import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
    import SpellAspects from "~/item/spell/SpellAspects.svelte";
 
+   // Reference to the application
+   const application = getContext("external").application;
+
    // Reference to the docuement
    const document = getContext("DocumentSheetObject");
 
@@ -40,9 +43,7 @@
                <ActorCheckButtonSmall
                   check={item.system.check}
                   on:click={() => {
-                     $document.rollCastingCheck({
-                        itemId: id,
-                     });
+                     application.rollCastingCheck(id);
                   }}
                />
             </div>

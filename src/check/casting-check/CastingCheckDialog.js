@@ -1,12 +1,12 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-import AttackCheckDialogShell from "./AttackCheckDialogShell.svelte";
-export class AttackCheckDialog extends TJSDialog {
+import CastingCheckDialogShell from "./CastingCheckDialogShell.svelte";
+export class CastingCheckDialog extends TJSDialog {
    constructor(actor, options) {
       super(
          {
-            title: `${game.i18n.localize(CONFIG.TITAN.local.attackCheck)} (${actor.name})`,
+            title: `${game.i18n.localize("LOCAL.castingCheck.label")} (${actor.name})`,
             content: {
-               class: AttackCheckDialogShell,
+               class: CastingCheckDialogShell,
                props: {
                   options: options,
                   actor: actor,
@@ -15,7 +15,7 @@ export class AttackCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 555,
+            height: 520,
          }
       );
    }

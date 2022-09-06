@@ -3,6 +3,7 @@ import { TitanNPCComponent } from "./npc/NPC.js";
 import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
 import { SkillCheckDialog } from "~/check/skill-check/SkillCheckDialog.js";
 import { AttackCheckDialog } from "~/check/attack-check/AttackCheckDialog.js";
+import { CastingCheckDialog } from "~/check/casting-check/CastingCheckDialog.js";
 import TitanUtility from "~/helpers/Utility.js";
 import TitanAttributeCheck from "~/check/AttributeCheck.js";
 import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
@@ -361,6 +362,8 @@ export class TitanActor extends Actor {
 
          // Get the attack type
          options.type = checkAttack.type;
+         options.weaponName = checkWeapon.name;
+         options.attackName = checkAttack.name;
 
          // Create the dialog
          const dialog = new AttackCheckDialog(this, options);
@@ -405,13 +408,7 @@ export class TitanActor extends Actor {
       const spellRollData = checkSpell.getRollData();
       checkOptions.spellRollData = spellRollData;
 
-      // Get the target check data
-      let userTargets = Array.from(game.user.targets);
-      if (userTargets.length < 1 && game.user.isGM) {
-         userTargets = Array.from(canvas.tokens.controlled);
-      }
-
-      // Perform the attack
+      // Get the check
       const castingCheck = new TitanCastingCheck(checkOptions);
       return castingCheck;
    }
@@ -429,20 +426,27 @@ export class TitanActor extends Actor {
             return false;
          }
 
+         // Get the spell data
+         options.difficulty = options.difficulty ?? checkSpell.system.check.difficulty;
+         options.complexity = options.complexity ?? checkSpell.system.check.complexity;
+         options.attribute = options.attribute ?? checkSpell.system.check.attribute;
+         options.skill = options.skill ?? checkSpell.system.check.skill;
+         options.spellName = checkSpell.name;
+
          // Get the damage mod
          options.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
          // Create the dialog
-         // const dialog = new CastingCheckDialog(this, options);
-         // dialog.render(true);
+         const dialog = new CastingCheckDialog(this, options);
+         dialog.render(true);
          return;
       }
 
       // Otherwise, get a check
-      const castingCHeck = await this.getCastingCheck(options);
-      if (castingCHeck && castingCHeck.isValid) {
-         await castingCHeck.evaluateCheck();
-         await castingCHeck.sendToChat({
+      const castingCheck = await this.getCastingCheck(options);
+      if (castingCheck && castingCheck.isValid) {
+         await castingCheck.evaluateCheck();
+         await castingCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
             rollMode: game.settings.get("core", "rollMode"),
