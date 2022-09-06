@@ -25,35 +25,35 @@
    </div>
 
    {#if chatContext.parameters.aspects && chatContext.parameters.aspects.length > 0}
-      <div class="info">
+      <div class="info top-margin">
          <AspectTags aspects={chatContext.parameters.aspects} />
       </div>
    {/if}
 
-   <div class="info">
+   <div class="info top-margin">
       <CheckChatDiceContainer />
    </div>
 
-   <div class="info">
+   <div class="info top-margin">
       <CheckChatResults />
    </div>
 
    {#if isOwner && overcastAspects && overcastAspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
-      <div class="info top-padding">
+      <div class="info top-margin">
          <CheckOvercastAspects bind:overcastAspects />
       </div>
    {/if}
 
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.damage !== undefined && game.user.isGM}
-      <div class="info top-padding">
+      <div class="info top-margin">
          <CheckDamageButtons />
       </div>
    {/if}
 
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.healing !== undefined && game.user.isGM}
-      <div class="info top-padding">
+      <div class="info top-margin">
          <CheckHealingButton />
       </div>
    {/if}
@@ -75,7 +75,7 @@
          width: 100%;
       }
 
-      .top-padding {
+      .top-margin {
          margin-top: 0.5rem;
       }
    }

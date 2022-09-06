@@ -43,7 +43,6 @@
       @include flex-group-center;
       width: 100%;
       flex-wrap: wrap;
-      padding: 0.5rem;
 
       .die {
          @include border;
