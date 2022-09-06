@@ -26,7 +26,7 @@
       <CheckChatResults />
    </div>
 
-   {#if chatContext.parameters.aspects && chatContext.results.extraSuccesses !== undefined && isOwner}
+   {#if isOwner && chatContext.parameters.aspects && chatContext.parameters.aspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
       <div class="info top-padding">
          <CheckAspects />
       </div>
