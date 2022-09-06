@@ -104,6 +104,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
 
          let overcastCount = 0;
          let overcastIdx = -1;
+         results.extraSuccessesRemaining = results.extraSuccesses;
 
          // Adjust aspect results
          this.parameters.aspects.forEach((aspect, idx) => {
@@ -137,7 +138,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
             const delta = Math.floor(results.extraSuccesses / aspect.cost);
             const cost = delta * aspect.cost;
             aspect.currentValue += delta;
-            results.extraSuccesses -= cost;
+            results.extraSuccessesRemaining -= cost;
 
             // Update damage
             if (aspect.isDamage) {

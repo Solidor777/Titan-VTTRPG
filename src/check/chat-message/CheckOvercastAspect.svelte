@@ -15,7 +15,7 @@
       aspect.currentValue += aspect.initialValue;
 
       // Decrease the extra successes by the cost
-      chatContext.results.extraSuccesses -= aspect.cost;
+      chatContext.results.extraSuccessesRemaining -= aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
@@ -40,7 +40,7 @@
       aspect.currentValue -= aspect.initialValue;
 
       // Increase the extra successes by the cost
-      chatContext.results.extraSuccesses += aspect.cost;
+      chatContext.results.extraSuccessesRemaining += aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
@@ -69,7 +69,7 @@
       aspect.currentValue = aspect.initialValue;
 
       // Reset the extra successes
-      chatContext.results.extraSuccesses += cost;
+      chatContext.results.extraSuccessesRemaining += cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
@@ -130,7 +130,7 @@
 
       <!--Increase Button-->
       <div class="control">
-         <EfxButton on:click={increaseAspect} disabled={chatContext.results.extraSuccesses < aspect.cost}>
+         <EfxButton on:click={increaseAspect} disabled={chatContext.results.extraSuccessesRemaining < aspect.cost}>
             <div class="button-inner">
                <i class="fas fa-plus" />
             </div>

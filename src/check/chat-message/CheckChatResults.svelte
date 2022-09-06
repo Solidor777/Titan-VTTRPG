@@ -23,7 +23,11 @@
       {#if results.extraSuccesses !== undefined}
          <div class="stat">
             {localize(`LOCAL.extraSuccesses.label`)}:
-            {results.extraSuccesses}
+            {#if results.extraSuccessesRemaining != undefined}
+               {results.extraSuccessesRemaining}/{results.extraSuccesses}
+            {:else}
+               {results.extraSuccesses}
+            {/if}
          </div>
       {/if}
    {:else if results.failed}
