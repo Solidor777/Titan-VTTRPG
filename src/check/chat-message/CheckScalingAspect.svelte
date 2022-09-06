@@ -144,11 +144,10 @@
    .aspect {
       @include flex-row;
       @include flex-space-between;
-      font-size: 1rem;
       width: 100%;
       min-height: 2rem;
       height: 100%;
-      font-size: 1rem;
+      font-size: 0.9rem;
 
       .label {
          @include flex-column;
