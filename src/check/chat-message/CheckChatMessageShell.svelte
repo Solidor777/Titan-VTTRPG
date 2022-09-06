@@ -7,6 +7,7 @@
    import CheckDamageButtons from "./CheckDamageButtons.svelte";
    import CheckHealingButton from "./CheckHealingButton.svelte";
    import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
+   import CheckResistanceCheckButtons from "./CheckResistanceCheckButtons.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -55,6 +56,12 @@
    {#if chatContext.results.healing !== undefined && game.user.isGM}
       <div class="info top-margin">
          <CheckHealingButton />
+      </div>
+   {/if}
+
+   {#if chatContext.results.reflexesCheck || chatContext.results.resilienceCheck || chatContext.results.willpowerCheck}
+      <div class="info">
+         <CheckResistanceCheckButtons />
       </div>
    {/if}
 </div>

@@ -620,15 +620,6 @@
       "customAspects": []
     }
   },
-  "miracle": {
-    "templates": [
-      "base",
-      "resolveCost",
-      "expCost"
-    ],
-    "source": "",
-    "resistanceChecks": []
-  },
   "ability": {
     "templates": [
       "base",

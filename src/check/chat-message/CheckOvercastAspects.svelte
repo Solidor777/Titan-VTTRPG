@@ -1,9 +1,5 @@
 <script>
-   import { getContext } from "svelte";
    import CheckOvercastAspect from "./CheckOvercastAspect.svelte";
-
-   // Chat context
-   const document = getContext("DocumentSheetObject");
 
    export let overcastAspects = void 0;
 </script>

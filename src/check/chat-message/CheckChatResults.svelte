@@ -1,9 +1,9 @@
 <script>
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
-   const document = getContext("DocumentSheetObject");
 
    // Results
+   const document = getContext("DocumentSheetObject");
    let results = $document.flags.titan.chatContext.results;
 </script>
 

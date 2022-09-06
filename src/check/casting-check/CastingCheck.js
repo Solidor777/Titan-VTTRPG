@@ -102,6 +102,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
       // Check if damage or healing is among the aspects
       if (results.succeeded) {
 
+         // Initialize state data
          let overcastCount = 0;
          let overcastIdx = -1;
          results.extraSuccessesRemaining = results.extraSuccesses;
@@ -125,6 +126,27 @@ export default class TitanCastingCheck extends TitanSkillCheck {
             if (aspect.overcast) {
                overcastCount += 1;
                overcastIdx = idx;
+            }
+
+            // Resistance check
+            if (aspect.resistanceCheck) {
+               switch (aspect.resistanceCheck) {
+                  case "reflexes": {
+                     results.reflexesCheck = true;
+                     break;
+                  }
+                  case "resilience": {
+                     results.resilienceCheck = true;
+                     break;
+                  }
+                  case "willpower": {
+                     results.willpowerCheck = true;
+                     break;
+                  }
+                  default: {
+                     break;
+                  }
+               }
             }
          });
 
