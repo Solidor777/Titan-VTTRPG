@@ -623,8 +623,9 @@
   "ability": {
     "templates": [
       "base",
-      "resolveCost",
+      "value",
       "expCost"
-    ]
+    ],
+    "aspects": []
   }
 }
