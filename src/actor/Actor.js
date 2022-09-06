@@ -333,6 +333,16 @@ export class TitanActor extends Actor {
             return false;
          }
 
+         // Get the attack data
+         const checkAttack = checkWeapon.system.attack[options.attackIdx];
+         if (!checkAttack) {
+            console.error(
+               "TITAN | Attack check failed. Invalid Attack Index provided to actor."
+            );
+
+            return false;
+         }
+
          // Get the damage mod
          options.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
@@ -340,14 +350,17 @@ export class TitanActor extends Actor {
          options.attackerMelee = this.system.rating.melee.value;
          options.attackerAccuracy = this.system.rating.accuracy.value;
 
-         // Get the target dfense
+         // Get the target defense
          let userTargets = Array.from(game.user.targets);
          if (userTargets.length < 1 && game.user.isGM) {
             userTargets = Array.from(canvas.tokens.controlled);
          }
          if (userTargets[0]) {
-            options.targetDefense = userTargets[0].system.rating.defense.value;
+            options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
          }
+
+         // Get the attack type
+         options.type = checkAttack.type;
 
          // Create the dialog
          const dialog = new AttackCheckDialog(this, options);

@@ -15,7 +15,7 @@ export class AttackCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 490,
+            height: 525,
          }
       );
    }

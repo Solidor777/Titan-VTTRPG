@@ -73,6 +73,7 @@
       .traits {
          @include flex-row;
          @include flex-space-evenly;
+         margin-top: 0.5rem;
          flex-wrap: wrap;
          width: 100%;
 

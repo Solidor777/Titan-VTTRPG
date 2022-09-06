@@ -94,6 +94,7 @@
          <AttributeSelect bind:value={checkParameters.attribute} />
       </div>
    </div>
+
    <!--Skill-->
    <div class="row">
       <div class="label">
@@ -120,7 +121,7 @@
          {localize("LOCAL.complexity.label")}
       </div>
       <div class="input">
-         <IntegerInput bind:value={checkParameters.complexity} positive={true} />
+         <IntegerInput bind:value={checkParameters.complexity} min={0} />
       </div>
    </div>
 
