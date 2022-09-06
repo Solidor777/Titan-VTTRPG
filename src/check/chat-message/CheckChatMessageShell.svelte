@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import CheckOvercastAspects from "./CheckOvercastAspects.svelte";
+   import CheckScalingAspects from "./CheckScalingAspects.svelte";
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
    import CheckChatResults from "./CheckChatResults.svelte";
@@ -13,9 +13,9 @@
    const document = getContext("DocumentSheetObject");
    const chatContext = $document.flags.titan.chatContext;
    const isOwner = $document.constructor.getSpeakerActor($document.speaker).isOwner;
-   let overcastAspects = chatContext.parameters.aspects
+   let scalingAspects = chatContext.parameters.aspects
       ? chatContext.parameters.aspects.filter((aspect) => {
-           return aspect.overcast;
+           return aspect.scaling;
         })
       : false;
 </script>
@@ -39,9 +39,9 @@
       <CheckChatResults />
    </div>
 
-   {#if isOwner && overcastAspects && overcastAspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
+   {#if isOwner && scalingAspects && scalingAspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
       <div class="info top-margin">
-         <CheckOvercastAspects bind:overcastAspects />
+         <CheckScalingAspects bind:scalingAspects />
       </div>
    {/if}
 

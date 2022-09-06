@@ -192,7 +192,7 @@ export class TitanSpell extends TitanTypeComponent {
       }
    }
 
-   _prepareStandardAspectData(aspect, label, overcast, requireOptions, initialValue, isDamage, isHealing) {
+   _prepareStandardAspectData(aspect, label, scaling, requireOptions, initialValue, isDamage, isHealing) {
       if (aspect.enabled) {
          // Check for options
          const option = [];
@@ -211,13 +211,13 @@ export class TitanSpell extends TitanTypeComponent {
                cost: aspect.cost,
             };
 
-            // Overcast
-            if (overcast) {
-               aspectEntry.overcast = true;
+            // Scaling
+            if (scaling) {
+               aspectEntry.scaling = true;
             }
 
             // Initial value
-            if (overcast === true) {
+            if (scaling === true) {
                aspectEntry.initialValue = initialValue;
                if (aspect.value) {
                   aspectEntry.label = game.i18n.localize(`LOCAL.${aspect.value}.label`);
@@ -256,7 +256,7 @@ export class TitanSpell extends TitanTypeComponent {
    getCustomAspectTemplate() {
       return {
          label: game.i18n.localize("LOCAL.customAspect.label"),
-         overcast: true,
+         scaling: true,
          initialValue: 1,
          cost: 1,
          resistanceCheck: "none",
@@ -293,8 +293,8 @@ export class TitanSpell extends TitanTypeComponent {
       };
 
       // Initial value
-      if (aspect.overcast && aspect.initialValue) {
-         aspectEntry.overcast = true;
+      if (aspect.scaling && aspect.initialValue) {
+         aspectEntry.scaling = true;
          aspectEntry.initialValue = Math.max(0, aspect.initialValue);
       }
 

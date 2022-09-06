@@ -1,15 +1,15 @@
 <script>
-   import CheckOvercastAspect from "./CheckOvercastAspect.svelte";
+   import CheckScalingAspect from "./CheckScalingAspect.svelte";
 
-   export let overcastAspects = void 0;
+   export let scalingAspects = void 0;
 </script>
 
 <div class="aspects">
    <!--Each aspect-->
-   {#each overcastAspects as aspect}
+   {#each scalingAspects as aspect}
       <!--Aspect-->
       <div class="aspect">
-         <CheckOvercastAspect bind:aspect />
+         <CheckScalingAspect bind:aspect />
       </div>
    {/each}
 </div>

@@ -103,8 +103,8 @@ export default class TitanCastingCheck extends TitanSkillCheck {
       if (results.succeeded) {
 
          // Initialize state data
-         let overcastCount = 0;
-         let overcastIdx = -1;
+         let scalingCount = 0;
+         let scalingIdx = -1;
          results.extraSuccessesRemaining = results.extraSuccesses;
 
          // Adjust aspect results
@@ -122,10 +122,10 @@ export default class TitanCastingCheck extends TitanSkillCheck {
             // Current value
             aspect.currentValue = aspect.initialValue;
 
-            // Overcast
-            if (aspect.overcast) {
-               overcastCount += 1;
-               overcastIdx = idx;
+            // Scaling
+            if (aspect.scaling) {
+               scalingCount += 1;
+               scalingIdx = idx;
             }
 
             // Resistance check
@@ -150,13 +150,13 @@ export default class TitanCastingCheck extends TitanSkillCheck {
             }
          });
 
-         // If there is only one overcast
-         if (overcastCount === 1 &&
+         // If there is only one scaling
+         if (scalingCount === 1 &&
             results.extraSuccesses &&
-            results.extraSuccesses >= this.parameters.aspects[overcastIdx].cost) {
+            results.extraSuccesses >= this.parameters.aspects[scalingIdx].cost) {
 
             // Maximize the aspect
-            const aspect = this.parameters.aspects[overcastIdx];
+            const aspect = this.parameters.aspects[scalingIdx];
             const delta = Math.floor(results.extraSuccesses / aspect.cost);
             const cost = delta * aspect.cost;
             aspect.currentValue += delta;

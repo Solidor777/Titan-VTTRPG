@@ -123,7 +123,7 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.damage.label")}?
+                           {localize("LOCAL.damage.label")}
                         </div>
 
                         <!--Value-->
@@ -136,7 +136,7 @@
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.healing.label")}?
+                           {localize("LOCAL.healing.label")}
                         </div>
 
                         <!--Value-->
@@ -145,22 +145,22 @@
                         </div>
                      </div>
 
-                     <!--Overcast-->
+                     <!--Scaling-->
                      <div class="stat">
                         <!--Label-->
                         <div class="label">
-                           {localize("LOCAL.overcast.label")}
+                           {localize("LOCAL.scaling.label")}
                         </div>
 
                         <!--Value-->
                         <div class="input checkbox">
-                           <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].overcast} />
+                           <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].scaling} />
                         </div>
                      </div>
                   </div>
 
                   <!--Initial value-->
-                  {#if $document.system.customAspects[idx].overcast}
+                  {#if $document.system.customAspects[idx].scaling}
                      <div class="row" transition:slide|local>
                         <div class="stat">
                            <!--Label-->

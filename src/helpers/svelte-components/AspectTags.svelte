@@ -9,7 +9,7 @@
    aspects.forEach((aspect, idx) => {
       let size = 0;
 
-      if (aspect.overcast) {
+      if (aspect.scaling) {
          size += 1;
       }
 

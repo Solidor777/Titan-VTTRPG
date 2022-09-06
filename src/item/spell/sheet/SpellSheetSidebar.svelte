@@ -35,7 +35,7 @@
                         {typeof aspect.initialValue === `string`
                            ? localize(`LOCAL.${aspect.initialValue}.label`)
                            : aspect.initialValue}
-                        {#if aspect.overcast}
+                        {#if aspect.scaling}
                            {#if aspect.cost > 1}
                               {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
                            {:else}
