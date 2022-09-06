@@ -1,22 +1,34 @@
 <script>
    import { getContext } from "svelte";
-   import CheckAspects from "./CheckAspects.svelte";
+   import CheckOvercastAspects from "./CheckOvercastAspects.svelte";
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
    import CheckChatResults from "./CheckChatResults.svelte";
    import CheckDamageButtons from "./CheckDamageButtons.svelte";
    import CheckHealingButton from "./CheckHealingButton.svelte";
+   import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
    const chatContext = $document.flags.titan.chatContext;
    const isOwner = $document.constructor.getSpeakerActor($document.speaker).isOwner;
+   let overcastAspects = chatContext.parameters.aspects
+      ? chatContext.parameters.aspects.filter((aspect) => {
+           return aspect.overcast;
+        })
+      : false;
 </script>
 
 <div class="check-chat-message">
    <div class="label">
       <CheckChatLabel />
    </div>
+
+   {#if chatContext.parameters.aspects && chatContext.parameters.aspects.length > 0}
+      <div class="info">
+         <AspectTags aspects={chatContext.parameters.aspects} />
+      </div>
+   {/if}
 
    <div class="info">
       <CheckChatDiceContainer />
@@ -26,9 +38,9 @@
       <CheckChatResults />
    </div>
 
-   {#if isOwner && chatContext.parameters.aspects && chatContext.parameters.aspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
+   {#if isOwner && overcastAspects && overcastAspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
       <div class="info top-padding">
-         <CheckAspects />
+         <CheckOvercastAspects bind:overcastAspects />
       </div>
    {/if}
 

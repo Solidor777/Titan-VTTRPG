@@ -1,31 +1,29 @@
 <script>
    import { getContext } from "svelte";
-   import CheckAspect from "./CheckAspect.svelte";
-   const document = getContext("DocumentSheetObject");
+   import CheckOvercastAspect from "./CheckOvercastAspect.svelte";
 
    // Chat context
-   const chatContext = $document.flags.titan.chatContext;
+   const document = getContext("DocumentSheetObject");
+
+   export let overcastAspects = void 0;
 </script>
 
 <div class="aspects">
    <!--Each aspect-->
-   {#each chatContext.parameters.aspects as aspect, idx}
-      <!--If Overcast-->
-      {#if aspect.overcast}
-         <!--Aspect-->
-         <div class="aspect">
-            <CheckAspect bind:aspect />
-         </div>
-      {/if}
+   {#each overcastAspects as aspect}
+      <!--Aspect-->
+      <div class="aspect">
+         <CheckOvercastAspect bind:aspect />
+      </div>
    {/each}
 </div>
 
 <style lang="scss">
    @import "../../styles/mixins.scss";
    .aspects {
-      @include border;
       @include flex-column;
       @include flex-group-top;
+      @include border;
       padding: 0.5rem;
       width: 100%;
       background-color: var(--label-background-color);

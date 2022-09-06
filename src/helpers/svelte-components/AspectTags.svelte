@@ -1,5 +1,5 @@
 <script>
-   import SpellAspect from "./SpellAspect.svelte";
+   import AspectTag from "./AspectTag.svelte";
 
    // Aspects list
    export let aspects = void 0;
@@ -39,7 +39,7 @@
    {#each aspectSizeMap as aspectSizeMap}
       {#if aspects[aspectSizeMap.idx]}
          <div class="aspect">
-            <SpellAspect aspect={aspects[aspectSizeMap.idx]} />
+            <AspectTag aspect={aspects[aspectSizeMap.idx]} />
          </div>
       {/if}
    {/each}

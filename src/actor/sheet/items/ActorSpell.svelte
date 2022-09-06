@@ -11,7 +11,7 @@
    import ActorItemTradition from "./ActorItemTradition.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
    import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
-   import SpellAspects from "~/item/spell/SpellAspects.svelte";
+   import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -75,7 +75,7 @@
 
             {#if item.aspects}
                <div class="item-expandable-content">
-                  <SpellAspects aspects={item.aspects} />
+                  <AspectTags aspects={item.aspects} />
                </div>
             {/if}
 
