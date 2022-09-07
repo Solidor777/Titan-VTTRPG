@@ -10,6 +10,7 @@ import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import TitanPlayerSheet from "./actor/player/PlayerSheet.js";
 import TitanWeaponSheet from "./item/weapon/sheet/WeaponSheet.js";
+import TitanAbilitySheet from './item/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/armor/sheet/ArmorSheet.js';
 import TitanSpellSheet from './item/spell/sheet/SpellSheet.js';
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
@@ -43,6 +44,10 @@ Hooks.once("init", async () => {
    // Register Sheet Classes
    Actors.registerSheet("titan", TitanPlayerSheet, {
       types: ["player"],
+      makeDefault: true,
+   });
+   Items.registerSheet("titan", TitanAbilitySheet, {
+      types: ["ability"],
       makeDefault: true,
    });
    Items.registerSheet("titan", TitanArmorSheet, {

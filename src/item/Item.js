@@ -1,5 +1,6 @@
-import { TitanWeapon } from "./weapon/Weapon";
-import { TitanSpell } from "./spell/Spell";
+import { TitanWeapon } from "./weapon/Weapon.js";
+import { TitanSpell } from "./spell/Spell.js";
+import { TitanAbility } from "./ability/Ability.js";
 
 export class TitanItem extends Item {
    prepareDerivedData() {
@@ -8,6 +9,13 @@ export class TitanItem extends Item {
       // Create type component if necessary
       if (!this.system.typeComponent) {
          switch (this.type) {
+            // Ability
+            case "ability": {
+               this.typeComponent = new TitanAbility(this);
+               this.ability = this.typeComponent;
+               break;
+            }
+
             // Spell
             case "spell": {
                this.typeComponent = new TitanSpell(this);

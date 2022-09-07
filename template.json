@@ -331,8 +331,7 @@
       "armor",
       "weapon",
       "spell",
-      "miracle",
-      "talent"
+      "ability"
     ],
     "templates": {
       "base": {
@@ -618,15 +617,15 @@
         }
       },
       "customAspects": []
+    },
+    "ability": {
+      "templates": [
+        "base",
+        "rarity",
+        "expCost"
+      ],
+      "type": "action",
+      "checks": []
     }
-  },
-  "ability": {
-    "templates": [
-      "base",
-      "rarity",
-      "expCost"
-    ],
-    "type": "action",
-    "checks": []
   }
 }
