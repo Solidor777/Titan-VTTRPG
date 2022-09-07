@@ -623,9 +623,10 @@
   "ability": {
     "templates": [
       "base",
-      "value",
+      "rarity",
       "expCost"
     ],
-    "aspects": []
+    "type": "action",
+    "checks": []
   }
 }
