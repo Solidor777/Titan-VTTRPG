@@ -16,60 +16,61 @@
 <!--Header-->
 <div class="header">
    <div class="main-label">
-      <!--Item portrait-->
+      <!--Portrait-->
       <div class="portrait">
          <DocumentImagePicker path={"img"} alt={"item portrait"} />
       </div>
+
       <!--Item name-->
       <div class="label-stats">
          <div class="name">
             <DocumentName />
          </div>
 
-         <!--Checkboxes-->
-         <div class="checkboxes">
-            <!--Action-->
-            <div class="checkbox">
+         <!--Secondary Stats-->
+         <div class="secondary-stats">
+            <!--Rarity-->
+            <div class="stat">
                <div class="label">
-                  {localize("LOCAL.action.label")}
+                  {localize("LOCAL.rarity.label")}
                </div>
                <div class="input">
-                  <DocumentCheckboxInput bind:value={$document.system.action} />
+                  <DocumentRaritySelect bind:value={$document.system.rarity} />
                </div>
             </div>
 
-            <!--Passive -->
-            <div class="checkbox">
+            <!--EXP Cost-->
+            <div class="stat">
                <div class="label">
-                  {localize("LOCAL.passive.label")}
+                  {localize("LOCAL.expCost.label")}
                </div>
-               <div class="input">
-                  <DocumentCheckboxInput bind:value={$document.system.passive} />
+               <div class="input integer">
+                  <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
                </div>
             </div>
          </div>
       </div>
    </div>
 
-   <!--Stats-->
-   <div class="stats">
-      <!--Rarity-->
-      <div class="stat">
+   <!--Checkboxes-->
+   <div class="checkboxes">
+      <!--Action-->
+      <div class="checkbox">
          <div class="label">
-            {localize("LOCAL.rarity.label")}
+            {localize("LOCAL.action.label")}
          </div>
          <div class="input">
-            <DocumentRaritySelect bind:value={$document.system.rarity} />
+            <DocumentCheckboxInput bind:value={$document.system.action} />
          </div>
       </div>
 
-      <!--EXP Cost-->
-      <div class="stat">
+      <!--Passive -->
+      <div class="checkbox">
          <div class="label">
-            {localize("LOCAL.expCost.label")}
+            {localize("LOCAL.passive.label")}
          </div>
          <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
+            <DocumentCheckboxInput bind:value={$document.system.passive} />
          </div>
       </div>
    </div>
@@ -86,55 +87,65 @@
 
       .main-label {
          @include flex-row;
-         @include flex-group-center;
+         @include flex-group-left;
 
          .portrait {
             width: 5rem;
             --border-style: none;
          }
 
+         .name {
+            @include flex-group-center;
+         }
+
          .label-stats {
             @include flex-column;
             @include flex-group-top-left;
-         }
 
-         .checkboxes {
-            @include flex-row;
-            @include flex-group-center;
-            margin-top: 0.25rem;
-            width: 100%;
-
-            .checkbox {
+            .secondary-stats {
                @include flex-row;
+               @include flex-group-left;
+               margin-top: 0.5rem;
+               width: 100%;
 
-               &:not(:first-child) {
-                  @include border-left;
-                  margin-left: 0.5rem;
-                  padding-left: 0.5rem;
-               }
-
-               .label {
+               .stat {
                   @include flex-row;
-                  @include flex-group-right;
-                  font-weight: bold;
-               }
+                  @include flex-group-left;
 
-               .input {
-                  margin: 0;
-                  margin-right: 0.25rem;
+                  &:not(:first-child) {
+                     @include border-left;
+                     margin-left: 0.5rem;
+                     padding-left: 0.5rem;
+                  }
+
+                  .label {
+                     @include flex-row;
+                     @include flex-group-left;
+                     font-weight: bold;
+                     margin-right: 0.5rem;
+                  }
+
+                  .input {
+                     @include flex-row;
+                     @include flex-group-center;
+
+                     &.integer {
+                        --input-width: 3rem;
+                     }
+                  }
                }
             }
          }
       }
 
-      .stats {
+      .checkboxes {
          @include flex-column;
          @include flex-group-top-right;
+         margin-left: 1rem;
 
-         .stat {
+         .checkbox {
             @include flex-row;
-            @include flex-group-right;
-            width: 100%;
+            @include flex-group-left;
 
             &:not(:first-child) {
                @include border-top;
@@ -146,13 +157,11 @@
                @include flex-row;
                @include flex-group-right;
                font-weight: bold;
-               margin-right: 0.5rem;
             }
 
             .input {
-               @include flex-row;
-               @include flex-group-center;
-               --input-width: 7rem;
+               margin: 0;
+               margin-right: 0.25rem;
             }
          }
       }
