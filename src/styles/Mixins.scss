@@ -156,6 +156,18 @@
   text-align: center;
 }
 
+@mixin flex-group-top-right {
+  align-items: flex-end;
+  justify-content: flex-start;
+  text-align: right;
+}
+
+@mixin flex-group-top-left {
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+}
+
 @mixin flex-space-between {
   align-items: center;
   justify-content: space-between;
@@ -171,7 +183,7 @@
 @mixin grid($column-count) {
   display: grid;
   gap: 0.5rem;
-  margin: 0.5rem 0;
+  margin: 0;
   padding: 0;
   grid-column: span $column-count / span $column-count;
   grid-template-columns: repeat($column-count, minmax(0, 1fr));

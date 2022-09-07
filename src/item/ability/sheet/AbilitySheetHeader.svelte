@@ -7,6 +7,7 @@
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import DocumentCheckboxInput from "../../../documents/components/DocumentCheckboxInput.svelte";
 
    // Setup
    const document = getContext("DocumentSheetObject");
@@ -14,33 +15,60 @@
 
 <!--Header-->
 <div class="header">
-   <div class="row">
-      <div class="label">
-         <!--Item portrait-->
-         <div class="portrait">
-            <DocumentImagePicker path={"img"} alt={"item portrait"} />
-         </div>
-         <!--Item name-->
+   <div class="main-label">
+      <!--Item portrait-->
+      <div class="portrait">
+         <DocumentImagePicker path={"img"} alt={"item portrait"} />
+      </div>
+      <!--Item name-->
+      <div class="label-stats">
          <div class="name">
             <DocumentName />
          </div>
-      </div>
 
-      <!--Stats-->
-      <div class="stats">
-         <!--Rarity-->
-         <div class="stat-label">
+         <!--Checkboxes-->
+         <div class="checkboxes">
+            <!--Action-->
+            <div class="checkbox">
+               <div class="label">
+                  {localize("LOCAL.action.label")}
+               </div>
+               <div class="input">
+                  <DocumentCheckboxInput bind:value={$document.system.action} />
+               </div>
+            </div>
+
+            <!--Passive -->
+            <div class="checkbox">
+               <div class="label">
+                  {localize("LOCAL.passive.label")}
+               </div>
+               <div class="input">
+                  <DocumentCheckboxInput bind:value={$document.system.passive} />
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!--Stats-->
+   <div class="stats">
+      <!--Rarity-->
+      <div class="stat">
+         <div class="label">
             {localize("LOCAL.rarity.label")}
          </div>
-         <div class="stat-input">
+         <div class="input">
             <DocumentRaritySelect bind:value={$document.system.rarity} />
          </div>
+      </div>
 
-         <!--Rarity-->
-         <div class="stat-label">
+      <!--EXP Cost-->
+      <div class="stat">
+         <div class="label">
             {localize("LOCAL.expCost.label")}
          </div>
-         <div class="stat-input">
+         <div class="input">
             <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
          </div>
       </div>
@@ -51,38 +79,80 @@
    @import "../../../Styles/Mixins.scss";
    .header {
       @include border;
-      @include flex-column;
-      align-items: center;
-      justify-content: space-between;
+      @include flex-row;
+      @include flex-space-between;
       width: 100%;
       padding: 0.5rem;
 
-      .row {
+      .main-label {
          @include flex-row;
-         @include flex-space-between;
-         width: 100%;
+         @include flex-group-center;
 
-         .label {
-            @include flex-row;
-            @include flex-group-center;
-            width: 100%;
-
-            .portrait {
-               width: 5rem;
-               --border-style: none;
-            }
+         .portrait {
+            width: 5rem;
+            --border-style: none;
          }
 
-         .stats {
-            @include grid(2);
-            width: 100%;
-            box-sizing: border-box;
-            margin-left: 0.5rem;
+         .label-stats {
+            @include flex-column;
+            @include flex-group-top-left;
+         }
 
-            .stat-label {
+         .checkboxes {
+            @include flex-row;
+            @include flex-group-center;
+            margin-top: 0.25rem;
+            width: 100%;
+
+            .checkbox {
+               @include flex-row;
+
+               &:not(:first-child) {
+                  @include border-left;
+                  margin-left: 0.5rem;
+                  padding-left: 0.5rem;
+               }
+
+               .label {
+                  @include flex-row;
+                  @include flex-group-right;
+                  font-weight: bold;
+               }
+
+               .input {
+                  margin: 0;
+                  margin-right: 0.25rem;
+               }
+            }
+         }
+      }
+
+      .stats {
+         @include flex-column;
+         @include flex-group-top-right;
+
+         .stat {
+            @include flex-row;
+            @include flex-group-right;
+            width: 100%;
+
+            &:not(:first-child) {
+               @include border-top;
+               margin-top: 0.25rem;
+               padding-top: 0.25rem;
+            }
+
+            .label {
                @include flex-row;
                @include flex-group-right;
                font-weight: bold;
+               margin-right: 0.5rem;
+            }
+
+            .input {
+               @include flex-row;
+               @include flex-group-center;
+               --input-width: 7rem;
             }
          }
       }
