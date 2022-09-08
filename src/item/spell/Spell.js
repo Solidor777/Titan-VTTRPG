@@ -1,5 +1,17 @@
 import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
 
+export function getCustomAspectTemplate() {
+   return {
+      label: game.i18n.localize("LOCAL.customAspect.label"),
+      scaling: true,
+      initialValue: 1,
+      cost: 1,
+      resistanceCheck: "none",
+      isDamage: false,
+      isHealing: false
+   };
+}
+
 export class TitanSpell extends TitanTypeComponent {
    prepareDerivedData() {
       // Reset aspects array
@@ -253,21 +265,9 @@ export class TitanSpell extends TitanTypeComponent {
       }
    }
 
-   getCustomAspectTemplate() {
-      return {
-         label: game.i18n.localize("LOCAL.customAspect.label"),
-         scaling: true,
-         initialValue: 1,
-         cost: 1,
-         resistanceCheck: "none",
-         isDamage: false,
-         isHealing: false
-      };
-   }
-
    addCustomAspect() {
       const system = this.parent.system;
-      system.customAspects.push(this.getCustomAspectTemplate());
+      system.customAspects.push(getCustomAspectTemplate());
       this.parent.update({
          system: system
       });

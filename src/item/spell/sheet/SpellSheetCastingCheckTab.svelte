@@ -9,8 +9,11 @@
    import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
 
-   // Document Setup
+   // Document reference
    const document = getContext("DocumentSheetObject");
+
+   // Application refernce
+   const application = getContext("external").application;
 
    const difficultyOptions = [2, 3, 4, 5, 6];
 </script>
@@ -124,7 +127,7 @@
          {localize("LOCAL.aspectCosts.label")}
       </div>
 
-      <ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.castingCheck}>
          <ol>
             {#each $document.aspects as aspect}
                <li>

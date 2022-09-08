@@ -10,8 +10,11 @@
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
    import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
 
-   // Document Setup
+   // Document reference
    const document = getContext("DocumentSheetObject");
+
+   // Application refernce
+   const application = getContext("external").application;
 
    // Resistance select options
    const resistanceSelectOptions = [
@@ -123,7 +126,7 @@
 
    <!--Scrolling aspects list-->
    <div class="scrolling-content">
-      <ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.standardAspects}>
          <ol class="aspects-list">
             <!--Each Aspect-->
             {#each filteredAspects as key}

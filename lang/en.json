@@ -338,6 +338,8 @@
   "LOCAL.active.label": "Active",
   "LOCAL.passive.label": "Passive",
   "LOCAL.activeAndPassive.label": "Active & Passive",
+  "LOCAL.checks.label": "Checks",
+  "LOCAL.addCheck.label": "Add Check",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

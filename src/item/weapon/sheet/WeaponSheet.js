@@ -30,7 +30,11 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       },
    };
 
-   activeTab = "description";
+   // Scroll State
+   scrollTop = {
+      sidebar: 0,
+      attacks: 0,
+   };
 
    // Handles deleting an attack
    async deleteAttack(key) {

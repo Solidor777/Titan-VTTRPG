@@ -6,12 +6,18 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import { element } from "svelte/internal";
+   import SpellSheetAddAspectButton from "./SpellSheetAddAspectButton.svelte";
 
+   // Document reference
+   const document = getContext("DocumentSheetObject");
+
+   // Application refernce
+   const application = getContext("external").application;
+
+   // Resistance options
    const resistanceSelectOptions = [
       {
          label: localize("LOCAL.reflexes.label"),
@@ -30,9 +36,6 @@
          value: "none",
       },
    ];
-
-   // Document Setup
-   const document = getContext("DocumentSheetObject");
 
    // Filter for the aspects to display
    let filter = "";
@@ -63,7 +66,7 @@
 
    <!--Scrolling Aspects list-->
    <div class="scrolling-content">
-      <ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.customAspects}>
          <ol class="aspects-list">
             <!--Each Aspect-->
             {#each filteredAspects as idx}
@@ -181,14 +184,7 @@
                </li>
             {/each}
          </ol>
-         <div class="add-aspect-button">
-            <EfxButton
-               efx={ripple}
-               on:click={() => {
-                  $document.spell.addCustomAspect();
-               }}>{localize("LOCAL.addCustomAspect.label")}<i class="fas fa-circle-plus" /></EfxButton
-            >
-         </div>
+         <SpellSheetAddAspectButton />
       </ScrollingContainer>
    </div>
 </div>
@@ -302,15 +298,6 @@
                &:not(:first-child) {
                   margin-top: 0.25rem;
                }
-            }
-         }
-
-         .add-aspect-button {
-            @include flex-row;
-            margin-top: 0.25rem;
-
-            .fas {
-               margin-left: 0.25rem;
             }
          }
       }

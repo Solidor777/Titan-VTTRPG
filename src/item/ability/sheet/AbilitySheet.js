@@ -10,12 +10,20 @@ export default class TitanAbilitySheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 600,
+         width: 650,
+         height: 650,
          svelte: {
             class: AbilitySheetShell,
             target: document.body
          }
       });
    }
+
+   // Scroll State
+   scrollTop = {
+      skills: 0,
+      actions: 0,
+      inventory: 0,
+      spells: 0
+   };
 }

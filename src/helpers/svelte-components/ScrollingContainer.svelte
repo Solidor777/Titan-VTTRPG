@@ -64,7 +64,7 @@
          left: 0;
          bottom: 0;
          overflow-y: scroll;
-         padding: 0.25rem;
+         padding: 0;
          z-index: var(--z-index-app);
 
          /*          &.top-overflowing {

@@ -4,37 +4,37 @@
    import { slide } from "svelte/transition";
    import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import ScrollingContainer from "../../../helpers/svelte-components/ScrollingContainer.svelte";
 
-   // Reference to the weapon item
+   // Document reference
    const document = getContext("DocumentSheetObject");
 
-   // Initialize collapsed state
+   // Application reference
    const application = getContext("external").application;
 </script>
 
-<div class="weapon-attacks-tab">
-   <!--For Each attack-->
-   {#each Object.entries($document.system.attack) as [attackIdx]}
-      <div class="attack-sheet" transition:slide|local>
-         <WeaponSheetAttack {attackIdx} bind:isExpandedObject={application.isExpanded.attacks.attack} />
+<ScrollingContainer bind:scrollTop={application.scrollTop.attacks}>
+   <div class="weapon-attacks-tab">
+      {#each Object.entries($document.system.attack) as [attackIdx]}
+         <div class="attack-sheet" transition:slide|local>
+            <WeaponSheetAttack {attackIdx} bind:isExpandedObject={application.isExpanded.attacks.attack} />
+         </div>
+      {/each}
+
+      <div class="add-attack-button">
+         <EfxButton efx={ripple()} on:click={application.addAttack.bind(application)}>
+            <i class="fas fa-circle-plus" />
+         </EfxButton>
       </div>
-   {/each}
-
-   <div class="add-attack-button">
-      <EfxButton efx={ripple()} on:click={application.addAttack.bind(application)}>
-         <i class="fas fa-circle-plus" />
-      </EfxButton>
    </div>
-</div>
+</ScrollingContainer>
 
+<!--For Each attack-->
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
    .weapon-attacks-tab {
-      display: grid;
-      gap: 0.5rem;
-      margin: 0.5rem 0.5rem;
-      grid-template-columns: repeat(auto-fit, minmax(10rem, 13rem));
+      @include grid(3);
       width: 100%;
 
       .add-attack-button {

@@ -5,8 +5,11 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
-   // Setup
+   // Document reference
    const document = getContext("DocumentSheetObject");
+
+   // Application refernce
+   const application = getContext("external").application;
 </script>
 
 <div class="sidebar">
@@ -19,7 +22,7 @@
 
    <!--Aspects List-->
    <div class="scrolling-content">
-      <ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.sidebar}>
          <ol class="aspects-list">
             {#each $document.aspects as aspect}
                <!--Each Aspect-->
@@ -121,6 +124,7 @@
          @include flex-group-top;
          width: 100%;
          height: 100%;
+         margin-top: 0.5rem;
 
          .aspects-list {
             @include flex-column;

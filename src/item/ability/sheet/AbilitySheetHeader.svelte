@@ -139,33 +139,5 @@
             }
          }
       }
-
-      .checkboxes {
-         @include flex-column;
-         @include flex-group-top-right;
-         margin-left: 1rem;
-
-         .checkbox {
-            @include flex-row;
-            @include flex-group-left;
-
-            &:not(:first-child) {
-               @include border-top;
-               margin-top: 0.25rem;
-               padding-top: 0.25rem;
-            }
-
-            .label {
-               @include flex-row;
-               @include flex-group-right;
-               font-weight: bold;
-            }
-
-            .input {
-               margin: 0;
-               margin-right: 0.25rem;
-            }
-         }
-      }
    }
 </style>

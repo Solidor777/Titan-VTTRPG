@@ -18,4 +18,12 @@ export default class TitanSpellSheet extends TitanItemSheet {
          }
       });
    }
+
+   // Scroll State
+   scrollTop = {
+      sidebar: 0,
+      standardAspects: 0,
+      customAspects: 0,
+      castingCheck: 0,
+   };
 }
