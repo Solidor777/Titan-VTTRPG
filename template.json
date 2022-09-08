@@ -624,7 +624,7 @@
         "rarity",
         "expCost"
       ],
-      "type": "action",
+      "type": "active",
       "checks": []
     }
   }

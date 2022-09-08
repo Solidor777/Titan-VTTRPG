@@ -8,9 +8,24 @@
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentCheckboxInput from "../../../documents/components/DocumentCheckboxInput.svelte";
+   import DocumentSelect from "../../../documents/components/DocumentSelect.svelte";
 
    // Setup
    const document = getContext("DocumentSheetObject");
+   const typeOptions = [
+      {
+         label: localize("LOCAL.active.label"),
+         value: "active",
+      },
+      {
+         label: localize("LOCAL.passive.label"),
+         value: "passive",
+      },
+      {
+         label: localize("LOCAL.activeAndPassive.label"),
+         value: "activeAndPassive",
+      },
+   ];
 </script>
 
 <!--Header-->
@@ -48,29 +63,16 @@
                   <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
                </div>
             </div>
-         </div>
-      </div>
-   </div>
 
-   <!--Checkboxes-->
-   <div class="checkboxes">
-      <!--Action-->
-      <div class="checkbox">
-         <div class="label">
-            {localize("LOCAL.action.label")}
-         </div>
-         <div class="input">
-            <DocumentCheckboxInput bind:value={$document.system.action} />
-         </div>
-      </div>
-
-      <!--Passive -->
-      <div class="checkbox">
-         <div class="label">
-            {localize("LOCAL.passive.label")}
-         </div>
-         <div class="input">
-            <DocumentCheckboxInput bind:value={$document.system.passive} />
+            <!--Type-->
+            <div class="stat">
+               <div class="label">
+                  {localize("LOCAL.type.label")}
+               </div>
+               <div class="input">
+                  <DocumentSelect options={typeOptions} bind:value={$document.system.type} />
+               </div>
+            </div>
          </div>
       </div>
    </div>

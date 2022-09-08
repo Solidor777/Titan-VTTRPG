@@ -10,8 +10,8 @@ export default class TitanAbilitySheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 600,
-         height: 500,
+         width: 700,
+         height: 600,
          svelte: {
             class: AbilitySheetShell,
             target: document.body
