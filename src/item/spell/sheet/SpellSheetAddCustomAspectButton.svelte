@@ -12,8 +12,8 @@
    <EfxButton
       efx={ripple}
       on:click={() => {
-         $document.ability.addCheck();
-      }}>{localize("LOCAL.addCheck.label")}<i class="fas fa-circle-plus" /></EfxButton
+         $document.spell.addCustomAspect();
+      }}>{localize("LOCAL.addCustomAspect.label")}<i class="fas fa-circle-plus" /></EfxButton
    >
 </div>
 
