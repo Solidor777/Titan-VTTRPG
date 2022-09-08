@@ -21,7 +21,7 @@ export function
 export class TitanAbility extends TitanTypeComponent {
 
    async addCheck() {
-      const retVal = this.parent.system.checks.push(getCheckTemplate());
+      const retVal = this.parent.system.check.push(getCheckTemplate());
       await this.parent.update({
          system: this.parent.system
       });
@@ -30,7 +30,7 @@ export class TitanAbility extends TitanTypeComponent {
    }
 
    async removeCheck(idx) {
-      this.parent.system.checks.splice(idx, 1);
+      this.parent.system.check.splice(idx, 1);
       return await this.parent.update({
          system: this.parent.system
       });

@@ -12,7 +12,7 @@
    <EfxButton
       efx={ripple}
       on:click={() => {
-         $document.spell.addCheck();
+         $document.ability.addCheck();
       }}>{localize("LOCAL.addCheck.label")}<i class="fas fa-circle-plus" /></EfxButton
    >
 </div>
@@ -22,7 +22,6 @@
 
    .add-aspect-button {
       @include flex-row;
-      margin-top: 0.25rem;
 
       .fas {
          margin-left: 0.25rem;
