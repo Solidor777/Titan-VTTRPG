@@ -190,9 +190,12 @@
       .row {
          @include flex-row;
          @include flex-group-center;
+         @include border-top;
+         margin-top: 0.5rem;
+         padding-top: 0.5rem;
          font-size: 0.9rem;
          --font-size: 0.9rem;
-         margin-top: 0.25rem;
+         width: 100%;
 
          .stat {
             @include flex-row;
@@ -206,12 +209,17 @@
             }
 
             .label {
+               @include flex-row;
+               @include flex-group-center;
                font-weight: bold;
             }
 
             .input {
+               @include flex-row;
+               @include flex-group-center;
+
                &.checkbox {
-                  margin-right: 0.25rem;
+                  margin-left: 0.25rem;
                }
 
                &:not(.checkbox) {

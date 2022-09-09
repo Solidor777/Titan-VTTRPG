@@ -8,6 +8,9 @@
    // Document reference
    const document = getContext("DocumentSheetObject");
 
+   // Select options
+   export let options = void 0;
+
    let data;
    $: {
       data = {
@@ -21,6 +24,7 @@
 
 <AttributeSelect
    bind:value
+   {options}
    on:change={async () => {
       $document.update(data);
    }}

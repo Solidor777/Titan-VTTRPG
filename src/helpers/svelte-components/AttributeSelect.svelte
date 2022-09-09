@@ -6,7 +6,7 @@
    export let value = void 0;
 
    // Options
-   const attributeOptions = [
+   export let options = [
       {
          label: localize("LOCAL.body.label"),
          value: "body",
@@ -23,7 +23,7 @@
 </script>
 
 <div class="attribute-select {value}" on:change>
-   <Select options={attributeOptions} bind:value />
+   <Select {options} bind:value />
 </div>
 
 <style lang="scss">
