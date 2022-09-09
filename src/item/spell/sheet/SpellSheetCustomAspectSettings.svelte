@@ -158,7 +158,7 @@
       width: 100%;
       font-size: 1rem;
       padding: 0.25rem;
-      background-color: var(--label-background-color);
+      background: var(--label-background-color);
 
       .aspect-header {
          @include flex-row;

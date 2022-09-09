@@ -26,7 +26,7 @@
       padding: 0.5rem;
       list-style: none;
       flex-wrap: wrap;
-      background-color: var(--label-background-color);
+      background: var(--label-background-color);
 
       li {
          width: 100%;

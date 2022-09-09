@@ -250,7 +250,7 @@
                   @include border-bottom-sides;
                   padding: 0.5rem;
                   width: calc(100% - 30px);
-                  background-color: var(--label-background-color);
+                  background: var(--label-background-color);
                   font-size: 0.9rem;
                   --font-size: 0.9rem;
 

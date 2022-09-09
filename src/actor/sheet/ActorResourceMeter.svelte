@@ -115,7 +115,7 @@
                display: block;
                height: 100%;
                border-radius: 20px;
-               background-color: var(--meter-color);
+               background: var(--meter-color);
                box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
                position: relative;
                overflow: hidden;
@@ -127,7 +127,7 @@
             @include flex-row;
             @include flex-group-center;
             @include border;
-            background-color: var(--static-label-background-color);
+            background: var(--static-label-background-color);
             width: 3.2rem;
             height: 100%;
             text-align: center;

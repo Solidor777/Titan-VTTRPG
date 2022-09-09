@@ -173,7 +173,7 @@
          @include flex-group-top;
          @include border-bottom-sides;
          width: 100%;
-         background-color: var(--label-background-color);
+         background: var(--label-background-color);
 
          .stat {
             @include flex-row;
@@ -236,7 +236,7 @@
                @include border;
                padding: 0.25rem;
                page-break-inside: avoid;
-               background-color: var(--label-background-color);
+               background: var(--label-background-color);
                font-weight: bold;
             }
          }

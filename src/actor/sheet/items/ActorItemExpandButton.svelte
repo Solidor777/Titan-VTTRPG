@@ -56,7 +56,7 @@
             border: none;
             border-radius: 10px;
             padding: 0.1rem;
-            background-color: black;
+            background: black;
          }
       }
    }

@@ -8,7 +8,7 @@
   background-attachment: initial;
   background-origin: initial;
   background-clip: initial;
-  background-color: initial;
+  background: initial;
 }
 
 @mixin input {
@@ -17,7 +17,7 @@
   border-radius: var(--input-border-radius);
   border-width: var(--input-border-width);
   border-color: var(--input-border-color);
-  background-color: var(--input-background-color);
+  background: var(--input-background-color);
   font-size: var(--font-size);
   font-family: var(--font-family);
   font-weight: var(--font-weight);
@@ -31,7 +31,7 @@
   border-width: var(--input-border-width);
   border-color: var(--input-border-color);
   color: var(--font-color);
-  background-color: var(--static-label-background-color);
+  background: var(--static-label-background-color);
   opacity: var(--disabled-opacity);
 }
 
@@ -87,7 +87,7 @@
   border-radius: var(--button-border-radius);
   border-width: var(--button-border-width);
   border-color: var(--button-border-color);
-  background-color: var(--button-background-color);
+  background: var(--button-background-color);
   font-size: var(--button-font-size);
   font-weight: var(--button-font-weight);
   padding: var(--button-padding);
@@ -96,7 +96,7 @@
 
   &:disabled {
     cursor: default;
-    background-color: var(--button-background-color-disabled);
+    background: var(--button-background-color-disabled);
   }
 
   &:hover {
@@ -117,7 +117,7 @@
   border-radius: var(--icon-button-border-radius);
   border-width: var(--icon-button-border-width);
   border-color: var(--border-color-icon-button);
-  background-color: var(--icon-button-background-color);
+  background: var(--icon-button-background-color);
   padding: var(--icon-button-padding);
   margin: 0;
 }
@@ -208,46 +208,46 @@
 
 @mixin attribute-colors {
   &.body {
-    background-color: var(--body-color-bright);
+    background: var(--body-color-bright);
   }
 
   &.mind {
-    background-color: var(--mind-color-bright);
+    background: var(--mind-color-bright);
   }
 
   &.soul {
-    background-color: var(--soul-color-bright);
+    background: var(--soul-color-bright);
   }
 }
 
 @mixin resistance-colors {
   &.reflexes {
-    background-color: var(--reflexes-color-bright);
+    background: var(--reflexes-color-bright);
   }
 
   &.resilience {
-    background-color: var(--resilience-color-bright);
+    background: var(--resilience-color-bright);
   }
 
   &.willpower {
-    background-color: var(--willpower-color-bright);
+    background: var(--willpower-color-bright);
   }
 }
 
 @mixin rarity-colors {
   &.common {
-    background-color: var(--label-background-color);
+    background: var(--label-background-color);
   }
 
   &.uncommon {
-    background-color: var(--uncommon-color-bright);
+    background: var(--uncommon-color-bright);
   }
 
   &.rare {
-    background-color: var(--rare-color-bright);
+    background: var(--rare-color-bright);
   }
 
   &.unique {
-    background-color: var(--unique-color-bright);
+    background: var(--unique-color-bright);
   }
 }

@@ -72,7 +72,7 @@
                height: 100%;
 
                &.active {
-                  background-color: var(--highlight-background-color);
+                  background: var(--highlight-background-color);
                }
             }
          }

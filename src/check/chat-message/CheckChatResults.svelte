@@ -73,7 +73,7 @@
       font-size: 1rem;
       width: 100%;
       padding: 0.5rem;
-      background-color: var(--label-background-color);
+      background: var(--label-background-color);
 
       .result {
          @include flex-row;

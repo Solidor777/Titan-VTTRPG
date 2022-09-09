@@ -18,10 +18,10 @@
       @include flex-group-left;
       @include border;
       padding: 0.5rem;
-      background-color: var(--label-background-color);
+      background: var(--label-background-color);
 
       img {
-         background-color: black;
+         background: black;
          border-radius: 10px;
          width: 2.5rem;
       }

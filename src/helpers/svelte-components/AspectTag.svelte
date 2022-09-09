@@ -56,7 +56,7 @@
 
    .aspect {
       @include flex-row;
-      background-color: var(--label-background-color);
+      background: var(--label-background-color);
       @include flex-group-center;
       @include resistance-colors;
       @include border;

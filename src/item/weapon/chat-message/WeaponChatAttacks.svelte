@@ -75,7 +75,7 @@
          @include flex-column;
          @include border;
          padding: 0.25rem;
-         background-color: var(--label-background-color);
+         background: var(--label-background-color);
          &:not(:first-child) {
             margin-top: 0.5rem;
          }

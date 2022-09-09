@@ -107,15 +107,15 @@
          width: 100%;
 
          &.body {
-            background-color: var(--body-color-bright);
+            background: var(--body-color-bright);
          }
 
          &.mind {
-            background-color: var(--mind-color-bright);
+            background: var(--mind-color-bright);
          }
 
          &.soul {
-            background-color: var(--soul-color-bright);
+            background: var(--soul-color-bright);
          }
       }
 
@@ -184,15 +184,15 @@
                      padding: 0.25rem;
 
                      &.reflexes {
-                        background-color: var(--reflexes-color-bright);
+                        background: var(--reflexes-color-bright);
                      }
 
                      &.resilience {
-                        background-color: var(--resilience-color-bright);
+                        background: var(--resilience-color-bright);
                      }
 
                      &.willpower {
-                        background-color: var(--willpower-color-bright);
+                        background: var(--willpower-color-bright);
                      }
                   }
                }

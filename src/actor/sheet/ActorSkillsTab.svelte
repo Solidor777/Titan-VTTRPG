@@ -140,7 +140,7 @@
             @include flex-row;
             @include border;
             @include z-index-app;
-            background-color: var(--label-background-color);
+            background: var(--label-background-color);
             width: 100%;
             padding: 0.5rem;
 

@@ -59,7 +59,7 @@
 
       img {
          margin-right: 0.5rem;
-         background-color: black;
+         background: black;
          border-radius: 10px;
          width: 2.5rem;
       }
