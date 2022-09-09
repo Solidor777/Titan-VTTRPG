@@ -208,6 +208,10 @@
             }
 
             .input {
+               &.checkbox {
+                  margin-right: 0.25rem;
+               }
+
                &:not(.checkbox) {
                   margin-left: 0.5rem;
                }

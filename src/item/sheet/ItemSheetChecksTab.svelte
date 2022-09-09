@@ -48,7 +48,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .checks-tab {
       @include flex-column;
@@ -63,6 +63,7 @@
          height: 100%;
 
          ol {
+            width: 100%;
             list-style: none;
             padding: 0;
             margin: 0;
@@ -78,6 +79,7 @@
 
          .add-check-button {
             margin-top: 0.5rem;
+            width: 100%;
          }
       }
    }

@@ -8,7 +8,7 @@
    import AbilitySheetHeader from "./AbilitySheetHeader.svelte";
    import AbilitySheetSidebar from "./AbilitySheetSidebar.svelte";
    import AbilitySheetDescriptionTab from "./AbilitySheetDescriptionTab.svelte";
-   import AbilitySheetChecksTab from "./AbilitySheetChecksTab.svelte";
+   import ItemSheetChecksTab from "~/item/sheet/ItemSheetChecksTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
 
    // Setup global variables
@@ -27,7 +27,7 @@
       {
          label: localize("LOCAL.checks.label"),
          id: "checks",
-         component: AbilitySheetChecksTab,
+         component: ItemSheetChecksTab,
       },
    ];
    application.activeTab = application.activeTab ?? "checks";
