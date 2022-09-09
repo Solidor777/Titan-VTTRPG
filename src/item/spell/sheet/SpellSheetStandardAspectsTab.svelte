@@ -8,7 +8,7 @@
    import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
-   import DocumentTextInput from "../../../documents/components/DocumentTextInput.svelte";
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -111,18 +111,8 @@
 </script>
 
 <div class="standard-aspects-tab">
-   <!-- Filter-->
-   <div class="filter">
-      <!--Label-->
-      <div class="label">
-         {localize("LOCAL.filter.label")}
-      </div>
-
-      <!--Input-->
-      <div class="input">
-         <DocumentTextInput bind:value={filter} />
-      </div>
-   </div>
+   <!--Filter-->
+   <TopFilter bind:filter />
 
    <!--Scrolling aspects list-->
    <div class="scrolling-content">
@@ -224,19 +214,6 @@
       @include flex-group-top;
       width: 100%;
       height: 100%;
-
-      .filter {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-bottom;
-         width: 100%;
-         padding: 0.25rem;
-
-         .label {
-            font-weight: bold;
-            margin-right: 0.25rem;
-         }
-      }
 
       .scrolling-content {
          @include flex-column;

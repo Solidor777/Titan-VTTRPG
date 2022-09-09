@@ -1,11 +1,10 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import SpellSheetAddCustomAspectButton from "./SpellSheetAddCustomAspectButton.svelte";
    import SpellSheetCustomAspectSettings from "./SpellSheetCustomAspectSettings.svelte";
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -27,18 +26,8 @@
 </script>
 
 <div class="custom-aspects-tab">
-   <!-- Filter-->
-   <div class="filter">
-      <!--Label-->
-      <div class="label">
-         {localize("LOCAL.filter.label")}
-      </div>
-
-      <!--Input-->
-      <div class="input">
-         <DocumentTextInput bind:value={filter} />
-      </div>
-   </div>
+   <!--Filter-->
+   <TopFilter bind:filter />
 
    <!--Scrolling Aspects list-->
    <div class="scrolling-content">
@@ -67,19 +56,6 @@
       @include flex-group-top;
       width: 100%;
       height: 100%;
-
-      .filter {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-bottom;
-         width: 100%;
-         padding: 0.25rem;
-
-         .label {
-            font-weight: bold;
-            margin-right: 0.25rem;
-         }
-      }
 
       .scrolling-content {
          @include flex-column;
