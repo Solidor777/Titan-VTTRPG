@@ -39,12 +39,16 @@ export default class TitanAbilitySheet extends TitanItemSheet {
    }
 
    async addCheck() {
-      this.reactive.state.isExpanded.checks.push(true);
+      const state = this.reactive.state;
+      state.isExpanded.checks.push(true);
+      this.reactive.state = state;
       return await this.reactive.document.typeComponent.addCheck();
    }
 
    async removeCheck(idx) {
+      const state = this.reactive.state;
+      state.isExpanded.checks.splice(idx, 1);
+      this.reactive.state = state;
       await this.reactive.document.typeComponent.removeCheck(idx);
-      return this.reactive.state.isExpanded.checks.splice(idx, 1);
    }
 }
