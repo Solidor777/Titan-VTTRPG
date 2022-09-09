@@ -4,15 +4,15 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
-   // Document Setup
-   const document = getContext("DocumentSheetObject");
+   // Application reference
+   const application = getContext("external").application;
 </script>
 
 <div class="add-aspect-button">
    <EfxButton
       efx={ripple}
       on:click={() => {
-         $document.typeComponent.addCheck();
+         application.addCheck();
       }}>{localize("LOCAL.addCheck.label")}<i class="fas fa-circle-plus" /></EfxButton
    >
 </div>

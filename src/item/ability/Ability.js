@@ -5,11 +5,11 @@ export function
    return {
       label: game.i18n.localize("LOCAL.check.label"),
       resolveCost: 0,
-      ability: "body",
+      attribute: "body",
       skill: "athletics",
       opposedCheck: {
          enabled: false,
-         ability: "body",
+         attribute: "body",
          skill: "athletics"
       },
       resistanceCheck: "none",

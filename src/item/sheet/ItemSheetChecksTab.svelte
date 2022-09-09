@@ -9,10 +9,15 @@
    // Document reference
    const document = getContext("DocumentSheetObject");
 
-   // Application refernce
+   // Application reference
    const application = getContext("external").application;
 
-   // Filter for the aspects to display
+   // Initialize expanded object
+   for (const idx of $document.system.check.keys()) {
+      application.isExpanded.checks[idx] = application.isExpanded.checks[idx] ?? true;
+   }
+
+   // Filter for the Checks to display
    let filter = "";
    let filteredChecks = [];
    $: {
@@ -35,7 +40,7 @@
             <ol>
                <!--Each Check-->
                {#each $document.system.check as check, idx}
-                  <li transition:slide|local>
+                  <li in:slide|local>
                      <ItemSheetCheckSettings {idx} />
                   </li>
                {/each}

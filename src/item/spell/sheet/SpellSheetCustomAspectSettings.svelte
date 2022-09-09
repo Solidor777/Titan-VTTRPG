@@ -71,7 +71,7 @@
       </div>
 
       <div class="row">
-         <!--Resistance Check-->
+         <!--Resistance aspect-->
          <div class="stat">
             <!--Label-->
             <div class="label">
@@ -166,7 +166,7 @@
          box-sizing: border-box;
          width: 100%;
          font-weight: bold;
-         padding: 0.25rem;
+         padding: 0.5rem 0.5rem 0 0.5rem;
 
          .aspect-cost {
             @include flex-row;
@@ -192,10 +192,11 @@
          @include flex-group-center;
          @include border-top;
          margin-top: 0.5rem;
-         padding-top: 0.5rem;
+         width: 100%;
+         padding: 0.5rem 0.5rem 0 0.5rem;
          font-size: 0.9rem;
          --font-size: 0.9rem;
-         width: 100%;
+         height: 2rem;
 
          .stat {
             @include flex-row;

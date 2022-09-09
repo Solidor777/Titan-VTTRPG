@@ -21,9 +21,22 @@ export default class TitanAbilitySheet extends TitanItemSheet {
 
    // Scroll State
    scrollTop = {
-      skills: 0,
-      actions: 0,
-      inventory: 0,
-      spells: 0
+      sidebar: 0,
+      checks: 0,
    };
+
+   // Is Expanded state
+   isExpanded = {
+      checks: [],
+   };
+
+   async addCheck() {
+      this.isExpanded.checks.push(true);
+      return await this.reactive.document.typeComponent.addCheck();
+   }
+
+   async removeCheck(idx) {
+      this.isExpanded.checks.splice(idx, 1);
+      await this.reactive.document.typeComponent.removeCheck(idx);
+   }
 }
