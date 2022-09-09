@@ -19,24 +19,32 @@ export default class TitanAbilitySheet extends TitanItemSheet {
       });
    }
 
-   // Scroll State
-   scrollTop = {
-      sidebar: 0,
-      checks: 0,
-   };
+   constructor(object) {
+      super(object);
+      const state = this.reactive.state;
 
-   // Is Expanded state
-   isExpanded = {
-      checks: [],
-   };
+      // Scroll State
+      state.scrollTop = {
+         sidebar: 0,
+         checks: 0,
+      };
+
+      // Is Expanded State
+      state.isExpanded = {
+         checks: [],
+      };
+
+      // Active Tab
+      state.activeTab = "description";
+   }
 
    async addCheck() {
-      this.isExpanded.checks.push(true);
+      this.reactive.state.isExpanded.checks.push(true);
       return await this.reactive.document.typeComponent.addCheck();
    }
 
    async removeCheck(idx) {
-      this.isExpanded.checks.splice(idx, 1);
       await this.reactive.document.typeComponent.removeCheck(idx);
+      return this.reactive.state.isExpanded.checks.splice(idx, 1);
    }
 }

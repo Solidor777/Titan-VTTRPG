@@ -11,11 +11,13 @@
    import ItemSheetChecksTab from "~/item/sheet/ItemSheetChecksTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
 
-   // Setup global variables
+   // Setup context variables
    export let elementRoot;
    export let documentStore;
+   export let applicationStateStore;
    setContext("DocumentSheetObject", documentStore);
-   const application = getContext("external").application;
+   setContext("ApplicationStateStore", applicationStateStore);
+   const appState = getContext("ApplicationStateStore");
 
    // Setup tabs
    const tabs = [
@@ -30,7 +32,6 @@
          component: ItemSheetChecksTab,
       },
    ];
-   application.activeTab = application.activeTab ?? "checks";
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -47,7 +48,7 @@
          </div>
 
          <div class="tabs">
-            <Tabs {tabs} bind:activeTab={application.activeTab} />
+            <Tabs {tabs} bind:activeTab={$appState.activeTab} />
          </div>
       </div>
    </div>

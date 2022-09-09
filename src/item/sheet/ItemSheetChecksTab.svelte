@@ -9,12 +9,12 @@
    // Document reference
    const document = getContext("DocumentSheetObject");
 
-   // Application reference
-   const application = getContext("external").application;
+   // Application staore reference
+   const appState = getContext("ApplicationStateStore");
 
    // Initialize expanded object
    for (const idx of $document.system.check.keys()) {
-      application.isExpanded.checks[idx] = application.isExpanded.checks[idx] ?? true;
+      $appState.isExpanded.checks[idx] = $appState.isExpanded.checks[idx] ?? true;
    }
 
    // Filter for the Checks to display
@@ -34,7 +34,7 @@
    <!--Filter-->
    <TopFilter bind:filter />
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.checks}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
          <div class="checks-tab">
             <!--Checks List-->
             <ol>

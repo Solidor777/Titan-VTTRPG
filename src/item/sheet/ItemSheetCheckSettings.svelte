@@ -14,6 +14,9 @@
    const document = getContext("DocumentSheetObject");
 
    // Application reference
+   const appState = getContext("ApplicationStateStore");
+
+   // Application reference
    const application = getContext("external").application;
 
    // Idx of the Check
@@ -41,23 +44,23 @@
 </script>
 
 {#if $document.system.check[idx]}
-   <div class="check" out:slide>
+   <div class="check">
       <!--Header-->
       <div class="check-header">
          <!--Expand button-->
          <div>
-            {#if application.isExpanded.checks[idx]}
+            {#if $appState.isExpanded.checks[idx]}
                <IconButton
                   icon={"fas fa-angles-down"}
                   on:click={() => {
-                     application.isExpanded.checks[idx] = false;
+                     $appState.isExpanded.checks[idx] = false;
                   }}
                />
             {:else}
                <IconButton
                   icon={"fas fa-angles-right"}
                   on:click={() => {
-                     application.isExpanded.checks[idx] = true;
+                     $appState.isExpanded.checks[idx] = true;
                   }}
                />
             {/if}
@@ -79,8 +82,8 @@
          </div>
       </div>
 
-      {#if application.isExpanded.checks[idx]}
-         <div class="content" in:slide|local>
+      {#if $appState.isExpanded.checks[idx]}
+         <div class="content" transition:slide|local>
             <div class="row">
                <!--Attribute Select-->
                <div class="stat">
@@ -241,6 +244,7 @@
       @include flex-column;
       @include flex-group-top;
       @include border;
+      @include z-index-app;
       width: 100%;
       font-size: 1rem;
 

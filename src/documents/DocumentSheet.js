@@ -1,5 +1,7 @@
 import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
+import { writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import DocumentShell from "./DocumentShell.svelte";
 export class SvelteDocumentSheet extends SvelteApplication {
    /**
@@ -8,6 +10,13 @@ export class SvelteDocumentSheet extends SvelteApplication {
     * @type {TJSDocument<foundry.abstract.Document>}
     */
    #documentStore = new TJSDocument(void 0, { delete: this.close.bind(this) });
+
+   /**
+ * Application store that monitors updates to any assigned document.
+ *
+ * @type {writable<object>}
+ */
+   #applicationStateStore = new writable({});
 
    /**
     * Holds the document unsubscription function.
@@ -32,6 +41,18 @@ export class SvelteDocumentSheet extends SvelteApplication {
          },
       });
       this.reactive.document = object;
+
+      /**
+      * @member {object} document - Adds accessors to SvelteReactive to get / set the application state associated with
+      *
+      * @memberof SvelteReactive#
+      */
+      Object.defineProperty(this.reactive, "state", {
+         get: () => get(this.#applicationStateStore),
+         set: (state) => {
+            this.#applicationStateStore = new writable(state);
+         },
+      });
    }
 
    /**
@@ -51,9 +72,11 @@ export class SvelteDocumentSheet extends SvelteApplication {
          svelte: {
             class: DocumentShell,
             target: document.body,
-            // You can assign a function that is invoked with MyItemApp instance as `this`.
             props: function () {
-               return { documentStore: this.#documentStore };
+               return {
+                  documentStore: this.#documentStore,
+                  applicationStateStore: this.#applicationStateStore
+               };
             },
          },
       });
