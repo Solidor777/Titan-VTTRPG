@@ -35,114 +35,116 @@
    ];
 </script>
 
-<div class="check">
-   <!--Header-->
-   <div class="check-header">
-      <!--Label-->
-      <div class="label-input">
-         <DocumentTextInput bind:value={$document.system.check[idx].label} />
-      </div>
-
-      <!--Cost-->
-      <div class="check-cost">
+{#if $document.system.check[idx]}
+   <div class="check" transition:slide|local>
+      <!--Header-->
+      <div class="check-header">
          <!--Label-->
-         <div class="label">
-            {localize("LOCAL.cost.label")}:
+         <div class="label-input">
+            <DocumentTextInput bind:value={$document.system.check[idx].label} />
          </div>
 
-         <!--Input-->
-         <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.check[idx].resolveCost} min={0} />
-         </div>
-      </div>
+         <!--Cost-->
+         <div class="check-cost">
+            <!--Label-->
+            <div class="label">
+               {localize("LOCAL.cost.label")}:
+            </div>
 
-      <!--Delete button-->
-      <div>
-         <IconButton
-            icon={"fas fa-trash"}
-            on:click={() => {
-               $document.spell.removeCustomAspect(idx);
-            }}
-         />
-      </div>
-   </div>
-
-   <div class="row">
-      <!--Resistance Check-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.resistanceCheck.label")}:
+            <!--Input-->
+            <div class="input">
+               <DocumentIntegerInput bind:value={$document.system.check[idx].resolveCost} min={0} />
+            </div>
          </div>
 
-         <!--Value-->
-         <div class="input">
-            <DocumentResistanceSelect
-               bind:value={$document.system.check[idx].resistanceCheck}
-               options={resistanceSelectOptions}
+         <!--Delete button-->
+         <div>
+            <IconButton
+               icon={"fas fa-trash"}
+               on:click={() => {
+                  $document.typeComponent.removeCheck(idx);
+               }}
             />
          </div>
       </div>
-   </div>
 
-   <div class="row">
-      <!--Damage-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.damage.label")}
-         </div>
-
-         <!--Value-->
-         <div class="input checkbox">
-            <DocumentCheckboxInput bind:value={$document.system.check[idx].isDamage} />
-         </div>
-      </div>
-
-      <!--Healing-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.healing.label")}
-         </div>
-
-         <!--Value-->
-         <div class="input checkbox">
-            <DocumentCheckboxInput bind:value={$document.system.check[idx].isHealing} />
-         </div>
-      </div>
-   </div>
-
-   <!--Initial value-->
-   {#if $document.system.check[idx].isDamage || $document.system.check[idx].isHealing}
-      <div class="row" transition:slide|local>
+      <div class="row">
+         <!--Resistance Check-->
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.initialValue.label")}:
+               {localize("LOCAL.resistanceCheck.label")}:
             </div>
 
             <!--Value-->
-            <div class="input number">
-               <DocumentIntegerInput bind:value={$document.system.check[idx].initialValue} min={0} />
+            <div class="input">
+               <DocumentResistanceSelect
+                  bind:value={$document.system.check[idx].resistanceCheck}
+                  options={resistanceSelectOptions}
+               />
             </div>
          </div>
+      </div>
 
-         <!--Scaling-->
+      <div class="row">
+         <!--Damage-->
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.scaling.label")}
+               {localize("LOCAL.damage.label")}
             </div>
 
             <!--Value-->
             <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.check[idx].scaling} />
+               <DocumentCheckboxInput bind:value={$document.system.check[idx].isDamage} />
+            </div>
+         </div>
+
+         <!--Healing-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("LOCAL.healing.label")}
+            </div>
+
+            <!--Value-->
+            <div class="input checkbox">
+               <DocumentCheckboxInput bind:value={$document.system.check[idx].isHealing} />
             </div>
          </div>
       </div>
-   {/if}
-</div>
+
+      <!--Initial value-->
+      {#if $document.system.check[idx].isDamage || $document.system.check[idx].isHealing}
+         <div class="row" transition:slide|local>
+            <div class="stat">
+               <!--Label-->
+               <div class="label">
+                  {localize("LOCAL.initialValue.label")}:
+               </div>
+
+               <!--Value-->
+               <div class="input number">
+                  <DocumentIntegerInput bind:value={$document.system.check[idx].initialValue} min={0} />
+               </div>
+            </div>
+
+            <!--Scaling-->
+            <div class="stat">
+               <!--Label-->
+               <div class="label">
+                  {localize("LOCAL.scaling.label")}
+               </div>
+
+               <!--Value-->
+               <div class="input checkbox">
+                  <DocumentCheckboxInput bind:value={$document.system.check[idx].scaling} />
+               </div>
+            </div>
+         </div>
+      {/if}
+   </div>
+{/if}
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";

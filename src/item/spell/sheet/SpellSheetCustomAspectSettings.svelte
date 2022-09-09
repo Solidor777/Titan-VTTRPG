@@ -36,115 +36,117 @@
    export let idx = void 0;
 </script>
 
-<div class="aspect">
-   <!--Header-->
-   <div class="aspect-header">
-      <!--Label-->
-      <div class="label-input">
-         <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
-      </div>
-
-      <!--Cost-->
-      <div class="aspect-cost">
+{#if $document.system.customAspects[idx]}
+   <div class="aspect" transition:slide|local>
+      <!--Header-->
+      <div class="aspect-header">
          <!--Label-->
-         <div class="label">
-            {localize("LOCAL.cost.label")}:
+         <div class="label-input">
+            <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
          </div>
 
-         <!--Input-->
-         <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} min={0} />
-         </div>
-      </div>
+         <!--Cost-->
+         <div class="aspect-cost">
+            <!--Label-->
+            <div class="label">
+               {localize("LOCAL.cost.label")}:
+            </div>
 
-      <!--Delete button-->
-      <div>
-         <IconButton
-            icon={"fas fa-trash"}
-            efx={ripple}
-            on:click={() => {
-               $document.spell.removeCustomAspect(idx);
-            }}
-         />
-      </div>
-   </div>
-
-   <div class="row">
-      <!--Resistance Check-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.resistanceCheck.label")}:
+            <!--Input-->
+            <div class="input">
+               <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} min={0} />
+            </div>
          </div>
 
-         <!--Value-->
-         <div class="input">
-            <DocumentResistanceSelect
-               bind:value={$document.system.customAspects[idx].resistanceCheck}
-               options={resistanceSelectOptions}
+         <!--Delete button-->
+         <div>
+            <IconButton
+               icon={"fas fa-trash"}
+               efx={ripple}
+               on:click={() => {
+                  $document.spell.removeCustomAspect(idx);
+               }}
             />
          </div>
       </div>
-   </div>
 
-   <div class="row">
-      <!--Damage-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.damage.label")}
-         </div>
-
-         <!--Value-->
-         <div class="input checkbox">
-            <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isDamage} />
-         </div>
-      </div>
-
-      <!--Healing-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.healing.label")}
-         </div>
-
-         <!--Value-->
-         <div class="input checkbox">
-            <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isHealing} />
-         </div>
-      </div>
-
-      <!--Scaling-->
-      <div class="stat">
-         <!--Label-->
-         <div class="label">
-            {localize("LOCAL.scaling.label")}
-         </div>
-
-         <!--Value-->
-         <div class="input checkbox">
-            <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].scaling} />
-         </div>
-      </div>
-   </div>
-
-   <!--Initial value-->
-   {#if $document.system.customAspects[idx].scaling}
-      <div class="row" transition:slide|local>
+      <div class="row">
+         <!--Resistance Check-->
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.initialValue.label")}:
+               {localize("LOCAL.resistanceCheck.label")}:
             </div>
 
             <!--Value-->
-            <div class="input number">
-               <DocumentIntegerInput bind:value={$document.system.customAspects[idx].initialValue} min={0} />
+            <div class="input">
+               <DocumentResistanceSelect
+                  bind:value={$document.system.customAspects[idx].resistanceCheck}
+                  options={resistanceSelectOptions}
+               />
             </div>
          </div>
       </div>
-   {/if}
-</div>
+
+      <div class="row">
+         <!--Damage-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("LOCAL.damage.label")}
+            </div>
+
+            <!--Value-->
+            <div class="input checkbox">
+               <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isDamage} />
+            </div>
+         </div>
+
+         <!--Healing-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("LOCAL.healing.label")}
+            </div>
+
+            <!--Value-->
+            <div class="input checkbox">
+               <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isHealing} />
+            </div>
+         </div>
+
+         <!--Scaling-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("LOCAL.scaling.label")}
+            </div>
+
+            <!--Value-->
+            <div class="input checkbox">
+               <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].scaling} />
+            </div>
+         </div>
+      </div>
+
+      <!--Initial value-->
+      {#if $document.system.customAspects[idx].scaling}
+         <div class="row" transition:slide|local>
+            <div class="stat">
+               <!--Label-->
+               <div class="label">
+                  {localize("LOCAL.initialValue.label")}:
+               </div>
+
+               <!--Value-->
+               <div class="input number">
+                  <DocumentIntegerInput bind:value={$document.system.customAspects[idx].initialValue} min={0} />
+               </div>
+            </div>
+         </div>
+      {/if}
+   </div>
+{/if}
 
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";

@@ -1,5 +1,6 @@
 <script>
    import { getContext } from "svelte";
+   import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ItemSheetCheckSettings from "~/item/sheet/ItemSheetCheckSettings.svelte";
    import ItemSheetAddCheckButton from "~/item/sheet/ItemSheetAddCheckButton.svelte";
@@ -34,7 +35,7 @@
             <ol>
                <!--Each Check-->
                {#each $document.system.check as check, idx}
-                  <li>
+                  <li transition:slide|local>
                      <ItemSheetCheckSettings {idx} />
                   </li>
                {/each}
