@@ -19,6 +19,7 @@
    import ActorActionsTab from "~/actor/sheet/ActorActionsTab.svelte";
    import ActorMod from "~/actor/sheet/ActorMod.svelte";
    import ActorSpellsTab from "~/actor/sheet/ActorSpellsTab.svelte";
+   import ActorAbilitiesTab from "~/actor/sheet/ActorAbilitiesTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -33,6 +34,7 @@
       { label: localize("LOCAL.skills.label"), id: "skills", component: ActorSkillsTab },
       { label: localize("LOCAL.actions.label"), id: "actions", component: ActorActionsTab },
       { label: localize("LOCAL.inventory.label"), id: "inventory", component: ActorInventoryTab },
+      { label: localize("LOCAL.abilities.label"), id: "abilities", component: ActorAbilitiesTab },
       { label: localize("LOCAL.spells.label"), id: "spells", component: ActorSpellsTab },
    ];
 

@@ -4,19 +4,21 @@ export function
    getCheckTemplate() {
    return {
       label: game.i18n.localize("LOCAL.check.label"),
-      resolveCost: 0,
       attribute: "body",
       skill: "athletics",
+      difficulty: 4,
+      complexity: 1,
+      resolveCost: 0,
+      isDamage: false,
+      isHealing: false,
+      initialValue: 1,
+      scaling: true,
+      resistanceCheck: "none",
       opposedCheck: {
          enabled: false,
          attribute: "body",
          skill: "athletics"
       },
-      resistanceCheck: "none",
-      isDamage: false,
-      isHealing: false,
-      initialValue: 1,
-      scaling: true,
    };
 }
 

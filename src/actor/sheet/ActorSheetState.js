@@ -7,11 +7,13 @@ export default function createActorSheetState() {
          skills: 0,
          actions: 0,
          inventory: 0,
+         abilities: 0,
          spells: 0
       },
       isExpanded: {
          inventory: {},
          actions: {},
+         abilities: {},
          spells: {},
       },
       activeTab: "skills"

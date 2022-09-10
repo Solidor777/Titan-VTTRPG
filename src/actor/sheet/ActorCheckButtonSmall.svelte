@@ -12,6 +12,8 @@
       difficulty: 4,
       complexity: 0,
    };
+
+   console.log(check);
 </script>
 
 <div class="item-check-button {check.attribute}">
