@@ -10,6 +10,7 @@ import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
 import TitanResistanceCheck from "~/check/resistance-check/ResistanceCheck.js";
 import TitanAttackCheck from "~/check/attack-check/AttackCheck.js";
 import TitanCastingCheck from "~/check/casting-check/CastingCheck.js";
+import TitanItemCheck from "~/check/item-check/ItemCheck.js";
 
 export class TitanActor extends Actor {
 
@@ -294,16 +295,15 @@ export class TitanActor extends Actor {
       }
 
       // Initialize check options
-      let checkOptions = options;
-      checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
+      options.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
       // Add the actor check data to the check options
       const actorRollData = this.getRollData();
-      checkOptions.actorRollData = actorRollData;
+      options.actorRollData = actorRollData;
 
       // Add the weapon data to the check options
       const weaponRollData = checkWeapon.getRollData();
-      checkOptions.weaponRollData = weaponRollData;
+      options.weaponRollData = weaponRollData;
 
       // Get the target check data
       let userTargets = Array.from(game.user.targets);
@@ -313,11 +313,11 @@ export class TitanActor extends Actor {
 
       if (userTargets[0]) {
          const targetRollData = userTargets[0].document.actor.getRollData();
-         checkOptions.targetRollData = targetRollData;
+         options.targetRollData = targetRollData;
       }
 
       // Perform the attack
-      const attackCheck = new TitanAttackCheck(checkOptions);
+      const attackCheck = new TitanAttackCheck(options);
       return attackCheck;
    }
 
@@ -397,19 +397,18 @@ export class TitanActor extends Actor {
       }
 
       // Initialize check options
-      let checkOptions = options;
-      checkOptions.damageMod = options.damageMod ?? this.system.mod.damage.value;
+      options.damageMod = options.damageMod ?? this.system.mod.damage.value;
 
       // Add the actor check data to the check options
       const actorRollData = this.getRollData();
-      checkOptions.actorRollData = actorRollData;
+      options.actorRollData = actorRollData;
 
       // Add the weapon data to the check options
       const spellRollData = checkSpell.getRollData();
-      checkOptions.spellRollData = spellRollData;
+      options.spellRollData = spellRollData;
 
       // Get the check
-      const castingCheck = new TitanCastingCheck(checkOptions);
+      const castingCheck = new TitanCastingCheck(options);
       return castingCheck;
    }
 
@@ -447,6 +446,72 @@ export class TitanActor extends Actor {
       if (castingCheck && castingCheck.isValid) {
          await castingCheck.evaluateCheck();
          await castingCheck.sendToChat({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this }),
+            rollMode: game.settings.get("core", "rollMode"),
+         });
+      }
+
+      return;
+   }
+
+   async getItemCheck(options) {
+      // Get the Item data.
+      const checkItem = this.items.get(options?.itemId);
+      if (!checkItem) {
+         console.error(
+            "TITAN | Item Check failed. Invalid Item provided to actor."
+         );
+
+         return false;
+      }
+
+      // Get the check data
+      const checkData = checkItem.system.check[0];
+      if (!checkData) {
+         console.error(
+            "TITAN | Item Check failed. Invalid Check IDX provided to actor."
+         );
+
+         return false;
+      }
+
+      // Populate options
+      options.label = options.label ?? checkData.label;
+      options.attribute = options.attribute ?? checkData.attribute;
+      options.skill = options.skill ?? checkData.skill;
+      options.difficulty = options.difficulty ?? checkData.difficulty;
+      options.complexity = options.complexity ?? checkData.complexity;
+      options.isDamage = options.isDamage ?? checkData.isDamage;
+      options.isHealing = options.isHealing ?? checkData.isHealing;
+      options.initialValue = options.initialValue ?? checkData.initialValue;
+      options.scaling = options.scaling ?? checkData.scaling;
+      options.resistanceCheck = options.resistanceCheck ?? checkData.resistanceCheck;
+      options.opposedCheck = options.opposedCheck ?? checkData.opposedCheck;
+      options.damageMod = options.damageMod ?? this.system.mod.damage.value;
+      options.itemName = checkItem.name;
+      options.img = checkItem.img;
+
+      // Add the actor check data to the check options
+      const actorRollData = this.getRollData();
+      options.actorRollData = actorRollData;
+
+      // Get the check
+      const itemCheck = new TitanItemCheck(options);
+      return itemCheck;
+   }
+
+   async rollItemCheck(options) {
+      // If get options, then create a dialog for setting options.
+      if (options?.getOptions === true) {
+         console.log("ToDo.");
+      }
+
+      // Otherwise, get a check
+      const itemCheck = await this.getItemCheck(options);
+      if (itemCheck && itemCheck.isValid) {
+         await itemCheck.evaluateCheck();
+         await itemCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
             rollMode: game.settings.get("core", "rollMode"),

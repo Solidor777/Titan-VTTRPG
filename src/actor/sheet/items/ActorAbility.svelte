@@ -10,7 +10,6 @@
    import ActorItemRarity from "./ActorItemRarity.svelte";
    import ActorItemTradition from "./ActorItemTradition.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
-   import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
    import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
 
    // Reference to the application
@@ -44,7 +43,7 @@
                   <ActorCheckButtonSmall
                      check={item.system.check[0]}
                      on:click={() => {
-                        application.rollCastingCheck(id);
+                        application.rollItemCheck(id, 0);
                      }}
                   />
                </div>

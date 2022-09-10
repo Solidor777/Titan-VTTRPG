@@ -23,6 +23,9 @@
          case "castingCheck": {
             return chatContext.parameters.attribute;
          }
+         case "itemCheck": {
+            return chatContext.parameters.attribute;
+         }
          default: {
             return "";
          }

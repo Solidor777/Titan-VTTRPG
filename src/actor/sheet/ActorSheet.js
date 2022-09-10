@@ -191,4 +191,17 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
       return;
    }
+
+   // Function for rolling an casting check
+   async rollItemCheck(itemId, checkIdx) {
+      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+
+      await this.reactive.document.rollItemCheck({
+         itemId: itemId,
+         checkIdx: checkIdx,
+         getOptions: getOptions,
+      });
+
+      return;
+   }
 }

@@ -25,6 +25,7 @@
          resistanceCheck: CheckChatMessageShell,
          attackCheck: CheckChatMessageShell,
          castingCheck: CheckChatMessageShell,
+         itemCheck: CheckChatMessageShell,
          armor: ArmorChatMessageShell,
          weapon: WeaponChatMessageShell,
          spell: SpellChatMessageShell,

@@ -7,8 +7,7 @@
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentCheckboxInput from "../../../documents/components/DocumentCheckboxInput.svelte";
-   import DocumentSelect from "../../../documents/components/DocumentSelect.svelte";
+   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
 
    // Setup
    const document = getContext("DocumentSheetObject");
@@ -97,7 +96,9 @@
          }
 
          .name {
-            @include flex-group-center;
+            @include flex-row;
+            @include flex-group-left;
+            width: 100%;
          }
 
          .label-stats {

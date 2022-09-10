@@ -58,6 +58,9 @@ export default class TitanSkillCheck extends TitanAttributeCheck {
   }
 
   _getTypeLabel() {
-    return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} (${game.i18n.localize(CONFIG.TITAN.local[this.parameters.skill])}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
+    if (this.parameters.skill) {
+      return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} (${game.i18n.localize(CONFIG.TITAN.local[this.parameters.skill])}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
+    }
+    return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} ${this.parameters.difficulty}:${this.parameters.complexity}`;
   }
 }

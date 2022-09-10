@@ -27,7 +27,6 @@ export default class TitanAttributeCheck extends TitanCheck {
   }
 
   _calculateDerivedData(options) {
-    super._calculateDerivedData(options);
     const actorRollData = options.actorRollData;
 
     // Get the attribute dice
