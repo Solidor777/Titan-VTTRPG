@@ -5,6 +5,8 @@
 
    // Resistance to roll
    export let resistance = "reflexes";
+   export let difficulty = 4;
+   export let complexity = 1;
 
    async function rollResistanceCheck() {
       // Get the targets
@@ -13,8 +15,6 @@
          if (!userTargets.length > 0) {
             userTargets = Array.from(canvas.tokens.controlled);
          }
-      } else if (userTargets.length > 0) {
-         userTargets = [userTargets[0]];
       }
 
       // For each target
@@ -23,7 +23,11 @@
          const target = userTargets[idx]?.actor;
          if (target) {
             // Roll a resistance check
-            await target.rollResistanceCheck({ resistance: resistance });
+            await target.rollResistanceCheck({
+               resistance: resistance,
+               difficulty: difficulty,
+               complexity: complexity,
+            });
          }
       }
 
@@ -38,7 +42,7 @@
          rollResistanceCheck();
       }}
    >
-      {localize(`LOCAL.${resistance}.label`)}
+      {`${localize(`LOCAL.${resistance}.label`)} ${difficulty}:${complexity}`}
    </EfxButton>
 </div>
 

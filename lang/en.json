@@ -343,6 +343,7 @@
   "LOCAL.opposedCheck.label": "Opposed Check",
   "LOCAL.abilities.label": "Abilities",
   "LOCAL.ability.label": "Ability",
+  "LOCAL.recoverStamina.label": "Recover Stamina",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

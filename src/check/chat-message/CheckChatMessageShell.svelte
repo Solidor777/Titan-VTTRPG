@@ -4,10 +4,10 @@
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
    import CheckChatResults from "./CheckChatResults.svelte";
-   import CheckDamageButtons from "./CheckDamageButtons.svelte";
-   import CheckHealingButton from "./CheckHealingButton.svelte";
+   import CheckChatDamageButtons from "./CheckChatDamageButtons.svelte";
+   import CheckChatHealingButton from "./CheckChatHealingButton.svelte";
    import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
-   import CheckResistanceCheckButtons from "./CheckResistanceCheckButtons.svelte";
+   import CheckChatResistanceCheckButtons from "./CheckChatResistanceCheckButtons.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -48,20 +48,20 @@
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.damage !== undefined && game.user.isGM}
       <div class="info top-margin">
-         <CheckDamageButtons />
+         <CheckChatDamageButtons />
       </div>
    {/if}
 
    <!-- svelte-ignore missing-declaration -->
    {#if chatContext.results.healing !== undefined && game.user.isGM}
       <div class="info top-margin">
-         <CheckHealingButton />
+         <CheckChatHealingButton />
       </div>
    {/if}
 
    {#if chatContext.results.reflexesCheck || chatContext.results.resilienceCheck || chatContext.results.willpowerCheck}
-      <div class="info">
-         <CheckResistanceCheckButtons />
+      <div class="info top-margin">
+         <CheckChatResistanceCheckButtons />
       </div>
    {/if}
 </div>

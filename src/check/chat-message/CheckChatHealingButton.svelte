@@ -30,15 +30,15 @@
 </script>
 
 <!--Apply healing button-->
-<div class="healing-button" data-titan-tooltip={localize("LOCAL.healDamage.label")}>
+<div class="healing-button" data-titan-tooltip={localize("LOCAL.recoverStamina.label")}>
    <EfxButton
       efx={ripple}
       on:click={() => {
-         healDamage(results.damage);
+         healDamage(results.healing);
       }}
    >
       <i class="fas fa-heart" />
-      {localize("LOCAL.healDamage.label")}
+      {`${localize("LOCAL.recoverStamina.label")} (${results.healing})`}
    </EfxButton>
 </div>
 

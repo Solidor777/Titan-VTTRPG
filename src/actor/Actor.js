@@ -488,6 +488,7 @@ export class TitanActor extends Actor {
       options.scaling = options.scaling ?? checkData.scaling;
       options.resistanceCheck = options.resistanceCheck ?? checkData.resistanceCheck;
       options.opposedCheck = options.opposedCheck ?? checkData.opposedCheck;
+      options.resolveCost = options.resolveCost ?? checkData.resolveCost;
       options.damageMod = options.damageMod ?? this.system.mod.damage.value;
       options.itemName = checkItem.name;
       options.img = checkItem.img;

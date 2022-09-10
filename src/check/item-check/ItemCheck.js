@@ -9,7 +9,7 @@ export default class TitanItemCheck extends TitanCheck {
          skill: options?.skill ?? false,
          difficulty: options?.difficulty ?? 4,
          complexity: options?.complexity ?? 1,
-         resolveCost: options?.resolveCost ?? 0,
+         resolveCost: options?.resolveCost ?? false,
          isDamage: options?.isDamage ?? false,
          isHealing: options?.isHealing ?? false,
          resistanceCheck: options?.resistanceCheck ?? false,
@@ -41,6 +41,14 @@ export default class TitanItemCheck extends TitanCheck {
          parameters.expertiseMod = options.expertiseMod ?? 0;
          parameters.doubleTraing = options.doubleTraining ?? false;
          parameters.doubleExpertise = options.doubleExpertise ?? false;
+      }
+
+      // Opposed check
+      if (parameters.opposedCheck !== false) {
+         parameters.opposedCheck.attribute = parameters.opposedCheck.attribute ?? "body";
+         parameters.opposedCheck.skill = parameters.opposedCheck.attribute ?? false;
+         parameters.opposedCheck.difficulty = parameters.opposedCheck.difficulty ?? parameters.difficulty;
+         parameters.opposedCheck.complexity = parameters.opposedCheck.complexity ?? 1;
       }
 
       return parameters;
@@ -99,8 +107,34 @@ export default class TitanItemCheck extends TitanCheck {
 
             // Set healing
             if (this.parameters.isHealing) {
-               results.isHealing = stat;
+               results.healing = stat;
             }
+         }
+
+         // If resistance check, add it to the results
+         if (this.parameters.resistanceCheck !== false) {
+            switch (this.parameters.resistanceCheck) {
+               case "reflexes": {
+                  results.reflexesCheck = true;
+                  break;
+               }
+               case "resilience": {
+                  results.resilienceCheck = true;
+                  break;
+               }
+               case "willpower": {
+                  results.willpowerCheck = true;
+                  break;
+               }
+               default: {
+                  break;
+               }
+            }
+         }
+
+         // If opposed check and extra successes, increase the complexity of the opposed check
+         if (this.parameters.opposedCheck && results.extraSuccesses) {
+            this.parameters.opposedCheck.complexity += results.extraSuccesses;
          }
       }
 

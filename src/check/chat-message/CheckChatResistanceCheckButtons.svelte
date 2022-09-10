@@ -4,28 +4,29 @@
 
    // Results
    const document = getContext("DocumentSheetObject");
-   let results = $document.flags.titan.chatContext.results;
+   $: results = $document.flags.titan.chatContext.results;
+   $: complexity = results.extraSuccesses ? 1 + results.extraSuccesses : 1;
 </script>
 
 <div class="buttons">
    <!--Reflexes-->
    {#if results.reflexesCheck}
       <div class="button">
-         <ResistanceCheckButton resistance={"reflexes"} />
+         <ResistanceCheckButton resistance={"reflexes"} difficulty={4} {complexity} />
       </div>
    {/if}
 
    <!--Resilience-->
    {#if results.resilienceCheck}
       <div class="button">
-         <ResistanceCheckButton resistance={"resilience"} />
+         <ResistanceCheckButton resistance={"resilience"} difficulty={4} {complexity} />
       </div>
    {/if}
 
    <!--Willpower-->
    {#if results.willpowerCheck}
       <div class="button">
-         <ResistanceCheckButton resistance={"willpower"} />
+         <ResistanceCheckButton resistance={"willpower"} difficulty={4} {complexity} />
       </div>
    {/if}
 </div>
