@@ -1,5 +1,6 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import AbilitySheetShell from './AbilitySheetShell.svelte';
+import createAbilitySheetState from './AbilitySheetState';
 
 export default class TitanAbilitySheet extends TitanItemSheet {
    /**
@@ -21,34 +22,16 @@ export default class TitanAbilitySheet extends TitanItemSheet {
 
    constructor(object) {
       super(object);
-      const state = this.reactive.state;
-
-      // Scroll State
-      state.scrollTop = {
-         sidebar: 0,
-         checks: 0,
-      };
-
-      // Is Expanded State
-      state.isExpanded = {
-         checks: [],
-      };
-
-      // Active Tab
-      state.activeTab = "description";
+      this.reactive.state = createAbilitySheetState();
    }
 
    async addCheck() {
-      const state = this.reactive.state;
-      state.isExpanded.checks.push(true);
-      this.reactive.state = state;
+      this.reactive.state.addCheck();
       return await this.reactive.document.typeComponent.addCheck();
    }
 
    async removeCheck(idx) {
-      const state = this.reactive.state;
-      state.isExpanded.checks.splice(idx, 1);
-      this.reactive.state = state;
+      this.reactive.state.removeCheck(idx);
       await this.reactive.document.typeComponent.removeCheck(idx);
    }
 }

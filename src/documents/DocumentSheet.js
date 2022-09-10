@@ -48,9 +48,9 @@ export class SvelteDocumentSheet extends SvelteApplication {
       * @memberof SvelteReactive#
       */
       Object.defineProperty(this.reactive, "state", {
-         get: () => get(this.#applicationStateStore),
+         get: () => this.#applicationStateStore,
          set: (state) => {
-            this.#applicationStateStore = new writable(state);
+            this.#applicationStateStore = state;
          },
       });
    }
