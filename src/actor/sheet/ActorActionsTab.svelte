@@ -6,8 +6,8 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import ActorItemList from "./ActorItemList.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
+   // Application reference
+   const appState = getContext("ApplicationStateStore");
 
    // Filter actions
    let filter = "";
@@ -18,7 +18,7 @@
    <TopFilter bind:filter />
 
    <!--Scrolling Containers-->
-   <ScrollingContainer bind:scrollTop={application.scrollTop.actions}>
+   <ScrollingContainer bind:scrollTop={$appState.scrollTop.actions}>
       <div class="scrolling-content">
          <!--Weapons-->
          <div class="category">
@@ -34,7 +34,7 @@
                   return item.type === "weapon" && item.system.equipped === true;
                }}
                {filter}
-               isExpandedMap={application.isExpanded.actions}
+               isExpandedMap={$appState.isExpanded.actions}
                isExpandedDefault={true}
             />
          </div>

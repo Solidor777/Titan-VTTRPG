@@ -5,13 +5,14 @@
    import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
-   // Reference to the document
+   // Document reference
    const document = getContext("DocumentSheetObject");
 
    // Application reference
+   const appState = getContext("ApplicationStateStore");
    const application = getContext("external").application;
 
    // Search filter
@@ -20,87 +21,88 @@
    // Filtered Skill list
    const skillList = $document.system.skill;
    $: filteredList = Object.entries(skillList).filter(
-      ([key, value]) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
+      ([key]) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
    );
 </script>
 
 <div class="skill-tab">
-   <div class="filter">
-      <div class="filter-label">{localize("LOCAL.filter.label")}</div>
-      <div class="filter-field"><TextInput bind:value={filter} /></div>
+   <!--Filter-->
+   <TopFilter bind:filter />
+
+   <div class="scrolling-content">
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.skills}>
+         <ol>
+            <!--Each skill-->
+            {#each filteredList as [key]}
+               <li>
+                  <!--Button and Attribute-->
+                  <div class="column">
+                     <!--Button for rolling the skill-->
+                     <div class="skill-button" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+                        <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
+                           {localize(`LOCAL.${key}.label`)}<i class="fas fa-dice" />
+                        </EfxButton>
+                     </div>
+                     <!--Default Attribute Select-->
+                     <div class="default-attribute">
+                        <div class="label">
+                           {localize("LOCAL.defaultAttribute.label")}
+                        </div>
+                        <div class="select">
+                           <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
+                        </div>
+                     </div>
+                  </div>
+                  <!--Training and Expertise-->
+                  <div class="column">
+                     <!--Header row for rolling the skill-->
+                     <div class="row">
+                        <div class="label" />
+                        <div class="value">{localize("LOCAL.base.label")}</div>
+                        <div class="op" />
+                        <div class="value">{localize("LOCAL.mod.label")}</div>
+                        <div class="op" />
+                        <div class="value" />
+                     </div>
+                     <!--Training row-->
+                     <div class="row">
+                        <div class="label">{localize("LOCAL.training.label")}</div>
+                        <div class="input">
+                           <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue} />
+                        </div>
+                        <div class="op">+</div>
+                        <div class="input">
+                           <DocumentIntegerInput bind:value={$document.system.skill[key].training.staticMod} />
+                        </div>
+                        <div class="op">=</div>
+                        <div class="value">
+                           {`${$document.system.skill[key].training.value} (${
+                              $document.system.skill[key].training.value +
+                              $document.system.attribute[$document.system.skill[key].defaultAttribute].value
+                           })`}
+                        </div>
+                     </div>
+                     <!--Expertise Row-->
+                     <div class="row">
+                        <div class="label">{localize("LOCAL.expertise.label")}</div>
+                        <div class="input">
+                           <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.baseValue} />
+                        </div>
+                        <div class="op">+</div>
+                        <div class="input">
+                           <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.staticMod} />
+                        </div>
+                        <div class="op">=</div>
+                        <div class="value">
+                           {$document.system.skill[key].expertise.value}
+                        </div>
+                     </div>
+                  </div>
+               </li>
+            {/each}
+         </ol>
+      </ScrollingContainer>
    </div>
-   <ScrollingContainer bind:scrollTop={application.scrollTop.skills}>
-      <ol>
-         <!--Each skill-->
-         {#each filteredList as [key]}
-            <li>
-               <!--Button and Attribute-->
-               <div class="column">
-                  <!--Button for rolling the skill-->
-                  <div class="skill-button" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
-                     <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
-                        {localize(`LOCAL.${key}.label`)}<i class="fas fa-dice" />
-                     </EfxButton>
-                  </div>
-                  <!--Default Attribute Select-->
-                  <div class="default-attribute">
-                     <div class="label">
-                        {localize("LOCAL.defaultAttribute.label")}
-                     </div>
-                     <div class="select">
-                        <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
-                     </div>
-                  </div>
-               </div>
-               <!--Training and Expertise-->
-               <div class="column">
-                  <!--Header row for rolling the skill-->
-                  <div class="row">
-                     <div class="label" />
-                     <div class="value">{localize("LOCAL.base.label")}</div>
-                     <div class="op" />
-                     <div class="value">{localize("LOCAL.mod.label")}</div>
-                     <div class="op" />
-                     <div class="value" />
-                  </div>
-                  <!--Training row-->
-                  <div class="row">
-                     <div class="label">{localize("LOCAL.training.label")}</div>
-                     <div class="input">
-                        <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue} />
-                     </div>
-                     <div class="op">+</div>
-                     <div class="input">
-                        <DocumentIntegerInput bind:value={$document.system.skill[key].training.staticMod} />
-                     </div>
-                     <div class="op">=</div>
-                     <div class="value">
-                        {`${$document.system.skill[key].training.value} (${
-                           $document.system.skill[key].training.value +
-                           $document.system.attribute[$document.system.skill[key].defaultAttribute].value
-                        })`}
-                     </div>
-                  </div>
-                  <!--Expertise Row-->
-                  <div class="row">
-                     <div class="label">{localize("LOCAL.expertise.label")}</div>
-                     <div class="input">
-                        <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.baseValue} />
-                     </div>
-                     <div class="op">+</div>
-                     <div class="input">
-                        <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.staticMod} />
-                     </div>
-                     <div class="op">=</div>
-                     <div class="value">
-                        {$document.system.skill[key].expertise.value}
-                     </div>
-                  </div>
-               </div>
-            </li>
-         {/each}
-      </ol>
-   </ScrollingContainer>
 
    <!--Each skill-->
 </div>
@@ -115,114 +117,107 @@
       height: 100%;
       font-size: 1rem;
 
-      .filter {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-bottom;
-         width: 100%;
-         box-sizing: border-box;
-         font-weight: bold;
-         padding: 0.25rem;
-
-         :not(:first-child) {
-            margin-left: 0.5rem;
-         }
-      }
-
-      ol {
+      .scrolling-content {
          @include flex-column;
-         list-style: none;
+         @include flex-group-top;
          width: 100%;
-         padding: 0.25rem;
-         margin: 0;
+         height: 100%;
 
-         li {
-            @include flex-row;
-            @include border;
-            @include z-index-app;
-            background: var(--label-background-color);
+         ol {
+            @include flex-column;
+            list-style: none;
             width: 100%;
-            padding: 0.5rem;
+            padding: 0.25rem;
+            margin: 0;
 
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
+            li {
+               @include flex-row;
+               @include border;
+               @include z-index-app;
+               background: var(--label-background-color);
+               width: 100%;
+               padding: 0.5rem;
 
-            .column {
-               @include flex-column;
-               height: 100%;
                &:not(:first-child) {
-                  margin-left: 0.5rem;
+                  margin-top: 0.5rem;
                }
 
-               .row {
+               .column {
+                  @include flex-column;
+                  height: 100%;
+                  &:not(:first-child) {
+                     margin-left: 0.5rem;
+                  }
+
+                  .row {
+                     @include flex-row;
+                     @include flex-group-center;
+                     &:not(:first-child) {
+                        margin-top: 0.5rem;
+                     }
+                     width: 100%;
+
+                     .label {
+                        @include flex-row;
+                        @include flex-group-right;
+                        height: 100%;
+                        width: 5rem;
+                        font-weight: bold;
+                        text-align: right;
+                     }
+                     .input {
+                        @include flex-row;
+                        @include flex-group-center;
+                        height: 100%;
+                        width: 2.5rem;
+                        margin-left: 0.5rem;
+                        font-weight: bold;
+                     }
+                     .value {
+                        @include flex-row;
+                        @include flex-group-center;
+                        height: 100%;
+                        width: 3.2rem;
+                        margin-left: 0.5rem;
+                        font-weight: bold;
+                     }
+                     .op {
+                        @include flex-row;
+                        @include flex-group-center;
+                        height: 100%;
+                        width: 0.5rem;
+                        margin-left: 0.5rem;
+                     }
+                  }
+               }
+
+               .skill-button {
+                  width: 11rem;
+                  i {
+                     margin-left: 0.25rem;
+                  }
+               }
+               .default-attribute {
                   @include flex-row;
                   @include flex-group-center;
-                  &:not(:first-child) {
-                     margin-top: 0.5rem;
-                  }
+                  height: 100%;
                   width: 100%;
 
                   .label {
                      @include flex-row;
-                     @include flex-group-right;
-                     height: 100%;
-                     width: 5rem;
-                     font-weight: bold;
-                     text-align: right;
-                  }
-                  .input {
-                     @include flex-row;
                      @include flex-group-center;
                      height: 100%;
-                     width: 2.5rem;
-                     margin-left: 0.5rem;
+                     width: 100%;
                      font-weight: bold;
                   }
-                  .value {
+
+                  .select {
                      @include flex-row;
                      @include flex-group-center;
+                     margin-left: 0.25rem;
                      height: 100%;
-                     width: 3.2rem;
-                     margin-left: 0.5rem;
-                     font-weight: bold;
+                     width: 100%;
                   }
-                  .op {
-                     @include flex-row;
-                     @include flex-group-center;
-                     height: 100%;
-                     width: 0.5rem;
-                     margin-left: 0.5rem;
-                  }
-               }
-            }
-
-            .skill-button {
-               width: 11rem;
-               i {
-                  margin-left: 0.25rem;
-               }
-            }
-            .default-attribute {
-               @include flex-row;
-               @include flex-group-center;
-               height: 100%;
-               width: 100%;
-
-               .label {
-                  @include flex-row;
-                  @include flex-group-center;
-                  height: 100%;
-                  width: 100%;
-                  font-weight: bold;
-               }
-
-               .select {
-                  @include flex-row;
-                  @include flex-group-center;
-                  margin-left: 0.25rem;
-                  height: 100%;
-                  width: 100%;
                }
             }
          }

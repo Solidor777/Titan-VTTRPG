@@ -20,10 +20,12 @@
    import ActorMod from "~/actor/sheet/ActorMod.svelte";
    import ActorSpellsTab from "~/actor/sheet/ActorSpellsTab.svelte";
 
-   // Setup
+   // Setup context variables
    export let elementRoot;
    export let documentStore;
+   export let applicationStateStore;
    setContext("DocumentSheetObject", documentStore);
+   setContext("ApplicationStateStore", applicationStateStore);
    const document = getContext("DocumentSheetObject");
 
    // Tabs
@@ -35,8 +37,7 @@
    ];
 
    // Application reference
-   const application = getContext("external").application;
-   application.activeTab = application.activeTab ?? "spells";
+   const appState = getContext("ApplicationStateStore");
 </script>
 
 <ApplicationShell bind:elementRoot>
@@ -164,7 +165,7 @@
          </div>
          <!--Tab Content-->
          <div class="tabs">
-            <Tabs {tabs} bind:activeTab={application.activeTab} />
+            <Tabs {tabs} bind:activeTab={$appState.activeTab} />
          </div>
       </div>
    </div>

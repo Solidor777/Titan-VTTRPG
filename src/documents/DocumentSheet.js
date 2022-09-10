@@ -43,10 +43,10 @@ export class SvelteDocumentSheet extends SvelteApplication {
       this.reactive.document = object;
 
       /**
-      * @member {object} document - Adds accessors to SvelteReactive to get / set the application state associated with
-      *
-      * @memberof SvelteReactive#
-      */
+       * @member {object} document - Adds accessors to SvelteReactive to get / set the application state associated with
+       *
+       * @memberof SvelteReactive#
+       */
       Object.defineProperty(this.reactive, "state", {
          get: () => this.#applicationStateStore,
          set: (state) => {

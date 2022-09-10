@@ -7,8 +7,8 @@
    import ActorAddItemEntryButton from "./ActorAddItemEntryButton.svelte";
    import ActorSpell from "./items/ActorSpell.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
+   // Application reference
+   const appState = getContext("ApplicationStateStore");
 
    // Filter Items
    let filter = "";
@@ -20,7 +20,7 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.spells}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.spells}>
          <!--Spells-->
          <div class="category">
             <!--List Header-->
@@ -35,7 +35,7 @@
                   return item.type === "spell";
                }}
                {filter}
-               isExpandedMap={application.isExpanded.spells}
+               isExpandedMap={$appState.isExpanded.spells}
             />
 
             <!--Add Spell Button-->

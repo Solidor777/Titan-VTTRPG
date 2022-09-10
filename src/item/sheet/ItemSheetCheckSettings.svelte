@@ -41,26 +41,29 @@
          value: "none",
       },
    ];
+
+   $: check = $document.system.check[idx];
+   $: isExpanded = $appState.isExpanded.checks[idx];
 </script>
 
-{#if $document.system.check[idx]}
+{#if check}
    <div class="check">
       <!--Header-->
       <div class="check-header">
          <!--Expand button-->
          <div>
-            {#if $appState.isExpanded.checks[idx]}
+            {#if isExpanded}
                <IconButton
                   icon={"fas fa-angles-down"}
                   on:click={() => {
-                     $appState.isExpanded.checks[idx] = false;
+                     isExpanded = false;
                   }}
                />
             {:else}
                <IconButton
                   icon={"fas fa-angles-right"}
                   on:click={() => {
-                     $appState.isExpanded.checks[idx] = true;
+                     isExpanded = true;
                   }}
                />
             {/if}
@@ -68,7 +71,7 @@
 
          <!--Label-->
          <div class="label-input">
-            <DocumentTextInput bind:value={$document.system.check[idx].label} />
+            <DocumentTextInput bind:value={check.label} />
          </div>
 
          <!--Delete button-->
@@ -82,7 +85,7 @@
          </div>
       </div>
 
-      {#if $appState.isExpanded.checks[idx]}
+      {#if isExpanded}
          <div class="content" transition:slide|local>
             <div class="row">
                <!--Attribute Select-->
@@ -94,7 +97,7 @@
 
                   <!--Value-->
                   <div class="input">
-                     <DocumentAttributeSelect bind:value={$document.system.check[idx].attribute} />
+                     <DocumentAttributeSelect bind:value={check.attribute} />
                   </div>
                </div>
 
@@ -107,7 +110,7 @@
 
                   <!--Value-->
                   <div class="input">
-                     <DocumentSkillSelect bind:value={$document.system.check[idx].skill} />
+                     <DocumentSkillSelect bind:value={check.skill} />
                   </div>
                </div>
             </div>
@@ -122,10 +125,7 @@
 
                   <!--Value-->
                   <div class="input">
-                     <DocumentResistanceSelect
-                        bind:value={$document.system.check[idx].resistanceCheck}
-                        options={resistanceSelectOptions}
-                     />
+                     <DocumentResistanceSelect bind:value={check.resistanceCheck} options={resistanceSelectOptions} />
                   </div>
                </div>
             </div>
@@ -140,7 +140,7 @@
 
                   <!--Value-->
                   <div class="input checkbox">
-                     <DocumentCheckboxInput bind:value={$document.system.check[idx].isDamage} />
+                     <DocumentCheckboxInput bind:value={check.isDamage} />
                   </div>
                </div>
 
@@ -153,13 +153,13 @@
 
                   <!--Value-->
                   <div class="input checkbox">
-                     <DocumentCheckboxInput bind:value={$document.system.check[idx].isHealing} />
+                     <DocumentCheckboxInput bind:value={check.isHealing} />
                   </div>
                </div>
             </div>
 
             <!--Initial value-->
-            {#if $document.system.check[idx].isDamage || $document.system.check[idx].isHealing}
+            {#if check.isDamage || check.isHealing}
                <div class="row" transition:slide|local>
                   <div class="stat">
                      <!--Label-->
@@ -169,7 +169,7 @@
 
                      <!--Value-->
                      <div class="input number">
-                        <DocumentIntegerInput bind:value={$document.system.check[idx].initialValue} min={0} />
+                        <DocumentIntegerInput bind:value={check.initialValue} min={0} />
                      </div>
                   </div>
 
@@ -182,7 +182,7 @@
 
                      <!--Value-->
                      <div class="input checkbox">
-                        <DocumentCheckboxInput bind:value={$document.system.check[idx].scaling} />
+                        <DocumentCheckboxInput bind:value={check.scaling} />
                      </div>
                   </div>
                </div>
@@ -198,12 +198,12 @@
 
                   <!--Value-->
                   <div class="input checkbox">
-                     <DocumentCheckboxInput bind:value={$document.system.check[idx].opposedCheck.enabled} />
+                     <DocumentCheckboxInput bind:value={check.opposedCheck.enabled} />
                   </div>
                </div>
             </div>
 
-            {#if $document.system.check[idx].opposedCheck.enabled}
+            {#if check.opposedCheck.enabled}
                <div class="row" transition:slide|local>
                   <!--Attribute Select-->
                   <div class="stat">
@@ -214,7 +214,7 @@
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentAttributeSelect bind:value={$document.system.check[idx].opposedCheck.attribute} />
+                        <DocumentAttributeSelect bind:value={check.opposedCheck.attribute} />
                      </div>
                   </div>
 
@@ -227,7 +227,7 @@
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentSkillSelect bind:value={$document.system.check[idx].opposedCheck.skill} />
+                        <DocumentSkillSelect bind:value={check.opposedCheck.skill} />
                      </div>
                   </div>
                </div>

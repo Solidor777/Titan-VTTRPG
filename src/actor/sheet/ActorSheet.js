@@ -1,4 +1,5 @@
 import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
+import createActorSheetState from './ActorSheetState';
 
 export default class TitanActorSheet extends SvelteDocumentSheet {
    /**
@@ -12,6 +13,11 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          width: 750,
          height: 800,
       });
+   }
+
+   constructor(object) {
+      super(object);
+      this.reactive.state = createActorSheetState();
    }
 
    _getHeaderButtons() {
@@ -29,21 +35,6 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       return buttons;
    }
 
-   // Is Expanded State
-   isExpanded = {
-      inventory: {},
-      actions: {},
-      spells: {},
-   };
-
-   // Scroll State
-   scrollTop = {
-      skills: 0,
-      actions: 0,
-      inventory: 0,
-      spells: 0
-   };
-
    // Embedded item edit
    async editItem(id) {
       const item = this.reactive.document.items.get(id);
@@ -53,23 +44,14 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Delete Item
    async deleteItem(id) {
+      this.reactive.state.deleteItem(id);
       this.reactive.document.deleteItem(id);
-
-      if (this.isExpanded.inventory[id]) {
-         delete this.isExpanded.inventory[id];
-      }
-
-      if (this.isExpanded.actions[id]) {
-         delete this.isExpanded.actions[id];
-      }
 
       return;
    }
 
    // Add item
    async addItem(type) {
-
-
       let itemName = "";
       switch (type) {
          case "weapon": {

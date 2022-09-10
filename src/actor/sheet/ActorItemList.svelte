@@ -96,7 +96,7 @@
          on:dragend={() => {
             onDragEnd();
          }}
-         transition:slide|local
+         in:slide|local
       >
          <svelte:component this={itemComponent} id={item._id} bind:isExpanded={isExpandedMap[item._id]} />
       </li>

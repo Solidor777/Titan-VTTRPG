@@ -8,8 +8,8 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import ActorAddItemEntryButton from "./ActorAddItemEntryButton.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
+   // Application reference
+   const appState = getContext("ApplicationStateStore");
 
    // Filter Items
    let filter = "";
@@ -21,7 +21,7 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.inventory}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.inventory}>
          <!--Weapons-->
          <div class="category">
             <!--List Header-->
@@ -36,7 +36,7 @@
                   return item.type === "weapon";
                }}
                {filter}
-               isExpandedMap={application.isExpanded.inventory}
+               isExpandedMap={$appState.isExpanded.inventory}
             />
 
             <!--Add Weapon Button-->
@@ -57,7 +57,7 @@
                   return item.type === "armor";
                }}
                {filter}
-               isExpandedMap={application.isExpanded.inventory}
+               isExpandedMap={$appState.isExpanded.inventory}
             />
 
             <!--Add Armor Button-->
