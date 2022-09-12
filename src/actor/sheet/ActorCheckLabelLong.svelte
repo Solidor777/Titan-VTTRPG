@@ -14,6 +14,7 @@
 
    $: secondRow =
       check.skill &&
+      check.skill !== "none" &&
       $document.system.skill[check.skill].expertise.value > 0 &&
       $document.system.skill[check.skill].training.value > 0;
 </script>
@@ -23,15 +24,21 @@
    <div class="row">
       <!--Skill & Attribute-->
       <div class="skill-attribute">
-         {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
+         {#if check.skill && check.skill !== "none"}
+            {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
+         {:else}
+            {localize(`LOCAL.${check.attribute}.label`)}
+         {/if}
       </div>
 
       <!--DC-->
-      {#if check.difficulty}
-         <div class="stat label">
+      <div class="stat label">
+         {#if check.complexity}
             {check.difficulty}:{check.complexity}
-         </div>
-      {/if}
+         {:else}
+            {check.difficulty}
+         {/if}
+      </div>
 
       {#if !secondRow}
          <!--Pool-->
@@ -50,7 +57,7 @@
          </div>
 
          <!--Skill stats-->
-         {#if check.skill}
+         {#if check.skill && check.skill !== "none"}
             <!--Expertise-->
             {#if $document.system.skill[check.skill].expertise.value > 0}
                <div class="stat">
@@ -103,7 +110,7 @@
          </div>
 
          <!--Skill stats-->
-         {#if check.skill}
+         {#if check.skill && check.skill !== "none"}
             <!--Expertise-->
             {#if $document.system.skill[check.skill].expertise.value > 0}
                <div class="stat">

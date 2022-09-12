@@ -2,6 +2,7 @@
    import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
    import ActorItemCheckButton from "./ActorItemCheckButton.svelte";
    import { getContext } from "svelte";
+   import ActorOpposedCheckLabel from "../ActorOpposedCheckLabel.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -38,6 +39,12 @@
             <ActorCheckLabelLong {check} />
          </div>
       </div>
+
+      {#if check.opposedCheck.enabled}
+         <div class="row">
+            <ActorOpposedCheckLabel opposedCheck={check.opposedCjeck} />
+         </div>
+      {/if}
    </div>
 {/if}
 
