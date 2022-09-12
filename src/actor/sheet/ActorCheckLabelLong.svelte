@@ -11,70 +11,132 @@
       difficulty: 4,
       complexity: 0,
    };
+
+   $: secondRow =
+      check.skill &&
+      $document.system.skill[check.skill].expertise.value > 0 &&
+      $document.system.skill[check.skill].training.value > 0;
 </script>
 
 <!--Check label-->
 <div class="check-label {check.attribute}">
-   <!--Skill & Attribute-->
-   <div class="skill-attribute">
-      {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
-   </div>
-
-   <!--DC-->
-   {#if check.difficulty}
-      <div class="stat label">
-         {check.difficulty}:{check.complexity}
-      </div>
-   {/if}
-
-   <!--Pool-->
-   <div class="stat">
-      <!--Label-->
-      <div class="label">
-         <i class="fas fa-dice-d6" />
-         {localize("LOCAL.dice.label")}:
+   <div class="row">
+      <!--Skill & Attribute-->
+      <div class="skill-attribute">
+         {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
       </div>
 
-      <!--Value-->
-      <div class="value">
-         {$document.system.attribute[check.attribute].value +
-            (check.skill ? $document.system.skill[check.skill].training.value : 0)}
-      </div>
-   </div>
+      <!--DC-->
+      {#if check.difficulty}
+         <div class="stat label">
+            {check.difficulty}:{check.complexity}
+         </div>
+      {/if}
 
-   <!--Skill stats-->
-   {#if check.skill}
-      <!--Expertise-->
-      {#if $document.system.skill[check.skill].expertise.value > 0}
+      {#if !secondRow}
+         <!--Pool-->
          <div class="stat">
             <!--Label-->
             <div class="label">
-               <i class="fas fa-graduation-cap" />
-               {localize("LOCAL.expertise.label")}:
+               <i class="fas fa-dice-d6" />
+               {localize("LOCAL.dice.label")}:
             </div>
 
             <!--Value-->
             <div class="value">
-               {$document.system.skill[check.skill].expertise.value}
+               {$document.system.attribute[check.attribute].value +
+                  (check.skill ? $document.system.skill[check.skill].training.value : 0)}
             </div>
          </div>
-      {/if}
 
-      <!--Training-->
-      {#if $document.system.skill[check.skill].training.value > 0}
+         <!--Skill stats-->
+         {#if check.skill}
+            <!--Expertise-->
+            {#if $document.system.skill[check.skill].expertise.value > 0}
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     <i class="fas fa-graduation-cap" />
+                     {localize("LOCAL.expertise.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="value">
+                     {$document.system.skill[check.skill].expertise.value}
+                  </div>
+               </div>
+            {/if}
+
+            <!--Training-->
+            {#if $document.system.skill[check.skill].training.value > 0}
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     <i class="fas fa-dumbbell" />
+                     {localize("LOCAL.training.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="value">
+                     {$document.system.skill[check.skill].training.value}
+                  </div>
+               </div>
+            {/if}
+         {/if}
+      {/if}
+   </div>
+   {#if secondRow}
+      <div class="row">
+         <!--Pool-->
          <div class="stat">
             <!--Label-->
             <div class="label">
-               <i class="fas fa-dumbbell" />
-               {localize("LOCAL.training.label")}:
+               <i class="fas fa-dice-d6" />
+               {localize("LOCAL.dice.label")}:
             </div>
 
             <!--Value-->
             <div class="value">
-               {$document.system.skill[check.skill].training.value}
+               {$document.system.attribute[check.attribute].value +
+                  (check.skill ? $document.system.skill[check.skill].training.value : 0)}
             </div>
          </div>
-      {/if}
+
+         <!--Skill stats-->
+         {#if check.skill}
+            <!--Expertise-->
+            {#if $document.system.skill[check.skill].expertise.value > 0}
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     <i class="fas fa-graduation-cap" />
+                     {localize("LOCAL.expertise.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="value">
+                     {$document.system.skill[check.skill].expertise.value}
+                  </div>
+               </div>
+            {/if}
+
+            <!--Training-->
+            {#if $document.system.skill[check.skill].training.value > 0}
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     <i class="fas fa-dumbbell" />
+                     {localize("LOCAL.training.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="value">
+                     {$document.system.skill[check.skill].training.value}
+                  </div>
+               </div>
+            {/if}
+         {/if}
+      </div>
    {/if}
 </div>
 
@@ -82,38 +144,50 @@
    @import "../../Styles/Mixins.scss";
 
    .check-label {
-      @include flex-row;
-      @include flex-group-center;
+      @include flex-column;
+      @include flex-group-top;
       @include attribute-colors;
       @include border;
       padding: 0.25rem;
-      flex-wrap: wrap;
 
-      .skill-attribute {
+      .row {
          @include flex-row;
          @include flex-group-center;
-         font-weight: bold;
-      }
+         flex-wrap: wrap;
 
-      .label {
-         @include flex-row;
-         @include flex-group-center;
-         margin-right: 0.25rem;
-         font-weight: bold;
-      }
+         &:not(:first-child) {
+            margin-top: 0.25rem;
+         }
 
-      .stat {
-         @include border-left;
-         @include flex-row;
-         @include flex-group-center;
-         margin-left: 0.25rem;
-         padding-left: 0.25rem;
+         .skill-attribute {
+            @include flex-row;
+            @include flex-group-center;
+            font-weight: bold;
+         }
 
          .label {
+            @include flex-row;
+            @include flex-group-center;
             margin-right: 0.25rem;
+            font-weight: bold;
+         }
 
-            i {
+         .stat {
+            @include flex-row;
+            @include flex-group-center;
+
+            &:not(:first-child) {
+               @include border-left;
+               margin-left: 0.25rem;
+               padding-left: 0.25rem;
+            }
+
+            .label {
                margin-right: 0.25rem;
+
+               i {
+                  margin-right: 0.25rem;
+               }
             }
          }
       }

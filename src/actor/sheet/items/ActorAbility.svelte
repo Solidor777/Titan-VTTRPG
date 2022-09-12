@@ -8,9 +8,8 @@
    import ActorItemDescription from "./ActorItemDescription.svelte";
    import ActorItemFooter from "./ActorItemFooter.svelte";
    import ActorItemRarity from "./ActorItemRarity.svelte";
-   import ActorItemTradition from "./ActorItemTradition.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
-   import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
+   import ActorItemChecks from "./ActorItemChecks.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -38,7 +37,7 @@
          <!--Controls-->
          <div class="item-controls">
             <!--Check-->
-            {#if item.system.check[0]}
+            {#if item.system.check.length > 0}
                <div>
                   <ActorCheckButtonSmall
                      check={item.system.check[0]}
@@ -69,22 +68,22 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
-            {#if item.aspects}
-               <div class="item-expandable-content">
-                  <AspectTags aspects={item.aspects} />
-               </div>
-            {/if}
-
             <!--Item Description-->
             <div class="item-expandable-content">
                <ActorItemDescription description={"Temporary Item Description"} />
             </div>
 
+            <!--Item Checks-->
+            {#if item.system.check.length > 0}
+               <div class="item-expandable-content">
+                  <ActorItemChecks {id} />
+               </div>
+            {/if}
+
             <!--Footer-->
             <div class="item-expandable-content">
                <ActorItemFooter>
                   <ActorItemRarity {item} />
-                  <ActorItemTradition {item} />
                </ActorItemFooter>
             </div>
          </div>
