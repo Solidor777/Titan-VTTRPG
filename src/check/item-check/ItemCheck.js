@@ -13,7 +13,6 @@ export default class TitanItemCheck extends TitanCheck {
          isDamage: options?.isDamage ?? false,
          isHealing: options?.isHealing ?? false,
          resistanceCheck: options?.resistanceCheck ?? false,
-         opposedCheck: options?.opposedCheck?.enabled ? options.opposedCheck : false,
          diceMod: options?.diceMod ?? 0,
          maximizeSuccesses: options?.maximizeSuccesses ?? false,
          extraSuccessOnCritical: options?.extraSuccessOnCritical ?? false,
@@ -43,12 +42,14 @@ export default class TitanItemCheck extends TitanCheck {
          parameters.doubleExpertise = options.doubleExpertise ?? false;
       }
 
-      // Opposed check
-      if (parameters.opposedCheck !== false) {
-         parameters.opposedCheck.attribute = parameters.opposedCheck.attribute ?? "body";
-         parameters.opposedCheck.skill = parameters.opposedCheck.attribute ?? false;
-         parameters.opposedCheck.difficulty = parameters.opposedCheck.difficulty ?? parameters.difficulty;
-         parameters.opposedCheck.complexity = parameters.opposedCheck.complexity ?? 1;
+      // Opposed check parameters
+      if (options?.opposedCheck) {
+         parameters.opposedCheck = {
+            attribute: options.opposedCheck.attribute ?? "body",
+            skill: options.opposedCheck.skill ?? false,
+            difficulty: options.opposedCheck.difficulty ?? 4,
+            complexity: options.opposedCheck.complexity ?? 1
+         };
       }
 
       return parameters;

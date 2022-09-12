@@ -366,6 +366,9 @@
       },
       "tradition": {
         "tradition": "Any"
+      },
+      "checks": {
+        "check": []
       }
     },
     "gear": {
@@ -622,10 +625,11 @@
       "templates": [
         "base",
         "rarity",
-        "expCost"
+        "expCost",
+        "checks"
       ],
       "type": "active",
-      "check": []
+      "requirements": ""
     }
   }
 }

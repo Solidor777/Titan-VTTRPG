@@ -11,10 +11,8 @@
    async function rollResistanceCheck() {
       // Get the targets
       let userTargets = game.user.isGM ? Array.from(game.user.targets) : Array.from(canvas.tokens.ownedTokens);
-      if (game.user.isGM) {
-         if (!userTargets.length > 0) {
-            userTargets = Array.from(canvas.tokens.controlled);
-         }
+      if (userTargets.length <= 0 && game.user.isGM) {
+         userTargets = Array.from(canvas.tokens.controlled);
       }
 
       // For each target
