@@ -56,10 +56,10 @@
 
    .aspect {
       @include flex-row;
-      background: var(--label-background-color);
       @include flex-group-center;
       @include resistance-colors;
       @include border;
+      background: var(--label-background-color);
       padding: 0.25rem;
       flex-wrap: wrap;
 

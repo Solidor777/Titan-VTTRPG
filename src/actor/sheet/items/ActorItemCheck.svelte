@@ -33,16 +33,23 @@
          />
       </div>
 
-      <!--Stats-->
+      <!--Main check stats-->
       <div class="row">
          <div classs="tag">
             <ActorCheckLabelLong {check} />
          </div>
       </div>
 
-      {#if check.opposedCheck.enabled}
+      <!--Secondary Stats-->
+      {#if check.opposedCheck.enabled || check.resistanceCheck !== "none"}
          <div class="row">
-            <ActorOpposedCheckLabel opposedCheck={check.opposedCjeck} />
+            {#if check.opposedCheck.enabled}
+               <div class="tag">
+                  <ActorOpposedCheckLabel opposedCheck={check.opposedCheck} />
+               </div>
+
+               <!--To do resolve cost-->
+            {/if}
          </div>
       {/if}
    </div>
