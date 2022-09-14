@@ -15,19 +15,16 @@
    const appState = getContext("ApplicationStateStore");
    const application = getContext("external").application;
 
-   // Search filter
-   let filter = "";
-
    // Filtered Skill list
    const skillList = $document.system.skill;
    $: filteredList = Object.entries(skillList).filter(
-      ([key]) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
+      ([key]) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf($appState.filter.skills.toLowerCase()) !== -1
    );
 </script>
 
 <div class="skill-tab">
    <!--Filter-->
-   <TopFilter bind:filter />
+   <TopFilter bind:filter={$appState.filter.skills} />
 
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.skills}>

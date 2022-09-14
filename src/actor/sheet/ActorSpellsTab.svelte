@@ -9,14 +9,11 @@
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
-
-   // Filter Items
-   let filter = "";
 </script>
 
 <div class="spells-tab">
    <!--Filter-->
-   <TopFilter bind:filter />
+   <TopFilter bind:filter={$appState.filter.spells} />
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
@@ -34,7 +31,7 @@
                filterFunction={(item) => {
                   return item.type === "spell";
                }}
-               {filter}
+               filter={$appState.filter.spells}
                isExpandedMap={$appState.isExpanded.spells}
             />
 

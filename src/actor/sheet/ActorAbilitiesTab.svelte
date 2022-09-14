@@ -6,17 +6,17 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import ActorAddItemEntryButton from "./ActorAddItemEntryButton.svelte";
    import ActorAbility from "./items/ActorAbility.svelte";
+   import ActorFilterOptions from "./ActorFilterOptions.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
-
-   // Filter Items
-   let filter = "";
 </script>
 
 <div class="abilities-tab">
+   <ActorFilterOptions />
+
    <!--Filter-->
-   <TopFilter bind:filter />
+   <TopFilter bind:filter={$appState.filter.abilities} />
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
@@ -34,7 +34,7 @@
                filterFunction={(item) => {
                   return item.type === "ability";
                }}
-               {filter}
+               filter={$appState.filter.abilities}
                isExpandedMap={$appState.isExpanded.abilities}
             />
 

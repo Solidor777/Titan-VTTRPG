@@ -8,14 +8,11 @@
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
-
-   // Filter actions
-   let filter = "";
 </script>
 
 <div class="inventory-tab">
    <!--Filter-->
-   <TopFilter bind:filter />
+   <TopFilter bind:filter={$appState.filter.actions} />
 
    <!--Scrolling Containers-->
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.actions}>
@@ -33,7 +30,7 @@
                filterFunction={(item) => {
                   return item.type === "weapon" && item.system.equipped === true;
                }}
-               {filter}
+               filter={$appState.filter.actions}
                isExpandedMap={$appState.isExpanded.actions}
                isExpandedDefault={true}
             />

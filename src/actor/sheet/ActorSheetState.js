@@ -4,17 +4,27 @@ import { writable } from 'svelte/store';
 export default function createActorSheetState() {
    const { set, update, subscribe } = writable({
       scrollTop: {
-         skills: 0,
+         abilities: 0,
          actions: 0,
          inventory: 0,
-         abilities: 0,
+         skills: 0,
          spells: 0
       },
       isExpanded: {
-         inventory: {},
          actions: {},
          abilities: {},
+         inventory: {},
          spells: {},
+      },
+      filter: {
+         abilities: "",
+         actions: "",
+         inventory: "",
+         skills: "",
+         spells: ""
+      },
+      filterOptions: {
+
       },
       activeTab: "skills"
    });

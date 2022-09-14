@@ -10,14 +10,11 @@
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
-
-   // Filter Items
-   let filter = "";
 </script>
 
 <div class="inventory-tab">
    <!--Filter-->
-   <TopFilter bind:filter />
+   <TopFilter bind:filter={$appState.filter.inventory} />
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
@@ -35,7 +32,7 @@
                filterFunction={(item) => {
                   return item.type === "weapon";
                }}
-               {filter}
+               filter={$appState.filter.inventory}
                isExpandedMap={$appState.isExpanded.inventory}
             />
 
@@ -56,7 +53,7 @@
                filterFunction={(item) => {
                   return item.type === "armor";
                }}
-               {filter}
+               filter={$appState.filter.inventory}
                isExpandedMap={$appState.isExpanded.inventory}
             />
 
