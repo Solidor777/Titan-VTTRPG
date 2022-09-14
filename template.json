@@ -628,7 +628,9 @@
         "expCost",
         "checks"
       ],
-      "type": "active",
+      "action": false,
+      "reaction": false,
+      "passive": false,
       "requirements": ""
     }
   }

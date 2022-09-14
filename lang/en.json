@@ -11,6 +11,8 @@
   "LOCAL.accuracy.label": "Accuracy",
   "LOCAL.accuracy.value.label": "Total Accuracy.",
   "LOCAL.actions.label": "Actions",
+  "LOCAL.action.label": "Action",
+  "LOCAL.reaction.label": "Reaction",
   "LOCAL.addAttribute.label": "Add Attribute",
   "LOCAL.addCondition.label": "Add Condition",
   "LOCAL.addRating.label": "Add Rating",

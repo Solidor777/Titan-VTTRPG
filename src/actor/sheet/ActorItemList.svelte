@@ -82,7 +82,7 @@
 <!--Item List-->
 <ol>
    <!--Each Item-->
-   {#each items as item}
+   {#each items as item (item._id)}
       <li
          class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
          data-item-id={item._id}

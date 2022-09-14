@@ -7,24 +7,10 @@
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
+   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
 
    // Setup
    const document = getContext("DocumentSheetObject");
-   const typeOptions = [
-      {
-         label: localize("LOCAL.active.label"),
-         value: "active",
-      },
-      {
-         label: localize("LOCAL.passive.label"),
-         value: "passive",
-      },
-      {
-         label: localize("LOCAL.activeAndPassive.label"),
-         value: "activeAndPassive",
-      },
-   ];
 </script>
 
 <!--Header-->
@@ -62,16 +48,38 @@
                   <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
                </div>
             </div>
+         </div>
+      </div>
+   </div>
 
-            <!--Type-->
-            <div class="stat">
-               <div class="label">
-                  {localize("LOCAL.type.label")}
-               </div>
-               <div class="input">
-                  <DocumentSelect options={typeOptions} bind:value={$document.system.type} />
-               </div>
-            </div>
+   <div class="ability-types">
+      <!--Action-->
+      <div class="checkbox">
+         <div class="label">
+            {localize("LOCAL.action.label")}
+         </div>
+         <div class="input">
+            <DocumentCheckboxInput bind:value={$document.system.action} />
+         </div>
+      </div>
+
+      <!--Reaction-->
+      <div class="checkbox">
+         <div class="label">
+            {localize("LOCAL.reaction.label")}
+         </div>
+         <div class="input">
+            <DocumentCheckboxInput bind:value={$document.system.reaction} />
+         </div>
+      </div>
+
+      <!--Passive-->
+      <div class="checkbox">
+         <div class="label">
+            {localize("LOCAL.passive.label")}
+         </div>
+         <div class="input">
+            <DocumentCheckboxInput bind:value={$document.system.passive} />
          </div>
       </div>
    </div>
@@ -89,21 +97,24 @@
       .main-label {
          @include flex-row;
          @include flex-group-left;
+         width: 100%;
 
          .portrait {
             width: 5rem;
             --border-style: none;
          }
 
-         .name {
-            @include flex-row;
-            @include flex-group-left;
-            width: 100%;
-         }
-
          .label-stats {
             @include flex-column;
             @include flex-group-top-left;
+            width: calc(100% - 5.5rem);
+            margin-left: 0.5rem;
+
+            .name {
+               @include flex-row;
+               @include flex-group-left;
+               width: 100%;
+            }
 
             .secondary-stats {
                @include flex-row;
@@ -137,6 +148,30 @@
                      }
                   }
                }
+            }
+         }
+      }
+      .ability-types {
+         @include flex-column;
+         @include flex-group-top;
+         margin-right: 0.5rem;
+         margin-left: 1rem;
+
+         .checkbox {
+            @include flex-row;
+            @include flex-group-right;
+            width: 100%;
+
+            .label {
+               @include flex-row;
+               @include flex-group-right;
+               font-weight: bold;
+            }
+
+            .input {
+               @include flex-row;
+               @include flex-group-left;
+               width: 1rem;
             }
          }
       }
