@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import ItemSheetChecksSidebar from "~/sheet/ItemSheetChecksSidebar.svelte";
+   import ItemSheetChecksSidebar from "~/item/sheet/ItemSheetChecksSidebar.svelte";
 
    // Application staore reference
    const appState = getContext("ApplicationStateStore");
@@ -13,7 +13,7 @@
       {localize("LOCAL.checks.label")}
    </div>
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={appState.scrollTop.sidebar}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
          <ItemSheetChecksSidebar />
       </ScrollingContainer>
    </div>
