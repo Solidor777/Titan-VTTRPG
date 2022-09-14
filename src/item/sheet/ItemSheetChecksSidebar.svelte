@@ -1,11 +1,5 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-   import { slide } from "svelte/transition";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import ItemSheetCheckSettings from "~/item/sheet/ItemSheetCheckSettings.svelte";
-   import ItemSheetAddCheckButton from "~/item/sheet/ItemSheetAddCheckButton.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
