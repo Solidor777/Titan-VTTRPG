@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
+   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ActorItemExpandButton from "./ActorItemExpandButton.svelte";
    import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
@@ -10,6 +11,7 @@
    import ActorItemRarity from "./ActorItemRarity.svelte";
    import ActorCheckButtonSmall from "~/actor/sheet/ActorCheckButtonSmall.svelte";
    import ActorItemChecks from "./ActorItemChecks.svelte";
+   import Tag from "~/helpers/svelte-components/Tag.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -83,7 +85,23 @@
             <!--Footer-->
             <div class="item-expandable-content">
                <ActorItemFooter>
+                  <!-- Rarity-->
                   <ActorItemRarity {item} />
+
+                  <!--Action-->
+                  {#if item.system.action}
+                     <Tag label={localize("LOCAL.action.label")} />
+                  {/if}
+
+                  <!--Reaction-->
+                  {#if item.system.reaction}
+                     <Tag label={localize("LOCAL.reaction.label")} />
+                  {/if}
+
+                  <!--Passive-->
+                  {#if item.system.passive}
+                     <Tag label={localize("LOCAL.passive.label")} />
+                  {/if}
                </ActorItemFooter>
             </div>
          </div>

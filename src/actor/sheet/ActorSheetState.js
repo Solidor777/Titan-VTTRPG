@@ -24,7 +24,11 @@ export default function createActorSheetState() {
          spells: ""
       },
       filterOptions: {
-
+         abilities: {
+            action: false,
+            reaction: false,
+            passive: false
+         }
       },
       activeTab: "skills"
    });

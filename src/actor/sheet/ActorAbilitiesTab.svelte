@@ -6,14 +6,21 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import ActorAddItemEntryButton from "./ActorAddItemEntryButton.svelte";
    import ActorAbility from "./items/ActorAbility.svelte";
-   import ActorFilterOptions from "./ActorFilterOptions.svelte";
+   import ToggleOptionButton from "~/helpers/svelte-components/ToggleOptionButton.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
 </script>
 
 <div class="abilities-tab">
-   <ActorFilterOptions />
+   <div class="filter-options">
+      {#each Object.entries($appState.filterOptions.abilities) as [key, value]}
+         <ToggleOptionButton
+            label={localize(`LOCAL.${key}.label`)}
+            bind:enabled={$appState.filterOptions.abilities[key]}
+         />
+      {/each}
+   </div>
 
    <!--Filter-->
    <TopFilter bind:filter={$appState.filter.abilities} />
@@ -32,7 +39,22 @@
             <ActorItemList
                itemComponent={ActorAbility}
                filterFunction={(item) => {
-                  return item.type === "ability";
+                  if (item.type !== "ability") {
+                     return false;
+                  }
+                  if ($appState.filterOptions.abilities.action && !item.system.action) {
+                     return false;
+                  }
+
+                  if ($appState.filterOptions.abilities.reaction && !item.system.reaction) {
+                     return false;
+                  }
+
+                  if ($appState.filterOptions.abilities.passive && !item.system.passive) {
+                     return false;
+                  }
+
+                  return true;
                }}
                filter={$appState.filter.abilities}
                isExpandedMap={$appState.isExpanded.abilities}
@@ -52,6 +74,16 @@
       @include flex-group-top;
       height: 100%;
       width: 100%;
+
+      .filter-options {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-bottom;
+         margin-top: 0.25rem;
+         margin-bottom: 0.25rem;
+         padding-bottom: 0.25rem;
+         width: 100%;
+      }
 
       .scrolling-content {
          @include flex-column;
