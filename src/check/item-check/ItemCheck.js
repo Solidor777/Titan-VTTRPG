@@ -1,4 +1,3 @@
-import TitanUtility from "~/helpers/Utility.js";
 import TitanCheck from "~/check/Check.js";
 
 export default class TitanItemCheck extends TitanCheck {

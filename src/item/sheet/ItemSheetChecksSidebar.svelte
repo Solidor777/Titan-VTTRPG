@@ -2,7 +2,6 @@
    import { getContext } from "svelte";
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { slide } from "svelte/transition";
-   import { spring } from "svelte/motion";
    import ResistanceTag from "~/helpers/svelte-components/ResistanceTag.svelte";
    import StatTag from "~/helpers/svelte-components/StatTag.svelte";
 

@@ -4,7 +4,7 @@ import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckD
 import { SkillCheckDialog } from "~/check/skill-check/SkillCheckDialog.js";
 import { AttackCheckDialog } from "~/check/attack-check/AttackCheckDialog.js";
 import { CastingCheckDialog } from "~/check/casting-check/CastingCheckDialog.js";
-import TitanUtility from "~/helpers/Utility.js";
+import { clamp } from "~/helpers/Utility.js";
 import TitanAttributeCheck from "~/check/AttributeCheck.js";
 import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
 import TitanResistanceCheck from "~/check/resistance-check/ResistanceCheck.js";
@@ -151,7 +151,7 @@ export class TitanActor extends Actor {
          systemData.resource[k].maxValue =
             v.maxBase + v.staticMod;
          systemData.resource[k].value =
-            TitanUtility.clamp(systemData.resource[k].value, 0, systemData.resource[k].maxValue);
+            clamp(systemData.resource[k].value, 0, systemData.resource[k].maxValue);
       }
 
       // Calculate mods

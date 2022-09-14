@@ -1,4 +1,5 @@
 import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
+import { localize } from '~/helpers/Utility';
 import createActorSheetState from './ActorSheetState';
 
 export default class TitanActorSheet extends SvelteDocumentSheet {
@@ -54,20 +55,24 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
    async addItem(type) {
       let itemName = "";
       switch (type) {
-         case "weapon": {
-            itemName = game.i18n.localize(CONFIG.TITAN.local.newWeapon);
+         case "ability": {
+            itemName = localize("LOCAL.newAbility.label");
             break;
          }
          case "armor": {
-            itemName = game.i18n.localize(CONFIG.TITAN.local.newArmor);
+            itemName = localize("LOCAL.newArmor.label");
+            break;
+         }
+         case "weapon": {
+            itemName = localize("LOCAL.newWeapon.label");
             break;
          }
          case "spell": {
-            itemName = game.i18n.localize(CONFIG.TITAN.local.newSpell);
+            itemName = localize("LOCAL.newSpell.label");
             break;
          }
          default: {
-            itemName = "New Item";
+            itemName = localize("LOCAL.newItem.label");
             break;
          }
       }

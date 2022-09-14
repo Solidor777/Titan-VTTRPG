@@ -1,4 +1,4 @@
-import TitanUtility from "../helpers/Utility.js";
+import { clamp } from "~/helpers/Utility";
 
 export default class TitanCheck {
   // Constructor
@@ -33,7 +33,7 @@ export default class TitanCheck {
   _initializeParameters(options) {
     const parameters = {
       difficulty: options.difficulty ?
-        TitanUtility.clamp(options.difficulty, 2, 6) : 4,
+        clamp(options.difficulty, 2, 6) : 4,
       complexity: options.complexity ? Math.max(0, options.complexity) : 0,
       diceMod: options.diceMod ?? 0,
       maximizeSuccesses: options.maximizeSuccesses ?? false,

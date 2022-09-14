@@ -1,4 +1,4 @@
-import TitanUtility from "~/helpers/Utility.js";
+import { clamp } from "~/helpers/Utility";
 import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
 
 export default class TitanAttackCheck extends TitanSkillCheck {
@@ -105,7 +105,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
                   this.parameters.attackerAccuracy;
 
             // Difficulty = 4 + defense rating - attacker rating
-            this.parameters.difficulty = TitanUtility.clamp(
+            this.parameters.difficulty = clamp(
                this.parameters.targetDefense - attackerRating + 4,
                2,
                6

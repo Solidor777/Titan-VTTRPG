@@ -1,4 +1,3 @@
-import TitanUtility from "../../helpers/Utility.js";
 import TitanAttributeCheck from "../AttributeCheck.js";
 
 export default class TitanSkillCheck extends TitanAttributeCheck {
