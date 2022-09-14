@@ -236,6 +236,7 @@
   "LOCAL.resolve.editStaticMod.label": "Edit bonus or penalty to Max Resolve.",
   "LOCAL.resolve.editValue.label": "Edit current Resolve.",
   "LOCAL.resolve.label": "Resolve",
+  "LOCAL.resolveCost.label": "Resolve Cost",
   "LOCAL.resolve.max.label": "Max Resolve = Soul / 2, rounded up.",
   "LOCAL.resolve.valueDesc.label": "Resolve remaining.",
   "LOCAL.restrained.label": "Restrained",

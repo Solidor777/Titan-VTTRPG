@@ -128,6 +128,19 @@
                      <DocumentResistanceSelect bind:value={check.resistanceCheck} options={resistanceSelectOptions} />
                   </div>
                </div>
+
+               <!--Resolve Cost-->
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     {localize("LOCAL.resolveCost.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="input number">
+                     <DocumentIntegerInput bind:value={check.resolveCost} min={0} />
+                  </div>
+               </div>
             </div>
 
             <div class="row">
@@ -318,7 +331,7 @@
                   }
 
                   &.number {
-                     width: 3rem;
+                     width: 2rem;
                   }
                }
             }
