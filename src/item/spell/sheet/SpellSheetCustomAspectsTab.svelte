@@ -66,6 +66,7 @@
          ol {
             @include flex-column;
             @include flex-group-top;
+            @include z-index-app;
             list-style: none;
             padding: 0;
             margin: 0;

@@ -335,6 +335,7 @@
   "LOCAL.castingCheck.label": "Casting Check",
   "LOCAL.autoCalculateCastingCheck.label": "Auto Calculate Casting Check",
   "LOCAL.resistedBy.label": "Resisted by",
+  "LOCAL.opposedBy.label": "Opposed by",
   "LOCAL.suggestedDifficultyAndComplexity.label": "Suggested Difficulty & Complexity",
   "LOCAL.aspectCosts.label": "Aspect Costs",
   "LOCAL.spells.label": "Spells",

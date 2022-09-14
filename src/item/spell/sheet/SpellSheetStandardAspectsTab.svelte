@@ -224,6 +224,7 @@
          .aspects-list {
             @include flex-column;
             @include flex-group-top;
+            @include z-index-app;
             list-style: none;
             padding: 0;
             margin: 0;
@@ -246,8 +247,8 @@
                .aspect-details {
                   @include flex-column;
                   @include flex-group-top;
-                  @include z-index-app;
                   @include border-bottom-sides;
+                  @include z-index-app;
                   padding: 0.5rem;
                   width: calc(100% - 30px);
                   background: var(--label-background-color);

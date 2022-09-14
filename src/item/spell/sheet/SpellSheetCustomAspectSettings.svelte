@@ -155,6 +155,7 @@
       @include flex-column;
       @include flex-group-top;
       @include border;
+      @include z-index-app;
       width: 100%;
       font-size: 1rem;
       padding: 0.25rem;

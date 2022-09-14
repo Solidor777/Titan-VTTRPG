@@ -9,6 +9,7 @@
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
    import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
+   import DocumentIntegerSelect from "../../documents/components/DocumentIntegerSelect.svelte";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -41,6 +42,9 @@
          value: "none",
       },
    ];
+
+   // Difficulty options
+   const difficultyOptions = [2, 3, 4, 5, 6];
 
    $: check = $document.system.check[idx];
    $: isExpanded = $appState.isExpanded.checks[idx];
@@ -111,6 +115,34 @@
                   <!--Value-->
                   <div class="input">
                      <DocumentSkillSelect bind:value={check.skill} />
+                  </div>
+               </div>
+            </div>
+
+            <div class="row">
+               <!--Difficulty Select-->
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     {localize("LOCAL.difficulty.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="input">
+                     <DocumentIntegerSelect options={difficultyOptions} bind:value={check.difficulty} />
+                  </div>
+               </div>
+
+               <!--Skill Select-->
+               <div class="stat">
+                  <!--Label-->
+                  <div class="label">
+                     {localize("LOCAL.complexity.label")}:
+                  </div>
+
+                  <!--Value-->
+                  <div class="input number">
+                     <DocumentIntegerInput bind:value={check.complexity} min={1} />
                   </div>
                </div>
             </div>

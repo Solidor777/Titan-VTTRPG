@@ -91,6 +91,7 @@
       @include flex-column;
       @include flex-group-top;
       @include border;
+      @include z-index-app;
       box-sizing: border-box;
       width: 13rem;
       min-width: 13rem;
