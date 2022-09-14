@@ -36,6 +36,12 @@
          @include flex-row;
          @include flex-group-center;
          width: 100%;
+
+         &:not(:first-child) {
+            @include border-top;
+            margin-top: 0.5rem;
+            padding-top: 00.5rem;
+         }
       }
    }
 </style>

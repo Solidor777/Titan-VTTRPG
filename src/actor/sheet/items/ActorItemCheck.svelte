@@ -1,8 +1,11 @@
 <script>
+   import { getContext } from "svelte";
+   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
    import ActorItemCheckButton from "./ActorItemCheckButton.svelte";
-   import { getContext } from "svelte";
-   import ActorOpposedCheckLabel from "../ActorOpposedCheckLabel.svelte";
+   import OpposedCheckLabel from "~/helpers/svelte-components/OpposedCheckLabel.svelte";
+   import ResistedByTag from "~/helpers/svelte-components/ResistedByTag.svelte";
+   import StatTag from "~/helpers/svelte-components/StatTag.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -33,25 +36,33 @@
          />
       </div>
 
-      <!--Main check stats-->
       <div class="row">
-         <div classs="tag">
+         <!--Main check stats-->
+         <div class="tag">
             <ActorCheckLabelLong {check} />
          </div>
+
+         <!--Resolve Cost-->
+         {#if check.resolveCost > 0}
+            <div class="tag">
+               <StatTag label={localize("LOCAL.resolveCost.label")} value={check.resolveCost} />
+            </div>
+         {/if}
+
+         <!--Resistance Check-->
+         {#if check.resistanceCheck !== "none"}
+            <div class="tag">
+               <ResistedByTag resistance={check.resistanceCheck} />
+            </div>
+         {/if}
+
+         <!--Opposed Check-->
+         {#if check.opposedCheck.enabled}
+            <div class="tag">
+               <OpposedCheckLabel opposedCheck={check.opposedCheck} />
+            </div>
+         {/if}
       </div>
-
-      <!--Secondary Stats-->
-      {#if check.opposedCheck.enabled || check.resistanceCheck !== "none"}
-         <div class="row">
-            {#if check.opposedCheck.enabled}
-               <div class="tag">
-                  <ActorOpposedCheckLabel opposedCheck={check.opposedCheck} />
-               </div>
-
-               <!--To do resolve cost-->
-            {/if}
-         </div>
-      {/if}
    </div>
 {/if}
 
@@ -68,14 +79,8 @@
          @include flex-group-center;
          flex-wrap: wrap;
 
-         &:not(:first-child) {
-            margin-top: 0.5rem;
-         }
-
          .tag {
-            &:not(:first-child) {
-               margin-left: 0.25rem;
-            }
+            margin: 0.5rem 0.25rem 0 0.25rem;
          }
       }
    }
