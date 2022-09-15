@@ -26,7 +26,7 @@ export const TITANLOCAL = Object.freeze({
   rangedWeapons: "LOCAL.rangedWeapons.label",
   subterfuge: "LOCAL.subterfuge.label",
   stealth: "LOCAL.stealth.label",
-  theology: "LOCAL.theology.label",
+  metaphysics: "LOCAL.metaphysics.label",
   resolve: "LOCAL.resolve.label",
   stamina: "LOCAL.stamina.label",
   wounds: "LOCAL.wounds.label",

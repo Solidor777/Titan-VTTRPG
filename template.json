@@ -154,6 +154,17 @@
               "staticMod": 0
             }
           },
+          "metaphysics": {
+            "defaultAttribute": "soul",
+            "training": {
+              "baseValue": 0,
+              "staticMod": 0
+            },
+            "expertise": {
+              "baseValue": 0,
+              "staticMod": 0
+            }
+          },
           "nature": {
             "defaultAttribute": "mind",
             "training": {
@@ -211,17 +222,6 @@
           },
           "stealth": {
             "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "staticMod": 0
-            },
-            "expertise": {
-              "baseValue": 0,
-              "staticMod": 0
-            }
-          },
-          "theology": {
-            "defaultAttribute": "soul",
             "training": {
               "baseValue": 0,
               "staticMod": 0
@@ -533,13 +533,13 @@
             "lore": false,
             "medicine": false,
             "meleeWeapons": false,
+            "metaphysics": false,
             "nature": false,
             "perception": false,
             "performance": false,
             "rangedWeapons": false,
             "subterfuge": false,
-            "stealth": false,
-            "theology": false
+            "stealth": false
           }
         },
         "increaseSkill": {
@@ -556,13 +556,13 @@
             "lore": false,
             "medicine": false,
             "meleeWeapons": false,
+            "metaphysics": false,
             "nature": false,
             "perception": false,
             "performance": false,
             "rangedWeapons": false,
             "subterfuge": false,
-            "stealth": false,
-            "theology": false
+            "stealth": false
           }
         },
         "decreaseSpeed": {

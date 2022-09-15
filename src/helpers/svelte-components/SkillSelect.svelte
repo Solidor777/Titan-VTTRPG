@@ -76,6 +76,10 @@
          value: "meleeWeapons",
       },
       {
+         label: localize("LOCAL.metaphysics.label"),
+         value: "metaphysics",
+      },
+      {
          label: localize("LOCAL.nature.label"),
          value: "nature",
       },
@@ -98,10 +102,6 @@
       {
          label: localize("LOCAL.stealth.label"),
          value: "stealth",
-      },
-      {
-         label: localize("LOCAL.theology.label"),
-         value: "theology",
       },
       {
          label: localize("LOCAL.none.label"),
