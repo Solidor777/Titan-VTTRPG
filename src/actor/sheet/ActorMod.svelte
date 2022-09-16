@@ -7,7 +7,7 @@
    export let key;
 
    // The Actor Data
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // The mod data
    $: mod = $document.system.mod[key];

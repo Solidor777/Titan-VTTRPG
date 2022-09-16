@@ -14,7 +14,7 @@
    export let elementRoot;
    export let documentStore;
    export let applicationStateStore;
-   setContext("DocumentSheetObject", documentStore);
+   setContext("DocumentStore", documentStore);
    setContext("ApplicationStateStore", applicationStateStore);
    const appState = getContext("ApplicationStateStore");
 

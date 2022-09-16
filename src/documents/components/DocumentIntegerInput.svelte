@@ -14,7 +14,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 <IntegerInput

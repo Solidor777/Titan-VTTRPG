@@ -7,7 +7,7 @@
    export let key;
 
    // The Actor Data
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // The rating data
    $: rating = $document.system.rating[key];

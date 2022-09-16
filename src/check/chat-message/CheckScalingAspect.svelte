@@ -7,7 +7,7 @@
    export let aspect = void 0;
 
    // Chat context
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
 
    function increaseAspect() {

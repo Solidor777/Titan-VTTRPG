@@ -351,6 +351,8 @@
   "LOCAL.wounds.valueDesc.label": "Wounds Taken. Mortally Wounded when Max Wounds are Taken.",
   "LOCAL.woundsTaken.label": "Wounds Taken",
   "LOCAL.zone.label": "Zone",
+  "LOCAL.addRulesElement.label": "Add Rules Element",
+  "LOCAL.flatModifier.label": "Flat Modifier",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

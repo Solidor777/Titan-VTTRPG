@@ -6,7 +6,7 @@
    export let value;
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    let data;
    $: {

@@ -8,7 +8,7 @@
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Application reference
    const application = getContext("external").application;

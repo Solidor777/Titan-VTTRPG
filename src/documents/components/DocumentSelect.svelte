@@ -9,7 +9,7 @@
    export let options = void 0;
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    let data;
    $: {

@@ -12,7 +12,7 @@
    const application = getContext("external").application;
 
    // Reference to the weapon item
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="weapon-description-tab">

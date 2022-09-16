@@ -8,7 +8,7 @@
    export let value = void 0;
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Copy of the document data
    let data;

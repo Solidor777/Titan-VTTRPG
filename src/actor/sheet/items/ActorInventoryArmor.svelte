@@ -13,7 +13,7 @@
    import ActorItemValue from "./ActorItemValue.svelte";
 
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Reference to the armor id
    export let id = void 0;

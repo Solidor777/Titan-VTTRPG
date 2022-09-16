@@ -3,7 +3,7 @@
    import { localize } from "~/helpers/Utility.js";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
 </script>
 

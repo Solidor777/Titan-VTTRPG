@@ -6,7 +6,7 @@
    import StatTag from "~/helpers/svelte-components/StatTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/AttributeTag.svelte";
 
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
 
    function getTagFromCheck(check) {

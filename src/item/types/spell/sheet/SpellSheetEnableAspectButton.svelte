@@ -14,7 +14,7 @@
    export let cost = void 0;
 
    // Setup
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 <EfxButton

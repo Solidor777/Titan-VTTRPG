@@ -9,7 +9,7 @@
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
 
    // Chat context reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
 </script>
 

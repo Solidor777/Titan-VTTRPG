@@ -3,7 +3,7 @@
    import ResistanceCheckButton from "~/helpers/svelte-components/ResistanceCheckButton.svelte";
 
    // Results
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    $: results = $document.flags.titan.chatContext.results;
    $: complexity = results.extraSuccesses ? 1 + results.extraSuccesses : 1;
 </script>

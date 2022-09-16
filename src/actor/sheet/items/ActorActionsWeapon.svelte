@@ -10,7 +10,7 @@
    import ActorWeaponMultiAttackButton from "./ActorWeaponMultiAttackButton.svelte";
 
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Reference to the weapon id
    export let id = void 0;

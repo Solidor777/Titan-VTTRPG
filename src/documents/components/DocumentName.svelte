@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 {#if $document.name !== null}

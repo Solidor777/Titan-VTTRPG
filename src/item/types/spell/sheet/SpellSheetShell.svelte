@@ -19,8 +19,8 @@
    // Setup
    export let elementRoot;
    export let documentStore;
-   setContext("DocumentSheetObject", documentStore);
-   const document = getContext("DocumentSheetObject");
+   setContext("DocumentStore", documentStore);
+   const document = getContext("DocumentStore");
    const application = getContext("external").application;
 
    // Tabs

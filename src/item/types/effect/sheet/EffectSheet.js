@@ -1,6 +1,7 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import EffectSheetShell from './EffectSheetShell.svelte';
 import createEffectSheetState from './EffectSheetState';
+import { addRuleElement } from '~/rules-elements/RuleElement';
 
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
@@ -25,4 +26,7 @@ export default class TitanEffectSheet extends TitanItemSheet {
       this.reactive.state = createEffectSheetState();
    }
 
+   async addRulesElement() {
+      await addRuleElement(this.reactive.document);
+   }
 }

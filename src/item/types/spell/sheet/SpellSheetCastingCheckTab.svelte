@@ -10,7 +10,7 @@
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Application refernce
    const application = getContext("external").application;

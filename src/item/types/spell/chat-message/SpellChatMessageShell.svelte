@@ -8,7 +8,7 @@
    import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
 
    // Chat context reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
 </script>
 

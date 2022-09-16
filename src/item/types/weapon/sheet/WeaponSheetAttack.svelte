@@ -20,7 +20,7 @@
    const application = getContext("external").application;
 
    // Document ref
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 {#if $document.system.attack[attackIdx]}

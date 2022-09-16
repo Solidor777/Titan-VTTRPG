@@ -6,7 +6,7 @@
    export let skill = void 0;
 
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 <!--Dice Pool-->

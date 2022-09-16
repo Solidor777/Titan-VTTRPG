@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Results
    let dice = $document.flags.titan.chatContext.results.dice;

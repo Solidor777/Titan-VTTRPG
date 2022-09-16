@@ -17,7 +17,7 @@
    const application = getContext("external").application;
 
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Reference to the weapon id
    export let id = void 0;

@@ -4,7 +4,7 @@
    import StatTag from "../../helpers/svelte-components/StatTag.svelte";
 
    // Chat context reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
 </script>
 

@@ -3,7 +3,7 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "../../helpers/svelte-components/EfxButton.svelte";
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Results
    let results = $document.flags.titan.chatContext.results;

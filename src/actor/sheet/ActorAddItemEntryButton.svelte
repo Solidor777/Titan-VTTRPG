@@ -6,7 +6,7 @@
    export let itemType = void 0;
 
    // Actor reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Reference to the application
    const application = getContext("external").application;

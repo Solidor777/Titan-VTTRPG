@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Chat context
    const chatContext = $document.flags.titan.chatContext;

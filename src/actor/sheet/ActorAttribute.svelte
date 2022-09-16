@@ -9,7 +9,7 @@
    export let key;
 
    // The Actor Data
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Application reference
    const application = getContext("external").application;

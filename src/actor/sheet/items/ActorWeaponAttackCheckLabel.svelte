@@ -5,7 +5,7 @@
    export let attack = void 0;
 
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 <!--Check label-->

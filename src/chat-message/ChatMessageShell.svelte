@@ -15,8 +15,8 @@
    export let documentStore = void 0;
 
    // Setup
-   setContext("DocumentSheetObject", documentStore);
-   const document = getContext("DocumentSheetObject");
+   setContext("DocumentStore", documentStore);
+   const document = getContext("DocumentStore");
 
    // Selector for the chat message type
    function selectComponent() {

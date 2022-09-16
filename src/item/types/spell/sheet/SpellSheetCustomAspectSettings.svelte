@@ -10,7 +10,7 @@
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Resistance options
    const resistanceSelectOptions = [

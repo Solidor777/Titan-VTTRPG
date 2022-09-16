@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Chat context reference
    const chatContext = $document.flags.titan.chatContext;

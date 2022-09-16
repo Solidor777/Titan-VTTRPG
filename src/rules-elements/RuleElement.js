@@ -1,6 +1,6 @@
 import flatModifier from './FlatModifier';
 
-export function getRuleElementTemplate() {
+function getRuleElementTemplate() {
    return {
       operation: 'flatModifier',
       selector: 'attribute',
@@ -8,6 +8,15 @@ export function getRuleElementTemplate() {
       value: 1,
       type: 'effect',
    };
+}
+
+export async function addRuleElement(document) {
+   document.system.rulesElement.push(getRuleElementTemplate());
+   document.update({
+      system: document.system
+   });
+
+   return;
 }
 
 export function applyRuleElement(element, actorData) {

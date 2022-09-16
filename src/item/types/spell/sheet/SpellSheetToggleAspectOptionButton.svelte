@@ -7,7 +7,7 @@
    export let label = void 0;
 
    // Setup
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Copy of the document data
    let data;

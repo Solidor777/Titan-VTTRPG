@@ -7,7 +7,7 @@
    export let key;
 
    // The Actor Data
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // The speed data
    $: speed = $document.system.speed[key];

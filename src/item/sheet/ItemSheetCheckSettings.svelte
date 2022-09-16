@@ -12,7 +12,7 @@
    import DocumentIntegerSelect from "../../documents/components/DocumentIntegerSelect.svelte";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Application reference
    const appState = getContext("ApplicationStateStore");

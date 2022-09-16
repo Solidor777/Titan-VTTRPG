@@ -18,7 +18,7 @@
    export let isExpandedDefault = false;
 
    // Actor reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Currently drag hovered state
    let isDragHovering = false;

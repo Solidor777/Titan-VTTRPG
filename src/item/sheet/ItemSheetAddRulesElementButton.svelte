@@ -4,24 +4,26 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
-   // Document Setup
-   const document = getContext("DocumentStore");
+   // Application reference
+   const application = getContext("external").application;
 </script>
 
-<div class="add-aspect-button">
+<div class="button">
    <EfxButton
       efx={ripple}
       on:click={() => {
-         $document.spell.addCustomAspect();
-      }}>{localize("addCustomAspect")}<i class="fas fa-circle-plus" /></EfxButton
+         application.addRulesElement();
+      }}>{localize("addRulesElement")}<i class="fas fa-circle-plus" /></EfxButton
    >
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
-   .add-aspect-button {
+   .button {
       @include flex-row;
+      @include flex-group-center;
+      width: 100%;
 
       .fas {
          margin-left: 0.25rem;

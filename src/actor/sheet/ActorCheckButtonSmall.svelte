@@ -2,7 +2,7 @@
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    import { getContext } from "svelte";
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Check
    export let check = {

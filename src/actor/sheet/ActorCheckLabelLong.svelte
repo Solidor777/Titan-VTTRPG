@@ -3,7 +3,7 @@
    import { getContext } from "svelte";
 
    // Reference to the docuement
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    export let check = {
       attribute: "body",

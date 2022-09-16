@@ -7,7 +7,7 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Application staore reference
    const appState = getContext("ApplicationStateStore");

@@ -2,7 +2,7 @@
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Results
    let results = $document.flags.titan.chatContext.results;

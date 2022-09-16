@@ -3,7 +3,7 @@
    import { getContext } from "svelte";
 
    // Results
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
    let results = $document.flags.titan.chatContext.results;
 </script>
 

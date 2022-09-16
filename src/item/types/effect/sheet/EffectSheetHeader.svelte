@@ -6,7 +6,7 @@
    import DocumentName from "~/documents/components/DocumentName.svelte";
 
    // Setup
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 </script>
 
 <!--Header-->

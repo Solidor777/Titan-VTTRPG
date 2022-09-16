@@ -7,7 +7,7 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
    // Document reference
-   const document = getContext("DocumentSheetObject");
+   const document = getContext("DocumentStore");
 
    // Application reference
    const application = getContext("external").application;
