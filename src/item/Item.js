@@ -1,6 +1,6 @@
-import { TitanWeapon } from "./weapon/Weapon.js";
-import { TitanSpell } from "./spell/Spell.js";
-import { TitanAbility } from "./ability/Ability.js";
+import { TitanAbility } from "./types/ability/Ability.js";
+import { TitanSpell } from "./types/spell/Spell.js";
+import { TitanWeapon } from "./types/weapon/Weapon.js";
 
 export class TitanItem extends Item {
    prepareDerivedData() {

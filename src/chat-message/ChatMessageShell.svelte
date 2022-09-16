@@ -3,13 +3,13 @@
 <script>
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
-   import WeaponChatMessageShell from "~/item/weapon/chat-message/WeaponChatMessageShell.svelte";
-   import ArmorChatMessageShell from "~/item/armor/chat-message/ArmorChatMessageShell.svelte";
    import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
    import HealingReportChatMessageShell from "./HealingReportChatMessageShell.svelte";
-   import SpellChatMessageShell from "~/item/spell/chat-message/SpellChatMessageShell.svelte";
-   import AbilityChatMesssageShell from "~/item/ability/chat-message/AbilityChatMesssageShell.svelte";
+   import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
+   import WeaponChatMessageShell from "~/item/types/weapon/chat-message/WeaponChatMessageShell.svelte";
+   import ArmorChatMessageShell from "~/item/types/armor/chat-message/ArmorChatMessageShell.svelte";
+   import SpellChatMessageShell from "~/item/types/spell/chat-message/SpellChatMessageShell.svelte";
+   import AbilityChatMesssageShell from "~/item/types/ability/chat-message/AbilityChatMesssageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
