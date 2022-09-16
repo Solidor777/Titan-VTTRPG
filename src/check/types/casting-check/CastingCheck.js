@@ -1,4 +1,4 @@
-import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
+import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
 
 export default class TitanCastingCheck extends TitanSkillCheck {
    _ensureValidConstruction(options) {

@@ -5,8 +5,9 @@
    import { getContext } from "svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
-   import CheckDifficultySelect from "~/check/components/CheckDifficultySelect.svelte";
    import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
+   import IntegerSelect from "~/helpers/svelte-components/IntegerSelect.svelte";
+   import Select from "~/helpers/svelte-components/Select.svelte";
 
    // The actor document making this check
    export let actor;
@@ -14,23 +15,49 @@
    // Initial check options
    export let options = void 0;
 
+   // Weapon
+   const weapon = actor.items.get(options.itemId);
+
+   // Attack
+   const attack = weapon.system.attack[options.attackIdx];
+
    // Initialize check parameters
    let checkParameters = {
-      attribute: options.attribute ? options.attribute : "body",
-      skill: options.skill ? options.skill : "athletics",
-      difficulty: options.difficulty ? options.difficulty : 4,
-      complexity: options.complexity ? options.complexity : 0,
-      trainingMod: options.trainingMod ? options.trainingMod : 0,
-      doubleTraining: options.doubleTraining ? options.doubleTraining : false,
-      expertiseMod: options.expertiseMod ? options.expertiseMod : 0,
-      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : false,
-      diceMod: options.diceMod ? options.diceMod : 0,
+      attribute: options.attribute ?? attack.attribute,
+      skill: options.skill ?? attack.skill,
+      type: options.type ?? "melee",
+      targetDefense: options.targetDefense ?? 1,
+      attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
+      attackerAccuracy: options.attackerAccuracy ?? actor.system.rating.accuracy.value,
+      damageMod: options.damageMod ?? 0,
+      trainingMod: options.trainingMod ?? 0,
+      doubleTraining: options.doubleTraining ?? false,
+      expertiseMod: options.expertiseMod ?? 0,
+      doubleExpertise: options.doubleExpertise ?? false,
+      diceMod: options.diceMod ?? 0,
+      itemId: options.itemId,
+      attackIdx: options.attackIdx,
    };
+
+   // Rating options
+   const ratingOptions = [1, 2, 3, 4, 5, 6];
+
+   // Type Options
+   const typeOptions = [
+      {
+         value: "melee",
+         label: localize("LOCAL.melee.label"),
+      },
+      {
+         value: "ranged",
+         label: localize("LOCAL.ranged.label"),
+      },
+   ];
 
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.rollAttributeCheck(checkParameters);
+      await actor.rollAttackCheck(checkParameters);
       application.close();
       return;
    }
@@ -85,6 +112,11 @@
 </script>
 
 <div class="skill-check-dialog">
+   <!--Name-->
+   <div class="row row-label">
+      {options.weaponName} ({options.attackName})
+   </div>
+
    <!--Attribute-->
    <div class="row">
       <div class="label">
@@ -105,23 +137,44 @@
       </div>
    </div>
 
-   <!--Difficulty-->
+   <!--Type-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.difficulty.label")}
+         {localize("LOCAL.type.label")}
       </div>
       <div class="input">
-         <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
+         <Select options={typeOptions} bind:value={checkParameters.type} />
       </div>
    </div>
 
-   <!--Complexity-->
+   <!--Attacker ratings-->
+   <div class="row">
+      {#if checkParameters.type === "melee"}
+         <!--Melee-->
+         <div class="label">
+            {localize("LOCAL.attackerMelee.label")}
+         </div>
+         <div class="input">
+            <IntegerSelect options={ratingOptions} bind:value={checkParameters.attackerMelee} />
+         </div>
+      {:else}
+         <!--Accuracy-->
+         <div class="label">
+            {localize("LOCAL.attackerAccuracy.label")}
+         </div>
+         <div class="input">
+            <IntegerSelect options={ratingOptions} bind:value={checkParameters.attackerAccuracy} />
+         </div>
+      {/if}
+   </div>
+
+   <!--Defense rating-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.complexity.label")}
+         {localize("LOCAL.targetDefense.label")}
       </div>
       <div class="input">
-         <IntegerInput bind:value={checkParameters.complexity} min={0} />
+         <IntegerSelect options={ratingOptions} bind:value={checkParameters.targetDefense} />
       </div>
    </div>
 
@@ -198,7 +251,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import "../../../styles/Mixins.scss";
 
    .skill-check-dialog {
       @include flex-column;
@@ -249,6 +302,14 @@
             margin-top: 0.5rem;
             font-size: 1rem;
          }
+      }
+
+      .row-label {
+         @include flex-group-center;
+         flex-wrap: wrap;
+         font-weight: bold;
+         height: 100%;
+         width: 100%;
       }
    }
 </style>

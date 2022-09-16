@@ -4,7 +4,7 @@
    import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
    import { getContext } from "svelte";
    import ResistanceSelect from "~/helpers/svelte-components/ResistanceSelect.svelte";
-   import CheckDifficultySelect from "~/check/components/CheckDifficultySelect.svelte";
+   import CheckDifficultySelect from "~/helpers/svelte-components/CheckDifficultySelect.svelte";
    import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
    // The actor document making this check
@@ -94,7 +94,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import "../../../styles/Mixins.scss";
 
    .resistance-check-dialog {
       @include flex-column;

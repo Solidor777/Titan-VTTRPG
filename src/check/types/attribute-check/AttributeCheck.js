@@ -1,4 +1,4 @@
-import TitanCheck from "./Check.js";
+import TitanCheck from "~/check/Check.js";
 
 export default class TitanAttributeCheck extends TitanCheck {
   _ensureValidConstruction(options) {

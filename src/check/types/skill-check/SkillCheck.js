@@ -1,4 +1,4 @@
-import TitanAttributeCheck from "../AttributeCheck.js";
+import TitanAttributeCheck from "~/check/types/attribute-check/AttributeCheck.js";
 
 export default class TitanSkillCheck extends TitanAttributeCheck {
   _initializeParameters(options) {

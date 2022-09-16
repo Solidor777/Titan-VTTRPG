@@ -1,16 +1,16 @@
 import { TitanPlayerComponent } from "./types/player/Player.js";
 import { TitanNPCComponent } from "./types/npc/NPC.js";
-import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
-import { SkillCheckDialog } from "~/check/skill-check/SkillCheckDialog.js";
-import { AttackCheckDialog } from "~/check/attack-check/AttackCheckDialog.js";
-import { CastingCheckDialog } from "~/check/casting-check/CastingCheckDialog.js";
+import { ResistanceCheckDialog } from "~/check/types/resistance-check/ResistanceCheckDialog.js";
+import { SkillCheckDialog } from "~/check/types/skill-check/SkillCheckDialog.js";
+import { AttackCheckDialog } from "~/check/types/attack-check/AttackCheckDialog.js";
+import { CastingCheckDialog } from "~/check/types/casting-check/CastingCheckDialog.js";
 import { clamp } from "~/helpers/Utility.js";
-import TitanAttributeCheck from "~/check/AttributeCheck.js";
-import TitanSkillCheck from "~/check/skill-check/SkillCheck.js";
-import TitanResistanceCheck from "~/check/resistance-check/ResistanceCheck.js";
-import TitanAttackCheck from "~/check/attack-check/AttackCheck.js";
-import TitanCastingCheck from "~/check/casting-check/CastingCheck.js";
-import TitanItemCheck from "~/check/item-check/ItemCheck.js";
+import TitanAttributeCheck from "~/check/types/attribute-check/AttributeCheck.js";
+import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
+import TitanResistanceCheck from "~/check/types/resistance-check/ResistanceCheck.js";
+import TitanAttackCheck from "~/check/types/attack-check/AttackCheck.js";
+import TitanCastingCheck from "~/check/types/casting-check/CastingCheck.js";
+import TitanItemCheck from "~/check/types/item-check/ItemCheck.js";
 
 export class TitanActor extends Actor {
 

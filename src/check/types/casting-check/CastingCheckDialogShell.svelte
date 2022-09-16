@@ -5,7 +5,7 @@
    import { getContext } from "svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
-   import CheckDifficultySelect from "~/check/components/CheckDifficultySelect.svelte";
+   import CheckDifficultySelect from "~/helpers/svelte-components/CheckDifficultySelect.svelte";
    import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
    // The actor document making this check
@@ -204,7 +204,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import "../../../styles/Mixins.scss";
 
    .casting-check-dialog {
       @include flex-column;
