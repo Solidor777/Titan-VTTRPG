@@ -1,5 +1,5 @@
-import { TitanPlayerComponent } from "./player/Player.js";
-import { TitanNPCComponent } from "./npc/NPC.js";
+import { TitanPlayerComponent } from "./types/player/Player.js";
+import { TitanNPCComponent } from "./types/npc/NPC.js";
 import { ResistanceCheckDialog } from "~/check/resistance-check/ResistanceCheckDialog.js";
 import { SkillCheckDialog } from "~/check/skill-check/SkillCheckDialog.js";
 import { AttackCheckDialog } from "~/check/attack-check/AttackCheckDialog.js";

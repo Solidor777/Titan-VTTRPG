@@ -174,7 +174,7 @@
 </ApplicationShell>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    .player-sheet {
       display: flex;

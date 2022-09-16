@@ -8,7 +8,7 @@ import { registerSystemSettings } from "./helpers/RegisterSystemSettings.js";
 import { TitanActor } from "./actor/Actor.js";
 import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
-import TitanPlayerSheet from "./actor/player/PlayerSheet.js";
+import TitanPlayerSheet from "./actor/types/player/PlayerSheet.js";
 import TitanAbilitySheet from './item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';

@@ -1,5 +1,5 @@
 import PlayerSheetShell from './PlayerSheetShell.svelte';
-import TitanActorSheet from '../sheet/ActorSheet';
+import TitanActorSheet from '~/actor/sheet/ActorSheet';
 
 export default class TitanPlayerSheet extends TitanActorSheet {
    /**
