@@ -292,19 +292,6 @@
             "staticMod": 0
           }
         }
-      },
-      "base": {
-        "description": "",
-        "race": "",
-        "size": "",
-        "tags": [],
-        "version": 1.0
-      },
-      "casting": {
-        "tradition": []
-      },
-      "invocation": {
-        "tradition": []
       }
     },
     "player": {
@@ -326,109 +313,49 @@
   },
   "Item": {
     "types": [
-      "item",
-      "equipment",
       "armor",
       "weapon",
       "spell",
-      "ability"
+      "ability",
+      "effect"
     ],
     "templates": {
-      "base": {
-        "description": "",
+      "object": {
+        "check": [],
         "rarity": "common",
-        "rulesElements": [],
-        "traits": [],
-        "version": 1.0
-      },
-      "value": {
+        "rulesElement": [],
         "value": 0
-      },
-      "quantity": {
-        "quantity": 1
-      },
-      "expCost": {
-        "expCost": 2
-      },
-      "equipped": {
-        "equipped": false
-      },
-      "resolveCost": {
-        "resolveCost": 0
-      },
-      "check": {
-        "check": {
-          "difficulty": 4,
-          "complexity": 1,
-          "attribute": "mind",
-          "skill": "arcana"
-        }
-      },
-      "tradition": {
-        "tradition": "Any"
-      },
-      "checks": {
-        "check": []
       }
-    },
-    "gear": {
-      "templates": [
-        "base",
-        "value",
-        "quantity"
-      ]
-    },
-    "equipment": {
-      "templates": [
-        "base",
-        "value",
-        "equipped"
-      ]
     },
     "armor": {
       "templates": [
-        "base",
-        "value"
+        "object"
       ],
-      "armor": 2
+      "armor": 2,
+      "description": "",
+      "equipped": false
     },
     "weapon": {
       "templates": [
-        "base",
-        "value",
-        "equipped"
+        "object"
       ],
-      "attack": [
-        {
-          "name": "Attack",
-          "type": "melee",
-          "range": 1,
-          "attribute": "body",
-          "skill": "meleeWeapons",
-          "damage": 1,
-          "plusSuccessDamage": true,
-          "traits": []
-        }
-      ],
-      "multiAttack": false,
+      "attack": [],
       "attackDescription": "",
-      "resistanceChecks": []
+      "description": "",
+      "equipped": false,
+      "multiAttack": false
     },
     "spell": {
-      "templates": [
-        "base",
-        "duration",
-        "check",
-        "tradition"
-      ],
+      "description": "",
+      "rarity": "common",
+      "tradition": "any",
       "check": {
         "skill": "arcana",
         "attribute": "mind",
+        "difficulty": 4,
+        "complexity": 1,
         "autoCalculateCheck": true
       },
-      "difficulty": 4,
-      "complexity": 1,
-      "autoCalculateCheck": true,
       "standardAspects": {
         "range": {
           "enabled": true,
@@ -622,16 +549,19 @@
       "customAspects": []
     },
     "ability": {
-      "templates": [
-        "base",
-        "rarity",
-        "expCost",
-        "checks"
-      ],
+      "check": [],
+      "description": "",
+      "expCost": 0,
+      "rarity": "common",
+      "requirements": "",
+      "rulesElement": [],
       "action": false,
       "reaction": false,
-      "passive": false,
-      "requirements": ""
+      "passive": false
+    },
+    "effect": {
+      "description": "",
+      "rulesElement": []
     }
   }
 }
