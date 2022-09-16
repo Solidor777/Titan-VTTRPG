@@ -1,5 +1,5 @@
-import { clamp, localize } from "~/helpers/Utility";
-import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
+import { clamp, localize } from '~/helpers/Utility';
+import TitanSkillCheck from '~/check/types/skill-check/SkillCheck.js';
 
 export default class TitanAttackCheck extends TitanSkillCheck {
    _ensureValidConstruction(options) {
@@ -100,7 +100,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
          if (this.parameters.targetDefense !== false) {
             // Calculate the attacker rating
             const attackerRating =
-               this.parameters.type === "melee" ?
+               this.parameters.type === 'melee' ?
                   this.parameters.attackerMelee :
                   this.parameters.attackerAccuracy;
 
@@ -123,7 +123,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
       if (this.parameters.multiAttack) {
          const traits = checkAttack.traits;
          for (let idx = 0; idx < traits.length; idx++) {
-            if (traits[idx].name === "multiAttack") {
+            if (traits[idx].name === 'multiAttack') {
                this.parameters.multiAttack = true;
                break;
             }
@@ -202,9 +202,9 @@ export default class TitanAttackCheck extends TitanSkillCheck {
          img: this.parameters.img
       };
       if (this.parameters.targetDefense) {
-         let subLabel = "";
+         let subLabel = '';
 
-         if (this.parameters.type === "melee") {
+         if (this.parameters.type === 'melee') {
             subLabel = `${localize(`melee`)} (${this.parameters.attackerMelee})`;
          }
          else {
@@ -219,6 +219,6 @@ export default class TitanAttackCheck extends TitanSkillCheck {
    }
 
    _getCheckType() {
-      return "attackCheck";
+      return 'attackCheck';
    }
 }

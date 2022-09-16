@@ -1,11 +1,11 @@
-import { localize } from "~/helpers/Utility.js";
-import TitanCheck from "~/check/Check.js";
+import { localize } from '~/helpers/Utility.js';
+import TitanCheck from '~/check/Check.js';
 
 export default class TitanItemCheck extends TitanCheck {
    _initializeParameters(options) {
       // Get default parameters
       const parameters = {
-         attribute: options?.attribute ?? "body",
+         attribute: options?.attribute ?? 'body',
          skill: options?.skill ?? false,
          difficulty: options?.difficulty ?? 4,
          complexity: options?.complexity ?? 1,
@@ -45,7 +45,7 @@ export default class TitanItemCheck extends TitanCheck {
       // Opposed check parameters
       if (options?.opposedCheck) {
          parameters.opposedCheck = {
-            attribute: options.opposedCheck.attribute ?? "body",
+            attribute: options.opposedCheck.attribute ?? 'body',
             skill: options.opposedCheck.skill ?? false,
             difficulty: options.opposedCheck.difficulty ?? 4,
             complexity: options.opposedCheck.complexity ?? 1
@@ -115,15 +115,15 @@ export default class TitanItemCheck extends TitanCheck {
          // If resistance check, add it to the results
          if (this.parameters.resistanceCheck !== false) {
             switch (this.parameters.resistanceCheck) {
-               case "reflexes": {
+               case 'reflexes': {
                   results.reflexesCheck = true;
                   break;
                }
-               case "resilience": {
+               case 'resilience': {
                   results.resilienceCheck = true;
                   break;
                }
-               case "willpower": {
+               case 'willpower': {
                   results.willpowerCheck = true;
                   break;
                }
@@ -173,7 +173,7 @@ export default class TitanItemCheck extends TitanCheck {
    }
 
    _getCheckType() {
-      return "itemCheck";
+      return 'itemCheck';
    }
 
    _getTypeLabel() {

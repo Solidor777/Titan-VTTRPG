@@ -2,21 +2,22 @@ import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Global.scss';
 import './styles/Mixins.scss';
-import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
+import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import TitanConstants from './system/Constants.js';
 import TitanChatMessageTypes from './system/ChatMessageTypes.js';
 import registerSystemSettings from './system/RegisterSystemSettings.js';
-import TitanActor from "./actor/Actor.js";
-import TitanItem from "./item/Item.js";
-import TitanPlayerSheet from "./actor/types/player/PlayerSheet.js";
+import TitanActor from './actor/Actor.js';
+import TitanItem from './item/Item.js';
+import TitanPlayerSheet from './actor/types/player/PlayerSheet.js';
 import TitanAbilitySheet from './item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
+import TitanEffectSheet from './item/types/effect/sheet/EffectSheet.js';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
-import TitanWeaponSheet from "./item/types/weapon/sheet/WeaponSheet.js";
-import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
+import TitanWeaponSheet from './item/types/weapon/sheet/WeaponSheet.js';
+import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
 
-Hooks.once("init", async () => {
-   console.log("TITAN | Starting Titan VTTRPG System");
+Hooks.once('init', async () => {
+   console.log('TITAN | Starting Titan VTTRPG System');
 
    // Add custom constants for easy access
    CONFIG.TITAN = {
@@ -28,24 +29,28 @@ Hooks.once("init", async () => {
    CONFIG.Item.documentClass = TitanItem;
 
    // Register Sheet Classes
-   Actors.registerSheet("titan", TitanPlayerSheet, {
-      types: ["player"],
+   Actors.registerSheet('titan', TitanPlayerSheet, {
+      types: ['player'],
       makeDefault: true,
    });
-   Items.registerSheet("titan", TitanAbilitySheet, {
-      types: ["ability"],
+   Items.registerSheet('titan', TitanAbilitySheet, {
+      types: ['ability'],
       makeDefault: true,
    });
-   Items.registerSheet("titan", TitanArmorSheet, {
-      types: ["armor"],
+   Items.registerSheet('titan', TitanArmorSheet, {
+      types: ['armor'],
       makeDefault: true,
    });
-   Items.registerSheet("titan", TitanSpellSheet, {
-      types: ["spell"],
+   Items.registerSystemSettings('titan', TitanEffectSheet, {
+      types: ['effect'],
       makeDefault: true,
    });
-   Items.registerSheet("titan", TitanWeaponSheet, {
-      types: ["weapon"],
+   Items.registerSheet('titan', TitanSpellSheet, {
+      types: ['spell'],
+      makeDefault: true,
+   });
+   Items.registerSheet('titan', TitanWeaponSheet, {
+      types: ['weapon'],
       makeDefault: true,
    });
 

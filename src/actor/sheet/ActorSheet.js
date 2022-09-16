@@ -24,11 +24,11 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
-      if (game.user.isGM || (this.reactive.document.isOwner && game.user.can("TOKEN_CONFIGURE"))) {
+      if (game.user.isGM || (this.reactive.document.isOwner && game.user.can('TOKEN_CONFIGURE'))) {
          buttons.splice(1, 0, {
-            label: this.token ? "Token" : "TOKEN.TitlePrototype",
-            class: "configure-token",
-            icon: "fas fa-user-circle",
+            label: this.token ? 'Token' : 'TOKEN.TitlePrototype',
+            class: 'configure-token',
+            icon: 'fas fa-user-circle',
             onclick: (ev) => this._onConfigureToken(ev),
          });
       }
@@ -53,26 +53,26 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Add item
    async addItem(type) {
-      let itemName = "";
+      let itemName = '';
       switch (type) {
-         case "ability": {
-            itemName = localize("newAbility");
+         case 'ability': {
+            itemName = localize('newAbility');
             break;
          }
-         case "armor": {
-            itemName = localize("newArmor");
+         case 'armor': {
+            itemName = localize('newArmor');
             break;
          }
-         case "weapon": {
-            itemName = localize("newWeapon");
+         case 'weapon': {
+            itemName = localize('newWeapon');
             break;
          }
-         case "spell": {
-            itemName = localize("newSpell");
+         case 'spell': {
+            itemName = localize('newSpell');
             break;
          }
          default: {
-            itemName = localize("newItem");
+            itemName = localize('newItem');
             break;
          }
       }
@@ -82,7 +82,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          type: type,
       };
 
-      this.reactive.document.createEmbeddedDocuments("Item", [itemData]);
+      this.reactive.document.createEmbeddedDocuments('Item', [itemData]);
 
       return;
    }
@@ -93,7 +93,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       // If the item is valid
       if (item) {
          // If the item is armor
-         if (item.type === "armor") {
+         if (item.type === 'armor') {
             // If the armor is equipped, un-equip it
             if (this.reactive.document.system.equipped.armor === itemId) {
                this.reactive.document.unEquipArmor();
@@ -136,7 +136,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Check rolls
    async rollResistanceCheck(resistance) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+      const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.rollResistanceCheck({
          resistance: resistance,
@@ -148,7 +148,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Function for rolling a skill check
    async rollSkillCheck(skill) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+      const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.rollAttributeCheck({
          attribute: this.reactive.document.system.skill[skill].defaultAttribute,
@@ -161,12 +161,12 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Function for rolling a straight attribute check
    async rollAttributeCheck(attribute) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+      const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.rollAttributeCheck({
          attribute: attribute,
          getOptions: getOptions,
-         skill: "none",
+         skill: 'none',
       });
 
       return;
@@ -174,7 +174,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Function for rolling an attack check
    async rollAttackCheck(itemId, attackIdx) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+      const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.rollAttackCheck({
          itemId: itemId,
@@ -187,7 +187,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Function for rolling an casting check
    async rollCastingCheck(itemId) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+      const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.rollCastingCheck({
          itemId: itemId,
@@ -199,7 +199,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
    // Function for rolling an casting check
    async rollItemCheck(itemId, checkIdx) {
-      const getOptions = game.settings.get("titan", "getCheckOptions") === true || event.shiftKey;
+      const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.rollItemCheck({
          itemId: itemId,

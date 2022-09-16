@@ -1,4 +1,4 @@
-import { clamp, localize } from "~/helpers/Utility.js";
+import { clamp, localize } from '~/helpers/Utility.js';
 
 export default class TitanCheck {
   // Constructor
@@ -247,7 +247,7 @@ export default class TitanCheck {
         },
         options?.rollMode ?
           options.rollMode :
-          game.settings.get("core", "rollMode")
+          game.settings.get('core', 'rollMode')
       )
     );
 
@@ -270,10 +270,10 @@ export default class TitanCheck {
   }
 
   _getCheckType() {
-    return "check";
+    return 'check';
   }
 
   _getTypeLabel() {
-    return `${localize("check")} ${this.parameters.difficulty}:${this.parameters.complexity}`;
+    return `${localize('check')} ${this.parameters.difficulty}:${this.parameters.complexity}`;
   }
 }

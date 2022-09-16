@@ -6,7 +6,7 @@
 
       // GUARD: If element is not scrollable, remove all classes
       if (!isScrollable) {
-         node.classList.remove("is-bottom-overflowing", "is-top-overflowing");
+         node.classList.remove('is-bottom-overflowing', 'is-top-overflowing');
          return;
       }
 
@@ -15,14 +15,14 @@
       const isScrolledToBottom = node.scrollHeight <= node.clientHeight + node.scrollTop;
       const isScroledlToTop = node.scrollTop === 0;
       if (!isScrolledToBottom) {
-         scrollClass = " faded bottom-overflowing";
+         scrollClass = ' faded bottom-overflowing';
          if (!isScroledlToTop) {
-            scrollClass += " top-overflowing";
+            scrollClass += ' top-overflowing';
          }
       } else if (!isScroledlToTop) {
-         scrollClass = " faded top-overflowing";
+         scrollClass = ' faded top-overflowing';
       } else {
-         scrollClass = "";
+         scrollClass = '';
       } */
    }
 

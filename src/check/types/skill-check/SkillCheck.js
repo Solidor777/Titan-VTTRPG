@@ -1,12 +1,12 @@
-import { localize } from "~/helpers/Utility.js";
-import TitanAttributeCheck from "~/check/types/attribute-check/AttributeCheck.js";
+import { localize } from '~/helpers/Utility.js';
+import TitanAttributeCheck from '~/check/types/attribute-check/AttributeCheck.js';
 
 export default class TitanSkillCheck extends TitanAttributeCheck {
   _initializeParameters(options) {
     const parameters = super._initializeParameters(options);
 
     // Initialize skill parameters
-    parameters.skill = options.skill ?? "athletics";
+    parameters.skill = options.skill ?? 'athletics';
     parameters.trainingMod = options.trainingMod ?? 0;
     parameters.doubleTraining = options.doubleTraining ?? false;
     parameters.expertiseMod = options.expertiseMod ?? 0;
@@ -54,7 +54,7 @@ export default class TitanSkillCheck extends TitanAttributeCheck {
   }
 
   _getCheckType() {
-    return "skillCheck";
+    return 'skillCheck';
   }
 
   _getTypeLabel() {

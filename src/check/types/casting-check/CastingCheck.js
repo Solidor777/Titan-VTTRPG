@@ -1,4 +1,4 @@
-import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
+import TitanSkillCheck from '~/check/types/skill-check/SkillCheck.js';
 
 export default class TitanCastingCheck extends TitanSkillCheck {
    _ensureValidConstruction(options) {
@@ -131,15 +131,15 @@ export default class TitanCastingCheck extends TitanSkillCheck {
             // Resistance check
             if (aspect.resistanceCheck) {
                switch (aspect.resistanceCheck) {
-                  case "reflexes": {
+                  case 'reflexes': {
                      results.reflexesCheck = true;
                      break;
                   }
-                  case "resilience": {
+                  case 'resilience': {
                      results.resilienceCheck = true;
                      break;
                   }
-                  case "willpower": {
+                  case 'willpower': {
                      results.willpowerCheck = true;
                      break;
                   }
@@ -197,6 +197,6 @@ export default class TitanCastingCheck extends TitanSkillCheck {
    }
 
    _getCheckType() {
-      return "castingCheck";
+      return 'castingCheck';
    }
 }

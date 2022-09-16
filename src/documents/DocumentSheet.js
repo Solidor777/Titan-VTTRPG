@@ -1,8 +1,8 @@
-import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
-import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { writable } from 'svelte/store';
-import { localize } from "~/helpers/Utility.js";
-import DocumentShell from "./DocumentShell.svelte";
+import { localize } from '~/helpers/Utility.js';
+import DocumentShell from './DocumentShell.svelte';
 export default class SvelteDocumentSheet extends SvelteApplication {
    /**
     * Document store that monitors updates to any assigned document.
@@ -34,7 +34,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
        *
        * @memberof SvelteReactive#
        */
-      Object.defineProperty(this.reactive, "document", {
+      Object.defineProperty(this.reactive, 'document', {
          get: () => this.#documentStore.get(),
          set: (document) => {
             this.#documentStore.set(document);
@@ -47,7 +47,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
        *
        * @memberof SvelteReactive#
        */
-      Object.defineProperty(this.reactive, "state", {
+      Object.defineProperty(this.reactive, 'state', {
          get: () => this.#applicationStateStore,
          set: (state) => {
             this.#applicationStateStore = state;
@@ -63,12 +63,12 @@ export default class SvelteDocumentSheet extends SvelteApplication {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         title: "No Document Assigned",
+         title: 'No Document Assigned',
          width: 800,
          height: 600,
          resizable: true,
          minimizable: true,
-         dragDrop: [{ dragSelector: ".directory-list .item", dropSelector: null }],
+         dragDrop: [{ dragSelector: '.directory-list .item', dropSelector: null }],
          svelte: {
             class: DocumentShell,
             target: document.body,
@@ -85,9 +85,9 @@ export default class SvelteDocumentSheet extends SvelteApplication {
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
       buttons.unshift({
-         class: "configure-sheet",
-         icon: "fas fa-cog",
-         title: localize("openSheetConfigurator"),
+         class: 'configure-sheet',
+         icon: 'fas fa-cog',
+         title: localize('openSheetConfigurator'),
          onclick: (ev) => this._onConfigureSheet(ev),
       });
       return buttons;
@@ -105,7 +105,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
    _onDragStart(event) {
       {
          const li = event.currentTarget;
-         if (event.target.classList.contains("content-link")) {
+         if (event.target.classList.contains('content-link')) {
             return;
          }
 
@@ -129,11 +129,11 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          }
 
          // Set data transfer
-         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+         event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
       }
    }
    async _onDrop(event) {
-      if (this.reactive.document.documentName !== "Actor") {
+      if (this.reactive.document.documentName !== 'Actor') {
          return;
       }
       const data = TextEditor.getDragEventData(event);
@@ -147,27 +147,27 @@ export default class SvelteDocumentSheet extends SvelteApplication {
        * @param {ActorSheet} sheet The ActorSheet application
        * @param {object} data      The data that has been dropped onto the sheet
        */
-      const allowed = Hooks.call("dropActorSheetData", actor, this, data);
+      const allowed = Hooks.call('dropActorSheetData', actor, this, data);
       if (allowed === false) {
          return;
       }
 
       // Handle different data types
       switch (data.type) {
-         case "ActiveEffect": {
+         case 'ActiveEffect': {
             return this._onDropActiveEffect(event, data, actor);
          }
-         case "Actor": {
+         case 'Actor': {
             return this._onDropActor(event, data, actor);
          }
-         case "Item": {
+         case 'Item': {
             return this._onDropItem(event, data, actor);
          }
-         case "Folder": {
+         case 'Folder': {
             return this._onDropFolder(event, data, actor);
          }
          default: {
-            console.error("TITAN | Impossible type in _onDrop.");
+            console.error('TITAN | Impossible type in _onDrop.');
             return;
          }
       }
@@ -210,7 +210,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       if (!actor.isOwner) {
          return [];
       }
-      if (data.documentName !== "Item") {
+      if (data.documentName !== 'Item') {
          return [];
       }
       const folder = await Folder.implementation.fromDropData(data);
@@ -226,14 +226,14 @@ export default class SvelteDocumentSheet extends SvelteApplication {
 
    async _onDropItemCreate(itemData, actor) {
       itemData = itemData instanceof Array ? itemData : [itemData];
-      return actor.createEmbeddedDocuments("Item", itemData);
+      return actor.createEmbeddedDocuments('Item', itemData);
    }
 
    _onSortItem(event, itemData, actor) {
       // Get the drag source and drop target
       const items = actor.items;
       const source = items.get(itemData._id);
-      const dropTarget = event.target.closest("[data-item-id]");
+      const dropTarget = event.target.closest('[data-item-id]');
       if (!dropTarget) {
          return;
       }
@@ -262,7 +262,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       });
 
       // Perform the update
-      return actor.updateEmbeddedDocuments("Item", updateData);
+      return actor.updateEmbeddedDocuments('Item', updateData);
 
    }
 
@@ -309,8 +309,8 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       const { action, data, documentType } = options;
 
       // I need to add a 'subscribe' action to TJSDocument so must check void.
-      if ((action === void 0 || action === "update" || action === "subscribe") && doc) {
-         this.reactive.title = doc?.isToken ? `[Token] ${doc?.name}` : doc?.name ?? "No Document Assigned";
+      if ((action === void 0 || action === 'update' || action === 'subscribe') && doc) {
+         this.reactive.title = doc?.isToken ? `[Token] ${doc?.name}` : doc?.name ?? 'No Document Assigned';
       }
    }
 

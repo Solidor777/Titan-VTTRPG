@@ -15,25 +15,25 @@ export default function flatModifier(selector, key, value, actorData) {
 
    // Switch depending on the selector
    switch (selector) {
-      case "attribute": {
+      case 'attribute': {
          return applyModifier(actorData.attribute[key]);
       }
-      case "resistance": {
+      case 'resistance': {
          return applyModifier(actorData.resistance[key]);
       }
-      case "training": {
+      case 'training': {
          return applyModifier(actorData.skill[key].training);
       }
-      case "rating": {
+      case 'rating': {
          return applyModifier(actorData.rating[key]);
       }
-      case "resource": {
+      case 'resource': {
          return applyModifier(actorData.resource[key]);
       }
-      case "speed": {
+      case 'speed': {
          return applyModifier(actorData.speed[key]);
       }
-      case "mod": {
+      case 'mod': {
          return applyModifier(actorData.mod[key]);
       }
       default: {

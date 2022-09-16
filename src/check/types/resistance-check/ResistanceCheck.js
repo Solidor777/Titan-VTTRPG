@@ -1,5 +1,5 @@
-import { localize } from "~/helpers/Utility.js";
-import TitanCheck from "~/check/Check.js";
+import { localize } from '~/helpers/Utility.js';
+import TitanCheck from '~/check/Check.js';
 
 export default class TitanResistanceCheck extends TitanCheck {
   _ensureValidConstruction(inData) {
@@ -10,7 +10,7 @@ export default class TitanResistanceCheck extends TitanCheck {
     // Check if actor check data is valid
     if (!inData?.actorRollData) {
       console.error(
-        "TITAN | Resistance Check failed during construction. No provided Actor Check Data."
+        'TITAN | Resistance Check failed during construction. No provided Actor Check Data.'
       );
       return false;
     }
@@ -22,7 +22,7 @@ export default class TitanResistanceCheck extends TitanCheck {
     const parameters = super._initializeParameters(inData);
 
     // Initialize resistance parameters
-    parameters.resistance = inData.resistance ?? "reflex";
+    parameters.resistance = inData.resistance ?? 'reflex';
 
     return parameters;
   }
@@ -48,7 +48,7 @@ export default class TitanResistanceCheck extends TitanCheck {
   }
 
   _getCheckType() {
-    return "resistanceCheck";
+    return 'resistanceCheck';
   }
 
   _getTypeLabel() {

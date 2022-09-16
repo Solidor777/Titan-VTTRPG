@@ -1,6 +1,6 @@
-import TitanAbility from "./types/ability/Ability.js";
-import TitanSpell from "./types/spell/Spell.js";
-import TitanWeapon from "./types/weapon/Weapon.js";
+import TitanAbility from './types/ability/Ability.js';
+import TitanSpell from './types/spell/Spell.js';
+import TitanWeapon from './types/weapon/Weapon.js';
 
 export default class TitanItem extends Item {
    prepareDerivedData() {
@@ -10,21 +10,21 @@ export default class TitanItem extends Item {
       if (!this.system.typeComponent) {
          switch (this.type) {
             // Ability
-            case "ability": {
+            case 'ability': {
                this.typeComponent = new TitanAbility(this);
                this.ability = this.typeComponent;
                break;
             }
 
             // Spell
-            case "spell": {
+            case 'spell': {
                this.typeComponent = new TitanSpell(this);
                this.spell = this.typeComponent;
                break;
             }
 
             // Weapon
-            case "weapon": {
+            case 'weapon': {
                this.typeComponent = new TitanWeapon(this);
                this.weapon = this.typeComponent;
                break;
@@ -75,7 +75,7 @@ export default class TitanItem extends Item {
             },
             options?.rollMode ?
                options.rollMode :
-               game.settings.get("core", "rollMode")
+               game.settings.get('core', 'rollMode')
          )
       );
    }

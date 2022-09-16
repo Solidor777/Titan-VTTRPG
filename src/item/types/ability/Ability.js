@@ -1,10 +1,10 @@
-import TitanTypeComponent from "~/helpers/TypeComponent";
+import TitanTypeComponent from '~/helpers/TypeComponent';
 
 function getCheckTemplate() {
    return {
-      label: localize("check"),
-      attribute: "body",
-      skill: "athletics",
+      label: localize('check'),
+      attribute: 'body',
+      skill: 'athletics',
       difficulty: 4,
       complexity: 1,
       resolveCost: 0,
@@ -12,11 +12,11 @@ function getCheckTemplate() {
       isHealing: false,
       initialValue: 1,
       scaling: true,
-      resistanceCheck: "none",
+      resistanceCheck: 'none',
       opposedCheck: {
          enabled: false,
-         attribute: "body",
-         skill: "athletics"
+         attribute: 'body',
+         skill: 'athletics'
       },
    };
 }

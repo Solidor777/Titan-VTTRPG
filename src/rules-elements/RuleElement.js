@@ -1,12 +1,12 @@
-import flatModifier from "./FlatModifier";
+import flatModifier from './FlatModifier';
 
 export function getRuleElementTemplate() {
    return {
-      operation: "flatModifier",
-      selector: "attribute",
-      key: "body",
+      operation: 'flatModifier',
+      selector: 'attribute',
+      key: 'body',
       value: 1,
-      type: "effect",
+      type: 'effect',
    };
 }
 
@@ -24,7 +24,7 @@ export function applyRuleElement(element, actorData) {
 
    // Select the appropriate element
    switch (element.operation) {
-      case "flatModifier": {
+      case 'flatModifier': {
          if (!flatModifier(element.selector, element.key, element.value, actorData)) {
             console.error(`TITAN | Error applying Flat Modifier.`);
             return false;

@@ -1,5 +1,5 @@
-import { localize } from "~/helpers/Utility.js";
-import TitanTypeComponent from "~/helpers/TypeComponent";
+import { localize } from '~/helpers/Utility.js';
+import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanWeapon extends TitanTypeComponent {
 
@@ -52,11 +52,11 @@ export default class TitanWeapon extends TitanTypeComponent {
 
    getAttackTemplate() {
       return {
-         name: localize("attack"),
-         type: "melee",
+         name: localize('attack'),
+         type: 'melee',
          range: 1,
-         attribute: "body",
-         skill: "meleeWeapons",
+         attribute: 'body',
+         skill: 'meleeWeapons',
          damage: 1,
          plusSuccessDamage: true,
          traits: [],

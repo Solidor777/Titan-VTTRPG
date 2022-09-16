@@ -1,4 +1,4 @@
-import TitanTypeComponent from "~/helpers/TypeComponent";
+import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanPlayerComponent extends TitanTypeComponent {
   // Prepare Player type specific data

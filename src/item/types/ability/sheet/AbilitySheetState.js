@@ -10,7 +10,7 @@ export default function createAbilitySheetState() {
       isExpanded: {
          checks: []
       },
-      activeTab: "description"
+      activeTab: 'description'
    });
 
    function addCheck() {

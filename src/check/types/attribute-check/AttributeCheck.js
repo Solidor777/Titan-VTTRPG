@@ -1,5 +1,5 @@
-import { localize } from "~/helpers/Utility.js";
-import TitanCheck from "~/check/Check.js";
+import { localize } from '~/helpers/Utility.js';
+import TitanCheck from '~/check/Check.js';
 
 export default class TitanAttributeCheck extends TitanCheck {
   _ensureValidConstruction(options) {
@@ -10,7 +10,7 @@ export default class TitanAttributeCheck extends TitanCheck {
     // Check if actor check data is valid
     if (!options?.actorRollData) {
       console.error(
-        "TITAN | Attribute Check failed during construction. No provided Actor Check Data."
+        'TITAN | Attribute Check failed during construction. No provided Actor Check Data.'
       );
       return false;
     }
@@ -22,7 +22,7 @@ export default class TitanAttributeCheck extends TitanCheck {
     const parameters = super._initializeParameters(options);
 
     // Initialize attribute parameters
-    parameters.attribute = options.attribute ?? "body";
+    parameters.attribute = options.attribute ?? 'body';
 
     return parameters;
   }
@@ -48,7 +48,7 @@ export default class TitanAttributeCheck extends TitanCheck {
   }
 
   _getCheckType() {
-    return "attributeCheck";
+    return 'attributeCheck';
   }
 
   _getTypeLabel() {

@@ -1,16 +1,16 @@
-import { clamp } from "~/helpers/Utility.js";
-import TitanPlayerComponent from "./types/player/Player.js";
-import TitanNPCComponent from "./types/npc/NPC.js";
-import ResistanceCheckDialog from "~/check/types/resistance-check/ResistanceCheckDialog.js";
-import SkillCheckDialog from "~/check/types/skill-check/SkillCheckDialog.js";
-import AttackCheckDialog from "~/check/types/attack-check/AttackCheckDialog.js";
-import CastingCheckDialog from "~/check/types/casting-check/CastingCheckDialog.js";
-import TitanAttributeCheck from "~/check/types/attribute-check/AttributeCheck.js";
-import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
-import TitanResistanceCheck from "~/check/types/resistance-check/ResistanceCheck.js";
-import TitanAttackCheck from "~/check/types/attack-check/AttackCheck.js";
-import TitanCastingCheck from "~/check/types/casting-check/CastingCheck.js";
-import TitanItemCheck from "~/check/types/item-check/ItemCheck.js";
+import { clamp } from '~/helpers/Utility.js';
+import TitanPlayerComponent from './types/player/Player.js';
+import TitanNPCComponent from './types/npc/NPC.js';
+import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
+import SkillCheckDialog from '~/check/types/skill-check/SkillCheckDialog.js';
+import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
+import CastingCheckDialog from '~/check/types/casting-check/CastingCheckDialog.js';
+import TitanAttributeCheck from '~/check/types/attribute-check/AttributeCheck.js';
+import TitanSkillCheck from '~/check/types/skill-check/SkillCheck.js';
+import TitanResistanceCheck from '~/check/types/resistance-check/ResistanceCheck.js';
+import TitanAttackCheck from '~/check/types/attack-check/AttackCheck.js';
+import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
+import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 
 export default class TitanActor extends Actor {
 
@@ -23,14 +23,14 @@ export default class TitanActor extends Actor {
       if (!this.system.typeComponent) {
          switch (this.type) {
             // Player
-            case "player": {
+            case 'player': {
                this.typeComponent = new TitanPlayerComponent(this);
                this.player = this.typeComponent;
                break;
             }
 
             // NPC
-            case "npc": {
+            case 'npc': {
                this._prepareNpcData();
                this.typeComponent = new TitanNPCComponent(this);
                this.npc = this.typeComponent;
@@ -39,7 +39,7 @@ export default class TitanActor extends Actor {
 
             // Default is an error
             default: {
-               console.error("TITAN: Invalid actor type when preparing derived data.");
+               console.error('TITAN: Invalid actor type when preparing derived data.');
                break;
             }
          }
@@ -182,20 +182,20 @@ export default class TitanActor extends Actor {
       const initiative = this.system.rating.initiative.value;
 
       // Get the initiative formula
-      let initiativeFormula = "";
-      const initiativeSettings = game.settings.get("titan", "initiativeFormula");
-      if (initiativeSettings === "roll2d6") {
-         initiativeFormula = "2d6+";
+      let initiativeFormula = '';
+      const initiativeSettings = game.settings.get('titan', 'initiativeFormula');
+      if (initiativeSettings === 'roll2d6') {
+         initiativeFormula = '2d6+';
       }
-      else if (initiativeSettings === "roll1d6") {
-         initiativeFormula = "1d6+";
+      else if (initiativeSettings === 'roll1d6') {
+         initiativeFormula = '1d6+';
       }
 
       const roll = new Roll(
          initiativeFormula +
          initiative.toString() +
          (options !== undefined && options.bonus !== undefined ?
-            options.bonus.toString() : "")
+            options.bonus.toString() : '')
       );
       const retVal = {
          outRoll: roll,
@@ -213,7 +213,7 @@ export default class TitanActor extends Actor {
       options.actorRollData = actorRollData;
 
       // Check if the skill is none
-      if (options.skill === "none") {
+      if (options.skill === 'none') {
          // If so, do an attribute check
          delete options.skill;
          delete options.trainingMod;
@@ -241,7 +241,7 @@ export default class TitanActor extends Actor {
          await attributeCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            rollMode: game.settings.get("core", "rollMode"),
+            rollMode: game.settings.get('core', 'rollMode'),
          });
       }
    }
@@ -275,7 +275,7 @@ export default class TitanActor extends Actor {
          await resistanceCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            rollMode: game.settings.get("core", "rollMode"),
+            rollMode: game.settings.get('core', 'rollMode'),
          });
       }
 
@@ -286,9 +286,9 @@ export default class TitanActor extends Actor {
    async getAttackCheck(options) {
       // Get the weapon check data.
       const checkWeapon = this.items.get(options?.itemId);
-      if (!checkWeapon || checkWeapon.type !== "weapon") {
+      if (!checkWeapon || checkWeapon.type !== 'weapon') {
          console.error(
-            "TITAN | Attack check failed. Invalid weapon ID provided to actor."
+            'TITAN | Attack check failed. Invalid weapon ID provided to actor.'
          );
 
          return false;
@@ -328,7 +328,7 @@ export default class TitanActor extends Actor {
          const checkWeapon = this.items.get(options?.itemId);
          if (!checkWeapon) {
             console.error(
-               "TITAN | Attack check failed. Invalid weapon ID provided to actor."
+               'TITAN | Attack check failed. Invalid weapon ID provided to actor.'
             );
 
             return false;
@@ -338,7 +338,7 @@ export default class TitanActor extends Actor {
          const checkAttack = checkWeapon.system.attack[options.attackIdx];
          if (!checkAttack) {
             console.error(
-               "TITAN | Attack check failed. Invalid Attack Index provided to actor."
+               'TITAN | Attack check failed. Invalid Attack Index provided to actor.'
             );
 
             return false;
@@ -378,7 +378,7 @@ export default class TitanActor extends Actor {
          await attackCHeck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            rollMode: game.settings.get("core", "rollMode"),
+            rollMode: game.settings.get('core', 'rollMode'),
          });
       }
 
@@ -388,9 +388,9 @@ export default class TitanActor extends Actor {
    async getCastingCheck(options) {
       // Get the weapon check data.
       const checkSpell = this.items.get(options?.itemId);
-      if (!checkSpell || checkSpell.type !== "spell") {
+      if (!checkSpell || checkSpell.type !== 'spell') {
          console.error(
-            "TITAN | Casting check failed. Invalid Spell ID provided to actor."
+            'TITAN | Casting check failed. Invalid Spell ID provided to actor.'
          );
 
          return false;
@@ -417,9 +417,9 @@ export default class TitanActor extends Actor {
       if (options?.getOptions === true) {
          // Get the spell check data.
          const checkSpell = this.items.get(options?.itemId);
-         if (!checkSpell || checkSpell.type !== "spell") {
+         if (!checkSpell || checkSpell.type !== 'spell') {
             console.error(
-               "TITAN | Casting check failed. Invalid Spell ID provided to actor."
+               'TITAN | Casting check failed. Invalid Spell ID provided to actor.'
             );
 
             return false;
@@ -448,7 +448,7 @@ export default class TitanActor extends Actor {
          await castingCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            rollMode: game.settings.get("core", "rollMode"),
+            rollMode: game.settings.get('core', 'rollMode'),
          });
       }
 
@@ -460,7 +460,7 @@ export default class TitanActor extends Actor {
       const checkItem = this.items.get(options?.itemId);
       if (!checkItem) {
          console.error(
-            "TITAN | Item Check failed. Invalid Item provided to actor."
+            'TITAN | Item Check failed. Invalid Item provided to actor.'
          );
 
          return false;
@@ -470,7 +470,7 @@ export default class TitanActor extends Actor {
       const checkData = checkItem.system.check[0];
       if (!checkData) {
          console.error(
-            "TITAN | Item Check failed. Invalid Check IDX provided to actor."
+            'TITAN | Item Check failed. Invalid Check IDX provided to actor.'
          );
 
          return false;
@@ -505,7 +505,7 @@ export default class TitanActor extends Actor {
    async rollItemCheck(options) {
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
-         console.log("ToDo.");
+         console.log('ToDo.');
       }
 
       // Otherwise, get a check
@@ -515,7 +515,7 @@ export default class TitanActor extends Actor {
          await itemCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
-            rollMode: game.settings.get("core", "rollMode"),
+            rollMode: game.settings.get('core', 'rollMode'),
          });
       }
 
@@ -572,7 +572,7 @@ export default class TitanActor extends Actor {
 
       // Create the damage report message
       const chatContext = {
-         type: "damageReport",
+         type: 'damageReport',
          actorName: this.name,
          baseDamage: baseDamage,
          damage: damage,
@@ -589,7 +589,7 @@ export default class TitanActor extends Actor {
          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
          sound: CONFIG.sounds.notification,
          whisper: game.users.filter((user) =>
-            this.testUserPermission(user, "OWNER")
+            this.testUserPermission(user, 'OWNER')
          ),
          flags: {
             titan: {
@@ -620,7 +620,7 @@ export default class TitanActor extends Actor {
 
       // Create the damage report message
       const chatContext = {
-         type: "healingReport",
+         type: 'healingReport',
          actorName: this.name,
          healing: healing,
          stamina: this.system.resource.stamina,
@@ -634,7 +634,7 @@ export default class TitanActor extends Actor {
          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
          sound: CONFIG.sounds.notification,
          whisper: game.users.filter((user) =>
-            this.testUserPermission(user, "OWNER")
+            this.testUserPermission(user, 'OWNER')
          ),
          flags: {
             titan: {
@@ -650,8 +650,8 @@ export default class TitanActor extends Actor {
    equipArmor(armorId) {
       // Ensure the armor is valid
       const armor = this.items.get(armorId);
-      if (!armor && armor.type === "armor") {
-         console.error("TITAN | Error equipping Armor. Invalid Armor ID.");
+      if (!armor && armor.type === 'armor') {
+         console.error('TITAN | Error equipping Armor. Invalid Armor ID.');
       }
 
       // Update the armor
@@ -707,7 +707,7 @@ export default class TitanActor extends Actor {
       await item.sendToChat({
          user: game.user.id,
          speaker: ChatMessage.getSpeaker({ actor: this }),
-         rollMode: game.settings.get("core", "rollMode"),
+         rollMode: game.settings.get('core', 'rollMode'),
       });
 
       return;

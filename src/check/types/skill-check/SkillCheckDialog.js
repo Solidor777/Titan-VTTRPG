@@ -1,11 +1,11 @@
-import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-import { localize } from "~/helpers/Utility.js";
-import SkillCheckDialogShell from "./SkillCheckDialogShell.svelte";
+import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { localize } from '~/helpers/Utility.js';
+import SkillCheckDialogShell from './SkillCheckDialogShell.svelte';
 export default class SkillCheckDialog extends TJSDialog {
   constructor(actor, options) {
     super(
       {
-        title: `${localize("skillCheck")} (${actor.name})`,
+        title: `${localize('skillCheck')} (${actor.name})`,
         content: {
           class: SkillCheckDialogShell,
           props: {

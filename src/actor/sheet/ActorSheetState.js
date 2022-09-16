@@ -17,11 +17,11 @@ export default function createActorSheetState() {
          spells: {},
       },
       filter: {
-         abilities: "",
-         actions: "",
-         inventory: "",
-         skills: "",
-         spells: ""
+         abilities: '',
+         actions: '',
+         inventory: '',
+         skills: '',
+         spells: ''
       },
       filterOptions: {
          abilities: {
@@ -30,7 +30,7 @@ export default function createActorSheetState() {
             passive: false
          }
       },
-      activeTab: "skills"
+      activeTab: 'skills'
    });
 
    // Remove an item
