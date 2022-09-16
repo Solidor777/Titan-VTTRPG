@@ -1,7 +1,6 @@
-import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
+import TitanTypeComponent from "~/helpers/TypeComponent";
 
-export function
-   getCheckTemplate() {
+function getCheckTemplate() {
    return {
       label: game.i18n.localize("LOCAL.check.label"),
       attribute: "body",
@@ -22,7 +21,7 @@ export function
    };
 }
 
-export class TitanAbility extends TitanTypeComponent {
+export default class TitanAbility extends TitanTypeComponent {
 
    async addCheck() {
       const retVal = this.parent.system.check.push(getCheckTemplate());

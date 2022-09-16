@@ -1,5 +1,5 @@
-import { TitanTypeComponent } from "~/helpers/TypeComponent";
+import TitanTypeComponent from "~/helpers/TypeComponent";
 
-export class TitanNPCComponent extends TitanTypeComponent {
+export default class TitanNPCComponent extends TitanTypeComponent {
 
 }

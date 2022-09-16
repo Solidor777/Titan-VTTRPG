@@ -1,4 +1,4 @@
-export class TitanTypeComponent {
+export default class TitanTypeComponent {
   constructor(parent) {
     this.parent = parent;
   }

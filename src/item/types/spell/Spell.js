@@ -1,6 +1,6 @@
-import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
+import TitanTypeComponent from "~/helpers/TypeComponent";
 
-export function getCustomAspectTemplate() {
+function getCustomAspectTemplate() {
    return {
       label: game.i18n.localize("LOCAL.customAspect.label"),
       scaling: true,
@@ -12,7 +12,7 @@ export function getCustomAspectTemplate() {
    };
 }
 
-export class TitanSpell extends TitanTypeComponent {
+export default class TitanSpell extends TitanTypeComponent {
    prepareDerivedData() {
       // Reset aspects array
       this.parent.aspects = [];

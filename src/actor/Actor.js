@@ -1,10 +1,10 @@
-import { TitanPlayerComponent } from "./types/player/Player.js";
-import { TitanNPCComponent } from "./types/npc/NPC.js";
-import { ResistanceCheckDialog } from "~/check/types/resistance-check/ResistanceCheckDialog.js";
-import { SkillCheckDialog } from "~/check/types/skill-check/SkillCheckDialog.js";
-import { AttackCheckDialog } from "~/check/types/attack-check/AttackCheckDialog.js";
-import { CastingCheckDialog } from "~/check/types/casting-check/CastingCheckDialog.js";
 import { clamp } from "~/helpers/Utility.js";
+import TitanPlayerComponent from "./types/player/Player.js";
+import TitanNPCComponent from "./types/npc/NPC.js";
+import ResistanceCheckDialog from "~/check/types/resistance-check/ResistanceCheckDialog.js";
+import SkillCheckDialog from "~/check/types/skill-check/SkillCheckDialog.js";
+import AttackCheckDialog from "~/check/types/attack-check/AttackCheckDialog.js";
+import CastingCheckDialog from "~/check/types/casting-check/CastingCheckDialog.js";
 import TitanAttributeCheck from "~/check/types/attribute-check/AttributeCheck.js";
 import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
 import TitanResistanceCheck from "~/check/types/resistance-check/ResistanceCheck.js";

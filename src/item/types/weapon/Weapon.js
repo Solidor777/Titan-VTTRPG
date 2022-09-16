@@ -1,6 +1,6 @@
-import { TitanTypeComponent } from "~/helpers/TypeComponent.js";
+import TitanTypeComponent from "~/helpers/TypeComponent";
 
-export function getAttackTemplate() {
+function getAttackTemplate() {
    return {
       name: game.i18n.localize(CONFIG.TITAN.local.attack),
       type: "melee",
@@ -13,7 +13,7 @@ export function getAttackTemplate() {
    };
 }
 
-export class TitanWeapon extends TitanTypeComponent {
+export default class TitanWeapon extends TitanTypeComponent {
    async addAttack() {
       // Create the new attack
       const newAttack = getAttackTemplate();
