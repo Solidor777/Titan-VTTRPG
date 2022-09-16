@@ -1,5 +1,5 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import { ArmorEditTraitsDialog } from './ArmorEditTraitsDialog';
+import ArmorEditTraitsDialog from './ArmorEditTraitsDialog';
 import ArmorSheetShell from './ArmorSheetShell.svelte';
 
 export default class TitanArmorSheet extends TitanItemSheet {

@@ -3,5 +3,5 @@ export function clamp(value, min, max) {
 }
 
 export function localize(string) {
-  return game.i18n.localize(string);
+  return game.i18n.localize(`LOCAL.${string}.label`);
 }

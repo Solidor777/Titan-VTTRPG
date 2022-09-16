@@ -1,5 +1,5 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import { WeaponEditAttackTraitsDialog } from "./WeaponEditAttackTraitsDialog.js";
+import WeaponEditAttackTraitsDialog from './WeaponEditAttackTraitsDialog';
 import WeaponSheetShell from './WeaponSheetShell.svelte';
 
 export default class TitanWeaponSheet extends TitanItemSheet {

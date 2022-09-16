@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ActorActionsWeapon from "./items/ActorActionsWeapon.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
