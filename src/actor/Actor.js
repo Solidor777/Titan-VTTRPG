@@ -12,7 +12,7 @@ import TitanAttackCheck from "~/check/types/attack-check/AttackCheck.js";
 import TitanCastingCheck from "~/check/types/casting-check/CastingCheck.js";
 import TitanItemCheck from "~/check/types/item-check/ItemCheck.js";
 
-export class TitanActor extends Actor {
+export default class TitanActor extends Actor {
 
    // Prepare calculated data
    prepareDerivedData() {

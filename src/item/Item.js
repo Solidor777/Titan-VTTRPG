@@ -2,7 +2,7 @@ import TitanAbility from "./types/ability/Ability.js";
 import TitanSpell from "./types/spell/Spell.js";
 import TitanWeapon from "./types/weapon/Weapon.js";
 
-export class TitanItem extends Item {
+export default class TitanItem extends Item {
    prepareDerivedData() {
       // Prepare universal character data
 

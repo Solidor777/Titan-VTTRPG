@@ -1,5 +1,6 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import EffectSheetShell from './EffectSheetShell.svelte';
+import createEffectSheetState from './EffectSheetState';
 
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
@@ -10,12 +11,18 @@ export default class TitanEffectSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 600,
-         height: 500,
+         width: 650,
+         height: 650,
          svelte: {
             class: EffectSheetShell,
             target: document.body
          }
       });
    }
+
+   constructor(object) {
+      super(object);
+      this.reactive.state = createEffectSheetState();
+   }
+
 }

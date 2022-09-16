@@ -2,32 +2,18 @@ import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Global.scss';
 import './styles/Mixins.scss';
-import TitanConstants from './system/Constants';
-import registerSystemSettings from './system/RegisterSystemSettings';
-import { TitanActor } from "./actor/Actor.js";
-import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
+import TitanConstants from './system/Constants.js';
+import TitanChatMessageTypes from './system/ChatMessageTypes.js';
+import registerSystemSettings from './system/RegisterSystemSettings.js';
+import TitanActor from "./actor/Actor.js";
+import TitanItem from "./item/Item.js";
 import TitanPlayerSheet from "./actor/types/player/PlayerSheet.js";
 import TitanAbilitySheet from './item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from "./item/types/weapon/sheet/WeaponSheet.js";
 import ChatMessageShell from "./chat-message/ChatMessageShell.svelte";
-
-const validChatMessageTypes = Object.freeze(new Set([
-   'attributeCheck',
-   'skillCheck',
-   'resistanceCheck',
-   'attackCheck',
-   'castingCheck',
-   'itemCheck',
-   'armor',
-   'weapon',
-   'spell',
-   'ability',
-   'damageReport',
-   'healingReport'
-]));
 
 Hooks.once("init", async () => {
    console.log("TITAN | Starting Titan VTTRPG System");
@@ -73,7 +59,7 @@ Hooks.on('renderChatMessage', (message, html) => {
    // Check if this is a valid titan chat message
    const chatContext = message.getFlag('titan', 'chatContext');
 
-   if (validChatMessageTypes.has(chatContext?.type)) {
+   if (TitanChatMessageTypes.has(chatContext?.type)) {
       // If so, create the chat message shell and display the message
       const documentStore = new TJSDocument(message);
       message._svelteComponent = new ChatMessageShell({
