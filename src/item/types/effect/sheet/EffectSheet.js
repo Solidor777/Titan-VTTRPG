@@ -11,8 +11,8 @@ export default class TitanEffectSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 650,
-         height: 650,
+         width: 450,
+         height: 450,
          svelte: {
             class: EffectSheetShell,
             target: document.body

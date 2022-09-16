@@ -84,4 +84,3 @@ Hooks.on('preDeleteChatMessage', (message) => {
       message._svelteComponent.$destroy();
    }
 });
-

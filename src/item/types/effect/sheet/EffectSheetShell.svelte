@@ -7,6 +7,8 @@
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import EffectSheetDescriptionTab from "./EffectSheetDescriptionTab.svelte";
+   import EffectSheetHeader from "./EffectSheetHeader.svelte";
+   import ItemSheetRulesElementsTab from "~/item/sheet/ItemSheetRulesElementsTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -23,21 +25,24 @@
          id: "description",
          component: EffectSheetDescriptionTab,
       },
+      {
+         label: localize("rulesElements"),
+         id: "rulesElements",
+         component: ItemSheetRulesElementsTab,
+      },
    ];
 </script>
 
 <ApplicationShell bind:elementRoot>
    <div class="ability-sheet">
       <!--Header-->
-      <div class="header">Header</div>
+      <div class="header">
+         <EffectSheetHeader />
+      </div>
 
-      <!--Content-->
-      <div class="body">
-         <div class="sidebar">Sidebar</div>
-
-         <div class="tabs">
-            <Tabs {tabs} bind:activeTab={$appState.activeTab} />
-         </div>
+      <!--Tabs-->
+      <div class="tabs">
+         <Tabs {tabs} bind:activeTab={$appState.activeTab} />
       </div>
    </div>
 </ApplicationShell>
@@ -51,23 +56,11 @@
       display: flex;
       flex: 1;
 
-      .body {
+      .tabs {
          @include flex-row;
+         margin-top: 0.5rem;
          height: 100%;
          width: 100%;
-
-         .sidebar {
-            @include flex-row;
-            width: 13rem;
-            min-width: 13rem;
-            margin: 0.5rem 0.5rem 0 0;
-         }
-
-         .tabs {
-            @include flex-row;
-            margin-top: 0.5rem;
-            width: 100%;
-         }
       }
    }
 </style>
