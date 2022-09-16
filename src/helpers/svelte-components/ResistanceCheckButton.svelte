@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
@@ -40,7 +40,7 @@
          rollResistanceCheck();
       }}
    >
-      {`${localize(`LOCAL.${resistance}.label`)} ${difficulty}:${complexity}`}
+      {`${localize(`${resistance}`)} ${difficulty}:${complexity}`}
    </EfxButton>
 </div>
 

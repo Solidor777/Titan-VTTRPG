@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ActorInventoryWeapon from "./items/ActorInventoryWeapon.svelte";
    import ActorInventoryArmor from "./items/ActorInventoryArmor.svelte";
@@ -23,7 +23,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.weapons.label")}
+               {localize("weapons")}
             </div>
 
             <!--Weapon List-->
@@ -44,7 +44,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.armor.label")}
+               {localize("armor")}
             </div>
 
             <!--Armor list-->

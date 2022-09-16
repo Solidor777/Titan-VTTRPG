@@ -4,7 +4,7 @@
    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
@@ -26,22 +26,22 @@
    // Tabs
    const tabs = [
       {
-         label: localize("LOCAL.description.label"),
+         label: localize("description"),
          id: "description",
          component: SpellSheetDescriptionTab,
       },
       {
-         label: localize("LOCAL.standardAspects.label"),
+         label: localize("standardAspects"),
          id: "standardAspects",
          component: SpellSheetStandardAspectsTab,
       },
       {
-         label: localize("LOCAL.customAspects.label"),
+         label: localize("customAspects"),
          id: "customAspects",
          component: SpellSheetCustomAspectsTab,
       },
       {
-         label: localize("LOCAL.castingCheck.label"),
+         label: localize("castingCheck"),
          id: "castingCheck",
          component: SpellSheetCastingCheckTab,
       },
@@ -68,7 +68,7 @@
             <div class="stats">
                <!--Rarity-->
                <div class="stat-label">
-                  {localize("LOCAL.rarity.label")}
+                  {localize("rarity")}
                </div>
                <div class="stat-input">
                   <DocumentRaritySelect bind:value={$document.system.rarity} />
@@ -76,7 +76,7 @@
 
                <!--Tradition-->
                <div class="stat-label">
-                  {localize("LOCAL.tradition.label")}
+                  {localize("tradition")}
                </div>
                <div class="stat-input">
                   <DocumentTextInput bind:value={$document.system.tradition} />

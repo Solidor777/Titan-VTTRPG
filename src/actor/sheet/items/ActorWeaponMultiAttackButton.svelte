@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
@@ -25,7 +25,7 @@
       <div class="button-inner">
          <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
          <div class="label">
-            {localize("LOCAL.multi.label")}
+            {localize("multi")}
          </div>
          <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
       </div>

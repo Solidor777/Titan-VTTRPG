@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
@@ -15,19 +15,19 @@
    // Resistance options
    const resistanceSelectOptions = [
       {
-         label: localize("LOCAL.reflexes.label"),
+         label: localize("reflexes"),
          value: "reflexes",
       },
       {
-         label: localize("LOCAL.resilience.label"),
+         label: localize("resilience"),
          value: "resilience",
       },
       {
-         label: localize("LOCAL.willpower.label"),
+         label: localize("willpower"),
          value: "willpower",
       },
       {
-         label: localize("LOCAL.none.label"),
+         label: localize("none"),
          value: "none",
       },
    ];
@@ -49,7 +49,7 @@
          <div class="aspect-cost">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.cost.label")}:
+               {localize("cost")}:
             </div>
 
             <!--Input-->
@@ -75,7 +75,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.resistanceCheck.label")}:
+               {localize("resistanceCheck")}:
             </div>
 
             <!--Value-->
@@ -93,7 +93,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.damage.label")}
+               {localize("damage")}
             </div>
 
             <!--Value-->
@@ -106,7 +106,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.healing.label")}
+               {localize("healing")}
             </div>
 
             <!--Value-->
@@ -119,7 +119,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.scaling.label")}
+               {localize("scaling")}
             </div>
 
             <!--Value-->
@@ -135,7 +135,7 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("LOCAL.initialValue.label")}:
+                  {localize("initialValue")}:
                </div>
 
                <!--Value-->

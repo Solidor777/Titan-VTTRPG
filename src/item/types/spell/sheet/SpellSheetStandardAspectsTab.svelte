@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
@@ -19,19 +19,19 @@
    // Resistance select options
    const resistanceSelectOptions = [
       {
-         label: localize("LOCAL.reflexes.label"),
+         label: localize("reflexes"),
          value: "reflexes",
       },
       {
-         label: localize("LOCAL.resilience.label"),
+         label: localize("resilience"),
          value: "resilience",
       },
       {
-         label: localize("LOCAL.willpower.label"),
+         label: localize("willpower"),
          value: "willpower",
       },
       {
-         label: localize("LOCAL.none.label"),
+         label: localize("none"),
          value: "none",
       },
    ];
@@ -41,53 +41,53 @@
       range: [
          {
             value: "self",
-            label: localize("LOCAL.self.label"),
+            label: localize("self"),
          },
          {
             value: "touch",
-            label: localize("LOCAL.touch.label"),
+            label: localize("touch"),
          },
          {
             value: "m10",
-            label: localize("LOCAL.m10.label"),
+            label: localize("m10"),
          },
          {
             value: "m30",
-            label: localize("LOCAL.m30.label"),
+            label: localize("m30"),
          },
          {
             value: "m50",
-            label: localize("LOCAL.m50.label"),
+            label: localize("m50"),
          },
       ],
       radius: [
          {
             value: "m5",
-            label: localize("LOCAL.m5.label"),
+            label: localize("m5"),
          },
          {
             value: "m10",
-            label: localize("LOCAL.m10.label"),
+            label: localize("m10"),
          },
       ],
       duration: [
          {
             value: "rounds",
-            label: localize("LOCAL.rounds.label"),
+            label: localize("rounds"),
          },
          {
             value: "minutes",
-            label: localize("LOCAL.minutes.label"),
+            label: localize("minutes"),
          },
       ],
       increaseSpeed: [
          {
             value: "m5",
-            label: localize("LOCAL.m5.label"),
+            label: localize("m5"),
          },
          {
             value: "m10",
-            label: localize("LOCAL.m10.label"),
+            label: localize("m10"),
          },
       ],
    };
@@ -106,7 +106,7 @@
    let filter = "";
 
    $: filteredAspects = Object.keys($document.system.standardAspects).filter(
-      (key) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
+      (key) => localize(`${key}`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
    );
 </script>
 
@@ -127,7 +127,7 @@
                   <div class="aspect-enable">
                      <SpellSheetEnableAspectButton
                         bind:enabled={$document.system.standardAspects[key].enabled}
-                        label={localize(`LOCAL.${key}.label`)}
+                        label={localize(`${key}`)}
                         cost={$document.system.standardAspects[key].cost}
                      />
                   </div>
@@ -153,7 +153,7 @@
                               <div class="stat">
                                  <!--Label-->
                                  <div class="label">
-                                    {localize("LOCAL.resistanceCheck.label")}:
+                                    {localize("resistanceCheck")}:
                                  </div>
 
                                  <!--Value-->
@@ -173,7 +173,7 @@
                               <div class="stat">
                                  <!--Label-->
                                  <div class="label">
-                                    {localize("LOCAL.allOptions.label")}:
+                                    {localize("allOptions")}:
                                  </div>
 
                                  <!--Value-->
@@ -191,7 +191,7 @@
                            <div class="toggles">
                               {#each Object.entries($document.system.standardAspects[key].option) as [option]}
                                  <SpellSheetToggleAspectOptionButton
-                                    label={localize(`LOCAL.${option}.label`)}
+                                    label={localize(`${option}`)}
                                     bind:enabled={$document.system.standardAspects[key].option[option]}
                                  />
                               {/each}

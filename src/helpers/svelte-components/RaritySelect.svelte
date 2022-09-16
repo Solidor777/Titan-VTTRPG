@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import Select from "~/helpers/svelte-components/Select.svelte";
 
    // Value
@@ -8,19 +8,19 @@
    // Options
    const rarityOptions = [
       {
-         label: localize("LOCAL.common.label"),
+         label: localize("common"),
          value: "common",
       },
       {
-         label: localize("LOCAL.uncommon.label"),
+         label: localize("uncommon"),
          value: "uncommon",
       },
       {
-         label: localize("LOCAL.rare.label"),
+         label: localize("rare"),
          value: "rare",
       },
       {
-         label: localize("LOCAL.unique.label"),
+         label: localize("unique"),
          value: "unique",
       },
    ];

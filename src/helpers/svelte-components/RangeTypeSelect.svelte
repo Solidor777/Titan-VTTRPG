@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import Select from "~/helpers/svelte-components/Select.svelte";
 
    // Value
@@ -8,11 +8,11 @@
    // Options
    const rangeTypeOptions = [
       {
-         label: localize("LOCAL.melee.label"),
+         label: localize("melee"),
          value: "melee",
       },
       {
-         label: localize("LOCAL.ranged.label"),
+         label: localize("ranged"),
          value: "ranged",
       },
    ];

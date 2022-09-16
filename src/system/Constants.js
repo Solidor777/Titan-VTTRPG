@@ -1,4 +1,4 @@
-export const TITANCONSTANTS = Object.freeze({
+export default Object.freeze({
   attribute: {
     min: 1,
     max: 8,

@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility";
+   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ActorActionsWeapon from "./items/ActorActionsWeapon.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
@@ -21,7 +21,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.weapons.label")}
+               {localize("weapons")}
             </div>
 
             <!--Weapon List-->

@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
@@ -46,11 +46,11 @@
    const typeOptions = [
       {
          value: "melee",
-         label: localize("LOCAL.melee.label"),
+         label: localize("melee"),
       },
       {
          value: "ranged",
-         label: localize("LOCAL.ranged.label"),
+         label: localize("ranged"),
       },
    ];
 
@@ -120,7 +120,7 @@
    <!--Attribute-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.attribute.label")}
+         {localize("attribute")}
       </div>
       <div class="input">
          <AttributeSelect bind:value={checkParameters.attribute} />
@@ -130,7 +130,7 @@
    <!--Skill-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.skill.label")}
+         {localize("skill")}
       </div>
       <div class="input">
          <SkillSelect bind:value={checkParameters.skill} />
@@ -140,7 +140,7 @@
    <!--Type-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.type.label")}
+         {localize("type")}
       </div>
       <div class="input">
          <Select options={typeOptions} bind:value={checkParameters.type} />
@@ -152,7 +152,7 @@
       {#if checkParameters.type === "melee"}
          <!--Melee-->
          <div class="label">
-            {localize("LOCAL.attackerMelee.label")}
+            {localize("attackerMelee")}
          </div>
          <div class="input">
             <IntegerSelect options={ratingOptions} bind:value={checkParameters.attackerMelee} />
@@ -160,7 +160,7 @@
       {:else}
          <!--Accuracy-->
          <div class="label">
-            {localize("LOCAL.attackerAccuracy.label")}
+            {localize("attackerAccuracy")}
          </div>
          <div class="input">
             <IntegerSelect options={ratingOptions} bind:value={checkParameters.attackerAccuracy} />
@@ -171,7 +171,7 @@
    <!--Defense rating-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.targetDefense.label")}
+         {localize("targetDefense")}
       </div>
       <div class="input">
          <IntegerSelect options={ratingOptions} bind:value={checkParameters.targetDefense} />
@@ -181,7 +181,7 @@
    <!--Dice Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.bonusPenaltyDice.label")}
+         {localize("bonusPenaltyDice")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.diceMod} />
@@ -191,7 +191,7 @@
    <!--Training Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.trainingMod.label")}
+         {localize("trainingMod")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.trainingMod} />
@@ -201,7 +201,7 @@
    <!--Expertise Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.expertiseMod.label")}
+         {localize("expertiseMod")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.expertiseMod} />
@@ -211,7 +211,7 @@
    <!--Double Training-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.doubleTraining.label")}
+         {localize("doubleTraining")}
       </div>
       <div class="input">
          <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
@@ -221,7 +221,7 @@
    <!--Double Expertise-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.doubleExpertise.label")}
+         {localize("doubleExpertise")}
       </div>
       <div class="input">
          <input type="checkbox" bind:checked={checkParameters.doubleExpertise} />
@@ -232,21 +232,21 @@
    <div class="row">
       <!--Total Dice-->
       <div class="summary">
-         {localize("LOCAL.totalDice.label") + ": "}
+         {localize("totalDice") + ": "}
          {totalDice}
       </div>
 
       <!--Total Expertise-->
       <div class="summary">
-         {localize("LOCAL.totalExpertise.label") + ": "}
+         {localize("totalExpertise") + ": "}
          {totalExpertise}
       </div>
    </div>
 
    <!--Buttons-->
    <div class="row">
-      <button on:click={onRoll}>{localize("LOCAL.roll.label")}</button>
-      <button on:click={onCancel}>{localize("LOCAL.cancel.label")}</button>
+      <button on:click={onRoll}>{localize("roll")}</button>
+      <button on:click={onCancel}>{localize("cancel")}</button>
    </div>
 </div>
 

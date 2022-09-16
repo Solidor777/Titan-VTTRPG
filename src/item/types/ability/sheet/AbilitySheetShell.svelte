@@ -4,7 +4,7 @@
    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import AbilitySheetHeader from "./AbilitySheetHeader.svelte";
    import AbilitySheetSidebar from "./AbilitySheetSidebar.svelte";
    import AbilitySheetDescriptionTab from "./AbilitySheetDescriptionTab.svelte";
@@ -22,12 +22,12 @@
    // Setup tabs
    const tabs = [
       {
-         label: localize("LOCAL.description.label"),
+         label: localize("description"),
          id: "description",
          component: AbilitySheetDescriptionTab,
       },
       {
-         label: localize("LOCAL.checks.label"),
+         label: localize("checks"),
          id: "checks",
          component: ItemSheetChecksTab,
       },

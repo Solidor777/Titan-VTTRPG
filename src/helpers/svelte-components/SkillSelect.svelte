@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import Select from "~/helpers/svelte-components/Select.svelte";
 
    // Value
@@ -8,103 +8,103 @@
    // Options
    const skillOptions = [
       {
-         label: localize("LOCAL.arcana.label"),
+         label: localize("arcana"),
          value: "arcana",
       },
       {
-         label: localize("LOCAL.athletics.label"),
+         label: localize("athletics"),
          value: "athletics",
       },
       {
-         label: localize("LOCAL.deception.label"),
+         label: localize("deception"),
          value: "deception",
       },
       {
-         label: localize("LOCAL.dexterity.label"),
+         label: localize("dexterity"),
          value: "dexterity",
       },
       {
-         label: localize("LOCAL.diplomacy.label"),
+         label: localize("diplomacy"),
          value: "diplomacy",
       },
       {
-         label: localize("LOCAL.engineering.label"),
+         label: localize("engineering"),
          value: "engineering",
       },
       {
-         label: localize("LOCAL.intimidation.label"),
+         label: localize("intimidation"),
          value: "intimidation",
       },
       {
-         label: localize("LOCAL.investigation.label"),
+         label: localize("investigation"),
          value: "investigation",
       },
       {
-         label: localize("LOCAL.deception.label"),
+         label: localize("deception"),
          value: "deception",
       },
       {
-         label: localize("LOCAL.dexterity.label"),
+         label: localize("dexterity"),
          value: "dexterity",
       },
       {
-         label: localize("LOCAL.diplomacy.label"),
+         label: localize("diplomacy"),
          value: "diplomacy",
       },
       {
-         label: localize("LOCAL.engineering.label"),
+         label: localize("engineering"),
          value: "engineering",
       },
       {
-         label: localize("LOCAL.intimidation.label"),
+         label: localize("intimidation"),
          value: "intimidation",
       },
       {
-         label: localize("LOCAL.investigation.label"),
+         label: localize("investigation"),
          value: "investigation",
       },
       {
-         label: localize("LOCAL.lore.label"),
+         label: localize("lore"),
          value: "lore",
       },
       {
-         label: localize("LOCAL.medicine.label"),
+         label: localize("medicine"),
          value: "medicine",
       },
       {
-         label: localize("LOCAL.meleeWeapons.label"),
+         label: localize("meleeWeapons"),
          value: "meleeWeapons",
       },
       {
-         label: localize("LOCAL.metaphysics.label"),
+         label: localize("metaphysics"),
          value: "metaphysics",
       },
       {
-         label: localize("LOCAL.nature.label"),
+         label: localize("nature"),
          value: "nature",
       },
       {
-         label: localize("LOCAL.perception.label"),
+         label: localize("perception"),
          value: "perception",
       },
       {
-         label: localize("LOCAL.performance.label"),
+         label: localize("performance"),
          value: "performance",
       },
       {
-         label: localize("LOCAL.rangedWeapons.label"),
+         label: localize("rangedWeapons"),
          value: "rangedWeapons",
       },
       {
-         label: localize("LOCAL.subterfuge.label"),
+         label: localize("subterfuge"),
          value: "subterfuge",
       },
       {
-         label: localize("LOCAL.stealth.label"),
+         label: localize("stealth"),
          value: "stealth",
       },
       {
-         label: localize("LOCAL.none.label"),
+         label: localize("none"),
          value: "none",
       },
    ];

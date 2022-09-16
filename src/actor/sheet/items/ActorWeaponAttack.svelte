@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
@@ -48,9 +48,9 @@
          {#each attack.traits as trait}
             <div class="trait">
                {#if trait.type === "number"}
-                  <StatTag label={localize(`LOCAL.${trait.name}.label`)} value={trait.value} />
+                  <StatTag label={localize(`${trait.name}`)} value={trait.value} />
                {:else}
-                  <Tag label={localize(`LOCAL.${trait.name}.label`)} />
+                  <Tag label={localize(`${trait.name}`)} />
                {/if}
             </div>
          {/each}

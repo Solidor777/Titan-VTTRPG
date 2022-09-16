@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import StatTag from "../../helpers/svelte-components/StatTag.svelte";
 
    // Chat context reference
@@ -8,4 +8,4 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<StatTag label={localize("LOCAL.tradition.label")} value={chatContext.system.tradition} />
+<StatTag label={localize("tradition")} value={chatContext.system.tradition} />

@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
@@ -64,13 +64,13 @@
          <div transition:slide|local>
             <!--Type-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.type.label")}</div>
+               <div class="label">{localize("type")}</div>
                <DocumentRangeTypeSelect bind:value={$document.system.attack[attackIdx].type} />
             </div>
 
             <!--Range-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.range.label")}</div>
+               <div class="label">{localize("range")}</div>
                <div class="input">
                   <DocumentIntegerInput bind:value={$document.system.attack[attackIdx].range} />
                </div>
@@ -78,13 +78,13 @@
 
             <!--Damage-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.damage.label")}</div>
+               <div class="label">{localize("damage")}</div>
                <div class="input-row">
                   <div class="input">
                      <DocumentIntegerInput bind:value={$document.system.attack[attackIdx].damage} />
                   </div>
                   <div class="input">
-                     {localize("LOCAL.plusSuccess.label")}
+                     {localize("plusSuccess")}
                      <DocumentCheckboxInput bind:value={$document.system.attack[attackIdx].plusSuccessDamage} />
                   </div>
                </div>
@@ -92,13 +92,13 @@
 
             <!--Attribute select-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.attribute.label")};</div>
+               <div class="label">{localize("attribute")};</div>
                <DocumentAttributeSelect bind:value={$document.system.attack[attackIdx].attribute} />
             </div>
 
             <!--Skill select-->
             <div class="attack-field">
-               <div class="label">{localize("LOCAL.skill.label")}</div>
+               <div class="label">{localize("skill")}</div>
                <DocumentSkillSelect bind:value={$document.system.attack[attackIdx].skill} />
             </div>
 
@@ -108,7 +108,7 @@
                <div class="attack-traits-header">
                   <div />
                   <div>
-                     {localize("LOCAL.traits.label")}
+                     {localize("traits")}
                   </div>
                   <div>
                      <IconButton
@@ -122,7 +122,7 @@
                   <!--Each trait-->
                   {#each $document.system.attack[attackIdx].traits as trait}
                      <div class="attack-trait">
-                        {localize(`LOCAL.${trait.name}.label`)}
+                        {localize(`${trait.name}`)}
                         {#if trait.type === "number"}
                            {trait.value}
                         {/if}

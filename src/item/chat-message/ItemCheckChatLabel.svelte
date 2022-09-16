@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Chat context reference
    const document = getContext("DocumentSheetObject");
@@ -22,8 +22,8 @@
 
       <!--Sub Label-->
       <div class="sub-label">
-         {localize(`LOCAL.${chatContext.system.check.attribute}.label`)}
-         ({localize(`LOCAL.${chatContext.system.check.skill}.label`)})
+         {localize(`${chatContext.system.check.attribute}`)}
+         ({localize(`${chatContext.system.check.skill}`)})
          {chatContext.system.check.difficulty}:{chatContext.system.check.complexity}
       </div>
    </div>

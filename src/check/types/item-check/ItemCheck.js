@@ -1,3 +1,4 @@
+import { localize } from "~/helpers/Utility.js";
 import TitanCheck from "~/check/Check.js";
 
 export default class TitanItemCheck extends TitanCheck {
@@ -176,6 +177,6 @@ export default class TitanItemCheck extends TitanCheck {
    }
 
    _getTypeLabel() {
-      return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} (${game.i18n.localize(CONFIG.TITAN.local[this.parameters.skill])}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
+      return `${localize(this.parameters.attribute)} (${localize(this.parameters.skill)}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
    }
 }

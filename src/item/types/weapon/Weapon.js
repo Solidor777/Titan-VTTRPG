@@ -1,22 +1,19 @@
+import { localize } from "~/helpers/Utility.js";
 import TitanTypeComponent from "~/helpers/TypeComponent";
 
-function getAttackTemplate() {
-   return {
-      name: game.i18n.localize(CONFIG.TITAN.local.attack),
-      type: "melee",
-      range: 1,
-      attribute: "body",
-      skill: "meleeWeapons",
-      damage: 1,
-      plusSuccessDamage: true,
-      traits: [],
-   };
-}
-
 export default class TitanWeapon extends TitanTypeComponent {
+
+   prepareDerivedData() {
+      if (this.parent.system.attack.length <= 0) {
+         this.addAttack();
+      }
+
+      return;
+   }
+
    async addAttack() {
       // Create the new attack
-      const newAttack = getAttackTemplate();
+      const newAttack = this.getAttackTemplate();
 
       // Add the attack and update the item
       let attack = this.parent.system.attack;
@@ -51,5 +48,18 @@ export default class TitanWeapon extends TitanTypeComponent {
 
          return;
       }
+   }
+
+   getAttackTemplate() {
+      return {
+         name: localize("attack"),
+         type: "melee",
+         range: 1,
+         attribute: "body",
+         skill: "meleeWeapons",
+         damage: 1,
+         plusSuccessDamage: true,
+         traits: [],
+      };
    }
 }

@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import IconButton from "~/helpers/svelte-components/IconButton.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
@@ -26,19 +26,19 @@
    // Resistance options
    const resistanceSelectOptions = [
       {
-         label: localize("LOCAL.reflexes.label"),
+         label: localize("reflexes"),
          value: "reflexes",
       },
       {
-         label: localize("LOCAL.resilience.label"),
+         label: localize("resilience"),
          value: "resilience",
       },
       {
-         label: localize("LOCAL.willpower.label"),
+         label: localize("willpower"),
          value: "willpower",
       },
       {
-         label: localize("LOCAL.none.label"),
+         label: localize("none"),
          value: "none",
       },
    ];
@@ -96,7 +96,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.attribute.label")}:
+                     {localize("attribute")}:
                   </div>
 
                   <!--Value-->
@@ -109,7 +109,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.skill.label")}:
+                     {localize("skill")}:
                   </div>
 
                   <!--Value-->
@@ -124,7 +124,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.difficulty.label")}:
+                     {localize("difficulty")}:
                   </div>
 
                   <!--Value-->
@@ -137,7 +137,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.complexity.label")}:
+                     {localize("complexity")}:
                   </div>
 
                   <!--Value-->
@@ -152,7 +152,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.resistanceCheck.label")}:
+                     {localize("resistanceCheck")}:
                   </div>
 
                   <!--Value-->
@@ -165,7 +165,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.resolveCost.label")}:
+                     {localize("resolveCost")}:
                   </div>
 
                   <!--Value-->
@@ -180,7 +180,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.damage.label")}
+                     {localize("damage")}
                   </div>
 
                   <!--Value-->
@@ -193,7 +193,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.healing.label")}
+                     {localize("healing")}
                   </div>
 
                   <!--Value-->
@@ -209,7 +209,7 @@
                   <div class="stat">
                      <!--Label-->
                      <div class="label">
-                        {localize("LOCAL.initialValue.label")}:
+                        {localize("initialValue")}:
                      </div>
 
                      <!--Value-->
@@ -222,7 +222,7 @@
                   <div class="stat">
                      <!--Label-->
                      <div class="label">
-                        {localize("LOCAL.scaling.label")}
+                        {localize("scaling")}
                      </div>
 
                      <!--Value-->
@@ -238,7 +238,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.opposedCheck.label")}
+                     {localize("opposedCheck")}
                   </div>
 
                   <!--Value-->
@@ -254,7 +254,7 @@
                   <div class="stat">
                      <!--Label-->
                      <div class="label">
-                        {localize("LOCAL.attribute.label")}:
+                        {localize("attribute")}:
                      </div>
 
                      <!--Value-->
@@ -267,7 +267,7 @@
                   <div class="stat">
                      <!--Label-->
                      <div class="label">
-                        {localize("LOCAL.skill.label")}:
+                        {localize("skill")}:
                      </div>
 
                      <!--Value-->

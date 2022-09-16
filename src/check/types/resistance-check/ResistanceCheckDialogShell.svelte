@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import ResistanceSelect from "~/helpers/svelte-components/ResistanceSelect.svelte";
    import CheckDifficultySelect from "~/helpers/svelte-components/CheckDifficultySelect.svelte";
@@ -40,7 +40,7 @@
       <!--Resistance-->
       <div class="row">
          <div class="label">
-            {localize("LOCAL.resistance.label")}
+            {localize("resistance")}
          </div>
          <div class="input">
             <ResistanceSelect bind:value={checkParameters.resistance} />
@@ -51,7 +51,7 @@
    <!--Difficulty-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.difficulty.label")}
+         {localize("difficulty")}
       </div>
       <div class="input">
          <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
@@ -61,7 +61,7 @@
    <!--Complexity-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.complexity.label")}
+         {localize("complexity")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.complexity} min={0} />
@@ -71,7 +71,7 @@
    <!--Dice Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.bonusPenaltyDice.label")}
+         {localize("bonusPenaltyDice")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.diceMod} />
@@ -81,15 +81,15 @@
    <!--Total Dice-->
    <div class="row">
       <div class="summary">
-         {localize("LOCAL.totalDice.label") + ": "}
+         {localize("totalDice") + ": "}
          {actor.system.resistance[checkParameters.resistance].value + checkParameters.diceMod}
       </div>
    </div>
 
    <!--Buttons-->
    <div class="row">
-      <button on:click={onRoll}>{localize("LOCAL.roll.label")}</button>
-      <button on:click={onCancel}>{localize("LOCAL.cancel.label")}</button>
+      <button on:click={onRoll}>{localize("roll")}</button>
+      <button on:click={onCancel}>{localize("cancel")}</button>
    </div>
 </div>
 

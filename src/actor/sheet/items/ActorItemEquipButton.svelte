@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
@@ -17,7 +17,7 @@
    <EfxButton efx={ripple} on:click={application.toggleEquipped.bind(application, item._id)}>
       <div class="button-inner">
          <div class="label">
-            {localize("LOCAL.equipped.label")}
+            {localize("equipped")}
          </div>
          <i class={equipped ? "fas fa-square-check" : "fas fa-square"} />
       </div>

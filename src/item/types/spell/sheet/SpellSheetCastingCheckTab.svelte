@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
@@ -27,7 +27,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.autoCalculateCastingCheck.label")}
+               {localize("autoCalculateCastingCheck")}
             </div>
 
             <!--Checkbox-->
@@ -42,7 +42,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.difficulty.label")}
+               {localize("difficulty")}
             </div>
 
             <!--Select-->
@@ -61,7 +61,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("LOCAL.complexity.label")}
+               {localize("complexity")}
             </div>
 
             <!--Input-->
@@ -82,7 +82,7 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("LOCAL.totalCost.label")}:
+                  {localize("totalCost")}:
                </div>
 
                <!--Value-->
@@ -98,7 +98,7 @@
          <!--Attribute-->
          <div class="stat">
             <div class="label">
-               {localize("LOCAL.attribute.label")}
+               {localize("attribute")}
             </div>
 
             <div class="select">
@@ -111,7 +111,7 @@
          <!--Skill-->
          <div class="stat">
             <div class="label">
-               {localize("LOCAL.skill.label")}
+               {localize("skill")}
             </div>
 
             <div class="select">
@@ -124,7 +124,7 @@
    <!--Aspects-->
    <div class="aspect-costs">
       <div class="header">
-         {localize("LOCAL.aspectCosts.label")}
+         {localize("aspectCosts")}
       </div>
 
       <ScrollingContainer bind:scrollTop={application.scrollTop.castingCheck}>

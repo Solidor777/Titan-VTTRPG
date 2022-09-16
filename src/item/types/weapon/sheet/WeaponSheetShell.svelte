@@ -4,7 +4,7 @@
    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
@@ -29,8 +29,8 @@
 
    // Tabs
    const tabs = [
-      { label: localize("LOCAL.description.label"), id: "description", component: WeaponSheetDescriptionTab },
-      { label: localize("LOCAL.attacks.label"), id: "attacks", component: WeaponSheetAttacksTab },
+      { label: localize("description"), id: "description", component: WeaponSheetDescriptionTab },
+      { label: localize("attacks"), id: "attacks", component: WeaponSheetAttacksTab },
    ];
    application.activeTab = application.activeTab ?? "description";
 </script>
@@ -54,7 +54,7 @@
             <div class="stats">
                <!--Rarity-->
                <div class="stat-label">
-                  {localize("LOCAL.rarity.label")}
+                  {localize("rarity")}
                </div>
                <div class="stat-input">
                   <DocumentRaritySelect bind:value={$document.system.rarity} />
@@ -62,7 +62,7 @@
 
                <!--Value-->
                <div class="stat-label">
-                  {localize("LOCAL.value.label")}
+                  {localize("value")}
                </div>
                <div class="stat-input">
                   <DocumentIntegerInput bind:value={$document.system.value} />

@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    const document = getContext("DocumentSheetObject");
@@ -29,14 +29,14 @@
 </script>
 
 <!--Apply healing button-->
-<div class="healing-button" data-titan-tooltip={localize("LOCAL.recoverStamina.label")}>
+<div class="healing-button" data-titan-tooltip={localize("recoverStamina")}>
    <EfxButton
       on:click={() => {
          healDamage(results.healing);
       }}
    >
       <i class="fas fa-heart" />
-      {`${localize("LOCAL.recoverStamina.label")} (${results.healing})`}
+      {`${localize("recoverStamina")} (${results.healing})`}
    </EfxButton>
 </div>
 

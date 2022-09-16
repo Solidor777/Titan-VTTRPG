@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Reference to the item
    export let item = void 0;
@@ -9,7 +9,7 @@
 <div class="item-value">
    <!--Label-->
    <div class="label">
-      {localize("LOCAL.value.label")}:
+      {localize("value")}:
    </div>
 
    <!--Value-->

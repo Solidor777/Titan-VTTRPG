@@ -1,8 +1,9 @@
 import TitanTypeComponent from "~/helpers/TypeComponent";
+import { localize } from "~/helpers/Utility.js";
 
 function getCustomAspectTemplate() {
    return {
-      label: game.i18n.localize("LOCAL.customAspect.label"),
+      label: localize("customAspect"),
       scaling: true,
       initialValue: 1,
       cost: 1,
@@ -29,7 +30,7 @@ export default class TitanSpell extends TitanTypeComponent {
          m50: 4
       };
       this._calculateStandardAspectCost(standardAspects.range, rangeCosts, 0);
-      this._prepareStandardAspectData(standardAspects.range, game.i18n.localize("LOCAL.range.label"), false, false, false);
+      this._prepareStandardAspectData(standardAspects.range, localize("range"), false, false, false);
 
       // Target
       const targetCosts = {
@@ -37,15 +38,15 @@ export default class TitanSpell extends TitanTypeComponent {
          m10: 6,
       };
       this._calculateStandardAspectCost(standardAspects.radius, targetCosts, 0);
-      this._prepareStandardAspectData(standardAspects.radius, game.i18n.localize("LOCAL.radius.label"), false, false, false);
+      this._prepareStandardAspectData(standardAspects.radius, localize("radius"), false, false, false);
 
       // Damage
       this._calculateStandardAspectCost(standardAspects.damage, 1, 1);
-      this._prepareStandardAspectData(standardAspects.damage, game.i18n.localize("LOCAL.damage.label"), true, false, 1, true, false);
+      this._prepareStandardAspectData(standardAspects.damage, localize("damage"), true, false, 1, true, false);
 
       // Healing
       this._calculateStandardAspectCost(standardAspects.healing, 1);
-      this._prepareStandardAspectData(standardAspects.healing, game.i18n.localize("LOCAL.healing.label"), true, false, 1, false, true);
+      this._prepareStandardAspectData(standardAspects.healing, localize("healing"), true, false, 1, false, true);
 
       // Duration
       const durationCosts = {
@@ -53,47 +54,47 @@ export default class TitanSpell extends TitanTypeComponent {
          minutes: 4
       };
       this._calculateStandardAspectCost(standardAspects.duration, durationCosts);
-      this._prepareStandardAspectData(standardAspects.duration, game.i18n.localize("LOCAL.duration.label"), true, false, 1);
+      this._prepareStandardAspectData(standardAspects.duration, localize("duration"), true, false, 1);
 
       // Decrease Mod
       this._calculateStandardAspectCost(standardAspects.decreaseMod, 0, 2);
-      this._prepareStandardAspectData(standardAspects.decreaseMod, game.i18n.localize("LOCAL.decreaseMod.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseMod, localize("decreaseMod"), true, true, 1);
 
       // Increase Mod
       this._calculateStandardAspectCost(standardAspects.increaseMod, 0, 2);
-      this._prepareStandardAspectData(standardAspects.increaseMod, game.i18n.localize("LOCAL.increaseMod.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.increaseMod, localize("increaseMod"), true, true, 1);
 
       // Decrease Rating
       this._calculateStandardAspectCost(standardAspects.decreaseRating, 0, 1);
-      this._prepareStandardAspectData(standardAspects.decreaseRating, game.i18n.localize("LOCAL.decreaseRating.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseRating, localize("decreaseRating"), true, true, 1);
 
       // Increase Rating
       this._calculateStandardAspectCost(standardAspects.increaseRating, 0, 1);
-      this._prepareStandardAspectData(standardAspects.increaseRating, game.i18n.localize("LOCAL.increaseRating.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.increaseRating, localize("increaseRating"), true, true, 1);
 
       // Decrease Resistance
       this._calculateStandardAspectCost(standardAspects.decreaseResistance, 0, 1);
-      this._prepareStandardAspectData(standardAspects.decreaseResistance, game.i18n.localize("LOCAL.decreaseResistance.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseResistance, localize("decreaseResistance"), true, true, 1);
 
       // Increase Resistance
       this._calculateStandardAspectCost(standardAspects.increaseResistance, 0, 1);
-      this._prepareStandardAspectData(standardAspects.increaseResistance, game.i18n.localize("LOCAL.increaseResistance.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.increaseResistance, localize("increaseResistance"), true, true, 1);
 
       // Decrease Attribute
       this._calculateStandardAspectCost(standardAspects.decreaseAttribute, 0, 4);
-      this._prepareStandardAspectData(standardAspects.decreaseAttribute, game.i18n.localize("LOCAL.decreaseAttribute.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseAttribute, localize("decreaseAttribute"), true, true, 1);
 
       // Increase Attribute
       this._calculateStandardAspectCost(standardAspects.increaseAttribute, 0, 4);
-      this._prepareStandardAspectData(standardAspects.increaseAttribute, game.i18n.localize("LOCAL.increaseAttribute.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.increaseAttribute, localize("increaseAttribute"), true, true, 1);
 
       // Decrease Skill
       this._calculateStandardAspectCost(standardAspects.decreaseSkill, 0, 1);
-      this._prepareStandardAspectData(standardAspects.decreaseSkill, game.i18n.localize("LOCAL.decreaseSkill.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.decreaseSkill, localize("decreaseSkill"), true, true, 1);
 
       // Increase Skill
       this._calculateStandardAspectCost(standardAspects.increaseSkill, 0, 1);
-      this._prepareStandardAspectData(standardAspects.increaseSkill, game.i18n.localize("LOCAL.increaseSkill.label"), true, true, 1);
+      this._prepareStandardAspectData(standardAspects.increaseSkill, localize("increaseSkill"), true, true, 1);
 
       // Inflict Condition
       const inflictConditionCosts = {
@@ -109,11 +110,11 @@ export default class TitanSpell extends TitanTypeComponent {
          unconscious: 7
       };
       this._calculateStandardAspectCost(standardAspects.inflictCondition, 0, inflictConditionCosts, false, true);
-      this._prepareStandardAspectData(standardAspects.inflictCondition, game.i18n.localize("LOCAL.inflictCondition.label"), false, true, false);
+      this._prepareStandardAspectData(standardAspects.inflictCondition, localize("inflictCondition"), false, true, false);
 
       // Remove Condition
       this._calculateStandardAspectCost(standardAspects.removeCondition, 0, 2, 5);
-      this._prepareStandardAspectData(standardAspects.removeCondition, game.i18n.localize("LOCAL.removeCondition.label"), false, true, false);
+      this._prepareStandardAspectData(standardAspects.removeCondition, localize("removeCondition"), false, true, false);
 
       // Decrease Speed
       const speedCosts = {
@@ -121,11 +122,11 @@ export default class TitanSpell extends TitanTypeComponent {
          m10: 3
       };
       this._calculateStandardAspectCost(standardAspects.decreaseSpeed, 0, speedCosts);
-      this._prepareStandardAspectData(standardAspects.decreaseSpeed, game.i18n.localize("LOCAL.decreaseSpeed.label"), false, true);
+      this._prepareStandardAspectData(standardAspects.decreaseSpeed, localize("decreaseSpeed"), false, true);
 
       // Increase Speed
       this._calculateStandardAspectCost(standardAspects.increaseSpeed, 0, speedCosts);
-      this._prepareStandardAspectData(standardAspects.increaseSpeed, game.i18n.localize("LOCAL.increaseSpeed.label"), false, true);
+      this._prepareStandardAspectData(standardAspects.increaseSpeed, localize("increaseSpeed"), false, true);
 
       // Process custom aspects
       this.parent.system.customAspects.forEach((element) => {
@@ -232,7 +233,7 @@ export default class TitanSpell extends TitanTypeComponent {
             if (scaling === true) {
                aspectEntry.initialValue = initialValue;
                if (aspect.value) {
-                  aspectEntry.label = game.i18n.localize(`LOCAL.${aspect.value}.label`);
+                  aspectEntry.label = localize(`${aspect.value}`);
                }
             }
             else if (aspect.value) {

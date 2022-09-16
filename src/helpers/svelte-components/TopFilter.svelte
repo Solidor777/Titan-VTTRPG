@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import TextInput from "~/helpers/svelte-components/TextInput.svelte";
 
    // Filter Items
@@ -8,7 +8,7 @@
 
 <!--Filter-->
 <div class="filter">
-   <div class="label">{localize("LOCAL.filter.label")}</div>
+   <div class="label">{localize("filter")}</div>
    <div class="input"><TextInput bind:value={filter} /></div>
 </div>
 

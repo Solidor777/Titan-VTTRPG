@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
@@ -17,7 +17,7 @@
 <div class="attacks">
    <!--Attacks Label-->
    <div class="attacks-header">
-      {localize("LOCAL.attacks.label")}
+      {localize("attacks")}
    </div>
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={application.scrollTop.sidebar}>

@@ -1,5 +1,5 @@
-import { SvelteDocumentSheet } from '~/documents/DocumentSheet';
 import { localize } from '~/helpers/Utility';
+import SvelteDocumentSheet from '~/documents/DocumentSheet';
 import createActorSheetState from './ActorSheetState';
 
 export default class TitanActorSheet extends SvelteDocumentSheet {
@@ -56,23 +56,23 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       let itemName = "";
       switch (type) {
          case "ability": {
-            itemName = localize("LOCAL.newAbility.label");
+            itemName = localize("newAbility");
             break;
          }
          case "armor": {
-            itemName = localize("LOCAL.newArmor.label");
+            itemName = localize("newArmor");
             break;
          }
          case "weapon": {
-            itemName = localize("LOCAL.newWeapon.label");
+            itemName = localize("newWeapon");
             break;
          }
          case "spell": {
-            itemName = localize("LOCAL.newSpell.label");
+            itemName = localize("newSpell");
             break;
          }
          default: {
-            itemName = localize("LOCAL.newItem.label");
+            itemName = localize("newItem");
             break;
          }
       }

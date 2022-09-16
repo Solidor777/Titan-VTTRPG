@@ -1,3 +1,4 @@
+import { localize } from "~/helpers/Utility.js";
 import TitanAttributeCheck from "~/check/types/attribute-check/AttributeCheck.js";
 
 export default class TitanSkillCheck extends TitanAttributeCheck {
@@ -58,8 +59,8 @@ export default class TitanSkillCheck extends TitanAttributeCheck {
 
   _getTypeLabel() {
     if (this.parameters.skill) {
-      return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} (${game.i18n.localize(CONFIG.TITAN.local[this.parameters.skill])}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
+      return `${localize(this.parameters.attribute)} (${localize(this.parameters.skill)}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
     }
-    return `${game.i18n.localize(CONFIG.TITAN.local[this.parameters.attribute])} ${this.parameters.difficulty}:${this.parameters.complexity}`;
+    return `${localize(this.parameters.attribute)} ${this.parameters.difficulty}:${this.parameters.complexity}`;
   }
 }

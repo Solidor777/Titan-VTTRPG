@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ActorItemList from "./ActorItemList.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
@@ -15,10 +15,7 @@
 <div class="abilities-tab">
    <div class="filter-options">
       {#each Object.entries($appState.filterOptions.abilities) as [key, value]}
-         <ToggleOptionButton
-            label={localize(`LOCAL.${key}.label`)}
-            bind:enabled={$appState.filterOptions.abilities[key]}
-         />
+         <ToggleOptionButton label={localize(`${key}`)} bind:enabled={$appState.filterOptions.abilities[key]} />
       {/each}
    </div>
 
@@ -32,7 +29,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.abilities.label")}
+               {localize("abilities")}
             </div>
 
             <!--Abilities List-->

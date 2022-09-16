@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    export let opposedCheck = void 0;
 </script>
@@ -8,15 +8,15 @@
 <div class="check-label {opposedCheck.attribute}">
    <!--Label-->
    <div class="label main">
-      {localize("LOCAL.opposedCheck.label")}
+      {localize("opposedCheck")}
    </div>
 
    <!--Skill & Attribute-->
    <div class="label">
       {#if opposedCheck.skill && opposedCheck.skill !== "none"}
-         {`${localize(`LOCAL.${opposedCheck.attribute}.label`)} (${localize(`LOCAL.${opposedCheck.skill}.label`)})`}
+         {`${localize(`${opposedCheck.attribute}`)} (${localize(`${opposedCheck.skill}`)})`}
       {:else}
-         {localize(`LOCAL.${opposedCheck.attribute}.label`)}
+         {localize(`${opposedCheck.attribute}`)}
       {/if}
    </div>
 </div>

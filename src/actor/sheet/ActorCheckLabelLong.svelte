@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
 
    // Reference to the docuement
@@ -25,9 +25,9 @@
       <!--Skill & Attribute-->
       <div class="skill-attribute">
          {#if check.skill && check.skill !== "none"}
-            {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
+            {`${localize(`${check.attribute}`)} (${localize(`${check.skill}`)})`}
          {:else}
-            {localize(`LOCAL.${check.attribute}.label`)}
+            {localize(`${check.attribute}`)}
          {/if}
       </div>
 
@@ -46,7 +46,7 @@
             <!--Label-->
             <div class="label">
                <i class="fas fa-dice-d6" />
-               {localize("LOCAL.dice.label")}:
+               {localize("dice")}:
             </div>
 
             <!--Value-->
@@ -64,7 +64,7 @@
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-graduation-cap" />
-                     {localize("LOCAL.expertise.label")}:
+                     {localize("expertise")}:
                   </div>
 
                   <!--Value-->
@@ -80,7 +80,7 @@
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-dumbbell" />
-                     {localize("LOCAL.training.label")}:
+                     {localize("training")}:
                   </div>
 
                   <!--Value-->
@@ -99,7 +99,7 @@
             <!--Label-->
             <div class="label">
                <i class="fas fa-dice-d6" />
-               {localize("LOCAL.dice.label")}:
+               {localize("dice")}:
             </div>
 
             <!--Value-->
@@ -117,7 +117,7 @@
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-graduation-cap" />
-                     {localize("LOCAL.expertise.label")}:
+                     {localize("expertise")}:
                   </div>
 
                   <!--Value-->
@@ -133,7 +133,7 @@
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-dumbbell" />
-                     {localize("LOCAL.training.label")}:
+                     {localize("training")}:
                   </div>
 
                   <!--Value-->

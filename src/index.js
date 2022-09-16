@@ -2,9 +2,8 @@ import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Global.scss';
 import './styles/Mixins.scss';
-import { TITANCONSTANTS } from "./helpers/Constants.js";
-import { TITANLOCAL } from "./helpers/Local.js";
-import { registerSystemSettings } from "./helpers/RegisterSystemSettings.js";
+import TitanConstants from './system/Constants';
+import registerSystemSettings from './system/RegisterSystemSettings';
 import { TitanActor } from "./actor/Actor.js";
 import { TitanItem } from "./item/Item.js";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
@@ -35,8 +34,7 @@ Hooks.once("init", async () => {
 
    // Add custom constants for easy access
    CONFIG.TITAN = {
-      constants: TITANCONSTANTS,
-      local: TITANLOCAL,
+      constants: TitanConstants,
    };
 
    // Register Document Classes

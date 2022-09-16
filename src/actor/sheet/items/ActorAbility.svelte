@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import ActorItemExpandButton from "./ActorItemExpandButton.svelte";
    import ActorItemSendToChatButton from "./ActorItemSendToChatButton.svelte";
    import ActorItemEditButton from "./ActorItemEditButton.svelte";
@@ -90,17 +90,17 @@
 
                   <!--Action-->
                   {#if item.system.action}
-                     <Tag label={localize("LOCAL.action.label")} />
+                     <Tag label={localize("action")} />
                   {/if}
 
                   <!--Reaction-->
                   {#if item.system.reaction}
-                     <Tag label={localize("LOCAL.reaction.label")} />
+                     <Tag label={localize("reaction")} />
                   {/if}
 
                   <!--Passive-->
                   {#if item.system.passive}
-                     <Tag label={localize("LOCAL.passive.label")} />
+                     <Tag label={localize("passive")} />
                   {/if}
                </ActorItemFooter>
             </div>

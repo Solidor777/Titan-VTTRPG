@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
    const document = getContext("DocumentSheetObject");
@@ -36,11 +36,11 @@
       }}
    >
       {#if options.skill && options.skill !== "none"}
-         {`${localize(`LOCAL.${options.attribute}.label`)} (${localize(`LOCAL.${options.skill}.label`)}) ${
-            options.difficulty
-         }:${options.complexity}`}
+         {`${localize(`${options.attribute}`)} (${localize(`${options.skill}`)}) ${options.difficulty}:${
+            options.complexity
+         }`}
       {:else}
-         {`${localize(`LOCAL.${options.attribute}.label`)} ${options.difficulty}:${options.complexity}`}
+         {`${localize(`${options.attribute}`)} ${options.difficulty}:${options.complexity}`}
       {/if}
    </EfxButton>
 </div>

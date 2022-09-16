@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    const document = getContext("DocumentSheetObject");
 
    // Item reference
@@ -9,12 +9,12 @@
 
 <div class="armor-stats">
    <div class="stat">
-      {localize(`LOCAL.armor.label`)}: {item.system.armor}
+      {localize(`armor`)}: {item.system.armor}
    </div>
 
    {#each item.system.traits as trait}
       <div class="stat">
-         {localize(`LOCAL.${trait.name}.label`)}
+         {localize(`${trait.name}`)}
          {#if trait.type === "number"}
             {trait.value}
          {/if}

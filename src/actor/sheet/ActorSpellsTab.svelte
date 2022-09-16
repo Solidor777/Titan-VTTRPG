@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ActorItemList from "./ActorItemList.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
@@ -22,7 +22,7 @@
          <div class="category">
             <!--List Header-->
             <div class="category-header">
-               {localize("LOCAL.spells.label")}
+               {localize("spells")}
             </div>
 
             <!--Spell List-->

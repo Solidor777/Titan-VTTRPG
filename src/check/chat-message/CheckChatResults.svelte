@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
 
    // Results
@@ -11,18 +11,18 @@
    <!--Successes-->
    <div class="stat">
       {results.successes}
-      {localize(`LOCAL.successes.label`)}
+      {localize(`successes`)}
    </div>
 
    {#if results.succeeded}
       <!--Succeeded-->
       <div class="result succeeded">
-         {localize(`LOCAL.succeeded.label`)}
+         {localize(`succeeded`)}
       </div>
       <!--Extra Successes-->
       {#if results.extraSuccesses !== undefined}
          <div class="stat">
-            {localize(`LOCAL.extraSuccesses.label`)}:
+            {localize(`extraSuccesses`)}:
             {#if results.extraSuccessesRemaining != undefined}
                {results.extraSuccessesRemaining}/{results.extraSuccesses}
             {:else}
@@ -33,14 +33,14 @@
    {:else if results.failed}
       <!--Failed-->
       <div class="result failed">
-         {localize(`LOCAL.failed.label`)}
+         {localize(`failed`)}
       </div>
    {/if}
 
    <!--Expertise Remaining-->
    {#if results.expertiseRemaining}
       <div class="stat">
-         {localize(`LOCAL.expertiseRemaining.label`)}:
+         {localize(`expertiseRemaining`)}:
          {results.expertiseRemaining}
       </div>
    {/if}
@@ -48,7 +48,7 @@
    <!--Damage-->
    {#if results.damage !== undefined}
       <div class="stat">
-         {localize(`LOCAL.damage.label`)}:
+         {localize(`damage`)}:
          {results.damage}
       </div>
    {/if}
@@ -56,7 +56,7 @@
    <!--Healing-->
    {#if results.healing !== undefined}
       <div class="stat">
-         {localize(`LOCAL.healing.label`)}:
+         {localize(`healing`)}:
          {results.healing}
       </div>
    {/if}

@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import Tag from "~/helpers/svelte-components/Tag.svelte";
    import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
@@ -35,21 +35,21 @@
 
             {#if chatContext.system.action}
                <div class="tag">
-                  <Tag label={localize("LOCAL.action.label")} />
+                  <Tag label={localize("action")} />
                </div>
             {/if}
 
             <!--Reaction-->
             {#if chatContext.system.reaction}
                <div class="tag">
-                  <Tag label={localize("LOCAL.reaction.label")} />
+                  <Tag label={localize("reaction")} />
                </div>
             {/if}
 
             <!--Passive-->
             {#if chatContext.system.passive}
                <div class="tag">
-                  <Tag label={localize("LOCAL.passive.label")} />
+                  <Tag label={localize("passive")} />
                </div>
             {/if}
          </ItemChatFooter>

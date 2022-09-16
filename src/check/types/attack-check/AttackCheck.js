@@ -1,4 +1,4 @@
-import { clamp } from "~/helpers/Utility";
+import { clamp, localize } from "~/helpers/Utility";
 import TitanSkillCheck from "~/check/types/skill-check/SkillCheck.js";
 
 export default class TitanAttackCheck extends TitanSkillCheck {
@@ -205,13 +205,13 @@ export default class TitanAttackCheck extends TitanSkillCheck {
          let subLabel = "";
 
          if (this.parameters.type === "melee") {
-            subLabel = `${game.i18n.localize(`LOCAL.melee.label`)} (${this.parameters.attackerMelee})`;
+            subLabel = `${localize(`melee`)} (${this.parameters.attackerMelee})`;
          }
          else {
-            subLabel = `${game.i18n.localize(`LOCAL.accuracy.label`)} (${this.parameters.attackerAccuracy})`;
+            subLabel = `${localize(`accuracy`)} (${this.parameters.attackerAccuracy})`;
          }
 
-         subLabel += ` vs. ${game.i18n.localize(`LOCAL.defense.label`)} (${this.parameters.targetDefense})`;
+         subLabel += ` vs. ${localize(`defense`)} (${this.parameters.targetDefense})`;
          chatContext.subLabels.push(subLabel);
       }
 

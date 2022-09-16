@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
@@ -18,7 +18,7 @@
    // Filtered Skill list
    const skillList = $document.system.skill;
    $: filteredList = Object.entries(skillList).filter(
-      ([key]) => localize(`LOCAL.${key}.label`).toLowerCase().indexOf($appState.filter.skills.toLowerCase()) !== -1
+      ([key]) => localize(`${key}`).toLowerCase().indexOf($appState.filter.skills.toLowerCase()) !== -1
    );
 </script>
 
@@ -35,15 +35,15 @@
                   <!--Button and Attribute-->
                   <div class="column">
                      <!--Button for rolling the skill-->
-                     <div class="skill-button" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+                     <div class="skill-button" data-titan-tooltip={localize(`${key}.desc`)}>
                         <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
-                           {localize(`LOCAL.${key}.label`)}<i class="fas fa-dice" />
+                           {localize(`${key}`)}<i class="fas fa-dice" />
                         </EfxButton>
                      </div>
                      <!--Default Attribute Select-->
                      <div class="default-attribute">
                         <div class="label">
-                           {localize("LOCAL.defaultAttribute.label")}
+                           {localize("defaultAttribute")}
                         </div>
                         <div class="select">
                            <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
@@ -55,15 +55,15 @@
                      <!--Header row for rolling the skill-->
                      <div class="row">
                         <div class="label" />
-                        <div class="value">{localize("LOCAL.base.label")}</div>
+                        <div class="value">{localize("base")}</div>
                         <div class="op" />
-                        <div class="value">{localize("LOCAL.mod.label")}</div>
+                        <div class="value">{localize("mod")}</div>
                         <div class="op" />
                         <div class="value" />
                      </div>
                      <!--Training row-->
                      <div class="row">
-                        <div class="label">{localize("LOCAL.training.label")}</div>
+                        <div class="label">{localize("training")}</div>
                         <div class="input">
                            <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue} />
                         </div>
@@ -81,7 +81,7 @@
                      </div>
                      <!--Expertise Row-->
                      <div class="row">
-                        <div class="label">{localize("LOCAL.expertise.label")}</div>
+                        <div class="label">{localize("expertise")}</div>
                         <div class="input">
                            <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.baseValue} />
                         </div>

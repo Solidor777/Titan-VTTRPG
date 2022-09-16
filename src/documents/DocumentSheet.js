@@ -1,9 +1,9 @@
 import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import { writable } from 'svelte/store';
-import { get } from 'svelte/store';
+import { localize } from "~/helpers/Utility.js";
 import DocumentShell from "./DocumentShell.svelte";
-export class SvelteDocumentSheet extends SvelteApplication {
+export default class SvelteDocumentSheet extends SvelteApplication {
    /**
     * Document store that monitors updates to any assigned document.
     *
@@ -87,7 +87,7 @@ export class SvelteDocumentSheet extends SvelteApplication {
       buttons.unshift({
          class: "configure-sheet",
          icon: "fas fa-cog",
-         title: game.i18n.localize(CONFIG.TITAN.local.openSheetConfigurator),
+         title: localize("openSheetConfigurator"),
          onclick: (ev) => this._onConfigureSheet(ev),
       });
       return buttons;

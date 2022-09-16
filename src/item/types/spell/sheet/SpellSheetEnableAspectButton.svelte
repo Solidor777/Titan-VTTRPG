@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // Value to toggle
@@ -41,7 +41,7 @@
       <div class="cost">
          <!--Label-->
          <div class="cost-label">
-            {localize("LOCAL.cost.label")}:
+            {localize("cost")}:
          </div>
 
          <!--Value-->

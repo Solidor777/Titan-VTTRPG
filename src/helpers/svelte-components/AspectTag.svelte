@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Spell aspect
    export let aspect = void 0;
@@ -14,14 +14,12 @@
    <!--Initial value-->
    {#if aspect.initialValue}
       <div class="stat">
-         {typeof aspect.initialValue === `string`
-            ? localize(`LOCAL.${aspect.initialValue}.label`)
-            : aspect.initialValue}
+         {typeof aspect.initialValue === `string` ? localize(`${aspect.initialValue}`) : aspect.initialValue}
          {#if aspect.scaling}
             {#if aspect.cost > 1}
-               {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
+               {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
             {:else}
-               {`+ ${localize("LOCAL.extraSuccesses.short.label")}`}
+               {`+ ${localize("extraSuccesses.short")}`}
             {/if}
          {/if}
       </div>
@@ -31,13 +29,13 @@
    {#if aspect.allOptions}
       <!--All Options-->
       <div class="stat">
-         {localize("LOCAL.all.label")}
+         {localize("all")}
       </div>
    {:else if aspect.option}
       {#each aspect.option as option}
          <!--Each option-->
          <div class="stat">
-            {localize(`LOCAL.${option}.label`)}
+            {localize(`${option}`)}
          </div>
       {/each}
    {/if}
@@ -45,8 +43,8 @@
    <!--Resistance Check-->
    {#if aspect.resistanceCheck}
       <div class="stat">
-         {localize("LOCAL.resistedBy.label")}
-         {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
+         {localize("resistedBy")}
+         {localize(`${aspect.resistanceCheck}`)}
       </div>
    {/if}
 </div>

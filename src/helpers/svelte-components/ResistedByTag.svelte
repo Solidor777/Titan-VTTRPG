@@ -1,15 +1,15 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    export let resistance = void 0;
 </script>
 
 <div class="tag {resistance}">
    <div class="label">
-      {localize("LOCAL.resistedBy.label")}
+      {localize("resistedBy")}
    </div>
    <div class="value">
-      {localize(`LOCAL.${resistance}.label`)}
+      {localize(`${resistance}`)}
    </div>
 </div>
 

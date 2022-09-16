@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import ResistanceTag from "~/helpers/svelte-components/ResistanceTag.svelte";
    import StatTag from "~/helpers/svelte-components/StatTag.svelte";
@@ -27,11 +27,11 @@
             <!--Value-->
             <div class="value">
                {#if check.skill !== "none"}
-                  {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)}) ${
-                     check.difficulty
-                  }:${check.complexity}`}
+                  {`${localize(`${check.attribute}`)} (${localize(`${check.skill}`)}) ${check.difficulty}:${
+                     check.complexity
+                  }`}
                {:else}
-                  {`${localize(`LOCAL.${check.attribute}.label`)} ${check.difficulty}:${check.complexity}`}
+                  {`${localize(`${check.attribute}`)} ${check.difficulty}:${check.complexity}`}
                {/if}
             </div>
          </div>
@@ -39,7 +39,7 @@
          <!--Resolve Cost-->
          {#if check.resolveCost > 0}
             <div class="tag" transition:slide|local>
-               <StatTag label={localize("LOCAL.resolveCost.label")} value={check.resolveCost} />
+               <StatTag label={localize("resolveCost")} value={check.resolveCost} />
             </div>
          {/if}
 
@@ -48,7 +48,7 @@
             <div class="stat" transition:slide|local>
                <!--Label-->
                <div class="label">
-                  {localize("LOCAL.resistedBy.label")}
+                  {localize("resistedBy")}
                </div>
                <!--Valie-->
                <div class="value">
@@ -62,17 +62,17 @@
             <div class="stat" transition:slide|local>
                <!--Label-->
                <div class="label">
-                  {localize("LOCAL.opposedBy.label")}
+                  {localize("opposedBy")}
                </div>
 
                <!--Value-->
                <div class="value attribute {check.opposedCheck.attribute}">
                   {#if check.opposedCheck.skill !== "none"}
-                     {`${localize(`LOCAL.${check.opposedCheck.attribute}.label`)} (${localize(
+                     {`${localize(`${check.opposedCheck.attribute}`)} (${localize(
                         `LOCAL.${check.opposedCheck.skill}.label`
                      )})`}
                   {:else}
-                     {localize(`LOCAL.${check.opposedCheck.attribute}.label`)}
+                     {localize(`${check.opposedCheck.attribute}`)}
                   {/if}
                </div>
             </div>

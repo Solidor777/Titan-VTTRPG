@@ -1,4 +1,4 @@
-import { clamp, localize } from "~/helpers/Utility";
+import { clamp, localize } from "~/helpers/Utility.js";
 
 export default class TitanCheck {
   // Constructor
@@ -274,6 +274,6 @@ export default class TitanCheck {
   }
 
   _getTypeLabel() {
-    return `${localize("LOCAL.check.label")} ${this.parameters.difficulty}:${this.parameters.complexity}`;
+    return `${localize("check")} ${this.parameters.difficulty}:${this.parameters.complexity}`;
   }
 }

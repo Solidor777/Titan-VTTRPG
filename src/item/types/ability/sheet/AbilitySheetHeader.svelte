@@ -2,7 +2,7 @@
 
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
@@ -32,7 +32,7 @@
             <!--Rarity-->
             <div class="stat">
                <div class="label">
-                  {localize("LOCAL.rarity.label")}
+                  {localize("rarity")}
                </div>
                <div class="input">
                   <DocumentRaritySelect bind:value={$document.system.rarity} />
@@ -42,7 +42,7 @@
             <!--EXP Cost-->
             <div class="stat">
                <div class="label">
-                  {localize("LOCAL.expCost.label")}
+                  {localize("expCost")}
                </div>
                <div class="input integer">
                   <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
@@ -56,7 +56,7 @@
       <!--Action-->
       <div class="checkbox">
          <div class="label">
-            {localize("LOCAL.action.label")}
+            {localize("action")}
          </div>
          <div class="input">
             <DocumentCheckboxInput bind:value={$document.system.action} />
@@ -66,7 +66,7 @@
       <!--Reaction-->
       <div class="checkbox">
          <div class="label">
-            {localize("LOCAL.reaction.label")}
+            {localize("reaction")}
          </div>
          <div class="input">
             <DocumentCheckboxInput bind:value={$document.system.reaction} />
@@ -76,7 +76,7 @@
       <!--Passive-->
       <div class="checkbox">
          <div class="label">
-            {localize("LOCAL.passive.label")}
+            {localize("passive")}
          </div>
          <div class="input">
             <DocumentCheckboxInput bind:value={$document.system.passive} />

@@ -1,10 +1,11 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import { localize } from "~/helpers/Utility.js";
 import EditAttackTraitsDialogShell from "./WeaponEditAttackTraitsDialogShell.svelte";
 export default class WeaponEditAttackTraitsDialog extends TJSDialog {
    constructor(document, attackIdx) {
       super(
          {
-            title: `${game.i18n.localize(CONFIG.TITAN.local.editAttackTraits)} (${document.name}: ${document.system.attack[attackIdx].name})`,
+            title: `${"editAttackTraits"} (${document.name}: ${document.system.attack[attackIdx].name})`,
             content: {
                class: EditAttackTraitsDialogShell,
                props: {

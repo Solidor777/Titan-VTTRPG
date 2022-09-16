@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    export let check = {
       attribute: "body",
@@ -13,7 +13,7 @@
 <div class="check-label {check.attribute}">
    <!--Skill & Attribute-->
    <div class="skill-attribute">
-      {`${localize(`LOCAL.${check.attribute}.label`)} (${localize(`LOCAL.${check.skill}.label`)})`}
+      {`${localize(`${check.attribute}`)} (${localize(`${check.skill}`)})`}
    </div>
 
    <!--DC-->

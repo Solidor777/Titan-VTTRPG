@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "../../helpers/svelte-components/EfxButton.svelte";
@@ -57,7 +57,7 @@
 
 <div class="damage-buttons">
    <!--Apply damage button-->
-   <div class="button" data-titan-tooltip={localize("LOCAL.applyDamage.label")}>
+   <div class="button" data-titan-tooltip={localize("applyDamage")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
@@ -67,7 +67,7 @@
    </div>
 
    <!--Apply damage ignore armor button-->
-   <div class="button" data-titan-tooltip={localize("LOCAL.applyDamageIgnoreArmor.label")}>
+   <div class="button" data-titan-tooltip={localize("applyDamageIgnoreArmor")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
@@ -77,7 +77,7 @@
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" data-titan-tooltip={localize("LOCAL.applyHalfDamage.label")}>
+   <div class="button" data-titan-tooltip={localize("applyHalfDamage")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
@@ -87,7 +87,7 @@
    </div>
 
    <!--Apply healing button-->
-   <div class="button" data-titan-tooltip={localize("LOCAL.healDamage.label")}>
+   <div class="button" data-titan-tooltip={localize("healDamage")}>
       <EfxButton
          efx={ripple}
          on:click={() => {

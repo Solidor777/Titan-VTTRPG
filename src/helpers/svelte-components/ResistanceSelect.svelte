@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import Select from "~/helpers/svelte-components/Select.svelte";
 
    // Value
@@ -8,15 +8,15 @@
    // Options
    export let options = [
       {
-         label: localize("LOCAL.reflexes.label"),
+         label: localize("reflexes"),
          value: "reflexes",
       },
       {
-         label: localize("LOCAL.resilience.label"),
+         label: localize("resilience"),
          value: "resilience",
       },
       {
-         label: localize("LOCAL.willpower.label"),
+         label: localize("willpower"),
          value: "willpower",
       },
    ];

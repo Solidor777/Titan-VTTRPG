@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Chat context reference
    const document = getContext("DocumentSheetObject");
@@ -8,7 +8,7 @@
 </script>
 
 <div class="tag {chatContext.system.rarity}">
-   {localize(`LOCAL.${chatContext.system.rarity}.label`)}
+   {localize(`${chatContext.system.rarity}`)}
 </div>
 
 <style lang="scss">

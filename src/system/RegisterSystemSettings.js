@@ -1,4 +1,4 @@
-export function registerSystemSettings() {
+export default function registerSystemSettings() {
   game.settings.register("titan", "getCheckOptions", {
     config: true,
     scope: "client",

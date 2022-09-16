@@ -2,7 +2,7 @@
 
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
    // Document reference
@@ -15,7 +15,7 @@
 <div class="sidebar">
    <!--Header-->
    <div class="header {$document.system.check.attribute}">
-      {`${localize(`LOCAL.${$document.system.check.attribute}.label`)} (${localize(
+      {`${localize(`${$document.system.check.attribute}`)} (${localize(
          `LOCAL.${$document.system.check.skill}.label`
       )}) ${$document.system.check.difficulty}:${$document.system.check.complexity}`}
    </div>
@@ -36,13 +36,13 @@
                   {#if aspect.initialValue}
                      <div class="aspect-value">
                         {typeof aspect.initialValue === `string`
-                           ? localize(`LOCAL.${aspect.initialValue}.label`)
+                           ? localize(`${aspect.initialValue}`)
                            : aspect.initialValue}
                         {#if aspect.scaling}
                            {#if aspect.cost > 1}
-                              {`+ (${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`}
+                              {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
                            {:else}
-                              {`+ ${localize("LOCAL.extraSuccesses.short.label")}`}
+                              {`+ ${localize("extraSuccesses.short")}`}
                            {/if}
                         {/if}
                      </div>
@@ -54,13 +54,13 @@
                         {#if aspect.allOptions}
                            <!--All Options-->
                            <div class="aspect-option">
-                              {localize("LOCAL.all.label")}
+                              {localize("all")}
                            </div>
                         {:else}
                            {#each aspect.option as option}
                               <!--Each option-->
                               <div class="aspect-option">
-                                 {localize(`LOCAL.${option}.label`)}
+                                 {localize(`${option}`)}
                               </div>
                            {/each}
                         {/if}
@@ -71,10 +71,10 @@
                   {#if aspect.resistanceCheck}
                      <div class="aspect-resistance-check">
                         <div class="resistance-check-label">
-                           {localize("LOCAL.resistedBy.label")}
+                           {localize("resistedBy")}
                         </div>
                         <div class="resistance-check-value {aspect.resistanceCheck}">
-                           {localize(`LOCAL.${aspect.resistanceCheck}.label`)}
+                           {localize(`${aspect.resistanceCheck}`)}
                         </div>
                      </div>
                   {/if}

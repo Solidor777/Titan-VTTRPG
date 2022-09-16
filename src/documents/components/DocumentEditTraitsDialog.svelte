@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
@@ -54,7 +54,7 @@
          <li>
             <!--Label-->
             <div class="label">
-               {localize(`LOCAL.${trait.name}.label`)}
+               {localize(`${trait.name}`)}
             </div>
 
             <!--Input-->
@@ -73,11 +73,11 @@
 
    <!--Buttons-->
    <div class="row">
-      <button on:click={applyTraitEdits}>{localize("LOCAL.applyEdits.label")}</button>
+      <button on:click={applyTraitEdits}>{localize("applyEdits")}</button>
       <button
          on:click={() => {
             application.close();
-         }}>{localize("LOCAL.cancel.label")}</button
+         }}>{localize("cancel")}</button
       >
    </div>
 </div>

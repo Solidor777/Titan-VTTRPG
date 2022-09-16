@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import StatTag from "~/helpers/svelte-components/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/Tag.svelte";
 
@@ -24,26 +24,24 @@
          <div class="row stats">
             <!--Range-->
             <div class="stat">
-               <StatTag label={localize("LOCAL.range.label")} value={attack.range} />
+               <StatTag label={localize("range")} value={attack.range} />
             </div>
 
             <!--Attribute-->
             <div class="stat">
-               <StatTag label={localize("LOCAL.attribute.label")} value={localize(`LOCAL.${attack.attribute}.label`)} />
+               <StatTag label={localize("attribute")} value={localize(`${attack.attribute}`)} />
             </div>
 
             <!--Skill-->
             <div class="stat">
-               <StatTag label={localize("LOCAL.skill.label")} value={localize(`LOCAL.${attack.skill}.label`)} />
+               <StatTag label={localize("skill")} value={localize(`${attack.skill}`)} />
             </div>
 
             <!--Damage-->
             <div class="stat">
                <StatTag
-                  label={localize("LOCAL.damage.label")}
-                  value={`${attack.damage}${
-                     attack.plusSuccessDamage === true ? localize("LOCAL.plusSuccess.label") : ""
-                  }`}
+                  label={localize("damage")}
+                  value={`${attack.damage}${attack.plusSuccessDamage === true ? localize("plusSuccess") : ""}`}
                />
             </div>
 
@@ -51,9 +49,9 @@
             {#each attack.traits as trait}
                <div class="stat">
                   {#if trait.type === "number"}
-                     <StatTag label={localize(`LOCAL.${trait.name}.label`)} value={trait.value} />
+                     <StatTag label={localize(`${trait.name}`)} value={trait.value} />
                   {:else}
-                     <Tag label={localize(`LOCAL.${trait.name}.label`)} />
+                     <Tag label={localize(`${trait.name}`)} />
                   {/if}
                </div>
             {/each}

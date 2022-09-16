@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
 
    // Aspect
@@ -91,9 +91,9 @@
 
    function getExtraSuccessCostLabel() {
       if (aspect.cost > 1) {
-         return `(${aspect.cost} / ${localize("LOCAL.extraSuccesses.short.label")})`;
+         return `(${aspect.cost} / ${localize("extraSuccesses.short")})`;
       }
-      return localize("LOCAL.extraSuccesses.short.label");
+      return localize("extraSuccesses.short");
    }
 </script>
 

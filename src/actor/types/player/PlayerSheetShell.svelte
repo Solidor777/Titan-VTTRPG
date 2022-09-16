@@ -4,7 +4,7 @@
    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
@@ -31,11 +31,11 @@
 
    // Tabs
    const tabs = [
-      { label: localize("LOCAL.skills.label"), id: "skills", component: ActorSkillsTab },
-      { label: localize("LOCAL.actions.label"), id: "actions", component: ActorActionsTab },
-      { label: localize("LOCAL.inventory.label"), id: "inventory", component: ActorInventoryTab },
-      { label: localize("LOCAL.abilities.label"), id: "abilities", component: ActorAbilitiesTab },
-      { label: localize("LOCAL.spells.label"), id: "spells", component: ActorSpellsTab },
+      { label: localize("skills"), id: "skills", component: ActorSkillsTab },
+      { label: localize("actions"), id: "actions", component: ActorActionsTab },
+      { label: localize("inventory"), id: "inventory", component: ActorInventoryTab },
+      { label: localize("abilities"), id: "abilities", component: ActorAbilitiesTab },
+      { label: localize("spells"), id: "spells", component: ActorSpellsTab },
    ];
 
    // Application reference
@@ -61,11 +61,11 @@
                      bind:value={$document.system.resource[key].value}
                      bind:staticMod={$document.system.resource[key].staticMod}
                      max={$document.system.resource[key].maxValue}
-                     label={localize(`LOCAL.${key}.label`)}
-                     editStaticModTooltip={localize(`LOCAL.${key}.editStaticMod.label`)}
-                     editValueTooltip={localize(`LOCAL.${key}.editValue.label`)}
-                     valueTooltip={localize(`LOCAL.${key}.valueDesc.label`)}
-                     maxTooltip={localize(`LOCAL.${key}.max.label`)}
+                     label={localize(`${key}`)}
+                     editStaticModTooltip={localize(`${key}.editStaticMod`)}
+                     editValueTooltip={localize(`${key}.editValue`)}
+                     valueTooltip={localize(`${key}.valueDesc`)}
+                     maxTooltip={localize(`${key}.max`)}
                   />
                </div>
             {/each}
@@ -92,9 +92,9 @@
          <!--Speeds-->
          <div class="speeds">
             <div class="label">
-               <div class="name">{localize("LOCAL.speed.label")}</div>
-               <div class="base">{localize("LOCAL.base.label")}</div>
-               <div class="mod">{localize("LOCAL.mod.label")}</div>
+               <div class="name">{localize("speed")}</div>
+               <div class="base">{localize("base")}</div>
+               <div class="mod">{localize("mod")}</div>
             </div>
             {#each Object.entries($document.system.speed) as [key]}
                <div class="speed">
@@ -117,17 +117,17 @@
                <!--Exp-->
                <div class="exp">
                   <!--Available-->
-                  <div class="available" data-titan-tooltip={localize("LOCAL.expAvailable.label")}>
+                  <div class="available" data-titan-tooltip={localize("expAvailable")}>
                      {$document.system.exp.available} /
                   </div>
 
                   <!--Earned Input-->
-                  <div class="earned" data-titan-tooltip={localize("LOCAL.expEarned.label")}>
+                  <div class="earned" data-titan-tooltip={localize("expEarned")}>
                      <DocumentIntegerInput bind:value={$document.system.exp.earned} />
                   </div>
 
                   <!--Label-->
-                  <div class="label">{localize("LOCAL.exp.label")}</div>
+                  <div class="label">{localize("exp")}</div>
                </div>
             </div>
 
@@ -136,9 +136,9 @@
                <!--Attributes-->
                <div class="attributes">
                   <div class="label">
-                     <div class="name">{localize("LOCAL.attribute.label")}</div>
-                     <div class="base">{localize("LOCAL.base.label")}</div>
-                     <div class="mod">{localize("LOCAL.mod.label")}</div>
+                     <div class="name">{localize("attribute")}</div>
+                     <div class="base">{localize("base")}</div>
+                     <div class="mod">{localize("mod")}</div>
                   </div>
                   {#each Object.entries($document.system.attribute) as [key]}
                      <div class="attribute">
@@ -153,9 +153,9 @@
                <!--Resistances-->
                <div class="resistances">
                   <div class="label">
-                     <div class="name">{localize("LOCAL.resistance.label")}</div>
-                     <div class="base">{localize("LOCAL.base.label")}</div>
-                     <div class="mod">{localize("LOCAL.mod.label")}</div>
+                     <div class="name">{localize("resistance")}</div>
+                     <div class="base">{localize("base")}</div>
+                     <div class="mod">{localize("mod")}</div>
                   </div>
                   {#each Object.entries($document.system.resistance) as [key]}
                      <div class="resistance">

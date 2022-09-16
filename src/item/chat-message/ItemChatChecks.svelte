@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import OpposedCheckLabel from "~/helpers/svelte-components/OpposedCheckLabel.svelte";
    import ResistedByTag from "~/helpers/svelte-components/ResistedByTag.svelte";
    import StatTag from "~/helpers/svelte-components/StatTag.svelte";
@@ -10,9 +10,9 @@
    const chatContext = $document.flags.titan.chatContext;
 
    function getTagFromCheck(check) {
-      let retVal = localize(`LOCAL.${check.attribute}.label`);
+      let retVal = localize(`${check.attribute}`);
       if (check.skill && check.skill !== "none") {
-         retVal += ` (${localize(`LOCAL.${check.skill}.label`)})`;
+         retVal += ` (${localize(`${check.skill}`)})`;
       }
       retVal += ` ${check.difficulty}`;
       if (check.complexity) {
@@ -44,7 +44,7 @@
             <!--Resolve Cost-->
             {#if check.resolveCost > 0}
                <div class="tag">
-                  <StatTag label={localize("LOCAL.resolveCost.label")} value={check.resolveCost} />
+                  <StatTag label={localize("resolveCost")} value={check.resolveCost} />
                </div>
             {/if}
 

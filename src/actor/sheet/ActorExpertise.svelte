@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
 
    export let skill = "athletics";
@@ -14,7 +14,7 @@
    <!--Label-->
    <div class="label">
       <i class="fas fa-graduation-cap" />
-      {localize("LOCAL.expertise.label")}:
+      {localize("expertise")}:
    </div>
 
    <!--Value-->

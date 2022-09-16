@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -11,7 +11,7 @@
    <!--Header-->
    <div class="header">
       <div class="label">
-         <i class="fas fa-bolt" />{localize("LOCAL.damageReport.label")}
+         <i class="fas fa-bolt" />{localize("damageReport")}
       </div>
       <div class="name">
          {chatContext.actorName}
@@ -22,14 +22,14 @@
       <!--Ignore Armor-->
       <div class="row">
          <div class="label">
-            {localize("LOCAL.ignoreArmor.label")}
+            {localize("ignoreArmor")}
          </div>
       </div>
    {:else}
       <!--Base Damage-->
       <div class="row">
          <div class="label">
-            {localize("LOCAL.baseDamage.label")}:
+            {localize("baseDamage")}:
          </div>
          <div class="value">
             {chatContext.baseDamage}
@@ -39,7 +39,7 @@
       <!--Armor-->
       <div class="row">
          <div class="label">
-            {localize("LOCAL.armor.label")}:
+            {localize("armor")}:
          </div>
          <div class="value">
             {chatContext.armor}
@@ -50,7 +50,7 @@
    <!--Damage taken-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.damageTaken.label")}:
+         {localize("damageTaken")}:
       </div>
       <div class="value">
          {chatContext.damage}
@@ -60,7 +60,7 @@
    <!--Stamina-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.stamina.label")}:
+         {localize("stamina")}:
       </div>
       <div class="value">
          {chatContext.stamina.value} / {chatContext.stamina.maxValue}
@@ -70,7 +70,7 @@
    <!--Wounds-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.wounds.label")}:
+         {localize("wounds")}:
       </div>
       <div class="value">
          {chatContext.wounds.value} / {chatContext.wounds.maxValue}

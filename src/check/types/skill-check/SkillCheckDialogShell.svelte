@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
@@ -88,7 +88,7 @@
    <!--Attribute-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.attribute.label")}
+         {localize("attribute")}
       </div>
       <div class="input">
          <AttributeSelect bind:value={checkParameters.attribute} />
@@ -98,7 +98,7 @@
    <!--Skill-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.skill.label")}
+         {localize("skill")}
       </div>
       <div class="input">
          <SkillSelect bind:value={checkParameters.skill} />
@@ -108,7 +108,7 @@
    <!--Difficulty-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.difficulty.label")}
+         {localize("difficulty")}
       </div>
       <div class="input">
          <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
@@ -118,7 +118,7 @@
    <!--Complexity-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.complexity.label")}
+         {localize("complexity")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.complexity} min={0} />
@@ -128,7 +128,7 @@
    <!--Dice Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.bonusPenaltyDice.label")}
+         {localize("bonusPenaltyDice")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.diceMod} />
@@ -138,7 +138,7 @@
    <!--Training Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.trainingMod.label")}
+         {localize("trainingMod")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.trainingMod} />
@@ -148,7 +148,7 @@
    <!--Expertise Mod-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.expertiseMod.label")}
+         {localize("expertiseMod")}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.expertiseMod} />
@@ -158,7 +158,7 @@
    <!--Double Training-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.doubleTraining.label")}
+         {localize("doubleTraining")}
       </div>
       <div class="input">
          <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
@@ -168,7 +168,7 @@
    <!--Double Expertise-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.doubleExpertise.label")}
+         {localize("doubleExpertise")}
       </div>
       <div class="input">
          <input type="checkbox" bind:checked={checkParameters.doubleExpertise} />
@@ -179,21 +179,21 @@
    <div class="row">
       <!--Total Dice-->
       <div class="summary">
-         {localize("LOCAL.totalDice.label") + ": "}
+         {localize("totalDice") + ": "}
          {totalDice}
       </div>
 
       <!--Total Expertise-->
       <div class="summary">
-         {localize("LOCAL.totalExpertise.label") + ": "}
+         {localize("totalExpertise") + ": "}
          {totalExpertise}
       </div>
    </div>
 
    <!--Buttons-->
    <div class="row">
-      <button on:click={onRoll}>{localize("LOCAL.roll.label")}</button>
-      <button on:click={onCancel}>{localize("LOCAL.cancel.label")}</button>
+      <button on:click={onRoll}>{localize("roll")}</button>
+      <button on:click={onCancel}>{localize("cancel")}</button>
    </div>
 </div>
 

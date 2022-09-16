@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import DocumentIntegerInput from "../../documents/components/DocumentIntegerInput.svelte";
 
@@ -16,27 +16,27 @@
 <!--Speeds-->
 <div class="speed">
    <!--Label-->
-   <div class="label" data-titan-tooltip={localize(`LOCAL.${key}.desc.label`)}>
+   <div class="label" data-titan-tooltip={localize(`${key}.desc`)}>
       <!--Icon-->
-      {localize(`LOCAL.${key}.label`)}
+      {localize(`${key}`)}
    </div>
 
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editBaseValue.label`)}>
+      <div class="input" data-titan-tooltip={localize(`${key}.editBaseValue`)}>
          <DocumentIntegerInput bind:value={$document.system.speed[key].baseValue} />
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="input" data-titan-tooltip={localize(`LOCAL.${key}.editStaticMod.label`)}>
+      <div class="input" data-titan-tooltip={localize(`${key}.editStaticMod`)}>
          <DocumentIntegerInput bind:value={$document.system.speed[key].staticMod} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label final" data-titan-tooltip={localize(`LOCAL.${key}.value.label`)}>
+      <div class="label final" data-titan-tooltip={localize(`${key}.value`)}>
          {speed.value}
       </div>
    </div>

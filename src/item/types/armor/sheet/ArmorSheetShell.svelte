@@ -4,7 +4,7 @@
    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
@@ -39,7 +39,7 @@
             <div class="stats">
                <!--Rarity-->
                <div class="stat-label">
-                  {localize("LOCAL.rarity.label")}
+                  {localize("rarity")}
                </div>
                <div class="stat-input">
                   <DocumentRaritySelect bind:value={$document.system.rarity} />
@@ -47,7 +47,7 @@
 
                <!--Value-->
                <div class="stat-label">
-                  {localize("LOCAL.value.label")}
+                  {localize("value")}
                </div>
                <div class="stat-input">
                   <DocumentIntegerInput bind:value={$document.system.value} />
@@ -64,7 +64,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("LOCAL.armor.label")}
+                     {localize("armor")}
                   </div>
                   <!--Input-->
                   <div class="input">
@@ -80,7 +80,7 @@
                   <div />
                   <!--Label-->
                   <div>
-                     {localize("LOCAL.traits.label")}
+                     {localize("traits")}
                   </div>
                   <!--Edit button-->
                   <div>
@@ -97,7 +97,7 @@
                   <!--Each trait-->
                   {#each $document.system.traits as trait}
                      <div class="armor-trait">
-                        {localize(`LOCAL.${trait.name}.label`)}
+                        {localize(`${trait.name}`)}
                         {#if trait.type === "number"}
                            {trait.value}
                         {/if}

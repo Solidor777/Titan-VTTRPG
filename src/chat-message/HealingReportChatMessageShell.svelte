@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Document reference
    const document = getContext("DocumentSheetObject");
@@ -11,7 +11,7 @@
    <!--Header-->
    <div class="header">
       <div class="label">
-         <i class="fas fa-heart" />{localize("LOCAL.healingReport.label")}
+         <i class="fas fa-heart" />{localize("healingReport")}
       </div>
       <div class="name">
          {chatContext.actorName}
@@ -21,7 +21,7 @@
    <!--Stamina healed-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.staminaHealed.label")}:
+         {localize("staminaHealed")}:
       </div>
       <div class="value">
          {chatContext.healing}
@@ -31,7 +31,7 @@
    <!--Stamina-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.stamina.label")}:
+         {localize("stamina")}:
       </div>
       <div class="value">
          {chatContext.stamina.value} / {chatContext.stamina.maxValue}
@@ -41,7 +41,7 @@
    <!--Wounds-->
    <div class="row">
       <div class="label">
-         {localize("LOCAL.wounds.label")}:
+         {localize("wounds")}:
       </div>
       <div class="value">
          {chatContext.wounds.value} / {chatContext.wounds.maxValue}

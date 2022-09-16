@@ -1,12 +1,12 @@
 <script>
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
 
    // Reference to the item
    export let item = void 0;
 </script>
 
 <div class="rarity {item.system.rarity}">
-   {localize(`LOCAL.${item.system.rarity}.label`)}
+   {localize(`${item.system.rarity}`)}
 </div>
 
 <style lang="scss">

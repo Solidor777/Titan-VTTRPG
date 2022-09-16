@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+   import { localize } from "~/helpers/Utility.js";
    import ActorCheckLabelLong from "~/actor/sheet/ActorCheckLabelLong.svelte";
    import ActorItemCheckButton from "./ActorItemCheckButton.svelte";
    import OpposedCheckLabel from "~/helpers/svelte-components/OpposedCheckLabel.svelte";
@@ -45,7 +45,7 @@
          <!--Resolve Cost-->
          {#if check.resolveCost > 0}
             <div class="tag">
-               <StatTag label={localize("LOCAL.resolveCost.label")} value={check.resolveCost} />
+               <StatTag label={localize("resolveCost")} value={check.resolveCost} />
             </div>
          {/if}
 

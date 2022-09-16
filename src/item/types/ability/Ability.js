@@ -2,7 +2,7 @@ import TitanTypeComponent from "~/helpers/TypeComponent";
 
 function getCheckTemplate() {
    return {
-      label: game.i18n.localize("LOCAL.check.label"),
+      label: localize("check"),
       attribute: "body",
       skill: "athletics",
       difficulty: 4,
