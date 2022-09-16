@@ -41,7 +41,7 @@ Hooks.once('init', async () => {
       types: ['armor'],
       makeDefault: true,
    });
-   Items.registerSystemSettings('titan', TitanEffectSheet, {
+   Items.registerSheet('titan', TitanEffectSheet, {
       types: ['effect'],
       makeDefault: true,
    });
