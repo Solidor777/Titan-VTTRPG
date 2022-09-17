@@ -5,21 +5,21 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/DocumentName.svelte";
-   import ActorResourceMeter from "~/actor/sheet/ActorResourceMeter.svelte";
-   import ActorResistance from "~/actor/sheet/ActorResistance.svelte";
-   import ActorRating from "~/actor/sheet/ActorRating.svelte";
-   import ActorSpeed from "~/actor/sheet/ActorSpeed.svelte";
-   import ActorAttribute from "~/actor/sheet/ActorAttribute.svelte";
-   import ActorSkillsTab from "~/actor/sheet/ActorSkillsTab.svelte";
-   import ActorInventoryTab from "~/actor/sheet/ActorInventoryTab.svelte";
-   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import ActorActionsTab from "~/actor/sheet/ActorActionsTab.svelte";
-   import ActorMod from "~/actor/sheet/ActorMod.svelte";
-   import ActorSpellsTab from "~/actor/sheet/ActorSpellsTab.svelte";
-   import ActorAbilitiesTab from "~/actor/sheet/ActorAbilitiesTab.svelte";
+   import CharacterResourceMeter from "../character/sheet/base/CharacterResourceMeter.svelte";
+   import CharacterMod from "../character/sheet/base/CharacterMod.svelte";
+   import CharacterRating from "../character/sheet/base/CharacterRating.svelte";
+   import CharacterSpeed from "../character/sheet/base/CharacterSpeed.svelte";
+   import CharacterAttribute from "../character/sheet/base/CharacterAttribute.svelte";
+   import CharacterResistance from "../character/sheet/base/CharacterResistance.svelte";
+   import CharacterSkillsTab from "../character/sheet/tabs/CharacterSkillsTab.svelte";
+   import CharacterActionsTab from "../character/sheet/tabs/CharacterActionsTab.svelte";
+   import CharacterAbilitiesTab from "../character/sheet/tabs/CharacterAbilitiesTab.svelte";
+   import CharacterInventoryTab from "../character/sheet/tabs/CharacterInventoryTab.svelte";
+   import CharacterSpellsTab from "../character/sheet/tabs/CharacterSpellsTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -31,11 +31,11 @@
 
    // Tabs
    const tabs = [
-      { label: localize("skills"), id: "skills", component: ActorSkillsTab },
-      { label: localize("actions"), id: "actions", component: ActorActionsTab },
-      { label: localize("inventory"), id: "inventory", component: ActorInventoryTab },
-      { label: localize("abilities"), id: "abilities", component: ActorAbilitiesTab },
-      { label: localize("spells"), id: "spells", component: ActorSpellsTab },
+      { label: localize("skills"), id: "skills", component: CharacterSkillsTab },
+      { label: localize("actions"), id: "actions", component: CharacterActionsTab },
+      { label: localize("inventory"), id: "inventory", component: CharacterInventoryTab },
+      { label: localize("abilities"), id: "abilities", component: CharacterAbilitiesTab },
+      { label: localize("spells"), id: "spells", component: CharacterSpellsTab },
    ];
 
    // Application reference
@@ -57,7 +57,7 @@
             <!--Each Resource Meter-->
             {#each Object.entries($document.system.resource) as [key]}
                <div class="resource {key}">
-                  <ActorResourceMeter
+                  <CharacterResourceMeter
                      bind:value={$document.system.resource[key].value}
                      bind:staticMod={$document.system.resource[key].staticMod}
                      max={$document.system.resource[key].maxValue}
@@ -75,7 +75,7 @@
          <div class="mods">
             {#each Object.entries($document.system.mod) as [key]}
                <div class="mod">
-                  <ActorMod bind:key />
+                  <CharacterMod bind:key />
                </div>
             {/each}
          </div>
@@ -84,7 +84,7 @@
          <div class="ratings">
             {#each Object.entries($document.system.rating) as [key]}
                <div class="rating">
-                  <ActorRating bind:key />
+                  <CharacterRating bind:key />
                </div>
             {/each}
          </div>
@@ -98,7 +98,7 @@
             </div>
             {#each Object.entries($document.system.speed) as [key]}
                <div class="speed">
-                  <ActorSpeed bind:key />
+                  <CharacterSpeed bind:key />
                </div>
             {/each}
          </div>
@@ -109,7 +109,7 @@
          <div class="header">
             <!--Name and EXP-->
             <div class="row">
-               <!--Actor name Sheet-->
+               <!--Character name Sheet-->
                <div class="actor-name">
                   <DocumentName />
                </div>
@@ -142,7 +142,7 @@
                   </div>
                   {#each Object.entries($document.system.attribute) as [key]}
                      <div class="attribute">
-                        <ActorAttribute bind:key />
+                        <CharacterAttribute bind:key />
                      </div>
                   {/each}
                </div>
@@ -159,7 +159,7 @@
                   </div>
                   {#each Object.entries($document.system.resistance) as [key]}
                      <div class="resistance">
-                        <ActorResistance bind:key />
+                        <CharacterResistance bind:key />
                      </div>
                   {/each}
                </div>

@@ -5,7 +5,7 @@
    import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
    import ItemChatTradition from "~/item/chat-message/ItemChatTradition.svelte";
    import ItemCheckChatLabel from "~/item/chat-message/ItemCheckChatLabel.svelte";
-   import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
+   import SpellAspectTags from "~/helpers/svelte-components/SpellAspectTags.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -16,7 +16,7 @@
    <ItemCheckChatLabel />
    <div class="info-container">
       <div class="info">
-         <AspectTags aspects={chatContext.aspects} />
+         <SpellAspectTags aspects={chatContext.aspects} />
       </div>
 
       <div class="info">

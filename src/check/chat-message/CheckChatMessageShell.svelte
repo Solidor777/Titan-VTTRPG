@@ -6,9 +6,9 @@
    import CheckChatResults from "./CheckChatResults.svelte";
    import CheckChatDamageButtons from "./CheckChatDamageButtons.svelte";
    import CheckChatHealingButton from "./CheckChatHealingButton.svelte";
-   import AspectTags from "~/helpers/svelte-components/AspectTags.svelte";
    import CheckChatResistanceCheckButtons from "./CheckChatResistanceCheckButtons.svelte";
    import CheckChatOpposedCheckButton from "./CheckChatOpposedCheckButton.svelte";
+   import SpellAspectTags from "~/helpers/svelte-components/SpellAspectTags.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -28,7 +28,7 @@
 
    {#if chatContext.parameters.aspects && chatContext.parameters.aspects.length > 0}
       <div class="info top-margin">
-         <AspectTags aspects={chatContext.parameters.aspects} />
+         <SpellAspectTags aspects={chatContext.parameters.aspects} />
       </div>
    {/if}
 
