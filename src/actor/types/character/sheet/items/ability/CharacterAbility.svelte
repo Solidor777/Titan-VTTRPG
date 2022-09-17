@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import Tag from "~/helpers/svelte-components/Tag.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import CharacterItemExpandButton from "../CharacterItemExpandButton.svelte";
    import CharacterCheckButtonSmall from "../../checks/CharacterCheckButtonSmall.svelte";
    import CharacterItemSendToChatButton from "../CharacterItemSendToChatButton.svelte";

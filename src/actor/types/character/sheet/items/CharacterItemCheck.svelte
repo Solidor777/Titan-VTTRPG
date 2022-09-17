@@ -2,8 +2,8 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import OpposedCheckLabel from "~/helpers/svelte-components/OpposedCheckLabel.svelte";
-   import ResistedByTag from "~/helpers/svelte-components/ResistedByTag.svelte";
-   import StatTag from "~/helpers/svelte-components/StatTag.svelte";
+   import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import CharacterItemCheckButton from "./CharacterItemCheckButton.svelte";
    import CharacterCheckLabelLong from "../checks/CharacterCheckLabelLong.svelte";
 

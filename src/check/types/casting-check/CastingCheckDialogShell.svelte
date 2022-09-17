@@ -3,9 +3,9 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
-   import SkillSelect from "~/helpers/svelte-components/SkillSelect.svelte";
-   import CheckDifficultySelect from "~/helpers/svelte-components/CheckDifficultySelect.svelte";
+   import AttributeSelect from "~/helpers/svelte-components/select/AttributeSelect.svelte";
+   import SkillSelect from "~/helpers/svelte-components/select/SkillSelect.svelte";
+   import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
    import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
 
    // The actor document making this check

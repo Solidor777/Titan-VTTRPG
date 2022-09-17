@@ -11,7 +11,7 @@
    import CharacterItemRarity from "../CharacterItemRarity.svelte";
    import CharacterItemTradition from "../CharacterItemTradition.svelte";
    import CharacterCheckLabelLong from "../../checks/CharacterCheckLabelLong.svelte";
-   import SpellAspectTags from "~/helpers/svelte-components/SpellAspectTags.svelte";
+   import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
 
    // Reference to the application
    const application = getContext("external").application;

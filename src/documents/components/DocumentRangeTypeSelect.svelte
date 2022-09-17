@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import RangeTypeSelect from "~/helpers/svelte-components/RangeTypeSelect.svelte";
+   import RangeTypeSelect from "~/helpers/svelte-components/select/RangeTypeSelect.svelte";
 
    // The value of the input
    export let value;

@@ -1,8 +1,8 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import StatTag from "~/helpers/svelte-components/StatTag.svelte";
-   import Tag from "~/helpers/svelte-components/Tag.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");

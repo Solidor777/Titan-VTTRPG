@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import RatingSelect from "~/helpers/svelte-components/RatingSelect.svelte";
+   import RatingSelect from "~/helpers/svelte-components/select/RatingSelect.svelte";
 
    // The value of the input
    export let value;

@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import IntegerSelect from "~/helpers/svelte-components/IntegerSelect.svelte";
+   import IntegerSelect from "~/helpers/svelte-components/select/IntegerSelect.svelte";
 
    // The value of the input
    export let value = void 0;

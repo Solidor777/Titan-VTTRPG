@@ -5,7 +5,7 @@
    import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
    import ItemChatTradition from "~/item/chat-message/ItemChatTradition.svelte";
    import ItemCheckChatLabel from "~/item/chat-message/ItemCheckChatLabel.svelte";
-   import SpellAspectTags from "~/helpers/svelte-components/SpellAspectTags.svelte";
+   import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");

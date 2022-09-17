@@ -8,7 +8,7 @@
    import CheckChatHealingButton from "./CheckChatHealingButton.svelte";
    import CheckChatResistanceCheckButtons from "./CheckChatResistanceCheckButtons.svelte";
    import CheckChatOpposedCheckButton from "./CheckChatOpposedCheckButton.svelte";
-   import SpellAspectTags from "~/helpers/svelte-components/SpellAspectTags.svelte";
+   import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");

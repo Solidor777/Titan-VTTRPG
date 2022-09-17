@@ -1,5 +1,5 @@
 <script>
-   import AttributeSelect from "~/helpers/svelte-components/AttributeSelect.svelte";
+   import AttributeSelect from "~/helpers/svelte-components/select/AttributeSelect.svelte";
    import { getContext } from "svelte";
 
    // The value of the input

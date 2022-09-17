@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import ResistanceSelect from "~/helpers/svelte-components/ResistanceSelect.svelte";
+   import ResistanceSelect from "~/helpers/svelte-components/select/ResistanceSelect.svelte";
 
    // Value
    export let value = void 0;

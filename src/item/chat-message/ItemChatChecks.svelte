@@ -2,9 +2,9 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import OpposedCheckLabel from "~/helpers/svelte-components/OpposedCheckLabel.svelte";
-   import ResistedByTag from "~/helpers/svelte-components/ResistedByTag.svelte";
-   import StatTag from "~/helpers/svelte-components/StatTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/AttributeTag.svelte";
+   import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
+   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
 
    const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;

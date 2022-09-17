@@ -5,16 +5,11 @@
 </script>
 
 <div class="tag {resistance}">
-   <div class="label">
-      {localize("resistedBy")}
-   </div>
-   <div class="value">
-      {localize(`${resistance}`)}
-   </div>
+   {localize(`${resistance}`)}
 </div>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
+   @import "../../../styles/mixins.scss";
 
    .tag {
       @include flex-row;
@@ -32,13 +27,6 @@
 
       &.willpower {
          background: var(--willpower-color-bright);
-      }
-
-      .label {
-         @include border-right;
-         font-weight: bold;
-         padding-right: 0.25rem;
-         margin-right: 0.25rem;
       }
    }
 </style>

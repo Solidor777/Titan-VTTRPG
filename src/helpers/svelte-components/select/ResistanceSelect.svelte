@@ -1,6 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import Select from "~/helpers/svelte-components/Select.svelte";
+   import Select from "~/helpers/svelte-components/select/Select.svelte";
 
    // Value
    export let value = void 0;
