@@ -3,7 +3,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
+   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
 
    // The document
    export let document = void 0;

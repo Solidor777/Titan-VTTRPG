@@ -1,7 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    const document = getContext("DocumentStore");
 
    // Results

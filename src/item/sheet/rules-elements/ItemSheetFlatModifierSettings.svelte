@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";

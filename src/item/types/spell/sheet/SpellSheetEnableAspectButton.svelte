@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { localize } from "~/helpers/Utility.js";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Value to toggle
    export let enabled = void 0;

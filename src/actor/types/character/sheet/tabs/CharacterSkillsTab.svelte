@@ -5,7 +5,7 @@
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
    // Document reference

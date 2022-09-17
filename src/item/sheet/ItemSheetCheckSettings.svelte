@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";

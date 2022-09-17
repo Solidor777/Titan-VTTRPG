@@ -3,7 +3,7 @@
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import ToggleOptionButton from "~/helpers/svelte-components/ToggleOptionButton.svelte";
+   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
    import CharacterItemList from "../items/CharacterItemList.svelte";
    import CharacterAbility from "../items/ability/CharacterAbility.svelte";
    import CharacterItemAddEntryButton from "../items/CharacterItemAddEntryButton.svelte";

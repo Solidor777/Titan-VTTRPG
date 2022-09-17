@@ -1,5 +1,5 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Check reference
    export let check = void 0;

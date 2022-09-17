@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import ResistanceCheckButton from "~/helpers/svelte-components/ResistanceCheckButton.svelte";
+   import ResistanceCheckButton from "~/helpers/svelte-components/button/ResistanceCheckButton.svelte";
 
    // Results
    const document = getContext("DocumentStore");

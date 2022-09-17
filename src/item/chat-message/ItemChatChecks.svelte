@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import OpposedCheckLabel from "~/helpers/svelte-components/OpposedCheckLabel.svelte";
+   import OpposedCheckTag from "~/helpers/svelte-components/tag/OpposedCheckTag.svelte";
    import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
@@ -58,7 +58,7 @@
             <!--Opposed Check-->
             {#if check.opposedCheck.enabled}
                <div class="tag">
-                  <OpposedCheckLabel opposedCheck={check.opposedCheck} />
+                  <OpposedCheckTag opposedCheck={check.opposedCheck} />
                </div>
             {/if}
          </div>

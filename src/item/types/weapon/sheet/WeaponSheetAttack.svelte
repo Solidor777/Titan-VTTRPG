@@ -9,7 +9,7 @@
    import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentRangeTypeSelect from "~/documents/components/DocumentRangeTypeSelect.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Collapsed object
    export let isExpandedObject = void 0;

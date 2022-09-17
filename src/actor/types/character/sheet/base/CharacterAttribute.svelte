@@ -3,7 +3,7 @@
    import { getContext } from "svelte";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // The key / name of the attribute
    export let key;

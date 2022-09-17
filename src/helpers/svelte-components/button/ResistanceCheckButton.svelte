@@ -1,7 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Resistance to roll
    export let resistance = "reflexes";
@@ -45,7 +45,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import "../../../styles/Mixins.scss";
 
    .button {
       @include flex-row;

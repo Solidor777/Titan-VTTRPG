@@ -1,6 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
+   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
 
    // Filter Items
    export let filter = void 0;

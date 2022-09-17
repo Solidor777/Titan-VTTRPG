@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // The type of item to add
    export let itemType = void 0;

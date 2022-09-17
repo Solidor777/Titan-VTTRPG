@@ -6,7 +6,7 @@
    import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
    import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
    import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
 
    // Document reference

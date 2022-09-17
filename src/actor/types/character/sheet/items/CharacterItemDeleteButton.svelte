@@ -1,7 +1,7 @@
 <script>
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { getContext } from "svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Reference to the application
    const application = getContext("external").application;

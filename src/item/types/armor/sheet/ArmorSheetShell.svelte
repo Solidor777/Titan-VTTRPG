@@ -10,7 +10,7 @@
    import DocumentName from "~/documents/components/DocumentName.svelte";
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Setup
    export let elementRoot;

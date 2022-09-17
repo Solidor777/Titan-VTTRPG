@@ -1,5 +1,5 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import { getContext } from "svelte";
    // Reference to the docuement
    const document = getContext("DocumentStore");

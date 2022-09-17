@@ -6,7 +6,7 @@
    import AttributeSelect from "~/helpers/svelte-components/select/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/select/SkillSelect.svelte";
    import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
-   import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
+   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
 
    // The actor document making this check
    export let actor;

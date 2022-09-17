@@ -3,7 +3,7 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
    import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
    // Document reference

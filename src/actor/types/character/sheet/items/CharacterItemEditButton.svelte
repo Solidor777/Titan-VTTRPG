@@ -1,6 +1,6 @@
 <script>
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import IconButton from "~/helpers/svelte-components/IconButton.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Collapsed object
    export let item = void 0;

@@ -11,7 +11,7 @@
 </button>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import "../../../styles/Mixins.scss";
 
    button {
       @include button;

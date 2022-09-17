@@ -5,7 +5,7 @@
    import { getContext } from "svelte";
    import ResistanceSelect from "~/helpers/svelte-components/select/ResistanceSelect.svelte";
    import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
-   import IntegerInput from "~/helpers/svelte-components/IntegerInput.svelte";
+   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
 
    // The actor document making this check
    export let actor;

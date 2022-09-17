@@ -2,7 +2,7 @@
 
 <script>
    import { getContext } from "svelte";
-   import TextInput from "~/helpers/svelte-components/TextInput.svelte";
+   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
 
    // The value of the input
    export let value;

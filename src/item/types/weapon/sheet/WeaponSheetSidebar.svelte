@@ -5,7 +5,7 @@
    import { localize } from "~/helpers/Utility.js";
    import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/EfxButton.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
