@@ -5,11 +5,11 @@
    // The value of the input
    export let value;
 
+   // Whether to allow none
+   export let allowNone = false;
+
    // Document reference
    const document = getContext("DocumentStore");
-
-   // Select options
-   export let options = void 0;
 
    let data;
    $: {
@@ -23,8 +23,9 @@
 </script>
 
 <AttributeSelect
+   {allowNone}
    bind:value
-   {options}
+   on:change
    on:change={async () => {
       $document.update(data);
    }}

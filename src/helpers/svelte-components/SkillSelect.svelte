@@ -5,6 +5,9 @@
    // Value
    export let value = void 0;
 
+   // Whether to allow none
+   export let allowNone = false;
+
    // Options
    const skillOptions = [
       {
@@ -103,13 +106,15 @@
          label: localize("stealth"),
          value: "stealth",
       },
-      {
+   ];
+
+   // Add none option
+   if (allowNone) {
+      skillOptions.push({
          label: localize("none"),
          value: "none",
-      },
-   ];
+      });
+   }
 </script>
 
-<div class="skill-select {value}" on:change>
-   <Select options={skillOptions} bind:value />
-</div>
+<Select options={skillOptions} bind:value on:change />

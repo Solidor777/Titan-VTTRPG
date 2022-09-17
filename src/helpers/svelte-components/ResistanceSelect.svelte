@@ -5,6 +5,9 @@
    // Value
    export let value = void 0;
 
+   // Whether to allow none
+   export let allowNone = false;
+
    // Options
    export let options = [
       {
@@ -20,6 +23,14 @@
          value: "willpower",
       },
    ];
+
+   // Add none option
+   if (allowNone) {
+      skillOptions.push({
+         label: localize("none"),
+         value: "none",
+      });
+   }
 </script>
 
 <div class="resistance-select {value}" on:change>

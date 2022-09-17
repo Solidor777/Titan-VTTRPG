@@ -1,9 +1,9 @@
 <script>
    import { getContext } from "svelte";
-   import ResistanceSelect from "~/helpers/svelte-components/ResistanceSelect.svelte";
+   import ModSelect from "~/helpers/svelte-components/ModSelect.svelte";
 
-   // Value
-   export let value = void 0;
+   // The value of the input
+   export let value;
 
    // Whether to allow none
    export let allowNone = false;
@@ -22,7 +22,7 @@
    }
 </script>
 
-<ResistanceSelect
+<ModSelect
    {allowNone}
    bind:value
    on:change

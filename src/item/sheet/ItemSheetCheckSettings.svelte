@@ -23,26 +23,6 @@
    // Idx of the Check
    export let idx = void 0;
 
-   // Resistance options
-   const resistanceSelectOptions = [
-      {
-         label: localize("reflexes"),
-         value: "reflexes",
-      },
-      {
-         label: localize("resilience"),
-         value: "resilience",
-      },
-      {
-         label: localize("willpower"),
-         value: "willpower",
-      },
-      {
-         label: localize("none"),
-         value: "none",
-      },
-   ];
-
    // Difficulty options
    const difficultyOptions = [2, 3, 4, 5, 6];
 
@@ -157,7 +137,7 @@
 
                   <!--Value-->
                   <div class="input">
-                     <DocumentResistanceSelect bind:value={check.resistanceCheck} options={resistanceSelectOptions} />
+                     <DocumentResistanceSelect bind:value={check.resistanceCheck} allowNone={true} />
                   </div>
                </div>
 
@@ -272,7 +252,7 @@
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentSkillSelect bind:value={check.opposedCheck.skill} />
+                        <DocumentSkillSelect bind:value={check.opposedCheck.skill} allowNone={true} />
                      </div>
                   </div>
                </div>

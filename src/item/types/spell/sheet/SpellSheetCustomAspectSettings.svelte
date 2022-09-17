@@ -12,26 +12,6 @@
    // Document reference
    const document = getContext("DocumentStore");
 
-   // Resistance options
-   const resistanceSelectOptions = [
-      {
-         label: localize("reflexes"),
-         value: "reflexes",
-      },
-      {
-         label: localize("resilience"),
-         value: "resilience",
-      },
-      {
-         label: localize("willpower"),
-         value: "willpower",
-      },
-      {
-         label: localize("none"),
-         value: "none",
-      },
-   ];
-
    // Idx of the custom aspect being represented
    export let idx = void 0;
 </script>
@@ -82,7 +62,7 @@
             <div class="input">
                <DocumentResistanceSelect
                   bind:value={$document.system.customAspects[idx].resistanceCheck}
-                  options={resistanceSelectOptions}
+                  allowNone={true}
                />
             </div>
          </div>

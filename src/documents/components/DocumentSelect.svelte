@@ -25,6 +25,7 @@
 <Select
    bind:value
    {options}
+   on:change
    on:change={async () => {
       $document.update(data);
    }}

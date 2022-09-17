@@ -101,7 +101,7 @@
          {localize("skill")}
       </div>
       <div class="input">
-         <SkillSelect bind:value={checkParameters.skill} />
+         <SkillSelect bind:value={checkParameters.skill} allowNone={true} />
       </div>
    </div>
 

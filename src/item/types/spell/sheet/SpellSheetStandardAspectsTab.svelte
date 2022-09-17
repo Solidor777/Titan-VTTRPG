@@ -16,26 +16,6 @@
    // Application refernce
    const application = getContext("external").application;
 
-   // Resistance select options
-   const resistanceSelectOptions = [
-      {
-         label: localize("reflexes"),
-         value: "reflexes",
-      },
-      {
-         label: localize("resilience"),
-         value: "resilience",
-      },
-      {
-         label: localize("willpower"),
-         value: "willpower",
-      },
-      {
-         label: localize("none"),
-         value: "none",
-      },
-   ];
-
    // Initialize select options
    const selectOptions = {
       range: [
@@ -160,7 +140,7 @@
                                  <div class="input">
                                     <DocumentResistanceSelect
                                        bind:value={$document.system.standardAspects[key].resistanceCheck}
-                                       options={resistanceSelectOptions}
+                                       allowNone={true}
                                     />
                                  </div>
                               </div>
