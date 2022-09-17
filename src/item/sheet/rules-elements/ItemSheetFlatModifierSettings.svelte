@@ -7,6 +7,7 @@
    import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
    import DocumentModSelect from "../../../documents/components/DocumentModSelect.svelte";
+   import DocumentRatingSelect from "../../../documents/components/DocumentRatingSelect.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -72,6 +73,10 @@
             element.key = "armor";
             break;
          }
+         case "rating": {
+            element.key = "awareness";
+            break;
+         }
 
          default: {
             break;
@@ -106,8 +111,11 @@
                <!--Attribute-->
                <DocumentAttributeSelect bind:value={element.key} />
             {:else if element.selector === "mod"}
-               <!--Attribute-->
+               <!--Mod-->
                <DocumentModSelect bind:value={element.key} />
+            {:else if element.selector === "rating"}
+               <!--Rating-->
+               <DocumentRatingSelect bind:value={element.key} />
             {/if}
          </div>
 
