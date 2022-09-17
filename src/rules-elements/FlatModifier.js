@@ -24,6 +24,9 @@ export default function flatModifier(selector, key, value, actorData) {
       case 'training': {
          return applyModifier(actorData.skill[key].training);
       }
+      case 'expertise': {
+         return applyModifier(actorData.skill[key].expertise);
+      }
       case 'rating': {
          return applyModifier(actorData.rating[key]);
       }

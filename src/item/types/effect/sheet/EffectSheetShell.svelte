@@ -8,7 +8,7 @@
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import EffectSheetDescriptionTab from "./EffectSheetDescriptionTab.svelte";
    import EffectSheetHeader from "./EffectSheetHeader.svelte";
-   import ItemSheetRulesElementsTab from "~/item/sheet/ItemSheetRulesElementsTab.svelte";
+   import ItemSheetRulesElementsTab from "~/item/sheet/rules-elements/ItemSheetRulesElementsTab.svelte";
 
    // Setup context variables
    export let elementRoot;

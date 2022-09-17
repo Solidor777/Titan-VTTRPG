@@ -1,9 +1,9 @@
-import TitanTypeComponent from '~/helpers/TypeComponent';
+import TitanCharacterComponent from '~/actor/types/character/Character.js';
 
-export default class TitanPlayerComponent extends TitanTypeComponent {
+export default class TitanPlayerComponent extends TitanCharacterComponent {
   // Prepare Player type specific data
   prepareDerivedData() {
-    // Make modifications to data here.
+    super.prepareDerivedData();
     const systemData = this.parent.system;
 
     // Calculate the amount of EXP spent

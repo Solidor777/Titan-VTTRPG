@@ -24,7 +24,7 @@
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.rollResistanceCheck(checkParameters);
+      await actor.typeComponent.rollResistanceCheck(checkParameters);
       application.close();
       return;
    }

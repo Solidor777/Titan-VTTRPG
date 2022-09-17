@@ -30,7 +30,7 @@
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.rollAttributeCheck(checkParameters);
+      await actor.typeComponent.rollAttributeCheck(checkParameters);
       application.close();
       return;
    }

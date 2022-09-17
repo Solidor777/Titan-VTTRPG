@@ -353,6 +353,9 @@
   "LOCAL.zone.label": "Zone",
   "LOCAL.addRulesElement.label": "Add Rules Element",
   "LOCAL.flatModifier.label": "Flat Modifier",
+  "LOCAL.sense.label": "Sense",
+  "LOCAL.rating.label": "Rating",
+  "LOCAL.resource.label": "Resource",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

@@ -18,9 +18,9 @@
       for (let idx = 0; idx < userTargets.length; idx++) {
          // If the target is valid
          const target = userTargets[idx]?.actor;
-         if (target) {
+         if (target && target.system.resource?.stamina) {
             // Apply damage to the target
-            await target.healDamage(healing);
+            await target.typeComponent.healDamage(healing);
          }
       }
 

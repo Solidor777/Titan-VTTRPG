@@ -19,9 +19,9 @@
       for (let idx = 0; idx < userTargets.length; idx++) {
          // If the target is valid
          const target = userTargets[idx]?.actor;
-         if (target) {
+         if (target && target.system.resistance) {
             // Roll a resistance check
-            await target.rollResistanceCheck({
+            await target.typeComponent.rollResistanceCheck({
                resistance: resistance,
                difficulty: difficulty,
                complexity: complexity,

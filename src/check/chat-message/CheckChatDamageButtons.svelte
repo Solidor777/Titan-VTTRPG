@@ -9,12 +9,6 @@
    let results = $document.flags.titan.chatContext.results;
 
    async function applyDamage(damage, ignoreArmor) {
-      // Parse the damage data
-      const damageData = {
-         damage: damage,
-         ignoreArmor: ignoreArmor,
-      };
-
       // Get the targets
       let userTargets = Array.from(game.user.targets);
       if (userTargets.length < 1) {
@@ -25,9 +19,9 @@
       for (let idx = 0; idx < userTargets.length; idx++) {
          // If the target is valid
          const target = userTargets[idx]?.actor;
-         if (target) {
+         if (target && target.system.resource?.stamina) {
             // Apply damage to the target
-            await target.applyDamage(damageData);
+            await target.typeComponent.applyDamage(damage, ignoreArmor);
          }
       }
 
@@ -45,9 +39,9 @@
       for (let idx = 0; idx < userTargets.length; idx++) {
          // If the target is valid
          const target = userTargets[idx]?.actor;
-         if (target) {
+         if (target && target.system.resource?.stamina) {
             // Apply damage to the target
-            await target.healDamage(healing);
+            await target.typeComponent.healDamage(healing);
          }
       }
 

@@ -34,6 +34,7 @@
          damageReport: DamageReportChatMessageShell,
          healingReport: HealingReportChatMessageShell,
       };
+      console.log($document.flags.titan.chatContext.type);
       return chatComponents[$document.flags.titan.chatContext.type];
    }
 </script>
