@@ -37,7 +37,9 @@
             />
 
             <!--Add Weapon Button-->
-            <CharacterItemAddEntryButton itemType={"weapon"} />
+            <div class="add-entry-button">
+               <CharacterItemAddEntryButton itemType={"weapon"} />
+            </div>
          </div>
 
          <!--Armor-->
@@ -58,7 +60,9 @@
             />
 
             <!--Add Armor Button-->
-            <CharacterItemAddEntryButton itemType={"armor"} />
+            <div class="add-entry-button">
+               <CharacterItemAddEntryButton itemType={"armor"} />
+            </div>
          </div>
       </ScrollingContainer>
    </div>
@@ -84,16 +88,21 @@
             @include border;
             width: 100%;
             padding: 0.26rem;
-
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
+            margin-top: 0.5rem;
 
             .category-header {
                @include flex-row;
                @include flex-group-center;
                font-weight: bold;
                font-size: 1rem;
+               margin-bottom: 0.25rem;
+            }
+
+            .add-entry-button {
+               @include flex-row;
+               @include flex-group-center;
+               width: 100%;
+               margin-top: 0.5rem;
             }
          }
       }

@@ -59,16 +59,14 @@
             @include border;
             width: 100%;
             padding: 0.26rem;
-
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
+            margin-top: 0.5rem;
 
             .category-header {
                @include flex-row;
                @include flex-group-center;
                font-weight: bold;
                font-size: 1rem;
+               margin-bottom: 0.25rem;
             }
          }
       }

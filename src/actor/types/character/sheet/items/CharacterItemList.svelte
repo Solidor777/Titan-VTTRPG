@@ -109,9 +109,8 @@
    ol {
       @include flex-column;
       @include flex-group-top;
+      @include list;
       width: 100%;
-      margin: 0, 0, 0, 0.5rem;
-      padding: 0;
       list-style: none;
 
       li {
@@ -119,7 +118,7 @@
          @include flex-space-between;
          @include border;
          width: 100%;
-         padding: 0.5rem;
+         padding: 0.25rem;
 
          &.drag-hovered {
             background: var(--highlight-background-color);

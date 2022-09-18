@@ -1,24 +1,16 @@
 <script>
    import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
    import CharacterItemList from "../items/CharacterItemList.svelte";
-   import CharacterAbility from "../items/ability/CharacterAbility.svelte";
    import CharacterItemAddEntryButton from "../items/CharacterItemAddEntryButton.svelte";
+   import CharacterEffect from "../items/effect/CharacterEffect.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
 </script>
 
-<div class="abilities-tab">
-   <div class="filter-options">
-      {#each Object.entries($appState.filterOptions.abilities) as [key, value]}
-         <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.abilities[key]} />
-      {/each}
-   </div>
-
+<div class="effects-tab">
    <!--Filter-->
    <TopFilter bind:filter={$appState.filter.abilities} />
 
@@ -26,26 +18,11 @@
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.abilities}>
          <!--Abilities List-->
-         <div class="abilities">
+         <div class="effects">
             <CharacterItemList
-               itemComponent={CharacterAbility}
+               itemComponent={CharacterEffect}
                filterFunction={(item) => {
-                  if (item.type !== "ability") {
-                     return false;
-                  }
-                  if ($appState.filterOptions.abilities.action && !item.system.action) {
-                     return false;
-                  }
-
-                  if ($appState.filterOptions.abilities.reaction && !item.system.reaction) {
-                     return false;
-                  }
-
-                  if ($appState.filterOptions.abilities.passive && !item.system.passive) {
-                     return false;
-                  }
-
-                  return true;
+                  return item.type === "effect";
                }}
                filter={$appState.filter.abilities}
                isExpandedMap={$appState.isExpanded.abilities}
@@ -54,7 +31,7 @@
 
          <!--Add Spell Button-->
          <div class="add-entry-button">
-            <CharacterItemAddEntryButton itemType={"ability"} />
+            <CharacterItemAddEntryButton itemType={"effects"} />
          </div>
       </ScrollingContainer>
    </div>
@@ -62,7 +39,7 @@
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
-   .abilities-tab {
+   .effects-tab {
       @include flex-column;
       @include flex-group-top;
       height: 100%;
@@ -85,17 +62,11 @@
          height: 100%;
          padding-left: 0.25rem;
 
-         .abilities {
-            @include flex-column;
-            @include flex-group-center;
-            width: 100%;
+         .effects {
             margin-top: 0.5rem;
          }
 
          .add-entry-button {
-            @include flex-row;
-            @include flex-group-center;
-            width: 100%;
             margin-top: 0.5rem;
          }
       }

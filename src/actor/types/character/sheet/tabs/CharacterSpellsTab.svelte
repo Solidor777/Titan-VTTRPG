@@ -18,14 +18,8 @@
    <!--Scrolling Containers-->
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.spells}>
-         <!--Spells-->
-         <div class="category">
-            <!--List Header-->
-            <div class="category-header">
-               {localize("spells")}
-            </div>
-
-            <!--Spell List-->
+         <!--Spell List-->
+         <div class="spells">
             <CharacterItemList
                itemComponent={CharacterSpell}
                filterFunction={(item) => {
@@ -36,7 +30,9 @@
             />
 
             <!--Add Spell Button-->
-            <CharacterItemAddEntryButton itemType={"spell"} />
+            <div class="add-entry-button">
+               <CharacterItemAddEntryButton itemType={"spell"} />
+            </div>
          </div>
       </ScrollingContainer>
    </div>
@@ -55,24 +51,20 @@
          @include flex-group-top;
          width: 100%;
          height: 100%;
+         padding-left: 0.25rem;
 
-         .category {
+         .spells {
             @include flex-column;
-            @include flex-group-top;
-            @include border;
+            @include flex-group-center;
             width: 100%;
-            padding: 0.26rem;
+            margin-top: 0.5rem;
+         }
 
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
-
-            .category-header {
-               @include flex-row;
-               @include flex-group-center;
-               font-weight: bold;
-               font-size: 1rem;
-            }
+         .add-entry-button {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+            margin-top: 0.5rem;
          }
       }
    }
