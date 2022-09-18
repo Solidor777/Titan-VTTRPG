@@ -45,16 +45,6 @@
       height: 100%;
       width: 100%;
 
-      .filter-options {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-bottom;
-         margin-top: 0.25rem;
-         margin-bottom: 0.25rem;
-         padding-bottom: 0.25rem;
-         width: 100%;
-      }
-
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;

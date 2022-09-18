@@ -10,36 +10,34 @@ import TitanAttackCheck from '~/check/types/attack-check/AttackCheck.js';
 import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
 import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 import TitanTypeComponent from '~/helpers/TypeComponent.js';
+import applyFlatModifier from '~/rules-elements/FlatModifier';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Prepare Character type specific data
    prepareDerivedData() {
-      // Make modifications to data here. For example:
+      this._resetDynamicMods();
+      this._applyRulesElements();
+
+      // Get a reference to the parent system data
       const systemData = this.parent.system;
 
-      // Calculate ability mods
-      for (let [k, v] of Object.entries(systemData.attribute)) {
-         systemData.attribute[k].value = v.baseValue + v.staticMod;
-      }
-
-      // Calculate the total attribute value
+      // Calculate Attributes
       let totalBaseAttributeValue = 0;
-      for (const attribute in systemData.attribute) {
-         totalBaseAttributeValue += systemData.attribute[attribute].baseValue;
+      for (let [key, attribute] of Object.entries(systemData.attribute)) {
+         totalBaseAttributeValue += attribute.baseValue;
+         attribute.value = attribute.baseValue + attribute.staticMod + attribute.dynamicMod;
       }
 
-      // Calculate skill mods
-      for (let [k, v] of Object.entries(systemData.skill)) {
-         systemData.skill[k].training.value =
-            v.training.baseValue + v.training.staticMod;
-         systemData.skill[k].expertise.value =
-            v.expertise.baseValue + v.expertise.staticMod;
+      // Calculate Skills
+      for (let [key, skill] of Object.entries(systemData.skill)) {
+         skill.training.value = skill.training.baseValue + skill.training.staticMod + skill.training.dynamicMod;
+         skill.expertise.value = skill.expertise.baseValue + skill.expertise.staticMod + skill.expertise.dynamicMod;
       }
 
-      // Calculate speed mods
-      for (let [k, v] of Object.entries(systemData.speed)) {
-         systemData.speed[k].value = v.baseValue + v.staticMod;
+      // Calculate Speeds
+      for (let [key, speed] of Object.entries(systemData.speed)) {
+         speed.value = speed.baseValue + speed.staticMod + speed.dynamicMod;
       }
 
       // Calculate the base value of ratings
@@ -69,9 +67,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          Math.ceil((systemData.attribute.body.value +
             systemData.skill.meleeWeapons.training.value) / 2);
 
-      // Calculate rating mods
-      for (let [k, v] of Object.entries(systemData.rating)) {
-         systemData.rating[k].value = v.baseValue + v.staticMod;
+      // Calculate rating value
+      for (let [key, rating] of Object.entries(systemData.rating)) {
+         rating.value = rating.baseValue + rating.staticMod + rating.dynamicMod;
       }
 
       // Calculate resistance base values
@@ -92,7 +90,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Calculate resistance mods
       for (let [k, v] of Object.entries(systemData.resistance)) {
-         systemData.resistance[k].value = v.baseValue + v.staticMod;
+         systemData.resistance[k].value = v.baseValue + v.staticMod + v.dynamicMod;
       }
 
       // Calculate base resource values
@@ -111,7 +109,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Calculate resource mods and clamp them to be within range
       for (let [k, v] of Object.entries(systemData.resource)) {
          systemData.resource[k].maxValue =
-            v.maxBase + v.staticMod;
+            v.maxBase + v.staticMod + v.dynamicMod;
          systemData.resource[k].value =
             clamp(systemData.resource[k].value, 0, systemData.resource[k].maxValue);
       }
@@ -131,8 +129,72 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       systemData.mod.damage.baseValue = 0;
 
       // Final mods
-      for (let [k, v] of Object.entries(systemData.mod)) {
-         systemData.mod[k].value = v.baseValue + v.staticMod;
+      for (let [key, mod] of Object.entries(systemData.mod)) {
+         mod.value = mod.baseValue + mod.staticMod + mod.dynamicMod;
+      }
+
+      return;
+   }
+
+   async _applyRulesElements() {
+      // Reset dynamic mods
+      const systemData = this.parent.system;
+
+      // Get all the rules elements
+      let rulesElements = [];
+      this.parent.items.forEach((item) => {
+         if (item.system.rulesElement && item.system.rulesElement.length > 0) {
+            rulesElements = [...rulesElements, ...item.system.rulesElement];
+         }
+      });
+
+      // Sort the rules elements and process them in order
+      // FlatModifier
+      const flatMods = rulesElements.filter((element) => element.operation === "flatModifier");
+      flatMods.forEach((flatMod) => {
+         applyFlatModifier(flatMod, systemData);
+      });
+
+   }
+
+   _resetDynamicMods() {
+      // Reference to the parent system data
+      const systemData = this.parent.system;
+
+      // Attributes
+      for (let [key, attribute] of Object.entries(systemData.attribute)) {
+         attribute.dynamicMod = 0;
+      }
+
+      // Skills
+      for (let [key, skill] of Object.entries(systemData.skill)) {
+         skill.training.dynamicMod = 0;
+         skill.expertise.dynamicMod = 0;
+      }
+
+      // Resource
+      for (let [key, resource] of Object.entries(systemData.resource)) {
+         resource.dynamicMod = 0;
+      }
+
+      // Resistance
+      for (let [key, resistance] of Object.entries(systemData.resistance)) {
+         resistance.dynamicMod = 0;
+      }
+
+      // Rating
+      for (let [key, rating] of Object.entries(systemData.rating)) {
+         rating.dynamicMod = 0;
+      }
+
+      // Speed
+      for (let [key, speed] of Object.entries(systemData.speed)) {
+         speed.dynamicMod = 0;
+      }
+
+      // Mod
+      for (let [key, mod] of Object.entries(systemData.mod)) {
+         mod.dynamicMod = 0;
       }
 
       return;

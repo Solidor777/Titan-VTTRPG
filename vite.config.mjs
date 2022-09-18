@@ -1,7 +1,7 @@
-import { svelte } from "@sveltejs/vite-plugin-svelte";
-import resolve from "@rollup/plugin-node-resolve"; // This resolves NPM systems from node_systems.
-import preprocess from "svelte-preprocess";
-import { postcssConfig, terserConfig, typhonjsRuntime } from "@typhonjs-fvtt/runtime/rollup";
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import resolve from '@rollup/plugin-node-resolve'; // This resolves NPM systems from node_systems.
+import preprocess from 'svelte-preprocess';
+import { postcssConfig, terserConfig, typhonjsRuntime } from '@typhonjs-fvtt/runtime/rollup';
 import * as path from 'path';
 
 const s_COMPRESS = false; // Set to true to compress the module bundle.
@@ -15,7 +15,7 @@ const s_TYPHONJS_MODULE_LIB = false;
 // Used in bundling.
 const s_RESOLVE_CONFIG = {
    browser: true,
-   dedupe: ["svelte"],
+   dedupe: ['svelte'],
 };
 
 // ATTENTION!
@@ -25,20 +25,20 @@ const s_RESOLVE_CONFIG = {
 export default () => {
    /** @type {import('vite').UserConfig} */
    return {
-      root: "src/", // Source location / esbuild root.
-      base: "/systems/titan/", // Base module path that 30001 / served dev directory.
+      root: 'src/', // Source location / esbuild root.
+      base: '/systems/titan/', // Base module path that 30001 / served dev directory.
       publicDir: false, // No public resources to copy.
-      cacheDir: "../.vite-cache", // Relative from root directory.
+      cacheDir: '../.vite-cache', // Relative from root directory.
 
       resolve: {
-         conditions: ["import", "browser"],
+         conditions: ['import', 'browser'],
          alias: {
             '~': path.resolve(__dirname, 'src'),
          }
       },
 
       esbuild: {
-         target: ["es2022", "chrome100"],
+         target: ['es2022', 'chrome100'],
          keepNames: true, // Note: doesn't seem to work.
       },
 
@@ -47,7 +47,7 @@ export default () => {
          postcss: postcssConfig({
             compress: s_COMPRESS,
             sourceMap: s_SOURCEMAPS,
-            extract: "style.css"
+            extract: 'style.css'
          }),
       },
 
@@ -60,12 +60,14 @@ export default () => {
       // served.
       server: {
          port: 30001,
-         open: "/game",
+         open: '/game',
          proxy: {
-            "^(/systems/titan/lang)": "http://localhost:30000",
-            "^(?!/systems/titan/)": "http://localhost:30000",
-            "/socket.io": { target: "ws://localhost:30000", ws: true },
+            '^(/systems/titan/lang)': 'http://localhost:30000',
+            '^(/modules/titan/style.css)': 'http://localhost:30000',
+            '^(?!/systems/titan/)': 'http://localhost:30000',
+            '/socket.io': { target: 'ws://localhost:30000', ws: true },
          },
+
       },
 
       build: {
@@ -73,13 +75,13 @@ export default () => {
          emptyOutDir: false,
          sourcemap: s_SOURCEMAPS,
          brotliSize: true,
-         minify: s_COMPRESS ? "terser" : false,
-         target: ["es2022", "chrome100"],
+         minify: s_COMPRESS ? 'terser' : false,
+         target: ['es2022', 'chrome100'],
          terserOptions: s_COMPRESS ? { ...terserConfig(), ecma: 2022 } : void 0,
          lib: {
-            entry: "./index.js",
-            formats: ["es"],
-            fileName: "index",
+            entry: './index.js',
+            formats: ['es'],
+            fileName: 'index',
          },
       },
 
