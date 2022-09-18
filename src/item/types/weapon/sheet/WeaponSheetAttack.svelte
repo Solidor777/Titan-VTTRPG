@@ -3,12 +3,12 @@
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
-   import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
-   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentRangeTypeSelect from "~/documents/components/DocumentRangeTypeSelect.svelte";
+   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
+   import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
+   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
+   import DocumentRangeTypeSelect from "~/documents/components/select/DocumentRangeTypeSelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Collapsed object

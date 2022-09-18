@@ -2,11 +2,11 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");

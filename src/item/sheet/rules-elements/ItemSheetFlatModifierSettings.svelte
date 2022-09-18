@@ -1,13 +1,13 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
+   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
-   import DocumentModSelect from "../../../documents/components/DocumentModSelect.svelte";
-   import DocumentRatingSelect from "../../../documents/components/DocumentRatingSelect.svelte";
+   import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
+   import DocumentModSelect from "~/documents/components/select/DocumentModSelect.svelte";
+   import DocumentRatingSelect from "~/documents/components/select/DocumentRatingSelect.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");

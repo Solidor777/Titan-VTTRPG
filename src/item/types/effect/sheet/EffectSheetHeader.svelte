@@ -3,7 +3,7 @@
 <script>
    import { getContext } from "svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/DocumentName.svelte";
+   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
 
    // Setup
    const document = getContext("DocumentStore");

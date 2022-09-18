@@ -6,14 +6,14 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/DocumentName.svelte";
-   import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
+   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
+   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
    import SpellSheetDescriptionTab from "./SpellSheetDescriptionTab.svelte";
    import SpellSheetCastingCheckTab from "./SpellSheetCastingCheckTab.svelte";
    import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
    import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
    import SpellSheetSidebar from "./SpellSheetSidebar.svelte";
 
    // Setup

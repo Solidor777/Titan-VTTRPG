@@ -3,9 +3,9 @@
    import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
-   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
+   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
+   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
+   import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
    import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";

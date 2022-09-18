@@ -3,11 +3,11 @@
    import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentResistanceSelect from "~/documents/components/DocumentResistanceSelect.svelte";
-   import DocumentTextInput from "~/documents/components/DocumentTextInput.svelte";
+   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
+   import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
+   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");

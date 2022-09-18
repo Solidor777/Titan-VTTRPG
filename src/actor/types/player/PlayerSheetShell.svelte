@@ -6,9 +6,9 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/DocumentName.svelte";
+   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import CharacterResourceMeter from "../character/sheet/base/CharacterResourceMeter.svelte";
    import CharacterMod from "../character/sheet/base/CharacterMod.svelte";
    import CharacterRating from "../character/sheet/base/CharacterRating.svelte";

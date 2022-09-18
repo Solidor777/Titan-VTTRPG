@@ -3,11 +3,11 @@
    import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentIntegerSelect from "~/documents/components/DocumentIntegerSelect.svelte";
-   import DocumentSkillSelect from "~/documents/components/DocumentSkillSelect.svelte";
-   import DocumentAttributeSelect from "~/documents/components/DocumentAttributeSelect.svelte";
+   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import DocumentIntegerSelect from "~/documents/components/select/DocumentIntegerSelect.svelte";
+   import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
+   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");

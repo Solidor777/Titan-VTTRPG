@@ -1,5 +1,5 @@
 <script>
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
    // Label of the mater
    export let label;

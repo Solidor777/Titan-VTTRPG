@@ -1,7 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
    // The key / name of the speed
    export let key;

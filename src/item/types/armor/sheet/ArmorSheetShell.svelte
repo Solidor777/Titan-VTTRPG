@@ -7,9 +7,9 @@
    import { localize } from "~/helpers/Utility.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/DocumentName.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
+   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Setup

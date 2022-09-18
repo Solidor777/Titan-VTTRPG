@@ -4,10 +4,10 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/DocumentName.svelte";
-   import DocumentRaritySelect from "~/documents/components/DocumentRaritySelect.svelte";
-   import DocumentIntegerInput from "~/documents/components/DocumentIntegerInput.svelte";
-   import DocumentCheckboxInput from "~/documents/components/DocumentCheckboxInput.svelte";
+   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
+   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
 
    // Setup
    const document = getContext("DocumentStore");

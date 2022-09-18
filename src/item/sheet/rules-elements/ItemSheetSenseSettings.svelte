@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import DocumentSelect from "~/documents/components/DocumentSelect.svelte";
+   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Setup context variables
