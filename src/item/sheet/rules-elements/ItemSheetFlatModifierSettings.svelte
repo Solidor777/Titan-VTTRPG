@@ -8,6 +8,9 @@
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
    import DocumentModSelect from "~/documents/components/select/DocumentModSelect.svelte";
    import DocumentRatingSelect from "~/documents/components/select/DocumentRatingSelect.svelte";
+   import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
+   import DocumentResourceSelect from "~/documents/components/select/DocumentResourceSelect.svelte";
+   import DocumentSpeedSelect from "~/documents/components/select/DocumentSpeedSelect.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -77,6 +80,18 @@
             element.key = "awareness";
             break;
          }
+         case "resistance": {
+            element.key = "reflexes";
+            break;
+         }
+         case "resource": {
+            element.key = "resolve";
+            break;
+         }
+         case "speed": {
+            element.key = "burrow";
+            break;
+         }
 
          default: {
             break;
@@ -86,6 +101,37 @@
       $document.update({
          system: $document.system,
       });
+   }
+
+   function getSelector() {
+      switch (element.selector) {
+         case "attribute": {
+            return DocumentAttributeSelect;
+         }
+         case "training":
+         case "expertise": {
+            return DocumentSkillSelect;
+         }
+         case "mod": {
+            return DocumentModSelect;
+         }
+         case "rating": {
+            return DocumentRatingSelect;
+         }
+         case "resistance": {
+            return DocumentResistanceSelect;
+         }
+         case "resource": {
+            return DocumentResourceSelect;
+         }
+         case "speed": {
+            return DocumentSpeedSelect;
+         }
+
+         default: {
+            break;
+         }
+      }
    }
 
    // Setup tabs
@@ -99,26 +145,17 @@
             <DocumentSelect options={operationOptions} bind:value={element.operation} />
          </div>
 
+         <!--Selector-->
          <div class="field select">
             <DocumentSelect options={selectorOptions} bind:value={element.selector} on:change={onSelectorChange} />
          </div>
 
+         <!--Key-->
          <div class="field select">
-            {#if element.selector === "training" || element.selector === "expertise"}
-               <!--Training and Expertise-->
-               <DocumentSkillSelect bind:value={element.key} />
-            {:else if element.selector === "attribute"}
-               <!--Attribute-->
-               <DocumentAttributeSelect bind:value={element.key} />
-            {:else if element.selector === "mod"}
-               <!--Mod-->
-               <DocumentModSelect bind:value={element.key} />
-            {:else if element.selector === "rating"}
-               <!--Rating-->
-               <DocumentRatingSelect bind:value={element.key} />
-            {/if}
+            <svelte:component this={getSelector()} bind:value={element.key} />
          </div>
 
+         <!--Value-->
          <div class="field number">
             <DocumentIntegerInput bind:value={element.value} />
          </div>
