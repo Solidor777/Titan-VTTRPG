@@ -358,6 +358,7 @@
   "LOCAL.resource.label": "Resource",
   "LOCAL.effects.label": "Effects",
   "LOCAL.effect.label": "Effect",
+  "LOCAL.newEffect.label": "New Effect",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."

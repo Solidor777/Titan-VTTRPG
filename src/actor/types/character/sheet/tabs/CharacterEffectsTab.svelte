@@ -31,7 +31,7 @@
 
          <!--Add Spell Button-->
          <div class="add-entry-button">
-            <CharacterItemAddEntryButton itemType={"effects"} />
+            <CharacterItemAddEntryButton itemType={"effect"} />
          </div>
       </ScrollingContainer>
    </div>

@@ -5,42 +5,12 @@ import TitanSpell from './types/spell/Spell.js';
 import TitanWeapon from './types/weapon/Weapon.js';
 
 export default class TitanItem extends Item {
+
+
    prepareDerivedData() {
       // Create type component if necessary
-      if (!this.system.typeComponent) {
-         switch (this.type) {
-            // Ability
-            case 'ability': {
-               this.typeComponent = new TitanAbility(this);
-               this.ability = this.typeComponent;
-               break;
-            }
-
-            // Effect
-            case 'effect': {
-               this.typeComponent = new TitanEffect(this);
-               this.effect = this.typeComponent;
-               break;
-            }
-
-            // Spell
-            case 'spell': {
-               this.typeComponent = new TitanSpell(this);
-               this.spell = this.typeComponent;
-               break;
-            }
-
-            // Weapon
-            case 'weapon': {
-               this.typeComponent = new TitanWeapon(this);
-               this.weapon = this.typeComponent;
-               break;
-            }
-
-            default: {
-               break;
-            }
-         }
+      if (!this.typeComponent) {
+         this._initializeTypeComponent();
       }
 
       // Prepare type specific data
@@ -49,6 +19,57 @@ export default class TitanItem extends Item {
       }
 
       return;
+   }
+
+   _initializeTypeComponent() {
+      switch (this.type) {
+         // Ability
+         case 'ability': {
+            this.typeComponent = new TitanAbility(this);
+            this.ability = this.typeComponent;
+            break;
+         }
+
+         // Effect
+         case 'effect': {
+            this.typeComponent = new TitanEffect(this);
+            this.effect = this.typeComponent;
+            break;
+         }
+
+         // Spell
+         case 'spell': {
+            this.typeComponent = new TitanSpell(this);
+            this.spell = this.typeComponent;
+            break;
+         }
+
+         // Weapon
+         case 'weapon': {
+            this.typeComponent = new TitanWeapon(this);
+            this.weapon = this.typeComponent;
+            break;
+         }
+
+         default: {
+            break;
+         }
+      }
+   }
+
+   _onCreate(data, options, userId) {
+      super._onCreate(data, options, userId);
+      this._initializeTypeComponent();
+      if (this.typeComponent) {
+         this.typeComponent.onCreate();
+      }
+   }
+
+   _onDelete(options, userId) {
+      if (this.typeComponent) {
+         this.typeComponent.onDelete();
+      }
+      super._onDelete(options, userId);
    }
 
    async sendToChat(options) {
@@ -84,6 +105,10 @@ export default class TitanItem extends Item {
                game.settings.get('core', 'rollMode')
          )
       );
+   }
+
+   async addEffect() {
+
    }
 
    getRollData() {
@@ -124,4 +149,5 @@ export default class TitanItem extends Item {
 
       return;
    }
+
 }

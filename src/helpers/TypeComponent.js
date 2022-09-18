@@ -22,4 +22,12 @@ export default class TitanTypeComponent {
   onRemoveRulesElement(idx) {
     return;
   }
+
+  onCreate() {
+    return;
+  }
+
+  onDelete() {
+    return;
+  }
 }

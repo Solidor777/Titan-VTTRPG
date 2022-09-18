@@ -5,14 +5,16 @@
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Application reference
+   const document = getContext("DocumentStore");
    const application = getContext("external").application;
 </script>
 
 <div class="button">
    <EfxButton
       efx={ripple}
-      on:click={() => {
+      on:click={async () => {
          application.addRulesElement();
+         $document.addEffect();
       }}>{localize("addRulesElement")}<i class="fas fa-circle-plus" /></EfxButton
    >
 </div>

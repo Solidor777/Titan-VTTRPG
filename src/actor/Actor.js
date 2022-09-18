@@ -6,29 +6,8 @@ export default class TitanActor extends Actor {
    // Prepare calculated data
    prepareDerivedData() {
       // Create type component if necessary
-      if (!this.system.typeComponent) {
-         switch (this.type) {
-            // Player
-            case 'player': {
-               this.typeComponent = new TitanPlayerComponent(this);
-               this.player = this.typeComponent;
-               break;
-            }
-
-            // NPC
-            case 'npc': {
-               this._prepareNpcData();
-               this.typeComponent = new TitanNPCComponent(this);
-               this.npc = this.typeComponent;
-               break;
-            }
-
-            // Default is an error
-            default: {
-               console.error('TITAN: Invalid actor type when preparing derived data.');
-               break;
-            }
-         }
+      if (!this.typeComponent) {
+         this._initializeTypeComponent();
       }
 
       // Prepare type specific data
@@ -37,6 +16,46 @@ export default class TitanActor extends Actor {
       }
 
       return;
+   }
+
+   _initializeTypeComponent() {
+      switch (this.type) {
+         // Player
+         case 'player': {
+            this.typeComponent = new TitanPlayerComponent(this);
+            this.player = this.typeComponent;
+            break;
+         }
+
+         // NPC
+         case 'npc': {
+            this._prepareNpcData();
+            this.typeComponent = new TitanNPCComponent(this);
+            this.npc = this.typeComponent;
+            break;
+         }
+
+         // Default is an error
+         default: {
+            console.error('TITAN: Invalid actor type when preparing derived data.');
+            break;
+         }
+      }
+   }
+
+   _onCreate(data, options, userId) {
+      super._onCreate(data, options, userId);
+      this._initializeTypeComponent();
+      if (this.typeComponent) {
+         this.typeComponent.onCreate();
+      }
+   }
+
+   _onDelete(options, userId) {
+      if (this.typeComponent) {
+         this.typeComponent.onDelete();
+      }
+      super._onDelete(options, userId);
    }
 
    deleteItem(id) {
@@ -49,6 +68,11 @@ export default class TitanActor extends Actor {
       // Handle type specific deletion
       if (this.type === 'player' || this.type === 'npc') {
          this.typeComponent.deleteItem(id);
+      }
+
+      if (item.type === "effect" && item.system.effectId !== "") {
+         const effect = this.effects.get(item.system.effectId);
+         effect.delete();
       }
 
       // Delete the item
@@ -72,6 +96,10 @@ export default class TitanActor extends Actor {
          }
          case 'spell': {
             itemName = localize('newSpell');
+            break;
+         }
+         case 'effect': {
+            itemName = localize('newEffect');
             break;
          }
          default: {
