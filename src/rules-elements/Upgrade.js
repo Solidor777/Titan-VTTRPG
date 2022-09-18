@@ -1,4 +1,4 @@
-export function applyFlatModifier(flatModifier, actorData) {
+export function applyUpgrade(flatModifier, actorData) {
    // Ensure the modifier is valid
    if (flatModifier === undefined ||
       flatModifier.operation === undefined ||

@@ -1,5 +1,3 @@
-import flatModifier from './FlatModifier';
-
 function getRuleElementTemplate() {
    return {
       operation: 'flatModifier',

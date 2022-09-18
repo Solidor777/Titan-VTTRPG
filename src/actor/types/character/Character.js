@@ -1,4 +1,5 @@
 import { clamp } from '~/helpers/Utility.js';
+import { applyFlatModifier } from '~/rules-elements/FlatModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import SkillCheckDialog from '~/check/types/skill-check/SkillCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -10,7 +11,6 @@ import TitanAttackCheck from '~/check/types/attack-check/AttackCheck.js';
 import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
 import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 import TitanTypeComponent from '~/helpers/TypeComponent.js';
-import applyFlatModifier from '~/rules-elements/FlatModifier';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
