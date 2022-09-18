@@ -20,6 +20,7 @@
    import CharacterAbilitiesTab from "../character/sheet/tabs/CharacterAbilitiesTab.svelte";
    import CharacterInventoryTab from "../character/sheet/tabs/CharacterInventoryTab.svelte";
    import CharacterSpellsTab from "../character/sheet/tabs/CharacterSpellsTab.svelte";
+   import CharacterEffectsTab from "../character/sheet/tabs/CharacterEffectsTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -36,6 +37,7 @@
       { label: localize("inventory"), id: "inventory", component: CharacterInventoryTab },
       { label: localize("abilities"), id: "abilities", component: CharacterAbilitiesTab },
       { label: localize("spells"), id: "spells", component: CharacterSpellsTab },
+      { label: localize("effects"), id: "effects", component: CharacterEffectsTab },
    ];
 
    // Application reference

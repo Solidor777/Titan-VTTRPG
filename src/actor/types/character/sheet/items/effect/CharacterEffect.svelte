@@ -56,14 +56,6 @@
             <div class="item-expandable-content">
                <CharacterItemDescription description={"Temporary Item Description"} />
             </div>
-
-            <!--Footer-->
-            <div class="item-expandable-content">
-               <CharacterItemFooter>
-                  <CharacterItemRarity {item} />
-                  <CharacterItemValue {item} />
-               </CharacterItemFooter>
-            </div>
          </div>
       {/if}
    </div>

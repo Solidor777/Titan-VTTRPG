@@ -356,6 +356,8 @@
   "LOCAL.sense.label": "Sense",
   "LOCAL.rating.label": "Rating",
   "LOCAL.resource.label": "Resource",
+  "LOCAL.effects.label": "Effects",
+  "LOCAL.effect.label": "Effect",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
