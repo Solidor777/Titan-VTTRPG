@@ -3,14 +3,6 @@ import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanWeapon extends TitanTypeComponent {
 
-   prepareDerivedData() {
-      if (this.parent.system.attack.length <= 0) {
-         this.addAttack();
-      }
-
-      return;
-   }
-
    async addAttack() {
       // Create the new attack
       const newAttack = this.getAttackTemplate();

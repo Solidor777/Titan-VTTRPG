@@ -1,4 +1,3 @@
-import { localize } from '~/helpers/Utility';
 import SvelteDocumentSheet from '~/documents/DocumentSheet';
 import createActorSheetState from './ActorSheetState';
 
@@ -34,56 +33,5 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       }
 
       return buttons;
-   }
-
-   // Embedded item edit
-   async editItem(id) {
-      const item = this.reactive.document.items.get(id);
-      item.sheet.render(true);
-      return;
-   }
-
-   // Delete Item
-   async deleteItem(id) {
-      this.reactive.state.deleteItem(id);
-      this.reactive.document.deleteItem(id);
-
-      return;
-   }
-
-   // Add item
-   async addItem(type) {
-      let itemName = '';
-      switch (type) {
-         case 'ability': {
-            itemName = localize('newAbility');
-            break;
-         }
-         case 'armor': {
-            itemName = localize('newArmor');
-            break;
-         }
-         case 'weapon': {
-            itemName = localize('newWeapon');
-            break;
-         }
-         case 'spell': {
-            itemName = localize('newSpell');
-            break;
-         }
-         default: {
-            itemName = localize('newItem');
-            break;
-         }
-      }
-
-      let itemData = {
-         name: itemName,
-         type: type,
-      };
-
-      this.reactive.document.createEmbeddedDocuments('Item', [itemData]);
-
-      return;
    }
 }

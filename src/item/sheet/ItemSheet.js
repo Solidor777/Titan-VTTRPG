@@ -1,7 +1,5 @@
 import { localize } from '~/helpers/Utility.js';
 import SvelteDocumentSheet from '~/documents/DocumentSheet';
-import { addRuleElement } from '~/rules-elements/RuleElement';
-import { removeRuleElement } from '../../rules-elements/RuleElement';
 export default class TitanItemSheet extends SvelteDocumentSheet {
 
    _getHeaderButtons() {
@@ -18,10 +16,10 @@ export default class TitanItemSheet extends SvelteDocumentSheet {
    }
 
    async addRulesElement() {
-      return await addRuleElement(this.reactive.document);
+      return await this.reactive.document.addRulesElement();
    }
 
    async removeRulesElement(idx) {
-      return await removeRuleElement(this.reactive.document, idx);
+      return await this.reactive.document.removeRulesElement(idx);
    }
 }

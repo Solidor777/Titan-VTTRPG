@@ -123,4 +123,25 @@ export default class TitanCharacterSheet extends TitanActorSheet {
 
       return;
    }
+
+   // Embedded item edit
+   async editItem(id) {
+      const item = this.reactive.document.items.get(id);
+      item.sheet.render(true);
+      return;
+   }
+
+   // Delete Item
+   async deleteItem(id) {
+      this.reactive.state.deleteItem(id);
+      this.reactive.document.deleteItem(id);
+
+      return;
+   }
+
+   // Add item
+   async addItem(type) {
+      this.reactive.document.addItem(type);
+      return;
+   }
 }

@@ -4,7 +4,7 @@
    const document = getContext("DocumentStore");
 </script>
 
-{#if $document.name !== null}
+{#if $document?.name !== undefined}
    <div class="document-name">
       <DocumentTextInput bind:value={$document.name} />
    </div>

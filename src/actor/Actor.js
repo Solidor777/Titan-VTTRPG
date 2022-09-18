@@ -1,4 +1,4 @@
-import { clamp } from '~/helpers/Utility.js';
+import { localize } from '~/helpers/Utility';
 import TitanPlayerComponent from './types/player/Player.js';
 import TitanNPCComponent from './types/npc/NPC.js';
 export default class TitanActor extends Actor {
@@ -41,7 +41,7 @@ export default class TitanActor extends Actor {
 
    deleteItem(id) {
       // Ensure the item is valid
-      const item = this.parent.items.get(id);
+      const item = this.items.get(id);
       if (!item) {
          return false;
       }
@@ -53,5 +53,38 @@ export default class TitanActor extends Actor {
 
       // Delete the item
       item.delete();
+   }
+
+   addItem(type) {
+      let itemName = '';
+      switch (type) {
+         case 'ability': {
+            itemName = localize('newAbility');
+            break;
+         }
+         case 'armor': {
+            itemName = localize('newArmor');
+            break;
+         }
+         case 'weapon': {
+            itemName = localize('newWeapon');
+            break;
+         }
+         case 'spell': {
+            itemName = localize('newSpell');
+            break;
+         }
+         default: {
+            itemName = localize('newItem');
+            break;
+         }
+      }
+
+      let itemData = {
+         name: itemName,
+         type: type,
+      };
+
+      this.createEmbeddedDocuments('Item', [itemData]);
    }
 }

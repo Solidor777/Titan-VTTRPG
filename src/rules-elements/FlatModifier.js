@@ -65,12 +65,11 @@ export function applyFlatModifier(flatModifier, actorData) {
    return;
 }
 
-export function getRuleElementTemplate() {
+export function getFlatModifierTemplate() {
    return {
       operation: 'flatModifier',
       selector: 'attribute',
       key: 'body',
       value: 1,
-      type: 'effect',
    };
 }

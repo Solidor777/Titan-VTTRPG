@@ -333,7 +333,8 @@
       ],
       "armor": 2,
       "description": "",
-      "equipped": false
+      "equipped": false,
+      "traits": []
     },
     "weapon": {
       "templates": [
@@ -561,7 +562,8 @@
     },
     "effect": {
       "description": "",
-      "rulesElement": []
+      "rulesElement": [],
+      "effectId": ""
     }
   }
 }

@@ -84,3 +84,14 @@ Hooks.on('preDeleteChatMessage', (message) => {
       message._svelteComponent.$destroy();
    }
 });
+
+Hooks.on('renderTokenHUD', (tokenHudApp, html, applicationData) => {
+   console.log("Meow");
+   if (!tokenHudApp.object) {
+      return;
+   }
+
+   const statusEffects = html.find('.status-effects');
+
+   console.log(statusEffects);
+});

@@ -1,11 +1,11 @@
+import { getFlatModifierTemplate } from '../rules-elements/FlatModifier.js';
 import TitanAbility from './types/ability/Ability.js';
+import TitanEffect from './types/effect/Effect.js';
 import TitanSpell from './types/spell/Spell.js';
 import TitanWeapon from './types/weapon/Weapon.js';
 
 export default class TitanItem extends Item {
    prepareDerivedData() {
-      // Prepare universal character data
-
       // Create type component if necessary
       if (!this.system.typeComponent) {
          switch (this.type) {
@@ -13,6 +13,13 @@ export default class TitanItem extends Item {
             case 'ability': {
                this.typeComponent = new TitanAbility(this);
                this.ability = this.typeComponent;
+               break;
+            }
+
+            // Effect
+            case 'effect': {
+               this.typeComponent = new TitanEffect(this);
+               this.effect = this.typeComponent;
                break;
             }
 
@@ -45,7 +52,6 @@ export default class TitanItem extends Item {
    }
 
    async sendToChat(options) {
-
       // Create the context object
       let chatContext = {
          type: this.type,
@@ -89,5 +95,33 @@ export default class TitanItem extends Item {
       }
 
       return rollData;
+   }
+
+   async addRulesElement() {
+      const newElement = getFlatModifierTemplate();
+      newElement.type = this.type;
+      const idx = this.system.rulesElement.push(newElement) - 1;
+      await this.update({
+         system: this.system
+      });
+
+      if (this.typeComponent) {
+         this.typeComponent.onAddRulesElement(idx);
+      }
+
+      return idx;
+   }
+
+   async removeRulesElement(idx) {
+      this.system.rulesElement.splice(idx, 1);
+      await this.update({
+         system: this.system
+      });
+
+      if (this.typeComponent) {
+         this.typeComponent.onRemoveRulesElement(idx);
+      }
+
+      return;
    }
 }
