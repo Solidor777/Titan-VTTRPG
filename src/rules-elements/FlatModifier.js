@@ -1,16 +1,25 @@
 export default function applyFlatModifier(flatModifier, actorData) {
+   if (flatModifier === undefined ||
+      flatModifier.operation === undefined ||
+      flatModifier.selector === undefined ||
+      flatModifier.key === undefined ||
+      flatModifier.type === undefined ||
+      flatModifier.value === undefined) {
+      console.error(`TITAN | Error applying Flat Modifier. Invalid Element. (${flatModifier})`);
+      return;
+   }
+
    function applyModifier(valueObject) {
-      if (valueObject?.dynamicMod === undefined) {
+      if (valueObject.dynamicMod === undefined) {
          valueObject.dynamicMod = flatModifier.value;
       }
-      else if (valueObject?.dynamicMod + flatModifier.value !== undefined) {
+      else if (valueObject.dynamicMod + flatModifier.value !== undefined) {
          valueObject.dynamicMod += flatModifier.value;
       }
       else {
          console.error(`TITAN | Error applying Flat Modifier. Invalid Value provided. (${flatModifier.value})`);
-         return false;
       }
-      return true;
+      return;
    }
 
    // Switch depending on the selector
@@ -41,7 +50,7 @@ export default function applyFlatModifier(flatModifier, actorData) {
       }
       default: {
          console.error(`TITAN | Error applying Flat Modifier. Invalid Selector (${flatModifier.selector})`);
-         return false;
+         return;
       }
    }
 }
