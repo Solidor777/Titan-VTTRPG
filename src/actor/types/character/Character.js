@@ -18,120 +18,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    prepareDerivedData() {
       this._resetDynamicMods();
       this._applyRulesElements();
-
-      // Get a reference to the parent system data
-      const systemData = this.parent.system;
-
-      // Calculate Attributes
-      let totalBaseAttributeValue = 0;
-      for (let [key, attribute] of Object.entries(systemData.attribute)) {
-         totalBaseAttributeValue += attribute.baseValue;
-         attribute.value = attribute.baseValue + attribute.staticMod + attribute.dynamicMod;
-      }
-
-      // Calculate Skills
-      for (let [key, skill] of Object.entries(systemData.skill)) {
-         skill.training.value = skill.training.baseValue + skill.training.staticMod + skill.training.dynamicMod;
-         skill.expertise.value = skill.expertise.baseValue + skill.expertise.staticMod + skill.expertise.dynamicMod;
-      }
-
-      // Calculate Speeds
-      for (let [key, speed] of Object.entries(systemData.speed)) {
-         speed.value = speed.baseValue + speed.staticMod + speed.dynamicMod;
-      }
-
-      // Calculate the base value of ratings
-      // Initiative = (Mind + Perception + Dexterity) / 2 rounded up
-      systemData.rating.initiative.baseValue =
-         Math.ceil((systemData.attribute.mind.value +
-            systemData.skill.perception.training.value +
-            systemData.skill.dexterity.training.value) / 2);
-
-      // Awareness = (Mind + Perception) / 2 rounded up
-      systemData.rating.awareness.baseValue =
-         Math.ceil((systemData.attribute.mind.value +
-            systemData.skill.perception.training.value) / 2);
-
-      // Defense = (Body + Dexterity) / 2 rounded up
-      systemData.rating.defense.baseValue =
-         Math.ceil((systemData.attribute.body.value +
-            systemData.skill.dexterity.training.value) / 2);
-
-      // Accuracy = (Mind + Training in Ranged Weapons) / 2 rounded up
-      systemData.rating.accuracy.baseValue =
-         Math.ceil((systemData.attribute.mind.value +
-            systemData.skill.rangedWeapons.training.value) / 2);
-
-      // Melee = (Body + Training in Melee Weapons) / 2 rounded up
-      systemData.rating.melee.baseValue =
-         Math.ceil((systemData.attribute.body.value +
-            systemData.skill.meleeWeapons.training.value) / 2);
-
-      // Calculate rating value
-      for (let [key, rating] of Object.entries(systemData.rating)) {
-         rating.value = rating.baseValue + rating.staticMod + rating.dynamicMod;
-      }
-
-      // Calculate resistance base values
-      // Reflexes = (Mind + (Body / 2) rounded up)
-      systemData.resistance.reflexes.baseValue =
-         systemData.attribute.mind.value +
-         Math.ceil(systemData.attribute.body.value / 2);
-
-      // Resilience = (Body + (Soul/2) rounded up)
-      systemData.resistance.resilience.baseValue =
-         systemData.attribute.body.value +
-         Math.ceil(systemData.attribute.soul.value / 2);
-
-      // Willpower = (Soul + (Mind/2))
-      systemData.resistance.willpower.baseValue =
-         systemData.attribute.soul.value +
-         Math.ceil(systemData.attribute.mind.value / 2);
-
-      // Calculate resistance mods
-      for (let [k, v] of Object.entries(systemData.resistance)) {
-         systemData.resistance[k].value = v.baseValue + v.staticMod + v.dynamicMod;
-      }
-
-      // Calculate base resource values
-      // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = Math.ceil(totalBaseAttributeValue *
-         CONFIG.TITAN.constants.resource.stamina.maxBaseMulti);
-
-      // Resolve = Soul / 2 rounded up
-      systemData.resource.resolve.maxBase = Math.ceil(
-         systemData.attribute.soul.value * CONFIG.TITAN.constants.resource.resolve.maxBaseMulti);
-
-      // Wounds = Total Attribute mod / 2 rounded up
-      systemData.resource.wounds.maxBase = Math.ceil(
-         totalBaseAttributeValue * CONFIG.TITAN.constants.resource.wounds.maxBaseMulti);
-
-      // Calculate resource mods and clamp them to be within range
-      for (let [k, v] of Object.entries(systemData.resource)) {
-         systemData.resource[k].maxValue =
-            v.maxBase + v.staticMod + v.dynamicMod;
-         systemData.resource[k].value =
-            clamp(systemData.resource[k].value, 0, systemData.resource[k].maxValue);
-      }
-
-      // Calculate mods
-      // Add armor from the equipped armor if appropriate
-      systemData.mod.armor.baseValue = 0;
-      const armorId = this.parent.system.equipped.armor;
-      if (armorId) {
-         const armor = this.parent.items.get(armorId);
-         if (armor) {
-            systemData.mod.armor.baseValue = armor.system.armor;
-         }
-      }
-
-      // Damage
-      systemData.mod.damage.baseValue = 0;
-
-      // Final mods
-      for (let [key, mod] of Object.entries(systemData.mod)) {
-         mod.value = mod.baseValue + mod.staticMod + mod.dynamicMod;
-      }
+      this._calculateFinalStats();
 
       return;
    }
@@ -163,41 +50,164 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Attributes
       for (let [key, attribute] of Object.entries(systemData.attribute)) {
-         attribute.dynamicMod = 0;
+         attribute.itemMod = 0;
+         attribute.effectMod = 0;
       }
 
       // Skills
       for (let [key, skill] of Object.entries(systemData.skill)) {
-         skill.training.dynamicMod = 0;
-         skill.expertise.dynamicMod = 0;
+         skill.training.itemMod = 0;
+         skill.training.effectMod = 0;
+         skill.expertise.itemMod = 0;
+         skill.expertise.effectMod = 0;
       }
 
       // Resource
       for (let [key, resource] of Object.entries(systemData.resource)) {
-         resource.dynamicMod = 0;
+         resource.itemMod = 0;
+         resource.effectMod = 0;
       }
 
       // Resistance
       for (let [key, resistance] of Object.entries(systemData.resistance)) {
-         resistance.dynamicMod = 0;
+         resistance.itemMod = 0;
+         resistance.effectMod = 0;
       }
 
       // Rating
       for (let [key, rating] of Object.entries(systemData.rating)) {
-         rating.dynamicMod = 0;
+         rating.itemMod = 0;
+         rating.effectMod = 0;
       }
 
       // Speed
       for (let [key, speed] of Object.entries(systemData.speed)) {
-         speed.dynamicMod = 0;
+         speed.itemMod = 0;
+         speed.effectMod = 0;
       }
 
       // Mod
       for (let [key, mod] of Object.entries(systemData.mod)) {
-         mod.dynamicMod = 0;
+         mod.itemMod = 0;
+         mod.effectMod = 0;
       }
 
       return;
+   }
+
+   _calculateFinalStats() {
+
+      // Get a reference to the parent system data
+      const systemData = this.parent.system;
+
+      // Calculate Attributes
+      let totalBaseAttributeValue = 0;
+      for (let [key, attribute] of Object.entries(systemData.attribute)) {
+         totalBaseAttributeValue += attribute.baseValue;
+         attribute.value = attribute.baseValue + attribute.staticMod + attribute.itemMod + attribute.effectMod;
+      }
+
+      // Calculate Skills
+      for (let [key, skill] of Object.entries(systemData.skill)) {
+         skill.training.value = skill.training.baseValue + skill.training.staticMod + skill.training.itemMod + skill.training.effectMod;
+         skill.expertise.value = skill.expertise.baseValue + skill.expertise.staticMod + skill.expertise.itemMod + skill.expertise.effectMod;
+      }
+
+      // Calculate Speeds
+      for (let [key, speed] of Object.entries(systemData.speed)) {
+         speed.value = speed.baseValue + speed.staticMod + speed.itemMod + speed.effectMod;
+      }
+
+      // Calculate the base value of ratings
+      // Initiative = (Mind + Perception + Dexterity) / 2 rounded up
+      systemData.rating.initiative.baseValue =
+         Math.ceil((systemData.attribute.mind.value +
+            systemData.skill.perception.training.value +
+            systemData.skill.dexterity.training.value) / 2);
+
+      // Awareness = (Mind + Perception) / 2 rounded up
+      systemData.rating.awareness.baseValue =
+         Math.ceil((systemData.attribute.mind.value +
+            systemData.skill.perception.training.value) / 2);
+
+      // Defense = (Body + Dexterity) / 2 rounded up
+      systemData.rating.defense.baseValue =
+         Math.ceil((systemData.attribute.body.value +
+            systemData.skill.dexterity.training.value) / 2);
+
+      // Accuracy = (Mind + Training in Ranged Weapons) / 2 rounded up
+      systemData.rating.accuracy.baseValue =
+         Math.ceil((systemData.attribute.mind.value +
+            systemData.skill.rangedWeapons.training.value) / 2);
+
+      // Melee = (Body + Training in Melee Weapons) / 2 rounded up
+      systemData.rating.melee.baseValue =
+         Math.ceil((systemData.attribute.body.value +
+            systemData.skill.meleeWeapons.training.value) / 2);
+
+      // Calculate rating value
+      for (let [key, rating] of Object.entries(systemData.rating)) {
+         rating.value = rating.baseValue + rating.staticMod + rating.itemMod + rating.effectMod;
+      }
+
+      // Calculate resistance base values
+      // Reflexes = (Mind + (Body / 2) rounded up)
+      systemData.resistance.reflexes.baseValue =
+         systemData.attribute.mind.value +
+         Math.ceil(systemData.attribute.body.value / 2);
+
+      // Resilience = (Body + (Soul/2) rounded up)
+      systemData.resistance.resilience.baseValue =
+         systemData.attribute.body.value +
+         Math.ceil(systemData.attribute.soul.value / 2);
+
+      // Willpower = (Soul + (Mind/2))
+      systemData.resistance.willpower.baseValue =
+         systemData.attribute.soul.value +
+         Math.ceil(systemData.attribute.mind.value / 2);
+
+      // Calculate resistance mods
+      for (let [key, resistance] of Object.entries(systemData.resistance)) {
+         systemData.resistance[key].value = resistance.baseValue + resistance.staticMod + resistance.itemMod + resistance.effectMod;
+      }
+
+      // Calculate base resource values
+      // Stamina = Total Attribute Mod
+      systemData.resource.stamina.maxBase = Math.ceil(totalBaseAttributeValue *
+         CONFIG.TITAN.constants.resource.stamina.maxBaseMulti);
+
+      // Resolve = Soul / 2 rounded up
+      systemData.resource.resolve.maxBase = Math.ceil(
+         systemData.attribute.soul.value * CONFIG.TITAN.constants.resource.resolve.maxBaseMulti);
+
+      // Wounds = Total Attribute mod / 2 rounded up
+      systemData.resource.wounds.maxBase = Math.ceil(
+         totalBaseAttributeValue * CONFIG.TITAN.constants.resource.wounds.maxBaseMulti);
+
+      // Calculate resource mods and clamp them to be within range
+      for (let [key, resource] of Object.entries(systemData.resource)) {
+         systemData.resource[key].maxValue = resource.maxBase + resource.staticMod + resource.itemMod + resource.effectMod;
+         systemData.resource[key].value = clamp(systemData.resource[key].value, 0, systemData.resource[key].maxValue);
+      }
+
+      // Calculate mods
+      // Add armor from the equipped armor if appropriate
+      systemData.mod.armor.baseValue = 0;
+      const armorId = this.parent.system.equipped.armor;
+      if (armorId) {
+         const armor = this.parent.items.get(armorId);
+         if (armor) {
+            systemData.mod.armor.baseValue = armor.system.armor;
+         }
+      }
+
+      // Damage
+      systemData.mod.damage.baseValue = 0;
+
+      // Final mods
+      for (let [key, mod] of Object.entries(systemData.mod)) {
+         mod.value = mod.baseValue + mod.staticMod + mod.itemMod + mod.effectMod;
+      }
    }
 
    // Get the initiative check

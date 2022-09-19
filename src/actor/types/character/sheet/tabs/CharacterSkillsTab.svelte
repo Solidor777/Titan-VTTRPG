@@ -35,7 +35,7 @@
                   <!--Button and Attribute-->
                   <div class="column">
                      <!--Button for rolling the skill-->
-                     <div class="skill-button" data-titan-tooltip={localize(`${key}.desc`)}>
+                     <div class="skill-button" data-tooltip={localize(`${key}.desc`)}>
                         <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
                            {localize(`${key}`)}<i class="fas fa-dice" />
                         </EfxButton>

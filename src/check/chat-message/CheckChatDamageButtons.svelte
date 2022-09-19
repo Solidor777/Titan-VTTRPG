@@ -51,7 +51,7 @@
 
 <div class="damage-buttons">
    <!--Apply damage button-->
-   <div class="button" data-titan-tooltip={localize("applyDamage")}>
+   <div class="button" data-tooltip={localize("applyDamage")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
@@ -61,7 +61,7 @@
    </div>
 
    <!--Apply damage ignore armor button-->
-   <div class="button" data-titan-tooltip={localize("applyDamageIgnoreArmor")}>
+   <div class="button" data-tooltip={localize("applyDamageIgnoreArmor")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
@@ -71,7 +71,7 @@
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" data-titan-tooltip={localize("applyHalfDamage")}>
+   <div class="button" data-tooltip={localize("applyHalfDamage")}>
       <EfxButton
          efx={ripple}
          on:click={() => {
@@ -81,7 +81,7 @@
    </div>
 
    <!--Apply healing button-->
-   <div class="button" data-titan-tooltip={localize("healDamage")}>
+   <div class="button" data-tooltip={localize("healDamage")}>
       <EfxButton
          efx={ripple}
          on:click={() => {

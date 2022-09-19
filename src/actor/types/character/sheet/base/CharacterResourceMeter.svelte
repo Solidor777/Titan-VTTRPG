@@ -30,12 +30,12 @@
       <div class="spacer" />
 
       <!--Label-->
-      <span class="label" data-titan-tooltip={valueTooltip}>{label}</span>
+      <span class="label" data-tooltip={valueTooltip}>{label}</span>
 
       <!--Static Mod-->
       <div class="static-mod">
          +
-         <div class="input" data-titan-tooltip={editStaticModTooltip}>
+         <div class="input" data-tooltip={editStaticModTooltip}>
             <DocumentIntegerInput bind:value={staticMod} />
          </div>
       </div>
@@ -44,15 +44,15 @@
    <!--Meter bar row-->
    <div class="row">
       <!--Current Value Input-->
-      <div class="input" data-titan-tooltip={editValueTooltip}><DocumentIntegerInput bind:value /></div>
+      <div class="input" data-tooltip={editValueTooltip}><DocumentIntegerInput bind:value /></div>
 
       <!--The Meter-->
-      <div class="meter" data-titan-tooltip={valueTooltip}>
+      <div class="meter" data-tooltip={valueTooltip}>
          <span style="width: {meterWidth}" />
       </div>
 
       <!--Max Value Display-->
-      <div class="max" data-titan-tooltip={maxTooltip}>{max}</div>
+      <div class="max" data-tooltip={maxTooltip}>{max}</div>
    </div>
 </div>
 

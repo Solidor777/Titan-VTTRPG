@@ -20,7 +20,7 @@
 
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
-   <div class="button {key}" data-titan-tooltip={localize(`${key}.desc`)}>
+   <div class="button {key}" data-tooltip={localize(`${key}.desc`)}>
       <EfxButton on:click={application.rollAttributeCheck.bind(application, key)} efx={ripple()}>
          {localize(`${key}`)}
       </EfxButton>
@@ -29,19 +29,19 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input" data-titan-tooltip={localize(`${key}.editBaseValue`)}>
+      <div class="input" data-tooltip={localize(`${key}.editBaseValue`)}>
          <DocumentIntegerInput bind:value={$document.system.attribute[key].baseValue} />
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="input" data-titan-tooltip={localize(`${key}.editStaticMod`)}>
+      <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
          <DocumentIntegerInput bind:value={$document.system.attribute[key].staticMod} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label final" data-titan-tooltip={localize(`${key}.value`)}>
+      <div class="label final" data-tooltip={localize(`${key}.value`)}>
          {attribute.value}
       </div>
    </div>

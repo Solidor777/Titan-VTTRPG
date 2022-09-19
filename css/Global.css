@@ -1,11 +1,11 @@
-[data-titan-tooltip] {
+[data-tooltip] {
   position: relative;
   z-index: 2;
   display: block;
   overflow: visible; }
 
-[data-titan-tooltip]:before,
-[data-titan-tooltip]:after {
+[data-tooltip]:before,
+[data-tooltip]:after {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -15,7 +15,7 @@
           transform: translate(-50%, 5px);
   overflow: visible; }
 
-[data-titan-tooltip]:before {
+[data-tooltip]:before {
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -28,7 +28,7 @@
   background-color: #000;
   background-color: rgba(26, 26, 26, 0.944);
   color: #fff;
-  content: attr(data-titan-tooltip);
+  content: attr(data-tooltip);
   font-weight: normal;
   text-align: center;
   font-size: 1rem;
@@ -37,7 +37,7 @@
   transition: .2s ease-out;
   overflow: visible; }
 
-[data-titan-tooltip]:after {
+[data-tooltip]:after {
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -51,8 +51,8 @@
   line-height: 0;
   overflow: visible; }
 
-[data-titan-tooltip]:hover:before,
-[data-titan-tooltip]:hover:after {
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
   visibility: visible;
   opacity: 1;
   -webkit-transition-delay: var(--tooltip-delay-normal);
@@ -61,8 +61,8 @@
           transform: translate(-50%, 0);
   overflow: visible; }
 
-[data-titan-tooltip=false]:hover:before,
-[data-titan-tooltip=false]:hover:after {
+[data-tooltip=false]:hover:before,
+[data-tooltip=false]:hover:after {
   visibility: hidden;
   opacity: 0;
   overflow: visible; }

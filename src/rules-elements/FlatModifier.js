@@ -51,15 +51,15 @@ export function applyFlatModifier(flatModifier, actorData) {
       }
    }
 
-   // Modifier the dynamic mods
-   if (valueObject.dynamicMod === undefined) {
-      valueObject.dynamicMod = flatModifier.value;
-   }
-   else if (valueObject.dynamicMod + flatModifier.value !== undefined) {
-      valueObject.dynamicMod += flatModifier.value;
+   // Determine the mod type
+   const modType = flatModifier.type === "effect" ? "effectMod" : "itemMod";
+
+   // Apply the mod
+   if (valueObject[modType] + flatModifier.value !== undefined) {
+      valueObject[modType] += flatModifier.value;
    }
    else {
-      console.error(`TITAN | Error applying Flat Modifier. Invalid Value provided. (${flatModifier.value})`);
+      console.error(`TITAN | Error applying Flat Modifier. Invalid Value provided. (${modType} ${flatModifier.value})`);
    }
 
    return;

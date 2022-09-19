@@ -1,6 +1,5 @@
 import './styles/Fonts.scss';
 import './styles/Variables.scss';
-import './styles/Global.scss';
 import './styles/Mixins.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import TitanConstants from './system/Constants.js';
@@ -18,6 +17,7 @@ import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
+   console.log(CONFIG.statusEffects);
 
    // Add custom constants for easy access
    CONFIG.TITAN = {

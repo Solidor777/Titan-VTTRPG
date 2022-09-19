@@ -24,7 +24,7 @@
 
 <div class="rating">
    <!--Label-->
-   <div class="label" data-titan-tooltip={localize(`${key}.desc`)}>
+   <div class="label" data-tooltip={localize(`${key}.desc`)}>
       <!--Icon-->
       <i class="fas fa-{ratingIcons[key]}" />
       {localize(`${key}`)}
@@ -33,19 +33,19 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="label" data-titan-tooltip={localize(`${key}.baseValue`)}>
+      <div class="label" data-tooltip={localize(`${key}.baseValue`)}>
          {rating.baseValue}
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="static-mod" data-titan-tooltip={localize(`${key}.editStaticMod`)}>
+      <div class="static-mod" data-tooltip={localize(`${key}.editStaticMod`)}>
          <DocumentIntegerInput bind:value={$document.system.rating[key].staticMod} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label final" data-titan-tooltip={localize(`${key}.value`)}>
+      <div class="label final" data-tooltip={localize(`${key}.value`)}>
          {rating.value}
       </div>
    </div>

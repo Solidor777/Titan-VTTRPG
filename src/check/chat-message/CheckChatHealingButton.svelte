@@ -29,7 +29,7 @@
 </script>
 
 <!--Apply healing button-->
-<div class="healing-button" data-titan-tooltip={localize("recoverStamina")}>
+<div class="healing-button" data-tooltip={localize("recoverStamina")}>
    <EfxButton
       on:click={() => {
          healDamage(results.healing);
