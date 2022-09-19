@@ -9,22 +9,16 @@
 
    // Document reference
    const document = getContext("DocumentStore");
-
-   // Copy of the document data
-   let data;
-   $: {
-      data = {
-         img: $document.img,
-         system: $document.system,
-         flags: $document.flags,
-         name: $document.name,
-      };
-   }
 </script>
 
 <TextInput
    bind:value
+   on:change
    on:change={async () => {
-      $document.update(data);
+      $document.update({
+         system: $document.system,
+         flags: $document.flags,
+         name: $document.name,
+      });
    }}
 />

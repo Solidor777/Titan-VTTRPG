@@ -22,12 +22,11 @@
    {min}
    {max}
    {disabled}
+   on:change
    on:change={() => {
       $document.update({
-         img: $document.img,
          system: $document.system,
          flags: $document.flags,
-         name: $document.name,
       });
    }}
 />

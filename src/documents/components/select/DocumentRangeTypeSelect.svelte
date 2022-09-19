@@ -7,21 +7,15 @@
 
    // Document reference
    const document = getContext("DocumentStore");
-
-   let data;
-   $: {
-      data = {
-         img: $document.img,
-         system: $document.system,
-         flags: $document.flags,
-         name: $document.name,
-      };
-   }
 </script>
 
 <RangeTypeSelect
    bind:value
+   on:change
    on:change={async () => {
-      $document.update(data);
+      $document.update({
+         system: $document.system,
+         flags: $document.flags,
+      });
    }}
 />
