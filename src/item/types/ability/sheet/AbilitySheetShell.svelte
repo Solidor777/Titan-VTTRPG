@@ -43,10 +43,12 @@
 
       <!--Content-->
       <div class="body">
+         <!--Sidebar-->
          <div class="sidebar">
             <AbilitySheetSidebar />
          </div>
 
+         <!--Tabs-->
          <div class="tabs">
             <Tabs {tabs} bind:activeTab={$appState.activeTab} />
          </div>

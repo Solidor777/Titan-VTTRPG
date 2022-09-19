@@ -1,6 +1,7 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import WeaponEditAttackTraitsDialog from './WeaponEditAttackTraitsDialog';
 import WeaponSheetShell from './WeaponSheetShell.svelte';
+import createWeaponSheetState from './WeaponSheetState';
 
 export default class TitanWeaponSheet extends TitanItemSheet {
    /**
@@ -11,8 +12,8 @@ export default class TitanWeaponSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 680,
-         height: 690,
+         width: 650,
+         height: 650,
          svelte: {
             class: WeaponSheetShell,
             target: document.body
@@ -20,38 +21,19 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       });
    }
 
-   // Is collapsed object
-   isExpanded = {
-      desc: {
-         attack: []
-      },
-      attacks: {
-         attack: []
-      },
-   };
-
-   // Scroll State
-   scrollTop = {
-      sidebar: 0,
-      attacks: 0,
-   };
-
-   // Handles deleting an attack
-   async deleteAttack(key) {
-      if (this.isExpanded.desc.attack.length === 1) {
-         this.isExpanded.desc.attack[0] = false;
-      }
-      else {
-         this.isExpanded.desc.attack.splice(key, 1);
-      }
-      await this.reactive.document.weapon.deleteAttack(key);
-      return;
+   constructor(object) {
+      super(object);
+      this.reactive.state = createWeaponSheetState();
    }
 
-   // Handles adding an attack
    async addAttack() {
-      await this.reactive.document.weapon.addAttack();
-      return;
+      this.reactive.state.addAttack();
+      return await this.reactive.document.weapon.addAttack();
+   }
+
+   async removeAttack(idx) {
+      this.reactive.state.removeAttack(idx);
+      return await this.reactive.document.weapon.removeAttack(idx);
    }
 
    // Opens the attack traits edit dialog

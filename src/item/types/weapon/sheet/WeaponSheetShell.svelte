@@ -6,73 +6,52 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
    import WeaponSheetAttacksTab from "./WeaponSheetAttacksTab.svelte";
    import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
+   import WeaponSheetHeader from "./WeaponSheetHeader.svelte";
+   import WeaponSheetSidebar from "./WeaponSheetSidebar.svelte";
 
-   // Setup
+   // Setup context variables
    export let elementRoot;
    export let documentStore;
+   export let applicationStateStore;
    setContext("DocumentStore", documentStore);
-   const document = getContext("DocumentStore");
-
-   // Initialize collapsed state
-   const application = getContext("external").application;
-   const isExpanded = application.isExpanded;
-   for (const [key] of Object.entries($document.system.attack)) {
-      isExpanded.desc.attack[key] = isExpanded.desc.attack[key] ?? true;
-      isExpanded.attacks.attack[key] = isExpanded.attacks.attack[key] ?? true;
-   }
+   setContext("ApplicationStateStore", applicationStateStore);
+   const appState = getContext("ApplicationStateStore");
 
    // Tabs
    const tabs = [
-      { label: localize("description"), id: "description", component: WeaponSheetDescriptionTab },
-      { label: localize("attacks"), id: "attacks", component: WeaponSheetAttacksTab },
+      {
+         label: localize("description"),
+         id: "description",
+         component: WeaponSheetDescriptionTab,
+      },
+      {
+         label: localize("attacks"),
+         id: "attacks",
+         component: WeaponSheetAttacksTab,
+      },
    ];
-   application.activeTab = application.activeTab ?? "description";
 </script>
 
 <ApplicationShell bind:elementRoot>
    <div class="weapon-sheet">
       <!--Header-->
       <div class="header">
-         <div class="row">
-            <div class="label">
-               <!--Item portrait-->
-               <div class="portrait">
-                  <DocumentImagePicker path={"img"} alt={"item portrait"} />
-               </div>
-               <!--Item name-->
-               <div class="name">
-                  <DocumentName />
-               </div>
-            </div>
-
-            <div class="stats">
-               <!--Rarity-->
-               <div class="stat-label">
-                  {localize("rarity")}
-               </div>
-               <div class="stat-input">
-                  <DocumentRaritySelect bind:value={$document.system.rarity} />
-               </div>
-
-               <!--Value-->
-               <div class="stat-label">
-                  {localize("value")}
-               </div>
-               <div class="stat-input">
-                  <DocumentIntegerInput bind:value={$document.system.value} />
-               </div>
-            </div>
-         </div>
+         <WeaponSheetHeader />
       </div>
-      <!--Tab Content-->
-      <div class="tabs">
-         <Tabs {tabs} bind:activeTab={application.activeTab} />
+
+      <!--Content-->
+      <div class="body">
+         <!--Sidebar-->
+         <div class="sidebar">
+            <WeaponSheetSidebar />
+         </div>
+
+         <!--Tabs-->
+         <div class="tabs">
+            <Tabs {tabs} bind:activeTab={$appState.activeTab} />
+         </div>
       </div>
    </div>
 </ApplicationShell>
@@ -86,51 +65,23 @@
       display: flex;
       flex: 1;
 
-      .header {
-         @include border;
-         @include flex-column;
-         align-items: center;
-         justify-content: space-between;
-         width: 100%;
-         padding: 0.5rem;
-
-         .row {
-            @include flex-row;
-            @include flex-space-between;
-            width: 100%;
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               width: 100%;
-
-               .portrait {
-                  width: 5rem;
-                  --border-style: none;
-               }
-            }
-
-            .stats {
-               @include grid(2);
-               width: 100%;
-               box-sizing: border-box;
-               margin-left: 0.5rem;
-
-               .stat-label {
-                  @include flex-row;
-                  @include flex-group-right;
-                  font-weight: bold;
-               }
-            }
-         }
-      }
-
-      .tabs {
-         @include flex-column;
-         margin-top: 0.5rem;
-         position: relative;
+      .body {
+         @include flex-row;
          height: 100%;
          width: 100%;
+
+         .sidebar {
+            @include flex-row;
+            width: 13rem;
+            min-width: 13rem;
+            margin: 0.5rem 0.5rem 0 0;
+         }
+
+         .tabs {
+            @include flex-row;
+            margin-top: 0.5rem;
+            width: 100%;
+         }
       }
    }
 </style>

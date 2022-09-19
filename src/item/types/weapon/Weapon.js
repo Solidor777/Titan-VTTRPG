@@ -19,7 +19,7 @@ export default class TitanWeapon extends TitanTypeComponent {
       return;
    }
 
-   async deleteAttack(idx) {
+   async removeAttack(idx) {
       // Remove the attack and update the item
       let attack = this.parent.system.attack;
       attack.splice(idx, 1);

@@ -7,11 +7,10 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   // Document reference
-   const document = getContext("DocumentStore");
-
-   // Application reference
+   // Setup context variables
    const application = getContext("external").application;
+   const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 </script>
 
 <div class="attacks">
@@ -20,19 +19,22 @@
       {localize("attacks")}
    </div>
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.sidebar}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
          <!--List of attacks-->
          <ol>
             <!--For Each attack-->
             {#each Object.entries($document.system.attack) as [attackIdx]}
-               <li transition:slide|local>
-                  <WeaponSheetAttack {attackIdx} bind:isExpandedObject={application.isExpanded.desc.attack} />
-               </li>
+               <li transition:slide|local />
             {/each}
          </ol>
          <!--Add attack button-->
          <div class="add-attack-button">
-            <EfxButton efx={ripple()} on:click={application.addAttack.bind(application)}>
+            <EfxButton
+               efx={ripple()}
+               on:click={() => {
+                  application.addAttack();
+               }}
+            >
                <i class="fas fa-circle-plus" />
             </EfxButton>
          </div>

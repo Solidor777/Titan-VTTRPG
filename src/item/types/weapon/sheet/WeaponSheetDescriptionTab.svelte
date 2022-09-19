@@ -1,48 +1,78 @@
 <script>
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import WeaponSheetSidebar from "./WeaponSheetSidebar.svelte";
 
-   // Reference to the application
+   // Setup context variables
    const application = getContext("external").application;
-
-   // Reference to the weapon item
    const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 </script>
 
-<div class="weapon-description-tab">
-   <!--Sidebar-->
-   <div class="sidebar">
-      <WeaponSheetSidebar />
-   </div>
-   <div class="description">Description</div>
+<div class="tab">
+   <ScrollingContainer bind:scrollTop={$appState.scrollTop.description}>
+      <div class="scrolling-content">
+         <!--Description-->
+         <div class="description">
+            <!--Header-->
+            <h3 class="header">
+               {localize("description")}
+            </h3>
+
+            <!--Body-->
+            <div class="body">Description</div>
+         </div>
+
+         <!--Attack-->
+         <div class="description">
+            <!--Header-->
+            <h3 class="header">
+               {localize("description")}
+            </h3>
+
+            <!--Body-->
+            <div class="body">Attack Description</div>
+         </div>
+      </div>
+   </ScrollingContainer>
 </div>
 
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
-   .weapon-description-tab {
+   .tab {
+      @include flex-group-center;
       @include flex-row;
       height: 100%;
       width: 100%;
+      font-size: 1rem;
 
-      .sidebar {
-         width: 13rem;
-         min-width: 13rem;
-      }
-
-      .description {
+      .scrolling-content {
          @include flex-column;
          @include flex-group-top;
-         @include border;
-         box-sizing: border-box;
+         height: 100%;
          width: 100%;
-         margin: 0.5rem 0.5rem 0.5rem 0;
          padding: 0.5rem;
+
+         .description {
+            @include flex-column;
+            @include flex-group-top;
+            min-height: 10rem;
+            width: 100%;
+
+            .header {
+               @include flex-row;
+               @include flex-group-left;
+               flex-wrap: wrap;
+               width: 100%;
+            }
+
+            .body {
+               @include flex-row;
+               @include flex-group-left;
+               flex-wrap: wrap;
+               width: 100%;
+            }
+         }
       }
    }
 </style>

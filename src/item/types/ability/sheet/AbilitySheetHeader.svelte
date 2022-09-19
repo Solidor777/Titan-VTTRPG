@@ -21,8 +21,9 @@
          <DocumentImagePicker path={"img"} alt={"item portrait"} />
       </div>
 
-      <!--Item name-->
+      <!--Label Stats-->
       <div class="label-stats">
+         <!--Name-->
          <div class="name">
             <DocumentName />
          </div>
@@ -31,9 +32,12 @@
          <div class="secondary-stats">
             <!--Rarity-->
             <div class="stat">
+               <!--Label-->
                <div class="label">
                   {localize("rarity")}
                </div>
+
+               <!--Input-->
                <div class="input">
                   <DocumentRaritySelect bind:value={$document.system.rarity} />
                </div>
@@ -41,9 +45,12 @@
 
             <!--EXP Cost-->
             <div class="stat">
+               <!--Label-->
                <div class="label">
                   {localize("expCost")}
                </div>
+
+               <!--Input-->
                <div class="input integer">
                   <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
                </div>
