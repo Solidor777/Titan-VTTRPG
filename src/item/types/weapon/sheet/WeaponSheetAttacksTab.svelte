@@ -1,48 +1,104 @@
 <script>
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
+   import { localize } from "~/helpers/Utility.js";
    import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
-   // Document reference
-   const document = getContext("DocumentStore");
-
-   // Application reference
+   // Setup context variables
    const application = getContext("external").application;
+   const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 </script>
 
-<ScrollingContainer bind:scrollTop={application.scrollTop.attacks}>
-   <div class="weapon-attacks-tab">
-      {#each Object.entries($document.system.attack) as [attackIdx]}
-         <div class="attack-sheet" transition:slide|local>
-            <WeaponSheetAttack {attackIdx} bind:isExpandedObject={application.isExpanded.attacks.attack} />
-         </div>
-      {/each}
+<div class="tab">
+   <ScrollingContainer bind:scrollTop={$appState.scrollTop.attacks}>
+      <div class="scrolling-content">
+         <!--Attacks List-->
+         {#if $document.system.attack.length > 0}
+            <ol>
+               <!--Each attack-->
+               {#each Object.entries($document.system.attack) as [attackIdx, attack]}
+                  <li>
+                     {attack.name}
+                  </li>
+               {/each}
+            </ol>
+         {/if}
 
-      <div class="add-attack-button">
-         <EfxButton efx={ripple()} on:click={application.addAttack.bind(application)}>
-            <i class="fas fa-circle-plus" />
-         </EfxButton>
+         <!--Add Attack Button-->
+         <div class="add-attack-button">
+            <EfxButton
+               on:click={() => {
+                  application.addAttack();
+               }}
+            >
+               <!--Button Content-->
+               <div class="button-content">
+                  <!--Label-->
+                  <div class="label">
+                     {localize("addAttack")}
+                  </div>
+
+                  <!--Icon-->
+                  <i class="fas fa-circle-plus" />
+               </div>
+            </EfxButton>
+         </div>
       </div>
-   </div>
-</ScrollingContainer>
+   </ScrollingContainer>
+</div>
 
 <!--For Each attack-->
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .weapon-attacks-tab {
-      @include grid(3);
+   .tab {
+      @include flex-group-center;
+      @include flex-row;
+      height: 100%;
       width: 100%;
+      font-size: 1rem;
 
-      .add-attack-button {
-         @include flex-row;
-         @include flex-group-center;
+      .scrolling-content {
+         @include flex-column;
+         @include flex-group-top;
+         width: 100%;
+         height: 100%;
 
-         .fas {
-            padding: 0.25rem;
+         ol {
+            @include flex-column;
+            @include flex-group-top;
+            @include list;
+            @include z-index-app;
+            width: 100%;
+
+            li {
+               @include flex-row;
+               @include flex-group-center;
+               @include z-index-app;
+               width: 100%;
+            }
+         }
+
+         .add-attack-button {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+
+            &:not(:first-child) {
+               margin-top: 0.5rem;
+            }
+
+            .button-content {
+               @include flex-row;
+               @include flex-group-center;
+
+               i {
+                  margin-left: 0.25rem;
+               }
+            }
          }
       }
    }

@@ -9,9 +9,12 @@
 </script>
 
 <div class="sidebar">
+   <!--Header-->
    <div class="header">
       {localize("checks")}
    </div>
+
+   <!--Checks-->
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
          <ItemSheetChecksSidebar />

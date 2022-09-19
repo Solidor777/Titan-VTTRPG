@@ -4,8 +4,6 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
    const appState = getContext("ApplicationStateStore");
 </script>
 

@@ -7,82 +7,45 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
+   // Application staore reference
    const appState = getContext("ApplicationStateStore");
 </script>
 
-<div class="attacks">
-   <!--Attacks Label-->
-   <div class="attacks-header">
+<div class="sidebar">
+   <!--Header-->
+   <div class="header">
       {localize("attacks")}
    </div>
+
+   <!--Attacks-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
-         <!--List of attacks-->
-         <ol>
-            <!--For Each attack-->
-            {#each Object.entries($document.system.attack) as [attackIdx]}
-               <li transition:slide|local />
-            {/each}
-         </ol>
-         <!--Add attack button-->
-         <div class="add-attack-button">
-            <EfxButton
-               efx={ripple()}
-               on:click={() => {
-                  application.addAttack();
-               }}
-            >
-               <i class="fas fa-circle-plus" />
-            </EfxButton>
-         </div>
-      </ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>Attacks</ScrollingContainer>
    </div>
 </div>
 
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .attacks {
+   .sidebar {
       @include flex-column;
       @include flex-group-top;
-      margin-top: 0.5rem;
-      height: 100%;
+      @include border;
       width: 100%;
-      font-weight: bold;
-      padding: 0.5rem;
+      box-sizing: border-box;
+
+      .header {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-bottom;
+         width: 100%;
+         font-weight: bold;
+         margin-top: 0.5rem;
+         padding-bottom: 0.5rem;
+      }
 
       .scrolling-content {
-         @include flex-column;
-         @include flex-group-top;
-         height: 100%;
          width: 100%;
-         margin-top: 0.5rem;
-
-         ol {
-            @include flex-column;
-            @include flex-group-top;
-            width: 100%;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-
-            :not(:first-child) {
-               margin-top: 0.5rem;
-            }
-         }
-
-         .add-attack-button {
-            @include flex-row;
-            @include flex-group-center;
-            margin-top: 0.5rem;
-
-            .fas {
-               padding: 0.25rem;
-            }
-         }
+         height: 100%;
       }
    }
 </style>
