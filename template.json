@@ -291,6 +291,18 @@
           "damage": {
             "staticMod": 0
           }
+        },
+        "statusEffect": {
+          "asleep": false,
+          "blinded": false,
+          "contaminated": false,
+          "deafened": false,
+          "frightened": false,
+          "incapacitated": false,
+          "prone": false,
+          "restrained": false,
+          "stunned": false,
+          "unconscious": false
         }
       }
     },

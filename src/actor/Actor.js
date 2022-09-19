@@ -15,12 +15,6 @@ export default class TitanActor extends Actor {
          this.typeComponent.prepareDerivedData();
       }
 
-      if (this._source) {
-         console.log(this._source.token);
-         console.log(this);
-      }
-
-
       return;
    }
 

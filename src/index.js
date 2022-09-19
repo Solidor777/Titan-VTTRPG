@@ -3,6 +3,7 @@ import './styles/Variables.scss';
 import './styles/Mixins.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import TitanConstants from './system/Constants.js';
+import TitanStatusEffects from './helpers/StatusEffects.js';
 import TitanChatMessageTypes from './system/ChatMessageTypes.js';
 import registerSystemSettings from './system/RegisterSystemSettings.js';
 import TitanActor from './actor/Actor.js';
@@ -17,7 +18,6 @@ import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
-   console.log(CONFIG.statusEffects);
 
    // Add custom constants for easy access
    CONFIG.TITAN = {
@@ -58,6 +58,15 @@ Hooks.once('init', async () => {
    registerSystemSettings();
 
    return;
+});
+
+Hooks.once('setup', async () => {
+   // Set up status effects
+   CONFIG.statusEffects = TitanStatusEffects.sort((a, b) => {
+      const textA = game.i18n.localize(a.label);
+      const textB = game.i18n.localize(b.label);
+      return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+   });
 });
 
 Hooks.on('renderChatMessage', (message, html) => {

@@ -16,32 +16,45 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Prepare Character type specific data
    prepareDerivedData() {
+      this._calculateBaseRatings();
       this._resetDynamicMods();
       this._applyRulesElements();
+      this._applyStatusEffects();
       this._calculateFinalStats();
 
       return;
    }
 
-   async _applyRulesElements() {
-      // Reset dynamic mods
+   _calculateBaseRatings() {
       const systemData = this.parent.system;
+      // Calculate the base value of ratings
+      // Initiative = (Mind + Perception + Dexterity) / 2 rounded up
+      systemData.rating.initiative.baseValue =
+         Math.ceil((systemData.attribute.mind.baseValue +
+            systemData.skill.perception.training.baseValue +
+            systemData.skill.dexterity.training.baseValue) / 2);
 
-      // Get all the rules elements
-      let rulesElements = [];
-      this.parent.items.forEach((item) => {
-         if (item.system.rulesElement && item.system.rulesElement.length > 0) {
-            rulesElements = [...rulesElements, ...item.system.rulesElement];
-         }
-      });
+      // Awareness = (Mind + Perception) / 2 rounded up
+      systemData.rating.awareness.baseValue =
+         Math.ceil((systemData.attribute.mind.baseValue +
+            systemData.skill.perception.training.baseValue) / 2);
 
-      // Sort the rules elements and process them in order
-      // FlatModifier
-      const flatMods = rulesElements.filter((element) => element.operation === "flatModifier");
-      flatMods.forEach((flatMod) => {
-         applyFlatModifier(flatMod, systemData);
-      });
+      // Defense = (Body + Dexterity) / 2 rounded up
+      systemData.rating.defense.baseValue =
+         Math.ceil((systemData.attribute.body.baseValue +
+            systemData.skill.dexterity.training.baseValue) / 2);
 
+      // Accuracy = (Mind + Training in Ranged Weapons) / 2 rounded up
+      systemData.rating.accuracy.baseValue =
+         Math.ceil((systemData.attribute.mind.baseValue +
+            systemData.skill.rangedWeapons.training.baseValue) / 2);
+
+      // Melee = (Body + Training in Melee Weapons) / 2 rounded up
+      systemData.rating.melee.baseValue =
+         Math.ceil((systemData.attribute.body.baseValue +
+            systemData.skill.meleeWeapons.training.baseValue) / 2);
+
+      return;
    }
 
    _resetDynamicMods() {
@@ -92,7 +105,163 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          mod.effectMod = 0;
       }
 
+      // Status effects
+      for (let [key, status] of Object.entries(systemData.statusEffect)) {
+         status = false;
+      }
+
       return;
+   }
+
+   _applyRulesElements() {
+      // Reset dynamic mods
+      const systemData = this.parent.system;
+
+      // Get all the rules elements
+      let rulesElements = [];
+      this.parent.items.forEach((item) => {
+         if (item.system.rulesElement && item.system.rulesElement.length > 0) {
+            rulesElements = [...rulesElements, ...item.system.rulesElement];
+         }
+      });
+
+      // Sort the rules elements and process them in order
+      // FlatModifier
+      const flatMods = rulesElements.filter((element) => element.operation === 'flatModifier');
+      flatMods.forEach((flatMod) => {
+         applyFlatModifier(flatMod, systemData);
+      });
+
+   }
+
+   _applyStatusEffects() {
+      // Get the temporary effects
+      const temporaryEffects = this.parent.temporaryEffects;
+
+      // Check each effect to see if it is a status effect
+      temporaryEffects.forEach((effect) => {
+         switch (effect.flags.core.statusId) {
+            // Blinded
+            case 'blind': {
+               this.parent.system.statusEffect.blinded = true;
+               break;
+            }
+
+            // Defeaned
+            case 'deaf': {
+               // Apply the effect
+               this.parent.system.statusEffect.deafened = true;
+               break;
+            }
+
+            // Fear
+            case 'fear': {
+               // Apply the effect
+               this.parent.system.statusEffect.frightened = true;
+               break;
+            }
+
+            // Paralysis
+            case 'paralysis': {
+               // Apply the effect
+               this.parent.system.statusEffect.incapacitated = true;
+               break;
+            }
+
+            // Restrained
+            case 'restrain': {
+               // Apply the effect
+               const systemData = this.parent.system;
+               systemData.statusEffect.restrained = true;
+
+               // Decrease Melee, Accuracy, and Defense by 1
+               systemData.rating.melee.effectMod -= 1;
+               systemData.rating.accuracy.effectMod -= 1;
+               systemData.rating.defense.effectMod -= 1;
+
+               // Decrease Speed to 0
+               for (let [key, speed] of Object.entries(systemData.speed)) {
+                  const speedValue = speed.baseValue + speed.staticMod + speed.itemMod;
+                  if (speedValue > 0) {
+                     speed.effectMod = -speedValue;
+                  }
+               }
+
+               break;
+            }
+
+            // Prone
+            case 'prone': {
+               // Apply the effect
+               const systemData = this.parent.system;
+               systemData.statusEffect.prone = true;
+
+               // Decrease Speed by half
+               for (let [key, speed] of Object.entries(systemData.speed)) {
+                  const speedValue = speed.baseValue + speed.staticMod + speed.itemMod;
+                  if (speedValue > 0) {
+                     speed.effectMod = -(Math.ceil(speedValue / 2));
+                  }
+               }
+
+               break;
+            }
+
+            // Sleep
+            case 'sleep': {
+               // Apply the effect
+               const systemData = this.parent.system;
+               systemData.statusEffect.asleep = true;
+
+               // Decrease awareness by half
+               const awareness = this.parent.system.rating.awareness;
+               const awarenessValue = awareness.baseValue + awareness.staticMod + awareness.itemMod;
+               if (awarenessValue > 0) {
+                  awareness.effectMod = -(Math.ceil(awarenessValue / 2));
+               }
+
+               break;
+            }
+
+            // Sleep
+            case 'stun': {
+               // Apply the effect
+               const systemData = this.parent.system;
+               systemData.statusEffect.stunned = true;
+
+               // Decrease Defense by 1
+               this.parent.system.rating.defense.effectMod -= 1;
+
+               break;
+            }
+
+            // Poisoned
+            case 'poison': {
+               // Apply the effect
+               const systemData = this.parent.system;
+               systemData.statusEffect.contaminated = true;
+
+               // Decrease all Skills and Resistances by 1
+               for (let [key, skill] of Object.entries(systemData.skill)) {
+                  skill.training.effectMod -= 1;
+               }
+               for (let [key, resistance] of Object.entries(systemData.resistance)) {
+                  resistance.effectMod -= 1;
+               }
+               break;
+            }
+
+            // Unconscious
+            case 'unconscious': {
+               this.parent.system.statusEffect.unconscious = true;
+               break;
+            }
+
+            default: {
+               break;
+            }
+         }
+      });
    }
 
    _calculateFinalStats() {
@@ -117,33 +286,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       for (let [key, speed] of Object.entries(systemData.speed)) {
          speed.value = speed.baseValue + speed.staticMod + speed.itemMod + speed.effectMod;
       }
-
-      // Calculate the base value of ratings
-      // Initiative = (Mind + Perception + Dexterity) / 2 rounded up
-      systemData.rating.initiative.baseValue =
-         Math.ceil((systemData.attribute.mind.value +
-            systemData.skill.perception.training.value +
-            systemData.skill.dexterity.training.value) / 2);
-
-      // Awareness = (Mind + Perception) / 2 rounded up
-      systemData.rating.awareness.baseValue =
-         Math.ceil((systemData.attribute.mind.value +
-            systemData.skill.perception.training.value) / 2);
-
-      // Defense = (Body + Dexterity) / 2 rounded up
-      systemData.rating.defense.baseValue =
-         Math.ceil((systemData.attribute.body.value +
-            systemData.skill.dexterity.training.value) / 2);
-
-      // Accuracy = (Mind + Training in Ranged Weapons) / 2 rounded up
-      systemData.rating.accuracy.baseValue =
-         Math.ceil((systemData.attribute.mind.value +
-            systemData.skill.rangedWeapons.training.value) / 2);
-
-      // Melee = (Body + Training in Melee Weapons) / 2 rounded up
-      systemData.rating.melee.baseValue =
-         Math.ceil((systemData.attribute.body.value +
-            systemData.skill.meleeWeapons.training.value) / 2);
 
       // Calculate rating value
       for (let [key, rating] of Object.entries(systemData.rating)) {
