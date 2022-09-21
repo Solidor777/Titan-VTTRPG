@@ -12,7 +12,7 @@
    const appState = getContext("ApplicationStateStore");
 
    $document.system.attack.forEach((attack, idx) => {
-      $appState.isExpanded.attacks[idx] = $appState.isExpanded.attack[idx] ?? true;
+      $appState.isExpanded.attacks[idx] = $appState.isExpanded.attacks[idx] ?? true;
    });
 </script>
 
