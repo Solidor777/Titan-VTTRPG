@@ -7,7 +7,6 @@ export default class TitanWeapon extends TitanTypeComponent {
    async addAttack() {
       // Create the new attack
       const newAttack = this.getAttackTemplate();
-      newAttack.uuid = uuidv4();
 
       // Add the attack and update the item
       const attack = this.parent.system.attack;
@@ -54,6 +53,13 @@ export default class TitanWeapon extends TitanTypeComponent {
          damage: 1,
          plusSuccessDamage: true,
          trait: [],
+         uuid: uuidv4()
       };
+   }
+
+   onCreate() {
+      if (this.parent.system.attack.length === 0) {
+         this.addAttack();
+      }
    }
 }
