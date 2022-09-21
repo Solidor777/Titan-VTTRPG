@@ -268,7 +268,7 @@
                @include flex-group-center;
                flex-wrap: wrap;
                width: 100%;
-               margin-bottom: 0.25rem;
+               margin-bottom: 00.25rem;
 
                .trait {
                   margin: 0.5rem 0.25rem 0 0.25rem;

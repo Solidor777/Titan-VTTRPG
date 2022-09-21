@@ -24,7 +24,7 @@
             <ol>
                <!--Each attack-->
                {#each Object.entries($document.system.attack) as [idx]}
-                  <li>
+                  <li in:slide>
                      <WeaponSheetAttackSettings {idx} />
                   </li>
                {/each}
