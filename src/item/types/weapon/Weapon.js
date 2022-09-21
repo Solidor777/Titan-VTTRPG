@@ -1,4 +1,5 @@
 import { localize } from '~/helpers/Utility.js';
+import { v4 as uuidv4 } from 'uuid';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanWeapon extends TitanTypeComponent {
@@ -6,9 +7,10 @@ export default class TitanWeapon extends TitanTypeComponent {
    async addAttack() {
       // Create the new attack
       const newAttack = this.getAttackTemplate();
+      newAttack.uuid = uuidv4();
 
       // Add the attack and update the item
-      let attack = this.parent.system.attack;
+      const attack = this.parent.system.attack;
       attack.push(newAttack);
       await this.parent.update({
          system: {

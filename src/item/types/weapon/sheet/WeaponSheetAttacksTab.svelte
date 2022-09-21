@@ -23,8 +23,8 @@
          {#if $document.system.attack.length > 0}
             <ol>
                <!--Each attack-->
-               {#each Object.entries($document.system.attack) as [idx]}
-                  <li in:slide>
+               {#each Object.entries($document.system.attack) as [idx, attack] (attack.uuid)}
+                  <li transition:slide|local>
                      <WeaponSheetAttackSettings {idx} />
                   </li>
                {/each}

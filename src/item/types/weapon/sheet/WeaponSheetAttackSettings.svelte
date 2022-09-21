@@ -88,7 +88,7 @@
 
                   <!--Input-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={attack.range} />
+                     <DocumentIntegerInput bind:value={attack.range} min={1} />
                   </div>
                </div>
             </div>
@@ -101,7 +101,7 @@
 
                   <!--Input-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={attack.damage} />
+                     <DocumentIntegerInput bind:value={attack.damage} min={0} />
                   </div>
 
                   <!--Plus Success Damage-->
@@ -153,7 +153,7 @@
                {#if attack.trait.length > 0}
                   <div class="traits-container">
                      <!--Each trait-->
-                     {#each attack.trait as trait}
+                     {#each attack.trait as trait (trait.name)}
                         <div class="trait" data-tooltip={localize(`${trait.name}.desc`)}>
                            {#if trait.type === "number"}
                               <!--Number Trait-->

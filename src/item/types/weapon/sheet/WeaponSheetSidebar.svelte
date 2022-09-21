@@ -1,22 +1,28 @@
 <script>
    import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
+   import WeaponSheetSidebarAttacks from "./WeaponSheetSidebarAttacks.svelte";
 
-   // Application staore reference
+   // Application statee reference
    const appState = getContext("ApplicationStateStore");
 </script>
 
 <div class="sidebar">
-   <!--Header-->
-   <div class="header">
-      {localize("attacks")}
-   </div>
-
    <!--Attacks-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>Attacks</ScrollingContainer>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+         <div class="attacks">
+            <!--Header-->
+            <div class="header">
+               {localize("attacks")}
+            </div>
+
+            <div class="list">
+               <WeaponSheetSidebarAttacks />
+            </div>
+         </div>
+      </ScrollingContainer>
    </div>
 </div>
 
@@ -38,6 +44,7 @@
          width: 100%;
          font-weight: bold;
          padding: 0.25rem 0.5rem;
+         font-size: 1.2rem;
       }
 
       .scrolling-content {
