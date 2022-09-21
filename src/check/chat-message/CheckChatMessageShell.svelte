@@ -13,7 +13,7 @@
    // Document reference
    const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
-   const isOwner = $document.constructor.getSpeakerActor($document.speaker).isOwner;
+   const isOwner = $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
    let scalingAspects = chatContext.parameters.aspects
       ? chatContext.parameters.aspects.filter((aspect) => {
            return aspect.scaling;
