@@ -154,7 +154,7 @@
                   <div class="traits-container">
                      <!--Each trait-->
                      {#each attack.trait as trait}
-                        <div class="trait">
+                        <div class="trait" data-tooltip={localize(`${trait.name}.desc`)}>
                            {#if trait.type === "number"}
                               <!--Number Trait-->
                               <StatTag label={localize(trait.name)} value={trait.value} />

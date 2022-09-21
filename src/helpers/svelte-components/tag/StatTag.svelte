@@ -19,8 +19,8 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
+      @include label;
       padding: 0.25rem;
-      background: var(--label-background-color);
 
       .label {
          @include border-right;

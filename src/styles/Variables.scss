@@ -84,8 +84,6 @@
   --color-background: #bab9ae;
   --color-foreground: #e4e3d7;
   --text-color: white;
-
-  --label-background-color: whitesmoke;
   --highlight-background-color: rgb(255, 233, 174);
   --static-label-background-color: rgb(208, 208, 208);
   --active-background-color: #fcdbbf;
@@ -97,6 +95,10 @@
   --panel-2-color: black;
   --panel-3-background: #eee9e683;
   --panel-3-color: black;
+
+  // Label styles
+  --label-background: whitesmoke;
+  --label-color: black;
 
   // Rarity colors
   --uncommon-color-bright: #d0ffbb;

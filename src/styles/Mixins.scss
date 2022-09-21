@@ -259,19 +259,25 @@
 }
 
 @mixin panel-1 {
-  background-color: var(--panel-1-background);
+  background: var(--panel-1-background);
   color: var(--panel-1-color);
   --border-color: var(--panel-1-color);
 }
 
 @mixin panel-2 {
-  background-color: var(--panel-2-background);
+  background: var(--panel-2-background);
   color: var(--panel-2-color);
   --border-color: var(--panel-2-color);
 }
 
 @mixin panel-3 {
-  background-color: var(--panel-3-background);
+  background: var(--panel-3-background);
   color: var(--panel-3-color);
   --border-color: var(--panel-3-color);
+}
+
+@mixin label {
+  background: var(--label-background);
+  color: var(--label-color);
+  --border-color: var(--label-color);
 }

@@ -13,8 +13,8 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
+      @include label;
       font-weight: bold;
       padding: 0.25rem;
-      background: var(--label-background-color);
    }
 </style>

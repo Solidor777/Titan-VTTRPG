@@ -20,11 +20,6 @@ export default Object.freeze([
       value: false,
    },
    {
-      name: "defensive",
-      type: "boolean",
-      value: false,
-   },
-   {
       name: "ineffective",
       type: "boolean",
       value: false,
@@ -75,19 +70,9 @@ export default Object.freeze([
       value: false,
    },
    {
-      name: "spread",
+      name: "splash",
       type: "number",
       value: 0,
-   },
-   {
-      name: "subtle",
-      type: "boolean",
-      value: false,
-   },
-   {
-      name: "thrown",
-      type: "boolean",
-      value: false,
    },
    {
       name: "twoHanded",

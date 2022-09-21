@@ -51,10 +51,10 @@
    <ol>
       {#each traitOptions as trait, idx}
          <!--Trait-->
-         <li>
+         <li data-tooltip={localize(`${trait.name}.desc`)}>
             <!--Label-->
             <div class="label">
-               {localize(`${trait.name}`)}
+               {localize(trait.name)}
             </div>
 
             <!--Input-->
@@ -95,6 +95,7 @@
             @include border;
             @include flex-row;
             @include flex-group-center;
+            @include panel-2;
             width: 100%;
             height: 2.5rem;
             margin-bottom: 0.5rem;
@@ -127,7 +128,7 @@
          @include flex-row;
          @include flex-group-center;
          width: 100%;
-         margin-top: 0.5rem;
+         margin-top: 0.25rem;
 
          button {
             font-size: 1rem;
