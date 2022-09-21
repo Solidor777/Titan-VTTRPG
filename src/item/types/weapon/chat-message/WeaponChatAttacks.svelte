@@ -46,7 +46,7 @@
             </div>
 
             <!--Traits-->
-            {#each attack.traits as trait}
+            {#each attack.trait as trait}
                <div class="stat">
                   {#if trait.type === "number"}
                      <StatTag label={localize(`${trait.name}`)} value={trait.value} />

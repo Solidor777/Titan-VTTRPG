@@ -33,7 +33,7 @@
          // Filter the active traits
          documentTraits = traitOptions.filter(
             (trait) =>
-               (trait.type === "boolean" && trait.value === true) || (trait.type === "number" && trait.value === true)
+               (trait.type === "boolean" && trait.value === true) || (trait.type === "number" && trait.value > 0)
          );
 
          // Update the document

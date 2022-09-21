@@ -121,7 +121,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
 
       // Calculate whether this is a dual attack
       if (this.parameters.multiAttack) {
-         const traits = checkAttack.traits;
+         const traits = checkAttack.trait;
          for (let idx = 0; idx < traits.length; idx++) {
             if (traits[idx].name === 'multiAttack') {
                this.parameters.multiAttack = true;

@@ -17,7 +17,7 @@
 <div class="weapon-edit-trait-dialog">
    <DocumentEditTraitsDialog
       {document}
-      bind:documentTraits={document.system.attack[attackIdx].traits}
+      bind:documentTraits={document.system.attack[attackIdx].trait}
       bind:traitOptions
    />
 </div>

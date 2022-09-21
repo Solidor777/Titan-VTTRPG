@@ -2,14 +2,15 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
    import DocumentRangeTypeSelect from "~/documents/components/select/DocumentRangeTypeSelect.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import Tag from "../../../../helpers/svelte-components/tag/Tag.svelte";
 
    // Attack idx
    export let idx = void 0;
@@ -139,26 +140,32 @@
             <div class="traits">
                <!--Header-->
                <div class="traits-header">
-                  <div />
-                  <div>
+                  <!--Label-->
+                  <div class="label">
                      {localize("traits")}
                   </div>
-                  <div>
+
+                  <!--Edit Button-->
+                  <div class="edit-traits-button">
                      <IconButton icon={"fas fa-pen-to-square"} on:click={application.editAttackTraits(idx)} />
                   </div>
                </div>
-               <div class="traits-container">
-                  <!--Each trait-->
-                  {#each attack.traits as trait}
-                     <div class="trait">
-                        {#if trait.type === "number"}
-                           {trait.value}
-                        {:else}
-                           <Tag label={localize(trait.name)} />
-                        {/if}
-                     </div>
-                  {/each}
-               </div>
+               {#if attack.trait.length > 0}
+                  <div class="traits-container">
+                     <!--Each trait-->
+                     {#each attack.trait as trait}
+                        <div class="trait">
+                           {#if trait.type === "number"}
+                              <!--Number Trait-->
+                              <StatTag label={localize(trait.name)} value={trait.value} />
+                           {:else}
+                              <!--Bool Trait-->
+                              <Tag label={localize(trait.name)} />
+                           {/if}
+                        </div>
+                     {/each}
+                  </div>
+               {/if}
             </div>
          </div>
       {/if}
@@ -239,15 +246,20 @@
             padding-top: 0.25rem;
 
             .traits-header {
-               @include grid(3);
-               font-weight: bold;
-               font-size: 1rem;
+               @include flex-row;
+               @include flex-group-center;
 
-               div {
+               .label {
                   @include flex-row;
                   @include flex-group-center;
-                  height: 100%;
-                  width: 100%;
+                  font-weight: bold;
+                  font-size: 1rem;
+               }
+
+               .edit-traits-button {
+                  @include flex-row;
+                  @include flex-group-center;
+                  margin-left: 0.5rem;
                }
             }
 
@@ -256,6 +268,7 @@
                @include flex-group-center;
                flex-wrap: wrap;
                width: 100%;
+               margin-bottom: 0.25rem;
 
                .trait {
                   margin: 0.5rem 0.25rem 0 0.25rem;
