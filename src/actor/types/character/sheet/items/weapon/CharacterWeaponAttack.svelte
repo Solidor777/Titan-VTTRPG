@@ -31,7 +31,7 @@
             }}
          >
             <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
-            {attack.name}
+            {attack.label}
          </EfxButton>
       </div>
    </div>

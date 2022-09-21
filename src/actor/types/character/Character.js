@@ -539,7 +539,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Get the attack type
          options.type = checkAttack.type;
          options.weaponName = checkWeapon.name;
-         options.attackName = checkAttack.name;
+         options.attackName = checkAttack.label;
 
          // Create the dialog
          const dialog = new AttackCheckDialog(this.parent, options);

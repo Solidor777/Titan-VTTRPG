@@ -39,19 +39,19 @@
   border-style: var(--border-style);
   border-radius: var(--border-radius);
   border-width: var(--border-width);
-  border-color: var(--border-color-normal);
+  border-color: var(--border-color);
 }
 
 @mixin border-top {
   border-top: var(--border-style);
   border-width: var(--border-width);
-  border-color: var(--border-color-normal);
+  border-color: var(--border-color);
 }
 
 @mixin border-bottom {
   border-bottom: var(--border-style);
   border-width: var(--border-width);
-  border-color: var(--border-color-normal);
+  border-color: var(--border-color);
 }
 
 @mixin border-bottom-sides {
@@ -61,19 +61,19 @@
   border-bottom-right-radius: var(--border-radius);
   border-bottom-left-radius: var(--border-radius);
   border-width: var(--border-width);
-  border-color: var(--border-color-normal);
+  border-color: var(--border-color);
 }
 
 @mixin border-left {
   border-left: var(--border-style);
   border-width: var(--border-width);
-  border-color: var(--border-color-normal);
+  border-color: var(--border-color);
 }
 
 @mixin border-right {
   border-right: var(--border-style);
   border-width: var(--border-width);
-  border-color: var(--border-color-normal);
+  border-color: var(--border-color);
 }
 
 @mixin button {
@@ -256,4 +256,22 @@
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+@mixin panel-1 {
+  background-color: var(--panel-1-background);
+  color: var(--panel-1-color);
+  --border-color: var(--panel-1-color);
+}
+
+@mixin panel-2 {
+  background-color: var(--panel-2-background);
+  color: var(--panel-2-color);
+  --border-color: var(--panel-2-color);
+}
+
+@mixin panel-3 {
+  background-color: var(--panel-3-background);
+  color: var(--panel-3-color);
+  --border-color: var(--panel-3-color);
 }

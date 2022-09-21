@@ -74,11 +74,29 @@
   --succeeded-color-dark: darkblue;
   --failed-color-dark: darkred;
 
-  // General colors
+  // Theme Colors
+  --color-primary: #80cbc4;
+  --color-primary-light: #b2fef7;
+  --color-primary-dark: #4f9a94;
+  --color-secondary: #9fa8da;
+  --color-secondary-light: #d1d9ff;
+  --color-secondary-dark: #6f79a8;
+  --color-background: #bab9ae;
+  --color-foreground: #e4e3d7;
+  --text-color: white;
+
   --label-background-color: whitesmoke;
   --highlight-background-color: rgb(255, 233, 174);
   --static-label-background-color: rgb(208, 208, 208);
   --active-background-color: #fcdbbf;
+
+  // Panel Styles
+  --panel-1-background: #8c8c8c5e;
+  --panel-1-color: black;
+  --panel-2-background: #c7c7c75e;
+  --panel-2-color: black;
+  --panel-3-background: #eee9e683;
+  --panel-3-color: black;
 
   // Rarity colors
   --uncommon-color-bright: #d0ffbb;

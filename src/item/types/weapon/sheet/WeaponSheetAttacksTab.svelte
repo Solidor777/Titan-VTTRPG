@@ -2,14 +2,18 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
+   import WeaponSheetAttackSettings from "./WeaponSheetAttackSettings.svelte";
 
    // Setup context variables
    const application = getContext("external").application;
    const document = getContext("DocumentStore");
    const appState = getContext("ApplicationStateStore");
+
+   $document.system.attack.forEach((attack, idx) => {
+      $appState.isExpanded.attack[idx] = $appState.isExpanded.attack[idx] ?? true;
+   });
 </script>
 
 <div class="tab">
@@ -19,9 +23,9 @@
          {#if $document.system.attack.length > 0}
             <ol>
                <!--Each attack-->
-               {#each Object.entries($document.system.attack) as [attackIdx, attack]}
+               {#each Object.entries($document.system.attack) as [idx]}
                   <li>
-                     {attack.name}
+                     <WeaponSheetAttackSettings {idx} />
                   </li>
                {/each}
             </ol>
@@ -64,6 +68,7 @@
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;
+         @include panel-2;
          width: 100%;
          height: 100%;
 
@@ -79,6 +84,7 @@
                @include flex-group-center;
                @include z-index-app;
                width: 100%;
+               margin-top: 0.5rem;
             }
          }
 
@@ -86,10 +92,7 @@
             @include flex-row;
             @include flex-group-center;
             width: 100%;
-
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
+            margin-top: 0.5rem;
 
             .button-content {
                @include flex-row;

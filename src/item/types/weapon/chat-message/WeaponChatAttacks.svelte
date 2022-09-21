@@ -17,7 +17,7 @@
             <!--Attack Button-->
             <div class="attack-name">
                <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
-               {attack.name}
+               {attack.label}
             </div>
          </div>
 

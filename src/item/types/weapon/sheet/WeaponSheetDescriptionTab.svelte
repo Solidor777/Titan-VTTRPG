@@ -40,6 +40,7 @@
    .tab {
       @include flex-group-center;
       @include flex-row;
+      @include panel-2;
       height: 100%;
       width: 100%;
       font-size: 1rem;

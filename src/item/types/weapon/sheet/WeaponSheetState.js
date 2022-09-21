@@ -26,6 +26,9 @@ export default function createWeaponSheetState() {
    function removeAttack(idx) {
       update((state) => {
          state.isExpanded.attack.splice(idx, 1);
+         if (state.isExpanded.attack.length === 0) {
+            state.isExpanded.attack.push(true);
+         }
          return state;
       });
    }

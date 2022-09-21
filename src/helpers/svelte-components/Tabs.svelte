@@ -10,7 +10,7 @@
 <!--List of tabs-->
 <div class="tabs">
    <!--Tab List-->
-   <ul>
+   <ol>
       <!--For each tab-->
       {#each tabs as tab}
          <li class={activeTab === tab.id ? "active" : ""}>
@@ -25,7 +25,7 @@
             </button>
          </li>
       {/each}
-   </ul>
+   </ol>
 
    <!--Tab Content-->
    <div class="tab-content">
@@ -47,10 +47,11 @@
       height: 100%;
       width: 100%;
 
-      ul {
+      ol {
          @include flex-row;
          @include flex-space-evenly;
          @include border-bottom;
+         @include panel-1;
          list-style: none;
          width: 100%;
          margin: 0;
@@ -68,7 +69,7 @@
                font-size: var(--font-size);
                border-style: var(--border-style);
                border-width: var(--border-width);
-               border-color: var(--border-color-normal);
+               border-color: var(--border-color);
                height: 100%;
 
                &.active {

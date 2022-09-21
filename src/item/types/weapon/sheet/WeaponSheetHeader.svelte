@@ -61,8 +61,9 @@
       @include border;
       @include flex-row;
       @include flex-group-left;
+      @include panel-1;
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.25rem 0.5rem;
 
       .portrait {
          width: 5rem;

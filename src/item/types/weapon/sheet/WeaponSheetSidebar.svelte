@@ -1,11 +1,8 @@
 <script>
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import WeaponSheetAttack from "./WeaponSheetAttack.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Application staore reference
    const appState = getContext("ApplicationStateStore");
@@ -37,13 +34,14 @@
          @include flex-row;
          @include flex-group-center;
          @include border-bottom;
+         @include panel-1;
          width: 100%;
          font-weight: bold;
-         margin-top: 0.5rem;
-         padding-bottom: 0.5rem;
+         padding: 0.25rem 0.5rem;
       }
 
       .scrolling-content {
+         @include panel-2;
          width: 100%;
          height: 100%;
       }

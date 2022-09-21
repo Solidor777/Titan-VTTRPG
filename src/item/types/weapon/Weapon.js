@@ -44,7 +44,7 @@ export default class TitanWeapon extends TitanTypeComponent {
 
    getAttackTemplate() {
       return {
-         name: localize('attack'),
+         label: localize('attack'),
          type: 'melee',
          range: 1,
          attribute: 'body',
