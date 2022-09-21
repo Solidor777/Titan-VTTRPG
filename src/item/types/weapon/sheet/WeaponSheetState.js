@@ -5,7 +5,10 @@ export default function createWeaponSheetState() {
    const { set, update, subscribe } = writable({
       activeTab: 'description',
       isExpanded: {
-         attack: []
+         attacks: [],
+         sidebar: {
+            attack: []
+         }
       },
       scrollTop: {
          sidebar: 0,
@@ -18,16 +21,19 @@ export default function createWeaponSheetState() {
 
    function addAttack() {
       update((state) => {
-         state.isExpanded.attack.push(true);
+         state.isExpanded.attacks.push(true);
+         state.isExpanded.sidebar.attack.push(true);
          return state;
       });
    }
 
    function removeAttack(idx) {
       update((state) => {
-         state.isExpanded.attack.splice(idx, 1);
-         if (state.isExpanded.attack.length === 0) {
-            state.isExpanded.attack.push(true);
+         state.isExpanded.attacks.splice(idx, 1);
+         state.isExpanded.sidebar.attack.splice(idx, 1);
+         if (state.isExpanded.attacks.length === 0) {
+            state.isExpanded.attacks.push(true);
+            state.isExpanded.sidebar.attack.push(true);
          }
          return state;
       });

@@ -21,7 +21,7 @@
    const appState = getContext("ApplicationStateStore");
 
    $: attack = $document.system.attack[idx];
-   $: isExpanded = $appState.isExpanded.attack[idx];
+   $: isExpanded = $appState.isExpanded.attacks[idx];
 </script>
 
 {#if attack}
@@ -35,7 +35,7 @@
                <IconButton
                   icon="fas fa-angle-double-down"
                   on:click={() => {
-                     $appState.isExpanded.attack[idx] = false;
+                     $appState.isExpanded.attacks[idx] = false;
                   }}
                />
             {:else}
@@ -43,7 +43,7 @@
                <IconButton
                   icon="fas fa-angle-double-right"
                   on:click={() => {
-                     $appState.isExpanded.attack[idx] = true;
+                     $appState.isExpanded.attacks[idx] = true;
                   }}
                />
             {/if}
