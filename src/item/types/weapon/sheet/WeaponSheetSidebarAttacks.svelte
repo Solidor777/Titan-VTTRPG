@@ -73,7 +73,7 @@
          @include flex-column;
          @include flex-group-top;
          width: 100%;
-         padding-top: 0.25rem;
+         padding-bottom: 0.25rem;
 
          &:not(:first-child) {
             @include border-top;
@@ -83,7 +83,7 @@
          .header {
             @include flex-row;
             @include flex-group-center;
-            @include border-top-bottom;
+            @include border-bottom;
             @include panel-1;
             font-weight: bold;
             width: 100%;
