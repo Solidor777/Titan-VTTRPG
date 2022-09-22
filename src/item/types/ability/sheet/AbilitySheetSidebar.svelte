@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import ItemSheetChecksSidebar from "~/item/check-component/ItemSheetChecksSidebar.svelte";
+   import ItemSheetChecksSidebar from "~/item/component/check/ItemSheetChecksSidebar.svelte";
 
    // Application staore reference
    const appState = getContext("ApplicationStateStore");

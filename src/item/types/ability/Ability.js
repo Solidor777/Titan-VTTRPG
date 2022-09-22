@@ -1,5 +1,5 @@
 import TitanTypeComponent from '~/helpers/TypeComponent';
-import { addCheck, removeCheck } from '~/item/check-component/CheckComponent';
+import { addCheck, removeCheck } from '~/item/component/check/CheckComponent';
 
 export default class TitanAbility extends TitanTypeComponent {
 

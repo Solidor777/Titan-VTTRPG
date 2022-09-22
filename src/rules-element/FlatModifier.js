@@ -1,4 +1,6 @@
-export function applyFlatModifier(flatModifier, actorData) {
+import { v4 as uuidv4 } from 'uuid';
+
+export function applyFlatModifier(flatModifier) {
    // Ensure the modifier is valid
    if (flatModifier === undefined ||
       flatModifier.operation === undefined ||
@@ -12,37 +14,38 @@ export function applyFlatModifier(flatModifier, actorData) {
 
    // Find the value object
    let valueObject = {};
+   const systemData = this.parent.system;
    switch (flatModifier.selector) {
       case 'attribute': {
-         valueObject = actorData.attribute[flatModifier.key];
+         valueObject = systemData.attribute[flatModifier.key];
          break;
       }
       case 'resistance': {
-         valueObject = actorData.resistance[flatModifier.key];
+         valueObject = systemData.resistance[flatModifier.key];
          break;
       }
       case 'training': {
-         valueObject = actorData.skill[flatModifier.key].training;
+         valueObject = systemData.skill[flatModifier.key].training;
          break;
       }
       case 'expertise': {
-         valueObject = actorData.skill[flatModifier.key].expertise;
+         valueObject = systemData.skill[flatModifier.key].expertise;
          break;
       }
       case 'rating': {
-         valueObject = actorData.rating[flatModifier.key];
+         valueObject = systemData.rating[flatModifier.key];
          break;
       }
       case 'resource': {
-         valueObject = actorData.resource[flatModifier.key];
+         valueObject = systemData.resource[flatModifier.key];
          break;
       }
       case 'speed': {
-         valueObject = actorData.speed[flatModifier.key];
+         valueObject = systemData.system.speed[flatModifier.key];
          break;
       }
       case 'mod': {
-         valueObject = actorData.mod[flatModifier.key];
+         valueObject = systemData.system.mod[flatModifier.key];
          break;
       }
       default: {
@@ -71,5 +74,6 @@ export function getFlatModifierTemplate() {
       selector: 'attribute',
       key: 'body',
       value: 1,
+      uuid: uuidv4()
    };
 }

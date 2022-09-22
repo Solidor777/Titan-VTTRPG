@@ -6,7 +6,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import ItemSheetChecksTab from "~/item/check-component/ItemSheetChecksTab.svelte";
+   import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
    import WeaponSheetAttacksTab from "./WeaponSheetAttacksTab.svelte";
    import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
    import WeaponSheetHeader from "./WeaponSheetHeader.svelte";

@@ -1,9 +1,18 @@
 import { localize } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
-import { addCheck, removeCheck } from '~/item/check-component/CheckComponent';
+import { addCheck, removeCheck } from '~/item/component/check/CheckComponent';
+import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanWeapon extends TitanTypeComponent {
+
+   // Import functions for adding and removing checks
+   addCheck = addCheck.bind(this);
+   removeCheck = removeCheck.bind(this);
+
+   // Import functions for adding and removing rules elements
+   addRulesElement = addRulesElement.bind(this);
+   removeRulesElement = removeRulesElement.bind(this);
 
    async addAttack() {
       // Create the new attack
@@ -63,9 +72,4 @@ export default class TitanWeapon extends TitanTypeComponent {
          this.addAttack();
       }
    }
-
-
-   addCheck = addCheck.bind(this);
-
-   removeCheck = removeCheck.bind(this);
 }

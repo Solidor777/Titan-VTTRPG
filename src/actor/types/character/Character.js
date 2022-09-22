@@ -1,5 +1,5 @@
 import { clamp } from '~/helpers/Utility.js';
-import { applyFlatModifier } from '~/rules-elements/FlatModifier';
+import { applyFlatModifier } from '~/rules-element/FlatModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import SkillCheckDialog from '~/check/types/skill-check/SkillCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -864,4 +864,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       return;
    }
+
+   // Apply rules element bindings
+   applyFlatModifier = applyFlatModifier.bind(this);
 }

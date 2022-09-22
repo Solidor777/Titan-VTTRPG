@@ -1,4 +1,4 @@
-import { getFlatModifierTemplate } from '../rules-elements/FlatModifier.js';
+import { getFlatModifierTemplate } from '../rules-element/FlatModifier.js';
 import TitanAbility from './types/ability/Ability.js';
 import TitanEffect from './types/effect/Effect.js';
 import TitanSpell from './types/spell/Spell.js';
@@ -121,33 +121,4 @@ export default class TitanItem extends Item {
 
       return rollData;
    }
-
-   async addRulesElement() {
-      const newElement = getFlatModifierTemplate();
-      newElement.type = this.type;
-      const idx = this.system.rulesElement.push(newElement) - 1;
-      await this.update({
-         system: this.system
-      });
-
-      if (this.typeComponent) {
-         this.typeComponent.onAddRulesElement(idx);
-      }
-
-      return idx;
-   }
-
-   async removeRulesElement(idx) {
-      this.system.rulesElement.splice(idx, 1);
-      await this.update({
-         system: this.system
-      });
-
-      if (this.typeComponent) {
-         this.typeComponent.onRemoveRulesElement(idx);
-      }
-
-      return;
-   }
-
 }

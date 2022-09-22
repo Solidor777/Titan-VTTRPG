@@ -82,7 +82,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    ol {
       @include flex-column;

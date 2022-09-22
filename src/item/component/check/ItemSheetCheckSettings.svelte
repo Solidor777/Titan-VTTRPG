@@ -258,7 +258,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    .check {
       @include flex-column;
