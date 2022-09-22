@@ -4,8 +4,8 @@
    import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import WeaponSheetAttackSettings from "./WeaponSheetAttackSettings.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import WeaponSheetAttackSettings from "./WeaponSheetAttackSettings.svelte";
 
    // Setup context variables
    const application = getContext("external").application;
@@ -13,7 +13,7 @@
    const appState = getContext("ApplicationStateStore");
 
    // Initialize expanded state
-   $document.system.attack.forEach((attack, idx) => {
+   $document.system.attack.forEach((entry, idx) => {
       $appState.isExpanded.attacks[idx] = $appState.isExpanded.attacks[idx] ?? true;
    });
 
@@ -46,7 +46,7 @@
          {/if}
 
          <!--Add Attack Button-->
-         <div class="add-attack-button">
+         <div class="add-entry-button">
             <EfxButton
                on:click={() => {
                   application.addAttack();
@@ -102,7 +102,7 @@
             }
          }
 
-         .add-attack-button {
+         .add-entry-button {
             @include flex-row;
             @include flex-group-center;
             width: 100%;

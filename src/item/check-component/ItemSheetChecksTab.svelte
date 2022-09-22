@@ -1,91 +1,120 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
+   import { localize } from "~/helpers/Utility.js";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import ItemSheetCheckSettings from "./ItemSheetCheckSettings.svelte";
-   import ItemSheetAddCheckButton from "./ItemSheetAddCheckButton.svelte";
 
-   // Document reference
+   // Setup context variables
+   const application = getContext("external").application;
    const document = getContext("DocumentStore");
-
-   // Application staore reference
    const appState = getContext("ApplicationStateStore");
 
-   // Initialize expanded object
-   for (const idx of $document.system.check.keys()) {
+   // Initialize expanded state
+   $document.system.check.forEach((entry, idx) => {
       $appState.isExpanded.checks[idx] = $appState.isExpanded.checks[idx] ?? true;
-   }
+   });
 
-   // Filter for the Checks to display
-   let filter = "";
-   let filteredChecks = [];
+   // Initialize filter
+   let filteredEntries = [];
    $: {
-      filteredChecks = [];
-      $document.system.check.forEach((aspect, idx) => {
-         if (aspect.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1) {
-            filteredChecks.push(idx);
+      filteredEntries = [];
+      $document.system.check.forEach((entry, idx) => {
+         if (entry.label.toLowerCase().indexOf($appState.filter.checks.toLowerCase()) !== -1) {
+            filteredEntries.push(idx);
          }
       });
    }
 </script>
 
-<div class="checks-tab">
-   <!--Filter-->
-   <TopFilter bind:filter />
-   <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
-         <div class="checks-tab">
-            <!--Checks List-->
+<div class="tab">
+   <TopFilter bind:filter={$appState.filter.checks} />
+   <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
+      <div class="scrolling-content">
+         <!--checks List-->
+         {#if $document.system.check.length > 0}
             <ol>
-               <!--Each Check-->
-               {#each $document.system.check as check, idx}
-                  <li in:slide|local>
+               <!--Each check-->
+               {#each filteredEntries as idx ($document.system.check[idx].uuid)}
+                  <li transition:slide|local>
                      <ItemSheetCheckSettings {idx} />
                   </li>
                {/each}
             </ol>
-            <div class="add-check-button">
-               <ItemSheetAddCheckButton />
-            </div>
+         {/if}
+
+         <!--Add check Button-->
+         <div class="add-entry-button">
+            <EfxButton
+               on:click={() => {
+                  application.addCheck();
+               }}
+            >
+               <!--Button Content-->
+               <div class="button-content">
+                  <!--Label-->
+                  <div class="label">
+                     {localize("addCheck")}
+                  </div>
+
+                  <!--Icon-->
+                  <i class="fas fa-circle-plus" />
+               </div>
+            </EfxButton>
          </div>
-      </ScrollingContainer>
-   </div>
+      </div>
+   </ScrollingContainer>
 </div>
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .checks-tab {
+   .tab {
       @include flex-column;
       @include flex-group-top;
-      width: 100%;
       height: 100%;
+      width: 100%;
+      font-size: 1rem;
 
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;
+         @include panel-2;
          width: 100%;
          height: 100%;
 
          ol {
+            @include flex-column;
+            @include flex-group-top;
+            @include list;
+            @include z-index-app;
             width: 100%;
-            list-style: none;
-            padding: 0;
-            margin: 0;
 
             li {
+               @include flex-row;
+               @include flex-group-center;
+               @include z-index-app;
                width: 100%;
-
-               &:not(:first-child) {
-                  margin-top: 0.5rem;
-               }
+               margin-top: 0.5rem;
             }
          }
 
-         .add-check-button {
-            margin-top: 0.5rem;
+         .add-entry-button {
+            @include flex-row;
+            @include flex-group-center;
             width: 100%;
+            margin-top: 0.5rem;
+
+            .button-content {
+               @include flex-row;
+               @include flex-group-center;
+
+               i {
+                  margin-left: 0.25rem;
+               }
+            }
          }
       }
    }
