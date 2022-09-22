@@ -1,5 +1,6 @@
 import { localize } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
+import { addCheck, removeCheck } from '~/item/check-component/CheckComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanWeapon extends TitanTypeComponent {
@@ -62,4 +63,9 @@ export default class TitanWeapon extends TitanTypeComponent {
          this.addAttack();
       }
    }
+
+
+   addCheck = addCheck.bind(this);
+
+   removeCheck = removeCheck.bind(this);
 }

@@ -36,6 +36,16 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       return await this.reactive.document.weapon.removeAttack(idx);
    }
 
+   async addCheck() {
+      this.reactive.state.addCheck();
+      return await this.reactive.document.typeComponent.addCheck();
+   }
+
+   async removeCheck(idx) {
+      this.reactive.state.removeCheck(idx);
+      return await this.reactive.document.typeComponent.removeCheck(idx);
+   }
+
    // Opens the attack traits edit dialog
    editAttackTraits(attackIdx) {
       const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);

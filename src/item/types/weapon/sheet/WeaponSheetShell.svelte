@@ -10,6 +10,7 @@
    import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
    import WeaponSheetHeader from "./WeaponSheetHeader.svelte";
    import WeaponSheetSidebar from "./WeaponSheetSidebar.svelte";
+   import ItemSheetChecksTab from "~/item/sheet/ItemSheetChecksTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -30,6 +31,11 @@
          label: localize("attacks"),
          id: "attacks",
          component: WeaponSheetAttacksTab,
+      },
+      {
+         label: localize("checks"),
+         id: "checks",
+         component: ItemSheetChecksTab,
       },
    ];
 </script>

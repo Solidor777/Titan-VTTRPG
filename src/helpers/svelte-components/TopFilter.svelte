@@ -19,6 +19,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border-bottom;
+      @include panel-1;
       width: 100%;
       font-size: 1rem;
       font-weight: bold;

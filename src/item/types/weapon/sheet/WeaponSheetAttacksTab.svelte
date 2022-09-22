@@ -5,25 +5,39 @@
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import WeaponSheetAttackSettings from "./WeaponSheetAttackSettings.svelte";
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
    // Setup context variables
    const application = getContext("external").application;
    const document = getContext("DocumentStore");
    const appState = getContext("ApplicationStateStore");
 
+   // Initialize expanded state
    $document.system.attack.forEach((attack, idx) => {
       $appState.isExpanded.attacks[idx] = $appState.isExpanded.attacks[idx] ?? true;
    });
+
+   // Initialize filter
+   let filteredEntries = [];
+   $: {
+      filteredEntries = [];
+      $document.system.attack.forEach((entry, idx) => {
+         if (entry.label.toLowerCase().indexOf($appState.filter.attacks.toLowerCase()) !== -1) {
+            filteredEntries.push(idx);
+         }
+      });
+   }
 </script>
 
 <div class="tab">
+   <TopFilter bind:filter={$appState.filter.attacks} />
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.attacks}>
       <div class="scrolling-content">
          <!--Attacks List-->
          {#if $document.system.attack.length > 0}
             <ol>
                <!--Each attack-->
-               {#each Object.entries($document.system.attack) as [idx, attack] (attack.uuid)}
+               {#each filteredEntries as idx ($document.system.attack[idx].uuid)}
                   <li transition:slide|local>
                      <WeaponSheetAttackSettings {idx} />
                   </li>
@@ -59,8 +73,8 @@
    @import "../../../../Styles/Mixins.scss";
 
    .tab {
-      @include flex-group-center;
-      @include flex-row;
+      @include flex-column;
+      @include flex-group-top;
       height: 100%;
       width: 100%;
       font-size: 1rem;

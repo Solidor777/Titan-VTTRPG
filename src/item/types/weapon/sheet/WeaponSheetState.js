@@ -6,8 +6,10 @@ export default function createWeaponSheetState() {
       activeTab: 'description',
       isExpanded: {
          attacks: [],
+         checks: [],
          sidebar: {
-            attack: []
+            attack: [],
+            check: [],
          }
       },
       scrollTop: {
@@ -16,6 +18,10 @@ export default function createWeaponSheetState() {
          attacks: 0,
          checks: 0,
          rulesElements: 0,
+      },
+      filter: {
+         attacks: "",
+         checks: ""
       }
    });
 
@@ -39,11 +45,29 @@ export default function createWeaponSheetState() {
       });
    }
 
+   function addCheck() {
+      update((state) => {
+         state.isExpanded.checks.push(true);
+         state.isExpanded.sidebar.check.push(true);
+         return state;
+      });
+   }
+
+   function removeCheck(idx) {
+      update((state) => {
+         state.isExpanded.checks.splice(idx, 1);
+         state.isExpanded.sidebar.check.splice(idx, 1);
+         return state;
+      });
+   }
+
    return {
       set,
       update,
       subscribe,
       addAttack,
-      removeAttack
+      removeAttack,
+      addCheck,
+      removeCheck
    };
 }
