@@ -7,24 +7,17 @@
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
-   import DocumentIntegerSelect from "~/documents/components/select/DocumentIntegerSelect.svelte";
+   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
+   import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
 
-   // Document reference
-   const document = getContext("DocumentStore");
-
-   // Application reference
-   const appState = getContext("ApplicationStateStore");
-
-   // Application reference
-   const application = getContext("external").application;
-
-   // Idx of the Check
+   // Check idx
    export let idx = void 0;
 
-   // Difficulty options
-   const difficultyOptions = [2, 3, 4, 5, 6];
+   // Setup context variables
+   const application = getContext("external").application;
+   const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 
    $: check = $document.system.check[idx];
    $: isExpanded = $appState.isExpanded.checks[idx];
@@ -33,21 +26,23 @@
 {#if check}
    <div class="check">
       <!--Header-->
-      <div class="check-header">
-         <!--Expand button-->
+      <div class="header">
+         <!--Expand Toggle-->
          <div>
             {#if isExpanded}
+               <!--Collapse button-->
                <IconButton
-                  icon={"fas fa-angles-down"}
+                  icon="fas fa-angle-double-down"
                   on:click={() => {
-                     isExpanded = false;
+                     $appState.isExpanded.checks[idx] = false;
                   }}
                />
             {:else}
+               <!--Expand button-->
                <IconButton
-                  icon={"fas fa-angles-right"}
+                  icon="fas fa-angle-double-right"
                   on:click={() => {
-                     isExpanded = true;
+                     $appState.isExpanded.checks[idx] = true;
                   }}
                />
             {/if}
@@ -70,13 +65,13 @@
       </div>
 
       {#if isExpanded}
-         <div class="content" transition:slide|local>
+         <div class="expandable-content" transition:slide|local>
             <div class="row">
                <!--Attribute Select-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("attribute")}:
+                     {localize("attribute")}
                   </div>
 
                   <!--Value-->
@@ -86,10 +81,10 @@
                </div>
 
                <!--Skill Select-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("skill")}:
+                     {localize("skill")}
                   </div>
 
                   <!--Value-->
@@ -101,23 +96,23 @@
 
             <div class="row">
                <!--Difficulty Select-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("difficulty")}:
+                     {localize("difficulty")}
                   </div>
 
                   <!--Value-->
                   <div class="input">
-                     <DocumentIntegerSelect options={difficultyOptions} bind:value={check.difficulty} />
+                     <CheckDifficultySelect bind:value={check.difficulty} />
                   </div>
                </div>
 
                <!--Skill Select-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("complexity")}:
+                     {localize("complexity")}
                   </div>
 
                   <!--Value-->
@@ -129,10 +124,10 @@
 
             <div class="row">
                <!--Resistance Check-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("resistanceCheck")}:
+                     {localize("resistanceCheck")}
                   </div>
 
                   <!--Value-->
@@ -142,10 +137,10 @@
                </div>
 
                <!--Resolve Cost-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("resolveCost")}:
+                     {localize("resolveCost")}
                   </div>
 
                   <!--Value-->
@@ -157,7 +152,7 @@
 
             <div class="row">
                <!--Damage-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
                      {localize("damage")}
@@ -170,7 +165,7 @@
                </div>
 
                <!--Healing-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
                      {localize("healing")}
@@ -186,10 +181,10 @@
             <!--Initial value-->
             {#if check.isDamage || check.isHealing}
                <div class="row" transition:slide|local>
-                  <div class="stat">
+                  <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("initialValue")}:
+                        {localize("initialValue")}
                      </div>
 
                      <!--Value-->
@@ -199,7 +194,7 @@
                   </div>
 
                   <!--Scaling-->
-                  <div class="stat">
+                  <div class="field">
                      <!--Label-->
                      <div class="label">
                         {localize("scaling")}
@@ -215,7 +210,7 @@
 
             <div class="row">
                <!--Opposed Check-->
-               <div class="stat">
+               <div class="field">
                   <!--Label-->
                   <div class="label">
                      {localize("opposedCheck")}
@@ -231,10 +226,10 @@
             {#if check.opposedCheck.enabled}
                <div class="row" transition:slide|local>
                   <!--Attribute Select-->
-                  <div class="stat">
+                  <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("attribute")}:
+                        {localize("attribute")}
                      </div>
 
                      <!--Value-->
@@ -244,10 +239,10 @@
                   </div>
 
                   <!--Skill Select-->
-                  <div class="stat">
+                  <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("skill")}:
+                        {localize("skill")}
                      </div>
 
                      <!--Value-->
@@ -268,58 +263,43 @@
    .check {
       @include flex-column;
       @include flex-group-top;
-      @include border;
-      @include z-index-app;
       width: 100%;
-      font-size: 1rem;
 
-      .check-header {
+      .header {
+         @include border;
          @include flex-row;
          @include flex-space-between;
-         box-sizing: border-box;
+         @include panel-1;
+         padding: 0.25rem;
          width: 100%;
-         font-weight: bold;
-         padding: 0.5rem;
-
-         .label-input {
-            @include flex-row;
-            @include flex-group-center;
-            height: 100%;
-            --input-height: 100%;
-         }
       }
 
-      .content {
+      .expandable-content {
          @include flex-column;
          @include flex-group-top;
-         width: 100%;
-         background: var(--label-background-color);
+         @include border-bottom-sides;
+         @include panel-3;
+         width: calc(100% - 2rem);
+         padding: 0.25rem;
+         font-size: 0.9rem;
 
          .row {
             @include flex-row;
             @include flex-group-center;
-            @include border-top;
+            padding-top: 0.5rem;
             width: 100%;
-            padding: 0.5rem 0.5rem 0 0.5rem;
-            font-size: 0.9rem;
-            --font-size: 0.9rem;
-            height: 2rem;
 
             &:not(:first-child) {
+               @include border-top;
                margin-top: 0.5rem;
             }
 
-            &:last-child {
-               margin-bottom: 0.5rem;
-            }
-
-            .stat {
+            .field {
                @include flex-row;
                @include flex-group-center;
 
                &:not(:first-child) {
                   @include border-left;
-                  height: 100%;
                   margin-left: 0.5rem;
                   padding-left: 0.5rem;
                }
@@ -333,6 +313,8 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
+                  margin-left: 0.5rem;
+                  font-size: 1rem;
 
                   &.checkbox {
                      margin-left: 0.25rem;
@@ -348,10 +330,6 @@
                }
             }
          }
-      }
-
-      &:not(:first-child) {
-         margin-top: 0.25rem;
       }
    }
 </style>

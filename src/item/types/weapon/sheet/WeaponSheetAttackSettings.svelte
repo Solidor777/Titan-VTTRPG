@@ -29,7 +29,7 @@
       <!--Header-->
       <div class="header">
          <!--Expand Toggle-->
-         <div class="expand-button">
+         <div>
             {#if isExpanded}
                <!--Collapse button-->
                <IconButton
@@ -228,7 +228,6 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
-                  box-sizing: content-box;
                   margin-left: 0.5rem;
                   font-size: 1rem;
 
