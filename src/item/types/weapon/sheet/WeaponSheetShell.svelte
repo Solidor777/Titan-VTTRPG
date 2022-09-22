@@ -6,11 +6,11 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
+   import ItemSheetChecksTab from "~/item/check-component/ItemSheetChecksTab.svelte";
    import WeaponSheetAttacksTab from "./WeaponSheetAttacksTab.svelte";
    import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
    import WeaponSheetHeader from "./WeaponSheetHeader.svelte";
    import WeaponSheetSidebar from "./WeaponSheetSidebar.svelte";
-   import ItemSheetChecksTab from "~/item/sheet/ItemSheetChecksTab.svelte";
 
    // Setup context variables
    export let elementRoot;

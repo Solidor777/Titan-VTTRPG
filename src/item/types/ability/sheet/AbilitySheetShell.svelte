@@ -8,7 +8,7 @@
    import AbilitySheetHeader from "./AbilitySheetHeader.svelte";
    import AbilitySheetSidebar from "./AbilitySheetSidebar.svelte";
    import AbilitySheetDescriptionTab from "./AbilitySheetDescriptionTab.svelte";
-   import ItemSheetChecksTab from "~/item/sheet/ItemSheetChecksTab.svelte";
+   import ItemSheetChecksTab from "~/item/check-component/ItemSheetChecksTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
 
    // Setup context variables
