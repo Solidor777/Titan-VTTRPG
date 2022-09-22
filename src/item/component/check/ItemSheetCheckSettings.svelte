@@ -24,7 +24,7 @@
 </script>
 
 {#if check}
-   <div class="check">
+   <div class="check" transition:slide|local>
       <!--Header-->
       <div class="header">
          <!--Expand Toggle-->

@@ -25,7 +25,7 @@
 </script>
 
 {#if attack}
-   <div class="attack">
+   <div class="attack" transition:slide|local>
       <!--Header-->
       <div class="header">
          <!--Expand Toggle-->

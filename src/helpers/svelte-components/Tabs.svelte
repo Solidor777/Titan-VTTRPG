@@ -10,22 +10,20 @@
 <!--List of tabs-->
 <div class="tabs">
    <!--Tab List-->
-   <ol>
+   <div class="tabs-list">
       <!--For each tab-->
-      {#each tabs as tab}
-         <li class={activeTab === tab.id ? "active" : ""}>
-            <button
-               class={activeTab === tab.id ? "active" : ""}
-               on:click={() => {
-                  activeTab = tab.id;
-               }}
-               on:mousedown={preventDefault}
-            >
-               {tab.label}
-            </button>
-         </li>
+      {#each tabs as tab, idx}
+         <button
+            class={activeTab === tab.id ? "active " : ""}
+            on:click={() => {
+               activeTab = tab.id;
+            }}
+            on:mousedown={preventDefault}
+         >
+            {tab.label}
+         </button>
       {/each}
-   </ol>
+   </div>
 
    <!--Tab Content-->
    <div class="tab-content">
@@ -47,7 +45,7 @@
       height: 100%;
       width: 100%;
 
-      ol {
+      .tabs-list {
          @include flex-row;
          @include flex-space-evenly;
          @include border-bottom;
@@ -59,22 +57,30 @@
          height: 100%;
          flex: 0;
 
-         li {
-            @include flex-row;
+         button {
+            --button-border-radius: 5px;
+            --button-line-height: var(--tab-line-height);
+            @include button;
+            position: relative;
+            overflow: hidden;
+            clip-path: var(--tjs-icon-button-clip-path, none);
+            transform-style: preserve-3d;
             width: 100%;
             height: 100%;
-            button {
-               @include flex-row;
-               @include flex-group-center;
-               font-size: var(--font-size);
-               border-style: var(--border-style);
-               border-width: var(--border-width);
-               border-color: var(--border-color);
-               height: 100%;
+            font-weight: normal;
 
-               &.active {
-                  background: var(--highlight-background-color);
+            &:not(:first-child) {
+               border-left: none;
+            }
+
+            :hover {
+               &:not(:disabled) {
+                  clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
                }
+            }
+
+            &.active {
+               background: var(--highlight-background-color);
             }
          }
       }

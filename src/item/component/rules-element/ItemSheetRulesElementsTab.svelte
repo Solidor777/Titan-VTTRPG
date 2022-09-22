@@ -1,28 +1,27 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import ItemSheetAddRulesElementButton from "./ItemSheetAddRulesElementButton.svelte";
+   import { slide } from "svelte/transition";
+   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
+   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ItemSheetFlatModifierSettings from "./ItemSheetFlatModifierSettings.svelte";
-   import ItemSheetSenseSettings from "./ItemSheetSenseSettings.svelte";
 
    // Setup context variables
+   const application = getContext("external").application;
    const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 
    const operationOptions = [
       {
          label: localize("flatModifier"),
          value: "flatModifier",
       },
-      {
-         label: localize("sense"),
-         value: "sense",
-      },
    ];
 
    function selectComponent(operation) {
       const elementComponents = {
          flatModifier: ItemSheetFlatModifierSettings,
-         sense: ItemSheetSenseSettings,
       };
 
       return elementComponents[operation];
@@ -32,25 +31,51 @@
 </script>
 
 <div class="tab">
-   <!--Rules Element List-->
    {#if $document.system.rulesElement.length > 0}
-      <ol>
-         <!--Each Element-->
-         {#each $document.system.rulesElement as element, idx}
-            <li>
-               <svelte:component
-                  this={selectComponent($document.system.rulesElement[idx].operation)}
-                  {idx}
-                  {operationOptions}
-               />
-            </li>
-         {/each}
-      </ol>
+      <!--Filter-->
+      <div class="filter" transition:slide|local>
+         <TopFilter bind:filter={$appState.filter.rulesElement} />
+      </div>
    {/if}
 
-   <div class="add-element-button">
-      <ItemSheetAddRulesElementButton />
-   </div>
+   <!--Scrolling Content-->
+   <ScrollingContainer>
+      <!--Rules Element List-->
+      {#if $document.system.rulesElement.length > 0}
+         <ol transition:slide|local>
+            <!--Each Element-->
+            {#each $document.system.rulesElement as element, idx (element.uuid)}
+               <li transition:slide|local>
+                  <svelte:component
+                     this={selectComponent($document.system.rulesElement[idx].operation)}
+                     {idx}
+                     {operationOptions}
+                  />
+               </li>
+            {/each}
+         </ol>
+      {/if}
+
+      <!--Add Element Button-->
+      <div class="add-entry-button">
+         <EfxButton
+            on:click={() => {
+               application.addRulesElement();
+            }}
+         >
+            <!--Button Content-->
+            <div class="button-content">
+               <!--Label-->
+               <div class="label">
+                  {localize("addRulesElement")}
+               </div>
+
+               <!--Icon-->
+               <i class="fas fa-circle-plus" />
+            </div>
+         </EfxButton>
+      </div>
+   </ScrollingContainer>
 </div>
 
 <style lang="scss">
@@ -58,32 +83,44 @@
    .tab {
       @include flex-column;
       @include flex-group-top;
+      height: 100%;
       width: 100%;
+
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+      }
 
       ol {
          @include flex-column;
          @include flex-group-top;
          @include list;
+         @include z-index-app;
          width: 100%;
 
          li {
-            @include flex-column;
-            @include flex-group-top;
+            @include flex-row;
+            @include flex-group-center;
+            @include z-index-app;
             width: 100%;
-
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
+            margin-top: 0.5rem;
          }
       }
 
-      .add-element-button {
+      .add-entry-button {
          @include flex-row;
          @include flex-group-center;
          width: 100%;
+         margin-top: 0.5rem;
 
-         &:not(:first-child) {
-            margin-top: 0.5rem;
+         .button-content {
+            @include flex-row;
+            @include flex-group-center;
+
+            i {
+               margin-left: 0.25rem;
+            }
          }
       }
    }

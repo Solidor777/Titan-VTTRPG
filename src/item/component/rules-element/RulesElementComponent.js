@@ -8,9 +8,9 @@ export async function addRulesElement() {
    newElement.type = this.type;
 
    // Add the item to the rules element ware
-   const idx = this.system.rulesElement.push(newElement) - 1;
-   await this.update({
-      system: this.system
+   const idx = this.parent.system.rulesElement.push(newElement) - 1;
+   await this.parent.update({
+      system: this.parent.system
    });
 
    // Alert the type component
@@ -23,9 +23,9 @@ export async function addRulesElement() {
 
 export async function removeRulesElement(idx) {
    // Remove the element
-   this.system.rulesElement.splice(idx, 1);
-   await this.update({
-      system: this.system
+   this.parent.system.rulesElement.splice(idx, 1);
+   await this.parent.update({
+      system: this.parent.system
    });
 
    // Alert the type component

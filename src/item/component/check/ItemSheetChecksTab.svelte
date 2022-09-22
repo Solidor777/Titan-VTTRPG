@@ -30,12 +30,19 @@
 </script>
 
 <div class="tab">
-   <TopFilter bind:filter={$appState.filter.checks} />
+   <!--Filter-->
+   {#if $document.system.check.length > 0}
+      <div class="filter" transition:slide|local>
+         <TopFilter bind:filter={$appState.filter.checks} />
+      </div>
+   {/if}
+
+   <!--Scroling Content-->
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
       <div class="scrolling-content">
          <!--checks List-->
          {#if $document.system.check.length > 0}
-            <ol>
+            <ol transition:slide|local>
                <!--Each check-->
                {#each filteredEntries as idx ($document.system.check[idx].uuid)}
                   <li transition:slide|local>
@@ -76,7 +83,12 @@
       @include flex-group-top;
       height: 100%;
       width: 100%;
-      font-size: 1rem;
+
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+      }
 
       .scrolling-content {
          @include flex-column;

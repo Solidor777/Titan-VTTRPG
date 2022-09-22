@@ -52,4 +52,12 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       dialog.render(true);
       return;
    }
+
+   async addRulesElement() {
+      return await this.reactive.document.typeComponent.addRulesElement();
+   }
+
+   async removeRulesElement(idx) {
+      return await this.reactive.document.typeComponent.removeRulesElement(idx);
+   }
 }

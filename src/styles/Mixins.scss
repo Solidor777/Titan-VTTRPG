@@ -99,6 +99,7 @@
   font-weight: var(--button-font-weight);
   padding: var(--button-padding);
   color: var(--button-text-color);
+  line-height: var(--button-line-height);
   margin: 0;
 
   &:disabled {

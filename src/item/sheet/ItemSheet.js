@@ -14,12 +14,4 @@ export default class TitanItemSheet extends SvelteDocumentSheet {
 
       return buttons;
    }
-
-   async addRulesElement() {
-      return await this.reactive.document.addRulesElement();
-   }
-
-   async removeRulesElement(idx) {
-      return await this.reactive.document.removeRulesElement(idx);
-   }
 }

@@ -30,7 +30,12 @@
 </script>
 
 <div class="tab">
-   <TopFilter bind:filter={$appState.filter.attacks} />
+   <!--Filter-->
+   <div class="filter">
+      <TopFilter bind:filter={$appState.filter.attacks} />
+   </div>
+
+   <!--Scroling Content-->
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.attacks}>
       <div class="scrolling-content">
          <!--Attacks List-->
@@ -77,7 +82,12 @@
       @include flex-group-top;
       height: 100%;
       width: 100%;
-      font-size: 1rem;
+
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+      }
 
       .scrolling-content {
          @include flex-column;

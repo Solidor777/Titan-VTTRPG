@@ -7,6 +7,7 @@
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
+   import ItemSheetRulesElementsTab from "../../../component/rules-element/ItemSheetRulesElementsTab.svelte";
    import WeaponSheetAttacksTab from "./WeaponSheetAttacksTab.svelte";
    import WeaponSheetDescriptionTab from "./WeaponSheetDescriptionTab.svelte";
    import WeaponSheetHeader from "./WeaponSheetHeader.svelte";
@@ -36,6 +37,11 @@
          label: localize("checks"),
          id: "checks",
          component: ItemSheetChecksTab,
+      },
+      {
+         label: localize("rulesElements"),
+         id: "rulesElements",
+         component: ItemSheetRulesElementsTab,
       },
    ];
 </script>

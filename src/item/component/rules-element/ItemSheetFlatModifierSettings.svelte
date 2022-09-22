@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import { slide } from "svelte/transition";
    import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
@@ -138,7 +139,7 @@
 </script>
 
 {#if element && element.operation === "flatModifier"}
-   <div class="element">
+   <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
          <div class="field select">
@@ -180,12 +181,8 @@
       @include flex-row;
       @include flex-space-between;
       @include border;
+      @include panel-1;
       width: 100%;
-      background-color: var(--label-background-color);
-
-      &:not(:first-child) {
-         margin-top: 0.5rem;
-      }
 
       .settings {
          @include flex-row;
