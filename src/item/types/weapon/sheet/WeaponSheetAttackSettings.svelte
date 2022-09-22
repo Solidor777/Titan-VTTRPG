@@ -187,6 +187,15 @@
          @include panel-1;
          padding: 0.25rem;
          width: 100%;
+
+         .label {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+            margin: 0 0.5rem;
+            --font-size: 1.2rem;
+            --input-height: 2rem;
+         }
       }
 
       .expandable-content {
