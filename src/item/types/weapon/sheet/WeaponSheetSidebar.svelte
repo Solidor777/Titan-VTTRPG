@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import ItemSheetChecksSidebar from "../../../component/check/ItemSheetChecksSidebar.svelte";
+   import ItemSheetSidebarChecks from "../../../component/check/ItemSheetSidebarChecks.svelte";
    import WeaponSheetSidebarAttacks from "./WeaponSheetSidebarAttacks.svelte";
 
    // Application statee reference
@@ -21,7 +21,7 @@
       <!--Checks-->
       {#if $document.system.check.length > 0}
          <div class="checks" transition:slide|local>
-            <ItemSheetChecksSidebar />
+            <ItemSheetSidebarChecks />
          </div>
       {/if}
    </ScrollingContainer>

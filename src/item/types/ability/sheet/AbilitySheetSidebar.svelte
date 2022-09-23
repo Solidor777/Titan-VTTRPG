@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import ItemSheetChecksSidebar from "~/item/component/check/ItemSheetChecksSidebar.svelte";
+   import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
 
    // Application staore reference
    const appState = getContext("ApplicationStateStore");
@@ -17,7 +17,7 @@
    <!--Checks-->
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
-         <ItemSheetChecksSidebar />
+         <ItemSheetSidebarChecks />
       </ScrollingContainer>
    </div>
 </div>

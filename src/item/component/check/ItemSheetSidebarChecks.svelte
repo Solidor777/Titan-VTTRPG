@@ -4,12 +4,17 @@
    import { slide } from "svelte/transition";
    import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import AttributeTag from "../../../helpers/svelte-components/tag/AttributeTag.svelte";
-   import IconButton from "../../../helpers/svelte-components/button/IconButton.svelte";
+   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
    const appState = getContext("ApplicationStateStore");
+
+   // Initialize expanded state
+   $document.system.attack.forEach((entry, idx) => {
+      $appState.isExpanded.sidebar.check[idx] = $appState.isExpanded.sidebar.check[idx] ?? true;
+   });
 </script>
 
 <ol>
