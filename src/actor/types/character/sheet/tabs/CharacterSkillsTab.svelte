@@ -1,7 +1,6 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
@@ -36,7 +35,7 @@
                   <div class="column">
                      <!--Button for rolling the skill-->
                      <div class="skill-button" data-tooltip={localize(`${key}.desc`)}>
-                        <EfxButton on:click={application.rollSkillCheck.bind(application, key)} efx={ripple()}>
+                        <EfxButton on:click={application.rollSkillCheck.bind(application, key)}>
                            {localize(`${key}`)}<i class="fas fa-dice" />
                         </EfxButton>
                      </div>

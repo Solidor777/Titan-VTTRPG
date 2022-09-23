@@ -1,7 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
@@ -21,7 +20,7 @@
 <div class="resistance" data-resistance={key}>
    <!--Resistance Label-->
    <div class="button {key}" data-tooltip={localize(`${key}.desc`)}>
-      <EfxButton on:click={application.rollResistanceCheck.bind(application, key)} efx={ripple()}>
+      <EfxButton on:click={application.rollResistanceCheck.bind(application, key)}>
          {localize(`${key}`)}
       </EfxButton>
    </div>

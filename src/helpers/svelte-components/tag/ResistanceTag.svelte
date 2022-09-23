@@ -16,6 +16,7 @@
       @include flex-group-center;
       @include border;
       padding: 0.25rem;
+      font-weight: bold;
 
       &.reflexes {
          background: var(--reflexes-color-bright);

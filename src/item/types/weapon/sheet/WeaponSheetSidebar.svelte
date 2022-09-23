@@ -1,19 +1,30 @@
 <script>
    import { getContext } from "svelte";
+   import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
+   import ItemSheetChecksSidebar from "../../../component/check/ItemSheetChecksSidebar.svelte";
    import WeaponSheetSidebarAttacks from "./WeaponSheetSidebarAttacks.svelte";
 
    // Application statee reference
    const appState = getContext("ApplicationStateStore");
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="sidebar">
    <!--Attacks-->
-   <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+   <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+      <!--Attacks-->
+      <div class="attacks">
          <WeaponSheetSidebarAttacks />
-      </ScrollingContainer>
-   </div>
+      </div>
+
+      <!--Checks-->
+      {#if $document.system.check.length > 0}
+         <div class="checks" transition:slide|local>
+            <ItemSheetChecksSidebar />
+         </div>
+      {/if}
+   </ScrollingContainer>
 </div>
 
 <style lang="scss">
@@ -23,13 +34,13 @@
       @include flex-column;
       @include flex-group-top;
       @include border;
+      @include panel-2;
       width: 100%;
-      box-sizing: border-box;
+      height: 100%;
 
-      .scrolling-content {
-         @include panel-2;
-         width: 100%;
-         height: 100%;
+      .checks {
+         @include border-top;
+         margin-top: 0.25rem;
       }
    }
 </style>

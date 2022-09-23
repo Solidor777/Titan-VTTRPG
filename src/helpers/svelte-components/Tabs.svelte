@@ -7,6 +7,8 @@
 
    // The active tab
    export let activeTab = void 0;
+
+   export let efx = ripple();
 </script>
 
 <!--List of tabs-->
@@ -21,7 +23,7 @@
                activeTab = tab.id;
             }}
             on:mousedown={preventDefault}
-            use:ripple
+            use:efx
          >
             {tab.label}
          </button>

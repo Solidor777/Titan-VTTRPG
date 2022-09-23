@@ -1,5 +1,4 @@
 <script>
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { getContext } from "svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
@@ -10,4 +9,4 @@
    export let itemId = void 0;
 </script>
 
-<IconButton icon={"fas fa-trash"} efx={ripple} on:click={application.deleteItem.bind(application, itemId)} />
+<IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, itemId)} />

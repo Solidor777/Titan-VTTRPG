@@ -1,6 +1,5 @@
 <script>
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
@@ -18,7 +17,6 @@
 </script>
 
 <EfxButton
-   efx={ripple}
    on:click={async () => {
       enabled = !enabled;
       const system = $document.system;

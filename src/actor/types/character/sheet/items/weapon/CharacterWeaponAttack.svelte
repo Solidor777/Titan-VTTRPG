@@ -1,7 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";

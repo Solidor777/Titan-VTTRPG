@@ -1,7 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    const document = getContext("DocumentStore");
 
@@ -53,7 +52,6 @@
    <!--Apply damage button-->
    <div class="button" data-tooltip={localize("applyDamage")}>
       <EfxButton
-         efx={ripple}
          on:click={() => {
             applyDamage(results.damage, false);
          }}><i class="fas fa-bolt" /></EfxButton
@@ -63,7 +61,6 @@
    <!--Apply damage ignore armor button-->
    <div class="button" data-tooltip={localize("applyDamageIgnoreArmor")}>
       <EfxButton
-         efx={ripple}
          on:click={() => {
             applyDamage(results.damage, true);
          }}><i class="fas fa-shield-slash" /></EfxButton
@@ -73,7 +70,6 @@
    <!--Apply half damage button-->
    <div class="button" data-tooltip={localize("applyHalfDamage")}>
       <EfxButton
-         efx={ripple}
          on:click={() => {
             applyDamage(Math.ceil(results.damage / 2), false);
          }}><i class="fas fa-heart-half-stroke" /></EfxButton
@@ -83,7 +79,6 @@
    <!--Apply healing button-->
    <div class="button" data-tooltip={localize("healDamage")}>
       <EfxButton
-         efx={ripple}
          on:click={() => {
             healDamage(results.damage);
          }}><i class="fas fa-heart" /></EfxButton

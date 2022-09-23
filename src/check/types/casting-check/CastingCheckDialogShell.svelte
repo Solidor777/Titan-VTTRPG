@@ -117,7 +117,7 @@
          {localize("difficulty")}
       </div>
       <div class="input">
-         <CheckDifficultySelect bind:difficulty={checkParameters.difficulty} />
+         <CheckDifficultySelect bind:value={checkParameters.difficulty} />
       </div>
    </div>
 

@@ -1,28 +1,9 @@
 <script>
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
 
-   export let button = void 0;
    export let icon = void 0;
-   export let efx = void 0;
-
-   $: icon =
-      typeof button === "object" && typeof button.icon === "string"
-         ? button.icon
-         : typeof icon === "string"
-         ? icon
-         : "";
-   $: styles =
-      typeof button === "object" && typeof button.styles === "object"
-         ? button.styles
-         : typeof styles === "object"
-         ? styles
-         : void 0;
-   $: efx =
-      typeof button === "object" && typeof button.efx === "function"
-         ? button.efx
-         : typeof efx === "function"
-         ? efx
-         : () => {};
+   export let efx = ripple();
 </script>
 
 <button on:click on:mousedown={preventDefault} use:efx>

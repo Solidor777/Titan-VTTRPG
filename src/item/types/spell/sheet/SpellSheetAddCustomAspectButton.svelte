@@ -1,7 +1,6 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Document Setup
@@ -10,7 +9,6 @@
 
 <div class="add-aspect-button">
    <EfxButton
-      efx={ripple}
       on:click={() => {
          $document.spell.addCustomAspect();
       }}>{localize("addCustomAspect")}<i class="fas fa-circle-plus" /></EfxButton

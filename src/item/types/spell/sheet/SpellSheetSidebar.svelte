@@ -15,9 +15,9 @@
 <div class="sidebar">
    <!--Header-->
    <div class="header {$document.system.check.attribute}">
-      {`${localize(`${$document.system.check.attribute}`)} (${localize(
-         `LOCAL.${$document.system.check.skill}.label`
-      )}) ${$document.system.check.difficulty}:${$document.system.check.complexity}`}
+      {`${localize($document.system.check.attribute)} (${localize($document.system.check.skill)}) ${
+         $document.system.check.difficulty
+      }:${$document.system.check.complexity}`}
    </div>
 
    <!--Aspects List-->

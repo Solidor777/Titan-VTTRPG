@@ -2,7 +2,6 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import { slide } from "svelte/transition";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
    import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
    import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
@@ -42,7 +41,6 @@
          <div>
             <IconButton
                icon={"fas fa-trash"}
-               efx={ripple}
                on:click={() => {
                   $document.spell.removeCustomAspect(idx);
                }}

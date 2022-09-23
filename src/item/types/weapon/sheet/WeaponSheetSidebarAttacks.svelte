@@ -8,9 +8,13 @@
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Setup context variables
-   const application = getContext("external").application;
    const document = getContext("DocumentStore");
    const appState = getContext("ApplicationStateStore");
+
+   // Initialize expanded state
+   $document.system.attack.forEach((entry, idx) => {
+      $appState.isExpanded.sidebar.attack[idx] = $appState.isExpanded.sidebar.attack[idx] ?? true;
+   });
 </script>
 
 <ol>
@@ -157,7 +161,7 @@
             @include panel-3;
             width: calc(100% - 0.5rem);
             flex-wrap: wrap;
-            padding-bottom: 0.5rem;
+            padding: 0 0.25rem 0.5rem 0.25rem;
 
             .stat {
                margin: 0.5rem 0.25rem 0 0.25rem;

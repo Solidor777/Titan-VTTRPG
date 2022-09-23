@@ -1,5 +1,4 @@
 <script>
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Collapsed object

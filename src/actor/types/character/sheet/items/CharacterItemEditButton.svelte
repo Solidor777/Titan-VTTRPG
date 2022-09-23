@@ -1,5 +1,4 @@
 <script>
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Collapsed object
@@ -8,7 +7,6 @@
 
 <IconButton
    icon={"fas fa-pen-to-square"}
-   efx={ripple}
    on:click={() => {
       item.sheet.render(true);
    }}

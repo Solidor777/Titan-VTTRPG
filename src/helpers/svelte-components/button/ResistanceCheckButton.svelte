@@ -1,6 +1,5 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Resistance to roll
@@ -35,7 +34,6 @@
 
 <div class="button {resistance}">
    <EfxButton
-      efx={ripple}
       on:click={() => {
          rollResistanceCheck();
       }}

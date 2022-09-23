@@ -5,7 +5,6 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
@@ -86,7 +85,6 @@
                   <div>
                      <IconButton
                         icon={"fas fa-pen-to-square"}
-                        efx={ripple}
                         on:click={() => {
                            application.editArmorTraits();
                         }}
