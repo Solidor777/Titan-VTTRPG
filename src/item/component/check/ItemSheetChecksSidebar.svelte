@@ -5,19 +5,53 @@
    import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import AttributeTag from "../../../helpers/svelte-components/tag/AttributeTag.svelte";
+   import IconButton from "../../../helpers/svelte-components/button/IconButton.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 </script>
 
 <ol>
    {#each $document.system.check as check, idx (check.uuid)}
       <li transition:slide|local>
-         <!--Check-->
+         <!--Header-->
          <div class="header {check.attribute}">
-            <!--Header-->
+            <!--Label-->
             <div class="label">
-               {check.label}
+               <div class="spacer" />
+
+               <div class="main-label">
+                  <!--Text-->
+                  <div class="text">
+                     {check.label}
+                  </div>
+
+                  <!--Icon-->
+                  <i class="fas fa-dice" />
+               </div>
+
+               <div class="spacer">
+                  {#if check.resolveCost > 0 || (check.resistanceCheck !== "none" && check.opposedCheck.enabled === true)}
+                     {#if $appState.isExpanded.sidebar.check[idx]}
+                        <!--Collapse button-->
+                        <IconButton
+                           icon="fas fa-angle-double-down"
+                           on:click={() => {
+                              $appState.isExpanded.sidebar.check[idx] = false;
+                           }}
+                        />
+                     {:else}
+                        <!--Expand button-->
+                        <IconButton
+                           icon="fas fa-angle-double-right"
+                           on:click={() => {
+                              $appState.isExpanded.sidebar.check[idx] = true;
+                           }}
+                        />
+                     {/if}
+                  {/if}
+               </div>
             </div>
 
             <!--Value-->
@@ -30,7 +64,7 @@
             </div>
          </div>
 
-         {#if check.resolveCost > 0 || (check.resistanceCheck !== "none" && check.opposedCheck.enabled === true)}
+         {#if $appState.isExpanded.sidebar.check[idx] && (check.resolveCost > 0 || (check.resistanceCheck !== "none" && check.opposedCheck.enabled === true))}
             <div class="stats" transition:slide|local>
                <!--Resolve Cost-->
                {#if check.resolveCost > 0}
@@ -110,16 +144,39 @@
             @include flex-column;
             @include flex-group-top;
             @include border-bottom;
-            @include border-right;
             @include attribute-colors;
             padding: 0.25rem 0;
             width: 100%;
+            padding: 0.25rem;
 
             .label {
                @include flex-row;
                @include flex-group-center;
                width: 100%;
-               font-weight: bold;
+
+               .main-label {
+                  @include flex-row;
+                  @include flex-group-center;
+                  width: 100%;
+
+                  .text {
+                     @include flex-row;
+                     @include flex-group-center;
+                     font-weight: bold;
+                  }
+
+                  i {
+                     @include flex-row;
+                     @include flex-group-center;
+                     margin-left: 0.25rem;
+                  }
+               }
+
+               .spacer {
+                  @include flex-row;
+                  @include flex-group-center;
+                  width: 3rem;
+               }
             }
 
             .value {
