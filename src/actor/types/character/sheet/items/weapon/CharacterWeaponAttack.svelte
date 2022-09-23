@@ -25,7 +25,6 @@
       <!--Attack Button-->
       <div class="attack-button">
          <EfxButton
-            efx={ripple}
             on:click={() => {
                application.rollAttackCheck(item._id, attackIdx);
             }}

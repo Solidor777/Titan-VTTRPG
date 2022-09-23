@@ -114,6 +114,40 @@
   }
 }
 
+@mixin button-top {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-right: var(--button-border-style);
+  border-left: var(--button-border-style);
+  border-bottom: var(--button-border-style);
+  border-bottom-right-radius: var(--button-border-radius);
+  border-bottom-left-radius: var(--button-border-radius);
+  border-width: var(--button-border-width);
+  border-color: var(--button-border-color);
+  background: var(--button-background-color);
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
+  padding: var(--button-padding);
+  color: var(--button-text-color);
+  line-height: var(--button-line-height);
+  margin: 0;
+
+  &:disabled {
+    cursor: default;
+    background: var(--button-background-color-disabled);
+  }
+
+  &:hover {
+    &:not(:disabled) {
+      background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
+    }
+  }
+}
+
 @mixin icon-button {
   box-sizing: border-box;
   display: flex;

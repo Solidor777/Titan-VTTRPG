@@ -1,5 +1,7 @@
 <script>
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
+   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
+
    // List of tabs
    export let tabs = [];
 
@@ -19,6 +21,7 @@
                activeTab = tab.id;
             }}
             on:mousedown={preventDefault}
+            use:ripple
          >
             {tab.label}
          </button>

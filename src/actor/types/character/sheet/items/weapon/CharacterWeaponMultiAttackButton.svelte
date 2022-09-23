@@ -1,6 +1,5 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Collapsed object
@@ -9,7 +8,6 @@
 
 <div class="item-equip-button">
    <EfxButton
-      efx={ripple}
       on:click={async () => {
          const updateData = {
             system: {

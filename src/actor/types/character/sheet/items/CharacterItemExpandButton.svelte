@@ -14,7 +14,6 @@
 
 <div class="item-expand-button">
    <EfxButton
-      efx={ripple}
       on:click={() => {
          isExpanded = !isExpanded;
       }}

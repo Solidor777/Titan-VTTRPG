@@ -14,7 +14,7 @@
    @import "../../../styles/Mixins.scss";
 
    button {
-      @include button;
+      @include button-top;
       position: relative;
       overflow: hidden;
       clip-path: var(--tjs-icon-button-clip-path, none);
