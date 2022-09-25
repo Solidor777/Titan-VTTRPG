@@ -61,7 +61,7 @@ export default class TitanWeapon extends TitanTypeComponent {
          attribute: 'body',
          skill: 'meleeWeapons',
          damage: 1,
-         plusSuccessDamage: true,
+         plusExtraSuccessDamage: true,
          trait: [],
          uuid: uuidv4()
       };

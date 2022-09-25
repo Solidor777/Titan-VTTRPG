@@ -41,7 +41,9 @@
             <div class="stat">
                <StatTag
                   label={localize("damage")}
-                  value={`${attack.damage}${attack.plusSuccessDamage === true ? localize("plusSuccess") : ""}`}
+                  value={`${attack.damage}${
+                     attack.plusExtraSuccessDamage === true ? localize("plusExtraSuccess.short") : ""
+                  }`}
                />
             </div>
 

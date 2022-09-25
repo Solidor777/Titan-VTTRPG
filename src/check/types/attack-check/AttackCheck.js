@@ -183,7 +183,7 @@ export default class TitanAttackCheck extends TitanSkillCheck {
             this.parameters.attack.damage + this.parameters.damageMod + 1;
 
          // Add extra damage if appropriate
-         if (results.extraSuccesses && this.parameters.attack.plusSuccessDamage) {
+         if (results.extraSuccesses && this.parameters.attack.plusExtraSuccessDamage) {
             results.damage += results.extraSuccesses;
          }
       }
