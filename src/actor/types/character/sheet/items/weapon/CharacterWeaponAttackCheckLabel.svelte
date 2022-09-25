@@ -22,9 +22,11 @@
             {localize("damage")}
          </div>
          <div class="value">
-            {`${attack.damage + $document.system.mod.damage.value}${
-               attack.plusExtraSuccessDamage === true ? localize("plusExtraSucces.short") : ""
-            } `}
+            {#if attack.plusExtraSuccessDamage}
+               {attack.damage + $document.system.mod.damage.value} + {localize("extraSuccess.short")}
+            {:else}
+               {attack.damage + $document.system.mod.damage.value}
+            {/if}
          </div>
       </div>
 

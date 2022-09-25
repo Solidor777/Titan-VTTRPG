@@ -106,7 +106,7 @@
 
                   <!--Plus Success Damage-->
                   <div class="input">
-                     {localize("plusExtraSuccess.short")}
+                     + {localize("extraSuccess.short")}
                      <DocumentCheckboxInput bind:value={attack.plusExtraSuccessDamage} />
                   </div>
                </div>
