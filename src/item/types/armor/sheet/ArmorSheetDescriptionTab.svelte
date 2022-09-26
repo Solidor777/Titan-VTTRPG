@@ -16,42 +16,16 @@
       <div class="scrolling-content">
          <!--Description-->
          {#if $document.system.description !== "" && $document.system.description !== "<p></p>"}
-            <div class={`description${$appState.isExpanded.description.description ? " expanded" : ""}`}>
+            <div class={"description"}>
                <!--Header-->
-               <div class="header">
-                  <!--Label-->
-                  <h3 class="label">
-                     {localize("description")}
-                  </h3>
-
-                  <!--Add Attack Button-->
-                  <div class="toggle-expanded-button">
-                     {#if $appState.isExpanded.description.description}
-                        <!--Collapse button-->
-                        <IconButton
-                           icon="fas fa-angle-double-down"
-                           on:click={() => {
-                              $appState.isExpanded.description.description = false;
-                           }}
-                        />
-                     {:else}
-                        <!--Expand button-->
-                        <IconButton
-                           icon="fas fa-angle-double-left"
-                           on:click={() => {
-                              $appState.isExpanded.description.description = true;
-                           }}
-                        />
-                     {/if}
-                  </div>
-               </div>
+               <h3 class="header">
+                  {localize("description")}
+               </h3>
 
                <!--Body-->
-               {#if $appState.isExpanded.description.description}
-                  <div class="body">
-                     <DocumentEditorInput fieldName={"system.description"} />
-                  </div>
-               {/if}
+               <div class="body">
+                  <DocumentEditorInput fieldName={"system.description"} />
+               </div>
             </div>
          {:else}
             <!--Add description button-->
@@ -125,13 +99,7 @@
             @include flex-column;
             @include flex-group-top;
             width: 100%;
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
-
-            &.expanded {
-               height: 100%;
-            }
+            height: 100%;
 
             .header {
                @include flex-row;
@@ -142,12 +110,6 @@
                   @include flex-row;
                   @include flex-group-left;
                   width: 100%;
-               }
-
-               .toggle-expanded-button {
-                  @include flex-row;
-                  @include flex-group-center;
-                  margin-left: 0.5rem;
                }
             }
 
