@@ -48,7 +48,7 @@
                {:else}
                   <!--Expand button-->
                   <IconButton
-                     icon="fas fa-angle-double-right"
+                     icon="fas fa-angle-double-left"
                      on:click={() => {
                         $appState.isExpanded.sidebar.attack[idx] = true;
                      }}
