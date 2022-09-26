@@ -370,6 +370,8 @@
   "LOCAL.slashing.desc.label": "A Slashing attack is sharp and typically bladed, and is used to cut enemies open.",
   "LOCAL.splash.desc.label": "Attacks with the Splash trait deal half-damage to adjacent creatures.",
   "LOCAL.twoHanded.desc.label": "An attacker using a Two-Handed attack must use at least two hands.",
+  "LOCAL.addDescription.label": "Add Description",
+  "LOCAL.addAttackDescription.label": "Add Attack Description",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

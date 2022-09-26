@@ -323,3 +323,9 @@
   color: var(--label-color);
   --border-color: var(--label-color);
 }
+
+@mixin editor {
+  --tjs-editor-background: var(--editor-background);
+  --tjs-editor-border: var(--editor-border);
+  --tjs-editor-border-radius: var(--editor-border-radius);
+}

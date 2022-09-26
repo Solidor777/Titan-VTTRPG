@@ -23,7 +23,7 @@
          </div>
          <div class="value">
             {#if attack.plusExtraSuccessDamage}
-               {attack.damage + $document.system.mod.damage.value} + {localize("extraSuccess.short")}
+               {attack.damage + $document.system.mod.damage.value} + {localize("extraSuccesses.short")}
             {:else}
                {attack.damage + $document.system.mod.damage.value}
             {/if}
