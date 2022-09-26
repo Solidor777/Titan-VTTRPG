@@ -1,5 +1,5 @@
-import { getFlatModifierTemplate } from '../rules-element/FlatModifier.js';
 import TitanAbility from './types/ability/Ability.js';
+import TitanArmor from './types/armor/Armor.js';
 import TitanEffect from './types/effect/Effect.js';
 import TitanSpell from './types/spell/Spell.js';
 import TitanWeapon from './types/weapon/Weapon.js';
@@ -27,6 +27,12 @@ export default class TitanItem extends Item {
          case 'ability': {
             this.typeComponent = new TitanAbility(this);
             this.ability = this.typeComponent;
+            break;
+         }
+
+         case 'armor': {
+            this.typeComponent = new TitanArmor(this);
+            this.armor = this.typeComponent;
             break;
          }
 

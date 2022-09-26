@@ -12,6 +12,8 @@ export default class ArmorEditTraitsDialog extends TJSDialog {
                   document: document,
                },
             },
+            // To do: Remove this once the tooltip action is in
+            zIndex: null
          },
          {
             width: 320,

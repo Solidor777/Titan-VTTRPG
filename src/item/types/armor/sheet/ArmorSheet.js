@@ -1,5 +1,6 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import ArmorEditTraitsDialog from './ArmorEditTraitsDialog';
+import createArmorSheetState from './ArmorSheetState.js';
 import ArmorSheetShell from './ArmorSheetShell.svelte';
 
 export default class TitanArmorSheet extends TitanItemSheet {
@@ -11,13 +12,38 @@ export default class TitanArmorSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 600,
-         height: 500,
+         width: 650,
+         height: 650,
          svelte: {
             class: ArmorSheetShell,
             target: document.body
          }
       });
+   }
+
+   constructor(object) {
+      super(object);
+      this.reactive.state = createArmorSheetState();
+   }
+
+   async addAttack() {
+      this.reactive.state.addAttack();
+      return await this.reactive.document.weapon.addAttack();
+   }
+
+   async removeAttack(idx) {
+      this.reactive.state.removeAttack(idx);
+      return await this.reactive.document.weapon.removeAttack(idx);
+   }
+
+   async addCheck() {
+      this.reactive.state.addCheck();
+      return await this.reactive.document.typeComponent.addCheck();
+   }
+
+   async removeCheck(idx) {
+      this.reactive.state.removeCheck(idx);
+      return await this.reactive.document.typeComponent.removeCheck(idx);
    }
 
    editArmorTraits() {

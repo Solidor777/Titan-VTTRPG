@@ -5,106 +5,57 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
+   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
+   import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
+   import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
+   import ArmorSheetHeader from "./ArmorSheetHeader.svelte";
+   import ArmorSheetDescriptionTab from "./ArmorSheetDescriptionTab.svelte";
+   import ArmorSheetSidebar from "./ArmorSheetSidebar.svelte";
 
-   // Setup
+   // Setup context variables
    export let elementRoot;
    export let documentStore;
+   export let applicationStateStore;
    setContext("DocumentStore", documentStore);
-   const document = getContext("DocumentStore");
-   const application = getContext("external").application;
+   setContext("ApplicationStateStore", applicationStateStore);
+   const appState = getContext("ApplicationStateStore");
+
+   // Tabs
+   const tabs = [
+      {
+         label: localize("description"),
+         id: "description",
+         component: ArmorSheetDescriptionTab,
+      },
+      {
+         label: localize("checks"),
+         id: "checks",
+         component: ItemSheetChecksTab,
+      },
+      {
+         label: localize("rulesElements"),
+         id: "rulesElements",
+         component: ItemSheetRulesElementsTab,
+      },
+   ];
 </script>
 
 <ApplicationShell bind:elementRoot>
-   <div class="armor-sheet">
+   <div class="weapon-sheet">
       <!--Header-->
       <div class="header">
-         <div class="row">
-            <div class="label">
-               <!--Item portrait-->
-               <div class="portrait">
-                  <DocumentImagePicker path={"img"} alt={"item portrait"} />
-               </div>
-               <!--Item name-->
-               <div class="name">
-                  <DocumentName />
-               </div>
-            </div>
-
-            <div class="stats">
-               <!--Rarity-->
-               <div class="stat-label">
-                  {localize("rarity")}
-               </div>
-               <div class="stat-input">
-                  <DocumentRaritySelect bind:value={$document.system.rarity} />
-               </div>
-
-               <!--Value-->
-               <div class="stat-label">
-                  {localize("value")}
-               </div>
-               <div class="stat-input">
-                  <DocumentIntegerInput bind:value={$document.system.value} />
-               </div>
-            </div>
-         </div>
+         <ArmorSheetHeader />
       </div>
 
       <!--Content-->
-      <div class="content">
-         <div class="sidebar">
-            <div class="stats">
-               <!--Armor-->
-               <div class="stat">
-                  <!--Label-->
-                  <div class="label">
-                     {localize("armor")}
-                  </div>
-                  <!--Input-->
-                  <div class="input">
-                     <DocumentIntegerInput bind:value={$document.system.armor} />
-                  </div>
-               </div>
-            </div>
+      <div class="body">
+         <!--Sidebar-->
+         <div class="sidebar"><ArmorSheetSidebar /></div>
 
-            <!--Traits-->
-            <div class="armor-traits">
-               <!--Header-->
-               <div class="armor-traits-header">
-                  <div />
-                  <!--Label-->
-                  <div>
-                     {localize("traits")}
-                  </div>
-                  <!--Edit button-->
-                  <div>
-                     <IconButton
-                        icon={"fas fa-pen-to-square"}
-                        on:click={() => {
-                           application.editArmorTraits();
-                        }}
-                     />
-                  </div>
-               </div>
-               <div class="armor-traits-container">
-                  <!--Each trait-->
-                  {#each $document.system.traits as trait}
-                     <div class="armor-trait">
-                        {localize(`${trait.name}`)}
-                        {#if trait.type === "number"}
-                           {trait.value}
-                        {/if}
-                     </div>
-                  {/each}
-               </div>
-            </div>
+         <!--Tabs-->
+         <div class="tabs">
+            <Tabs {tabs} bind:activeTab={$appState.activeTab} />
          </div>
-         <div class="description">Description</div>
       </div>
    </div>
 </ApplicationShell>
@@ -112,136 +63,28 @@
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .armor-sheet {
+   .weapon-sheet {
       @include flex-column;
       font-size: 1rem;
       display: flex;
       flex: 1;
 
-      .header {
-         @include border;
-         @include flex-column;
-         align-items: center;
-         justify-content: space-between;
-         width: 100%;
-         padding: 0.5rem;
-
-         .row {
-            @include flex-row;
-            @include flex-space-between;
-            width: 100%;
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               width: 100%;
-
-               .portrait {
-                  width: 5rem;
-                  --border-style: none;
-               }
-            }
-
-            .stats {
-               @include grid(2);
-               width: 100%;
-               box-sizing: border-box;
-               margin-left: 0.5rem;
-
-               .stat-label {
-                  @include flex-row;
-                  @include flex-group-right;
-                  font-weight: bold;
-               }
-            }
-         }
-      }
-
-      .content {
+      .body {
          @include flex-row;
          height: 100%;
          width: 100%;
 
          .sidebar {
-            @include flex-column;
-            @include flex-group-top;
-            @include border;
-            padding: 0.5rem;
-            box-sizing: border-box;
+            @include flex-row;
             width: 13rem;
             min-width: 13rem;
-            margin: 0.5rem;
-
-            .stats {
-               @include flex-column;
-               @include flex-group-top;
-               width: 100%;
-
-               .stat {
-                  @include flex-column;
-                  @include flex-group-top;
-                  width: 100%;
-
-                  &:not(:first-child) {
-                     @include border-top;
-                     padding-top: 0.5rem;
-                     margin-top: 0.5rem;
-                  }
-
-                  .label {
-                     @include flex-column;
-                     @include flex-group-center;
-                     font-size: 1rem;
-                     font-weight: bold;
-                  }
-               }
-            }
-
-            .armor-traits {
-               @include flex-column;
-               @include flex-group-top;
-               @include border-top;
-               width: 100%;
-               margin-top: 0.25rem;
-               padding-top: 0.25rem;
-
-               .armor-traits-header {
-                  @include grid(3);
-                  width: 100%;
-                  font-weight: bold;
-
-                  div {
-                     @include flex-row;
-                     @include flex-group-center;
-                     height: 100%;
-                     width: 100%;
-                  }
-               }
-            }
-
-            .armor-traits-container {
-               @include flex-row;
-               @include flex-group-center;
-               flex-wrap: wrap;
-               width: 100%;
-
-               .armor-trait {
-                  @include border;
-                  font-weight: bold;
-                  margin: 0.25rem;
-                  padding: 0.25rem;
-               }
-            }
+            margin: 0.5rem 0.5rem 0 0;
          }
 
-         .description {
-            @include flex-column;
-            @include flex-group-top;
-            @include border;
-            box-sizing: border-box;
+         .tabs {
+            @include flex-row;
+            margin-top: 0.5rem;
             width: 100%;
-            margin: 0.5rem 0.5rem 0.5rem 0;
-            padding: 0.5rem;
          }
       }
    }

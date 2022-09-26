@@ -346,7 +346,7 @@
       "armor": 2,
       "description": "",
       "equipped": false,
-      "traits": []
+      "trait": []
     },
     "weapon": {
       "templates": [

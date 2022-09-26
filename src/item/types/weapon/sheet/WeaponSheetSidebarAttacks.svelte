@@ -116,11 +116,10 @@
          @include flex-column;
          @include flex-group-top;
          width: 100%;
-         padding-bottom: 0.25rem;
 
          &:not(:first-child) {
             @include border-top;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
          }
 
          .header {

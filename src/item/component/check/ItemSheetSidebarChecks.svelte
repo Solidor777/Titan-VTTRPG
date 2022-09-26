@@ -12,7 +12,7 @@
    const appState = getContext("ApplicationStateStore");
 
    // Initialize expanded state
-   $document.system.attack.forEach((entry, idx) => {
+   $document.system.check.forEach((entry, idx) => {
       $appState.isExpanded.sidebar.check[idx] = $appState.isExpanded.sidebar.check[idx] ?? true;
    });
 </script>
@@ -37,7 +37,7 @@
                </div>
 
                <div class="spacer">
-                  {#if check.resolveCost > 0 || (check.resistanceCheck !== "none" && check.opposedCheck.enabled === true)}
+                  {#if check.resolveCost > 0 || check.resistanceCheck !== "none" || check.opposedCheck.enabled === true}
                      {#if $appState.isExpanded.sidebar.check[idx]}
                         <!--Collapse button-->
                         <IconButton
@@ -69,7 +69,7 @@
             </div>
          </div>
 
-         {#if $appState.isExpanded.sidebar.check[idx] && (check.resolveCost > 0 || (check.resistanceCheck !== "none" && check.opposedCheck.enabled === true))}
+         {#if $appState.isExpanded.sidebar.check[idx] && (check.resolveCost > 0 || check.resistanceCheck !== "none" || check.opposedCheck.enabled === true)}
             <div class="stats" transition:slide|local>
                <!--Resolve Cost-->
                {#if check.resolveCost > 0}
@@ -150,7 +150,7 @@
             @include flex-group-top;
             @include border-bottom;
             @include attribute-colors;
-            padding: 0.25rem 0;
+            @include panel-1;
             width: 100%;
             padding: 0.25rem;
 

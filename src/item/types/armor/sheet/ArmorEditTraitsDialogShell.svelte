@@ -13,15 +13,20 @@
          type: "boolean",
          value: false,
       },
+      {
+         name: "loud.armor",
+         type: "boolean",
+         value: false,
+      },
    ];
 </script>
 
 <div class="armor-edit-trait-dialog">
-   <DocumentEditTraitsDialog bind:document bind:documentTraits={document.system.traits} bind:traitOptions />
+   <DocumentEditTraitsDialog bind:document bind:documentTraits={document.system.trait} bind:traitOptions />
 </div>
 
 <style lang="scss">
    .armor-edit-trait-dialog {
-      --trait-column-count: 1;
+      --trait-column-count: 2;
    }
 </style>
