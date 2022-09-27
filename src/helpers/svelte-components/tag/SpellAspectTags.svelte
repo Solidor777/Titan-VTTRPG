@@ -48,7 +48,7 @@
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";
 
-   .aspects {
+   .aspect {
       @include flex-row;
       @include flex-space-evenly;
       flex-wrap: wrap;

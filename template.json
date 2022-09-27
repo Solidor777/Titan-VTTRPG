@@ -385,9 +385,9 @@
         "complexity": 1,
         "autoCalculateCheck": true
       },
-      "standardAspects": {
+      "standardAspect": {
         "range": {
-          "enabled": true,
+          "enabled": false,
           "value": "self"
         },
         "radius": {
@@ -575,7 +575,7 @@
           }
         }
       },
-      "customAspects": []
+      "customAspect": []
     },
     "weapon": {
       "templates": [

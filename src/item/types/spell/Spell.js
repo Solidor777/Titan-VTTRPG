@@ -16,10 +16,10 @@ function getCustomAspectTemplate() {
 export default class TitanSpell extends TitanTypeComponent {
    prepareDerivedData() {
       // Reset aspects array
-      this.parent.aspects = [];
+      this.parent.aspect = [];
 
       // Reference to standard aspects
-      const standardAspects = this.parent.system.standardAspects;
+      const standardAspects = this.parent.system.standardAspect;
 
       // Range
       const rangeCosts = {
@@ -129,13 +129,13 @@ export default class TitanSpell extends TitanTypeComponent {
       this._prepareStandardAspectData(standardAspects.increaseSpeed, localize('increaseSpeed'), false, true);
 
       // Process custom aspects
-      this.parent.system.customAspects.forEach((element) => {
+      this.parent.system.customAspect.forEach((element) => {
          this._prepareCustomAspectData(element);
       });
 
       // Calculate total cost
       let totalAspectCost = 1;
-      this.parent.aspects.forEach((element) => {
+      this.parent.aspect.forEach((element) => {
          totalAspectCost += element.cost;
       });
       this.parent.totalAspectCost = totalAspectCost;
@@ -261,14 +261,14 @@ export default class TitanSpell extends TitanTypeComponent {
             }
 
             // Push to the aspects array
-            this.parent.aspects.push(aspectEntry);
+            this.parent.aspect.push(aspectEntry);
          }
       }
    }
 
    addCustomAspect() {
       const system = this.parent.system;
-      system.customAspects.push(getCustomAspectTemplate());
+      system.customAspect.push(getCustomAspectTemplate());
       this.parent.update({
          system: system
       });
@@ -278,7 +278,7 @@ export default class TitanSpell extends TitanTypeComponent {
 
    removeCustomAspect(idx) {
       const system = this.parent.system;
-      system.customAspects.splice(idx, 1);
+      system.customAspect.splice(idx, 1);
       this.parent.update({
          system: system
       });
@@ -314,20 +314,26 @@ export default class TitanSpell extends TitanTypeComponent {
          aspectEntry.isHealing = true;
       }
 
-      this.parent.aspects.push(aspectEntry);
+      this.parent.aspect.push(aspectEntry);
 
       return;
    }
 
    getRollData(rollData) {
-      rollData.aspects = this.parent.aspects;
+      rollData.aspect = this.parent.aspect;
 
       return rollData;
    }
 
    getChatContext(chatContext) {
-      chatContext.aspects = this.parent.aspects;
+      chatContext.aspect = this.parent.aspect;
 
       return chatContext;
+   }
+
+   onCreate() {
+      if (this.parent.system.tradition === "any") {
+         this.parent.system.tradition = localize("any");
+      }
    }
 }

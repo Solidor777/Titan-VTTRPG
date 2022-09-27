@@ -10,11 +10,9 @@
    import SpellSheetToggleAspectOptionButton from "./SpellSheetToggleAspectOptionButton.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
-   // Document reference
+   // Setup context variables
    const document = getContext("DocumentStore");
-
-   // Application refernce
-   const application = getContext("external").application;
+   const appState = getContext("ApplicationStateStore");
 
    // Initialize select options
    const selectOptions = {
@@ -70,22 +68,23 @@
             label: localize("m10"),
          },
       ],
+      decreaseSpeed: [],
    };
    selectOptions.decreaseSpeed = selectOptions.increaseSpeed;
 
    // Determines whether an aspect should have a details div
    function hasDetails(key) {
       return (
-         $document.system.standardAspects[key].option ||
-         $document.system.standardAspects[key].value ||
-         $document.system.standardAspects[key].resistanceCheck
+         $document.system.standardAspect[key].option ||
+         $document.system.standardAspect[key].value ||
+         $document.system.standardAspect[key].resistanceCheck
       );
    }
 
    // Filter for the aspects to display
    let filter = "";
 
-   $: filteredAspects = Object.keys($document.system.standardAspects).filter(
+   $: filteredAspects = Object.keys($document.system.standardAspect).filter(
       (key) => localize(`${key}`).toLowerCase().indexOf(filter.toLowerCase()) !== -1
    );
 </script>
@@ -96,7 +95,7 @@
 
    <!--Scrolling aspects list-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.standardAspects}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.standardAspect}>
          <ol class="aspects-list">
             <!--Each Aspect-->
             {#each filteredAspects as key}
@@ -106,28 +105,28 @@
                   <!--Enable Header-->
                   <div class="aspect-enable">
                      <SpellSheetEnableAspectButton
-                        bind:enabled={$document.system.standardAspects[key].enabled}
+                        bind:enabled={$document.system.standardAspect[key].enabled}
                         label={localize(`${key}`)}
-                        cost={$document.system.standardAspects[key].cost}
+                        cost={$document.system.standardAspect[key].cost}
                      />
                   </div>
-                  {#if $document.system.standardAspects[key].enabled && hasDetails(key)}
+                  {#if $document.system.standardAspect[key].enabled && hasDetails(key)}
                      <!--Content-->
                      <div class="aspect-details" transition:slide|local>
-                        {#if $document.system.standardAspects[key].value}
+                        {#if $document.system.standardAspect[key].value}
                            <!--Select Options-->
                            <div class="row">
                               <div>
                                  <!--Select Value-->
                                  <DocumentSelect
-                                    bind:value={$document.system.standardAspects[key].value}
+                                    bind:value={$document.system.standardAspect[key].value}
                                     options={selectOptions[key]}
                                  />
                               </div>
                            </div>
                         {/if}
 
-                        {#if $document.system.standardAspects[key].resistanceCheck}
+                        {#if $document.system.standardAspect[key].resistanceCheck}
                            <!--Resistance Check-->
                            <div class="row">
                               <div class="stat">
@@ -139,7 +138,7 @@
                                  <!--Value-->
                                  <div class="input">
                                     <DocumentResistanceSelect
-                                       bind:value={$document.system.standardAspects[key].resistanceCheck}
+                                       bind:value={$document.system.standardAspect[key].resistanceCheck}
                                        allowNone={true}
                                     />
                                  </div>
@@ -147,7 +146,7 @@
                            </div>
                         {/if}
 
-                        {#if $document.system.standardAspects[key].allOptions !== undefined}
+                        {#if $document.system.standardAspect[key].allOptions !== undefined}
                            <!--All Options-->
                            <div class="row">
                               <div class="stat">
@@ -159,20 +158,20 @@
                                  <!--Value-->
                                  <div class="input">
                                     <DocumentCheckboxInput
-                                       bind:value={$document.system.standardAspects[key].allOptions}
+                                       bind:value={$document.system.standardAspect[key].allOptions}
                                     />
                                  </div>
                               </div>
                            </div>
                         {/if}
 
-                        {#if $document.system.standardAspects[key].option}
+                        {#if $document.system.standardAspect[key].option}
                            <!--Option Toggles-->
                            <div class="toggles">
-                              {#each Object.entries($document.system.standardAspects[key].option) as [option]}
+                              {#each Object.entries($document.system.standardAspect[key].option) as [option]}
                                  <SpellSheetToggleAspectOptionButton
                                     label={localize(`${option}`)}
-                                    bind:enabled={$document.system.standardAspects[key].option[option]}
+                                    bind:enabled={$document.system.standardAspect[key].option[option]}
                                  />
                               {/each}
                            </div>

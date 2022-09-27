@@ -73,9 +73,9 @@
                <CharacterCheckLabelLong check={item.system.castingCheck} />
             </div>
 
-            {#if item.aspects}
+            {#if item.aspect}
                <div class="item-expandable-content">
-                  <SpellAspectTags aspects={item.aspects} />
+                  <SpellAspectTags aspects={item.aspect} />
                </div>
             {/if}
 

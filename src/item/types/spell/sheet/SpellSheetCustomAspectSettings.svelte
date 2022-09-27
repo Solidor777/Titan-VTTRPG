@@ -15,13 +15,13 @@
    export let idx = void 0;
 </script>
 
-{#if $document.system.customAspects[idx]}
+{#if $document.system.customAspect[idx]}
    <div class="aspect" transition:slide|local>
       <!--Header-->
       <div class="aspect-header">
          <!--Label-->
          <div class="label-input">
-            <DocumentTextInput bind:value={$document.system.customAspects[idx].label} />
+            <DocumentTextInput bind:value={$document.system.customAspect[idx].label} />
          </div>
 
          <!--Cost-->
@@ -33,7 +33,7 @@
 
             <!--Input-->
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.customAspects[idx].cost} min={0} />
+               <DocumentIntegerInput bind:value={$document.system.customAspect[idx].cost} min={0} />
             </div>
          </div>
 
@@ -59,7 +59,7 @@
             <!--Value-->
             <div class="input">
                <DocumentResistanceSelect
-                  bind:value={$document.system.customAspects[idx].resistanceCheck}
+                  bind:value={$document.system.customAspect[idx].resistanceCheck}
                   allowNone={true}
                />
             </div>
@@ -76,7 +76,7 @@
 
             <!--Value-->
             <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isDamage} />
+               <DocumentCheckboxInput bind:value={$document.system.customAspect[idx].isDamage} />
             </div>
          </div>
 
@@ -89,7 +89,7 @@
 
             <!--Value-->
             <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].isHealing} />
+               <DocumentCheckboxInput bind:value={$document.system.customAspect[idx].isHealing} />
             </div>
          </div>
 
@@ -102,13 +102,13 @@
 
             <!--Value-->
             <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.customAspects[idx].scaling} />
+               <DocumentCheckboxInput bind:value={$document.system.customAspect[idx].scaling} />
             </div>
          </div>
       </div>
 
       <!--Initial value-->
-      {#if $document.system.customAspects[idx].scaling}
+      {#if $document.system.customAspect[idx].scaling}
          <div class="row" transition:slide|local>
             <div class="stat">
                <!--Label-->
@@ -118,7 +118,7 @@
 
                <!--Value-->
                <div class="input number">
-                  <DocumentIntegerInput bind:value={$document.system.customAspects[idx].initialValue} min={0} />
+                  <DocumentIntegerInput bind:value={$document.system.customAspect[idx].initialValue} min={0} />
                </div>
             </div>
          </div>

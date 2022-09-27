@@ -5,17 +5,14 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentIntegerSelect from "~/documents/components/select/DocumentIntegerSelect.svelte";
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
+   import DocumentCheckDifficultSelect from "~/documents/components/select/DocumentCheckDifficultSelect.svelte";
+   import StatTag from "../../../../helpers/svelte-components/tag/StatTag.svelte";
 
-   // Document reference
+   // Setup context variables
    const document = getContext("DocumentStore");
-
-   // Application refernce
-   const application = getContext("external").application;
-
-   const difficultyOptions = [2, 3, 4, 5, 6];
+   const appState = getContext("ApplicationStateStore");
 </script>
 
 <div class="casting-check-tab">
@@ -47,8 +44,7 @@
 
             <!--Select-->
             <div class="select">
-               <DocumentIntegerSelect
-                  options={difficultyOptions}
+               <DocumentCheckDifficultSelect
                   bind:value={$document.system.castingCheck.difficulty}
                   disabled={$document.system.castingCheck.autoCalculateCheck}
                />
@@ -127,19 +123,14 @@
          {localize("aspectCosts")}
       </div>
 
-      <ScrollingContainer bind:scrollTop={application.scrollTop.castingCheck}>
-         <ol>
-            {#each $document.aspects as aspect}
-               <li>
-                  <div class="label">
-                     {aspect.label}
-                  </div>
-                  <div class="value">
-                     {aspect.cost}
-                  </div>
-               </li>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.castingCheck}>
+         <div class="costs-container">
+            {#each $document.aspect as aspect}
+               <div class="cost">
+                  <StatTag label={aspect.label} value={aspect.cost} />
+               </div>
             {/each}
-         </ol>
+         </div>
       </ScrollingContainer>
    </div>
 </div>
@@ -149,6 +140,8 @@
 
    .casting-check-tab {
       @include flex-column;
+      @include flex-group-top;
+      @include panel-2;
       height: 100%;
       width: 100%;
 
@@ -172,8 +165,9 @@
          @include flex-column;
          @include flex-group-top;
          @include border-bottom-sides;
+         @include panel-1;
+         padding: 0.25rem;
          width: 100%;
-         background: var(--label-background-color);
 
          .stat {
             @include flex-row;
@@ -186,6 +180,7 @@
                height: 100%;
                font-weight: bold;
                margin-right: 0.25rem;
+               font-size: 0.9rem;
             }
 
             .input {
@@ -212,6 +207,7 @@
 
       .aspect-costs {
          @include flex-column;
+         padding: 0.25rem;
          height: 100%;
          width: 100%;
 
@@ -225,19 +221,14 @@
             font-weight: bold;
          }
 
-         ol {
-            @include grid(2);
-            list-style: none;
-            margin: 0.25rem 0 0 0;
+         .costs-container {
+            @include flex-row;
+            @include flex-group-left;
+            width: 100%;
+            flex-wrap: wrap;
 
-            li {
-               @include flex-row;
-               @include flex-space-between;
-               @include border;
-               padding: 0.25rem;
-               page-break-inside: avoid;
-               background: var(--label-background-color);
-               font-weight: bold;
+            .cost {
+               @include tag-padding;
             }
          }
       }

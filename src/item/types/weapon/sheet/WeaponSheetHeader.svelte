@@ -102,7 +102,7 @@
                   @include flex-row;
                   @include flex-group-left;
                   font-weight: bold;
-                  margin-right: 0.5rem;
+                  margin-right: 0.25rem;
                }
 
                .input {

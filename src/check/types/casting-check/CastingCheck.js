@@ -32,7 +32,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
          spellName: options.spellRollData.name,
-         aspects: options.spellRollData.aspects,
+         aspects: options.spellRollData.aspect,
          damageMod: options.damageMod ?? options.actorRollData.mod.damage.value,
          img: options.spellRollData.img ?? false,
       };
@@ -108,7 +108,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          results.extraSuccessesRemaining = results.extraSuccesses;
 
          // Adjust aspect results
-         this.parameters.aspects.forEach((aspect, idx) => {
+         this.parameters.aspect.forEach((aspect, idx) => {
             // Damage
             if (aspect.isDamage) {
                results.damage = results.damage ? results.damage + aspect.initialValue : aspect.initialValue;
@@ -153,10 +153,10 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          // If there is only one scaling
          if (scalingCount === 1 &&
             results.extraSuccesses &&
-            results.extraSuccesses >= this.parameters.aspects[scalingIdx].cost) {
+            results.extraSuccesses >= this.parameters.aspect[scalingIdx].cost) {
 
             // Maximize the aspect
-            const aspect = this.parameters.aspects[scalingIdx];
+            const aspect = this.parameters.aspect[scalingIdx];
             const delta = Math.floor(results.extraSuccesses / aspect.cost);
             const cost = delta * aspect.cost;
             aspect.currentValue += delta;

@@ -16,7 +16,7 @@
    <ItemCheckChatLabel />
    <div class="info-container">
       <div class="info">
-         <SpellAspectTags aspects={chatContext.aspects} />
+         <SpellAspectTags aspects={chatContext.aspect} />
       </div>
 
       <div class="info">

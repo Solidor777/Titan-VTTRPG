@@ -17,7 +17,7 @@
    let filteredAspects = [];
    $: {
       filteredAspects = [];
-      $document.system.customAspects.forEach((aspect, idx) => {
+      $document.system.customAspect.forEach((aspect, idx) => {
          if (aspect.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1) {
             filteredAspects.push(idx);
          }
@@ -31,7 +31,7 @@
 
    <!--Scrolling Aspects list-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.customAspects}>
+      <ScrollingContainer bind:scrollTop={application.scrollTop.customAspect}>
          <ol>
             <!--Each Aspect-->
             {#each filteredAspects as idx}

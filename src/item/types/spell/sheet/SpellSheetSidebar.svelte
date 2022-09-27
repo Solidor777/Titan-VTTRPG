@@ -20,7 +20,7 @@
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
          <ol>
-            {#each $document.aspects as aspect}
+            {#each $document.aspect as aspect}
                <!--Each Aspect-->
                <li>
                   <!--Label-->

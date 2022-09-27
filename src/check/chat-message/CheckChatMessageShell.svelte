@@ -14,8 +14,8 @@
    const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
    const isOwner = $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
-   let scalingAspects = chatContext.parameters.aspects
-      ? chatContext.parameters.aspects.filter((aspect) => {
+   let scalingAspects = chatContext.parameters.aspect
+      ? chatContext.parameters.aspect.filter((aspect) => {
            return aspect.scaling;
         })
       : false;
@@ -26,9 +26,9 @@
       <CheckChatLabel />
    </div>
 
-   {#if chatContext.parameters.aspects && chatContext.parameters.aspects.length > 0}
+   {#if chatContext.parameters.aspect && chatContext.parameters.aspect.length > 0}
       <div class="info top-margin">
-         <SpellAspectTags aspects={chatContext.parameters.aspects} />
+         <SpellAspectTags aspects={chatContext.parameters.aspect} />
       </div>
    {/if}
 
