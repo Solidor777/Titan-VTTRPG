@@ -70,7 +70,7 @@
       @include flex-column;
       @include flex-group-center;
       font-weight: bold;
-      font-size: 1rem;
+      @include font-size-normal;
       width: 100%;
       padding: 0.5rem;
       background: var(--label-background-color);
@@ -80,8 +80,7 @@
          @include flex-group-center;
          width: 100%;
          font-weight: bold;
-         font-size: 1.2rem;
-
+         @include font-size-large;
          &.succeeded {
             color: var(--succeeded-color-dark);
          }

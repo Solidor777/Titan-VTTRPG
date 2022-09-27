@@ -56,7 +56,7 @@
       width: 100%;
       align-items: center;
       justify-content: space-between;
-      font-size: 1rem;
+      @include font-size-normal;
       box-sizing: border-box;
 
       .button {
@@ -97,7 +97,7 @@
             @include flex-row;
             @include flex-group-center;
             height: 100%;
-            font-size: 1rem;
+            @include font-size-normal;
 
             &.final {
                font-weight: bold;

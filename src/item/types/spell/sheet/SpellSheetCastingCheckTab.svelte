@@ -117,22 +117,27 @@
       </div>
    </div>
 
-   <!--Aspects-->
-   <div class="aspect-costs">
-      <div class="header">
-         {localize("aspectCosts")}
-      </div>
-
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.castingCheck}>
-         <div class="costs-container">
-            {#each $document.aspect as aspect}
-               <div class="cost">
-                  <StatTag label={aspect.label} value={aspect.cost} />
-               </div>
-            {/each}
+   <!--Aspect Costs-->
+   {#if $document.aspect && $document.aspect.length > 0}
+      <div class="aspect-costs" transition:slide|local>
+         <!--Header-->
+         <div class="header">
+            {localize("aspectCosts")}
          </div>
-      </ScrollingContainer>
-   </div>
+
+         <ScrollingContainer bind:scrollTop={$appState.scrollTop.castingCheck}>
+            <!--Container-->
+            <div class="costs-container" transition:slide|local>
+               <!--Each Cost-->
+               {#each $document.aspect as aspect}
+                  <div class="cost">
+                     <StatTag label={aspect.label} value={aspect.cost} />
+                  </div>
+               {/each}
+            </div>
+         </ScrollingContainer>
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -180,7 +185,7 @@
                height: 100%;
                font-weight: bold;
                margin-right: 0.25rem;
-               font-size: 0.9rem;
+               @include font-size-small;
             }
 
             .input {
@@ -223,12 +228,13 @@
 
          .costs-container {
             @include flex-row;
-            @include flex-group-left;
+            @include flex-group-center;
             width: 100%;
             flex-wrap: wrap;
 
             .cost {
                @include tag-padding;
+               @include font-size-small;
             }
          }
       }

@@ -65,7 +65,7 @@
 
    .item-sheet {
       @include flex-column;
-      font-size: 1rem;
+      @include font-size-normal;
       display: flex;
       flex: 1;
 

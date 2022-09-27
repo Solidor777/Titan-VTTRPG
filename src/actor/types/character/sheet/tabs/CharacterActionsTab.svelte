@@ -65,7 +65,7 @@
                @include flex-row;
                @include flex-group-center;
                font-weight: bold;
-               font-size: 1rem;
+               @include font-size-normal;
                margin-bottom: 0.25rem;
             }
          }

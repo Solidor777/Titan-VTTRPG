@@ -193,7 +193,7 @@
             @include flex-group-center;
             width: 100%;
             margin: 0 0.5rem;
-            --font-size: 1.2rem;
+            --input-font-size: var(--font-size-large);
             --input-height: 2rem;
          }
       }
@@ -205,7 +205,7 @@
          @include panel-3;
          width: calc(100% - 2rem);
          padding: 0.25rem;
-         font-size: 0.9rem;
+         @include font-size-small;
 
          .row {
             @include flex-row;
@@ -238,7 +238,7 @@
                   @include flex-row;
                   @include flex-group-center;
                   margin-left: 0.5rem;
-                  font-size: 1rem;
+                  @include font-size-normal;
 
                   &.number {
                      width: 2rem;
@@ -261,7 +261,7 @@
                   @include flex-row;
                   @include flex-group-center;
                   font-weight: bold;
-                  font-size: 1rem;
+                  @include font-size-normal;
                }
 
                .edit-traits-button {

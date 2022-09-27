@@ -278,7 +278,7 @@
             .label {
                @include flex-row;
                @include flex-group-left;
-               font-size: 1rem;
+               @include font-size-normal;
                font-weight: bold;
                width: 100%;
 
@@ -349,7 +349,7 @@
                   .available {
                      font-family: var(--font-family);
                      font-weight: bold;
-                     font-size: 1.1rem;
+                     @include font-size-normal;
                      display: flex;
                      margin-right: 0.25rem;
                   }
@@ -374,7 +374,7 @@
                   height: 100%;
 
                   .label {
-                     font-size: 1rem;
+                     @include font-size-normal;
                      font-weight: bold;
                      @include flex-row;
                      width: 100%;
@@ -414,7 +414,7 @@
 
                   .label {
                      @include flex-row;
-                     font-size: 1rem;
+                     @include font-size-normal;
                      font-weight: bold;
                      width: 100%;
 

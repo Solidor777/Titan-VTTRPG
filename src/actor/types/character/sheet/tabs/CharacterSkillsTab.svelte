@@ -111,7 +111,7 @@
       position: relative;
       width: 100%;
       height: 100%;
-      font-size: 1rem;
+      @include font-size-normal;
 
       .scrolling-content {
          @include flex-column;

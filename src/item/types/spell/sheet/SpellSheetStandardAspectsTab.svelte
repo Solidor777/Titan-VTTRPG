@@ -231,8 +231,8 @@
                   padding: 0.5rem;
                   width: calc(100% - 30px);
                   background: var(--label-background-color);
-                  font-size: 0.9rem;
-                  --font-size: 0.9rem;
+                  @include font-size-small;
+                  --input-font-size: var(--font-size-small);
 
                   .row {
                      @include flex-row;

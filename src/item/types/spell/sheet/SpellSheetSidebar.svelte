@@ -142,7 +142,7 @@
                .aspect-label {
                   @include flex-row;
                   @include flex-group-center;
-                  font-size: 1rem;
+                  @include font-size-normal;
                   font-weight: bold;
                }
 
@@ -155,7 +155,7 @@
 
                   .aspect-option {
                      @include border;
-                     font-size: 0.9rem;
+                     @include font-size-small;
                      font-weight: bold;
                      margin: 0.25rem;
                      padding: 0.25rem;
@@ -168,7 +168,7 @@
                   margin-top: 0.5rem;
 
                   .resistance-check-label {
-                     font-size: 0.9rem;
+                     @include font-size-small;
                      font-weight: bold;
                   }
 

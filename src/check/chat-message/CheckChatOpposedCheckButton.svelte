@@ -52,7 +52,7 @@
       @include flex-row;
       width: 100%;
       --button-border-radius: 10px;
-      font-size: 1rem;
+      @include font-size-normal;
 
       &.body {
          --button-background-color: var(--body-color-bright);

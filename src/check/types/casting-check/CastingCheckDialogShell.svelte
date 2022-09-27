@@ -209,7 +209,7 @@
    .casting-check-dialog {
       @include flex-column;
       justify-items: flex-end;
-      font-size: 1rem;
+      @include font-size-normal;
 
       .row {
          @include flex-row;
@@ -245,7 +245,7 @@
             @include flex-group-center;
             margin-top: 0.5rem;
             font-weight: bold;
-            font-size: 1.1rem;
+            @include font-size-normal;
             height: 100%;
             width: 100%;
             margin-right: 0.5rem;
@@ -253,7 +253,7 @@
 
          button {
             margin-top: 0.5rem;
-            font-size: 1rem;
+            @include font-size-normal;
          }
       }
 

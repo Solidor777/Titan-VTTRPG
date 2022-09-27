@@ -31,7 +31,7 @@
          @include flex-group-center;
          margin-left: 0.5rem;
          height: 100%;
-         font-size: 1.2rem;
+         @include font-size-large;
          font-weight: bold;
       }
    }

@@ -48,7 +48,7 @@
          @include border;
          @include flex-row;
          @include flex-group-center;
-         font-size: 1.2rem;
+         @include font-size-large;
          font-weight: bold;
          padding: 0.25rem;
          height: 2.5rem;

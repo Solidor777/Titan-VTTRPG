@@ -10,7 +10,7 @@
       @include flex-row;
       @include flex-space-evenly;
       flex-wrap: wrap;
-      font-size: 0.9rem;
+      @include font-size-small;
       font-weight: bold;
       width: 100%;
    }

@@ -48,7 +48,7 @@
    .button {
       @include flex-row;
       width: 100%;
-      font-size: 1rem;
+      @include font-size-normal;
 
       &.reflexes {
          --button-background-color: var(--reflexes-color-bright);

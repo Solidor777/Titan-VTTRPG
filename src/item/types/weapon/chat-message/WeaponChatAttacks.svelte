@@ -69,7 +69,7 @@
       list-style: none;
       margin: 0 0 0 0;
       padding: 0;
-      font-size: 0.9rem;
+      @include font-size-small;
 
       li {
          @include flex-column;
@@ -94,7 +94,7 @@
             }
 
             .attack-name {
-               font-size: 1rem;
+               @include font-size-normal;
                font-weight: bold;
             }
 

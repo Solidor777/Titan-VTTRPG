@@ -135,7 +135,7 @@
       @include border;
       @include z-index-app;
       width: 100%;
-      font-size: 1rem;
+      @include font-size-normal;
       padding: 0.25rem;
       background: var(--label-background-color);
 
@@ -173,8 +173,8 @@
          margin-top: 0.5rem;
          width: 100%;
          padding: 0.5rem 0.5rem 0 0.5rem;
-         font-size: 0.9rem;
-         --font-size: 0.9rem;
+         @include font-size-small;
+         --input-font-size: var(--font-size-small);
          height: 2rem;
 
          .stat {
@@ -198,7 +198,7 @@
                @include flex-row;
                @include flex-group-center;
 
-               &.castingCheckbox {
+               &.checkbox {
                   margin-left: 0.25rem;
                }
 

@@ -37,7 +37,7 @@
    @import "../../../../Styles/Mixins.scss";
 
    .toggle {
-      --button-font-size: 0.9rem;
+      --button-font-size: var(--font-size-small);
       --button-padding: 0 0.25rem;
       --button-border-radius: 10px;
       margin: 0.25rem;

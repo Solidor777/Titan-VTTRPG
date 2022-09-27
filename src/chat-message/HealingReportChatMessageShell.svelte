@@ -57,7 +57,7 @@
       @include flex-column;
       @include flex-group-top;
       width: 100%;
-      font-size: 1rem;
+      @include font-size-normal;
 
       .header {
          @include border;
@@ -71,11 +71,11 @@
          }
 
          .label {
-            font-size: 1.25rem;
+            @include font-size-large;
          }
 
          .name {
-            font-size: 1.1rem;
+            @include font-size-normal;
          }
       }
 

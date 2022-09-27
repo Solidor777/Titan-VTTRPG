@@ -11,6 +11,6 @@
       flex-wrap: wrap;
       width: 100%;
       padding: 0 0.5rem 0 0.5rem;
-      font-size: 0.9rem;
+      @include font-size-small;
    }
 </style>

@@ -65,7 +65,7 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         font-size: 1rem;
+         @include font-size-normal;
 
          &.final {
             font-weight: bold;

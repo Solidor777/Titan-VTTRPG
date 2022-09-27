@@ -100,7 +100,7 @@
             height: 2.5rem;
             margin-bottom: 0.5rem;
             padding: 0.25rem;
-            font-size: 1rem;
+            @include font-size-normal;
             font-weight: bold;
             page-break-inside: avoid;
 
@@ -131,7 +131,7 @@
          margin-top: 0.25rem;
 
          button {
-            font-size: 1rem;
+            @include font-size-normal;
          }
       }
    }

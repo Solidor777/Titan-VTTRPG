@@ -333,3 +333,19 @@
 @mixin tag-padding {
   margin: 0.5rem 0.25rem 0 0.25rem;
 }
+
+@mixin font-size-normal {
+  font-size: var(--font-size-normal);
+}
+
+@mixin font-size-small {
+  font-size: var(--font-size-small);
+}
+
+@mixin font-size-large {
+  font-size: var(--font-size-large);
+}
+
+@mixin font-size-extra-large {
+  font-size: var(--font-size-extra-large);
+}

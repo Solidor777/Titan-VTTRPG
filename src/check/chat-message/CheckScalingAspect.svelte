@@ -147,7 +147,7 @@
       width: 100%;
       min-height: 2rem;
       height: 100%;
-      font-size: 0.9rem;
+      @include font-size-small;
 
       .label {
          @include flex-column;

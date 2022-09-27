@@ -101,7 +101,7 @@
       }
 
       .fas {
-         font-size: 1.5rem;
+         @include font-size-extra-large;
       }
    }
 </style>

@@ -72,7 +72,7 @@
          width: 100%;
          height: 100%;
          padding-top: 0.25rem;
-         font-size: 1rem;
+         @include font-size-normal;
 
          .spacer {
             width: 5rem;
@@ -83,7 +83,7 @@
             @include flex-group-center;
             width: 100%;
             height: 100%;
-            font-size: 1rem;
+            @include font-size-normal;
             font-weight: bold;
          }
 

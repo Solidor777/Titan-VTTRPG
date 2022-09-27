@@ -47,6 +47,6 @@
       @include flex-row;
       width: 100%;
       --button-border-radius: 10px;
-      font-size: 1rem;
+      @include font-size-normal;
    }
 </style>

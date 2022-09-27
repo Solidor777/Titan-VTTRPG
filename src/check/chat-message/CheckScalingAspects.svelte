@@ -16,7 +16,7 @@
 
 <style lang="scss">
    @import "../../styles/mixins.scss";
-   .aspect {
+   .aspects {
       @include flex-column;
       @include flex-group-top;
       @include border;
@@ -27,7 +27,7 @@
       .aspect {
          @include flex-row;
          @include flex-group-center;
-         font-size: 1rem;
+         @include font-size-normal;
          width: 100%;
 
          &:not(:first-child) {

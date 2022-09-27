@@ -93,7 +93,7 @@
             padding: 0.5rem;
             width: 100%;
             font-weight: bold;
-            font-size: 1rem;
+            @include font-size-normal;
          }
 
          .tags {

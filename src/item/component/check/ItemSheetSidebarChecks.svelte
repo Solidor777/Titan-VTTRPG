@@ -212,7 +212,7 @@
                .label {
                   @include flex-row;
                   @include flex-group-center;
-                  font-size: 0.9rem;
+                  @include font-size-small;
                   font-weight: bold;
                }
 

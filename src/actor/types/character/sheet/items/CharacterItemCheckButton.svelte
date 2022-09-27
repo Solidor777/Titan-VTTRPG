@@ -40,7 +40,7 @@
          height: 100%;
          line-height: normal;
          padding: 0.25rem;
-         font-size: 1rem;
+         @include font-size-normal;
 
          i {
             margin-right: 0.5rem;

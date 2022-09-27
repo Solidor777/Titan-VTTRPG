@@ -48,7 +48,7 @@
             @include flex-row;
             @include flex-group-center;
             height: 100%;
-            font-size: 1.2rem;
+            @include font-size-large;
             font-weight: bold;
          }
 

@@ -72,7 +72,7 @@
          @include flex-row;
          @include flex-space-between;
          width: 100%;
-         font-size: 1rem;
+         @include font-size-normal;
          font-weight: bold;
 
          .item-controls {

@@ -21,12 +21,12 @@
       @include border-bottom;
       @include panel-1;
       width: 100%;
-      font-size: 1rem;
+      @include font-size-normal;
       font-weight: bold;
       padding: 0.25rem;
 
       .input {
-         font-size: 1rem;
+         @include font-size-normal;
          margin-left: 0.5rem;
       }
    }
