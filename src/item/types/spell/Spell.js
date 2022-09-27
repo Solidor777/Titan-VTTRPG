@@ -334,6 +334,11 @@ export default class TitanSpell extends TitanTypeComponent {
    onCreate() {
       if (this.parent.system.tradition === "any") {
          this.parent.system.tradition = localize("any");
+         this.parent.update({
+            system: {
+               tradition: this.parent.system.tradition
+            }
+         });
       }
    }
 }
