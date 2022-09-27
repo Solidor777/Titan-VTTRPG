@@ -65,6 +65,7 @@
          button {
             --button-border-radius: 5px;
             --button-line-height: var(--tab-line-height);
+            --button-font-size: var(--tab-font-size);
             @include button;
             position: relative;
             overflow: hidden;

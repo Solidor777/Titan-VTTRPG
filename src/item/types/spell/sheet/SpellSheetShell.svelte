@@ -12,6 +12,7 @@
    import SpellSheetHeader from "./SpellSheetHeader.svelte";
    import SpellSheetCastingCheckTab from "./SpellSheetCastingCheckTab.svelte";
    import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
+   import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -32,6 +33,11 @@
          label: localize("standardAspects"),
          id: "standardAspects",
          component: SpellSheetStandardAspectsTab,
+      },
+      {
+         label: localize("customAspects"),
+         id: "customAspects",
+         component: SpellSheetCustomAspectsTab,
       },
       {
          label: localize("castingCheck"),
@@ -89,6 +95,7 @@
 
          .tabs {
             @include flex-row;
+            --tab-font-size: var(--font-size-small);
             margin-top: 0.5rem;
             width: 100%;
          }
