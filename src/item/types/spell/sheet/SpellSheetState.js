@@ -5,7 +5,11 @@ export default function createSpellSheetState() {
    const { set, update, subscribe } = writable({
       activeTab: 'description',
       isExpanded: {
-         customAspects: []
+         checks: [],
+         customAspects: [],
+         sidebar: {
+            check: []
+         }
       },
       scrollTop: {
          sidebar: 0,
@@ -17,8 +21,25 @@ export default function createSpellSheetState() {
       filter: {
          standardAspects: "",
          customAspects: "",
+         checks: ""
       }
    });
+
+   function addCheck() {
+      update((state) => {
+         state.isExpanded.checks.push(true);
+         state.isExpanded.sidebar.check.push(true);
+         return state;
+      });
+   }
+
+   function removeCheck(idx) {
+      update((state) => {
+         state.isExpanded.checks.splice(idx, 1);
+         state.isExpanded.sidebar.check.splice(idx, 1);
+         return state;
+      });
+   }
 
    function addCustomAspect() {
       update((state) => {
@@ -39,6 +60,8 @@ export default function createSpellSheetState() {
       update,
       subscribe,
       addCustomAspect,
-      removeCustomAspect
+      removeCustomAspect,
+      addCheck,
+      removeCheck,
    };
 }

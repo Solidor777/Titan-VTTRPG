@@ -375,6 +375,7 @@
   "LOCAL.addDescription.label": "Add Description",
   "LOCAL.addAttackDescription.label": "Add Attack Notes",
   "LOCAL.addTraits.label": "Add Traits",
+  "LOCAL.castingChecks.label": "Casting Checks",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

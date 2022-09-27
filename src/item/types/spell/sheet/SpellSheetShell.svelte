@@ -11,6 +11,7 @@
    import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
    import SpellSheetSidebar from "./SpellSheetSidebar.svelte";
    import SpellSheetHeader from "./SpellSheetHeader.svelte";
+   import SpellSheetCastingCheckTab from "./SpellSheetCastingCheckTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -28,14 +29,14 @@
          component: ItemSheetDescriptionTab,
       },
       {
-         label: localize("casting-checks"),
-         id: "casting-checks",
-         component: ItemSheetChecksTab,
+         label: localize("castingCheck"),
+         id: "castingCheck",
+         component: SpellSheetCastingCheckTab,
       },
       {
-         label: localize("rulesElements"),
-         id: "rulesElements",
-         component: ItemSheetRulesElementsTab,
+         label: localize("checks"),
+         id: "checks",
+         component: ItemSheetChecksTab,
       },
    ];
 </script>
