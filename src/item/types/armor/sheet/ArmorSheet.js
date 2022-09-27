@@ -26,14 +26,10 @@ export default class TitanArmorSheet extends TitanItemSheet {
       this.reactive.state = createArmorSheetState();
    }
 
-   async addAttack() {
-      this.reactive.state.addAttack();
-      return await this.reactive.document.weapon.addAttack();
-   }
-
-   async removeAttack(idx) {
-      this.reactive.state.removeAttack(idx);
-      return await this.reactive.document.weapon.removeAttack(idx);
+   editArmorTraits() {
+      const dialog = new ArmorEditTraitsDialog(this.reactive.document);
+      dialog.render(true);
+      return;
    }
 
    async addCheck() {
@@ -46,9 +42,12 @@ export default class TitanArmorSheet extends TitanItemSheet {
       return await this.reactive.document.typeComponent.removeCheck(idx);
    }
 
-   editArmorTraits() {
-      const dialog = new ArmorEditTraitsDialog(this.reactive.document);
-      dialog.render(true);
-      return;
+   async addRulesElement() {
+      return await this.reactive.document.typeComponent.addRulesElement();
    }
+
+   async removeRulesElement(idx) {
+      return await this.reactive.document.typeComponent.removeRulesElement(idx);
+   }
+
 }

@@ -1,32 +1,28 @@
-<svelte:options accessors={true} />
-
 <script>
    import { getContext } from "svelte";
+   import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
 
-   // Document reference
+   // Application statee reference
+   const appState = getContext("ApplicationStateStore");
    const document = getContext("DocumentStore");
-
-   // Application refernce
-   const application = getContext("external").application;
 </script>
 
 <div class="sidebar">
    <!--Header-->
    <div class="header {$document.system.check.attribute}">
-      {`${localize($document.system.check.attribute)} (${localize($document.system.check.skill)}) ${
-         $document.system.check.difficulty
-      }:${$document.system.check.complexity}`}
+      {localize($document.system.check.attribute)} ({localize($document.system.check.skill)}) {$document.system.check
+         .difficulty}:{$document.system.check.complexity}
    </div>
 
    <!--Aspects List-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.sidebar}>
-         <ol class="aspects-list">
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+         <ol>
             {#each $document.aspects as aspect}
                <!--Each Aspect-->
-               <li class="aspect">
+               <li>
                   <!--Label-->
                   <div class="aspect-label">
                      {aspect.label}
@@ -91,12 +87,9 @@
       @include flex-column;
       @include flex-group-top;
       @include border;
-      @include z-index-app;
-      box-sizing: border-box;
-      width: 13rem;
-      min-width: 13rem;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
+      @include panel-2;
+      width: 100%;
+      height: 100%;
 
       .header {
          @include flex-row;
@@ -127,7 +120,7 @@
          height: 100%;
          margin-top: 0.5rem;
 
-         .aspects-list {
+         ol {
             @include flex-column;
             @include flex-group-top;
             list-style: none;
@@ -135,7 +128,7 @@
             margin: 0 0 0 0;
             width: 100%;
 
-            .aspect {
+            li {
                @include flex-column;
                @include flex-group-top;
                width: 100%;

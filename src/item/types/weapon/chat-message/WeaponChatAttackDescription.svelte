@@ -6,7 +6,7 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="description">Temporary Attack Description</div>
+<div class="description">Temporary Attack Notes</div>
 
 <style lang="scss">
    @import "../../../../styles/mixins.scss";

@@ -58,7 +58,7 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Description-->
             <div class="item-expandable-content">
-               <CharacterItemDescription description={"Temporary Attack Description"} />
+               <CharacterItemDescription description={"Temporary Attack Notes"} />
             </div>
 
             <!--Attacks list-->

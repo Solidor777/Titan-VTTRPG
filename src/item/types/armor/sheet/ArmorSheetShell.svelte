@@ -41,7 +41,7 @@
 </script>
 
 <ApplicationShell bind:elementRoot>
-   <div class="weapon-sheet">
+   <div class="item-sheet">
       <!--Header-->
       <div class="header">
          <ArmorSheetHeader />
@@ -63,7 +63,7 @@
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .weapon-sheet {
+   .item-sheet {
       @include flex-column;
       font-size: 1rem;
       display: flex;

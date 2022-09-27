@@ -29,12 +29,12 @@
          <div class="description">
             <!--Header-->
             <h3>
-               {localize("attackDescription")}
+               {localize("attackNotes")}
             </h3>
 
             <!--Body-->
             <div class="body">
-               <DocumentEditorInput fieldName={"system.attackDescription"} />
+               <DocumentEditorInput fieldName={"system.attackNotes"} />
             </div>
          </div>
       </div>

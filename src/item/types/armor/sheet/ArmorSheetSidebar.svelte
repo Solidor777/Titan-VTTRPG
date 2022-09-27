@@ -8,7 +8,6 @@
    // Application statee reference
    const appState = getContext("ApplicationStateStore");
    const document = getContext("DocumentStore");
-   const application = getContext("external").application;
 </script>
 
 <div class="sidebar">

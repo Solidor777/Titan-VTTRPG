@@ -5,91 +5,56 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
-   import SpellSheetDescriptionTab from "./SpellSheetDescriptionTab.svelte";
-   import SpellSheetCastingCheckTab from "./SpellSheetCastingCheckTab.svelte";
-   import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
-   import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
+   import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
+   import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
+   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
    import SpellSheetSidebar from "./SpellSheetSidebar.svelte";
+   import SpellSheetHeader from "./SpellSheetHeader.svelte";
 
-   // Setup
+   // Setup context variables
    export let elementRoot;
    export let documentStore;
+   export let applicationStateStore;
    setContext("DocumentStore", documentStore);
-   const document = getContext("DocumentStore");
-   const application = getContext("external").application;
+   setContext("ApplicationStateStore", applicationStateStore);
+   const appState = getContext("ApplicationStateStore");
 
    // Tabs
    const tabs = [
       {
          label: localize("description"),
          id: "description",
-         component: SpellSheetDescriptionTab,
+         component: ItemSheetDescriptionTab,
       },
       {
-         label: localize("standardAspects"),
-         id: "standardAspects",
-         component: SpellSheetStandardAspectsTab,
+         label: localize("checks"),
+         id: "checks",
+         component: ItemSheetChecksTab,
       },
       {
-         label: localize("customAspects"),
-         id: "customAspects",
-         component: SpellSheetCustomAspectsTab,
-      },
-      {
-         label: localize("castingCheck"),
-         id: "castingCheck",
-         component: SpellSheetCastingCheckTab,
+         label: localize("rulesElements"),
+         id: "rulesElements",
+         component: ItemSheetRulesElementsTab,
       },
    ];
-   application.activeTab = application.activeTab ?? "description";
 </script>
 
 <ApplicationShell bind:elementRoot>
-   <div class="spell-sheet">
+   <div class="item-sheet">
       <!--Header-->
       <div class="header">
-         <div class="row">
-            <div class="label">
-               <!--Item portrait-->
-               <div class="portrait">
-                  <DocumentImagePicker path={"img"} alt={"item portrait"} />
-               </div>
-               <!--Item name-->
-               <div class="name">
-                  <DocumentName />
-               </div>
-            </div>
-
-            <div class="stats">
-               <!--Rarity-->
-               <div class="stat-label">
-                  {localize("rarity")}
-               </div>
-               <div class="stat-input">
-                  <DocumentRaritySelect bind:value={$document.system.rarity} />
-               </div>
-
-               <!--Tradition-->
-               <div class="stat-label">
-                  {localize("tradition")}
-               </div>
-               <div class="stat-input">
-                  <DocumentTextInput bind:value={$document.system.tradition} />
-               </div>
-            </div>
-         </div>
+         <SpellSheetHeader />
       </div>
 
       <!--Content-->
-      <div class="content">
-         <SpellSheetSidebar />
+      <div class="body">
+         <!--Sidebar-->
+         <div class="sidebar"><SpellSheetSidebar /></div>
+
+         <!--Tabs-->
          <div class="tabs">
-            <Tabs {tabs} bind:activeTab={application.activeTab} />
+            <Tabs {tabs} bind:activeTab={$appState.activeTab} />
          </div>
       </div>
    </div>
@@ -98,64 +63,28 @@
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .spell-sheet {
+   .item-sheet {
       @include flex-column;
       font-size: 1rem;
       display: flex;
       flex: 1;
 
-      .header {
-         @include border;
-         @include flex-column;
-         align-items: center;
-         justify-content: space-between;
-         width: 100%;
-         padding: 0.5rem;
-
-         .row {
-            @include flex-row;
-            @include flex-space-between;
-            width: 100%;
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               width: 100%;
-
-               .portrait {
-                  width: 5rem;
-                  --border-style: none;
-               }
-            }
-
-            .stats {
-               @include grid(2);
-               width: 100%;
-               box-sizing: border-box;
-               margin-left: 0.5rem;
-
-               .stat-label {
-                  @include flex-row;
-                  @include flex-group-right;
-                  font-weight: bold;
-               }
-            }
-         }
-      }
-
-      .content {
+      .body {
          @include flex-row;
          height: 100%;
          width: 100%;
 
+         .sidebar {
+            @include flex-row;
+            width: 13rem;
+            min-width: 13rem;
+            margin: 0.5rem 0.5rem 0 0;
+         }
+
          .tabs {
-            @include flex-column;
-            @include flex-group-top;
-            @include border;
-            box-sizing: border-box;
+            @include flex-row;
+            margin-top: 0.5rem;
             width: 100%;
-            margin: 0.5rem 0 0 0.5rem;
-            padding: 0.5rem;
          }
       }
    }

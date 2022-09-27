@@ -65,7 +65,7 @@
 
             <!--Attack description-->
             <div class="item-expandable-content">
-               <CharacterItemDescription description={"Temporary Attack Description"} />
+               <CharacterItemDescription description={"Temporary Attack Notes"} />
             </div>
 
             <!--Footer-->

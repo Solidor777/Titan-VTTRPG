@@ -14,7 +14,6 @@ export default function createArmorSheetState() {
       scrollTop: {
          sidebar: 0,
          description: 0,
-         traits: 0,
          checks: 0,
          rulesElements: 0,
       },

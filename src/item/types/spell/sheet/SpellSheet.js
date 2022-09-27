@@ -1,5 +1,6 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import SpellSheetShell from './SpellSheetShell.svelte';
+import createSpellSheetState from './SpellSheetState';
 
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
@@ -19,11 +20,18 @@ export default class TitanSpellSheet extends TitanItemSheet {
       });
    }
 
-   // Scroll State
-   scrollTop = {
-      sidebar: 0,
-      standardAspects: 0,
-      customAspects: 0,
-      castingCheck: 0,
-   };
+   constructor(object) {
+      super(object);
+      this.reactive.state = createSpellSheetState();
+   }
+
+   async addCustomAspect() {
+      this.reactive.state.addCustomAspect();
+      return await this.reactive.document.spell.addCustomAspect();
+   }
+
+   async removeCustomAspect(idx) {
+      this.reactive.state.removeCustomAspect(idx);
+      return await this.reactive.document.spell.removeCustomAspect(idx);
+   }
 }
