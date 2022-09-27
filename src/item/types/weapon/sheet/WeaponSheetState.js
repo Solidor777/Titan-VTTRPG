@@ -11,10 +11,6 @@ export default function createWeaponSheetState() {
             attack: [],
             check: [],
          },
-         description: {
-            description: true,
-            attackDescription: true
-         },
       },
       scrollTop: {
          sidebar: 0,

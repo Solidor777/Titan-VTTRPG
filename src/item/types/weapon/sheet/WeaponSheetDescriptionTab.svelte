@@ -20,26 +20,22 @@
             </h3>
 
             <!--Body-->
-            {#if $appState.isExpanded.description.description}
-               <div class="body">
-                  <DocumentEditorInput fieldName={"system.description"} />
-               </div>
-            {/if}
+            <div class="body">
+               <DocumentEditorInput fieldName={"system.description"} />
+            </div>
          </div>
 
          <!--Description-->
          <div class="description">
             <!--Header-->
-            <h3 class="header">
+            <h3>
                {localize("attackDescription")}
             </h3>
 
             <!--Body-->
-            {#if $appState.isExpanded.description.attackDescription}
-               <div class="body">
-                  <DocumentEditorInput fieldName={"system.attackDescription"} />
-               </div>
-            {/if}
+            <div class="body">
+               <DocumentEditorInput fieldName={"system.attackDescription"} />
+            </div>
          </div>
       </div>
    </ScrollingContainer>
@@ -72,10 +68,11 @@
                margin-top: 0.5rem;
             }
 
-            .header {
+            h3 {
                @include flex-row;
                @include flex-group-left;
                width: 100%;
+               margin-bottom: 0;
             }
 
             .body {

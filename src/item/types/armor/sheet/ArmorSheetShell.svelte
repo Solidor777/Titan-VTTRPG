@@ -9,8 +9,8 @@
    import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
    import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
    import ArmorSheetHeader from "./ArmorSheetHeader.svelte";
-   import ArmorSheetDescriptionTab from "./ArmorSheetDescriptionTab.svelte";
    import ArmorSheetSidebar from "./ArmorSheetSidebar.svelte";
+   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -25,7 +25,7 @@
       {
          label: localize("description"),
          id: "description",
-         component: ArmorSheetDescriptionTab,
+         component: ItemSheetDescriptionTab,
       },
       {
          label: localize("checks"),
