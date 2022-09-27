@@ -28,8 +28,8 @@
          component: ItemSheetDescriptionTab,
       },
       {
-         label: localize("checks"),
-         id: "checks",
+         label: localize("casting-checks"),
+         id: "casting-checks",
          component: ItemSheetChecksTab,
       },
       {

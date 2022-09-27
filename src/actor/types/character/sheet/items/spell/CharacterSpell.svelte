@@ -41,7 +41,7 @@
             <!--Cast Spell-->
             <div>
                <CharacterCheckButtonSmall
-                  check={item.system.check}
+                  check={item.system.castingCheck}
                   on:click={() => {
                      application.rollCastingCheck(id);
                   }}
@@ -70,7 +70,7 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Check Data-->
             <div class="item-expandable-content">
-               <CharacterCheckLabelLong check={item.system.check} />
+               <CharacterCheckLabelLong check={item.system.castingCheck} />
             </div>
 
             {#if item.aspects}

@@ -5,7 +5,6 @@
       "npc"
     ],
     "templates": {
-      "typeComponent": null,
       "character": {
         "attribute": {
           "body": {
@@ -308,7 +307,6 @@
     },
     "player": {
       "templates": [
-        "base",
         "character"
       ],
       "exp": {
@@ -318,29 +316,45 @@
     },
     "npc": {
       "templates": [
-        "base",
         "character"
       ]
     }
   },
   "Item": {
     "types": [
-      "armor",
-      "weapon",
-      "spell",
       "ability",
-      "effect"
+      "armor",
+      "effect",
+      "spell",
+      "weapon"
     ],
     "templates": {
+      "base": {
+        "description": "",
+        "check": []
+      },
       "object": {
-        "check": [],
         "rarity": "common",
         "rulesElement": [],
         "value": 0
       }
     },
+    "ability": {
+      "templates": [
+        "base"
+      ],
+      "description": "",
+      "expCost": 0,
+      "rarity": "common",
+      "requirements": "",
+      "rulesElement": [],
+      "action": false,
+      "reaction": false,
+      "passive": false
+    },
     "armor": {
       "templates": [
+        "base",
         "object"
       ],
       "armor": 2,
@@ -348,21 +362,20 @@
       "equipped": false,
       "trait": []
     },
-    "weapon": {
+    "effect": {
       "templates": [
-        "object"
+        "base"
       ],
-      "attack": [],
-      "attackNotes": "",
-      "description": "",
-      "equipped": false,
-      "multiAttack": false
+      "rulesElement": [],
+      "effectId": ""
     },
     "spell": {
-      "description": "",
+      "templates": [
+        "base"
+      ],
       "rarity": "common",
       "tradition": "any",
-      "check": {
+      "castingCheck": {
         "skill": "arcana",
         "attribute": "mind",
         "difficulty": 4,
@@ -561,21 +574,16 @@
       },
       "customAspects": []
     },
-    "ability": {
-      "check": [],
+    "weapon": {
+      "templates": [
+        "base",
+        "object"
+      ],
+      "attack": [],
+      "attackNotes": "",
       "description": "",
-      "expCost": 0,
-      "rarity": "common",
-      "requirements": "",
-      "rulesElement": [],
-      "action": false,
-      "reaction": false,
-      "passive": false
-    },
-    "effect": {
-      "description": "",
-      "rulesElement": [],
-      "effectId": ""
+      "equipped": false,
+      "multiAttack": false
     }
   }
 }

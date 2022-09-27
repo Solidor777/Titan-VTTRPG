@@ -1,3 +1,5 @@
+import { localize } from '~/helpers/Utility.js';
+import { v4 as uuidv4 } from 'uuid';
 import TitanAbility from './types/ability/Ability.js';
 import TitanArmor from './types/armor/Armor.js';
 import TitanEffect from './types/effect/Effect.js';
@@ -113,10 +115,6 @@ export default class TitanItem extends Item {
       );
    }
 
-   async addEffect() {
-
-   }
-
    getRollData() {
       let rollData = super.getRollData();
       rollData.name = this.name;
@@ -126,5 +124,41 @@ export default class TitanItem extends Item {
       }
 
       return rollData;
+   }
+
+   addCheck() {
+      this.system.check.push(this.getCheckTemplate());
+      return this.update({
+         system: this.system
+      });
+   }
+
+   removeCheck(idx) {
+      this.system.check.splice(idx, 1);
+      return this.update({
+         system: this.system
+      });
+   }
+
+   getCheckTemplate() {
+      return {
+         label: localize('check'),
+         attribute: 'body',
+         skill: 'athletics',
+         difficulty: 4,
+         complexity: 1,
+         resolveCost: 0,
+         isDamage: false,
+         isHealing: false,
+         initialValue: 1,
+         scaling: true,
+         resistanceCheck: 'none',
+         opposedCheck: {
+            enabled: false,
+            attribute: 'body',
+            skill: 'athletics'
+         },
+         uuid: uuidv4()
+      };
    }
 }

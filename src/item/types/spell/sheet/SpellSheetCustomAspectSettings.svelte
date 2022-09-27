@@ -198,11 +198,11 @@
                @include flex-row;
                @include flex-group-center;
 
-               &.checkbox {
+               &.castingCheckbox {
                   margin-left: 0.25rem;
                }
 
-               &:not(.checkbox) {
+               &:not(.castingCheckbox) {
                   margin-left: 0.5rem;
                }
 

@@ -18,9 +18,9 @@
    const difficultyOptions = [2, 3, 4, 5, 6];
 </script>
 
-<div class="check-tab">
+<div class="casting-check-tab">
    <!--check Settings-->
-   <div class="check-settings">
+   <div class="casting-check-settings">
       <!--Auto Calculate check-->
       <div class="row">
          <!--check-->
@@ -31,8 +31,8 @@
             </div>
 
             <!--Checkbox-->
-            <div class="checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.check.autoCalculateCheck} />
+            <div class="casting-checkbox">
+               <DocumentCheckboxInput bind:value={$document.system.castingCheck.autoCalculateCheck} />
             </div>
          </div>
       </div>
@@ -49,8 +49,8 @@
             <div class="select">
                <DocumentIntegerSelect
                   options={difficultyOptions}
-                  bind:value={$document.system.check.difficulty}
-                  disabled={$document.system.check.autoCalculateCheck}
+                  bind:value={$document.system.castingCheck.difficulty}
+                  disabled={$document.system.castingCheck.autoCalculateCheck}
                />
             </div>
          </div>
@@ -67,16 +67,16 @@
             <!--Input-->
             <div class="input">
                <DocumentIntegerInput
-                  bind:value={$document.system.check.complexity}
+                  bind:value={$document.system.castingCheck.complexity}
                   min={1}
                   max={16}
-                  disabled={$document.system.check.autoCalculateCheck}
+                  disabled={$document.system.castingCheck.autoCalculateCheck}
                />
             </div>
          </div>
       </div>
 
-      {#if !$document.system.check.autoCalculateCheck}
+      {#if !$document.system.castingCheck.autoCalculateCheck}
          <div class="row" transition:slide|local>
             <!--Difficulty-->
             <div class="stat">
@@ -102,7 +102,7 @@
             </div>
 
             <div class="select">
-               <DocumentAttributeSelect bind:value={$document.system.check.attribute} />
+               <DocumentAttributeSelect bind:value={$document.system.castingCheck.attribute} />
             </div>
          </div>
 
@@ -115,7 +115,7 @@
             </div>
 
             <div class="select">
-               <DocumentSkillSelect bind:value={$document.system.check.skill} />
+               <DocumentSkillSelect bind:value={$document.system.castingCheck.skill} />
             </div>
          </div>
       </div>
@@ -147,7 +147,7 @@
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .check-tab {
+   .casting-check-tab {
       @include flex-column;
       height: 100%;
       width: 100%;
@@ -168,7 +168,7 @@
          }
       }
 
-      .check-settings {
+      .casting-check-settings {
          @include flex-column;
          @include flex-group-top;
          @include border-bottom-sides;

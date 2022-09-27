@@ -183,6 +183,7 @@
       @include border;
       @include panel-1;
       width: 100%;
+      height: 100%;
 
       .settings {
          @include flex-row;

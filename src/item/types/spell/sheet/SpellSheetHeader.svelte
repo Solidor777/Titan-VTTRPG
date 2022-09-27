@@ -109,10 +109,6 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  &.integer {
-                     --input-width: 3rem;
-                  }
-
                   &.text {
                      @include flex-row;
                      @include flex-group-left;

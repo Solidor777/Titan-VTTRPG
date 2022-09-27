@@ -11,9 +11,9 @@
 
 <div class="sidebar">
    <!--Header-->
-   <div class="header {$document.system.check.attribute}">
-      {localize($document.system.check.attribute)} ({localize($document.system.check.skill)}) {$document.system.check
-         .difficulty}:{$document.system.check.complexity}
+   <div class="header {$document.system.castingCheck.attribute}">
+      {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
+         .system.castingCheck.difficulty}:{$document.system.castingCheck.complexity}
    </div>
 
    <!--Aspects List-->

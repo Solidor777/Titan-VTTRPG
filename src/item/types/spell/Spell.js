@@ -154,9 +154,9 @@ export default class TitanSpell extends TitanTypeComponent {
       this.parent.suggestedComplexity = suggestedComplexity;
 
       // Auto calculate difficulty and complexity if appropriate
-      if (this.parent.system.check.autoCalculateCheck) {
-         this.parent.system.check.difficulty = suggestedDifficulty;
-         this.parent.system.check.complexity = suggestedComplexity;
+      if (this.parent.system.castingCheck.autoCalculateCheck) {
+         this.parent.system.castingCheck.difficulty = suggestedDifficulty;
+         this.parent.system.castingCheck.complexity = suggestedComplexity;
       }
 
       return;
