@@ -335,8 +335,11 @@
       },
       "object": {
         "rarity": "common",
-        "rulesElement": [],
         "value": 0
+      },
+      "equippable": {
+        "equipped": false,
+        "rulesElement": []
       }
     },
     "ability": {
@@ -355,11 +358,11 @@
     "armor": {
       "templates": [
         "base",
+        "equippable",
         "object"
       ],
       "armor": 2,
       "description": "",
-      "equipped": false,
       "trait": []
     },
     "effect": {
@@ -577,12 +580,12 @@
     "weapon": {
       "templates": [
         "base",
+        "equippable",
         "object"
       ],
       "attack": [],
       "attackNotes": "",
       "description": "",
-      "equipped": false,
       "multiAttack": false
     }
   }
