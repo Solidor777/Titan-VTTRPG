@@ -14,13 +14,12 @@
 <div class="casting-check">
    <!--Head-->
    <div class="header {$document.system.castingCheck.attribute}">
-      <!--Label-->
-      <div class="label">
-         {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
-            .system.castingCheck.difficulty}:{$document.system.castingCheck.complexity}
-      </div>
-
       {#if $document.aspect && $document.aspect.length > 0}
+         <!--Label-->
+         <div class="label-button">
+            {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
+               .system.castingCheck.difficulty}:{$document.system.castingCheck.complexity}
+         </div>
          <!--Expand button-->
          <div class="spacer">
             {#if $appState.isExpanded.sidebar.castingCheck}
@@ -40,6 +39,12 @@
                   }}
                />
             {/if}
+         </div>
+      {:else}
+         <!--Label-->
+         <div class="label-normal">
+            {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
+               .system.castingCheck.difficulty}:{$document.system.castingCheck.complexity}
          </div>
       {/if}
    </div>
@@ -68,8 +73,16 @@
          width: 100%;
          padding: 0.25rem;
          font-weight: bold;
+         min-height: 3rem;
 
-         .label {
+         .label-normal {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+            flex-wrap: wrap;
+         }
+
+         .label-button {
             @include flex-row;
             @include flex-group-right;
             width: 100%;

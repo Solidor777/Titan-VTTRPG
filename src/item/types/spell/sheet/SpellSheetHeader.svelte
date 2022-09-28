@@ -5,6 +5,7 @@
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
    import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
+   import DocumentIntegerInput from "../../../../documents/components/input/DocumentIntegerInput.svelte";
 
    // Get Context variables
    const document = getContext("DocumentStore");
@@ -38,8 +39,21 @@
             </div>
          </div>
 
-         <!--Tradition-->
+         <!--XP Cost-->
          <div class="stat">
+            <!-- Label-->
+            <div class="label">
+               {localize("xp")}
+            </div>
+
+            <!--Input-->
+            <div class="input number">
+               <DocumentIntegerInput bind:value={$document.system.xpCost} min={0} />
+            </div>
+         </div>
+
+         <!--Tradition-->
+         <div class="stat text">
             <!-- Label-->
             <div class="label">
                {localize("tradition")}
@@ -98,6 +112,15 @@
                   padding-left: 0.5rem;
                }
 
+               &.text {
+                  width: 100%;
+                  flex: 1;
+
+                  .input {
+                     width: 100%;
+                  }
+               }
+
                .label {
                   @include flex-row;
                   @include flex-group-left;
@@ -109,9 +132,8 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  &.text {
-                     @include flex-row;
-                     @include flex-group-left;
+                  &.number {
+                     width: 2rem;
                   }
                }
             }

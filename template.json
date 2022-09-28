@@ -309,7 +309,7 @@
       "templates": [
         "character"
       ],
-      "exp": {
+      "xp": {
         "earned": 0
       },
       "inspiration": 0
@@ -376,6 +376,7 @@
       "templates": [
         "base"
       ],
+      "xpCost": 0,
       "rarity": "common",
       "tradition": "any",
       "castingCheck": {
@@ -385,6 +386,7 @@
         "complexity": 1,
         "autoCalculateDC": true
       },
+      "customAspect": [],
       "standardAspect": {
         "range": {
           "enabled": false,
@@ -574,8 +576,7 @@
             "unconscious": false
           }
         }
-      },
-      "customAspect": []
+      }
     },
     "weapon": {
       "templates": [

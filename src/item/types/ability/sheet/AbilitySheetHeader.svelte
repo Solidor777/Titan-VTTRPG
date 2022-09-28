@@ -43,7 +43,7 @@
                </div>
             </div>
 
-            <!--EXP Cost-->
+            <!--XP Cost-->
             <div class="stat">
                <!--Label-->
                <div class="label">
@@ -52,7 +52,7 @@
 
                <!--Input-->
                <div class="input integer">
-                  <DocumentIntegerInput bind:value={$document.system.expCost} min={0} />
+                  <DocumentIntegerInput bind:value={$document.system.xpCost} min={0} />
                </div>
             </div>
          </div>

@@ -46,7 +46,7 @@
             </div>
 
             <!--Input-->
-            <div class="input integer">
+            <div class="input large-number">
                <DocumentIntegerInput bind:value={$document.system.value} min={0} />
             </div>
          </div>
@@ -59,7 +59,7 @@
             </div>
 
             <!--Input-->
-            <div class="input integer">
+            <div class="input number">
                <DocumentIntegerInput bind:value={$document.system.armor} min={0} />
             </div>
          </div>
@@ -122,8 +122,12 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  &.integer {
-                     --input-width: 3rem;
+                  &.number {
+                     --input-width: 2rem;
+                  }
+
+                  &.large-number {
+                     --input-width: 5rem;
                   }
                }
             }

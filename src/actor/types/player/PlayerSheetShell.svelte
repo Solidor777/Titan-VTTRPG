@@ -109,7 +109,7 @@
       <div class="main">
          <!--Header -->
          <div class="header">
-            <!--Name and EXP-->
+            <!--Name and XP-->
             <div class="row">
                <!--Character name Sheet-->
                <div class="actor-name">
@@ -338,7 +338,7 @@
                   width: 50%;
                }
 
-               .exp {
+               .xp {
                   margin-right: 0.5rem;
                   display: flex;
                   width: 10rem;
