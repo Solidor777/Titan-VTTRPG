@@ -132,7 +132,7 @@
                               <div class="stat">
                                  <!--Label-->
                                  <div class="label">
-                                    {localize("resistanceCheck")}:
+                                    {localize("resistanceCheck")}
                                  </div>
 
                                  <!--Value-->
@@ -152,7 +152,7 @@
                               <div class="stat">
                                  <!--Label-->
                                  <div class="label">
-                                    {localize("allOptions")}:
+                                    {localize("allOptions")}
                                  </div>
 
                                  <!--Value-->
@@ -214,10 +214,7 @@
                @include flex-column;
                @include flex-group-top;
                width: 100%;
-
-               &:not(:first-child) {
-                  margin-top: 0.25rem;
-               }
+               margin-top: 0.5rem;
 
                .aspect-enable {
                   @include flex-row;

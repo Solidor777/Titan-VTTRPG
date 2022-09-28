@@ -72,10 +72,7 @@
 
             li {
                width: 100%;
-
-               &:not(:first-child) {
-                  margin-top: 0.5rem;
-               }
+               margin-top: 0.5rem;
             }
          }
 
