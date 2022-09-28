@@ -84,7 +84,7 @@
 
                   <!--Input-->
                   <div class="input">
-                     <DocumentResistanceSelect bind:value={aspect.type} allowNone={true} />
+                     <DocumentResistanceSelect bind:value={aspect.resistanceCheck} allowNone={true} />
                   </div>
                </div>
             </div>
