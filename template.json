@@ -347,7 +347,7 @@
         "base"
       ],
       "description": "",
-      "expCost": 0,
+      "xpCost": 0,
       "rarity": "common",
       "requirements": "",
       "rulesElement": [],

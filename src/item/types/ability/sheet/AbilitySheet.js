@@ -34,4 +34,12 @@ export default class TitanAbilitySheet extends TitanItemSheet {
       this.reactive.state.removeCheck(idx);
       return await this.reactive.document.removeCheck(idx);
    }
+
+   async addRulesElement() {
+      return await this.reactive.document.typeComponent.addRulesElement();
+   }
+
+   async removeRulesElement(idx) {
+      return await this.reactive.document.typeComponent.removeRulesElement(idx);
+   }
 }

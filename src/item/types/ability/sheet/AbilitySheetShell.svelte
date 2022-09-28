@@ -5,11 +5,13 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import { slide } from "svelte/transition";
+   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import AbilitySheetHeader from "./AbilitySheetHeader.svelte";
    import AbilitySheetSidebar from "./AbilitySheetSidebar.svelte";
-   import AbilitySheetDescriptionTab from "./AbilitySheetDescriptionTab.svelte";
    import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
-   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
+   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
+   import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -18,18 +20,24 @@
    setContext("DocumentStore", documentStore);
    setContext("ApplicationStateStore", applicationStateStore);
    const appState = getContext("ApplicationStateStore");
+   const document = getContext("DocumentStore");
 
    // Setup tabs
    const tabs = [
       {
          label: localize("description"),
          id: "description",
-         component: AbilitySheetDescriptionTab,
+         component: ItemSheetDescriptionTab,
       },
       {
          label: localize("checks"),
          id: "checks",
          component: ItemSheetChecksTab,
+      },
+      {
+         label: localize("rulesElements"),
+         id: "rulesElements",
+         component: ItemSheetRulesElementsTab,
       },
    ];
 </script>

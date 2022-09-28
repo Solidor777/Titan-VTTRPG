@@ -9,7 +9,7 @@
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
 
-   // Setup
+   // Setup context variables
    const document = getContext("DocumentStore");
 </script>
 
@@ -47,11 +47,11 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("expCost")}
+                  {localize("xp")}
                </div>
 
                <!--Input-->
-               <div class="input integer">
+               <div class="input number">
                   <DocumentIntegerInput bind:value={$document.system.xpCost} min={0} />
                </div>
             </div>
@@ -98,6 +98,7 @@
       @include border;
       @include flex-row;
       @include flex-space-between;
+      @include panel-1;
       width: 100%;
       padding: 0.5rem;
 
@@ -150,8 +151,8 @@
                      @include flex-row;
                      @include flex-group-center;
 
-                     &.integer {
-                        --input-width: 3rem;
+                     &.number {
+                        --input-width: 2rem;
                      }
                   }
                }
