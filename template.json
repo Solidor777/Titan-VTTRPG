@@ -346,7 +346,6 @@
       "templates": [
         "base"
       ],
-      "description": "",
       "xpCost": 0,
       "rarity": "common",
       "requirements": "",
@@ -362,7 +361,6 @@
         "object"
       ],
       "armor": 2,
-      "description": "",
       "trait": []
     },
     "effect": {
@@ -371,6 +369,20 @@
       ],
       "rulesElement": [],
       "effectId": ""
+    },
+    "equipment": {
+      "templates": [
+        "base",
+        "equippable",
+        "object"
+      ],
+      "rulesElement": []
+    },
+    "item": {
+      "templates": [
+        "base",
+        "object"
+      ]
     },
     "spell": {
       "templates": [
@@ -586,7 +598,6 @@
       ],
       "attack": [],
       "attackNotes": "",
-      "description": "",
       "multiAttack": false
     }
   }
