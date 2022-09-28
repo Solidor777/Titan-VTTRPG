@@ -10,8 +10,8 @@ export default class TitanEffectSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 450,
-         height: 450,
+         width: 650,
+         height: 650,
          svelte: {
             class: EffectSheetShell,
             target: document.body
@@ -22,5 +22,23 @@ export default class TitanEffectSheet extends TitanItemSheet {
    constructor(object) {
       super(object);
       this.reactive.state = createEffectSheetState();
+   }
+
+   async addCheck() {
+      this.reactive.state.addCheck();
+      return await this.reactive.document.addCheck();
+   }
+
+   async removeCheck(idx) {
+      this.reactive.state.removeCheck(idx);
+      return await this.reactive.document.removeCheck(idx);
+   }
+
+   async addRulesElement() {
+      return await this.reactive.document.typeComponent.addRulesElement();
+   }
+
+   async removeRulesElement(idx) {
+      return await this.reactive.document.typeComponent.removeRulesElement(idx);
    }
 }

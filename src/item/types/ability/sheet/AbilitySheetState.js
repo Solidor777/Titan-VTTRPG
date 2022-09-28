@@ -10,12 +10,12 @@ export default function createAbilitySheetState() {
          }
       },
       scrollTop: {
+         description: 0,
          sidebar: 0,
          checks: 0,
          rulesElements: 0,
       },
       filter: {
-         attacks: "",
          checks: "",
          rulesElements: ""
       },

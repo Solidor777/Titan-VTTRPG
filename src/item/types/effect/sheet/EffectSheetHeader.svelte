@@ -1,12 +1,8 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { getContext } from "svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-
-   // Setup
-   const document = getContext("DocumentStore");
 </script>
 
 <!--Header-->
@@ -28,6 +24,7 @@
       @include border;
       @include flex-row;
       @include flex-space-between;
+      @include panel-1;
       width: 100%;
       padding: 0.5rem;
 

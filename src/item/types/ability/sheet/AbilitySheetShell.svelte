@@ -5,7 +5,6 @@
    import { setContext } from "svelte";
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import AbilitySheetHeader from "./AbilitySheetHeader.svelte";
    import AbilitySheetSidebar from "./AbilitySheetSidebar.svelte";
@@ -20,7 +19,6 @@
    setContext("DocumentStore", documentStore);
    setContext("ApplicationStateStore", applicationStateStore);
    const appState = getContext("ApplicationStateStore");
-   const document = getContext("DocumentStore");
 
    // Setup tabs
    const tabs = [
