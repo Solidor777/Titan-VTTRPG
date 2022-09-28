@@ -2,6 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
+   import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
    import SpellSheetSidebarAspects from "./SpellSheetSidebarAspects.svelte";
    import SpellSheetSidebarCastingCheck from "./SpellSheetSidebarCastingCheck.svelte";
 
@@ -15,11 +16,19 @@
       <!--Casting Check-->
       <div class="section">
          <SpellSheetSidebarCastingCheck />
+
          <!--Aspects-->
          {#if $document.aspect && $document.aspect.length > 0 && $appState.isExpanded.sidebar.castingCheck}
             <SpellSheetSidebarAspects />
          {/if}
       </div>
+
+      <!--Checks-->
+      {#if $document.system.check.length > 0}
+         <div class="section" transition:slide|local>
+            <ItemSheetSidebarChecks />
+         </div>
+      {/if}
    </ScrollingContainer>
 </div>
 
@@ -36,10 +45,10 @@
       .section {
          @include flex-column;
          @include flex-group-top;
+         margin-top: 0.5rem;
 
          &:not(:first-child) {
             @include border-top;
-            margin-top: 0.5rem;
          }
       }
    }

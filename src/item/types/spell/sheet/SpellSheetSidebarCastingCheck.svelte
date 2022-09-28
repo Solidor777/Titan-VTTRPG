@@ -1,6 +1,5 @@
 <script>
    import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
@@ -19,7 +18,7 @@
 
    {#if $document.aspect && $document.aspect.length > 0}
       <!--Expand button-->
-      <div class="expand-button" transition:slide|local>
+      <div class="spacer">
          {#if $appState.isExpanded.sidebar.castingCheck}
             <!--Collapse button-->
             <IconButton
@@ -47,22 +46,23 @@
       @include flex-row;
       @include flex-group-center;
       @include border-top-bottom;
-      border-radius: 0;
-      padding: 0.5rem;
-      font-weight: bold;
+      @include attribute-colors;
+      @include panel-1;
       width: 100%;
-      margin-top: 0.5rem;
+      padding: 0.25rem;
+      font-weight: bold;
 
-      &.body {
-         background: var(--body-color-bright);
+      .label {
+         @include flex-row;
+         @include flex-group-right;
+         width: 100%;
+         flex-wrap: wrap;
       }
 
-      &.mind {
-         background: var(--mind-color-bright);
-      }
-
-      &.soul {
-         background: var(--soul-color-bright);
+      .spacer {
+         @include flex-row;
+         @include flex-group-right;
+         width: 3rem;
       }
    }
 </style>
