@@ -116,7 +116,7 @@
                <!--Attribute select-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("attribute")};</div>
+                  <div class="label">{localize("attribute")}</div>
 
                   <!--Input-->
                   <div class="input">
@@ -237,7 +237,7 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
-                  margin-left: 0.5rem;
+                  margin-left: 0.25rem;
                   @include font-size-normal;
 
                   &.number {

@@ -383,7 +383,7 @@
         "attribute": "mind",
         "difficulty": 4,
         "complexity": 1,
-        "autoCalculateCheck": true
+        "autoCalculateDC": true
       },
       "standardAspect": {
         "range": {

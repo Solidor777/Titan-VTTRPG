@@ -8,117 +8,132 @@
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
-   // Document reference
+   // Setup context variables
+   const application = getContext("external").application;
    const document = getContext("DocumentStore");
+   const appState = getContext("ApplicationStateStore");
 
    // Idx of the custom aspect being represented
    export let idx = void 0;
+
+   $: aspect = $document.system.customAspect[idx];
+   $: isExpanded = $appState.isExpanded.customAspects[idx];
 </script>
 
-{#if $document.system.customAspect[idx]}
+{#if aspect}
    <div class="aspect" transition:slide|local>
       <!--Header-->
-      <div class="aspect-header">
-         <!--Label-->
-         <div class="label-input">
-            <DocumentTextInput bind:value={$document.system.customAspect[idx].label} />
+      <div class="header">
+         <!--Expand Toggle-->
+         <div>
+            {#if isExpanded}
+               <!--Collapse button-->
+               <IconButton
+                  icon="fas fa-angle-double-down"
+                  on:click={() => {
+                     $appState.isExpanded.customAspects[idx] = false;
+                  }}
+               />
+            {:else}
+               <!--Expand button-->
+               <IconButton
+                  icon="fas fa-angle-double-right"
+                  on:click={() => {
+                     $appState.isExpanded.customAspects[idx] = true;
+                  }}
+               />
+            {/if}
          </div>
 
-         <!--Cost-->
-         <div class="aspect-cost">
-            <!--Label-->
-            <div class="label">
-               {localize("cost")}:
-            </div>
-
-            <!--Input-->
-            <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.customAspect[idx].cost} min={0} />
-            </div>
+         <!--Label-->
+         <div class="label">
+            <DocumentTextInput bind:value={aspect.label} />
          </div>
 
          <!--Delete button-->
-         <div>
+         <div class="delete-button">
+            <!--Delete button-->
             <IconButton
                icon={"fas fa-trash"}
                on:click={() => {
-                  $document.spell.removeCustomAspect(idx);
+                  application.removeCustomAspect(idx);
                }}
             />
          </div>
       </div>
 
-      <div class="row">
-         <!--Resistance aspect-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("resistanceCheck")}:
-            </div>
+      <!--Expandable Content-->
+      {#if isExpanded}
+         <div class="expandable-content" transition:slide|local>
+            <div class="row">
+               <!--Cost-->
+               <div class="field">
+                  <!--Label-->
+                  <div class="label">{localize("cost")}</div>
 
-            <!--Value-->
-            <div class="input">
-               <DocumentResistanceSelect
-                  bind:value={$document.system.customAspect[idx].resistanceCheck}
-                  allowNone={true}
-               />
-            </div>
-         </div>
-      </div>
-
-      <div class="row">
-         <!--Damage-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("damage")}
-            </div>
-
-            <!--Value-->
-            <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.customAspect[idx].isDamage} />
-            </div>
-         </div>
-
-         <!--Healing-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("healing")}
-            </div>
-
-            <!--Value-->
-            <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.customAspect[idx].isHealing} />
-            </div>
-         </div>
-
-         <!--Scaling-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("scaling")}
-            </div>
-
-            <!--Value-->
-            <div class="input checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.customAspect[idx].scaling} />
-            </div>
-         </div>
-      </div>
-
-      <!--Initial value-->
-      {#if $document.system.customAspect[idx].scaling}
-         <div class="row" transition:slide|local>
-            <div class="stat">
-               <!--Label-->
-               <div class="label">
-                  {localize("initialValue")}:
+                  <!--Input-->
+                  <div class="input number">
+                     <DocumentIntegerInput bind:value={aspect.cost} min={0} />
+                  </div>
                </div>
 
-               <!--Value-->
-               <div class="input number">
-                  <DocumentIntegerInput bind:value={$document.system.customAspect[idx].initialValue} min={0} />
+               <!--Resistance Check-->
+               <div class="field">
+                  <!--Label-->
+                  <div class="label">{localize("resistanceCheck")}</div>
+
+                  <!--Input-->
+                  <div class="input">
+                     <DocumentResistanceSelect bind:value={aspect.type} allowNone={true} />
+                  </div>
+               </div>
+            </div>
+
+            <div class="row">
+               <!--Damage-->
+               <div class="field">
+                  <!--Label-->
+                  <div class="label">{localize("damage")}</div>
+
+                  <!--Input-->
+                  <div class="input checkbox">
+                     <DocumentCheckboxInput bind:value={aspect.isDamage} />
+                  </div>
+               </div>
+
+               <!--Healing-->
+               <div class="field">
+                  <!--Label-->
+                  <div class="label">{localize("healing")}</div>
+
+                  <!--Input-->
+                  <div class="input checkbox">
+                     <DocumentCheckboxInput bind:value={aspect.isHealing} />
+                  </div>
+               </div>
+            </div>
+
+            <div class="row">
+               <!--Scaling-->
+               <div class="field">
+                  <!--Label-->
+                  <div class="label">{localize("scaling")}</div>
+
+                  <!--Input-->
+                  <div class="input checkbox">
+                     <DocumentCheckboxInput bind:value={aspect.scaling} />
+                  </div>
+               </div>
+
+               <!--Initial Value-->
+               <div class="field">
+                  <!--Label-->
+                  <div class="label">{localize("initialValue")}</div>
+
+                  <!--Input-->
+                  <div class="input number">
+                     <DocumentIntegerInput bind:value={aspect.initialValue} min={1} />
+                  </div>
                </div>
             </div>
          </div>
@@ -132,89 +147,77 @@
    .aspect {
       @include flex-column;
       @include flex-group-top;
-      @include border;
-      @include z-index-app;
       width: 100%;
-      @include font-size-normal;
-      padding: 0.25rem;
-      background: var(--label-background-color);
 
-      .aspect-header {
+      .header {
+         @include border;
          @include flex-row;
          @include flex-space-between;
-         box-sizing: border-box;
+         @include panel-1;
+         padding: 0.25rem;
          width: 100%;
-         font-weight: bold;
-         padding: 0.5rem 0.5rem 0 0.5rem;
 
-         .aspect-cost {
+         .label {
             @include flex-row;
             @include flex-group-center;
-            height: 100%;
-
-            .input {
-               margin-left: 0.25rem;
-               width: 3rem;
-            }
-         }
-
-         .label-input {
-            @include flex-row;
-            @include flex-group-center;
-            height: 100%;
-            --input-height: 100%;
+            width: 100%;
+            margin: 0 0.5rem;
+            --input-font-size: var(--font-size-large);
+            --input-height: 2rem;
          }
       }
 
-      .row {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-top;
-         margin-top: 0.5rem;
-         width: 100%;
-         padding: 0.5rem 0.5rem 0 0.5rem;
+      .expandable-content {
+         @include flex-column;
+         @include flex-group-top;
+         @include border-bottom-sides;
+         @include panel-3;
+         width: calc(100% - 2rem);
+         padding: 0.25rem;
          @include font-size-small;
-         --input-font-size: var(--font-size-small);
-         height: 2rem;
 
-         .stat {
+         .row {
             @include flex-row;
             @include flex-group-center;
+            padding-top: 0.5rem;
+            width: 100%;
 
             &:not(:first-child) {
-               @include border-left;
-               height: 100%;
-               margin-left: 0.5rem;
-               padding-left: 0.5rem;
+               @include border-top;
+               margin-top: 0.5rem;
             }
 
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               font-weight: bold;
-            }
-
-            .input {
+            .field {
                @include flex-row;
                @include flex-group-center;
 
-               &.checkbox {
-                  margin-left: 0.25rem;
-               }
-
-               &:not(.castingCheckbox) {
+               &:not(:first-child) {
+                  @include border-left;
                   margin-left: 0.5rem;
+                  padding-left: 0.5rem;
                }
 
-               &.number {
-                  width: 3rem;
+               .label {
+                  @include flex-row;
+                  @include flex-group-center;
+                  font-weight: bold;
+               }
+
+               .input {
+                  @include flex-row;
+                  @include flex-group-center;
+                  @include font-size-normal;
+
+                  &:not(.checkbox) {
+                     margin-left: 0.25rem;
+                  }
+
+                  &.number {
+                     width: 2rem;
+                  }
                }
             }
          }
-      }
-
-      &:not(:first-child) {
-         margin-top: 0.25rem;
       }
    }
 </style>

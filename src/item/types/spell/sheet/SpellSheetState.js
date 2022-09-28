@@ -43,14 +43,14 @@ export default function createSpellSheetState() {
 
    function addCustomAspect() {
       update((state) => {
-         state.isExpanded.customAspect.push(true);
+         state.isExpanded.customAspects.push(true);
          return state;
       });
    }
 
    function removeCustomAspect(idx) {
       update((state) => {
-         state.isExpanded.customAspect.splice(idx, 1);
+         state.isExpanded.customAspects.splice(idx, 1);
          return state;
       });
    }

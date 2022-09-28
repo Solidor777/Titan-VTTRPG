@@ -1,5 +1,6 @@
-import TitanTypeComponent from '~/helpers/TypeComponent';
 import { localize } from '~/helpers/Utility.js';
+import { v4 as uuidv4 } from 'uuid';
+import TitanTypeComponent from '~/helpers/TypeComponent';
 
 function getCustomAspectTemplate() {
    return {
@@ -9,7 +10,8 @@ function getCustomAspectTemplate() {
       cost: 1,
       resistanceCheck: 'none',
       isDamage: false,
-      isHealing: false
+      isHealing: false,
+      uuid: uuidv4()
    };
 }
 
@@ -154,7 +156,7 @@ export default class TitanSpell extends TitanTypeComponent {
       this.parent.suggestedComplexity = suggestedComplexity;
 
       // Auto calculate difficulty and complexity if appropriate
-      if (this.parent.system.castingCheck.autoCalculateCheck) {
+      if (this.parent.system.castingCheck.autoCalculateDC) {
          this.parent.system.castingCheck.difficulty = suggestedDifficulty;
          this.parent.system.castingCheck.complexity = suggestedComplexity;
       }

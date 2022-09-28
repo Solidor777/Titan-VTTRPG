@@ -6,11 +6,9 @@
    import SpellSheetCustomAspectSettings from "./SpellSheetCustomAspectSettings.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
 
-   // Document reference
+   // Setup context variables
    const document = getContext("DocumentStore");
-
-   // Application refernce
-   const application = getContext("external").application;
+   const appState = getContext("ApplicationStateStore");
 
    // Filter for the aspects to display
    let filter = "";
@@ -31,12 +29,12 @@
 
    <!--Scrolling Aspects list-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={application.scrollTop.customAspect}>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.customAspect}>
          <ol>
             <!--Each Aspect-->
-            {#each filteredAspects as idx}
+            {#each filteredAspects as idx ($document.system.customAspect[idx].uuid)}
                <li transition:slide|local>
-                  <SpellSheetCustomAspectSettings bind:idx />
+                  <SpellSheetCustomAspectSettings {idx} />
                </li>
             {/each}
          </ol>

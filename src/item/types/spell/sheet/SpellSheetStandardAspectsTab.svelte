@@ -191,6 +191,7 @@
    .standard-aspects-tab {
       @include flex-column;
       @include flex-group-top;
+      @include panel-2;
       width: 100%;
       height: 100%;
 
@@ -228,10 +229,10 @@
                   @include flex-group-top;
                   @include border-bottom-sides;
                   @include z-index-app;
+                  @include font-size-small;
+                  @include panel-3;
                   padding: 0.5rem;
                   width: calc(100% - 30px);
-                  background: var(--label-background-color);
-                  @include font-size-small;
                   --input-font-size: var(--font-size-small);
 
                   .row {

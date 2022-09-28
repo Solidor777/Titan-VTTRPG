@@ -18,77 +18,6 @@
 <div class="casting-check-tab">
    <!--check Settings-->
    <div class="casting-check-settings">
-      <!--Auto Calculate check-->
-      <div class="row">
-         <!--check-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("autoCalculateCastingCheck")}
-            </div>
-
-            <!--Checkbox-->
-            <div class="casting-checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.castingCheck.autoCalculateCheck} />
-            </div>
-         </div>
-      </div>
-
-      <div class="row">
-         <!--Difficulty-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("difficulty")}
-            </div>
-
-            <!--Select-->
-            <div class="select">
-               <DocumentCheckDifficultSelect
-                  bind:value={$document.system.castingCheck.difficulty}
-                  disabled={$document.system.castingCheck.autoCalculateCheck}
-               />
-            </div>
-         </div>
-
-         <div class="divider" />
-
-         <!--Complexity-->
-         <div class="stat">
-            <!--Label-->
-            <div class="label">
-               {localize("complexity")}
-            </div>
-
-            <!--Input-->
-            <div class="input">
-               <DocumentIntegerInput
-                  bind:value={$document.system.castingCheck.complexity}
-                  min={1}
-                  max={16}
-                  disabled={$document.system.castingCheck.autoCalculateCheck}
-               />
-            </div>
-         </div>
-      </div>
-
-      {#if !$document.system.castingCheck.autoCalculateCheck}
-         <div class="row" transition:slide|local>
-            <!--Difficulty-->
-            <div class="stat">
-               <!--Label-->
-               <div class="label">
-                  {localize("totalCost")}:
-               </div>
-
-               <!--Value-->
-               <div class="value">
-                  {$document.totalAspectCost}
-               </div>
-            </div>
-         </div>
-      {/if}
-
       <!--Attribute and skill-->
       <div class="row">
          <!--Attribute-->
@@ -115,6 +44,77 @@
             </div>
          </div>
       </div>
+
+      <!--Auto Calculate check-->
+      <div class="row">
+         <!--check-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("autoCalculateDC")}
+            </div>
+
+            <!--Checkbox-->
+            <div class="casting-checkbox">
+               <DocumentCheckboxInput bind:value={$document.system.castingCheck.autoCalculateDC} />
+            </div>
+         </div>
+      </div>
+
+      <div class="row">
+         <!--Difficulty-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("difficulty")}
+            </div>
+
+            <!--Select-->
+            <div class="select">
+               <DocumentCheckDifficultSelect
+                  bind:value={$document.system.castingCheck.difficulty}
+                  disabled={$document.system.castingCheck.autoCalculateDC}
+               />
+            </div>
+         </div>
+
+         <div class="divider" />
+
+         <!--Complexity-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("complexity")}
+            </div>
+
+            <!--Input-->
+            <div class="input">
+               <DocumentIntegerInput
+                  bind:value={$document.system.castingCheck.complexity}
+                  min={1}
+                  max={16}
+                  disabled={$document.system.castingCheck.autoCalculateDC}
+               />
+            </div>
+         </div>
+      </div>
+
+      {#if !$document.system.castingCheck.autoCalculateDC}
+         <div class="row" transition:slide|local>
+            <!--Difficulty-->
+            <div class="stat">
+               <!--Label-->
+               <div class="label">
+                  {localize("totalAspectCost")}:
+               </div>
+
+               <!--Value-->
+               <div class="value">
+                  {$document.totalAspectCost}
+               </div>
+            </div>
+         </div>
+      {/if}
    </div>
 
    <!--Aspect Costs-->
@@ -170,9 +170,9 @@
          @include flex-column;
          @include flex-group-top;
          @include border-bottom-sides;
-         @include panel-1;
+         @include panel-3;
          padding: 0.25rem;
-         width: 100%;
+         width: calc(100% - 2rem);
 
          .stat {
             @include flex-row;

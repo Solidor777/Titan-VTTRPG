@@ -322,12 +322,7 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
-                  margin-left: 0.5rem;
                   @include font-size-normal;
-
-                  &.checkbox {
-                     margin-left: 0.25rem;
-                  }
 
                   &:not(.checkbox) {
                      margin-left: 0.5rem;
