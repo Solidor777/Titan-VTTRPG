@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import TitanAbility from './types/ability/Ability.js';
 import TitanArmor from './types/armor/Armor.js';
 import TitanEffect from './types/effect/Effect.js';
+import TitanEquipment from './types/equipment/Equipment.js';
 import TitanSpell from './types/spell/Spell.js';
 import TitanWeapon from './types/weapon/Weapon.js';
 
@@ -42,6 +43,13 @@ export default class TitanItem extends Item {
          case 'effect': {
             this.typeComponent = new TitanEffect(this);
             this.effect = this.typeComponent;
+            break;
+         }
+
+         // Effect
+         case 'equipment': {
+            this.typeComponent = new TitanEquipment(this);
+            this.equipment = this.typeComponent;
             break;
          }
 

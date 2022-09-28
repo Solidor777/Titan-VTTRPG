@@ -324,6 +324,7 @@
     "types": [
       "ability",
       "armor",
+      "equipment",
       "effect",
       "spell",
       "weapon"

@@ -7,10 +7,9 @@
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
-   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
    import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
+   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
    import ItemSheetSidebar from "~/item/sheet/ItemSheetSidebar.svelte";
-   import EffectSheetHeader from "./EffectSheetHeader.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -20,7 +19,7 @@
    setContext("ApplicationStateStore", applicationStateStore);
    const appState = getContext("ApplicationStateStore");
 
-   // Setup tabs
+   // Tabs
    const tabs = [
       {
          label: localize("description"),
@@ -41,11 +40,9 @@
 </script>
 
 <ApplicationShell bind:elementRoot>
-   <div class="ability-sheet">
+   <div class="item-sheet">
       <!--Header-->
-      <div class="header">
-         <EffectSheetHeader />
-      </div>
+      <div class="header">Header</div>
 
       <!--Content-->
       <div class="body">
@@ -63,7 +60,7 @@
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .ability-sheet {
+   .item-sheet {
       @include flex-column;
       @include font-size-normal;
       display: flex;

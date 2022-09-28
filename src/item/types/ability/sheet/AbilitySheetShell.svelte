@@ -7,10 +7,10 @@
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import AbilitySheetHeader from "./AbilitySheetHeader.svelte";
-   import AbilitySheetSidebar from "./AbilitySheetSidebar.svelte";
    import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
    import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
    import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
+   import ItemSheetSidebar from "~/item/sheet/ItemSheetSidebar.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -51,7 +51,7 @@
       <div class="body">
          <!--Sidebar-->
          <div class="sidebar">
-            <AbilitySheetSidebar />
+            <ItemSheetSidebar />
          </div>
 
          <!--Tabs-->

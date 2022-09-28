@@ -1,9 +1,8 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
-import WeaponEditAttackTraitsDialog from './WeaponEditAttackTraitsDialog.js';
-import WeaponSheetShell from './WeaponSheetShell.svelte';
-import createWeaponSheetState from './WeaponSheetState.js';
+import EquipmentSheetShell from './EquipmentSheetShell.svelte';
+import createEquipmentSheetState from './EquipmentSheetState.js';
 
-export default class TitanWeaponSheet extends TitanItemSheet {
+export default class TitanEquipmentSheet extends TitanItemSheet {
    /**
     * Default Application options
     *
@@ -15,7 +14,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
          width: 650,
          height: 650,
          svelte: {
-            class: WeaponSheetShell,
+            class: EquipmentSheetShell,
             target: document.body
          }
       });
@@ -23,25 +22,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
 
    constructor(object) {
       super(object);
-      this.reactive.state = createWeaponSheetState();
-   }
-
-   // Opens the attack traits edit dialog
-   editAttackTraits(attackIdx) {
-      const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
-      dialog.render(true);
-      return;
-   }
-
-
-   async addAttack() {
-      this.reactive.state.addAttack();
-      return await this.reactive.document.weapon.addAttack();
-   }
-
-   async removeAttack(idx) {
-      this.reactive.state.removeAttack(idx);
-      return await this.reactive.document.weapon.removeAttack(idx);
+      this.reactive.state = createEquipmentSheetState();
    }
 
    async addCheck() {

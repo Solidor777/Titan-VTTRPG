@@ -5,6 +5,7 @@ import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import TitanConstants from './system/Constants.js';
 import TitanStatusEffects from './helpers/StatusEffects.js';
 import TitanChatMessageTypes from './system/ChatMessageTypes.js';
+import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
 import registerSystemSettings from './system/RegisterSystemSettings.js';
 import TitanActor from './actor/Actor.js';
 import TitanItem from './item/Item.js';
@@ -12,9 +13,9 @@ import TitanPlayerSheet from './actor/types/player/PlayerSheet.js';
 import TitanAbilitySheet from './item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
 import TitanEffectSheet from './item/types/effect/sheet/EffectSheet.js';
+import TitanEquipmentSheet from './item/types/equipment/sheet/EquipmentSheet.js';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from './item/types/weapon/sheet/WeaponSheet.js';
-import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
@@ -43,6 +44,10 @@ Hooks.once('init', async () => {
    });
    Items.registerSheet('titan', TitanEffectSheet, {
       types: ['effect'],
+      makeDefault: true,
+   });
+   Items.registerSheet('titan', TitanEquipmentSheet, {
+      types: ['equipment'],
       makeDefault: true,
    });
    Items.registerSheet('titan', TitanSpellSheet, {
