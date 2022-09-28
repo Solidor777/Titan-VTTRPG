@@ -3,7 +3,6 @@
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
-   import SpellSheetSidebarAspects from "./SpellSheetSidebarAspects.svelte";
    import SpellSheetSidebarCastingCheck from "./SpellSheetSidebarCastingCheck.svelte";
 
    // Application statee reference
@@ -16,11 +15,6 @@
       <!--Casting Check-->
       <div class="section">
          <SpellSheetSidebarCastingCheck />
-
-         <!--Aspects-->
-         {#if $document.aspect && $document.aspect.length > 0 && $appState.isExpanded.sidebar.castingCheck}
-            <SpellSheetSidebarAspects />
-         {/if}
       </div>
 
       <!--Checks-->
