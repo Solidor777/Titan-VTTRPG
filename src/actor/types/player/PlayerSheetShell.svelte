@@ -117,19 +117,19 @@
                </div>
 
                <!--Exp-->
-               <div class="exp">
+               <div class="xp">
                   <!--Available-->
-                  <div class="available" data-tooltip={localize("expAvailable")}>
-                     {$document.system.exp.available} /
+                  <div class="available" data-tooltip={localize("xpAvailable")}>
+                     {$document.system.xp.available} /
                   </div>
 
                   <!--Earned Input-->
-                  <div class="earned" data-tooltip={localize("expEarned")}>
+                  <div class="earned" data-tooltip={localize("xpEarned")}>
                      <DocumentIntegerInput bind:value={$document.system.exp.earned} />
                   </div>
 
                   <!--Label-->
-                  <div class="label">{localize("exp")}</div>
+                  <div class="label">{localize("xp")}</div>
                </div>
             </div>
 
