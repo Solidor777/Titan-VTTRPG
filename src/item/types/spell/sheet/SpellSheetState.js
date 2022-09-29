@@ -8,7 +8,7 @@ export default function createSpellSheetState() {
          checks: [],
          customAspects: [],
          sidebar: {
-            aspects: false,
+            castingCheck: true,
             check: []
          }
       },

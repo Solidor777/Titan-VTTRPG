@@ -23,9 +23,13 @@
    }
 </script>
 
-<div class="custom-aspects-tab">
+<div class="tab">
    <!--Filter-->
-   <TopFilter bind:filter />
+   {#if $document.system.customAspect && $document.system.customAspect.length > 0}
+      <div class="filter" transition:slide|local>
+         <TopFilter bind:filter />
+      </div>
+   {/if}
 
    <!--Scrolling Aspects list-->
    <div class="scrolling-content">
@@ -49,11 +53,17 @@
 <style lang="scss">
    @import "../../../../Styles/Mixins.scss";
 
-   .custom-aspects-tab {
+   .tab {
       @include flex-column;
       @include flex-group-top;
       width: 100%;
       height: 100%;
+
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+      }
 
       .scrolling-content {
          @include flex-column;

@@ -33,7 +33,6 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       return;
    }
 
-
    async addAttack() {
       this.reactive.state.addAttack();
       return await this.reactive.document.weapon.addAttack();
@@ -42,16 +41,6 @@ export default class TitanWeaponSheet extends TitanItemSheet {
    async removeAttack(idx) {
       this.reactive.state.removeAttack(idx);
       return await this.reactive.document.weapon.removeAttack(idx);
-   }
-
-   async addCheck() {
-      this.reactive.state.addCheck();
-      return await this.reactive.document.addCheck();
-   }
-
-   async removeCheck(idx) {
-      this.reactive.state.removeCheck(idx);
-      return await this.reactive.document.removeCheck(idx);
    }
 
    async addRulesElement() {

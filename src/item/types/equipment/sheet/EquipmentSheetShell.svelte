@@ -10,6 +10,7 @@
    import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
    import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
    import ItemSheetSidebar from "~/item/sheet/ItemSheetSidebar.svelte";
+   import EquipmentSheetHeader from "./EquipmentSheetHeader.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -42,7 +43,9 @@
 <ApplicationShell bind:elementRoot>
    <div class="item-sheet">
       <!--Header-->
-      <div class="header">Header</div>
+      <div class="header">
+         <EquipmentSheetHeader />
+      </div>
 
       <!--Content-->
       <div class="body">
