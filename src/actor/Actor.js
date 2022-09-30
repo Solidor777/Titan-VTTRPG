@@ -90,16 +90,24 @@ export default class TitanActor extends Actor {
             itemName = localize('newArmor');
             break;
          }
-         case 'weapon': {
-            itemName = localize('newWeapon');
+         case 'commodity': {
+            itemName = localize('newCommodity');
+            break;
+         }
+         case 'effect': {
+            itemName = localize('newEffect');
+            break;
+         }
+         case 'equipment': {
+            itemName = localize('newEquipment');
             break;
          }
          case 'spell': {
             itemName = localize('newSpell');
             break;
          }
-         case 'effect': {
-            itemName = localize('newEffect');
+         case 'weapon': {
+            itemName = localize('newWeapon');
             break;
          }
          default: {

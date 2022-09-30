@@ -370,6 +370,7 @@
         "base",
         "object"
       ],
+      "rulesElement": [],
       "quantity": 1
     },
     "effect": {
