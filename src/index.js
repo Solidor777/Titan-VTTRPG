@@ -12,6 +12,7 @@ import TitanItem from './item/Item.js';
 import TitanPlayerSheet from './actor/types/player/PlayerSheet.js';
 import TitanAbilitySheet from './item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
+import TitanCommoditySheet from './item/types/commodity/sheet/CommoditySheet.js';
 import TitanEffectSheet from './item/types/effect/sheet/EffectSheet.js';
 import TitanEquipmentSheet from './item/types/equipment/sheet/EquipmentSheet.js';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
@@ -40,6 +41,10 @@ Hooks.once('init', async () => {
    });
    Items.registerSheet('titan', TitanArmorSheet, {
       types: ['armor'],
+      makeDefault: true,
+   });
+   Items.registerSheet('titan', TitanCommoditySheet, {
+      types: ['commodity'],
       makeDefault: true,
    });
    Items.registerSheet('titan', TitanEffectSheet, {

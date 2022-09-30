@@ -324,8 +324,9 @@
     "types": [
       "ability",
       "armor",
-      "equipment",
+      "commodity",
       "effect",
+      "equipment",
       "spell",
       "weapon"
     ],
@@ -364,6 +365,13 @@
       "armor": 2,
       "trait": []
     },
+    "commodity": {
+      "templates": [
+        "base",
+        "object"
+      ],
+      "quantity": 1
+    },
     "effect": {
       "templates": [
         "base"
@@ -378,12 +386,6 @@
         "object"
       ],
       "rulesElement": []
-    },
-    "item": {
-      "templates": [
-        "base",
-        "object"
-      ]
     },
     "spell": {
       "templates": [

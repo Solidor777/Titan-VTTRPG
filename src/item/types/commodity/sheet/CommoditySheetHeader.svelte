@@ -50,6 +50,19 @@
                <DocumentIntegerInput bind:value={$document.system.value} min={0} />
             </div>
          </div>
+
+         <!--Value-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("quantity")}
+            </div>
+
+            <!--Input-->
+            <div class="input number">
+               <DocumentIntegerInput bind:value={$document.system.quantity} min={0} />
+            </div>
+         </div>
       </div>
    </div>
 </div>
@@ -108,6 +121,10 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
+
+                  &.number {
+                     --input-width: 2rem;
+                  }
 
                   &.large-number {
                      --input-width: 5rem;
