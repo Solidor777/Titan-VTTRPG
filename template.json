@@ -490,7 +490,8 @@
         "base"
       ],
       "rulesElement": [],
-      "effectId": ""
+      "effectId": "",
+      "duration": "temporary"
     },
     "equipment": {
       "templates": [

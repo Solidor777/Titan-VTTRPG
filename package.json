@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "@typhonjs-fvtt/runtime": "^0.0.19",
-    "@typhonjs-fvtt/svelte-standard": "^0.0.10",
+    "@typhonjs-fvtt/svelte-standard": "^0.0.14",
     "svelte": "^3.49.0",
     "uuid": "^9.0.0"
   },

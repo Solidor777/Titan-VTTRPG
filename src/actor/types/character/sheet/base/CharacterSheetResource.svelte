@@ -11,7 +11,7 @@
    const document = getContext("DocumentStore");
 
    // Calculate the tooltip for the max value
-   function getTotalValueTooltip(maxValue, maxBase, equipment, effect, ability) {
+   function getTotalValueTooltip(maxValue, maxBase, equipment, effect, ability, staticMod) {
       // Base label
       let retVal = `<p>${localize(`${key}.max`)}</p>`;
 
@@ -33,6 +33,11 @@
          retVal += `<p>${localize("effects")}: ${effect}</p>`;
       }
 
+      // Static mod
+      if (staticMod !== 0) {
+         retVal += `<p>${localize("static")}: ${effect}</p>`;
+      }
+
       return retVal;
    }
 
@@ -49,7 +54,8 @@
       $document.system.resource[key].maxBase,
       $document.system.resource[key].mod.equipment,
       $document.system.resource[key].mod.effect,
-      $document.system.resource[key].mod.ability
+      $document.system.resource[key].mod.ability,
+      $document.system.resource[key].mod.static
    );
 
    $: modClass = getModClass($document.system.resource[key].mod.effect, $document.system.resource[key].mod.static);
@@ -136,7 +142,7 @@
 
          .static-value {
             @include border;
-            @include static-value;
+            @include panel-3;
             @include mod-colors;
             height: 100%;
             width: 1.75rem;

@@ -44,11 +44,7 @@ export default () => {
 
       css: {
          // Creates a standard configuration for PostCSS with autoprefixer & postcss-preset-env.
-         postcss: postcssConfig({
-            compress: s_COMPRESS,
-            sourceMap: s_SOURCEMAPS,
-            extract: 'style.css'
-         }),
+         postcss: postcssConfig({ compress: s_COMPRESS, sourceMap: s_SOURCEMAPS })
       },
 
       // About server options:
@@ -63,7 +59,7 @@ export default () => {
          open: '/game',
          proxy: {
             '^(/systems/titan/lang)': 'http://localhost:30000',
-            '^(/modules/titan/style.css)': 'http://localhost:30000',
+            '^(/systems/titan/style.css)': 'http://localhost:30000',
             '^(?!/systems/titan/)': 'http://localhost:30000',
             '/socket.io': { target: 'ws://localhost:30000', ws: true },
          },

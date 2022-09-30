@@ -1,6 +1,6 @@
 export default function registerTooltipSettings() {
-   class TitanTooltipManager extends TitanTooltipManager {
-      static TOOLTIP_ACTIVATION_MS = 2000;
+   class TitanTooltipManager extends TooltipManager {
+      static TOOLTIP_ACTIVATION_MS = 1500;
    }
    game.tooltip = new TitanTooltipManager();
 }
