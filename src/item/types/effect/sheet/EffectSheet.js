@@ -1,3 +1,4 @@
+import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import EffectSheetShell from './EffectSheetShell.svelte';
 import createEffectSheetState from './EffectSheetState';
@@ -24,11 +25,7 @@ export default class TitanEffectSheet extends TitanItemSheet {
       this.reactive.state = createEffectSheetState();
    }
 
-   async addRulesElement() {
-      return await this.reactive.document.typeComponent.addRulesElement();
-   }
-
-   async removeRulesElement(idx) {
-      return await this.reactive.document.typeComponent.removeRulesElement(idx);
-   }
+   // Import add rules element functions
+   addRulesElement = addRulesElement.bind(this);
+   removeRulesElement = removeRulesElement.bind(this);
 }

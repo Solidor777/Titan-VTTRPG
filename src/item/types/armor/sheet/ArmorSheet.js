@@ -1,3 +1,4 @@
+import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import ArmorEditTraitsDialog from './ArmorEditTraitsDialog';
 import createArmorSheetState from './ArmorSheetState.js';
@@ -26,17 +27,14 @@ export default class TitanArmorSheet extends TitanItemSheet {
       this.reactive.state = createArmorSheetState();
    }
 
+   // Import add rules element functions
+   addRulesElement = addRulesElement.bind(this);
+   removeRulesElement = removeRulesElement.bind(this);
+
+
    editArmorTraits() {
       const dialog = new ArmorEditTraitsDialog(this.reactive.document);
       dialog.render(true);
       return;
-   }
-
-   async addRulesElement() {
-      return await this.reactive.document.typeComponent.addRulesElement();
-   }
-
-   async removeRulesElement(idx) {
-      return await this.reactive.document.typeComponent.removeRulesElement(idx);
    }
 }

@@ -1,9 +1,11 @@
+import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
 import WeaponEditAttackTraitsDialog from './WeaponEditAttackTraitsDialog.js';
 import WeaponSheetShell from './WeaponSheetShell.svelte';
 import createWeaponSheetState from './WeaponSheetState.js';
 
 export default class TitanWeaponSheet extends TitanItemSheet {
+
    /**
     * Default Application options
     *
@@ -26,6 +28,10 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       this.reactive.state = createWeaponSheetState();
    }
 
+   // Import add rules element functions
+   addRulesElement = addRulesElement.bind(this);
+   removeRulesElement = removeRulesElement.bind(this);
+
    // Opens the attack traits edit dialog
    editAttackTraits(attackIdx) {
       const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
@@ -41,13 +47,5 @@ export default class TitanWeaponSheet extends TitanItemSheet {
    async removeAttack(idx) {
       this.reactive.state.removeAttack(idx);
       return await this.reactive.document.weapon.removeAttack(idx);
-   }
-
-   async addRulesElement() {
-      return await this.reactive.document.typeComponent.addRulesElement();
-   }
-
-   async removeRulesElement(idx) {
-      return await this.reactive.document.typeComponent.removeRulesElement(idx);
    }
 }
