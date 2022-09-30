@@ -86,7 +86,7 @@
   --color-foreground: #e4e3d7;
   --text-color: white;
   --highlight-background-color: rgb(255, 233, 174);
-  --static-label-background-color: rgb(208, 208, 208);
+  --static-value-background: rgb(208, 208, 208);
   --active-background-color: #fcdbbf;
 
   // Panel Styles
@@ -119,4 +119,10 @@
   --font-size-small: 0.9rem;
   --font-size-large: 1.2rem;
   --font-size-extra-large: 1.5rem;
+
+  // Mod values
+  --lesser-color-dark: #8B0000;
+  --lesser-color-bright: #ffd1d1;
+  --greater-color-dark: #023020;
+  --greater-color-bright: #c5ffeb;
 }

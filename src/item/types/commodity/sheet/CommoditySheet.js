@@ -1,4 +1,3 @@
-import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
 import CommoditySheetShell from './CommoditySheetShell.svelte';
 import createCommoditySheetState from './CommoditySheetState.js';
@@ -25,8 +24,4 @@ export default class TitanCommoditySheet extends TitanItemSheet {
       super(object);
       this.reactive.state = createCommoditySheetState();
    }
-
-   // Import add rules element functions
-   addRulesElement = addRulesElement.bind(this);
-   removeRulesElement = removeRulesElement.bind(this);
 }

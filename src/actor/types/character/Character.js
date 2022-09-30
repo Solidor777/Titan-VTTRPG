@@ -14,19 +14,26 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
+   // Apply rules element bindings
+   applyFlatModifier = applyFlatModifier.bind(this);
+
    // Prepare Character type specific data
    prepareDerivedData() {
       this._calculateBaseRatings();
+      this._calculateBaseResistances();
+      this._calculateBaseResources();
       this._resetDynamicMods();
       this._applyRulesElements();
       this._applyStatusEffects();
-      this._calculateFinalStats();
+      this._applyMods();
+      this._clampResources();
 
       return;
    }
 
    _calculateBaseRatings() {
       const systemData = this.parent.system;
+
       // Calculate the base value of ratings
       // Initiative = (Mind + Perception + Dexterity) / 2 rounded up
       systemData.rating.initiative.baseValue =
@@ -57,52 +64,90 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   _calculateBaseResistances() {
+      const systemData = this.parent.system;
+
+      // Calculate resistance base values
+      // Reflexes = (Mind + (Body / 2) rounded up)
+      systemData.resistance.reflexes.baseValue =
+         systemData.attribute.mind.baseValue +
+         Math.ceil(systemData.attribute.body.baseValue / 2);
+
+      // Resilience = (Body + (Soul/2) rounded up)
+      systemData.resistance.resilience.baseValue =
+         systemData.attribute.body.baseValue +
+         Math.ceil(systemData.attribute.soul.baseValue / 2);
+
+      // Willpower = (Soul + (Mind/2))
+      systemData.resistance.willpower.baseValue =
+         systemData.attribute.soul.baseValue +
+         Math.ceil(systemData.attribute.mind.baseValue / 2);
+   }
+
+   _calculateBaseResources() {
+      const systemData = this.parent.system;
+      const totalBaseAttributeValue =
+         systemData.attribute.body.baseValue +
+         systemData.attribute.mind.baseValue +
+         systemData.attribute.soul.baseValue;
+
+      // Calculate base resource values
+      // Stamina = Total Attribute Mod
+      systemData.resource.stamina.maxBase = Math.ceil(totalBaseAttributeValue *
+         CONFIG.TITAN.constants.resource.stamina.maxBaseMulti);
+
+      // Resolve = Soul / 2 rounded up
+      systemData.resource.resolve.maxBase = Math.ceil(
+         systemData.attribute.soul.baseValue * CONFIG.TITAN.constants.resource.resolve.maxBaseMulti);
+
+      // Wounds = Total Attribute mod / 2 rounded up
+      systemData.resource.wounds.maxBase = Math.ceil(
+         totalBaseAttributeValue * CONFIG.TITAN.constants.resource.wounds.maxBaseMulti);
+   }
+
    _resetDynamicMods() {
       // Reference to the parent system data
       const systemData = this.parent.system;
+      function resetMods(mods) {
+         mods.equipment = 0;
+         mods.effect = 0;
+         mods.ability = 0;
+      }
 
       // Attributes
       for (let [key, attribute] of Object.entries(systemData.attribute)) {
-         attribute.itemMod = 0;
-         attribute.effectMod = 0;
+         resetMods(attribute.mod);
       }
 
       // Skills
       for (let [key, skill] of Object.entries(systemData.skill)) {
-         skill.training.itemMod = 0;
-         skill.training.effectMod = 0;
-         skill.expertise.itemMod = 0;
-         skill.expertise.effectMod = 0;
+         resetMods(skill.training.mod);
+         resetMods(skill.expertise.mod);
       }
 
       // Resource
       for (let [key, resource] of Object.entries(systemData.resource)) {
-         resource.itemMod = 0;
-         resource.effectMod = 0;
+         resetMods(resource.mod);
       }
 
       // Resistance
       for (let [key, resistance] of Object.entries(systemData.resistance)) {
-         resistance.itemMod = 0;
-         resistance.effectMod = 0;
+         resetMods(resistance.mod);
       }
 
       // Rating
       for (let [key, rating] of Object.entries(systemData.rating)) {
-         rating.itemMod = 0;
-         rating.effectMod = 0;
+         resetMods(rating.mod);
       }
 
       // Speed
       for (let [key, speed] of Object.entries(systemData.speed)) {
-         speed.itemMod = 0;
-         speed.effectMod = 0;
+         resetMods(speed.mod);
       }
 
       // Mod
       for (let [key, mod] of Object.entries(systemData.mod)) {
-         mod.itemMod = 0;
-         mod.effectMod = 0;
+         resetMods(mod.mod);
       }
 
       // Status effects
@@ -114,9 +159,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    _applyRulesElements() {
-      // Reset dynamic mods
-      const systemData = this.parent.system;
-
       // Get all the rules elements
       let rulesElements = [];
       this.parent.items.forEach((item) => {
@@ -129,9 +171,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // FlatModifier
       const flatMods = rulesElements.filter((element) => element.operation === 'flatModifier');
       flatMods.forEach((flatMod) => {
-         applyFlatModifier(flatMod, systemData);
+         this.applyFlatModifier(flatMod);
       });
 
+      return;
    }
 
    _applyStatusEffects() {
@@ -175,15 +218,21 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.statusEffect.restrained = true;
 
                // Decrease Melee, Accuracy, and Defense by 1
-               systemData.rating.melee.effectMod -= 1;
-               systemData.rating.accuracy.effectMod -= 1;
-               systemData.rating.defense.effectMod -= 1;
+               systemData.rating.melee.effect -= 1;
+               systemData.rating.accuracy.effect -= 1;
+               systemData.rating.defense.effect -= 1;
 
                // Decrease Speed to 0
-               for (let [key, speed] of Object.entries(systemData.speed)) {
-                  const speedValue = speed.baseValue + speed.staticMod + speed.itemMod;
+               for (let [speedKey, speed] of Object.entries(systemData.speed)) {
+                  // Calculate the total speed
+                  let speedValue = speed.baseValue;
+                  for (let [modKey, mod] of Object.entries(speed.mod)) {
+                     speedValue += mod;
+                  }
+
+                  // Set the effect speed so that the total speed is 0 
                   if (speedValue > 0) {
-                     speed.effectMod = -speedValue;
+                     speed.mod.effect -= speedValue;
                   }
                }
 
@@ -197,10 +246,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.statusEffect.prone = true;
 
                // Decrease Speed by half
-               for (let [key, speed] of Object.entries(systemData.speed)) {
-                  const speedValue = speed.baseValue + speed.staticMod + speed.itemMod;
+               for (let [speedKey, speed] of Object.entries(systemData.speed)) {
+                  // Calculate the total speed
+                  let speedValue = speed.baseValue;
+                  for (let [modKey, mod] of Object.entries(speed.mod)) {
+                     speedValue += mod;
+                  }
+
+                  // Set the effect mod so that the total speed is 1/2 of normal
                   if (speedValue > 0) {
-                     speed.effectMod = -(Math.ceil(speedValue / 2));
+                     speed.mod.effect -= (Math.ceil(speedValue / 2));
                   }
                }
 
@@ -213,11 +268,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                const systemData = this.parent.system;
                systemData.statusEffect.asleep = true;
 
-               // Decrease awareness by half
+               // Calculate the total awareness
                const awareness = this.parent.system.rating.awareness;
-               const awarenessValue = awareness.baseValue + awareness.staticMod + awareness.itemMod;
+               let awarenessValue = awareness.baseValue + awareness.mod.static + awareness.equipment;
+               for (let [key, mod] of Object.entries(awareness.mod)) {
+                  awarenessValue += mod;
+               }
+
+               // Set the effect mod so that the total awareness is 1/2 of norma;
                if (awarenessValue > 0) {
-                  awareness.effectMod = -(Math.ceil(awarenessValue / 2));
+                  awareness.mod.effect -= (Math.ceil(awarenessValue / 2));
                }
 
                break;
@@ -230,7 +290,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.statusEffect.stunned = true;
 
                // Decrease Defense by 1
-               this.parent.system.rating.defense.effectMod -= 1;
+               systemData.rating.defense.mod.effect -= 1;
 
                break;
             }
@@ -243,10 +303,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
                // Decrease all Skills and Resistances by 1
                for (let [key, skill] of Object.entries(systemData.skill)) {
-                  skill.training.effectMod -= 1;
+                  skill.training.mod.effect -= 1;
                }
                for (let [key, resistance] of Object.entries(systemData.resistance)) {
-                  resistance.effectMod -= 1;
+                  resistance.mod.effect -= 1;
                }
                break;
             }
@@ -264,91 +324,78 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
    }
 
-   _calculateFinalStats() {
-
+   _applyMods() {
       // Get a reference to the parent system data
       const systemData = this.parent.system;
 
-      // Calculate Attributes
-      let totalBaseAttributeValue = 0;
-      for (let [key, attribute] of Object.entries(systemData.attribute)) {
-         totalBaseAttributeValue += attribute.baseValue;
-         attribute.value = attribute.baseValue + attribute.staticMod + attribute.itemMod + attribute.effectMod;
-      }
+      function applyMods(stat) {
+         stat.value = stat.baseValue;
 
-      // Calculate Skills
-      for (let [key, skill] of Object.entries(systemData.skill)) {
-         skill.training.value = skill.training.baseValue + skill.training.staticMod + skill.training.itemMod + skill.training.effectMod;
-         skill.expertise.value = skill.expertise.baseValue + skill.expertise.staticMod + skill.expertise.itemMod + skill.expertise.effectMod;
-      }
-
-      // Calculate Speeds
-      for (let [key, speed] of Object.entries(systemData.speed)) {
-         speed.value = speed.baseValue + speed.staticMod + speed.itemMod + speed.effectMod;
-      }
-
-      // Calculate rating value
-      for (let [key, rating] of Object.entries(systemData.rating)) {
-         rating.value = rating.baseValue + rating.staticMod + rating.itemMod + rating.effectMod;
-      }
-
-      // Calculate resistance base values
-      // Reflexes = (Mind + (Body / 2) rounded up)
-      systemData.resistance.reflexes.baseValue =
-         systemData.attribute.mind.value +
-         Math.ceil(systemData.attribute.body.value / 2);
-
-      // Resilience = (Body + (Soul/2) rounded up)
-      systemData.resistance.resilience.baseValue =
-         systemData.attribute.body.value +
-         Math.ceil(systemData.attribute.soul.value / 2);
-
-      // Willpower = (Soul + (Mind/2))
-      systemData.resistance.willpower.baseValue =
-         systemData.attribute.soul.value +
-         Math.ceil(systemData.attribute.mind.value / 2);
-
-      // Calculate resistance mods
-      for (let [key, resistance] of Object.entries(systemData.resistance)) {
-         systemData.resistance[key].value = resistance.baseValue + resistance.staticMod + resistance.itemMod + resistance.effectMod;
-      }
-
-      // Calculate base resource values
-      // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = Math.ceil(totalBaseAttributeValue *
-         CONFIG.TITAN.constants.resource.stamina.maxBaseMulti);
-
-      // Resolve = Soul / 2 rounded up
-      systemData.resource.resolve.maxBase = Math.ceil(
-         systemData.attribute.soul.value * CONFIG.TITAN.constants.resource.resolve.maxBaseMulti);
-
-      // Wounds = Total Attribute mod / 2 rounded up
-      systemData.resource.wounds.maxBase = Math.ceil(
-         totalBaseAttributeValue * CONFIG.TITAN.constants.resource.wounds.maxBaseMulti);
-
-      // Calculate resource mods and clamp them to be within range
-      for (let [key, resource] of Object.entries(systemData.resource)) {
-         systemData.resource[key].maxValue = resource.maxBase + resource.staticMod + resource.itemMod + resource.effectMod;
-         systemData.resource[key].value = clamp(systemData.resource[key].value, 0, systemData.resource[key].maxValue);
-      }
-
-      // Calculate mods
-      // Add armor from the equipped armor if appropriate
-      systemData.mod.armor.baseValue = 0;
-      const armorId = this.parent.system.equipped.armor;
-      if (armorId) {
-         const armor = this.parent.items.get(armorId);
-         if (armor) {
-            systemData.mod.armor.baseValue = armor.system.armor;
+         // Each mod in the stat
+         for (let [modKey, mod] of Object.entries(stat.mod)) {
+            stat.value += mod;
          }
       }
 
-      // Damage
-      systemData.mod.damage.baseValue = 0;
+      function applyModsDeep(stats) {
+         // Each stat
+         for (let [key, stat] of Object.entries(stats)) {
+            applyMods(stat);
+         }
+      }
+
+      // Attributes
+      applyModsDeep(systemData.attribute);
+
+      // Skills
+      for (let [key, skill] of Object.entries(systemData.skill)) {
+         // Training
+         applyMods(skill.training);
+
+         // Expertise
+         applyMods(skill.expertise);
+      }
+
+      // Resistances
+      applyModsDeep(systemData.resistance);
+
+      // Ratings
+      applyModsDeep(systemData.rating);
+
+      // Resources
+      for (let [key, resource] of Object.entries(systemData.resource)) {
+         resource.maxValue = resource.maxBase;
+         for (let [modKey, mod] of (Object.entries(resource.mod))) {
+            resource.maxValue += mod;
+         }
+      }
+
+      // Speeds
+      applyModsDeep(systemData.speed);
+
+      // Mods
+      // Add armor from the equipped armor if appropriate
+      const armor = systemData.mod.armor;
+      armor.baseValue = 0;
+      const equippedArmorId = this.parent.system.equipped.armor;
+      if (equippedArmorId) {
+         const equippedArmor = this.parent.items.get(equippedArmorId);
+         if (equippedArmor) {
+            armor.baseValue = equippedArmor.system.armor;
+         }
+      }
 
       // Final mods
-      for (let [key, mod] of Object.entries(systemData.mod)) {
-         mod.value = mod.baseValue + mod.staticMod + mod.itemMod + mod.effectMod;
+      systemData.mod.damage.baseValue = 0;
+
+      applyModsDeep(systemData.mod);
+
+      return;
+   }
+
+   _clampResources() {
+      for (let [key, resource] of Object.entries(this.parent.system.resource)) {
+         resource.value = clamp(resource.value, 0, resource.maxValue);
       }
    }
 
@@ -864,7 +911,4 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       return;
    }
-
-   // Apply rules element bindings
-   applyFlatModifier = applyFlatModifier.bind(this);
 }

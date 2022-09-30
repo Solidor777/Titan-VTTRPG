@@ -68,7 +68,7 @@
                         </div>
                         <div class="op">+</div>
                         <div class="input">
-                           <DocumentIntegerInput bind:value={$document.system.skill[key].training.staticMod} />
+                           <DocumentIntegerInput bind:value={$document.system.skill[key].training.mod.static} />
                         </div>
                         <div class="op">=</div>
                         <div class="value">
@@ -86,7 +86,7 @@
                         </div>
                         <div class="op">+</div>
                         <div class="input">
-                           <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.staticMod} />
+                           <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.mod.static} />
                         </div>
                         <div class="op">=</div>
                         <div class="value">

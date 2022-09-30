@@ -3,41 +3,47 @@
    import { getContext } from "svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
-   // The key / name of the speed
+   // The key / name of the Rating
    export let key;
 
    // The Character Data
    const document = getContext("DocumentStore");
 
-   // The speed data
-   $: speed = $document.system.speed[key];
+   // The mod data
+   $: mod = $document.system.mod[key];
+
+   // Map of icons to use for the mods
+   const modIcons = {
+      armor: "helmet-battle",
+      damage: "bolt",
+   };
 </script>
 
-<!--Speeds-->
-<div class="speed">
+<div class="mod">
    <!--Label-->
    <div class="label" data-tooltip={localize(`${key}.desc`)}>
       <!--Icon-->
+      <i class="fas fa-{modIcons[key]}" />
       {localize(`${key}`)}
    </div>
 
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input" data-tooltip={localize(`${key}.editBaseValue`)}>
-         <DocumentIntegerInput bind:value={$document.system.speed[key].baseValue} />
+      <div class="label" data-tooltip={localize(`${key}.baseValue`)}>
+         {mod.baseValue}
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
-         <DocumentIntegerInput bind:value={$document.system.speed[key].mod.static} />
+      <div class="static-mod" data-tooltip={localize(`${key}.editStaticMod`)}>
+         <DocumentIntegerInput bind:value={$document.system.mod[key].mod.static} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
       <div class="label final" data-tooltip={localize(`${key}.value`)}>
-         {speed.value}
+         {mod.value}
       </div>
    </div>
 </div>
@@ -45,11 +51,15 @@
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
 
-   .speed {
+   .mod {
       @include flex-row;
       @include flex-space-between;
       width: 100%;
       height: 100%;
+
+      i {
+         width: 1.25rem;
+      }
 
       .label {
          @include flex-row;
@@ -60,6 +70,10 @@
          &.final {
             font-weight: bold;
          }
+
+         .fas {
+            margin-right: 0.25rem;
+         }
       }
 
       .stats {
@@ -68,10 +82,10 @@
          height: 100%;
 
          :not(:first-child) {
-            margin-left: 0.5rem;
+            margin-left: 0.25rem;
          }
 
-         .input {
+         .static-mod {
             width: 1.7rem;
             --input-border-radius: 10px;
          }

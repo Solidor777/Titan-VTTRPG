@@ -31,7 +31,7 @@
   border-width: var(--input-border-width);
   border-color: var(--input-border-color);
   color: var(--font-color);
-  background: var(--static-label-background-color);
+  background: var(--static-value-background);
   opacity: var(--disabled-opacity);
 }
 
@@ -348,4 +348,21 @@
 
 @mixin font-size-extra-large {
   font-size: var(--font-size-extra-large);
+}
+
+@mixin static-value {
+  background-color: var(--static-value-background);
+}
+
+@mixin mod-colors {
+
+  &.greater {
+    color: var(--greater-color-dark);
+    background: var(--greater-color-bright);
+  }
+
+  &.lesser {
+    color: var(--lesser-color-dark);
+    background: var(--lesser-color-bright);
+  }
 }

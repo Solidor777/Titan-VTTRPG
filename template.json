@@ -9,26 +9,38 @@
         "attribute": {
           "body": {
             "baseValue": 1,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "mind": {
             "baseValue": 1,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "soul": {
             "baseValue": 1,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           }
         },
         "resistance": {
           "reflexes": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "resilience": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "willpower": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           }
         },
         "skill": {
@@ -36,248 +48,344 @@
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "athletics": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "deception": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "dexterity": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "diplomacy": {
             "defaultAttribute": "soul",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "engineering": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "intimidation": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "investigation": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "lore": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "medicine": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "meleeWeapons": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "metaphysics": {
             "defaultAttribute": "soul",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "nature": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "perception": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "performance": {
             "defaultAttribute": "soul",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "rangedWeapons": {
             "defaultAttribute": "mind",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "subterfuge": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           },
           "stealth": {
             "defaultAttribute": "body",
             "training": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             },
             "expertise": {
               "baseValue": 0,
-              "staticMod": 0
+              "mod": {
+                "static": 0
+              }
             }
           }
         },
         "rating": {
           "awareness": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "defense": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "melee": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "accuracy": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "initiative": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           }
         },
         "resource": {
           "stamina": {
             "value": 3,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "resolve": {
             "value": 0,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "wounds": {
             "value": 0,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           }
         },
         "speed": {
           "stride": {
             "baseValue": 5,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "fly": {
             "baseValue": 0,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "swim": {
             "baseValue": 0,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "burrow": {
             "baseValue": 0,
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           }
         },
         "equipped": {
@@ -285,10 +393,14 @@
         },
         "mod": {
           "armor": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           },
           "damage": {
-            "staticMod": 0
+            "mod": {
+              "static": 0
+            }
           }
         },
         "statusEffect": {

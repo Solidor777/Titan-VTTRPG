@@ -5,7 +5,7 @@ export async function addRulesElement() {
    const newElement = getFlatModifierTemplate();
 
    // Set the element type to this item
-   newElement.type = this.type;
+   newElement.type = this.parent.type;
 
    // Add the item to the rules element ware
    const idx = this.parent.system.rulesElement.push(newElement) - 1;

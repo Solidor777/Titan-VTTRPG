@@ -3,47 +3,58 @@
    import { getContext } from "svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
-   // The key / name of the Rating
-   export let key;
-
-   // The Character Data
+   // Setup context variables
    const document = getContext("DocumentStore");
 
-   // The mod data
-   $: mod = $document.system.mod[key];
+   // Calculate the tooltip for the max value
+   function getTotalValueTooltip(equipment, effect) {
+      // Base label
+      let retVal = `<p>${localize("armor.max")}</p>`;
 
-   // Map of icons to use for the mods
-   const modIcons = {
-      armor: "helmet-battle",
-      damage: "bolt",
-   };
+      // If the value has been modified
+      if (maxValue !== maxBase) {
+         // Base
+         retVal += `<p>${localize("base")}: ${maxBase}</p>`;
+
+         // Equipment Mod
+         if (equipment !== 0) {
+            retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+         }
+
+         // Effect Mod
+         if (effect !== 0) {
+            retVal += `<p>${localize("effects")}: ${effect}</p>`;
+         }
+      }
+      return retVal;
+   }
 </script>
 
 <div class="mod">
    <!--Label-->
-   <div class="label" data-tooltip={localize(`${key}.desc`)}>
+   <div class="label" data-tooltip={localize("armor.desc")}>
       <!--Icon-->
-      <i class="fas fa-{modIcons[key]}" />
-      {localize(`${key}`)}
+      <i class="fas fa-helmet-battle" />
+      {localize("armor")}
    </div>
 
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="label" data-tooltip={localize(`${key}.baseValue`)}>
-         {mod.baseValue}
+      <div class="label" data-tooltip={localize("armor.baseValue")}>
+         {$document.system.mod.armor.baseValue}
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="static-mod" data-tooltip={localize(`${key}.editStaticMod`)}>
-         <DocumentIntegerInput bind:value={$document.system.mod[key].staticMod} />
+      <div class="static-mod" data-tooltip={localize("armor.editStaticMod")}>
+         <DocumentIntegerInput bind:value={$document.system.mod.armor.mod.static} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label final" data-tooltip={localize(`${key}.value`)}>
-         {mod.value}
+      <div class="label final" data-tooltip={localize("armor.valie")}>
+         {$document.system.mod.armor.value}
       </div>
    </div>
 </div>
@@ -65,7 +76,6 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         @include font-size-normal;
 
          &.final {
             font-weight: bold;
@@ -87,7 +97,6 @@
 
          .static-mod {
             width: 1.7rem;
-            --input-border-radius: 10px;
          }
       }
    }

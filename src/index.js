@@ -2,11 +2,12 @@ import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Mixins.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import registerSystemSettings from './system/RegisterSystemSettings.js';
+import registerTooltipSettings from './system/TooltipManager';
 import TitanConstants from './system/Constants.js';
 import TitanStatusEffects from './helpers/StatusEffects.js';
 import TitanChatMessageTypes from './system/ChatMessageTypes.js';
 import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
-import registerSystemSettings from './system/RegisterSystemSettings.js';
 import TitanActor from './actor/Actor.js';
 import TitanItem from './item/Item.js';
 import TitanPlayerSheet from './actor/types/player/PlayerSheet.js';
@@ -66,6 +67,7 @@ Hooks.once('init', async () => {
 
    // Register system settings
    registerSystemSettings();
+   registerTooltipSettings();
 
    return;
 });

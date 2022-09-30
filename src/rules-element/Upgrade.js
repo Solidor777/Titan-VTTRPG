@@ -52,11 +52,11 @@ export function applyUpgrade(flatModifier, actorData) {
    }
 
    // Modifier the dynamic mods
-   if (valueObject.itemMod === undefined) {
-      valueObject.itemMod = flatModifier.value;
+   if (valueObject.equipment === undefined) {
+      valueObject.equipment = flatModifier.value;
    }
-   else if (valueObject.itemMod + flatModifier.value !== undefined) {
-      valueObject.itemMod += flatModifier.value;
+   else if (valueObject.equipment + flatModifier.value !== undefined) {
+      valueObject.equipment += flatModifier.value;
    }
    else {
       console.error(`TITAN | Error applying Flat Modifier. Invalid Value provided. (${flatModifier.value})`);

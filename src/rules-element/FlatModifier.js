@@ -2,50 +2,60 @@ import { v4 as uuidv4 } from 'uuid';
 
 export function applyFlatModifier(flatModifier) {
    // Ensure the modifier is valid
-   if (flatModifier === undefined ||
-      flatModifier.operation === undefined ||
-      flatModifier.selector === undefined ||
-      flatModifier.key === undefined ||
-      flatModifier.type === undefined ||
-      flatModifier.value === undefined) {
-      console.error(`TITAN | Error applying Flat Modifier. Invalid Element. (${flatModifier})`);
+   if (flatModifier === undefined) {
+      console.error(`TITAN | Error applying Flat Modifier. Undefined Element.`);
       return;
+   }
+   if (flatModifier.selector === undefined) {
+      console.error(`TITAN | Error applying Flat Modifier. Undefined Selector.`);
+   }
+
+   if (flatModifier.key === undefined) {
+      console.error(`TITAN | Error applying Flat Modifier. Undefined Key.`);
+   }
+
+   if (flatModifier.type === undefined) {
+      console.error(`TITAN | Error applying Flat Modifier. Undefined Type.`);
+   }
+
+   if (flatModifier.value === undefined) {
+      console.error(`TITAN | Error applying Flat Modifier. Undefined Value.`);
    }
 
    // Find the value object
-   let valueObject = {};
+   let mods = {};
    const systemData = this.parent.system;
    switch (flatModifier.selector) {
       case 'attribute': {
-         valueObject = systemData.attribute[flatModifier.key];
+         mods = systemData.attribute[flatModifier.key].mod;
          break;
       }
       case 'resistance': {
-         valueObject = systemData.resistance[flatModifier.key];
+         mods = systemData.resistance[flatModifier.key].mod;
          break;
       }
       case 'training': {
-         valueObject = systemData.skill[flatModifier.key].training;
+         mods = systemData.skill[flatModifier.key].training.mod;
          break;
       }
       case 'expertise': {
-         valueObject = systemData.skill[flatModifier.key].expertise;
+         mods = systemData.skill[flatModifier.key].expertise.mod;
          break;
       }
       case 'rating': {
-         valueObject = systemData.rating[flatModifier.key];
+         mods = systemData.rating[flatModifier.key].mod;
          break;
       }
       case 'resource': {
-         valueObject = systemData.resource[flatModifier.key];
+         mods = systemData.resource[flatModifier.key].mod;
          break;
       }
       case 'speed': {
-         valueObject = systemData.system.speed[flatModifier.key];
+         mods = systemData.system.speed[flatModifier.key].mod;
          break;
       }
       case 'mod': {
-         valueObject = systemData.system.mod[flatModifier.key];
+         mods = systemData.system.mod[flatModifier.key].mod;
          break;
       }
       default: {
@@ -54,21 +64,36 @@ export function applyFlatModifier(flatModifier) {
       }
    }
 
-   // Determine the mod type
-   const modType = flatModifier.type === "effect" ? "effectMod" : "itemMod";
+   // Ensure there is a valid object for the mods
+   let type = '';
+   switch (flatModifier.type) {
+      case 'ability': {
+         type = 'ability';
+         break;
+      }
+      case 'armor':
+      case 'equipment':
+      case 'weapon': {
+         type = 'equipment';
+         break;
+      }
+      case 'effect': {
+         type = 'effect';
+         break;
+      }
+      default: {
+         console.error(`TITAN | Error applying Flat Modifier. Invalid Type (${flatModifier.type})`);
+         return;
+      }
+   }
 
    // Apply the mod
-   if (valueObject[modType] + flatModifier.value !== undefined) {
-      valueObject[modType] += flatModifier.value;
-   }
-   else {
-      console.error(`TITAN | Error applying Flat Modifier. Invalid Value provided. (${modType} ${flatModifier.value})`);
-   }
+   mods[type] += flatModifier.value;
 
    return;
 }
 
-export function getFlatModifierTemplate() {
+export function getFlatModifierTemplate(sourceType) {
    return {
       operation: 'flatModifier',
       selector: 'attribute',

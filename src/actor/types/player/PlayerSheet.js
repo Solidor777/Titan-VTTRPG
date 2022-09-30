@@ -1,5 +1,6 @@
 import PlayerSheetShell from './PlayerSheetShell.svelte';
 import TitanCharacterSheet from '~/actor/types/character/sheet/CharacterSheet.js';
+import createPlayerSheetState from './PlayerSheetState';
 
 export default class TitanPlayerSheet extends TitanCharacterSheet {
    /**
@@ -17,5 +18,10 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
             target: document.body
          }
       });
+   }
+
+   constructor(object) {
+      super(object);
+      this.reactive.state = createPlayerSheetState();
    }
 }

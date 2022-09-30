@@ -6,47 +6,61 @@
    // The key / name of the Rating
    export let key;
 
-   // The Character Data
+   // Icon to display
+   export let icon = void 0;
+
+   // Setup context variables
    const document = getContext("DocumentStore");
 
-   // The rating data
-   $: rating = $document.system.rating[key];
+   // Calculate the tooltip for the max value
+   function getTotalValueTooltip(equipment, effect) {
+      // Base label
+      let retVal = `<p>${localize(`${key}.max`)}</p>`;
 
-   // Map of icons to use for the ratings
-   const ratingIcons = {
-      awareness: "eye",
-      defense: "shield",
-      melee: "sword",
-      accuracy: "bow-arrow",
-      initiative: "clock",
-   };
+      // If the value has been modified
+      if (maxValue !== maxBase) {
+         // Base
+         retVal += `<p>Base: ${maxBase}</p>`;
+
+         // Item Mod
+         if (equipment !== 0) {
+            retVal += `<p>Items: ${equipment}</p>`;
+         }
+
+         // Effect Mod
+         if (effect !== 0) {
+            retVal += `<p>Effects: ${effect}</p>`;
+         }
+      }
+      return retVal;
+   }
 </script>
 
-<div class="rating">
+<div class="mod">
    <!--Label-->
    <div class="label" data-tooltip={localize(`${key}.desc`)}>
       <!--Icon-->
-      <i class="fas fa-{ratingIcons[key]}" />
-      {localize(`${key}`)}
+      <i class="fas fa-armor" />
+      {localize(key)}
    </div>
 
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
       <div class="label" data-tooltip={localize(`${key}.baseValue`)}>
-         {rating.baseValue}
+         {$document.system.mod[key].baseValue}
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
       <div class="static-mod" data-tooltip={localize(`${key}.editStaticMod`)}>
-         <DocumentIntegerInput bind:value={$document.system.rating[key].mod.static} />
+         <DocumentIntegerInput bind:value={$document.system.mod[key].mod.static} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
       <div class="label final" data-tooltip={localize(`${key}.value`)}>
-         {rating.value}
+         {$document.system.mod[key].value}
       </div>
    </div>
 </div>
@@ -54,7 +68,7 @@
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
 
-   .rating {
+   .mod {
       @include flex-row;
       @include flex-space-between;
       width: 100%;
@@ -68,7 +82,6 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         @include font-size-normal;
 
          &.final {
             font-weight: bold;
@@ -90,7 +103,6 @@
 
          .static-mod {
             width: 1.7rem;
-            --input-border-radius: 10px;
          }
       }
    }

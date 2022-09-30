@@ -89,7 +89,7 @@
             @include flex-group-center;
             height: 1.5rem;
             width: 1.5rem;
-            background: var(--static-label-background-color);
+            background: var(--static-value-background);
             margin-left: 0.25rem;
             z-index: inherit;
          }

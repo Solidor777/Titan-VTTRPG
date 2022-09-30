@@ -35,7 +35,7 @@
 
       <!--Static Mod-->
       <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
-         <DocumentIntegerInput bind:value={$document.system.attribute[key].staticMod} />
+         <DocumentIntegerInput bind:value={$document.system.attribute[key].mod.static} />
       </div>
       <div class="label">=</div>
 
