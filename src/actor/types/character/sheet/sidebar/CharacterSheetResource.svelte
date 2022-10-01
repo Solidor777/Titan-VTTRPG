@@ -3,6 +3,7 @@
    import { localize } from "~/helpers/Utility.js";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import Meter from "~/helpers/svelte-components/Meter.svelte";
+   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
 
    // Resource key
    export let key;
@@ -11,21 +12,18 @@
    const document = getContext("DocumentStore");
 
    // Calculate the tooltip for the max value
-   function getTotalValueTooltip(maxValue, maxBase, equipment, effect, ability, staticMod) {
+   function getTotalValueTooltip(maxBase, equipment, effect, ability, staticMod) {
       // Base label
-      let retVal = `<p>${localize(`${key}.max`)}</p>`;
-
-      // Base
-      retVal += `<p>${localize("base")}: ${maxBase}</p>`;
-
-      // Abilities
-      if (ability !== 0) {
-         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
-      }
+      let retVal = `<p>${localize(`${key}.max`)}</p><p>${localize("base")}: ${maxBase}</p>`;
 
       // Equipment
       if (equipment !== 0) {
          retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+      }
+
+      // Abilities
+      if (ability !== 0) {
+         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
       }
 
       // Effects
@@ -35,30 +33,19 @@
 
       // Static mod
       if (staticMod !== 0) {
-         retVal += `<p>${localize("static")}: ${effect}</p>`;
+         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
       }
 
       return retVal;
    }
 
-   function getModClass(effect, staticMod) {
-      if (effect + staticMod === 0) {
-         return "";
-      } else {
-         return effect + staticMod > 0 ? "greater" : "lesser";
-      }
-   }
-
    $: totalValueTooltip = getTotalValueTooltip(
-      $document.system.resource[key].maxValue,
       $document.system.resource[key].maxBase,
       $document.system.resource[key].mod.equipment,
       $document.system.resource[key].mod.effect,
       $document.system.resource[key].mod.ability,
       $document.system.resource[key].mod.static
    );
-
-   $: modClass = getModClass($document.system.resource[key].mod.effect, $document.system.resource[key].mod.static);
 </script>
 
 <div class="resource">
@@ -72,7 +59,7 @@
       <!--Static Mod-->
       <div class="static-mod">
          <div class="symbol">+</div>
-         <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
+         <div class="input">
             <DocumentIntegerInput bind:value={$document.system.resource[key].mod.static} />
          </div>
       </div>
@@ -81,7 +68,7 @@
    <!--Meter bar row-->
    <div class="row">
       <!--Current Value Input-->
-      <div class="input" data-tooltip={localize(`${key}.editValue`)}>
+      <div class="input">
          <DocumentIntegerInput bind:value={$document.system.resource[key].value} />
       </div>
 
@@ -91,8 +78,13 @@
       </div>
 
       <!--Max Value Display-->
-      <div class="static-value {modClass}" data-tooltip={totalValueTooltip}>
-         {$document.system.resource[key].maxValue}
+      <div class="value" data-tooltip={totalValueTooltip}>
+         <ModTag
+            baseValue={$document.system.resource[key].maxBase +
+               $document.system.resource[key].mod.equipment +
+               $document.system.resource[key].mod.ability}
+            currentValue={$document.system.resource[key].maxValue}
+         />
       </div>
    </div>
 </div>
@@ -140,12 +132,11 @@
             margin-right: 0.25rem;
          }
 
-         .static-value {
-            @include border;
-            @include panel-3;
-            @include mod-colors;
+         .value {
+            @include flex-row;
+            @include flex-group-center;
             height: 100%;
-            width: 1.75rem;
+            min-width: 1.75rem;
          }
 
          .spacer {

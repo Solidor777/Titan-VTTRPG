@@ -387,6 +387,7 @@
   "LOCAL.base.desc.label": "Base",
   "LOCAL.effects.desc.label": "Effects",
   "LOCAL.static.label": "Static",
+  "LOCAL.armor.equipmentValue.label": "Amount of Armor granted by equipped items.",
   "LOCAL.encounter.label": "Encounter",
   "LOCAL.temporary.label": "Temporary",
   "LOCAL.permanent.label": "Permanent",

@@ -381,12 +381,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (equippedArmorId) {
          const equippedArmor = this.parent.items.get(equippedArmorId);
          if (equippedArmor) {
-            armor.baseValue = equippedArmor.system.armor;
+            armor.mod.equipment += equippedArmor.system.armor;
          }
       }
 
-      // Final mods
-      systemData.mod.damage.baseValue = 0;
+      // Mods
+      for (let [key, mod] of Object.entries(systemData.mod)) {
+         mod.value = 0;
+         for (let [modKey, modMod] of (Object.entries(mod.mod))) {
+            mod.value += modMod;
+         }
+      }
 
       applyModsDeep(systemData.mod);
 

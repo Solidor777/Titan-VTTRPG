@@ -1,7 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import CharacterSheetResource from "~/actor/types/character/sheet/base/CharacterSheetResource.svelte";
-   import CharacterSheetArmor from "./CharacterSheetModArmor.svelte";
+   import CharacterSheetResource from "~/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -9,7 +8,6 @@
 
 <!--Resources-->
 <div class="resources">
-   <CharacterSheetArmor />
    <!--Each Resource Meter-->
    {#each Object.entries($document.system.resource) as [key]}
       <div class="resource {key}">

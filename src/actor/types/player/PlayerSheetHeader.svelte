@@ -3,8 +3,8 @@
    import { localize } from "~/helpers/Utility.js";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import CharacterAttribute from "~/actor/types/character/sheet/base/CharacterAttribute.svelte";
-   import CharacterResistance from "~/actor/types/character/sheet/base/CharacterResistance.svelte";
+   import CharacterAttribute from "~/actor/types/character/sheet/sidebar/CharacterAttribute.svelte";
+   import CharacterResistance from "~/actor/types/character/sheet/sidebar/CharacterResistance.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");

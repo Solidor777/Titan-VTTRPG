@@ -51,11 +51,11 @@ export function applyFlatModifier(flatModifier) {
          break;
       }
       case 'speed': {
-         mods = systemData.system.speed[flatModifier.key].mod;
+         mods = systemData.speed[flatModifier.key].mod;
          break;
       }
       case 'mod': {
-         mods = systemData.system.mod[flatModifier.key].mod;
+         mods = systemData.mod[flatModifier.key].mod;
          break;
       }
       default: {
