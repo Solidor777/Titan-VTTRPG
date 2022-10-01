@@ -54,12 +54,12 @@
 
    .attribute {
       @include flex-row;
-      @include flex-group-center;
+      @include flex-space-evenly;
       height: 100%;
       width: 100%;
 
       .button {
-         width: 6rem;
+         min-width: 6rem;
          &.body {
             --button-background-color: var(--body-color-bright);
          }
@@ -80,7 +80,7 @@
          margin-left: 0.5rem;
 
          :not(:first-child) {
-            margin-left: 0.5rem;
+            margin-left: 0.25rem;
          }
 
          .input {
