@@ -2,15 +2,13 @@
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import ModTag from "../../../../../helpers/svelte-components/tag/ModTag.svelte";
 
    // The key / name of the speed
    export let key;
 
    // The Character Data
    const document = getContext("DocumentStore");
-
-   // The speed data
-   $: speed = $document.system.speed[key];
 </script>
 
 <!--Speeds-->
@@ -36,8 +34,13 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label final" data-tooltip={localize(`${key}.value`)}>
-         {speed.value}
+      <div class="value" data-tooltip={localize(`${key}.value`)}>
+         <ModTag
+            currentValue={$document.system.speed[key].value}
+            baseValue={$document.system.speed[key].baseValue +
+               $document.system.speed[key].mod.ability +
+               $document.system.speed[key].mod.equipment}
+         />
       </div>
    </div>
 </div>
@@ -55,11 +58,12 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         @include font-size-normal;
+      }
 
-         &.final {
-            font-weight: bold;
-         }
+      .value {
+         @include flex-row;
+         @include flex-group-center;
+         min-width: 1.75rem;
       }
 
       .stats {
@@ -68,12 +72,11 @@
          height: 100%;
 
          :not(:first-child) {
-            margin-left: 0.5rem;
+            margin-left: 0.25rem;
          }
 
          .input {
-            width: 1.7rem;
-            --input-border-radius: 10px;
+            width: 1.75rem;
          }
       }
    }

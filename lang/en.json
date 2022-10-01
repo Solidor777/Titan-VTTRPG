@@ -391,6 +391,7 @@
   "LOCAL.encounter.label": "Encounter",
   "LOCAL.temporary.label": "Temporary",
   "LOCAL.permanent.label": "Permanent",
+  "LOCAL.total.label": "Total",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",
