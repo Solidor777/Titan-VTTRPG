@@ -3,6 +3,7 @@
    import { getContext } from "svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
 
    // The key / name of the resistance
    export let key;
@@ -12,49 +13,49 @@
 
    // Application reference
    const application = getContext("external").application;
-
-   // Reactive resistance data
-   $: resistance = $document.system.resistance[key];
 </script>
 
 <div class="resistance" data-resistance={key}>
    <!--Resistance Label-->
    <div class="button {key}" data-tooltip={localize(`${key}.desc`)}>
-      <EfxButton on:click={application.rollResistanceCheck.bind(application, key)}>
+      <EfxButton on:click={application.rollAttributeCheck.bind(application, key)}>
          {localize(`${key}`)}
       </EfxButton>
    </div>
 
+   <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="label" data-tooltip={localize(`${key}.baseValue`)}>
-         {resistance.baseValue}
+      <div class="input">
+         <DocumentIntegerInput bind:value={$document.system.resistance[key].baseValue} />
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
-      <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
+      <div class="input">
          <DocumentIntegerInput bind:value={$document.system.resistance[key].mod.static} />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="label final" data-tooltip={localize(`${key}.value`)}>
-         {resistance.value}
+      <div class="value" data-tooltip={localize(`${key}.value`)}>
+         <ModTag
+            currentValue={$document.system.resistance[key].value}
+            baseValue={$document.system.resistance[key].baseValue +
+               $document.system.resistance[key].mod.effect +
+               $document.system.resistance[key].mod.ability}
+         />
       </div>
    </div>
 </div>
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
-
    .resistance {
       @include flex-row;
+      @include flex-group-center;
+      height: 100%;
       width: 100%;
-      align-items: center;
-      justify-content: space-between;
-      box-sizing: border-box;
-      @include font-size-normal;
 
       .button {
          width: 6rem;
@@ -76,7 +77,7 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
-         margin-left: 1rem;
+         margin-left: 0.5rem;
 
          :not(:first-child) {
             margin-left: 0.5rem;
@@ -86,21 +87,20 @@
             @include flex-row;
             @include flex-group-center;
             height: 100%;
-            height: 100%;
-            width: 1.7rem;
-            --input-border-radius: 10px;
+            width: 1.75rem;
          }
 
          .label {
             @include flex-row;
             @include flex-group-center;
             height: 100%;
-            @include font-size-normal;
+         }
 
-            &.final {
-               font-weight: bold;
-               width: 1rem;
-            }
+         .value {
+            @include flex-row;
+            @include flex-group-center;
+            height: 100%;
+            min-width: 1.75rem;
          }
       }
    }

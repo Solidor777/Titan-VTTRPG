@@ -99,13 +99,14 @@
             }
          }
       }
+
       .stats {
          @include flex-row;
          @include flex-group-center;
          @include border-top;
          width: 100%;
-         margin-top: 0.5rem;
-         padding-top: 0.5rem;
+         margin-top: 0.25rem;
+         padding-top: 0.25rem;
 
          .section {
             @include flex-row;

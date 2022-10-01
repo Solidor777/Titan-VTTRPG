@@ -9,11 +9,6 @@
 
 <!--Attributes-->
 <div class="attributes">
-   <div class="label">
-      <div class="name">{localize("attribute")}</div>
-      <div class="base">{localize("base")}</div>
-      <div class="mod">{localize("mod")}</div>
-   </div>
    {#each Object.entries($document.system.attribute) as [key]}
       <div class="attribute">
          <CharacterSheetAttribute bind:key />
@@ -25,40 +20,17 @@
    @import "../../../../../Styles/Mixins.scss";
    .attributes {
       @include flex-column;
-      height: 100%;
-
-      .label {
-         @include font-size-normal;
-         @include flex-row;
-         font-weight: bold;
-         width: 100%;
-
-         .name {
-            @include flex-row;
-            @include flex-group-center;
-            width: 5.5rem;
-            margin-left: 0.5rem;
-         }
-         .base {
-            margin-left: 0.25rem;
-            width: 2.5rem;
-         }
-
-         .mod {
-            width: 2.5rem;
-            margin-left: 0.75rem;
-         }
-      }
+      @include flex-group-top;
+      width: 100%;
 
       .attribute {
-         height: 100%;
-         &:not(:first-child) {
-            margin-top: 0.25rem;
-         }
+         @include flex-row;
+         @include flex-group-center;
 
-         &:not(:last-child) {
-            @include border-bottom;
-            padding-bottom: 0.25rem;
+         &:not(:first-child) {
+            @include border-top;
+            padding-top: 0.25rem;
+            margin-top: 0.25rem;
          }
       }
    }
