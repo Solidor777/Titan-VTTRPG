@@ -911,7 +911,91 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   rest() {
+   async clearTemporaryEffects() {
+      const systemData = this.parent.system;
+
+      // Reset static mods
+      // Attribute
+      for (const [key, value] of Object.entries(systemData.attribute)) {
+         value.mod.static = 0;
+      }
+
+      // Skills
+      for (const [key, value] of Object.entries(systemData.skill)) {
+         value.training.mod.static = 0;
+         value.expertise.mod.static = 0;
+      }
+
+      // Ratings
+      for (const [key, value] of Object.entries(systemData.rating)) {
+         value.mod.static = 0;
+      }
+
+      // Speed
+      for (const [key, value] of Object.entries(systemData.speed)) {
+         value.mod.static = 0;
+      }
+
+      // Mod
+      for (const [key, value] of Object.entries(systemData.mod)) {
+         value.mod.static = 0;
+      }
+
+      // Update the actor
+      await this.parent.update({
+         system: this.parent.system
+      });
+
+      // Delete all Temporary Effects
+      let temporaryEffects = this.parent.items.filter((item) => {
+         return item.type === 'effect' && item.system.duration === 'temporary';
+      });
+      temporaryEffects.forEach((item) => {
+         return this.parent.deleteItem(item._id);
+      });
+
+      return;
+   }
+
+   async takeABreather() {
+      // Clear temporary effects
+      this.clearTemporaryEffects();
+
+      // Reset stamina to max
+      const stamina = this.parent.system.resource.stamina.maxValue;
+
+      // Update the actor
+      await this.parent.update({
+         system: {
+            resource: {
+               stamina: {
+                  value: stamina
+               }
+            }
+         }
+      });
+
+      return;
+   }
+
+   async rest() {
+      await this.takeABreather();
+
+      // Decrease wounds by 1
+      let wounds = this.parent.system.resource.wounds.value;
+      if (wounds > 0) {
+         wounds -= 1;
+         await this.parent.update({
+            system: {
+               resource: {
+                  wounds: {
+                     value: wounds
+                  }
+               }
+            }
+         });
+      }
+
       return;
    }
 }

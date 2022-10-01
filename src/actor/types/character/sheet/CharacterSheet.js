@@ -135,13 +135,40 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    async deleteItem(id) {
       this.reactive.state.deleteItem(id);
       this.reactive.document.deleteItem(id);
-
       return;
    }
 
    // Add item
    async addItem(type) {
       this.reactive.document.addItem(type);
+      return;
+   }
+
+   _clearTempEffectsFromState() {
+      // Delete all Temp Effects and Mods
+      let temporaryEffects = this.reactive.document.items.filter((item) => {
+         return item.type === 'effect' && item.system.duration === 'temporary';
+      });
+      temporaryEffects.forEach((item) => {
+         return this.reactive.state.deleteItem(item._id);
+      });
+   }
+
+   async clearTemporaryEffects() {
+      this._clearTempEffectsFromState();
+      await this.reactive.document.typeComponent.clearTemporaryEffects();
+      return;
+   }
+
+   async takeABreather() {
+      this._clearTempEffectsFromState();
+      await this.reactive.document.typeComponent.takeABreather();
+      return;
+   }
+
+   async rest() {
+      this._clearTempEffectsFromState();
+      await this.reactive.document.typeComponent.rest();
       return;
    }
 }

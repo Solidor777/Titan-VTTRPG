@@ -10,10 +10,6 @@
 
    const durationOptions = [
       {
-         value: "encounter",
-         label: localize("encounter"),
-      },
-      {
          value: "temporary",
          label: localize("temporary"),
       },

@@ -3,8 +3,8 @@
    import { localize } from "~/helpers/Utility.js";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import CharacterAttribute from "~/actor/types/character/sheet/sidebar/CharacterAttribute.svelte";
-   import CharacterResistance from "~/actor/types/character/sheet/sidebar/CharacterResistance.svelte";
+   import CharacterSheetAttribute from "~/actor/types/character/sheet/header/CharacterSheetAttribute.svelte";
+   import CharacterSheetResistance from "~/actor/types/character/sheet/header/CharacterSheetResistance.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -22,7 +22,7 @@
       <div class="xp">
          <!--Available-->
          <div class="available" data-tooltip={localize("xpAvailable")}>
-            {$document.system.xp.available} /
+            {`${$document.system.xp.available} / `}
          </div>
 
          <!--Earned Input-->
@@ -46,7 +46,7 @@
          </div>
          {#each Object.entries($document.system.attribute) as [key]}
             <div class="attribute">
-               <CharacterAttribute bind:key />
+               <CharacterSheetAttribute bind:key />
             </div>
          {/each}
       </div>
@@ -63,7 +63,7 @@
          </div>
          {#each Object.entries($document.system.resistance) as [key]}
             <div class="resistance">
-               <CharacterResistance bind:key />
+               <CharacterSheetResistance bind:key />
             </div>
          {/each}
       </div>
@@ -80,7 +80,7 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.25rem;
 
       .row {
          @include flex-row;
@@ -94,36 +94,35 @@
          }
 
          .actor-name {
-            width: 50%;
+            @include flex-row;
+            @include flex-group-left;
+            flex: auto;
+            margin-right: 1rem;
          }
 
          .xp {
-            margin-right: 0.5rem;
-            display: flex;
-            width: 10rem;
-            align-items: center;
-            text-align: center;
-            justify-content: flex-end;
+            @include flex-row;
+            @include flex-group-center;
+            margin-right: 0.25rem;
 
             .available {
-               font-family: var(--font-family);
+               @include flex-row;
+               @include flex-group-center;
                font-weight: bold;
-               @include font-size-normal;
-               display: flex;
                margin-right: 0.25rem;
+               flex-wrap: nowrap;
             }
 
             .earned {
-               font-family: var(--font-family);
-               display: flex;
+               @include flex-row;
+               @include flex-group-center;
                margin-right: 0.5rem;
-               width: 3rem;
-               --input-border-radius: 10px;
-               --input-height: 1.8rem;
+               width: 2.5rem;
             }
 
             .label {
-               font-family: var(--font-family);
+               @include flex-row;
+               @include flex-group-center;
                font-weight: bold;
             }
          }
