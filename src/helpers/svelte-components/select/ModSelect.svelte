@@ -18,6 +18,10 @@
          label: localize("damage"),
          value: "damage",
       },
+      {
+         label: localize("healing"),
+         value: "healing",
+      },
    ];
 
    // Add none option

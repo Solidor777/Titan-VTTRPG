@@ -401,6 +401,11 @@
             "mod": {
               "static": 0
             }
+          },
+          "healing": {
+            "mod": {
+              "static": 0
+            }
           }
         },
         "statusEffect": {

@@ -373,12 +373,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Speeds
       applyModsDeep(systemData.speed);
 
-      // Mods
       // Add armor from the equipped armor if appropriate
-      const armor = systemData.mod.armor;
-      armor.baseValue = 0;
       const equippedArmorId = this.parent.system.equipped.armor;
       if (equippedArmorId) {
+         const armor = systemData.mod.armor;
          const equippedArmor = this.parent.items.get(equippedArmorId);
          if (equippedArmor) {
             armor.mod.equipment += equippedArmor.system.armor;
@@ -392,9 +390,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             mod.value += modMod;
          }
       }
-
-      applyModsDeep(systemData.mod);
-
       return;
    }
 

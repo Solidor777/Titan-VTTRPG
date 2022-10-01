@@ -9,6 +9,7 @@
    const modIcons = {
       armor: "helmet-battle",
       damage: "bolt",
+      healing: "heart",
    };
 </script>
 
