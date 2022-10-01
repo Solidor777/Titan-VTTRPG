@@ -9,6 +9,42 @@
 
    // The Character Data
    const document = getContext("DocumentStore");
+
+   // Calculate the tooltip for the max value
+   function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
+      // Base label
+      let retVal = `<p>${localize("base")}: ${baseValue}</p>`;
+
+      // Equipment
+      if (equipment !== 0) {
+         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+      }
+
+      // Abilities
+      if (ability !== 0) {
+         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+      }
+
+      // Effects
+      if (effect !== 0) {
+         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+      }
+
+      // Static mod
+      if (staticMod !== 0) {
+         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+      }
+
+      return retVal;
+   }
+
+   $: totalValueTooltip = getTotalValueTooltip(
+      $document.system.speed[key].baseValue,
+      $document.system.speed[key].mod.equipment,
+      $document.system.speed[key].mod.effect,
+      $document.system.speed[key].mod.ability,
+      $document.system.speed[key].mod.static
+   );
 </script>
 
 <!--Speeds-->
@@ -22,19 +58,19 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input" data-tooltip={localize(`${key}.editBaseValue`)}>
+      <div class="input">
          <DocumentIntegerInput bind:value={$document.system.speed[key].baseValue} />
       </div>
       <div class="symbol">+</div>
 
       <!--Static Mod-->
-      <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
+      <div class="input">
          <DocumentIntegerInput bind:value={$document.system.speed[key].mod.static} />
       </div>
       <div class="symbol">=</div>
 
       <!--Total Value-->
-      <div class="value" data-tooltip={localize(`${key}.value`)}>
+      <div class="value" data-tooltip={totalValueTooltip}>
          <ModTag
             currentValue={$document.system.speed[key].value}
             baseValue={$document.system.speed[key].baseValue +
