@@ -1,4 +1,5 @@
 <script>
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
@@ -11,11 +12,31 @@
       <DocumentImagePicker path={"img"} alt={"character portrait"} />
    </div>
    <!--Rest Button-->
-   <div class="button">
+   <div class="button rest" data-tooltip={localize("rest")}>
       <IconButton
-         icon={"fas fa-campground"}
+         icon={"fas fa-bed"}
          on:click={() => {
             application.rest();
+         }}
+      />
+   </div>
+
+   <!--Take a Breather Button-->
+   <div class="button breather" data-tooltip={localize("takeABreather")}>
+      <IconButton
+         icon={"fas fa-face-exhaling"}
+         on:click={() => {
+            application.takeABreather();
+         }}
+      />
+   </div>
+
+   <!--Reset Temp Effects button-->
+   <div class="button clear" data-tooltip={localize("clearTemporaryEffects")}>
+      <IconButton
+         icon={"fas fa-arrow-rotate-left"}
+         on:click={() => {
+            application.clearTemporaryEffects();
          }}
       />
    </div>
@@ -37,8 +58,21 @@
 
       .button {
          position: absolute;
-         top: 0;
-         left: 0;
+
+         &.rest {
+            top: 0;
+            left: 0;
+         }
+
+         &.breather {
+            top: 0;
+            right: 0;
+         }
+
+         &.clear {
+            bottom: 0;
+            left: 0;
+         }
       }
    }
 </style>

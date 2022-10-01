@@ -3,8 +3,8 @@
    import { localize } from "~/helpers/Utility.js";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import CharacterSheetAttribute from "~/actor/types/character/sheet/header/CharacterSheetAttribute.svelte";
-   import CharacterSheetResistance from "~/actor/types/character/sheet/header/CharacterSheetResistance.svelte";
+   import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
+   import CharacterSheetResistances from "../character/sheet/header/CharacterSheetResistances.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -12,7 +12,7 @@
 
 <div class="header">
    <!--Name and XP-->
-   <div class="row">
+   <div class="main-header">
       <!--Character name Sheet-->
       <div class="actor-name">
          <DocumentName />
@@ -36,36 +36,15 @@
    </div>
 
    <!--Attributes and Resistances-->
-   <div class="row">
+   <div class="stats">
       <!--Attributes-->
-      <div class="attributes">
-         <div class="label">
-            <div class="name">{localize("attribute")}</div>
-            <div class="base">{localize("base")}</div>
-            <div class="mod">{localize("mod")}</div>
-         </div>
-         {#each Object.entries($document.system.attribute) as [key]}
-            <div class="attribute">
-               <CharacterSheetAttribute bind:key />
-            </div>
-         {/each}
+      <div class="section">
+         <CharacterSheetAttributes />
       </div>
 
-      <!--Divider-->
-      <div class="divider" />
-
       <!--Resistances-->
-      <div class="resistances">
-         <div class="label">
-            <div class="name">{localize("resistance")}</div>
-            <div class="base">{localize("base")}</div>
-            <div class="mod">{localize("mod")}</div>
-         </div>
-         {#each Object.entries($document.system.resistance) as [key]}
-            <div class="resistance">
-               <CharacterSheetResistance bind:key />
-            </div>
-         {/each}
+      <div class="section">
+         <CharacterSheetResistances />
       </div>
    </div>
 </div>
@@ -77,21 +56,14 @@
       @include panel-1;
       @include border;
       @include flex-column;
-      align-items: center;
-      justify-content: space-between;
+      @include flex-group-top;
       width: 100%;
       padding: 0.25rem;
 
-      .row {
+      .main-header {
          @include flex-row;
          @include flex-space-between;
          width: 100%;
-
-         &:not(:first-child) {
-            @include border-top;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-         }
 
          .actor-name {
             @include flex-row;
@@ -126,90 +98,25 @@
                font-weight: bold;
             }
          }
+      }
+      .stats {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-top;
+         width: 100%;
+         margin-top: 0.5rem;
+         padding-top: 0.5rem;
 
-         .attributes {
-            @include flex-column;
-            height: 100%;
+         .section {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
 
-            .label {
-               @include font-size-normal;
-               font-weight: bold;
-               @include flex-row;
-               width: 100%;
-               .name {
-                  @include flex-row;
-                  @include flex-group-center;
-                  width: 5.5rem;
-                  margin-left: 0.5rem;
-               }
-               .base {
-                  margin-left: 0.25rem;
-                  width: 2.5rem;
-               }
-
-               .mod {
-                  width: 2.5rem;
-                  margin-left: 0.75rem;
-               }
+            &:not(:first-child) {
+               @include border-left;
+               margin-left: 0.25rem;
+               padding-left: 0.25rem;
             }
-
-            .attribute {
-               height: 100%;
-               &:not(:first-child) {
-                  margin-top: 0.25rem;
-               }
-
-               &:not(:last-child) {
-                  @include border-bottom;
-                  padding-bottom: 0.25rem;
-               }
-            }
-         }
-
-         .resistances {
-            @include flex-column;
-            @include flex-group-top;
-
-            .label {
-               @include flex-row;
-               @include font-size-normal;
-               font-weight: bold;
-               width: 100%;
-
-               .name {
-                  @include flex-row;
-                  @include flex-group-center;
-                  width: 5.5rem;
-                  margin-left: 0.325rem;
-               }
-
-               .base {
-                  margin-left: 0.25rem;
-                  width: 2.5rem;
-               }
-
-               .mod {
-                  width: 2.5rem;
-                  margin-left: 0.325rem;
-               }
-            }
-
-            .resistance {
-               width: 100%;
-               margin-top: 0.25rem;
-
-               &:not(:last-child) {
-                  @include border-bottom;
-                  padding-bottom: 0.25rem;
-               }
-            }
-         }
-
-         .divider {
-            height: 100%;
-            width: 0;
-            border-left: var(--border-style);
-            border-width: var(--border-width);
          }
       }
    }
