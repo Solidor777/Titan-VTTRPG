@@ -6,7 +6,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import CharacterSkillsTab from "~/actor/types/character/sheet/tabs/CharacterSkillsTab.svelte";
+   import CharacterSkillsTab from "~/actor/types/character/sheet/tabs/skills/CharacterSkillsTab.svelte";
    import CharacterActionsTab from "~/actor/types/character/sheet/tabs/CharacterActionsTab.svelte";
    import CharacterAbilitiesTab from "~/actor/types/character/sheet/tabs/CharacterAbilitiesTab.svelte";
    import CharacterInventoryTab from "~/actor/types/character/sheet/tabs/CharacterInventoryTab.svelte";
