@@ -44,8 +44,6 @@
       $document.system.mod[key].mod.ability,
       $document.system.mod[key].mod.static
    );
-
-   console.log($document.system.mod[key].value);
 </script>
 
 <div class="mod">
