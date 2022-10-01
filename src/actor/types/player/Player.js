@@ -10,44 +10,44 @@ export default class TitanPlayerComponent extends TitanCharacterComponent {
     let spentXp = 0;
 
     // Add cost of current attribute
-    for (const attribute in systemData.attribute) {
-      const attributeBaseValue = systemData.attribute[attribute].baseValue;
-
-      // Calculate xp cost
-      const minAttributeValue = CONFIG.TITAN.constants.attribute.min;
-      if (attributeBaseValue > minAttributeValue) {
-        spentXp +=
-          CONFIG.TITAN.constants.attribute.totalExpCostByRank[
-          attributeBaseValue - minAttributeValue - 1
-          ];
-      }
+    for (const [key, attribute] of Object.entries(systemData.attribute)) {
+      spentXp += this._getAttributeXPCost(attribute.baseValue);
     }
 
     // Add cost of current skill
-    for (const skill in systemData.skill) {
-      const skillData = systemData.skill[skill];
-
-      // Calculate xp cost of training
-      const skillTrainingBaseValue = skillData.training.baseValue;
-      if (skillTrainingBaseValue > 0) {
-        spentXp +=
-          CONFIG.TITAN.constants.skill.training.totalExpCostByRank[
-          skillTrainingBaseValue - 1
-          ];
-      }
-
-      // Calculate xp cost of training
-      const skillExpertiseBaseValue = skillData.expertise.baseValue;
-      if (skillExpertiseBaseValue > 0) {
-        spentXp +=
-          CONFIG.TITAN.constants.skill.expertise.totalExpCostByRank[
-          skillExpertiseBaseValue - 1
-          ];
-      }
+    for (const [key, skill] of Object.entries(systemData.skill)) {
+      spentXp += this._getSkillXPCost(skill.training.baseValue);
+      spentXp += this._getSkillXPCost(skill.expertise.baseValue);
     }
 
     systemData.xp.available = systemData.xp.earned - spentXp;
   }
 
-  return;
+  _getAttributeXPCost(value) {
+    // Attribute Cost starts at 2 for rank 2, and increases by consecutive odd integers, starting with 5
+    let retVal = 0;
+    let intervalCost = 2;
+    let oddNumber = 5;
+    for (let idx = 1; idx < value; idx++) {
+      retVal += intervalCost;
+      intervalCost = oddNumber;
+      oddNumber += 2;
+    }
+
+    return retVal;
+  }
+
+  _getSkillXPCost(value) {
+    // Skill Cost starts at 1 for rank 1, and increases by consecutive even integers, starting with 2
+    let retVal = 0;
+    let intervalCost = 1;
+    let evenNumber = 2;
+    for (let idx = 0; idx < value; idx++) {
+      retVal += intervalCost;
+      intervalCost = evenNumber;
+      evenNumber += 2;
+    }
+
+    return retVal;
+  }
 }

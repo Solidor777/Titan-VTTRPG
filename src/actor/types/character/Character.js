@@ -93,16 +93,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Calculate base resource values
       // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = Math.ceil(totalBaseAttributeValue *
-         CONFIG.TITAN.constants.resource.stamina.maxBaseMulti);
+      systemData.resource.stamina.maxBase = totalBaseAttributeValue;
 
       // Resolve = Soul / 2 rounded up
       systemData.resource.resolve.maxBase = Math.ceil(
-         systemData.attribute.soul.baseValue * CONFIG.TITAN.constants.resource.resolve.maxBaseMulti);
+         systemData.attribute.soul.baseValue / 2);
 
       // Wounds = Total Attribute mod / 2 rounded up
       systemData.resource.wounds.maxBase = Math.ceil(
-         totalBaseAttributeValue * CONFIG.TITAN.constants.resource.wounds.maxBaseMulti);
+         totalBaseAttributeValue / 2);
    }
 
    _resetDynamicMods() {
@@ -115,38 +114,38 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Attributes
-      for (let [key, attribute] of Object.entries(systemData.attribute)) {
+      for (const [key, attribute] of Object.entries(systemData.attribute)) {
          resetMods(attribute.mod);
       }
 
       // Skills
-      for (let [key, skill] of Object.entries(systemData.skill)) {
+      for (const [key, skill] of Object.entries(systemData.skill)) {
          resetMods(skill.training.mod);
          resetMods(skill.expertise.mod);
       }
 
       // Resource
-      for (let [key, resource] of Object.entries(systemData.resource)) {
+      for (const [key, resource] of Object.entries(systemData.resource)) {
          resetMods(resource.mod);
       }
 
       // Resistance
-      for (let [key, resistance] of Object.entries(systemData.resistance)) {
+      for (const [key, resistance] of Object.entries(systemData.resistance)) {
          resetMods(resistance.mod);
       }
 
       // Rating
-      for (let [key, rating] of Object.entries(systemData.rating)) {
+      for (const [key, rating] of Object.entries(systemData.rating)) {
          resetMods(rating.mod);
       }
 
       // Speed
-      for (let [key, speed] of Object.entries(systemData.speed)) {
+      for (const [key, speed] of Object.entries(systemData.speed)) {
          resetMods(speed.mod);
       }
 
       // Mod
-      for (let [key, mod] of Object.entries(systemData.mod)) {
+      for (const [key, mod] of Object.entries(systemData.mod)) {
          resetMods(mod.mod);
       }
 
@@ -223,10 +222,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.rating.defense.effect -= 1;
 
                // Decrease Speed to 0
-               for (let [speedKey, speed] of Object.entries(systemData.speed)) {
+               for (const [speedKey, speed] of Object.entries(systemData.speed)) {
                   // Calculate the total speed
                   let speedValue = speed.baseValue;
-                  for (let [modKey, mod] of Object.entries(speed.mod)) {
+                  for (const [modKey, mod] of Object.entries(speed.mod)) {
                      speedValue += mod;
                   }
 
@@ -246,10 +245,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.statusEffect.prone = true;
 
                // Decrease Speed by half
-               for (let [speedKey, speed] of Object.entries(systemData.speed)) {
+               for (const [speedKey, speed] of Object.entries(systemData.speed)) {
                   // Calculate the total speed
                   let speedValue = speed.baseValue;
-                  for (let [modKey, mod] of Object.entries(speed.mod)) {
+                  for (const [modKey, mod] of Object.entries(speed.mod)) {
                      speedValue += mod;
                   }
 
@@ -271,7 +270,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Calculate the total awareness
                const awareness = this.parent.system.rating.awareness;
                let awarenessValue = awareness.baseValue + awareness.mod.static + awareness.equipment;
-               for (let [key, mod] of Object.entries(awareness.mod)) {
+               for (const [key, mod] of Object.entries(awareness.mod)) {
                   awarenessValue += mod;
                }
 
@@ -302,10 +301,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.statusEffect.contaminated = true;
 
                // Decrease all Skills and Resistances by 1
-               for (let [key, skill] of Object.entries(systemData.skill)) {
+               for (const [key, skill] of Object.entries(systemData.skill)) {
                   skill.training.mod.effect -= 1;
                }
-               for (let [key, resistance] of Object.entries(systemData.resistance)) {
+               for (const [key, resistance] of Object.entries(systemData.resistance)) {
                   resistance.mod.effect -= 1;
                }
                break;
@@ -332,14 +331,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          stat.value = stat.baseValue;
 
          // Each mod in the stat
-         for (let [modKey, mod] of Object.entries(stat.mod)) {
+         for (const [modKey, mod] of Object.entries(stat.mod)) {
             stat.value += mod;
          }
       }
 
       function applyModsDeep(stats) {
          // Each stat
-         for (let [key, stat] of Object.entries(stats)) {
+         for (const [key, stat] of Object.entries(stats)) {
             applyMods(stat);
          }
       }
@@ -348,7 +347,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       applyModsDeep(systemData.attribute);
 
       // Skills
-      for (let [key, skill] of Object.entries(systemData.skill)) {
+      for (const [key, skill] of Object.entries(systemData.skill)) {
          // Training
          applyMods(skill.training);
 
@@ -363,9 +362,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       applyModsDeep(systemData.rating);
 
       // Resources
-      for (let [key, resource] of Object.entries(systemData.resource)) {
+      for (const [key, resource] of Object.entries(systemData.resource)) {
          resource.maxValue = resource.maxBase;
-         for (let [modKey, mod] of (Object.entries(resource.mod))) {
+         for (const [modKey, mod] of (Object.entries(resource.mod))) {
             resource.maxValue += mod;
          }
       }
@@ -384,9 +383,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Mods
-      for (let [key, mod] of Object.entries(systemData.mod)) {
+      for (const [key, mod] of Object.entries(systemData.mod)) {
          mod.value = 0;
-         for (let [modKey, modMod] of (Object.entries(mod.mod))) {
+         for (const [modKey, modMod] of (Object.entries(mod.mod))) {
             mod.value += modMod;
          }
       }
@@ -394,7 +393,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    _clampResources() {
-      for (let [key, resource] of Object.entries(this.parent.system.resource)) {
+      for (const [key, resource] of Object.entries(this.parent.system.resource)) {
          resource.value = clamp(resource.value, 0, resource.maxValue);
       }
    }
@@ -909,6 +908,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          this.unEquipArmor();
       }
 
+      return;
+   }
+
+   rest() {
       return;
    }
 }

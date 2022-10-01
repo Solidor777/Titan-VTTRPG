@@ -2,7 +2,7 @@
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import ModTag from "../../../../../helpers/svelte-components/tag/ModTag.svelte";
+   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
 
    // The key / name of the speed
    export let key;
@@ -25,13 +25,13 @@
       <div class="input" data-tooltip={localize(`${key}.editBaseValue`)}>
          <DocumentIntegerInput bind:value={$document.system.speed[key].baseValue} />
       </div>
-      <div class="label">+</div>
+      <div class="symbol">+</div>
 
       <!--Static Mod-->
       <div class="input" data-tooltip={localize(`${key}.editStaticMod`)}>
          <DocumentIntegerInput bind:value={$document.system.speed[key].mod.static} />
       </div>
-      <div class="label">=</div>
+      <div class="symbol">=</div>
 
       <!--Total Value-->
       <div class="value" data-tooltip={localize(`${key}.value`)}>
@@ -57,6 +57,7 @@
       .label {
          @include flex-row;
          @include flex-group-center;
+         margin-left: 0.25rem;
          height: 100%;
       }
 
@@ -70,6 +71,12 @@
          @include flex-row;
          @include flex-group-center;
          height: 100%;
+
+         .symbol {
+            @include flex-row;
+            @include flex-group-center;
+            height: 100%;
+         }
 
          :not(:first-child) {
             margin-left: 0.25rem;

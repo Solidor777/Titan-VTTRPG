@@ -4,7 +4,6 @@ import './styles/Mixins.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import registerSystemSettings from './system/RegisterSystemSettings.js';
 import registerTooltipSettings from './system/TooltipManager';
-import TitanConstants from './system/Constants.js';
 import TitanStatusEffects from './helpers/StatusEffects.js';
 import TitanChatMessageTypes from './system/ChatMessageTypes.js';
 import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
@@ -21,11 +20,6 @@ import TitanWeaponSheet from './item/types/weapon/sheet/WeaponSheet.js';
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
-
-   // Add custom constants for easy access
-   CONFIG.TITAN = {
-      constants: TitanConstants,
-   };
 
    // Register Document Classes
    CONFIG.Actor.documentClass = TitanActor;

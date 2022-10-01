@@ -1,19 +1,19 @@
 <script>
-   import { getContext } from "svelte";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import CharacterSheetResources from "~/actor/types/character/sheet/sidebar/CharacterSheetResources.svelte";
    import CharacterSheetMods from "~/actor/types/character/sheet/sidebar/CharacterSheetMods.svelte";
    import CharacterSheetRatings from "~/actor/types/character/sheet/sidebar/CharacterSheetRatings.svelte";
-   import CharacterSheetSpeeds from "../character/sheet/sidebar/CharacterSheetSpeeds.svelte";
-
-   // Setup context variables
-   const document = getContext("DocumentStore");
+   import CharacterSheetSpeeds from "~/actor/types/character/sheet/sidebar/CharacterSheetSpeeds.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 </script>
 
 <div class="sidebar">
    <!--Character Portrait-->
    <div class="portrait">
-      <DocumentImagePicker path={"img"} alt={"character portrait"} />
+      <div class="image">
+         <DocumentImagePicker path={"img"} alt={"character portrait"} />
+      </div>
+      <div class="button"><IconButton icon={"fas fa-campground"} /></div>
    </div>
 
    <div class="sections">
@@ -46,14 +46,27 @@
       @include border;
       @include flex-column;
       @include flex-group-top;
-      @include panel-2;
+      @include panel-1;
       height: 100%;
       width: 100%;
       padding: 0.25rem;
 
       .portrait {
-         width: 10rem;
-         --border-style: none;
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+         position: relative;
+
+         .image {
+            width: 10rem;
+            --border-style: none;
+         }
+
+         .button {
+            position: absolute;
+            top: 0;
+            left: 0;
+         }
       }
 
       .sections {
