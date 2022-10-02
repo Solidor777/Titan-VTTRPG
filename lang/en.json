@@ -93,7 +93,7 @@
   "LOCAL.decreaseResistance.label": "Decrease Resistance",
   "LOCAL.decreaseSkill.label": "Decrease Skill",
   "LOCAL.decreaseSpeed.label": "Decrease Speed",
-  "LOCAL.defaultAttribute.label": "Attribute",
+  "LOCAL.defaultAttribute.label": "Default Attribute",
   "LOCAL.defense.baseValue.label": "Base Defense = (Body + Dexterity) / 2, rounded up.",
   "LOCAL.defense.desc.label": "The ability to defend against attacks.",
   "LOCAL.defense.editStaticMod.label": "Edit bonus or penalty to Defense.",
