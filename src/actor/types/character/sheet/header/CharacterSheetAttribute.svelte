@@ -8,11 +8,45 @@
    // The key / name of the attribute
    export let key;
 
-   // The Character Data
+   // Setup context variables
    const document = getContext("DocumentStore");
-
-   // Application reference
    const application = getContext("external").application;
+
+   // Calculate the tooltip for the max value
+   function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
+      // Base label
+      let retVal = `<p>${localize("base")}: ${baseValue}</p>`;
+
+      // Equipment
+      if (equipment !== 0) {
+         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+      }
+
+      // Abilities
+      if (ability !== 0) {
+         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+      }
+
+      // Effects
+      if (effect !== 0) {
+         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+      }
+
+      // Static mod
+      if (staticMod !== 0) {
+         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+      }
+
+      return retVal;
+   }
+
+   $: totalValueTooltip = getTotalValueTooltip(
+      $document.system.attribute[key].baseValue,
+      $document.system.attribute[key].mod.equipment,
+      $document.system.attribute[key].mod.effect,
+      $document.system.attribute[key].mod.ability,
+      $document.system.attribute[key].mod.static
+   );
 </script>
 
 <div class="attribute" data-attribute={key}>
@@ -38,7 +72,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" data-tooltip={localize(`${key}.value`)}>
+      <div class="value" data-tooltip={totalValueTooltip}>
          <ModTag
             currentValue={$document.system.attribute[key].value}
             baseValue={$document.system.attribute[key].baseValue +

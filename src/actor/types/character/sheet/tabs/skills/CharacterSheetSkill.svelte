@@ -52,7 +52,15 @@
       <!--Training row-->
       <div class="row">
          <!--Label-->
-         <div class="label">{localize("training")}</div>
+         <div class="label">
+            <!--Icon-->
+            <i class="fas fa-graduation-cap" />
+
+            <!--Inner Label-->
+            <div class="inner-label">
+               {localize("training")}
+            </div>
+         </div>
 
          <!--Base Value-->
          <div class="input">
@@ -80,7 +88,15 @@
       <!--Expertise row-->
       <div class="row">
          <!--Label-->
-         <div class="label">{localize("expertise")}</div>
+         <div class="label">
+            <!--Icon-->
+            <i class="fas fa-dumbbell" />
+
+            <!--Inner Label-->
+            <div class="inner-label">
+               {localize("expertise")}
+            </div>
+         </div>
 
          <!--Base Value-->
          <div class="input">
@@ -110,7 +126,7 @@
    <div class="column">
       <div class="tag">
          <!--Label-->
-         <div class="label">{localize("totalDice")}</div>
+         <div class="label"><i class="fas fa-dice-d6" />{localize("dice")}</div>
 
          <!--Total Value-->
          <div class="value">
@@ -190,6 +206,10 @@
                height: 100%;
                font-weight: bold;
                margin-right: 0.25rem;
+
+               i {
+                  margin-right: 0.25rem;
+               }
             }
 
             .input {
@@ -230,6 +250,10 @@
                @include flex-group-center;
                @include border-bottom;
                font-weight: bold;
+
+               i {
+                  margin-right: 0.25rem;
+               }
             }
 
             .value {
