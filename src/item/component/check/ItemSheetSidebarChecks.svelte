@@ -27,13 +27,13 @@
                <div class="spacer" />
 
                <div class="main-label">
+                  <!--Icon-->
+                  <i class="fas fa-dice" />
+
                   <!--Text-->
                   <div class="text">
                      {check.label}
                   </div>
-
-                  <!--Icon-->
-                  <i class="fas fa-dice" />
                </div>
 
                <div class="spacer">
@@ -173,7 +173,7 @@
                   i {
                      @include flex-row;
                      @include flex-group-center;
-                     margin-left: 0.25rem;
+                     margin-right: 0.25rem;
                   }
                }
 

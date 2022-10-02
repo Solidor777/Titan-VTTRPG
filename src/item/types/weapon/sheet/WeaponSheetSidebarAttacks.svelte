@@ -26,13 +26,12 @@
 
             <!--Label-->
             <div class="label">
+               <!--Icon-->
+               <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
                <!-- Text-->
                <div class="text">
                   {attack.label}
                </div>
-
-               <!--Icon-->
-               <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
             </div>
 
             <!--Expand Toggle-->
@@ -144,7 +143,7 @@
                i {
                   @include flex-row;
                   @include flex-group-center;
-                  margin-left: 0.25rem;
+                  margin-right: 0.25rem;
                }
             }
 
