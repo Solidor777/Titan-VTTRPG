@@ -177,6 +177,7 @@
             .label {
                @include flex-row;
                @include flex-group-center;
+               @include font-size-small;
                height: 100%;
                font-weight: bold;
             }
@@ -203,6 +204,7 @@
             .label {
                @include flex-row;
                @include flex-group-right;
+               @include font-size-small;
                height: 100%;
                font-weight: bold;
                margin-right: 0.25rem;
@@ -218,16 +220,15 @@
                height: 100%;
                width: 1.75rem;
                margin-left: 0.25rem;
-               font-weight: bold;
             }
 
             .value {
                @include flex-row;
                @include flex-group-center;
+               font-weight: normal;
                height: 100%;
                width: 1.75rem;
                margin-left: 0.25rem;
-               font-weight: bold;
             }
 
             .symbol {
@@ -243,6 +244,7 @@
             @include flex-group-top;
             @include border;
             @include label;
+            @include font-size-small;
             padding: 0.25rem;
 
             .label {
