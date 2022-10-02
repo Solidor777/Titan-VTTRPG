@@ -12,7 +12,7 @@
    const document = getContext("DocumentStore");
    const application = getContext("external").application;
 
-   // Calculate the tooltip for the max value
+   // Calculate the tooltip for the total value
    function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
       // Base label
       let retVal = `<p>${localize(`${key}.baseValue`)}</p><p>${localize("base")}: ${baseValue}</p>`;

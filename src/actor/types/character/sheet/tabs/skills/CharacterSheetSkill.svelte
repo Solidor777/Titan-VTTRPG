@@ -9,11 +9,76 @@
    // Key for the skill
    export let key;
 
-   // Document reference
+   // Setup context variables
    const document = getContext("DocumentStore");
-
-   // Application reference
    const application = getContext("external").application;
+
+   // Calculate the tooltip for the total value of training or expertise
+   function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
+      // Base label
+      let retVal = `<p>${localize("base")}: ${baseValue}</p>`;
+
+      // Equipment
+      if (equipment !== 0) {
+         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+      }
+
+      // Abilities
+      if (ability !== 0) {
+         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+      }
+
+      // Effects
+      if (effect !== 0) {
+         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+      }
+
+      // Static mod
+      if (staticMod !== 0) {
+         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+      }
+
+      return retVal;
+   }
+
+   // Calculate the tooltip for the total value of training or expertise
+   function getTotalDiceTooltip(attribute, training) {
+      // Base label
+      let retVal = `<p>${localize("skill.totalDice")}</p>`;
+
+      // Training
+      if (attribute !== 0) {
+         retVal += `<p>${localize("attribute")}: ${attribute}</p>`;
+      }
+
+      // Attribute
+      if (training !== 0) {
+         retVal += `<p>${localize("training")}: ${training}</p>`;
+      }
+
+      return retVal;
+   }
+
+   $: trainingTotalValueTooltip = getTotalValueTooltip(
+      $document.system.skill[key].training.baseValue,
+      $document.system.skill[key].training.mod.equipment,
+      $document.system.skill[key].training.mod.effect,
+      $document.system.skill[key].training.mod.ability,
+      $document.system.skill[key].training.mod.static
+   );
+
+   $: expertiseTotalValueTooltip = getTotalValueTooltip(
+      $document.system.skill[key].expertise.baseValue,
+      $document.system.skill[key].expertise.mod.equipment,
+      $document.system.skill[key].expertise.mod.effect,
+      $document.system.skill[key].expertise.mod.ability,
+      $document.system.skill[key].expertise.mod.static
+   );
+
+   $: totalDiceTooltip = getTotalDiceTooltip(
+      $document.system.attribute[$document.system.skill[key].defaultAttribute].value,
+      $document.system.skill[key].training.value
+   );
 </script>
 
 <div class="skill">
@@ -36,7 +101,7 @@
       <!--Default Attribute-->
       <div class="attribute">
          <!--Label-->
-         <div class="label">
+         <div class="label" data-tooltip={localize("defaultAttribute.desc")}>
             {localize("attribute")}
          </div>
 
@@ -52,7 +117,7 @@
       <!--Training row-->
       <div class="row">
          <!--Label-->
-         <div class="label">
+         <div class="label" data-tooltip={localize("training.desc")}>
             <!--Icon-->
             <i class="fas fa-graduation-cap" />
 
@@ -75,7 +140,7 @@
 
          <!--Total Value-->
          <div class="symbol">=</div>
-         <div class="value">
+         <div class="value" data-tooltip={trainingTotalValueTooltip}>
             <ModTag
                currentValue={$document.system.skill[key].training.value}
                baseValue={$document.system.skill[key].training.baseValue +
@@ -88,7 +153,7 @@
       <!--Expertise row-->
       <div class="row">
          <!--Label-->
-         <div class="label">
+         <div class="label" data-tooltip={localize("expertise.desc")}>
             <!--Icon-->
             <i class="fas fa-dumbbell" />
 
@@ -111,7 +176,7 @@
 
          <!--Total Value-->
          <div class="symbol">=</div>
-         <div class="value">
+         <div class="value" data-tooltip={expertiseTotalValueTooltip}>
             <ModTag
                currentValue={$document.system.skill[key].expertise.value}
                baseValue={$document.system.skill[key].expertise.baseValue +
@@ -124,7 +189,7 @@
 
    <!--Total Dice-->
    <div class="column">
-      <div class="tag">
+      <div class="tag" data-tooltip={totalDiceTooltip}>
          <!--Label-->
          <div class="label"><i class="fas fa-dice-d6" />{localize("dice")}</div>
 
