@@ -4,7 +4,7 @@
    import OpposedCheckTag from "~/helpers/svelte-components/tag/OpposedCheckTag.svelte";
    import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import CharacterItemCheckButton from "./CharacterItemCheckButton.svelte";
+   import CharacterSheetItemCheckButton from "./CharacterSheetItemCheckButton.svelte";
    import CharacterCheckLabelLong from "../checks/CharacterCheckLabelLong.svelte";
 
    // Reference to the application
@@ -28,7 +28,7 @@
    <div class="check">
       <!--Button-->
       <div class="row">
-         <CharacterItemCheckButton
+         <CharacterSheetItemCheckButton
             {check}
             on:click={() => {
                application.rollItemCheck(id, checkIdx);

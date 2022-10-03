@@ -1,15 +1,13 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
-   import CharacterItemExpandButton from "../CharacterItemExpandButton.svelte";
-   import CharacterItemSendToChatButton from "../CharacterItemSendToChatButton.svelte";
-   import CharacterItemEditButton from "../CharacterItemEditButton.svelte";
-   import CharacterItemDeleteButton from "../CharacterItemDeleteButton.svelte";
-   import CharacterItemDescription from "../CharacterItemDescription.svelte";
-   import CharacterItemEquipButton from "../CharacterItemEquipButton.svelte";
-   import CharacterItemFooter from "../CharacterItemFooter.svelte";
-   import CharacterItemRarity from "../CharacterItemRarity.svelte";
-   import CharacterItemValue from "../CharacterItemValue.svelte";
+   import CharacterSheetItemExpandButton from "../CharacterSheetItemExpandButton.svelte";
+   import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
+   import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
+   import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
+   import CharacterSheetItemDescription from "../CharacterSheetItemDescription.svelte";
+   import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
+   import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -20,7 +18,7 @@
    // Collapsed object
    export let isExpanded = void 0;
 
-   // Item reference
+   // Weapon list
    $: item = $document.items.get(id);
 </script>
 
@@ -29,28 +27,28 @@
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
-         <CharacterItemExpandButton {item} bind:isExpanded />
+         <CharacterSheetItemExpandButton {item} bind:isExpanded />
 
          <!--Controls-->
          <div class="item-controls">
-            <!--Toggle Equipped button-->
-            <div class="item-control-button">
-               <CharacterItemEquipButton {item} equipped={item.system.equipped} />
+            <!--Multi attack -->
+            <div class="item-expandable-content">
+               <CharacterSheetWeaponMultiAttackButton {item} />
             </div>
 
             <!--Send to Chat button-->
             <div class="item-control-button">
-               <CharacterItemSendToChatButton {item} />
+               <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
             <div class="item-control-button">
-               <CharacterItemEditButton {item} />
+               <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
             <div class="item-control-button">
-               <CharacterItemDeleteButton itemId={item._id} />
+               <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
       </div>
@@ -60,20 +58,12 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Description-->
             <div class="item-expandable-content">
-               <CharacterItemDescription description={"Temporary Item Description"} />
+               <CharacterSheetItemDescription description={"Temporary Attack Notes"} />
             </div>
 
-            <!--Attack description-->
+            <!--Attacks list-->
             <div class="item-expandable-content">
-               <CharacterItemDescription description={"Temporary Attack Notes"} />
-            </div>
-
-            <!--Footer-->
-            <div class="item-expandable-content">
-               <CharacterItemFooter>
-                  <CharacterItemRarity {item} />
-                  <CharacterItemValue {item} />
-               </CharacterItemFooter>
+               <CharacterSheetWeaponAttacks {item} />
             </div>
          </div>
       {/if}

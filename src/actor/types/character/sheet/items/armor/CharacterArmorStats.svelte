@@ -3,6 +3,7 @@
 
    // Item reference
    export let item = void 0;
+   console.log(item.system);
 </script>
 
 <div class="armor-stats">
@@ -10,7 +11,7 @@
       {localize(`armor`)}: {item.system.armor}
    </div>
 
-   {#each item.system.traits as trait}
+   {#each item.system.trait as trait}
       <div class="stat">
          {localize(`${trait.name}`)}
          {#if trait.type === "number"}

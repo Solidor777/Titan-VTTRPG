@@ -9,7 +9,7 @@
    import CharacterSheetSkillsTab from "~/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsTab.svelte";
    import CharacterSheetActionsTab from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetActionsTab.svelte";
    import CharacterAbilitiesTab from "~/actor/types/character/sheet/tabs/CharacterAbilitiesTab.svelte";
-   import CharacterSheetInventoryTab from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryTab.svelte";
+   import CharacterSheetInventoryTab from "~/actor/types/character/sheet/tabs/CharacterSheetInventoryTab.svelte";
    import CharacterSpellsTab from "~/actor/types/character/sheet/tabs/CharacterSpellsTab.svelte";
    import CharacterEffectsTab from "~/actor/types/character/sheet/tabs/CharacterEffectsTab.svelte";
    import PlayerSheetSidebar from "./PlayerSheetSidebar.svelte";

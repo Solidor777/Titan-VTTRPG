@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import CharacterItemCheck from "./CharacterItemCheck.svelte";
+   import CharacterSheetItemCheck from "./CharacterSheetItemCheck.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -18,7 +18,7 @@
       <!--Each Check-->
       {#each checks as check, checkIdx}
          <div class="check">
-            <CharacterItemCheck {id} {checkIdx} />
+            <CharacterSheetItemCheck {id} {checkIdx} />
          </div>
       {/each}
    </div>

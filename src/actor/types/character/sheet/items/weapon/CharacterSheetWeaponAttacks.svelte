@@ -1,5 +1,5 @@
 <script>
-   import CharacterWeaponAttack from "./CharacterWeaponAttack.svelte";
+   import CharacterSheetWeaponAttack from "./CharacterSheetWeaponAttack.svelte";
 
    // Reference to the weapon id
    export let item = void 0;
@@ -10,7 +10,7 @@
    <!--Each Attack-->
    {#each Object.entries(item.system.attack) as [attackIdx]}
       <li>
-         <CharacterWeaponAttack {attackIdx} {item} />
+         <CharacterSheetWeaponAttack {attackIdx} {item} />
       </li>
    {/each}
 </ol>

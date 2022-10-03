@@ -3,15 +3,15 @@
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import CharacterItemExpandButton from "../CharacterItemExpandButton.svelte";
+   import CharacterSheetItemExpandButton from "../CharacterSheetItemExpandButton.svelte";
    import CharacterCheckButtonSmall from "../../checks/CharacterCheckButtonSmall.svelte";
-   import CharacterItemSendToChatButton from "../CharacterItemSendToChatButton.svelte";
-   import CharacterItemEditButton from "../CharacterItemEditButton.svelte";
-   import CharacterItemDeleteButton from "../CharacterItemDeleteButton.svelte";
-   import CharacterItemDescription from "../CharacterItemDescription.svelte";
-   import CharacterItemChecks from "../CharacterItemChecks.svelte";
-   import CharacterItemFooter from "../CharacterItemFooter.svelte";
-   import CharacterItemRarity from "../CharacterItemRarity.svelte";
+   import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
+   import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
+   import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
+   import CharacterSheetItemDescription from "../CharacterSheetItemDescription.svelte";
+   import CharacterSheetItemChecks from "../CharacterSheetItemChecks.svelte";
+   import CharacterSheetItemFooter from "../CharacterSheetItemFooter.svelte";
+   import CharacterSheetItemRarity from "../CharacterSheetItemRarity.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -34,7 +34,7 @@
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
-         <CharacterItemExpandButton {item} bind:isExpanded />
+         <CharacterSheetItemExpandButton {item} bind:isExpanded />
 
          <!--Controls-->
          <div class="item-controls">
@@ -52,17 +52,17 @@
 
             <!--Send to Chat button-->
             <div class="item-control-button">
-               <CharacterItemSendToChatButton {item} />
+               <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
             <div class="item-control-button">
-               <CharacterItemEditButton {item} />
+               <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
             <div class="item-control-button">
-               <CharacterItemDeleteButton itemId={item._id} />
+               <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
       </div>
@@ -72,21 +72,21 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Description-->
             <div class="item-expandable-content">
-               <CharacterItemDescription description={"Temporary Item Description"} />
+               <CharacterSheetItemDescription description={"Temporary Item Description"} />
             </div>
 
             <!--Item Checks-->
             {#if item.system.check.length > 0}
                <div class="item-expandable-content">
-                  <CharacterItemChecks {id} />
+                  <CharacterSheetItemChecks {id} />
                </div>
             {/if}
 
             <!--Footer-->
             <div class="item-expandable-content">
-               <CharacterItemFooter>
+               <CharacterSheetItemFooter>
                   <!-- Rarity-->
-                  <CharacterItemRarity {item} />
+                  <CharacterSheetItemRarity {item} />
 
                   <!--Action-->
                   {#if item.system.action}
@@ -102,7 +102,7 @@
                   {#if item.system.passive}
                      <Tag label={localize("passive")} />
                   {/if}
-               </CharacterItemFooter>
+               </CharacterSheetItemFooter>
             </div>
          </div>
       {/if}

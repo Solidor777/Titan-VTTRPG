@@ -3,8 +3,8 @@
    import { getContext } from "svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import CharacterItemList from "~/actor/types/character/sheet/items/CharacterItemList.svelte";
-   import CharacterWeaponActions from "~/actor/types/character/sheet/items/weapon/CharacterWeaponActions.svelte";
+   import CharacterSheetItemList from "~/actor/types/character/sheet/items/CharacterSheetItemList.svelte";
+   import CharacterSheetWeaponActions from "~/actor/types/character/sheet/items/weapon/CharacterSheetWeaponActions.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -25,8 +25,8 @@
             </div>
 
             <!--Weapon List-->
-            <CharacterItemList
-               itemComponent={CharacterWeaponActions}
+            <CharacterSheetItemList
+               itemComponent={CharacterSheetWeaponActions}
                filterFunction={(item) => {
                   return item.type === "weapon" && item.system.equipped === true;
                }}

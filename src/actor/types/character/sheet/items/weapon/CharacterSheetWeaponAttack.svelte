@@ -4,7 +4,7 @@
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import CharacterWeaponAttackCheckLabel from "./CharacterWeaponAttackCheckLabel.svelte";
+   import CharacterSheetWeaponAttackCheckLabel from "./CharacterSheetWeaponAttackCheckLabel.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -36,7 +36,7 @@
 
    <!--Check Label-->
    <div class="check-label">
-      <CharacterWeaponAttackCheckLabel {attack} />
+      <CharacterSheetWeaponAttackCheckLabel {attack} />
    </div>
 
    <!--Traits-->

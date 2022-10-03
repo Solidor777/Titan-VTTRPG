@@ -80,28 +80,30 @@
 </script>
 
 <!--Item List-->
-<ol>
-   <!--Each Item-->
-   {#each items as item (item._id)}
-      <li
-         class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
-         data-item-id={item._id}
-         draggable={true}
-         on:dragstart={(event) => {
-            onDragStart(event, item._id, "item");
-         }}
-         on:dragenter={() => {
-            onDragEnter(item._id, "item");
-         }}
-         on:dragend={() => {
-            onDragEnd();
-         }}
-         in:slide|local
-      >
-         <svelte:component this={itemComponent} id={item._id} bind:isExpanded={isExpandedMap[item._id]} />
-      </li>
-   {/each}
-</ol>
+{#if items.length > 0}
+   <ol transition:slide|local>
+      <!--Each Item-->
+      {#each items as item (item._id)}
+         <li
+            class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
+            data-item-id={item._id}
+            draggable={true}
+            on:dragstart={(event) => {
+               onDragStart(event, item._id, "item");
+            }}
+            on:dragenter={() => {
+               onDragEnter(item._id, "item");
+            }}
+            on:dragend={() => {
+               onDragEnd();
+            }}
+            transition:slide|local
+         >
+            <svelte:component this={itemComponent} id={item._id} bind:isExpanded={isExpandedMap[item._id]} />
+         </li>
+      {/each}
+   </ol>
+{/if}
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
@@ -118,7 +120,6 @@
          @include flex-space-between;
          @include border;
          width: 100%;
-         padding: 0.25rem;
 
          &.drag-hovered {
             background: var(--highlight-background-color);

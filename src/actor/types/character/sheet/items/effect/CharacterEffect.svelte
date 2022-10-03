@@ -1,14 +1,14 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
-   import CharacterItemExpandButton from "../CharacterItemExpandButton.svelte";
-   import CharacterItemSendToChatButton from "../CharacterItemSendToChatButton.svelte";
-   import CharacterItemEditButton from "../CharacterItemEditButton.svelte";
-   import CharacterItemDeleteButton from "../CharacterItemDeleteButton.svelte";
-   import CharacterItemDescription from "../CharacterItemDescription.svelte";
-   import CharacterItemFooter from "../CharacterItemFooter.svelte";
-   import CharacterItemRarity from "../CharacterItemRarity.svelte";
-   import CharacterItemValue from "../CharacterItemValue.svelte";
+   import CharacterSheetItemExpandButton from "../CharacterSheetItemExpandButton.svelte";
+   import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
+   import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
+   import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
+   import CharacterSheetItemDescription from "../CharacterSheetItemDescription.svelte";
+   import CharacterSheetItemFooter from "../CharacterSheetItemFooter.svelte";
+   import CharacterSheetItemRarity from "../CharacterSheetItemRarity.svelte";
+   import CharacterSheetItemValue from "../CharacterSheetItemValue.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -28,23 +28,23 @@
       <!--Header-->
       <div class="item-header">
          <!--Expand button-->
-         <CharacterItemExpandButton {item} bind:isExpanded />
+         <CharacterSheetItemExpandButton {item} bind:isExpanded />
 
          <!--Controls-->
          <div class="item-controls">
             <!--Send to Chat button-->
             <div class="item-control-button">
-               <CharacterItemSendToChatButton {item} />
+               <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
             <div class="item-control-button">
-               <CharacterItemEditButton {item} />
+               <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
             <div class="item-control-button">
-               <CharacterItemDeleteButton itemId={item._id} />
+               <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
       </div>
@@ -54,7 +54,7 @@
          <div class="item-expandable-container" transition:slide|local>
             <!--Item Description-->
             <div class="item-expandable-content">
-               <CharacterItemDescription description={"Temporary Item Description"} />
+               <CharacterSheetItemDescription description={"Temporary Item Description"} />
             </div>
          </div>
       {/if}

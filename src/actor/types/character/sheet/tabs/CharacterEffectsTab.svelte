@@ -2,8 +2,8 @@
    import { getContext } from "svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import CharacterItemList from "../items/CharacterItemList.svelte";
-   import CharacterItemAddEntryButton from "../items/CharacterItemAddEntryButton.svelte";
+   import CharacterSheetItemList from "../items/CharacterSheetItemList.svelte";
+   import CharacterSheetItemAddEntryButton from "../items/CharacterSheetItemAddEntryButton.svelte";
    import CharacterEffect from "../items/effect/CharacterEffect.svelte";
 
    // Application reference
@@ -19,7 +19,7 @@
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.abilities}>
          <!--Abilities List-->
          <div class="effects">
-            <CharacterItemList
+            <CharacterSheetItemList
                itemComponent={CharacterEffect}
                filterFunction={(item) => {
                   return item.type === "effect";
@@ -31,7 +31,7 @@
 
          <!--Add Spell Button-->
          <div class="add-entry-button">
-            <CharacterItemAddEntryButton itemType={"effect"} />
+            <CharacterSheetItemAddEntryButton itemType={"effect"} />
          </div>
       </ScrollingContainer>
    </div>
