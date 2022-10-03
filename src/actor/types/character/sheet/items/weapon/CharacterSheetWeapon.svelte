@@ -10,6 +10,7 @@
    import CharacterSheetItemFooter from "~/actor/types/character/sheet/items/CharacterSheetItemFooter.svelte";
    import CharacterSheetItemRarity from "~/actor/types/character/sheet/items/CharacterSheetItemRarity.svelte";
    import CharacterSheetItemValue from "~/actor/types/character/sheet/items/CharacterSheetItemValue.svelte";
+   import CharacterSheetItemImage from "../CharacterSheetItemImage.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -28,8 +29,17 @@
    <div class="item" transition:slide|local>
       <!--Header-->
       <div class="header">
-         <!--Expand button-->
-         <CharacterSheetItemExpandButton {item} bind:isExpanded />
+         <div class="label">
+            <!--Image-->
+            <div class="image">
+               <CharacterSheetItemImage {item} />
+            </div>
+
+            <!--Expand button-->
+            <div class="button">
+               <CharacterSheetItemExpandButton {item} bind:isExpanded />
+            </div>
+         </div>
 
          <!--Controls-->
          <div class="controls">
@@ -100,6 +110,15 @@
          padding: 0.25rem;
          width: 100%;
          font-weight: bold;
+
+         .label {
+            @include flex-row;
+            @include flex-group-center;
+
+            .button {
+               margin-left: 0.25rem;
+            }
+         }
 
          .controls {
             @include flex-row;
