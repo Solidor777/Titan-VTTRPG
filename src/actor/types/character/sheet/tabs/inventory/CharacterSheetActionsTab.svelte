@@ -3,8 +3,8 @@
    import { getContext } from "svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import CharacterItemList from "../items/CharacterItemList.svelte";
-   import CharacterWeaponActions from "../items/weapon/CharacterWeaponActions.svelte";
+   import CharacterItemList from "~/actor/types/character/sheet/items/CharacterItemList.svelte";
+   import CharacterWeaponActions from "~/actor/types/character/sheet/items/weapon/CharacterWeaponActions.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -40,7 +40,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import "../../../../../../Styles/Mixins.scss";
    .inventory-tab {
       @include flex-column;
       @include flex-group-top;

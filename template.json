@@ -465,7 +465,7 @@
       "templates": [
         "base"
       ],
-      "xpCost": 0,
+      "xpCost": 2,
       "rarity": "common",
       "requirements": "",
       "rulesElement": [],

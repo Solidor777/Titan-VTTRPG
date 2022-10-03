@@ -2,10 +2,7 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
    import CharacterSheetSkill from "./CharacterSheetSkill.svelte";
 
    // Document reference

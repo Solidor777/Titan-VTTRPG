@@ -3,10 +3,10 @@
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import CharacterItemList from "../items/CharacterItemList.svelte";
-   import CharacterItemAddEntryButton from "../items/CharacterItemAddEntryButton.svelte";
-   import CharacterWeaponInventory from "../items/weapon/CharacterWeaponInventory.svelte";
-   import CharacterArmor from "../items/armor/CharacterArmor.svelte";
+   import CharacterItemList from "~/actor/types/character/sheet/items/CharacterItemList.svelte";
+   import CharacterItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterItemAddEntryButton.svelte";
+   import CharacterWeaponInventory from "~/actor/types/character/sheet/items/weapon/CharacterWeaponInventory.svelte";
+   import CharacterArmor from "~/actor/types/character/sheet/items/armor/CharacterArmor.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -69,7 +69,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import "../../../../../../Styles/Mixins.scss";
    .inventory-tab {
       @include flex-column;
       @include flex-group-top;
