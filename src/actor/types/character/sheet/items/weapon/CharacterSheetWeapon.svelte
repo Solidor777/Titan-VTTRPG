@@ -97,6 +97,7 @@
          @include flex-space-between;
          @include border;
          @include panel-1;
+         padding: 0.25rem;
          width: 100%;
          font-weight: bold;
 
@@ -107,7 +108,7 @@
 
             .button {
                &:not(:first-child) {
-                  margin-left: 0.5rem;
+                  margin-left: 0.25rem;
                }
             }
          }
