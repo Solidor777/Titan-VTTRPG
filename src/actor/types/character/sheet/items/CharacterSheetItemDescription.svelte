@@ -3,4 +3,4 @@
    export let description = void 0;
 </script>
 
-<div class="item-description">{description}</div>
+<div class="description">{@html description}</div>

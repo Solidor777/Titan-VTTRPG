@@ -59,17 +59,21 @@
       {#if isExpanded === true}
          <div class="expandable-content" transition:slide|local>
             <!--Item Description-->
-            <div class="section">
-               <CharacterSheetItemDescription description={"Temporary Item Description"} />
-            </div>
+            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+               <div class="section editor">
+                  <CharacterSheetItemDescription description={item.system.description} />
+               </div>
+            {/if}
 
             <!--Attack description-->
-            <div class="section">
-               <CharacterSheetItemDescription description={"Temporary Attack Notes"} />
-            </div>
+            {#if item.system.attackNotes !== "" && item.system.attackNotes !== "<p></p>"}
+               <div class="section editor">
+                  <CharacterSheetItemDescription description={item.system.attackNotes} />
+               </div>
+            {/if}
 
             <!--Footer-->
-            <div class="section">
+            <div class="section top-padding">
                <CharacterSheetItemFooter>
                   <CharacterSheetItemRarity {item} />
                   <CharacterSheetItemValue {item} />
@@ -115,18 +119,23 @@
          @include panel-3;
          @include border-bottom-sides;
          width: calc(100% - 1rem);
-         padding: 0.25rem;
+         padding: 0 0.25rem 0.25rem;
 
          .section {
             @include flex-column;
             @include flex-group-top;
             width: 100%;
 
+            &.top-padding {
+               margin-top: 0.25rem;
+            }
+
             &:not(:first-child) {
                @include border-top;
-               margin-top: 0.25rem;
-               margin-top: 0.25rem;
-               padding-top: 0.25rem;
+
+               &.top-padding {
+                  padding-top: 0.25rem;
+               }
             }
          }
       }
