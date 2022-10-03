@@ -118,7 +118,6 @@
       li {
          @include flex-row;
          @include flex-space-between;
-         @include border;
          width: 100%;
 
          &.drag-hovered {

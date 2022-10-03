@@ -172,7 +172,7 @@
          @include border-bottom-sides;
          @include panel-3;
          padding: 0.25rem;
-         width: calc(100% - 2rem);
+         width: calc(100% - 1rem);
 
          .stat {
             @include flex-row;

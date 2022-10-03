@@ -25,31 +25,31 @@
 </script>
 
 {#if item}
-   <div class="actor-inventory-weapon" transition:slide|local>
+   <div class="item" transition:slide|local>
       <!--Header-->
-      <div class="item-header">
+      <div class="header">
          <!--Expand button-->
          <CharacterSheetItemExpandButton {item} bind:isExpanded />
 
          <!--Controls-->
-         <div class="item-controls">
+         <div class="controls">
             <!--Toggle Equipped button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
             </div>
 
             <!--Send to Chat button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -57,19 +57,19 @@
 
       <!--Expandable content-->
       {#if isExpanded === true}
-         <div class="item-expandable-container" transition:slide|local>
+         <div class="expandable-content" transition:slide|local>
             <!--Item Description-->
-            <div class="item-expandable-content">
+            <div class="section">
                <CharacterSheetItemDescription description={"Temporary Item Description"} />
             </div>
 
             <!--Attack description-->
-            <div class="item-expandable-content">
+            <div class="section">
                <CharacterSheetItemDescription description={"Temporary Attack Notes"} />
             </div>
 
             <!--Footer-->
-            <div class="item-expandable-content">
+            <div class="section">
                <CharacterSheetItemFooter>
                   <CharacterSheetItemRarity {item} />
                   <CharacterSheetItemValue {item} />
@@ -83,23 +83,25 @@
 <style lang="scss">
    @import "../../../../../../Styles/Mixins.scss";
 
-   .actor-inventory-weapon {
+   .item {
       @include flex-column;
+      @include flex-group-top;
       width: 100%;
 
-      .item-header {
+      .header {
          @include flex-row;
          @include flex-space-between;
+         @include border;
+         @include panel-1;
          width: 100%;
-         @include font-size-normal;
          font-weight: bold;
 
-         .item-controls {
+         .controls {
             @include flex-row;
             @include flex-group-right;
             height: 100%;
 
-            .item-control-button {
+            .button {
                &:not(:first-child) {
                   margin-left: 0.5rem;
                }
@@ -107,14 +109,24 @@
          }
       }
 
-      .item-expandable-container {
-         margin-top: 0.5rem;
+      .expandable-content {
+         @include flex-column;
+         @include flex-group-top;
+         @include panel-3;
+         @include border-bottom-sides;
+         width: calc(100% - 1rem);
+         padding: 0.25rem;
 
-         .item-expandable-content {
+         .section {
+            @include flex-column;
+            @include flex-group-top;
+            width: 100%;
+
             &:not(:first-child) {
                @include border-top;
-               margin-top: 0.5rem;
-               padding-top: 0.5rem;
+               margin-top: 0.25rem;
+               margin-top: 0.25rem;
+               padding-top: 0.25rem;
             }
          }
       }

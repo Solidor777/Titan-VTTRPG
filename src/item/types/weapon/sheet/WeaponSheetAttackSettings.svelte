@@ -203,7 +203,7 @@
          @include flex-group-top;
          @include border-bottom-sides;
          @include panel-3;
-         width: calc(100% - 2rem);
+         width: calc(100% - 1rem);
          padding: 0.25rem;
          @include font-size-small;
 
