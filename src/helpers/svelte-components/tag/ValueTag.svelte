@@ -1,34 +1,31 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-
-   // Reference to the item
-   export let item = void 0;
+   export let value = void 0;
 </script>
 
-<!--Item Value-->
-<div class="item-value">
-   <!--Label-->
+<div class="stat">
    <div class="label">
-      {localize("value")}:
+      {localize("value")}
    </div>
-
-   <!--Value-->
    <div class="value">
-      {item.system.value}
+      {value}
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import "../../../styles/mixins.scss";
 
-   .item-value {
+   .stat {
       @include flex-row;
       @include flex-group-center;
       @include border;
+      @include label;
       padding: 0.25rem;
-      background: var(--label-background-color);
 
       .label {
+         @include border-right;
+         font-weight: bold;
+         padding-right: 0.25rem;
          margin-right: 0.25rem;
       }
    }

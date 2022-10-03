@@ -5,7 +5,7 @@
 </script>
 
 <div class="tag {resistance}">
-   {localize(`${resistance}`)}
+   {localize(resistance)}
 </div>
 
 <style lang="scss">
@@ -15,19 +15,9 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
+      @include resistance-colors;
+      @include label;
       padding: 0.25rem;
       font-weight: bold;
-
-      &.reflexes {
-         background: var(--reflexes-color-bright);
-      }
-
-      &.resilience {
-         background: var(--resilience-color-bright);
-      }
-
-      &.willpower {
-         background: var(--willpower-color-bright);
-      }
    }
 </style>

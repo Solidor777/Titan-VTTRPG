@@ -5,7 +5,7 @@
    import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
    import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemDescription from "../CharacterSheetItemDescription.svelte";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
    import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
    import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
 
@@ -56,10 +56,12 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="item-expandable-container" transition:slide|local>
-            <!--Item Description-->
-            <div class="item-expandable-content">
-               <CharacterSheetItemDescription description={"Temporary Attack Notes"} />
-            </div>
+            <!--Attack description-->
+            {#if item.system.attackNotes !== "" && item.system.attackNotes !== "<p></p>"}
+               <div class="section rich-text">
+                  <RichText text={item.system.attackNotes} />
+               </div>
+            {/if}
 
             <!--Attacks list-->
             <div class="item-expandable-content">

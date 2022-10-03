@@ -282,10 +282,6 @@
 }
 
 @mixin rarity-colors {
-  &.common {
-    background: var(--label-background-color);
-  }
-
   &.uncommon {
     background: var(--uncommon-color-bright);
   }

@@ -5,12 +5,12 @@
    import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
    import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemDescription from "../CharacterSheetItemDescription.svelte";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
    import CharacterSheetItemFooter from "../CharacterSheetItemFooter.svelte";
-   import CharacterSheetItemRarity from "../CharacterSheetItemRarity.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import CharacterSheetItemEquipButton from "../CharacterSheetItemEquipButton.svelte";
    import CharacterArmorStats from "./CharacterArmorStats.svelte";
-   import CharacterSheetItemValue from "../CharacterSheetItemValue.svelte";
+   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -66,14 +66,18 @@
 
             <!--Item Description-->
             <div class="item-expandable-content">
-               <CharacterSheetItemDescription description={"Temporary Item Description"} />
+               {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+                  <div class="section rich-text">
+                     <RichText text={item.system.description} />
+                  </div>
+               {/if}
             </div>
 
             <!--Footer-->
             <div class="item-expandable-content">
                <CharacterSheetItemFooter>
-                  <CharacterSheetItemRarity {item} />
-                  <CharacterSheetItemValue {item} />
+                  <RarityTag rarity={item.system.rarity} />
+                  <ValueTag value={item.system.value} />
                </CharacterSheetItemFooter>
             </div>
          </div>

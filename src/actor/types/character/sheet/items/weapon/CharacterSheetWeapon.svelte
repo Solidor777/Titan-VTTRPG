@@ -5,12 +5,12 @@
    import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
    import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemDescription from "~/actor/types/character/sheet/items/CharacterSheetItemDescription.svelte";
    import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
    import CharacterSheetItemFooter from "~/actor/types/character/sheet/items/CharacterSheetItemFooter.svelte";
-   import CharacterSheetItemRarity from "~/actor/types/character/sheet/items/CharacterSheetItemRarity.svelte";
-   import CharacterSheetItemValue from "~/actor/types/character/sheet/items/CharacterSheetItemValue.svelte";
-   import CharacterSheetItemImage from "../CharacterSheetItemImage.svelte";
+   import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
+   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -70,23 +70,23 @@
          <div class="expandable-content" transition:slide|local>
             <!--Item Description-->
             {#if item.system.description !== "" && item.system.description !== "<p></p>"}
-               <div class="section editor">
-                  <CharacterSheetItemDescription description={item.system.description} />
+               <div class="section rich-text">
+                  <RichText text={item.system.description} />
                </div>
             {/if}
 
-            <!--Attack description-->
+            <!--Attack notes-->
             {#if item.system.attackNotes !== "" && item.system.attackNotes !== "<p></p>"}
-               <div class="section editor">
-                  <CharacterSheetItemDescription description={item.system.attackNotes} />
+               <div class="section rich-text">
+                  <RichText text={item.system.attackNotes} />
                </div>
             {/if}
 
             <!--Footer-->
             <div class="section top-padding">
                <CharacterSheetItemFooter>
-                  <CharacterSheetItemRarity {item} />
-                  <CharacterSheetItemValue {item} />
+                  <RarityTag rarity={item.system.rarity} />
+                  <ValueTag value={item.system.value} />
                </CharacterSheetItemFooter>
             </div>
          </div>
@@ -146,15 +146,15 @@
             @include flex-group-top;
             width: 100%;
 
-            &.top-padding {
-               margin-top: 0.25rem;
-            }
-
             &:not(:first-child) {
                @include border-top;
 
                &.top-padding {
                   padding-top: 0.25rem;
+
+                  &:not(.rich-text + .top-padding) {
+                     margin-top: 0.25rem;
+                  }
                }
             }
          }
