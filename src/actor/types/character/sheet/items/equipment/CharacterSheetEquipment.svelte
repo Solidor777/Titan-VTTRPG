@@ -12,7 +12,6 @@
    import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import CharacterSheetArmorStats from "./CharacterSheetArmorStats.svelte";
 
    // Reference to the armor id
    export let id = void 0;
@@ -47,9 +46,9 @@
          <!--Controls-->
          <div class="controls">
             <!--Toggle Equipped button-->
-            {#if ($document.system.equipped.armor === item._id) === false || item.system.check.length === 0}
+            {#if item.system.equipped === false || item.system.check.length === 0}
                <div class="button">
-                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
+                  <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
                </div>
             {:else}
                <div class="button">
@@ -85,14 +84,9 @@
             <!--Equip button-->
             {#if item.system.check.length > 0}
                <div class="section space-evenly">
-                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
+                  <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
                </div>
             {/if}
-
-            <!--Armor Stats-->
-            <div class="section tags">
-               <CharacterSheetArmorStats {item} />
-            </div>
 
             <!--Item Description-->
             {#if item.system.description !== "" && item.system.description !== "<p></p>"}
@@ -170,10 +164,7 @@
 
             &:not(.rich-text) {
                padding-bottom: 0.5rem;
-
-               &:not(.tags) {
-                  padding-top: 0.5rem;
-               }
+               padding-top: 0.5rem;
             }
 
             &:not(:first-child) {

@@ -7,6 +7,7 @@
    import CharacterSheetItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterSheetItemAddEntryButton.svelte";
    import CharacterSheetWeapon from "~/actor/types/character/sheet/items/weapon/CharacterSheetWeapon.svelte";
    import CharacterSheetArmor from "~/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte";
+   import CharacterSheetEquipment from "~/actor/types/character/sheet/items/equipment/CharacterSheetEquipment.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -65,6 +66,31 @@
                <!--Add Armor Button-->
                <div class="add-entry-button">
                   <CharacterSheetItemAddEntryButton itemType={"armor"} />
+               </div>
+            </div>
+         </div>
+
+         <!--Equipment-->
+         <div class="category">
+            <!--List Header-->
+            <div class="header">
+               {localize("equipment")}
+            </div>
+
+            <!--Equipment list-->
+            <div class="list">
+               <CharacterSheetItemList
+                  itemComponent={CharacterSheetEquipment}
+                  filterFunction={(item) => {
+                     return item.type === "equipment";
+                  }}
+                  filter={$appState.filter.inventory}
+                  isExpandedMap={$appState.isExpanded.inventory}
+               />
+
+               <!--Add Armor Button-->
+               <div class="add-entry-button">
+                  <CharacterSheetItemAddEntryButton itemType={"equipment"} />
                </div>
             </div>
          </div>

@@ -113,7 +113,7 @@
             {/if}
 
             <!--Footer-->
-            <div class="section space-evenly">
+            <div class="section space-evenly small-text">
                <RarityTag rarity={item.system.rarity} />
                <ValueTag value={item.system.value} />
             </div>
@@ -188,6 +188,10 @@
             &:not(.space-evenly) {
                @include flex-column;
                @include flex-group-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
             }
          }
       }
