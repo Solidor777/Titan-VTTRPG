@@ -3,13 +3,11 @@
    import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
-
-   // Collapsed object
+   // Item reference
    export let item = void 0;
 
-   export let equipped = void 0;
+   // Reference to the application
+   const application = getContext("external").application;
 </script>
 
 <div class="item-equip-button">
@@ -18,7 +16,7 @@
          <div class="label">
             {localize("equipped")}
          </div>
-         <i class={equipped ? "fas fa-square-check" : "fas fa-square"} />
+         <i class={item.system.equipped ? "fas fa-square-check" : "fas fa-square"} />
       </div>
    </EfxButton>
 </div>

@@ -12,6 +12,9 @@
    import CharacterSheetItemFooter from "~/actor/types/character/sheet/items/CharacterSheetItemFooter.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
+   import CharacterSheetWeaponSettings from "../CharacterSheetItemSettings.svelte";
+   import CharacterSheetItemSettings from "../CharacterSheetItemSettings.svelte";
+   import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
 
    // Reference to the docuement
    const document = getContext("DocumentStore");
@@ -69,12 +72,17 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="expandable-content" transition:slide|local>
+            <div class="section">
+               <CharacterSheetItemSettings>
+                  <CharacterSheetWeaponMultiAttackButton {item} />
+                  <CharacterSheetItemEquipButton {item} />
+               </CharacterSheetItemSettings>
+            </div>
+
             <!--Attacks-->
-            {#if item.system.equipped}
-               <div class="section">
-                  <CharacterSheetWeaponAttacks {item} />
-               </div>
-            {/if}
+            <div class="section">
+               <CharacterSheetWeaponAttacks {item} />
+            </div>
 
             <!--Attack notes-->
             {#if item.system.attackNotes !== "" && item.system.attackNotes !== "<p></p>"}

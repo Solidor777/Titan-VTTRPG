@@ -6,7 +6,7 @@
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
    import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
-   import IconTag from "../../../../../../helpers/svelte-components/tag/IconTag.svelte";
+   import IconTag from "~/helpers/svelte-components/tag/IconTag.svelte";
 
    // Context references
    const document = getContext("DocumentStore");
@@ -23,9 +23,9 @@
 </script>
 
 <div class="attack">
-   <div class="row header">
-      <!--Attack Button-->
-      <div class="attack-button">
+   <!--Header-->
+   <div class="header">
+      {#if item.system.equipped}
          <EfxButton
             on:click={() => {
                application.rollAttackCheck(item._id, attackIdx);
@@ -34,7 +34,9 @@
             <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
             {attack.label}
          </EfxButton>
-      </div>
+      {:else}
+         <IconTag label={attack.label} icon="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
+      {/if}
    </div>
 
    <!--Check Label-->
@@ -120,6 +122,12 @@
       @include flex-column;
       @include flex-group-top;
       width: 100%;
+
+      .header {
+         @include flex-row;
+         @include flex-group-center;
+         height: 2rem;
+      }
 
       .check-stats {
          @include flex-row;

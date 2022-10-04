@@ -1,29 +1,20 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   // Collapsed object
+   // Item Reference
    export let item = void 0;
+   // Reference to the application
+   const application = getContext("external").application;
 </script>
 
 <div class="item-equip-button">
-   <EfxButton
-      on:click={async () => {
-         const updateData = {
-            system: {
-               multiAttack: !item.system.multiAttack,
-            },
-         };
-
-         item.update(updateData);
-
-         return;
-      }}
-   >
+   <EfxButton on:click={application.toggleMultiAttack.bind(application, item._id)}>
       <div class="button-inner">
          <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
          <div class="label">
-            {localize("multi")}
+            {localize("multiAttack")}
          </div>
          <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
       </div>

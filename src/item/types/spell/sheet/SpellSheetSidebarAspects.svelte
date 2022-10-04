@@ -15,6 +15,15 @@
       <li transition:slide|local>
          <!--Label-->
          <div class="aspect-label">
+            <!--Damage icon-->
+            {#if aspect.label === localize("damage") || aspect.isDamage}
+               <i class="fas fa-bolt" />
+            {/if}
+
+            <!--Healing icon-->
+            {#if aspect.label === localize("healing") || aspect.isHealing}
+               <i class="fas fa-heart" />
+            {/if}
             {aspect.label}
          </div>
 
@@ -97,6 +106,10 @@
             @include flex-group-center;
             @include font-size-normal;
             font-weight: bold;
+
+            i {
+               margin-right: 0.25rem;
+            }
          }
 
          .options {
