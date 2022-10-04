@@ -6,7 +6,7 @@
    import CharacterSheetItemList from "~/actor/types/character/sheet/items/CharacterSheetItemList.svelte";
    import CharacterSheetItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterSheetItemAddEntryButton.svelte";
    import CharacterSheetWeapon from "~/actor/types/character/sheet/items/weapon/CharacterSheetWeapon.svelte";
-   import CharacterArmor from "~/actor/types/character/sheet/items/armor/CharacterArmor.svelte";
+   import CharacterSheetArmor from "~/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -54,7 +54,7 @@
             <!--Armor list-->
             <div class="list">
                <CharacterSheetItemList
-                  itemComponent={CharacterArmor}
+                  itemComponent={CharacterSheetArmor}
                   filterFunction={(item) => {
                      return item.type === "armor";
                   }}

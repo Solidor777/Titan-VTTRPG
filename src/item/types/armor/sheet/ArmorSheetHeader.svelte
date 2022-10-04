@@ -56,6 +56,9 @@
 
          <!--Armor-->
          <div class="stat">
+            <!--Icon-->
+            <i class="fas fa-helmet-battle" />
+
             <!--Label-->
             <div class="label">
                {localize("armor")}

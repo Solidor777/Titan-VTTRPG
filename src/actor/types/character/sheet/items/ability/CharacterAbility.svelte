@@ -4,7 +4,7 @@
    import { localize } from "~/helpers/Utility.js";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import CharacterSheetItemExpandButton from "../CharacterSheetItemExpandButton.svelte";
-   import CharacterCheckButtonSmall from "../../checks/CharacterCheckButtonSmall.svelte";
+   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
    import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
@@ -41,7 +41,7 @@
             <!--Check-->
             {#if item.system.check.length > 0}
                <div>
-                  <CharacterCheckButtonSmall
+                  <CharacterSheetCheckButton
                      check={item.system.check[0]}
                      on:click={() => {
                         application.rollItemCheck(id, 0);

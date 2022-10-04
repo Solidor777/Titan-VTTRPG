@@ -1,9 +1,10 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
+   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
    import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
@@ -11,14 +12,12 @@
    import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
-   import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
-   import CharacterSheetWeaponAttackButton from "./CharacterSheetWeaponAttackButton.svelte";
+   import CharacterSheetArmorStats from "./CharacterSheetArmorStats.svelte";
 
-   // Weapon id
+   // Reference to the armor id
    export let id = void 0;
 
-   // Expanded object
+   // Collapsed object
    export let isExpanded = void 0;
 
    // Setup context references
@@ -30,7 +29,7 @@
 </script>
 
 {#if item}
-   <div class="item" transition:slide|local>
+   <div class="item">
       <!--Header-->
       <div class="header">
          <div class="label">
@@ -47,19 +46,21 @@
 
          <!--Controls-->
          <div class="controls">
-            <div class="button">
-               {#if item.system.equipped}
-                  <!--Toggle Equipped button-->
-                  <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
-               {:else}
-                  <CharacterSheetWeaponAttackButton
-                     attack={item.system.attack[0]}
+            <!--Toggle Equipped button-->
+            {#if ($document.system.equipped.armor === item._id) === false || item.system.check.length === 0}
+               <div class="button">
+                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
+               </div>
+            {:else}
+               <div class="button">
+                  <CharacterSheetCheckButton
+                     check={item.system.check[0]}
                      on:click={() => {
-                        application.rollAttackCheck(item._id, 0);
+                        application.rollItemCheck(id, 0);
                      }}
                   />
-               {/if}
-            </div>
+               </div>
+            {/if}
 
             <!--Send to Chat button-->
             <div class="button">
@@ -81,22 +82,15 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="expandable-content" transition:slide|local>
+            <!--Armor Stats-->
             <div class="section space-evenly">
-               <CharacterSheetWeaponMultiAttackButton {item} />
-               <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
+               <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
             </div>
 
-            <!--Attacks-->
-            <div class="section">
-               <CharacterSheetWeaponAttacks {item} />
+            <!--Armor Stats-->
+            <div class="section tags">
+               <CharacterSheetArmorStats {item} />
             </div>
-
-            <!--Attack notes-->
-            {#if item.system.attackNotes !== "" && item.system.attackNotes !== "<p></p>"}
-               <div class="section rich-text">
-                  <RichText text={item.system.attackNotes} />
-               </div>
-            {/if}
 
             <!--Item Description-->
             {#if item.system.description !== "" && item.system.description !== "<p></p>"}
@@ -173,7 +167,11 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding: 0.5rem 0 0.5rem;
+               padding-bottom: 0.5rem;
+
+               &:not(.tags) {
+                  padding-top: 0.5rem;
+               }
             }
 
             &:not(:first-child) {

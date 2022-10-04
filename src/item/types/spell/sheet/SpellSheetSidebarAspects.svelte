@@ -24,6 +24,16 @@
             {#if aspect.label === localize("healing") || aspect.isHealing}
                <i class="fas fa-heart" />
             {/if}
+
+            <!--Range icon-->
+            {#if aspect.label === localize("range")}
+               <i class="fas fa-ruler" />
+            {/if}
+
+            <!--Radius icon-->
+            {#if aspect.label === localize("radius")}
+               <i class="fas fa-bullseye" />
+            {/if}
             {aspect.label}
          </div>
 

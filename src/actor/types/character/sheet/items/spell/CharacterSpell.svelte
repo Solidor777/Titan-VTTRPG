@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import CharacterSheetItemExpandButton from "../CharacterSheetItemExpandButton.svelte";
-   import CharacterCheckButtonSmall from "../../checks/CharacterCheckButtonSmall.svelte";
+   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
    import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
@@ -40,7 +40,7 @@
          <div class="item-controls">
             <!--Cast Spell-->
             <div>
-               <CharacterCheckButtonSmall
+               <CharacterSheetCheckButton
                   check={item.system.castingCheck}
                   on:click={() => {
                      application.rollCastingCheck(id);

@@ -43,7 +43,7 @@
          .name {
             @include flex-row;
             @include flex-group-center;
-            padding: 0.25rem;
+            padding: 0.25rem 0;
             flex-wrap: wrap;
             width: 100%;
             line-height: normal;

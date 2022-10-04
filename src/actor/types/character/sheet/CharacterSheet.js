@@ -134,6 +134,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Delete Item
    async deleteItem(id) {
       this.reactive.state.deleteItem(id);
+      console.log(id);
       this.reactive.document.deleteItem(id);
       return;
    }

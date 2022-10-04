@@ -33,17 +33,19 @@ export default function createPlayerSheetState() {
    // Remove an item
    function deleteItem(id) {
       update((state) => {
-         if (state.isExpanded.actions[id]) {
-            delete state.isExpanded.actions[id];
-         }
-
-         if (state.isExpanded.inventory[id]) {
+         if (state.isExpanded.inventory[id] === false || state.isExpanded.inventory[id] === true) {
             delete state.isExpanded.inventory[id];
          }
 
-         if (state.isExpanded.spells[id]) {
+         if (state.isExpanded.abilities[id] === false || state.isExpanded.abilities[id] === true) {
+            delete state.isExpanded.abilities[id];
+         }
+
+         if (state.isExpanded.spells[id] === false || state.isExpanded.spells[id] === true) {
             delete state.isExpanded.spells[id];
          }
+
+
          return state;
       });
    }
