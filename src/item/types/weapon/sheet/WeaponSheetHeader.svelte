@@ -40,6 +40,9 @@
 
          <!--Value-->
          <div class="stat">
+            <!--Icon-->
+            <i class="fas fa-coins" />
+
             <!--Label-->
             <div class="label">
                {localize("value")}
@@ -96,6 +99,10 @@
                   @include border-left;
                   margin-left: 0.5rem;
                   padding-left: 0.5rem;
+               }
+
+               i {
+                  margin-right: 0.25rem;
                }
 
                .label {

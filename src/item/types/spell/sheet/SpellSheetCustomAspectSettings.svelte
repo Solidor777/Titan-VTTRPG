@@ -92,6 +92,9 @@
             <div class="row">
                <!--Damage-->
                <div class="field">
+                  <!--Icon-->
+                  <i class="fas fa-bolt" />
+
                   <!--Label-->
                   <div class="label">{localize("damage")}</div>
 
@@ -103,6 +106,9 @@
 
                <!--Healing-->
                <div class="field">
+                  <!--Icon-->
+                  <i class="fas fa-heart" />
+
                   <!--Label-->
                   <div class="label">{localize("healing")}</div>
 
@@ -195,6 +201,10 @@
                   @include border-left;
                   margin-left: 0.5rem;
                   padding-left: 0.5rem;
+               }
+
+               i {
+                  margin-right: 0.25rem;
                }
 
                .label {

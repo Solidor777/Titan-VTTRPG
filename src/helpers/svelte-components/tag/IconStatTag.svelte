@@ -1,12 +1,13 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   export let label = void 0;
    export let value = void 0;
+   export let icon = void 0;
 </script>
 
 <div class="stat">
-   <i class="fas fa-coins" />
+   <i class={icon} />
    <div class="label">
-      {localize("value")}
+      {label}
    </div>
    <div class="value">
       {value}

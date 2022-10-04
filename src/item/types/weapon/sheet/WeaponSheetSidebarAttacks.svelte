@@ -6,6 +6,7 @@
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
+   import IconStatTag from "../../../../helpers/svelte-components/tag/IconStatTag.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -64,13 +65,16 @@
                </div>
 
                <!--Range-->
-               <div class="stat">
-                  <StatTag label={localize("range")} value={attack.range} />
-               </div>
+               {#if attack.range !== 1}
+                  <div class="stat">
+                     <IconStatTag label={localize("range")} value={attack.range} icon={"fas fa-ruler"} />
+                  </div>
+               {/if}
 
                <!--Damage-->
                <div class="stat">
-                  <StatTag
+                  <IconStatTag
+                     icon={"fas fa-bolt"}
                      label={localize("damage")}
                      value={`${attack.damage}${
                         attack.plusExtraSuccessDamage ? ` + ${localize("extraSuccesses.short")}` : ""

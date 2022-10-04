@@ -2,11 +2,10 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import ResistanceTag from "../../../../helpers/svelte-components/tag/ResistanceTag.svelte";
-   import Tag from "../../../../helpers/svelte-components/tag/Tag.svelte";
+   import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Application statee reference
-   const appState = getContext("ApplicationStateStore");
    const document = getContext("DocumentStore");
 </script>
 

@@ -1,15 +1,12 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   export let value = void 0;
+   export let label = void 0;
+   export let icon = void 0;
 </script>
 
 <div class="stat">
-   <i class="fas fa-coins" />
+   <i class={icon} />
    <div class="label">
-      {localize("value")}
-   </div>
-   <div class="value">
-      {value}
+      {label}
    </div>
 </div>
 
@@ -24,10 +21,8 @@
       padding: 0.25rem;
 
       .label {
-         @include border-right;
          font-weight: bold;
-         padding-right: 0.25rem;
-         margin: 0 0.25rem;
+         margin-left: 0.25rem;
       }
    }
 </style>

@@ -83,6 +83,9 @@
 
                <!--Range-->
                <div class="field">
+                  <!--Icon-->
+                  <i class="fas fa-ruler" />
+
                   <!--Label-->
                   <div class="label">{localize("range")}</div>
 
@@ -96,6 +99,9 @@
             <div class="row">
                <!--Damage-->
                <div class="field">
+                  <!--Icon-->
+                  <i class="fas fa-bolt" />
+
                   <!--Label-->
                   <div class="label">{localize("damage")}</div>
 
@@ -226,6 +232,10 @@
                   @include border-left;
                   margin-left: 0.5rem;
                   padding-left: 0.5rem;
+               }
+
+               i {
+                  margin-right: 0.25rem;
                }
 
                .label {

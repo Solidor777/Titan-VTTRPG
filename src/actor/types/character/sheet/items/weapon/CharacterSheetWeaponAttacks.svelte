@@ -19,19 +19,20 @@
    @import "../../../../../../Styles/Mixins.scss";
 
    ol {
-      @include flex-row;
-      @include flex-group-left;
-      @include border;
-      margin: 0;
-      padding: 0.5rem;
-      list-style: none;
-      flex-wrap: wrap;
-      background: var(--label-background-color);
+      @include flex-column;
+      @include flex-group-top;
+      @include list;
+      width: 100%;
+      padding-bottom: 0.25rem;
 
       li {
+         @include flex-row;
+         @include flex-group-center;
          width: 100%;
 
          &:not(:first-child) {
+            @include border-top;
+            padding-top: 0.5rem;
             margin-top: 0.5rem;
          }
       }
