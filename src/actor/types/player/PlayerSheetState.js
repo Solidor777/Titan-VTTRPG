@@ -5,20 +5,17 @@ export default function createPlayerSheetState() {
    const { set, update, subscribe } = writable({
       scrollTop: {
          abilities: 0,
-         actions: 0,
          inventory: 0,
          skills: 0,
          spells: 0
       },
       isExpanded: {
-         actions: {},
          abilities: {},
          inventory: {},
          spells: {},
       },
       filter: {
          abilities: '',
-         actions: '',
          inventory: '',
          skills: '',
          spells: ''

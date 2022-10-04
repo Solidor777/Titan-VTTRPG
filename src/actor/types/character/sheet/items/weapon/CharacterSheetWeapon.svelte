@@ -12,6 +12,7 @@
    import CharacterSheetItemFooter from "~/actor/types/character/sheet/items/CharacterSheetItemFooter.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemSettings from "~/actor/types/character/sheet/items/CharacterSheetItemSettings.svelte";
+   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
    import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
    import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
    import CharacterSheetWeaponAttackButton from "./CharacterSheetWeaponAttackButton.svelte";
@@ -105,6 +106,13 @@
             {#if item.system.description !== "" && item.system.description !== "<p></p>"}
                <div class="section rich-text">
                   <RichText text={item.system.description} />
+               </div>
+            {/if}
+
+            <!--Item Checks-->
+            {#if item.system.check.length > 0}
+               <div class="section">
+                  <CharacterSheetItemChecks {item} />
                </div>
             {/if}
 
