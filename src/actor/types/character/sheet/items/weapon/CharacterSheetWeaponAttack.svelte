@@ -24,7 +24,7 @@
 
 <div class="attack">
    <!--Header-->
-   <div class="header">
+   <div class="header {attack.attribute}">
       {#if item.system.equipped}
          <EfxButton
             on:click={() => {
@@ -127,6 +127,18 @@
          @include flex-row;
          @include flex-group-center;
          height: 2rem;
+
+         &.body {
+            --button-background-color: var(--body-color-bright);
+         }
+
+         &.mind {
+            --button-background-color: var(--mind-color-bright);
+         }
+
+         &.soul {
+            --button-background-color: var(--soul-color-bright);
+         }
       }
 
       .check-stats {

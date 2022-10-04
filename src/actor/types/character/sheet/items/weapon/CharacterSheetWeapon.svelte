@@ -11,19 +11,20 @@
    import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
    import CharacterSheetItemFooter from "~/actor/types/character/sheet/items/CharacterSheetItemFooter.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
-   import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
-   import CharacterSheetWeaponSettings from "../CharacterSheetItemSettings.svelte";
-   import CharacterSheetItemSettings from "../CharacterSheetItemSettings.svelte";
+   import CharacterSheetItemSettings from "~/actor/types/character/sheet/items/CharacterSheetItemSettings.svelte";
    import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
+   import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
+   import CharacterSheetWeaponAttackButton from "./CharacterSheetWeaponAttackButton.svelte";
 
-   // Reference to the docuement
-   const document = getContext("DocumentStore");
-
-   // Reference to the weapon id
+   // Weapon id
    export let id = void 0;
 
-   // Collapsed object
+   // Expanded object
    export let isExpanded = void 0;
+
+   // Setup context references
+   const document = getContext("DocumentStore");
+   const application = getContext("external").application;
 
    // Item reference
    $: item = $document.items.get(id);
@@ -47,9 +48,18 @@
 
          <!--Controls-->
          <div class="controls">
-            <!--Toggle Equipped button-->
             <div class="button">
-               <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
+               {#if !item.system.equipped}
+                  <!--Toggle Equipped button-->
+                  <CharacterSheetItemEquipButton {item} />
+               {:else}
+                  <CharacterSheetWeaponAttackButton
+                     attack={item.system.attack[0]}
+                     on:click={() => {
+                        application.rollAttackCheck(item._id, 0);
+                     }}
+                  />
+               {/if}
             </div>
 
             <!--Send to Chat button-->
@@ -163,7 +173,7 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding: 0.25rem 0 0.25rem;
+               padding: 0.5rem 0 0.5rem;
             }
 
             &:not(:first-child) {

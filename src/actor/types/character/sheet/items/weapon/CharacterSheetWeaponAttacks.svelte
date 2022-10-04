@@ -23,7 +23,6 @@
       @include flex-group-top;
       @include list;
       width: 100%;
-      padding-bottom: 0.25rem;
 
       li {
          @include flex-row;
@@ -33,7 +32,7 @@
          &:not(:first-child) {
             @include border-top;
             padding-top: 0.5rem;
-            margin-top: 0.5rem;
+            margin-top: 0.55rem;
          }
       }
    }
