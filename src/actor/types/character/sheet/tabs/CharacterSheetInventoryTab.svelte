@@ -127,7 +127,11 @@
             .header {
                @include flex-row;
                @include flex-group-center;
+               @include panel-1;
+               @include border;
+               width: 100%;
                font-weight: bold;
+               padding: 0.5rem 0;
             }
 
             .list {

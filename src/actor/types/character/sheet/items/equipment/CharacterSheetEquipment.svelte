@@ -88,17 +88,17 @@
                </div>
             {/if}
 
-            <!--Item Description-->
-            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
-               <div class="section rich-text">
-                  <RichText text={item.system.description} />
-               </div>
-            {/if}
-
             <!--Item Checks-->
             {#if item.system.check.length > 0}
                <div class="section">
                   <CharacterSheetItemChecks {item} />
+               </div>
+            {/if}
+
+            <!--Item Description-->
+            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+               <div class="section rich-text">
+                  <RichText text={item.system.description} />
                </div>
             {/if}
 
