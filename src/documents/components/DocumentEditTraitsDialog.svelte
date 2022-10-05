@@ -4,6 +4,7 @@
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // The document
    export let document = void 0;
@@ -73,12 +74,20 @@
 
    <!--Buttons-->
    <div class="row">
-      <button on:click={applyTraitEdits}>{localize("applyEdits")}</button>
-      <button
-         on:click={() => {
-            application.close();
-         }}>{localize("cancel")}</button
-      >
+      <div class="button">
+         <EfxButton on:click={applyTraitEdits}>
+            {localize("applyEdits")}
+         </EfxButton>
+      </div>
+
+      <div class="button">
+         <EfxButton
+            on:click={() => {
+               application.close();
+            }}
+            >{localize("cancel")}
+         </EfxButton>
+      </div>
    </div>
 </div>
 
@@ -130,8 +139,14 @@
          width: 100%;
          margin-top: 0.25rem;
 
-         button {
-            @include font-size-normal;
+         .button {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+            --button-border-radius: 0;
+            &:not(:first-child) {
+               margin-left: 0.25rem;
+            }
          }
       }
    }

@@ -410,6 +410,7 @@
   "LOCAL.shield.label": "Shield",
   "LOCAL.addNewShield.label": "Add New Shield",
   "LOCAL.newShield.label": "New Shield",
+  "LOCAL.addNewItem.label": "Add New Item",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",
