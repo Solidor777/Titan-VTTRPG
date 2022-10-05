@@ -17,7 +17,7 @@
       @include flex-row;
       @include flex-group-left;
       @include border;
-      @include label;
+      @include panel-1;
       padding: 0.25rem;
 
       img {

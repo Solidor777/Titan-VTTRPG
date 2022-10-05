@@ -31,7 +31,7 @@
       <!--Checks-->
       {#if item.system.check.length > 0}
          <div class="section">
-            <ItemChatChecks />
+            <ItemChatChecks {item} />
          </div>
       {/if}
 

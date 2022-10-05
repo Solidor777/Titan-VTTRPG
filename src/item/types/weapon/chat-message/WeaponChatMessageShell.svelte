@@ -18,7 +18,7 @@
    <div class="sections">
       <!--Attacks-->
       <div class="section">
-         <WeaponChatAttacks />
+         <WeaponChatAttacks {item} />
       </div>
 
       <!--Attack Notes-->
@@ -38,7 +38,7 @@
       <!--Checks-->
       {#if item.system.check.length > 0}
          <div class="section">
-            <ItemChatChecks />
+            <ItemChatChecks {item} />
          </div>
       {/if}
 

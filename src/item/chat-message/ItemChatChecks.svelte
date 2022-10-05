@@ -1,13 +1,11 @@
 <script>
-   import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import OpposedCheckTag from "~/helpers/svelte-components/tag/OpposedCheckTag.svelte";
    import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
 
-   const document = getContext("DocumentStore");
-   const item = $document.flags.titan.chatContext;
+   export let item = void 0;
 
    function getTagFromCheck(check) {
       let retVal = localize(`${check.attribute}`);

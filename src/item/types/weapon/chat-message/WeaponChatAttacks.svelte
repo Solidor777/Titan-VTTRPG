@@ -1,19 +1,16 @@
 <script>
-   import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import IconStatTag from "../../../../helpers/svelte-components/tag/IconStatTag.svelte";
-   import AttributeTag from "../../../../helpers/svelte-components/tag/AttributeTag.svelte";
-   import IconTag from "../../../../helpers/svelte-components/tag/IconTag.svelte";
+   import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
+   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
+   import IconTag from "~/helpers/svelte-components/tag/IconTag.svelte";
 
-   // Chat context reference
-   const document = getContext("DocumentStore");
-   const chatContext = $document.flags.titan.chatContext;
+   export let item = void 0;
 </script>
 
 <ol>
-   {#each Object.entries(chatContext.system.attack) as [attackIdx, attack]}
+   {#each Object.entries(item.system.attack) as [attackIdx, attack]}
       <!--Each attack-->
       <li>
          <div class="row header">
