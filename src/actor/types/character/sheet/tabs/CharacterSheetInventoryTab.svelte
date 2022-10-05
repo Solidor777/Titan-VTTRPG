@@ -11,6 +11,7 @@
    import CharacterSheetCommodity from "~/actor/types/character/sheet/items/commodity/CharacterSheetCommodity.svelte";
    import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
    import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -36,6 +37,18 @@
       {#each Object.entries($appState.filterOptions.inventory) as [key]}
          <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.inventory[key]} />
       {/each}
+
+      <div
+         class="reset"
+         on:click={() => {
+            $appState.filterOptions.inventory.weapon = false;
+            $appState.filterOptions.inventory.armor = false;
+            $appState.filterOptions.inventory.equipment = false;
+            $appState.filterOptions.inventory.commodity = false;
+         }}
+      >
+         <IconButton icon="fas fa-rotate-left" />
+      </div>
    </div>
 
    <!--Scrolling Containers-->
@@ -174,6 +187,12 @@
 
          .input {
             @include flex-group-left;
+         }
+
+         .reset {
+            @include font-size-small;
+            --icon-button-font-size: var(--font-size-small);
+            --icon-button-radius: 1.75rem;
          }
       }
 

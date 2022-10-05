@@ -159,9 +159,12 @@
   border-radius: var(--icon-button-border-radius);
   border-width: var(--icon-button-border-width);
   border-color: var(--border-color-icon-button);
+  font-size: var(--icon-button-font-size);
   background: var(--icon-button-background-color);
   padding: var(--icon-button-padding);
-  margin: 0;
+  line-height: var(--icon-button-line-height);
+  width: var(--icon-button-radius);
+  height: var(--icon-button-radius);
 }
 
 @mixin flex-row {

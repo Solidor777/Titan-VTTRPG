@@ -22,10 +22,10 @@ export default function createPlayerSheetState() {
       },
       filterOptions: {
          inventory: {
-            armor: false,
-            commodity: false,
-            equipment: false,
             weapon: false,
+            armor: false,
+            equipment: false,
+            commodity: false,
          },
          abilities: {
             action: false,

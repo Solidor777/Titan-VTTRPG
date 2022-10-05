@@ -19,8 +19,6 @@
       overflow: hidden;
       clip-path: var(--tjs-icon-button-clip-path, none);
       transform-style: preserve-3d;
-      width: var(--icon-button-radius);
-      height: var(--icon-button-radius);
    }
 
    button:hover {
