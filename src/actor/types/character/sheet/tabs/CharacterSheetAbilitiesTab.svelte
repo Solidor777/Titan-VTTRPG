@@ -140,15 +140,15 @@
             @include flex-group-top;
             width: 100%;
             margin-top: 0.5rem;
+         }
 
-            .add-entry-button {
-               @include flex-row;
-               @include flex-group-center;
-               width: 100%;
+         .add-entry-button {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
 
-               &:not(:first-child) {
-                  margin-top: 0.5rem;
-               }
+            &:not(:first-child) {
+               margin-top: 0.5rem;
             }
          }
       }

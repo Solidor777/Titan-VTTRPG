@@ -7,7 +7,7 @@
 
 <div class="aspect {aspect.resistanceCheck ? aspect.resistanceCheck : ''}">
    <!--Label-->
-   <div class="stat  label">
+   <div class="stat label">
       {aspect.label}
    </div>
 
@@ -57,7 +57,7 @@
       @include flex-group-center;
       @include resistance-colors;
       @include border;
-      background: var(--label-background-color);
+      @include label;
       padding: 0.25rem;
       flex-wrap: wrap;
 

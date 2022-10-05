@@ -5,34 +5,34 @@
    export let aspects = void 0;
 
    // Sort the aspects by size
-   let aspectSizeMap = [];
-   aspects.forEach((aspect, idx) => {
-      let size = 0;
+   $: aspectSizeMap = aspects
+      .map((aspect, idx) => {
+         let size = 0;
 
-      if (aspect.scaling) {
-         size += 1;
-      }
+         if (aspect.scaling) {
+            size += 1;
+         }
 
-      if (aspect.allOptions) {
-         size += 1;
-      } else if (aspect.option) {
-         size += aspect.option.length;
-      }
+         if (aspect.allOptions) {
+            size += 1;
+         } else if (aspect.option) {
+            size += aspect.option.length;
+         }
 
-      if (aspect.resistanceCheck) {
-         size += 2;
-      }
-      aspectSizeMap.push({ idx: idx, size: size });
-   });
-   aspectSizeMap = aspectSizeMap.sort((a, b) => {
-      if (a.size > b.size) {
-         return 1;
-      }
-      if (a.size < b.size) {
-         return -1;
-      }
-      return 0;
-   });
+         if (aspect.resistanceCheck) {
+            size += 2;
+         }
+         return { idx: idx, size: size };
+      })
+      .sort((a, b) => {
+         if (a.size > b.size) {
+            return 1;
+         }
+         if (a.size < b.size) {
+            return -1;
+         }
+         return 0;
+      });
 </script>
 
 <div class="aspects">
@@ -51,10 +51,11 @@
    .aspects {
       @include flex-row;
       @include flex-space-evenly;
+      @include font-size-small;
       flex-wrap: wrap;
 
       .aspect {
-         margin: 0.25rem;
+         @include tag-padding;
       }
    }
 </style>
