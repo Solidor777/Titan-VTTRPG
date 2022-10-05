@@ -129,11 +129,11 @@
       .header {
          @include flex-row;
          @include flex-group-center;
+         height: 2rem;
 
          .label {
             @include flex-row;
             @include flex-group-center;
-            height: 2rem;
             font-weight: bold;
          }
 
