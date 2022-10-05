@@ -18,18 +18,18 @@
       @include flex-group-left;
       @include border;
       @include panel-1;
-      padding: 0.5rem;
+      padding: 0.25rem;
 
       img {
          border: none;
-         width: 2.5rem;
+         width: 2rem;
       }
 
       .name {
          @include flex-row;
          @include flex-group-center;
          @include font-size-large;
-         margin-left: 0.5rem;
+         margin-left: 0.25rem;
          height: 100%;
          font-weight: bold;
       }

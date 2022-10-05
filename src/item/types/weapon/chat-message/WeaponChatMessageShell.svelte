@@ -1,15 +1,11 @@
 <script>
    import { getContext } from "svelte";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
+   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
+   import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
    import WeaponChatAttacks from "./WeaponChatAttacks.svelte";
-   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
-   import ItemChatValue from "~/item/chat-message/ItemChatValue.svelte";
-   import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
-   import RichText from "../../../../helpers/svelte-components/RichText.svelte";
-   import RarityTag from "../../../../helpers/svelte-components/tag/RarityTag.svelte";
-   import ValueTag from "../../../../helpers/svelte-components/tag/ValueTag.svelte";
-   import ItemChatChecks from "../../../chat-message/ItemChatChecks.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -74,7 +70,12 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding: 0.5rem 0 0.5rem;
+               padding-top: 0.5rem;
+               padding-bottom: 0.5rem;
+            }
+
+            &:last-child {
+               padding-bottom: 0.25rem;
             }
 
             &:not(:first-child) {

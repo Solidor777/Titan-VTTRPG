@@ -1,43 +1,41 @@
 <script>
-   import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   const document = getContext("DocumentStore");
+   import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
-   // Chat context reference
-   const chatContext = $document.flags.titan.chatContext;
+   // Item reference
+   export let item = void 0;
 </script>
 
 <div class="stats">
    <div class="stat">
-      {localize(`armor`)}: {chatContext.system.armor}
+      <IconStatTag icon={"fas fa-helmet-battle"} label={localize("armor")} value={item.system.armor} />
    </div>
 
-   {#each chatContext.system.traits as trait}
+   <!--Traits-->
+   {#each item.system.trait as trait}
       <div class="stat">
-         {localize(`${trait.name}`)}
          {#if trait.type === "number"}
-            {trait.value}
+            <StatTag label={localize(`${trait.name}`)} value={trait.value} />
+         {:else}
+            <Tag label={localize(`${trait.name}`)} />
          {/if}
       </div>
    {/each}
 </div>
 
 <style lang="scss">
-   @import "../../../../styles/mixins.scss";
+   @import "../../../../Styles/Mixins.scss";
    .stats {
       @include flex-row;
       @include flex-group-center;
+      @include font-size-small;
       width: 100%;
       flex-wrap: wrap;
-      font-weight: bold;
 
       .stat {
-         @include flex-row;
-         @include flex-group-center;
-         @include border;
-         margin: 0.25rem;
-         padding: 0.25rem;
-         background: var(--label-background-color);
+         @include tag-padding;
       }
    }
 </style>

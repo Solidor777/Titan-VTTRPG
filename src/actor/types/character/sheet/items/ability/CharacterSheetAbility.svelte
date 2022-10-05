@@ -167,7 +167,7 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding: 0.5rem 0 0.5rem;
+               padding: 0.5rem 0;
             }
 
             &:not(:first-child) {
