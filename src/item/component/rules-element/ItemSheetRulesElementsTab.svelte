@@ -65,13 +65,13 @@
          >
             <!--Button Content-->
             <div class="button-content">
+               <!--Icon-->
+               <i class="fas fa-circle-plus" />
+
                <!--Label-->
                <div class="label">
                   {localize("addRulesElement")}
                </div>
-
-               <!--Icon-->
-               <i class="fas fa-circle-plus" />
             </div>
          </EfxButton>
       </div>
@@ -120,7 +120,7 @@
             @include flex-group-center;
 
             i {
-               margin-left: 0.25rem;
+               margin-right: 0.25rem;
             }
          }
       }

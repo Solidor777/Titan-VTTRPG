@@ -4,6 +4,7 @@
 
    // The type of item to add
    export let itemType = void 0;
+   export let label = void 0;
 
    // Character reference
    const document = getContext("DocumentStore");
@@ -12,12 +13,17 @@
    const application = getContext("external").application;
 </script>
 
-<EfxButton on:click={application.addItem.bind(application, itemType)}><i class="fas fa-circle-plus" /></EfxButton>
+<EfxButton on:click={application.addItem.bind(application, itemType)}>
+   <i class="fas fa-circle-plus" />
+   <div>
+      {label}
+   </div>
+</EfxButton>
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
 
    .fas {
-      padding: 0.25rem;
+      margin-right: 0.25rem;
    }
 </style>

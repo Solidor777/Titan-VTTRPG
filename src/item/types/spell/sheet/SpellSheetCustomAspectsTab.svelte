@@ -1,14 +1,16 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
+   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import SpellSheetAddCustomAspectButton from "./SpellSheetAddCustomAspectButton.svelte";
-   import SpellSheetCustomAspectSettings from "./SpellSheetCustomAspectSettings.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import SpellSheetCustomAspectSettings from "./SpellSheetCustomAspectSettings.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
    const appState = getContext("ApplicationStateStore");
+   const application = getContext("external").application;
 
    // Filter for the aspects to display
    let filter = "";
@@ -43,8 +45,24 @@
             {/each}
          </ol>
 
-         <div class="add-custom-aspect-button">
-            <SpellSheetAddCustomAspectButton />
+         <!--Add Entry Button-->
+         <div class="add-entry-button">
+            <EfxButton
+               on:click={() => {
+                  application.addCustomAspect();
+               }}
+            >
+               <!--Button Content-->
+               <div class="button-content">
+                  <!--Icon-->
+                  <i class="fas fa-circle-plus" />
+
+                  <!--Label-->
+                  <div class="label">
+                     {localize("addCustomAspect")}
+                  </div>
+               </div>
+            </EfxButton>
          </div>
       </ScrollingContainer>
    </div>
@@ -86,8 +104,20 @@
             }
          }
 
-         .add-custom-aspect-button {
+         .add-entry-button {
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
             margin-top: 0.5rem;
+
+            .button-content {
+               @include flex-row;
+               @include flex-group-center;
+
+               i {
+                  margin-right: 0.25rem;
+               }
+            }
          }
       }
    }

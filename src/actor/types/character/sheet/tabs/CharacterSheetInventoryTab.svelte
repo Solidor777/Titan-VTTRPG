@@ -41,7 +41,7 @@
 
                <!--Add Weapon Button-->
                <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton itemType={"weapon"} />
+                  <CharacterSheetItemAddEntryButton label={localize("addNewWeapon")} itemType={"weapon"} />
                </div>
             </div>
          </div>
@@ -66,7 +66,7 @@
 
                <!--Add Armor Button-->
                <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton itemType={"armor"} />
+                  <CharacterSheetItemAddEntryButton label={localize("addNewArmor")} itemType={"armor"} />
                </div>
             </div>
          </div>
@@ -91,7 +91,7 @@
 
                <!--Add Armor Button-->
                <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton itemType={"equipment"} />
+                  <CharacterSheetItemAddEntryButton itemType={"equipment"} label={localize("addNewEquipment")} />
                </div>
             </div>
          </div>
@@ -116,7 +116,7 @@
 
                <!--Add Armor Button-->
                <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton itemType={"commodity"} />
+                  <CharacterSheetItemAddEntryButton itemType={"commodity"} label={localize("addNewCommodity")} />
                </div>
             </div>
          </div>
@@ -154,7 +154,7 @@
                @include flex-row;
                @include flex-group-center;
                @include panel-1;
-               @include border;
+               @include border-top-bottom;
                width: 100%;
                font-weight: bold;
                padding: 0.5rem 0;
@@ -163,6 +163,7 @@
             .list {
                @include flex-column;
                @include flex-group-top;
+               padding: 0 0.25rem;
                width: 100%;
                margin-top: 0.5rem;
 
