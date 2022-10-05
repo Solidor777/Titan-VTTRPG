@@ -20,14 +20,13 @@
       @include flex-group-center;
       @include border-bottom;
       @include panel-1;
-      width: 100%;
       @include font-size-normal;
-      font-weight: bold;
+      width: 100%;
       padding: 0.25rem;
 
-      .input {
-         @include font-size-normal;
-         margin-left: 0.5rem;
+      .label {
+         font-weight: bold;
+         margin-right: 0.25rem;
       }
    }
 </style>

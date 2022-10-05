@@ -203,10 +203,11 @@
             @include flex-row;
             @include flex-group-center;
             margin-top: 0.25rem;
+            width: 100%;
 
             .label {
                font-weight: bold;
-               margin: 0 0.25rem;
+               margin-right: 0.25rem;
             }
 
             .input {
