@@ -21,6 +21,12 @@ export default function createPlayerSheetState() {
          spells: ''
       },
       filterOptions: {
+         inventory: {
+            armor: false,
+            commodity: false,
+            equipment: false,
+            weapon: false,
+         },
          abilities: {
             action: false,
             reaction: false,

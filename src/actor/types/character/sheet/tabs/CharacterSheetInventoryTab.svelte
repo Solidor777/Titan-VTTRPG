@@ -9,117 +9,145 @@
    import CharacterSheetArmor from "~/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte";
    import CharacterSheetEquipment from "~/actor/types/character/sheet/items/equipment/CharacterSheetEquipment.svelte";
    import CharacterSheetCommodity from "~/actor/types/character/sheet/items/commodity/CharacterSheetCommodity.svelte";
+   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
+   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
+
+   $: noOptions =
+      $appState.filterOptions.inventory.weapon === false &&
+      $appState.filterOptions.inventory.armor === false &&
+      $appState.filterOptions.inventory.equipment === false &&
+      $appState.filterOptions.inventory.commodity === false;
 </script>
 
 <div class="inventory-tab">
    <!--Filter-->
-   <TopFilter bind:filter={$appState.filter.inventory} />
+   <div class="filter">
+      <div class="label">
+         {localize("filter")}
+      </div>
+
+      <div class="input">
+         <TextInput bind:value={$appState.filter.inventory} />
+      </div>
+
+      {#each Object.entries($appState.filterOptions.inventory) as [key]}
+         <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.inventory[key]} />
+      {/each}
+   </div>
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.inventory}>
-         <!--Weapons-->
-         <div class="category">
-            <!--List Header-->
-            <div class="header">
-               {localize("weapons")}
-            </div>
+         {#if $appState.filterOptions.inventory.weapon === true || noOptions}
+            <!--Weapons-->
+            <div class="category">
+               <!--List Header-->
+               <div class="header">
+                  {localize("weapons")}
+               </div>
 
-            <!--Weapon List-->
-            <div class="list">
-               <CharacterSheetItemList
-                  itemComponent={CharacterSheetWeapon}
-                  filterFunction={(item) => {
-                     return item.type === "weapon";
-                  }}
-                  filter={$appState.filter.inventory}
-                  isExpandedMap={$appState.isExpanded.inventory}
-               />
+               <!--Weapon List-->
+               <div class="list">
+                  <CharacterSheetItemList
+                     itemComponent={CharacterSheetWeapon}
+                     filterFunction={(item) => {
+                        return item.type === "weapon";
+                     }}
+                     filter={$appState.filter.inventory}
+                     isExpandedMap={$appState.isExpanded.inventory}
+                  />
 
-               <!--Add Weapon Button-->
-               <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton label={localize("addNewWeapon")} itemType={"weapon"} />
+                  <!--Add Weapon Button-->
+                  <div class="add-entry-button">
+                     <CharacterSheetItemAddEntryButton label={localize("addNewWeapon")} itemType={"weapon"} />
+                  </div>
                </div>
             </div>
-         </div>
+         {/if}
 
          <!--Armor-->
-         <div class="category">
-            <!--List Header-->
-            <div class="header">
-               {localize("armor")}
-            </div>
+         {#if $appState.filterOptions.inventory.armor === true || noOptions}
+            <div class="category">
+               <!--List Header-->
+               <div class="header">
+                  {localize("armor")}
+               </div>
 
-            <!--Armor list-->
-            <div class="list">
-               <CharacterSheetItemList
-                  itemComponent={CharacterSheetArmor}
-                  filterFunction={(item) => {
-                     return item.type === "armor";
-                  }}
-                  filter={$appState.filter.inventory}
-                  isExpandedMap={$appState.isExpanded.inventory}
-               />
+               <!--Armor list-->
+               <div class="list">
+                  <CharacterSheetItemList
+                     itemComponent={CharacterSheetArmor}
+                     filterFunction={(item) => {
+                        return item.type === "armor";
+                     }}
+                     filter={$appState.filter.inventory}
+                     isExpandedMap={$appState.isExpanded.inventory}
+                  />
 
-               <!--Add Armor Button-->
-               <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton label={localize("addNewArmor")} itemType={"armor"} />
+                  <!--Add Armor Button-->
+                  <div class="add-entry-button">
+                     <CharacterSheetItemAddEntryButton label={localize("addNewArmor")} itemType={"armor"} />
+                  </div>
                </div>
             </div>
-         </div>
+         {/if}
 
          <!--Equipment-->
-         <div class="category">
-            <!--List Header-->
-            <div class="header">
-               {localize("equipment")}
-            </div>
+         {#if $appState.filterOptions.inventory.equipment === true || noOptions}
+            <div class="category">
+               <!--List Header-->
+               <div class="header">
+                  {localize("equipment")}
+               </div>
 
-            <!--Equipment list-->
-            <div class="list">
-               <CharacterSheetItemList
-                  itemComponent={CharacterSheetEquipment}
-                  filterFunction={(item) => {
-                     return item.type === "equipment";
-                  }}
-                  filter={$appState.filter.inventory}
-                  isExpandedMap={$appState.isExpanded.inventory}
-               />
+               <!--Equipment list-->
+               <div class="list">
+                  <CharacterSheetItemList
+                     itemComponent={CharacterSheetEquipment}
+                     filterFunction={(item) => {
+                        return item.type === "equipment";
+                     }}
+                     filter={$appState.filter.inventory}
+                     isExpandedMap={$appState.isExpanded.inventory}
+                  />
 
-               <!--Add Armor Button-->
-               <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton itemType={"equipment"} label={localize("addNewEquipment")} />
+                  <!--Add Armor Button-->
+                  <div class="add-entry-button">
+                     <CharacterSheetItemAddEntryButton itemType={"equipment"} label={localize("addNewEquipment")} />
+                  </div>
                </div>
             </div>
-         </div>
+         {/if}
 
          <!--Commodity-->
-         <div class="category">
-            <!--List Header-->
-            <div class="header">
-               {localize("commodity")}
-            </div>
+         {#if $appState.filterOptions.inventory.commodity === true || noOptions}
+            <div class="category">
+               <!--List Header-->
+               <div class="header">
+                  {localize("commodity")}
+               </div>
 
-            <!--Equipment list-->
-            <div class="list">
-               <CharacterSheetItemList
-                  itemComponent={CharacterSheetCommodity}
-                  filterFunction={(item) => {
-                     return item.type === "commodity";
-                  }}
-                  filter={$appState.filter.inventory}
-                  isExpandedMap={$appState.isExpanded.inventory}
-               />
+               <!--Equipment list-->
+               <div class="list">
+                  <CharacterSheetItemList
+                     itemComponent={CharacterSheetCommodity}
+                     filterFunction={(item) => {
+                        return item.type === "commodity";
+                     }}
+                     filter={$appState.filter.inventory}
+                     isExpandedMap={$appState.isExpanded.inventory}
+                  />
 
-               <!--Add Armor Button-->
-               <div class="add-entry-button">
-                  <CharacterSheetItemAddEntryButton itemType={"commodity"} label={localize("addNewCommodity")} />
+                  <!--Add Armor Button-->
+                  <div class="add-entry-button">
+                     <CharacterSheetItemAddEntryButton itemType={"commodity"} label={localize("addNewCommodity")} />
+                  </div>
                </div>
             </div>
-         </div>
+         {/if}
       </ScrollingContainer>
    </div>
 </div>
@@ -132,6 +160,22 @@
       @include panel-2;
       height: 100%;
       width: 100%;
+
+      .filter {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-bottom;
+         @include panel-1;
+
+         .label {
+            font-weight: bold;
+            margin: 0 0.25rem;
+         }
+
+         .input {
+            @include flex-group-left;
+         }
+      }
 
       .scrolling-content {
          @include flex-column;
