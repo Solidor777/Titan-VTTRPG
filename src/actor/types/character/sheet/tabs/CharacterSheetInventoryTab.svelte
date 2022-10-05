@@ -2,16 +2,15 @@
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
+   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
+   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
+   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import CharacterSheetItemList from "~/actor/types/character/sheet/items/CharacterSheetItemList.svelte";
    import CharacterSheetItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterSheetItemAddEntryButton.svelte";
    import CharacterSheetWeapon from "~/actor/types/character/sheet/items/weapon/CharacterSheetWeapon.svelte";
    import CharacterSheetArmor from "~/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte";
    import CharacterSheetEquipment from "~/actor/types/character/sheet/items/equipment/CharacterSheetEquipment.svelte";
    import CharacterSheetCommodity from "~/actor/types/character/sheet/items/commodity/CharacterSheetCommodity.svelte";
-   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
-   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -23,7 +22,7 @@
       $appState.filterOptions.inventory.commodity === false;
 </script>
 
-<div class="inventory-tab">
+<div class="tab">
    <!--Filter-->
    <div class="filter">
       <!--Options-->
@@ -48,10 +47,12 @@
 
       <!--Field-->
       <div class="field">
+         <!--Label-->
          <div class="label">
             {localize("filter")}
          </div>
 
+         <!--Input-->
          <div class="input">
             <TextInput bind:value={$appState.filter.inventory} />
          </div>
@@ -174,7 +175,7 @@
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
-   .inventory-tab {
+   .tab {
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
@@ -187,7 +188,7 @@
          @include border-bottom;
          @include panel-1;
          width: 100%;
-         padding-bottom: 0.5rem;
+         padding-bottom: 0.25rem;
 
          .options {
             @include flex-row;

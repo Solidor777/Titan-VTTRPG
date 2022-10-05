@@ -7,7 +7,7 @@
    import { localize } from "~/helpers/Utility.js";
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import CharacterSheetSkillsTab from "~/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsTab.svelte";
-   import CharacterAbilitiesTab from "~/actor/types/character/sheet/tabs/CharacterAbilitiesTab.svelte";
+   import CharacterSheetAbilitiesTab from "~/actor/types/character/sheet/tabs/CharacterSheetAbilitiesTab.svelte";
    import CharacterSheetInventoryTab from "~/actor/types/character/sheet/tabs/CharacterSheetInventoryTab.svelte";
    import CharacterSpellsTab from "~/actor/types/character/sheet/tabs/CharacterSpellsTab.svelte";
    import CharacterEffectsTab from "~/actor/types/character/sheet/tabs/CharacterEffectsTab.svelte";
@@ -26,7 +26,7 @@
    const tabs = [
       { label: localize("skills"), id: "skills", component: CharacterSheetSkillsTab },
       { label: localize("inventory"), id: "inventory", component: CharacterSheetInventoryTab },
-      { label: localize("abilities"), id: "abilities", component: CharacterAbilitiesTab },
+      { label: localize("abilities"), id: "abilities", component: CharacterSheetAbilitiesTab },
       { label: localize("spells"), id: "spells", component: CharacterSpellsTab },
       { label: localize("effects"), id: "effects", component: CharacterEffectsTab },
    ];
