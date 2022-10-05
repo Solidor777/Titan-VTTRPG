@@ -92,23 +92,34 @@
             {/if}
 
             <!--Footer-->
-            <div class="section space-evenly small-text">
+            <div class="section tags small-text">
                <!-- Rarity-->
-               <RarityTag rarity={item.system.rarity} />
+               <div class="tag">
+                  <RarityTag rarity={item.system.rarity} />
+               </div>
 
                <!--Action-->
                {#if item.system.action}
-                  <Tag label={localize("action")} />
+                  <!-- Rarity-->
+                  <div class="tag">
+                     <Tag label={localize("action")} />
+                  </div>
                {/if}
 
                <!--Reaction-->
                {#if item.system.reaction}
-                  <Tag label={localize("reaction")} />
+                  <!-- Rarity-->
+                  <div class="tag">
+                     <Tag label={localize("reaction")} />
+                  </div>
                {/if}
 
                <!--Passive-->
                {#if item.system.passive}
-                  <Tag label={localize("passive")} />
+                  <!-- Rarity-->
+                  <div class="tag">
+                     <Tag label={localize("passive")} />
+                  </div>
                {/if}
             </div>
          </div>
@@ -167,19 +178,28 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding: 0.5rem 0;
+               padding-bottom: 0.5rem;
+
+               &:not(.tags) {
+                  padding-top: 0.5rem;
+               }
             }
 
             &:not(:first-child) {
                @include border-top;
             }
 
-            &.space-evenly {
+            &.tags {
                @include flex-row;
-               @include flex-space-evenly;
+               @include flex-group-center;
+               flex-wrap: wrap;
+
+               .tag {
+                  @include tag-padding;
+               }
             }
 
-            &:not(.space-evenly) {
+            &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
             }

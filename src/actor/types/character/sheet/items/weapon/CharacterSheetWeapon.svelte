@@ -186,6 +186,7 @@
                   padding-top: 0.5rem;
                }
             }
+
             &:not(:first-child) {
                @include border-top;
             }
