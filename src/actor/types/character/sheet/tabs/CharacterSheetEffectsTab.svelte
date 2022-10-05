@@ -2,18 +2,39 @@
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import CharacterSheetItemList from "../items/CharacterSheetItemList.svelte";
-   import CharacterSheetItemAddEntryButton from "../items/CharacterSheetItemAddEntryButton.svelte";
-   import CharacterSheetEffect from "../items/effect/CharacterSheetEffect.svelte";
+   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
+   import CharacterSheetItemList from "~/actor/types/character/sheet/items/CharacterSheetItemList.svelte";
+   import CharacterSheetItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterSheetItemAddEntryButton.svelte";
+   import CharacterSheetEffect from "~/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
+   const application = getContext("external").application;
 </script>
 
 <div class="tab">
-   <!--Filter-->
-   <TopFilter bind:filter={$appState.filter.abilities} />
+   <!--Header-->
+   <div class="header">
+      <!--Label-->
+      <div class="label">
+         {localize("filter")}
+      </div>
+
+      <!--Input-->
+      <div class="input">
+         <TextInput bind:value={$appState.filter.abilities} />
+      </div>
+
+      <!--Add Item Button-->
+      <div>
+         <CharacterSheetItemAddEntryButton
+            label={localize("addNewEffect")}
+            on:click={() => {
+               application.addItem("effect");
+            }}
+         />
+      </div>
+   </div>
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
@@ -29,11 +50,6 @@
                isExpandedMap={$appState.isExpanded.abilities}
             />
          </div>
-
-         <!--Add Spell Button-->
-         <div class="add-entry-button">
-            <CharacterSheetItemAddEntryButton itemType={"effect"} label={localize("addNewEffect")} />
-         </div>
       </ScrollingContainer>
    </div>
 </div>
@@ -48,6 +64,23 @@
       height: 100%;
       width: 100%;
 
+      .header {
+         @include flex-row;
+         @include flex-group-center;
+         @include border-bottom;
+         @include panel-1;
+         width: 100%;
+
+         .label {
+            font-weight: bold;
+            margin-right: 0.25rem;
+         }
+
+         .input {
+            @include flex-group-left;
+         }
+      }
+
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;
@@ -59,16 +92,6 @@
             @include flex-group-top;
             width: 100%;
             margin-top: 0.5rem;
-         }
-
-         .add-entry-button {
-            @include flex-row;
-            @include flex-group-center;
-            width: 100%;
-
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
          }
       }
    }

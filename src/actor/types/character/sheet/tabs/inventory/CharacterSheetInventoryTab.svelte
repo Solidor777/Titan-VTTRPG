@@ -116,7 +116,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import "../../../../../../Styles/Mixins.scss";
    .tab {
       @include flex-column;
       @include flex-group-top;
@@ -130,7 +130,6 @@
          @include border-bottom;
          @include panel-1;
          width: 100%;
-         padding-bottom: 0.25rem;
 
          .row {
             @include flex-row;
@@ -139,10 +138,6 @@
             .reset {
                --icon-button-font-size: var(--font-size-small);
                --icon-button-radius: 1.75rem;
-            }
-
-            &:not(:first-child) {
-               margin-top: 0.25rem;
             }
 
             .label {
