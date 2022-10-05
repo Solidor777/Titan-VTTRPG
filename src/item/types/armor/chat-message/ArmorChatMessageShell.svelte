@@ -12,7 +12,7 @@
    const item = $document.flags.titan.chatContext;
 </script>
 
-<div class="chat-message">
+<div class="item-chat-message">
    <!--Header-->
    <ItemChatLabel />
    <div class="sections">
@@ -47,7 +47,7 @@
    @import "../../../../styles/Mixins.scss";
    @import "../../../../styles/Variables.scss";
 
-   .chat-message {
+   .item-chat-message {
       @include flex-column;
       @include font-size-normal;
       align-items: flex-start;
