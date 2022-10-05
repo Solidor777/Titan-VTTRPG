@@ -405,6 +405,7 @@
   "LOCAL.addNewAbility.label": "Add New Ability",
   "LOCAL.addNewSpell.label": "Add New Spell",
   "LOCAL.addNewEffect.label": "Add New Effect",
+  "LOCAL.notes.label": "Notes",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

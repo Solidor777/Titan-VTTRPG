@@ -10,7 +10,8 @@
    import CharacterSheetAbilitiesTab from "~/actor/types/character/sheet/tabs/CharacterSheetAbilitiesTab.svelte";
    import CharacterSheetInventoryTab from "~/actor/types/character/sheet/tabs/CharacterSheetInventoryTab.svelte";
    import CharacterSheetSpellsTab from "~/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte";
-   import CharacterEffectsTab from "~/actor/types/character/sheet/tabs/CharacterEffectsTab.svelte";
+   import CharacterSheetEffectsTab from "~/actor/types/character/sheet/tabs/CharacterSheetEffectsTab.svelte";
+   import CharacterSheetNotesTab from "~/actor/types/character/sheet/tabs/CharacterSheetNotesTab.svelte";
    import PlayerSheetSidebar from "./PlayerSheetSidebar.svelte";
    import PlayerSheetHeader from "./PlayerSheetHeader.svelte";
 
@@ -28,7 +29,8 @@
       { label: localize("inventory"), id: "inventory", component: CharacterSheetInventoryTab },
       { label: localize("abilities"), id: "abilities", component: CharacterSheetAbilitiesTab },
       { label: localize("spells"), id: "spells", component: CharacterSheetSpellsTab },
-      { label: localize("effects"), id: "effects", component: CharacterEffectsTab },
+      { label: localize("effects"), id: "effects", component: CharacterSheetEffectsTab },
+      { label: localize("notes"), id: "notes", component: CharacterSheetNotesTab },
    ];
 </script>
 

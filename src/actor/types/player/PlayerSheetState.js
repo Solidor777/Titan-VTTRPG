@@ -7,7 +7,8 @@ export default function createPlayerSheetState() {
          abilities: 0,
          inventory: 0,
          skills: 0,
-         spells: 0
+         spells: 0,
+         notes: 0
       },
       isExpanded: {
          abilities: {},

@@ -5,7 +5,7 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import CharacterSheetItemList from "../items/CharacterSheetItemList.svelte";
    import CharacterSheetItemAddEntryButton from "../items/CharacterSheetItemAddEntryButton.svelte";
-   import CharacterEffect from "../items/effect/CharacterEffect.svelte";
+   import CharacterSheetEffect from "../items/effect/CharacterSheetEffect.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -21,7 +21,7 @@
          <!--Abilities List-->
          <div class="list">
             <CharacterSheetItemList
-               itemComponent={CharacterEffect}
+               itemComponent={CharacterSheetEffect}
                filterFunction={(item) => {
                   return item.type === "effect";
                }}

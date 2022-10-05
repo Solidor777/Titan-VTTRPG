@@ -419,7 +419,8 @@
           "restrained": false,
           "stunned": false,
           "unconscious": false
-        }
+        },
+        "description": ""
       }
     },
     "player": {

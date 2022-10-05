@@ -13,6 +13,7 @@
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetSpellCastingCheck from "./CharacterSheetSpellCastingCheck.svelte";
+   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -87,6 +88,13 @@
             {#if item.aspect && item.aspect.length > 0}
                <div class="section tags">
                   <SpellAspectTags aspects={item.aspect} />
+               </div>
+            {/if}
+
+            <!--Item Checks-->
+            {#if item.system.check.length > 0}
+               <div class="section">
+                  <CharacterSheetItemChecks {item} />
                </div>
             {/if}
 
