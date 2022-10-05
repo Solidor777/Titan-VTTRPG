@@ -34,7 +34,7 @@
    ];
 </script>
 
-<ApplicationShell bind:elementRoot>
+<ApplicationShell bind:elementRoot class="titan">
    <!--Sheet-->
    <div class="actor-sheet">
       <!--Sidebar-->

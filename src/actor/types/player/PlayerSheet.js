@@ -16,7 +16,8 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
          svelte: {
             class: PlayerSheetShell,
             target: document.body
-         }
+         },
+         classes: ['titan']
       });
    }
 

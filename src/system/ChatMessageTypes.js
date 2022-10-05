@@ -6,9 +6,11 @@ export default Object.freeze(new Set([
    'castingCheck',
    'itemCheck',
    'armor',
-   'weapon',
-   'spell',
    'ability',
+   'commodity',
+   'equipment',
+   'spell',
+   'weapon',
    'damageReport',
    'healingReport'
 ]));

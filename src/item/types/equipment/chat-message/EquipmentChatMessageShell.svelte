@@ -5,7 +5,6 @@
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ArmorChatStats from "./ArmorChatStats.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -16,22 +15,17 @@
    <!--Header-->
    <ItemChatLabel />
    <div class="sections">
-      <!--Armor stat-->
-      <div class="section tags">
-         <ArmorChatStats {item} />
-      </div>
+      <!--Checks-->
+      {#if item.system.check.length > 0}
+         <div class="section">
+            <ItemChatChecks {item} />
+         </div>
+      {/if}
 
       <!--Description-->
       {#if item.system.description !== "" && item.system.description !== "<p></p>"}
          <div class="section rich-text">
             <RichText text={item.system.description} />
-         </div>
-      {/if}
-
-      <!--Checks-->
-      {#if item.system.check.length > 0}
-         <div class="section">
-            <ItemChatChecks {item} />
          </div>
       {/if}
 

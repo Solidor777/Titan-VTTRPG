@@ -10,6 +10,8 @@
    import ArmorChatMessageShell from "~/item/types/armor/chat-message/ArmorChatMessageShell.svelte";
    import SpellChatMessageShell from "~/item/types/spell/chat-message/SpellChatMessageShell.svelte";
    import AbilityChatMesssageShell from "~/item/types/ability/chat-message/AbilityChatMesssageShell.svelte";
+   import EquipmentChatMessageShell from "~/item/types/equipment/chat-message/EquipmentChatMessageShell.svelte";
+   import CommodityChatMessageShell from "~/item/types/commodity/chat-message/CommodityChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -28,9 +30,11 @@
          castingCheck: CheckChatMessageShell,
          itemCheck: CheckChatMessageShell,
          armor: ArmorChatMessageShell,
-         weapon: WeaponChatMessageShell,
-         spell: SpellChatMessageShell,
          ability: AbilityChatMesssageShell,
+         commodity: CommodityChatMessageShell,
+         equipment: EquipmentChatMessageShell,
+         spell: SpellChatMessageShell,
+         weapon: WeaponChatMessageShell,
          damageReport: DamageReportChatMessageShell,
          healingReport: HealingReportChatMessageShell,
       };

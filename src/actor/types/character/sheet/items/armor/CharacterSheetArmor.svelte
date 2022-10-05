@@ -109,9 +109,16 @@
             {/if}
 
             <!--Footer-->
-            <div class="section space-evenly small-text">
-               <RarityTag rarity={item.system.rarity} />
-               <ValueTag value={item.system.value} />
+            <div class="section tags small-text">
+               <!--Rarity-->
+               <div class="tag">
+                  <RarityTag rarity={item.system.rarity} />
+               </div>
+
+               <!--Value-->
+               <div class="tag">
+                  <ValueTag value={item.system.value} />
+               </div>
             </div>
          </div>
       {/if}
@@ -180,12 +187,17 @@
                @include border-top;
             }
 
-            &.space-evenly {
+            &.tags {
                @include flex-row;
-               @include flex-space-evenly;
+               @include flex-group-center;
+               flex-wrap: wrap;
+
+               .tag {
+                  @include tag-padding;
+               }
             }
 
-            &:not(.space-evenly) {
+            &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
             }
