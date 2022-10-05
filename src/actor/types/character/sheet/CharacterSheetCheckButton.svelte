@@ -60,10 +60,10 @@
       .button-inner {
          @include flex-row;
          @include flex-group-center;
+         @include font-size-normal;
          height: 100%;
          line-height: normal;
          padding: 0.25rem;
-         @include font-size-normal;
 
          i {
             margin-right: 0.25rem;

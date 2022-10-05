@@ -7,7 +7,7 @@
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
 
    const document = getContext("DocumentStore");
-   const chatContext = $document.flags.titan.chatContext;
+   const item = $document.flags.titan.chatContext;
 
    function getTagFromCheck(check) {
       let retVal = localize(`${check.attribute}`);
@@ -23,13 +23,17 @@
    }
 </script>
 
-<!--Check-->
 <div class="checks">
-   {#each chatContext.system.check as check}
+   <!--Each check-->
+   {#each item.system.check as check}
       <div class="check">
-         <!--Check header-->
+         <!--Header-->
          <div class="header {check.attribute}">
-            {check.label}
+            <!--Icon-->
+            <i class="fas fa-dice" />
+
+            <!--Label-->
+            <div>{check.label}</div>
          </div>
 
          <div class="tags">
@@ -88,18 +92,23 @@
          .header {
             @include flex-row;
             @include flex-group-center;
+            @include font-size-normal;
             @include border;
             @include attribute-colors;
-            padding: 0.5rem;
-            width: 100%;
+            padding: 0.25rem;
             font-weight: bold;
-            @include font-size-normal;
+
+            i {
+               margin-right: 0.25rem;
+            }
          }
 
          .tags {
             @include flex-row;
             @include flex-group-center;
+            @include font-size-small;
             flex-wrap: wrap;
+
             .tag {
                margin: 0.5rem 0.25rem 0 0.25rem;
             }

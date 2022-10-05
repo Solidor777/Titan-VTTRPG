@@ -3,6 +3,9 @@
    import { localize } from "~/helpers/Utility.js";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import IconStatTag from "../../../../helpers/svelte-components/tag/IconStatTag.svelte";
+   import AttributeTag from "../../../../helpers/svelte-components/tag/AttributeTag.svelte";
+   import IconTag from "../../../../helpers/svelte-components/tag/IconTag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -22,28 +25,37 @@
          </div>
 
          <div class="row stats">
-            <!--Range-->
-            <div class="stat">
-               <StatTag label={localize("range")} value={attack.range} />
-            </div>
-
-            <!--Attribute-->
-            <div class="stat">
-               <StatTag label={localize("attribute")} value={localize(`${attack.attribute}`)} />
-            </div>
-
-            <!--Skill-->
-            <div class="stat">
-               <StatTag label={localize("skill")} value={localize(`${attack.skill}`)} />
-            </div>
-
             <!--Damage-->
             <div class="stat">
-               <StatTag
+               <IconStatTag
+                  icon={"fas fa-bolt"}
                   label={localize("damage")}
                   value={`${attack.damage}${
-                     attack.plusExtraSuccessDamage === true ? `+ ${localize("plusExtraSuccess.short")}` : ""
+                     attack.plusExtraSuccessDamage ? ` + ${localize("extraSuccesses.short")}` : ""
                   }`}
+               />
+            </div>
+
+            <!--Type-->
+            <div class="stat">
+               <IconTag
+                  icon={attack.type === "melee" ? "fas fa-sword" : "fas fa-bow-arrow"}
+                  label={localize(attack.type)}
+               />
+            </div>
+
+            <!--Range-->
+            {#if attack.range !== 1}
+               <div class="stat">
+                  <IconStatTag label={localize("range")} value={attack.range} icon={"fas fa-ruler"} />
+               </div>
+            {/if}
+
+            <!--Attribute and skill-->
+            <div class="stat">
+               <AttributeTag
+                  attribute={attack.attribute}
+                  label={`${localize(attack.attribute)} (${localize(attack.skill)})`}
                />
             </div>
 
@@ -66,18 +78,19 @@
    @import "../../../../styles/mixins.scss";
 
    ol {
+      @include font-size-small;
       list-style: none;
       margin: 0 0 0 0;
       padding: 0;
-      @include font-size-small;
 
       li {
          @include flex-column;
-         @include border;
          padding: 0.25rem;
-         background: var(--label-background-color);
+
          &:not(:first-child) {
+            @include border-top;
             margin-top: 0.5rem;
+            padding-top: 0.5rem;
          }
 
          .row {
@@ -90,16 +103,16 @@
             }
 
             &.stats {
-               @include flex-space-evenly;
+               @include flex-group-center;
+
+               .stat {
+                  @include tag-padding;
+               }
             }
 
             .attack-name {
                @include font-size-normal;
                font-weight: bold;
-            }
-
-            .stat {
-               margin: 0.25rem;
             }
          }
       }

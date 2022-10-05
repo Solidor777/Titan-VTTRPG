@@ -35,7 +35,10 @@
             {attack.label}
          </EfxButton>
       {:else}
-         <IconTag label={attack.label} icon="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
+         <div class="label">
+            <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
+            <div>{attack.label}</div>
+         </div>
       {/if}
    </div>
 
@@ -126,7 +129,13 @@
       .header {
          @include flex-row;
          @include flex-group-center;
-         height: 2rem;
+
+         .label {
+            @include flex-row;
+            @include flex-group-center;
+            height: 2rem;
+            font-weight: bold;
+         }
 
          &.body {
             --button-background-color: var(--body-color-bright);
@@ -139,6 +148,10 @@
          &.soul {
             --button-background-color: var(--soul-color-bright);
          }
+
+         i {
+            margin-right: 0.25rem;
+         }
       }
 
       .check-stats {
@@ -147,7 +160,6 @@
          @include font-size-small;
          width: 100%;
          flex-wrap: wrap;
-         @include z-index-app;
 
          .stat {
             @include tag-padding;

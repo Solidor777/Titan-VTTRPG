@@ -17,21 +17,20 @@
       @include flex-row;
       @include flex-group-left;
       @include border;
+      @include panel-1;
       padding: 0.5rem;
-      background: var(--label-background-color);
 
       img {
-         background: black;
-         border-radius: 10px;
+         border: none;
          width: 2.5rem;
       }
 
       .name {
          @include flex-row;
          @include flex-group-center;
+         @include font-size-large;
          margin-left: 0.5rem;
          height: 100%;
-         @include font-size-large;
          font-weight: bold;
       }
    }

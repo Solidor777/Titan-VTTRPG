@@ -14,7 +14,7 @@
       @include flex-row;
       @include flex-group-left;
       padding: 0 0.5rem 0 0.5rem;
-      @include font-size-small;
+      @include font-size-normal;
       width: 100%;
    }
 </style>
