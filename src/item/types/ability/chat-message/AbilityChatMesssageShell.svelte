@@ -1,58 +1,66 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import ItemChatDescription from "~/item/chat-message/ItemChatDescription.svelte";
-   import ItemChatFooter from "~/item/chat-message/ItemChatFooter.svelte";
-   import ItemChatRarity from "~/item/chat-message/ItemChatRarity.svelte";
-   import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
+   import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
-   const chatContext = $document.flags.titan.chatContext;
+   const item = $document.flags.titan.chatContext;
 </script>
 
-<div class="chat-message">
+<div class="item-chat-message">
+   <!--Header-->
    <ItemChatLabel />
-   <div class="info-container">
-      <div class="info">
-         <ItemChatDescription />
-      </div>
 
-      {#if chatContext.system.check.length > 0}
-         <div class="info top-padding">
-            <ItemChatChecks />
+   <div class="sections">
+      <!--Checks-->
+      {#if item.system.check.length > 0}
+         <div class="section">
+            <ItemChatChecks {item} />
          </div>
       {/if}
 
-      <div class="info">
-         <ItemChatFooter>
-            <!--Action-->
+      <!--Description-->
+      {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+         <div class="section rich-text">
+            <RichText text={item.system.description} />
+         </div>
+      {/if}
+
+      <!--Footer-->
+      <div class="section small-text tags">
+         <!--Rarity-->
+         <div class="tag">
+            <RarityTag rarity={item.system.rarity} />
+         </div>
+
+         <!--Action-->
+         {#if item.system.action}
+            <!-- Rarity-->
             <div class="tag">
-               <ItemChatRarity />
+               <Tag label={localize("action")} />
             </div>
+         {/if}
 
-            {#if chatContext.system.action}
-               <div class="tag">
-                  <Tag label={localize("action")} />
-               </div>
-            {/if}
+         <!--Reaction-->
+         {#if item.system.reaction}
+            <!-- Rarity-->
+            <div class="tag">
+               <Tag label={localize("reaction")} />
+            </div>
+         {/if}
 
-            <!--Reaction-->
-            {#if chatContext.system.reaction}
-               <div class="tag">
-                  <Tag label={localize("reaction")} />
-               </div>
-            {/if}
-
-            <!--Passive-->
-            {#if chatContext.system.passive}
-               <div class="tag">
-                  <Tag label={localize("passive")} />
-               </div>
-            {/if}
-         </ItemChatFooter>
+         <!--Passive-->
+         {#if item.system.passive}
+            <!-- Rarity-->
+            <div class="tag">
+               <Tag label={localize("passive")} />
+            </div>
+         {/if}
       </div>
    </div>
 </div>
@@ -61,33 +69,54 @@
    @import "../../../../styles/Mixins.scss";
    @import "../../../../styles/Variables.scss";
 
-   .chat-message {
+   .item-chat-message {
       @include flex-column;
+      @include font-size-normal;
       align-items: flex-start;
       justify-content: center;
       width: 100%;
 
-      .info-container {
+      .sections {
          @include flex-column;
          @include flex-group-top;
          width: 100%;
 
-         .info {
-            @include flex-row;
-            @include flex-group-center;
+         .section {
             width: 100%;
-            margin-top: 0.5rem;
+
+            &:not(.rich-text) {
+               padding-bottom: 0.5rem;
+
+               &:not(.tags) {
+                  padding-top: 0.5rem;
+               }
+            }
+
+            &:last-child {
+               padding-bottom: 0.25rem;
+            }
 
             &:not(:first-child) {
                @include border-top;
             }
 
-            &.top-padding {
-               padding-top: 0.5rem;
+            &.tags {
+               @include flex-row;
+               @include flex-group-center;
+               flex-wrap: wrap;
+
+               .tag {
+                  @include tag-padding;
+               }
             }
 
-            .tag {
-               margin: 0.25rem 0.5rem 0.25rem 0;
+            &:not(.tags) {
+               @include flex-column;
+               @include flex-group-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
             }
          }
       }
