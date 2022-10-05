@@ -389,7 +389,8 @@
           }
         },
         "equipped": {
-          "armor": null
+          "armor": null,
+          "shield": null
         },
         "mod": {
           "armor": {
@@ -445,6 +446,7 @@
       "commodity",
       "effect",
       "equipment",
+      "shield",
       "spell",
       "weapon"
     ],
@@ -477,11 +479,11 @@
     "armor": {
       "templates": [
         "base",
-        "equippable",
         "object"
       ],
       "armor": 2,
-      "trait": []
+      "trait": [],
+      "rulesElement": []
     },
     "commodity": {
       "templates": [
@@ -505,6 +507,14 @@
         "equippable",
         "object"
       ],
+      "rulesElement": []
+    },
+    "shield": {
+      "templates": [
+        "base",
+        "object"
+      ],
+      "defense": 1,
       "rulesElement": []
     },
     "spell": {

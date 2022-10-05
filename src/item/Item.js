@@ -4,12 +4,11 @@ import TitanAbility from './types/ability/Ability.js';
 import TitanArmor from './types/armor/Armor.js';
 import TitanEffect from './types/effect/Effect.js';
 import TitanEquipment from './types/equipment/Equipment.js';
+import TitanShield from './types/shield/Shield.js';
 import TitanSpell from './types/spell/Spell.js';
 import TitanWeapon from './types/weapon/Weapon.js';
 
 export default class TitanItem extends Item {
-
-
    prepareDerivedData() {
       // Create type component if necessary
       if (!this.typeComponent) {
@@ -50,6 +49,13 @@ export default class TitanItem extends Item {
          case 'equipment': {
             this.typeComponent = new TitanEquipment(this);
             this.equipment = this.typeComponent;
+            break;
+         }
+
+         // Shield
+         case 'shield': {
+            this.typeComponent = new TitanShield(this);
+            this.shield = this.typeComponent;
             break;
          }
 

@@ -3,6 +3,8 @@
    import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
+   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
 
    // Item reference
    export let item = void 0;
@@ -11,6 +13,16 @@
 <div class="stats">
    <div class="stat">
       <IconStatTag icon={"fas fa-helmet-battle"} label={localize("armor")} value={item.system.armor} />
+   </div>
+
+   <!--Rarity-->
+   <div class="stat">
+      <RarityTag rarity={item.system.rarity} />
+   </div>
+
+   <!--Value-->
+   <div class="stat">
+      <ValueTag value={item.system.value} />
    </div>
 
    <!--Traits-->

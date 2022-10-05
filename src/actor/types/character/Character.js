@@ -25,6 +25,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._resetDynamicMods();
       this._applyRulesElements();
       this._applyStatusEffects();
+      this._applyEquipmentSlots();
       this._applyMods();
       this._clampResources();
 
@@ -323,6 +324,36 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
    }
 
+   _applyEquipmentSlots() {
+      const systemData = this.parent.system;
+
+      // Add defense from equipped shield if appropriate
+      const equippedShieldId = this.parent.system.equipped.shield;
+      if (equippedShieldId) {
+         const defense = systemData.rating.defense;
+         const equippedShield = this.parent.items.get(equippedShieldId);
+         if (equippedShield) {
+            defense.mod.equipment += equippedShield.system.defense;
+         }
+         else {
+            this.parent.system.equipped.shield = null;
+         }
+      }
+
+      // Add armor from the equipped armor if appropriate
+      const equippedArmorId = this.parent.system.equipped.armor;
+      if (equippedArmorId) {
+         const armor = systemData.mod.armor;
+         const equippedArmor = this.parent.items.get(equippedArmorId);
+         if (equippedArmor) {
+            armor.mod.equipment += equippedArmor.system.armor;
+         }
+         else {
+            this.parent.system.equipped.armor = null;
+         }
+      }
+   }
+
    _applyMods() {
       // Get a reference to the parent system data
       const systemData = this.parent.system;
@@ -358,6 +389,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Resistances
       applyModsDeep(systemData.resistance);
 
+
       // Ratings
       applyModsDeep(systemData.rating);
 
@@ -371,16 +403,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Speeds
       applyModsDeep(systemData.speed);
-
-      // Add armor from the equipped armor if appropriate
-      const equippedArmorId = this.parent.system.equipped.armor;
-      if (equippedArmorId) {
-         const armor = systemData.mod.armor;
-         const equippedArmor = this.parent.items.get(equippedArmorId);
-         if (equippedArmor) {
-            armor.mod.equipment += equippedArmor.system.armor;
-         }
-      }
 
       // Mods
       for (const [key, mod] of Object.entries(systemData.mod)) {
@@ -901,11 +923,53 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   equipShield(shieldId) {
+      // Ensure the shield is valid
+      const shield = this.parent.items.get(shieldId);
+      if (!shield && shield.type === 'shield') {
+         console.error('TITAN | Error equipping Shield. Invalid Shield ID.');
+      }
+
+      // Update the shield
+      let equippedShield = this.parent.system.equipped.shield;
+      equippedShield = shieldId;
+      this.parent.update({
+         system: {
+            equipped: {
+               shield: equippedShield,
+            },
+         },
+      });
+
+      return;
+   }
+
+   unEquipShield() {
+      // Remove the shield
+      let equippedShield = this.parent.system.equipped.shield;
+      equippedShield = null;
+      this.parent.update({
+         system: {
+            equipped: {
+               shield: equippedShield,
+            },
+         },
+      });
+
+      return;
+   }
+
    deleteItem(id) {
       // Remove the armor if appropriate
       const armorId = this.parent.system.equipped.armor;
       if (armorId === id) {
          this.unEquipArmor();
+      }
+
+      // Remove the shield if appropriate
+      const shieldId = this.parent.system.equipped.armor;
+      if (shieldId === id) {
+         this.unEquipShield();
       }
 
       return;

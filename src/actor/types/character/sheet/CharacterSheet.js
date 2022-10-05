@@ -19,6 +19,19 @@ export default class TitanCharacterSheet extends TitanActorSheet {
             }
          }
 
+         // If the item is a shield
+         else if (item.type === 'shield') {
+            // If the armor is equipped, un-equip it
+            if (this.reactive.document.system.equipped.shield === itemId) {
+               this.reactive.document.typeComponent.unEquipShield();
+            }
+
+            // Else, equip it
+            else {
+               this.reactive.document.typeComponent.equipShield(itemId);
+            }
+         }
+
          // Otherwise, update the equipped value on the item
          else {
             const updateData = {
@@ -134,7 +147,6 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Delete Item
    async deleteItem(id) {
       this.reactive.state.deleteItem(id);
-      console.log(id);
       this.reactive.document.deleteItem(id);
       return;
    }

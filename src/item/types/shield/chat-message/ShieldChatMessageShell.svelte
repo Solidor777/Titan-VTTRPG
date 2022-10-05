@@ -1,9 +1,10 @@
 <script>
    import { getContext } from "svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
+   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import ArmorChatStats from "./ArmorChatStats.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -17,10 +18,12 @@
    </div>
 
    <div class="sections">
-      <!--Armor stat-->
-      <div class="section tags">
-         <ArmorChatStats {item} />
-      </div>
+      <!--Checks-->
+      {#if item.system.check.length > 0}
+         <div class="section">
+            <ItemChatChecks {item} />
+         </div>
+      {/if}
 
       <!--Description-->
       {#if item.system.description !== "" && item.system.description !== "<p></p>"}
@@ -29,12 +32,18 @@
          </div>
       {/if}
 
-      <!--Checks-->
-      {#if item.system.check.length > 0}
-         <div class="section">
-            <ItemChatChecks {item} />
+      <!--Footer-->
+      <div class="section tags small-text">
+         <!--Rarity-->
+         <div class="tag">
+            <RarityTag rarity={item.system.rarity} />
          </div>
-      {/if}
+
+         <!--Value-->
+         <div class="tag">
+            <ValueTag value={item.system.value} />
+         </div>
+      </div>
    </div>
 </div>
 
@@ -77,11 +86,19 @@
                @include flex-row;
                @include flex-group-center;
                flex-wrap: wrap;
+
+               .tag {
+                  @include tag-padding;
+               }
             }
 
             &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
             }
          }
       }

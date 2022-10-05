@@ -12,7 +12,6 @@
    import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import CharacterSheetArmorStats from "./CharacterSheetArmorStats.svelte";
 
    // Reference to the armor id
    export let id = void 0;
@@ -47,9 +46,9 @@
          <!--Controls-->
          <div class="controls">
             <!--Toggle Equipped button-->
-            {#if ($document.system.equipped.armor === item._id) === false || item.system.check.length === 0}
+            {#if item.system.equipped === false || item.system.check.length === 0}
                <div class="button">
-                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
+                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.shield === item._id} />
                </div>
             {:else}
                <div class="button">
@@ -85,14 +84,9 @@
             <!--Equip button-->
             {#if item.system.check.length > 0}
                <div class="section space-evenly">
-                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.armor === item._id} />
+                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.shield === item._id} />
                </div>
             {/if}
-
-            <!--Armor Stats-->
-            <div class="section tags">
-               <CharacterSheetArmorStats {item} />
-            </div>
 
             <!--Item Checks-->
             {#if item.system.check.length > 0}
@@ -107,6 +101,19 @@
                   <RichText text={item.system.description} />
                </div>
             {/if}
+
+            <!--Footer-->
+            <div class="section tags small-text">
+               <!--Rarity-->
+               <div class="tag">
+                  <RarityTag rarity={item.system.rarity} />
+               </div>
+
+               <!--Value-->
+               <div class="tag">
+                  <ValueTag value={item.system.value} />
+               </div>
+            </div>
          </div>
       {/if}
    </div>
@@ -178,11 +185,19 @@
                @include flex-row;
                @include flex-group-center;
                flex-wrap: wrap;
+
+               .tag {
+                  @include tag-padding;
+               }
             }
 
             &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
             }
          }
       }

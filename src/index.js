@@ -15,6 +15,7 @@ import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
 import TitanCommoditySheet from './item/types/commodity/sheet/CommoditySheet.js';
 import TitanEffectSheet from './item/types/effect/sheet/EffectSheet.js';
 import TitanEquipmentSheet from './item/types/equipment/sheet/EquipmentSheet.js';
+import TitanShieldSheet from './item/types/shield/sheet/ShieldSheet';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from './item/types/weapon/sheet/WeaponSheet.js';
 
@@ -48,6 +49,10 @@ Hooks.once('init', async () => {
    });
    Items.registerSheet('titan', TitanEquipmentSheet, {
       types: ['equipment'],
+      makeDefault: true,
+   });
+   Items.registerSheet('titan', TitanShieldSheet, {
+      types: ['shield'],
       makeDefault: true,
    });
    Items.registerSheet('titan', TitanSpellSheet, {

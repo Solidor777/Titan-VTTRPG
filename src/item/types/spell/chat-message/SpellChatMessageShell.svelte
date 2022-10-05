@@ -3,11 +3,11 @@
    import { localize } from "~/helpers/Utility.js";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
    import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -31,9 +31,11 @@
       </div>
 
       <!--Aspects-->
-      <div class="section small-text tags">
-         <SpellAspectTags aspects={item.aspect} />
-      </div>
+      {#if item.aspect && item.aspect.length > 0}
+         <div class="section small-text tags">
+            <SpellAspectTags aspects={item.aspect} />
+         </div>
+      {/if}
 
       <!--Checks-->
       {#if item.system.check.length > 0}
@@ -56,29 +58,10 @@
             <RarityTag rarity={item.system.rarity} />
          </div>
 
-         <!--Action-->
-         {#if item.system.action}
-            <!-- Rarity-->
-            <div class="tag">
-               <Tag label={localize("action")} />
-            </div>
-         {/if}
-
-         <!--Reaction-->
-         {#if item.system.reaction}
-            <!-- Rarity-->
-            <div class="tag">
-               <Tag label={localize("reaction")} />
-            </div>
-         {/if}
-
-         <!--Passive-->
-         {#if item.system.passive}
-            <!-- Rarity-->
-            <div class="tag">
-               <Tag label={localize("passive")} />
-            </div>
-         {/if}
+         <!--Tradition-->
+         <div class="tag">
+            <StatTag label={localize("tradition")} value={item.system.tradition} />
+         </div>
       </div>
    </div>
 </div>

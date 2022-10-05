@@ -11,6 +11,7 @@
    import CharacterSheetArmor from "~/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte";
    import CharacterSheetEquipment from "~/actor/types/character/sheet/items/equipment/CharacterSheetEquipment.svelte";
    import CharacterSheetCommodity from "~/actor/types/character/sheet/items/commodity/CharacterSheetCommodity.svelte";
+   import CharacterSheetShield from "../items/shield/CharacterSheetShield.svelte";
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
@@ -18,6 +19,7 @@
    $: noOptions =
       $appState.filterOptions.inventory.weapon === false &&
       $appState.filterOptions.inventory.armor === false &&
+      $appState.filterOptions.inventory.shield === false &&
       $appState.filterOptions.inventory.equipment === false &&
       $appState.filterOptions.inventory.commodity === false;
 </script>
@@ -38,6 +40,7 @@
                on:click={() => {
                   $appState.filterOptions.inventory.weapon = false;
                   $appState.filterOptions.inventory.armor = false;
+                  $appState.filterOptions.inventory.spell = false;
                   $appState.filterOptions.inventory.equipment = false;
                   $appState.filterOptions.inventory.commodity = false;
                }}
@@ -111,6 +114,33 @@
                   <!--Add Armor Button-->
                   <div class="add-entry-button">
                      <CharacterSheetItemAddEntryButton label={localize("addNewArmor")} itemType={"armor"} />
+                  </div>
+               </div>
+            </div>
+         {/if}
+
+         <!--Shield-->
+         {#if $appState.filterOptions.inventory.shield === true || noOptions}
+            <div class="category">
+               <!--List Header-->
+               <div class="header">
+                  {localize("shield")}
+               </div>
+
+               <!--Shield list-->
+               <div class="list">
+                  <CharacterSheetItemList
+                     itemComponent={CharacterSheetShield}
+                     filterFunction={(item) => {
+                        return item.type === "shield";
+                     }}
+                     filter={$appState.filter.inventory}
+                     isExpandedMap={$appState.isExpanded.inventory}
+                  />
+
+                  <!--Add Shield Button-->
+                  <div class="add-entry-button">
+                     <CharacterSheetItemAddEntryButton label={localize("addNewShield")} itemType={"shield"} />
                   </div>
                </div>
             </div>

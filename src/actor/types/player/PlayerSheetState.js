@@ -25,6 +25,7 @@ export default function createPlayerSheetState() {
          inventory: {
             weapon: false,
             armor: false,
+            shield: false,
             equipment: false,
             commodity: false,
          },
