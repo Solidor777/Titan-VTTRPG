@@ -2,20 +2,20 @@ import { localize } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
-function getCustomAspectTemplate() {
-   return {
-      label: localize('customAspect'),
-      scaling: true,
-      initialValue: 1,
-      cost: 1,
-      resistanceCheck: 'none',
-      isDamage: false,
-      isHealing: false,
-      uuid: uuidv4()
-   };
-}
-
 export default class TitanSpell extends TitanTypeComponent {
+   getCustomAspectTemplate() {
+      return {
+         label: localize('customAspect'),
+         scaling: true,
+         initialValue: 1,
+         cost: 1,
+         resistanceCheck: 'none',
+         isDamage: false,
+         isHealing: false,
+         uuid: uuidv4()
+      };
+   }
+
    prepareDerivedData() {
       // Reset aspects array
       this.parent.aspect = [];
@@ -270,7 +270,7 @@ export default class TitanSpell extends TitanTypeComponent {
 
    addCustomAspect() {
       const system = this.parent.system;
-      system.customAspect.push(getCustomAspectTemplate());
+      system.customAspect.push(this.getCustomAspectTemplate());
       this.parent.update({
          system: system
       });
@@ -342,5 +342,17 @@ export default class TitanSpell extends TitanTypeComponent {
             }
          });
       }
+
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         this.initializeImg();
+      }
+   }
+
+   initializeImg() {
+      this.parent.img = 'icons/svg/explosion.svg';
+
+      this.parent.update({
+         img: this.parent.img
+      });
    }
 }

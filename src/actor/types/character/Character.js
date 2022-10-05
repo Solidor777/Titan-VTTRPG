@@ -911,7 +911,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async clearTemporaryEffects() {
+   async removeTemporaryEffects() {
       const systemData = this.parent.system;
 
       // Reset static mods
@@ -959,7 +959,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async takeABreather() {
       // Clear temporary effects
-      this.clearTemporaryEffects();
+      this.removeTemporaryEffects();
 
       // Reset stamina to max
       const stamina = this.parent.system.resource.stamina.maxValue;

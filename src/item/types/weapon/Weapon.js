@@ -66,5 +66,17 @@ export default class TitanWeapon extends TitanTypeComponent {
       if (this.parent.system.attack.length === 0) {
          this.addAttack();
       }
+
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         this.initializeImg();
+      }
+   }
+
+   initializeImg() {
+      this.parent.img = 'icons/svg/sword.svg';
+
+      this.parent.update({
+         img: this.parent.img
+      });
    }
 }

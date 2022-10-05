@@ -32,11 +32,11 @@
    </div>
 
    <!--Reset Temp Effects button-->
-   <div class="button clear" data-tooltip={localize("clearTemporaryEffects")}>
+   <div class="button clear" data-tooltip={localize("removeTemporaryEffects")}>
       <IconButton
          icon={"fas fa-arrow-rotate-left"}
          on:click={() => {
-            application.clearTemporaryEffects();
+            application.removeTemporaryEffects();
          }}
       />
    </div>

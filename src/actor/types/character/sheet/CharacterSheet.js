@@ -155,9 +155,9 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       });
    }
 
-   async clearTemporaryEffects() {
+   async removeTemporaryEffects() {
       this._clearTempEffectsFromState();
-      await this.reactive.document.typeComponent.clearTemporaryEffects();
+      await this.reactive.document.typeComponent.removeTemporaryEffects();
       return;
    }
 

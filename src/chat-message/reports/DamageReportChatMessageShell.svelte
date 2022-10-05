@@ -7,24 +7,53 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="healing-report">
+<div class="damage-report">
    <!--Header-->
    <div class="header">
       <div class="label">
-         <i class="fas fa-heart" />{localize("healingReport")}
+         <i class="fas fa-bolt" />{localize("damageReport")}
       </div>
       <div class="name">
          {chatContext.actorName}
       </div>
    </div>
 
-   <!--Stamina healed-->
+   {#if chatContext.ignoreArmor}
+      <!--Ignore Armor-->
+      <div class="row">
+         <div class="label">
+            {localize("ignoreArmor")}
+         </div>
+      </div>
+   {:else}
+      <!--Base Damage-->
+      <div class="row">
+         <div class="label">
+            {localize("baseDamage")}:
+         </div>
+         <div class="value">
+            {chatContext.baseDamage}
+         </div>
+      </div>
+
+      <!--Armor-->
+      <div class="row">
+         <div class="label">
+            {localize("armor")}:
+         </div>
+         <div class="value">
+            {chatContext.armor}
+         </div>
+      </div>
+   {/if}
+
+   <!--Damage taken-->
    <div class="row">
       <div class="label">
-         {localize("staminaHealed")}:
+         {localize("damageTaken")}:
       </div>
       <div class="value">
-         {chatContext.healing}
+         {chatContext.damage}
       </div>
    </div>
 
@@ -50,21 +79,20 @@
 </div>
 
 <style lang="scss">
-   @import "../styles/Mixins.scss";
-   @import "../styles/Variables.scss";
+   @import "../../styles/Mixins.scss";
 
-   .healing-report {
+   .damage-report {
       @include flex-column;
       @include flex-group-top;
-      width: 100%;
       @include font-size-normal;
+      width: 100%;
 
       .header {
          @include border;
+         @include panel-2;
          width: 100%;
          padding: (0.25rem);
          font-weight: bold;
-         background: var(--label-background-color);
 
          i {
             margin-right: 0.25rem;

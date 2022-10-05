@@ -1,14 +1,11 @@
 <script>
-   import { getContext } from "svelte";
-   const document = getContext("DocumentStore");
-
    // Chat context reference
-   const chatContext = $document.flags.titan.chatContext;
+   export let item = void 0;
 </script>
 
 <div class="label">
-   <img src={chatContext.img} alt="item" />
-   <div class="name">{chatContext.name}</div>
+   <img src={item.img} alt="item" />
+   <div class="name">{item.name}</div>
 </div>
 
 <style lang="scss">
@@ -23,6 +20,7 @@
       img {
          border: none;
          width: 2rem;
+         height: 2rem;
       }
 
       .name {

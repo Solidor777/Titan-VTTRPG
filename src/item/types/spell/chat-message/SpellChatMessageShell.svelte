@@ -16,7 +16,9 @@
 
 <div class="item-chat-message">
    <!--Header-->
-   <ItemChatLabel />
+   <div class="header">
+      <ItemChatLabel {item} />
+   </div>
 
    <div class="sections">
       <div class="section">

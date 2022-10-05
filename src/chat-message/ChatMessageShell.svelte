@@ -3,8 +3,8 @@
 <script>
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import DamageReportChatMessageShell from "./DamageReportChatMessageShell.svelte";
-   import HealingReportChatMessageShell from "./HealingReportChatMessageShell.svelte";
+   import DamageReportChatMessageShell from "./reports/DamageReportChatMessageShell.svelte";
+   import HealingReportChatMessageShell from "./reports/HealingReportChatMessageShell.svelte";
    import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
    import WeaponChatMessageShell from "~/item/types/weapon/chat-message/WeaponChatMessageShell.svelte";
    import ArmorChatMessageShell from "~/item/types/armor/chat-message/ArmorChatMessageShell.svelte";

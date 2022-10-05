@@ -7,9 +7,21 @@ export default class TitanEffect extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         this.initializeImg();
+      }
+
       if (this.parent.parent) {
          this._initializeEffect();
       }
+   }
+
+   initializeImg() {
+      this.parent.img = 'icons/svg/daze.svg';
+
+      this.parent.update({
+         img: this.parent.img
+      });
    }
 
    async _initializeEffect() {
@@ -36,5 +48,16 @@ export default class TitanEffect extends TitanTypeComponent {
       this.parent.update({
          system: parent.system
       });
+   }
+
+   prepareDerivedData() {
+      // Update effect icon and name
+      if (this.parent.parent) {
+         const effect = this.parent.parent.effects.get(this.parent.system.effectId);
+         if (effect) {
+            effect.icon = this.parent.img;
+            effect.label = this.parent.name;
+         }
+      }
    }
 }

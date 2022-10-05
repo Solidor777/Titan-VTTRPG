@@ -27,7 +27,7 @@
             <IconButton
                icon="fas fa-rotate-left"
                on:click={() => {
-                  $appState.filterOptions.abilities.passive = false;
+                  $appState.filterOptions.abilities.action = false;
                   $appState.filterOptions.abilities.reaction = false;
                   $appState.filterOptions.abilities.passive = false;
                }}
