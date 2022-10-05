@@ -26,28 +26,35 @@
 <div class="inventory-tab">
    <!--Filter-->
    <div class="filter">
-      <div class="label">
-         {localize("filter")}
+      <!--Options-->
+      <div class="options">
+         {#each Object.entries($appState.filterOptions.inventory) as [key]}
+            <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.inventory[key]} />
+         {/each}
+
+         <!--Reset button-->
+         <div class="reset">
+            <IconButton
+               icon="fas fa-rotate-left"
+               on:click={() => {
+                  $appState.filterOptions.inventory.weapon = false;
+                  $appState.filterOptions.inventory.armor = false;
+                  $appState.filterOptions.inventory.equipment = false;
+                  $appState.filterOptions.inventory.commodity = false;
+               }}
+            />
+         </div>
       </div>
 
-      <div class="input">
-         <TextInput bind:value={$appState.filter.inventory} />
-      </div>
+      <!--Field-->
+      <div class="field">
+         <div class="label">
+            {localize("filter")}
+         </div>
 
-      {#each Object.entries($appState.filterOptions.inventory) as [key]}
-         <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.inventory[key]} />
-      {/each}
-
-      <div
-         class="reset"
-         on:click={() => {
-            $appState.filterOptions.inventory.weapon = false;
-            $appState.filterOptions.inventory.armor = false;
-            $appState.filterOptions.inventory.equipment = false;
-            $appState.filterOptions.inventory.commodity = false;
-         }}
-      >
-         <IconButton icon="fas fa-rotate-left" />
+         <div class="input">
+            <TextInput bind:value={$appState.filter.inventory} />
+         </div>
       </div>
    </div>
 
@@ -175,24 +182,35 @@
       width: 100%;
 
       .filter {
-         @include flex-row;
-         @include flex-group-center;
+         @include flex-column;
+         @include flex-group-top;
          @include border-bottom;
          @include panel-1;
+         width: 100%;
+         padding-bottom: 0.5rem;
 
-         .label {
-            font-weight: bold;
-            margin: 0 0.25rem;
+         .options {
+            @include flex-row;
+            @include flex-group-center;
+            .reset {
+               --icon-button-font-size: var(--font-size-small);
+               --icon-button-radius: 1.75rem;
+            }
          }
 
-         .input {
-            @include flex-group-left;
-         }
+         .field {
+            @include flex-row;
+            @include flex-group-center;
+            margin-top: 0.25rem;
 
-         .reset {
-            @include font-size-small;
-            --icon-button-font-size: var(--font-size-small);
-            --icon-button-radius: 1.75rem;
+            .label {
+               font-weight: bold;
+               margin: 0 0.25rem;
+            }
+
+            .input {
+               @include flex-group-left;
+            }
          }
       }
 
