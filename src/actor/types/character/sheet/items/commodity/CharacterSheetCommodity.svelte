@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
+   import { localize } from "~/helpers/Utility.js";
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
@@ -10,6 +11,7 @@
    import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
+   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
 
    // Reference to the armor id
    export let id = void 0;
@@ -42,6 +44,25 @@
 
          <!--Controls-->
          <div class="controls">
+            <!--Quanity-->
+            <div class="field">
+               <div class="label">
+                  {localize("quantity")}
+               </div>
+               <div class="input">
+                  <IntegerInput
+                     bind:value={item.system.quantity}
+                     on:change={() => {
+                        item.update({
+                           system: {
+                              quantity: item.system.quantity,
+                           },
+                        });
+                     }}
+                  />
+               </div>
+            </div>
+
             <!--Send to Chat button-->
             <div class="button">
                <CharacterSheetItemSendToChatButton {item} />
@@ -120,6 +141,19 @@
             .button {
                &:not(:first-child) {
                   margin-left: 0.25rem;
+               }
+            }
+
+            .field {
+               @include flex-row;
+               @include flex-group-center;
+
+               .label {
+                  margin-right: 0.25rem;
+               }
+
+               .input {
+                  width: 2.5rem;
                }
             }
          }

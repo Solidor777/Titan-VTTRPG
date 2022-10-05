@@ -6,9 +6,6 @@
    export let itemType = void 0;
    export let label = void 0;
 
-   // Character reference
-   const document = getContext("DocumentStore");
-
    // Reference to the application
    const application = getContext("external").application;
 </script>
