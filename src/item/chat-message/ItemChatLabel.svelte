@@ -17,7 +17,7 @@
       @include flex-row;
       @include flex-group-left;
       @include border;
-      @include panel-1;
+      @include label;
       padding: 0.25rem;
 
       img {
@@ -29,7 +29,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-large;
-         margin-left: 0.25rem;
+         margin: 0 0.25rem;
          height: 100%;
          font-weight: bold;
       }
