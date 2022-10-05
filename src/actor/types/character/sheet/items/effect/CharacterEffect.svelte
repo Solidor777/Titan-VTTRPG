@@ -1,49 +1,71 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
-   import CharacterSheetItemExpandButton from "../CharacterSheetItemExpandButton.svelte";
-   import CharacterSheetItemSendToChatButton from "../CharacterSheetItemSendToChatButton.svelte";
-   import CharacterSheetItemEditButton from "../CharacterSheetItemEditButton.svelte";
-   import CharacterSheetItemDeleteButton from "../CharacterSheetItemDeleteButton.svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import CharacterSheetItemFooter from "../CharacterSheetItemFooter.svelte";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
+   import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
+   import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
+   import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
+   import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
+   import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
+   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
+   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
 
-   // Reference to the docuement
-   const document = getContext("DocumentStore");
-
-   // Reference to the armor id
+   // Reference to the weapon id
    export let id = void 0;
 
    // Collapsed object
    export let isExpanded = void 0;
+
+   // Setup context references
+   const document = getContext("DocumentStore");
+   const application = getContext("external").application;
 
    // Item reference
    $: item = $document.items.get(id);
 </script>
 
 {#if item}
-   <div class="actor-inventory-armor">
+   <div class="item">
       <!--Header-->
-      <div class="item-header">
-         <!--Expand button-->
-         <CharacterSheetItemExpandButton {item} bind:isExpanded />
+      <div class="header">
+         <div class="label">
+            <!--Image-->
+            <div class="image">
+               <CharacterSheetItemImage {item} />
+            </div>
+
+            <!--Expand button-->
+            <div class="button">
+               <CharacterSheetItemExpandButton {item} bind:isExpanded />
+            </div>
+         </div>
 
          <!--Controls-->
-         <div class="item-controls">
+         <div class="controls">
+            <!--Check-->
+            {#if item.system.check.length > 0}
+               <div>
+                  <CharacterSheetCheckButton
+                     check={item.system.check[0]}
+                     on:click={() => {
+                        application.rollItemCheck(id, 0);
+                     }}
+                  />
+               </div>
+            {/if}
+
             <!--Send to Chat button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="item-control-button">
+            <div class="button">
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -51,15 +73,20 @@
 
       <!--Expandable content-->
       {#if isExpanded === true}
-         <div class="item-expandable-container" transition:slide|local>
+         <div class="expandable-content" transition:slide|local>
+            <!--Item Checks-->
+            {#if item.system.check.length > 0}
+               <div class="section">
+                  <CharacterSheetItemChecks {item} />
+               </div>
+            {/if}
+
             <!--Item Description-->
-            <div class="item-expandable-content">
-               {#if item.system.description !== "" && item.system.description !== "<p></p>"}
-                  <div class="section rich-text">
-                     <RichText text={item.system.description} />
-                  </div>
-               {/if}
-            </div>
+            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+               <div class="section rich-text">
+                  <RichText text={item.system.description} />
+               </div>
+            {/if}
          </div>
       {/if}
    </div>
@@ -68,38 +95,61 @@
 <style lang="scss">
    @import "../../../../../../Styles/Mixins.scss";
 
-   .actor-inventory-armor {
+   .item {
       @include flex-column;
+      @include flex-group-top;
       width: 100%;
 
-      .item-header {
+      .header {
          @include flex-row;
          @include flex-space-between;
+         @include border;
+         @include panel-1;
+         padding: 0.25rem;
          width: 100%;
-         @include font-size-normal;
          font-weight: bold;
 
-         .item-controls {
+         .label {
+            @include flex-row;
+            @include flex-group-center;
+
+            .button {
+               margin-left: 0.25rem;
+            }
+         }
+
+         .controls {
             @include flex-row;
             @include flex-group-right;
             height: 100%;
 
-            .item-control-button {
+            .button {
                &:not(:first-child) {
-                  margin-left: 0.5rem;
+                  margin-left: 0.25rem;
                }
             }
          }
       }
 
-      .item-expandable-container {
-         margin-top: 0.5rem;
+      .expandable-content {
+         @include flex-column;
+         @include flex-group-top;
+         @include panel-3;
+         @include border-bottom-sides;
+         width: calc(100% - 1rem);
+         padding: 0 0.25rem;
 
-         .item-expandable-content {
+         .section {
+            @include flex-column;
+            @include flex-group-top;
+            width: 100%;
+
+            &:not(.rich-text) {
+               padding: 0.5rem 0 0.5rem;
+            }
+
             &:not(:first-child) {
                @include border-top;
-               margin-top: 0.5rem;
-               padding-top: 0.5rem;
             }
          }
       }

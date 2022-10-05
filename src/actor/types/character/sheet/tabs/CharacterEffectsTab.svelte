@@ -1,4 +1,5 @@
 <script>
+   import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
@@ -10,7 +11,7 @@
    const appState = getContext("ApplicationStateStore");
 </script>
 
-<div class="effects-tab">
+<div class="tab">
    <!--Filter-->
    <TopFilter bind:filter={$appState.filter.abilities} />
 
@@ -18,7 +19,7 @@
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.abilities}>
          <!--Abilities List-->
-         <div class="effects">
+         <div class="list">
             <CharacterSheetItemList
                itemComponent={CharacterEffect}
                filterFunction={(item) => {
@@ -31,7 +32,7 @@
 
          <!--Add Spell Button-->
          <div class="add-entry-button">
-            <CharacterSheetItemAddEntryButton itemType={"effect"} />
+            <CharacterSheetItemAddEntryButton itemType={"effect"} label={localize("addNewEffect")} />
          </div>
       </ScrollingContainer>
    </div>
@@ -39,9 +40,11 @@
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
-   .effects-tab {
+
+   .tab {
       @include flex-column;
       @include flex-group-top;
+      @include panel-2;
       height: 100%;
       width: 100%;
 
@@ -50,14 +53,22 @@
          @include flex-group-top;
          width: 100%;
          height: 100%;
-         padding-left: 0.25rem;
 
-         .effects {
+         .list {
+            @include flex-column;
+            @include flex-group-top;
+            width: 100%;
             margin-top: 0.5rem;
          }
 
          .add-entry-button {
-            margin-top: 0.5rem;
+            @include flex-row;
+            @include flex-group-center;
+            width: 100%;
+
+            &:not(:first-child) {
+               margin-top: 0.5rem;
+            }
          }
       }
    }

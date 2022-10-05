@@ -54,7 +54,6 @@
          @include panel-2;
          width: 100%;
          height: 100%;
-         padding: 0 0.25rem;
 
          ol {
             @include flex-column;
@@ -62,6 +61,7 @@
             @include list;
             width: 100%;
             margin-bottom: 0.25rem;
+            padding: 0 0.25rem;
 
             li {
                @include flex-row;

@@ -13,17 +13,15 @@
    import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
-
-   // Reference to the docuement
-   const document = getContext("DocumentStore");
-
    // Reference to the weapon id
    export let id = void 0;
 
    // Collapsed object
    export let isExpanded = void 0;
+
+   // Setup context references
+   const document = getContext("DocumentStore");
+   const application = getContext("external").application;
 
    // Item reference
    $: item = $document.items.get(id);
@@ -79,17 +77,17 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="expandable-content" transition:slide|local>
-            <!--Item Description-->
-            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
-               <div class="section rich-text">
-                  <RichText text={item.system.description} />
-               </div>
-            {/if}
-
             <!--Item Checks-->
             {#if item.system.check.length > 0}
                <div class="section">
                   <CharacterSheetItemChecks {item} />
+               </div>
+            {/if}
+
+            <!--Item Description-->
+            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+               <div class="section rich-text">
+                  <RichText text={item.system.description} />
                </div>
             {/if}
 

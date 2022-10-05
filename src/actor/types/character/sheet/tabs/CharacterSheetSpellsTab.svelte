@@ -40,6 +40,7 @@
 
 <style lang="scss">
    @import "../../../../../Styles/Mixins.scss";
+
    .tab {
       @include flex-column;
       @include flex-group-top;
