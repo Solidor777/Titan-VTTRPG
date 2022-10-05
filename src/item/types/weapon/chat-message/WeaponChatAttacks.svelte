@@ -12,7 +12,7 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<ol class="attacks">
+<ol>
    {#each Object.entries(chatContext.system.attack) as [attackIdx, attack]}
       <!--Each attack-->
       <li>
@@ -78,14 +78,16 @@
    @import "../../../../styles/mixins.scss";
 
    ol {
+      @include list;
+      @include flex-column;
+      @include flex-group-top;
       @include font-size-small;
-      list-style: none;
-      margin: 0 0 0 0;
-      padding: 0;
+      width: 100%;
 
       li {
          @include flex-column;
-         padding: 0.25rem;
+         @include flex-group-top;
+         width: 100%;
 
          &:not(:first-child) {
             @include border-top;

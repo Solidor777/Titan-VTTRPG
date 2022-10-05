@@ -23,10 +23,10 @@
    }
 </script>
 
-<div class="checks">
+<ol>
    <!--Each check-->
    {#each item.system.check as check}
-      <div class="check">
+      <li>
          <!--Header-->
          <div class="header {check.attribute}">
             <!--Icon-->
@@ -66,19 +66,21 @@
                </div>
             {/if}
          </div>
-      </div>
+      </li>
    {/each}
-</div>
+</ol>
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";
 
-   .checks {
+   ol {
+      @include list;
       @include flex-column;
       @include flex-group-top;
+      @include font-size-small;
       width: 100%;
 
-      .check {
+      li {
          @include flex-column;
          @include flex-group-top;
          width: 100%;
