@@ -53,7 +53,7 @@
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.abilities}>
          <!--Abilities List-->
-         <div class="abilities">
+         <div class="list">
             <CharacterSheetItemList
                itemComponent={CharacterSheetAbility}
                filterFunction={(item) => {
@@ -134,20 +134,22 @@
          @include flex-group-top;
          width: 100%;
          height: 100%;
-         padding-left: 0.25rem;
 
-         .abilities {
+         .list {
             @include flex-column;
-            @include flex-group-center;
+            @include flex-group-top;
             width: 100%;
             margin-top: 0.5rem;
-         }
 
-         .add-entry-button {
-            @include flex-row;
-            @include flex-group-center;
-            width: 100%;
-            margin-top: 0.5rem;
+            .add-entry-button {
+               @include flex-row;
+               @include flex-group-center;
+               width: 100%;
+
+               &:not(:first-child) {
+                  margin-top: 0.5rem;
+               }
+            }
          }
       }
    }
