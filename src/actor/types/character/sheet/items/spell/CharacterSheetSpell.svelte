@@ -12,7 +12,7 @@
    import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
-   import CharacterSheetCheckLabel from "~/actor/types/character/sheet/CharacterSheetCheckLabel.svelte";
+   import CharacterSheetSpellCastingCheck from "./CharacterSheetSpellCastingCheck.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -79,8 +79,8 @@
       {#if isExpanded === true}
          <div class="expandable-content" transition:slide|local>
             <!--Item Check Data-->
-            <div class="section">
-               <CharacterSheetCheckLabel check={item.system.castingCheck} />
+            <div class="section tags">
+               <CharacterSheetSpellCastingCheck {item} />
             </div>
 
             <!--Spell Aspects-->

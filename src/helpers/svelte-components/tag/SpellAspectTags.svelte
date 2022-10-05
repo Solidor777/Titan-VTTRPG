@@ -50,7 +50,7 @@
 
    .aspects {
       @include flex-row;
-      @include flex-space-evenly;
+      @include flex-group-center;
       @include font-size-small;
       flex-wrap: wrap;
 
