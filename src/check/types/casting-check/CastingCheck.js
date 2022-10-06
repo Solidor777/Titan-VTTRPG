@@ -20,10 +20,10 @@ export default class TitanCastingCheck extends TitanSkillCheck {
 
    _initializeParameters(options) {
       const parameters = {
-         attribute: options.attribute ?? options.spellRollData.check.attribute,
-         skill: options.skill ?? options.spellRollData.check.skill,
-         difficulty: options.difficulty ?? options.spellRollData.check.difficulty,
-         complexity: options.complexity ?? options.spellRollData.check.complexity,
+         attribute: options.attribute ?? options.spellRollData.castingCheck.attribute,
+         skill: options.skill ?? options.spellRollData.castingCheck.skill,
+         difficulty: options.difficulty ?? options.spellRollData.castingCheck.difficulty,
+         complexity: options.complexity ?? options.spellRollData.castingCheck.complexity,
          diceMod: options.diceMod ?? 0,
          trainingMod: options.trainingMod ?? 0,
          expertiseMod: options.expertiseMod ?? 0,
@@ -32,7 +32,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
          extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
          spellName: options.spellRollData.name,
-         aspects: options.spellRollData.aspect,
+         aspect: options.spellRollData.aspect,
          damageMod: options.damageMod ?? options.actorRollData.mod.damage.value,
          img: options.spellRollData.img ?? false,
       };
@@ -99,7 +99,7 @@ export default class TitanCastingCheck extends TitanSkillCheck {
 
    _calculateResults() {
       const results = super._calculateResults();
-      // Check if damage or healing is among the aspects
+      // Check if damage or healing is among the aspect
       if (results.succeeded) {
 
          // Initialize state data

@@ -34,6 +34,7 @@ export default class TitanAttributeCheck extends TitanCheck {
     this.parameters.attributeDice =
       actorRollData.attribute[this.parameters.attribute].value;
 
+
     return;
   }
 

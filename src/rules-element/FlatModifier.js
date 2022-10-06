@@ -73,6 +73,7 @@ export function applyFlatModifier(flatModifier) {
       }
       case 'armor':
       case 'equipment':
+      case 'shield':
       case 'weapon': {
          type = 'equipment';
          break;
