@@ -17,7 +17,8 @@
    import AttributeCheckChatMessageShell from "~/check/types/attribute-check/AttributeCheckChatMessageShell.svelte";
    import ResistanceCheckChatMessageShell from "~/check/types/resistance-check/ResistanceCheckChatMessageShell.svelte";
    import SkillCheckChatMessageShell from "~/check/types/skill-check/SkillCheckChatMessageShell.svelte";
-   import ItemCheckChatMessageShell from "../check/types/item-check/ItemCheckChatMessageShell.svelte";
+   import ItemCheckChatMessageShell from "~/check/types/item-check/ItemCheckChatMessageShell.svelte";
+   import CastingCheckChatMessageShell from "~/check/types/casting-check/CastingCheckChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -33,7 +34,7 @@
          skillCheck: SkillCheckChatMessageShell,
          resistanceCheck: ResistanceCheckChatMessageShell,
          attackCheck: CheckChatMessageShell,
-         castingCheck: CheckChatMessageShell,
+         castingCheck: CastingCheckChatMessageShell,
          itemCheck: ItemCheckChatMessageShell,
          armor: ArmorChatMessageShell,
          ability: AbilityChatMesssageShell,

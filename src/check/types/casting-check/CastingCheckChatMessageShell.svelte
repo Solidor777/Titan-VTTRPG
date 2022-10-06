@@ -1,12 +1,11 @@
 <script>
    import { getContext } from "svelte";
    import CheckChatDiceContainer from "~/check/chat-message/CheckChatDiceContainer.svelte";
-   import ItemCheckChatHeader from "./ItemCheckChatHeader.svelte";
+   import CastingCheckChatHeader from "./CastingCheckChatHeader.svelte";
    import CheckChatResults from "~/check/chat-message/CheckChatResults.svelte";
    import CheckChatDamageButtons from "~/check/chat-message/CheckChatDamageButtons.svelte";
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
-   import CheckChatOpposedCheckButton from "../../chat-message/CheckChatOpposedCheckButton.svelte";
-   import CheckChatResistanceCheckButtons from "../../chat-message/CheckChatResistanceCheckButtons.svelte";
+   import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -16,7 +15,7 @@
 <div class="check-chat-message">
    <!--Header-->
    <div class="section">
-      <ItemCheckChatHeader {check} />
+      <CastingCheckChatHeader {check} />
    </div>
 
    <!--Dice Container-->
@@ -42,13 +41,6 @@
    {#if check.results.healing !== undefined && game.user.isGM}
       <div class="section">
          <CheckChatHealingButton results={check.results} />
-      </div>
-   {/if}
-
-   <!--Opposed Check Buttons-->
-   {#if check.results.succeeded && check.parameters.opposedCheck}
-      <div class="section">
-         <CheckChatOpposedCheckButton opposedCheck={check.parameters.opposedCheck} />
       </div>
    {/if}
 

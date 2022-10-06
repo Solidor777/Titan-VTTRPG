@@ -56,11 +56,4 @@ export default class TitanSkillCheck extends TitanAttributeCheck {
   _getCheckType() {
     return 'skillCheck';
   }
-
-  _getTypeLabel() {
-    if (this.parameters.skill) {
-      return `${localize(this.parameters.attribute)} (${localize(this.parameters.skill)}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
-    }
-    return `${localize(this.parameters.attribute)} ${this.parameters.difficulty}:${this.parameters.complexity}`;
-  }
 }

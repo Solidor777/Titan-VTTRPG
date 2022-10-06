@@ -185,8 +185,4 @@ export default class TitanCastingCheck extends TitanSkillCheck {
    _getCheckType() {
       return 'castingCheck';
    }
-
-   _getTypeLabel() {
-      return this.parameters.spellName;
-   }
 }

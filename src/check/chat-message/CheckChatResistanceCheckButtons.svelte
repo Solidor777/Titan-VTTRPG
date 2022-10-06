@@ -1,11 +1,8 @@
 <script>
-   import { getContext } from "svelte";
    import ResistanceCheckButton from "~/helpers/svelte-components/button/ResistanceCheckButton.svelte";
 
-   // Results
-   const document = getContext("DocumentStore");
-   $: results = $document.flags.titan.chatContext.results;
-   $: complexity = results.extraSuccesses ? 1 + results.extraSuccesses : 1;
+   export let results = void 0;
+   const complexity = results.extraSuccesses ? 1 + results.extraSuccesses : 1;
 </script>
 
 <div class="buttons">
@@ -41,8 +38,7 @@
       flex-wrap: wrap;
 
       .button {
-         padding: 0.2rem;
-         box-sizing: border-box;
+         @include tag-margin;
          --button-border-radius: 10px;
       }
    }

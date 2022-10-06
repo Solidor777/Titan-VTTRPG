@@ -191,33 +191,6 @@ export default class TitanAttackCheck extends TitanSkillCheck {
       return results;
    }
 
-   _getChatContext(options) {
-      // Create the context object
-      const chatContext = {
-         label: this.parameters.attackName,
-         subLabels: [this.parameters.weaponName, this._getTypeLabel()],
-         parameters: this.parameters,
-         results: this.results,
-         type: this._getCheckType(),
-         img: this.parameters.img
-      };
-      if (this.parameters.targetDefense) {
-         let subLabel = '';
-
-         if (this.parameters.type === 'melee') {
-            subLabel = `${localize(`melee`)} (${this.parameters.attackerMelee})`;
-         }
-         else {
-            subLabel = `${localize(`accuracy`)} (${this.parameters.attackerAccuracy})`;
-         }
-
-         subLabel += ` vs. ${localize(`defense`)} (${this.parameters.targetDefense})`;
-         chatContext.subLabels.push(subLabel);
-      }
-
-      return chatContext;
-   }
-
    _getCheckType() {
       return 'attackCheck';
    }

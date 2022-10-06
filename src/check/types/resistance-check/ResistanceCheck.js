@@ -50,8 +50,4 @@ export default class TitanResistanceCheck extends TitanCheck {
   _getCheckType() {
     return 'resistanceCheck';
   }
-
-  _getTypeLabel() {
-    return `${localize(`${this.parameters.resistance}`)} ${this.parameters.difficulty}:${this.parameters.complexity}`;
-  }
 }

@@ -1,8 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   const document = getContext("DocumentStore");
 
    async function rollOpposedCheck(options) {
       // Get the targets
@@ -24,23 +22,23 @@
       return;
    }
 
-   // Options reference
-   $: options = $document.flags.titan.chatContext.parameters.opposedCheck;
+   // Check Options reference
+   export let opposedCheck = void 0;
 </script>
 
 <!--Apply healing button-->
-<div class="opposed-check-button {options.attribute}">
+<div class="opposed-check-button {opposedCheck.attribute}">
    <EfxButton
       on:click={() => {
-         rollOpposedCheck(options);
+         rollOpposedCheck(opposedCheck);
       }}
    >
-      {#if options.skill && options.skill !== "none"}
-         {`${localize(`${options.attribute}`)} (${localize(`${options.skill}`)}) ${options.difficulty}:${
-            options.complexity
+      {#if opposedCheck.skill && opposedCheck.skill !== "none"}
+         {`${localize(`${opposedCheck.attribute}`)} (${localize(`${opposedCheck.skill}`)}) ${opposedCheck.difficulty}:${
+            opposedCheck.complexity
          }`}
       {:else}
-         {`${localize(`${options.attribute}`)} ${options.difficulty}:${options.complexity}`}
+         {`${localize(`${opposedCheck.attribute}`)} ${opposedCheck.difficulty}:${opposedCheck.complexity}`}
       {/if}
    </EfxButton>
 </div>
