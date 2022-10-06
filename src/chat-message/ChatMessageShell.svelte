@@ -19,6 +19,7 @@
    import SkillCheckChatMessageShell from "~/check/types/skill-check/SkillCheckChatMessageShell.svelte";
    import ItemCheckChatMessageShell from "~/check/types/item-check/ItemCheckChatMessageShell.svelte";
    import CastingCheckChatMessageShell from "~/check/types/casting-check/CastingCheckChatMessageShell.svelte";
+   import AttackCheckChatMessageShell from "~/check/types/attack-check/AttackCheckChatMessageShell.svelte";
    import RemoveTempEffectsReportChatMessageShell from "./reports/RemoveTempEffectsReportChatMessageShell.svelte";
    import BreatherReportChatMessageShell from "./reports/BreatherReportChatMessageShell.svelte";
    import RestReportChatMessageShell from "./reports/RestReportChatMessageShell.svelte";
@@ -36,7 +37,7 @@
          attributeCheck: AttributeCheckChatMessageShell,
          skillCheck: SkillCheckChatMessageShell,
          resistanceCheck: ResistanceCheckChatMessageShell,
-         attackCheck: CheckChatMessageShell,
+         attackCheck: AttackCheckChatMessageShell,
          castingCheck: CastingCheckChatMessageShell,
          itemCheck: ItemCheckChatMessageShell,
          armor: ArmorChatMessageShell,

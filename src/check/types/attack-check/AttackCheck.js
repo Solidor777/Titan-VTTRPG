@@ -76,13 +76,8 @@ export default class TitanAttackCheck extends TitanSkillCheck {
       // Cache the attack info
       this.parameters.attack = checkAttack;
 
-      // Cache the attack name
-      this.parameters.attackName = checkAttack.label;
-
-      // Get the attack description
-      if (weaponRollData.attackNotes && weaponRollData.attackNotes.length > 0) {
-         this.parameters.attackNotes = weaponRollData.attackNotes;
-      }
+      // Get the attack description) {
+      this.parameters.attackNotes = weaponRollData.attackNotes;
 
       // Get the attack type
       if (!this.parameters.type) {

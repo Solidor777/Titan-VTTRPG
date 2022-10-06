@@ -27,7 +27,7 @@
 
    <!--Traits-->
    {#each item.system.trait as trait}
-      <div class="stat">
+      <div class="stat" data-tooltip={localize(`${trait.name}.desc`)}>
          {#if trait.type === "number"}
             <StatTag label={localize(`${trait.name}`)} value={trait.value} />
          {:else}

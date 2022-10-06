@@ -13,12 +13,17 @@
       <div class="labels">
          <!--Label-->
          <div class="label">
-            {check.parameters.itemName}
+            {check.parameters.weaponName}
+         </div>
+
+         <!--Attack -->
+         <div class="sub-label">
+            {check.parameters.attack.label}
          </div>
 
          <!--Type Label -->
          <div class="sub-label">
-            {`${localize(check.parameters.attribute)}(${localize(check.parameters.skill)}) ${
+            {`${localize(check.parameters.attribute)} (${localize(check.parameters.skill)}) ${
                check.parameters.difficulty
             }:${check.parameters.complexity}`}
          </div>

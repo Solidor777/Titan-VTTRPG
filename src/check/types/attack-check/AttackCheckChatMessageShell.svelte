@@ -7,6 +7,8 @@
    import CheckChatOpposedCheckButton from "~/check/chat-message/CheckChatOpposedCheckButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
    import AttackCheckChatHeader from "./AttackCheckChatHeader.svelte";
+   import AttackCheckChatAttackNotes from "./AttackCheckChatAttackNotes.svelte";
+   import AttackCheckStats from "./AttackCheckStats.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -17,6 +19,18 @@
    <!--Header-->
    <div class="section">
       <AttackCheckChatHeader {check} />
+   </div>
+
+   <!--Attack Notes-->
+   {#if check.parameters.attackNotes !== "" && check.parameters.attackNotes !== "<p></p>"}
+      <div class="section rich-text">
+         <AttackCheckChatAttackNotes text={check.parameters.attackNotes} />
+      </div>
+   {/if}
+
+   <!--Stats-->
+   <div class="section tags">
+      <AttackCheckStats attack={check.parameters.attack} />
    </div>
 
    <!--Dice Container-->
@@ -73,7 +87,7 @@
          @include flex-group-center;
          width: 100%;
 
-         &:not(:first-child):not(.tags) {
+         &:not(:first-child):not(.tags):not(.rich-text):not(.rich-text + section) {
             margin-top: 0.5rem;
          }
       }

@@ -66,7 +66,7 @@
 
                <!--Range-->
                {#if attack.range !== 1}
-                  <div class="stat">
+                  <div class="stat" transition:slide|local>
                      <IconStatTag label={localize("range")} value={attack.range} icon={"fas fa-ruler"} />
                   </div>
                {/if}
@@ -91,7 +91,7 @@
                </div>
 
                {#each attack.trait as trait (trait.name)}
-                  <div class="stat" data-tooltip={localize(`${trait.name}.desc`)}>
+                  <div class="stat" data-tooltip={localize(`${trait.name}.desc`)} transition:slide|local>
                      {#if trait.type === "number"}
                         <!--Number Trait-->
                         <StatTag label={localize(trait.name)} value={trait.value} />

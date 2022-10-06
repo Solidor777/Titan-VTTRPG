@@ -42,7 +42,7 @@
          value: false,
       },
       {
-         name: "magical",
+         name: "magical.attack",
          type: "boolean",
          value: false,
       },

@@ -18,7 +18,7 @@
 
          <!--Type Label -->
          <div class="sub-label">
-            {`${localize(check.parameters.attribute)}(${localize(check.parameters.skill)}) ${
+            {`${localize(check.parameters.attribute)} (${localize(check.parameters.skill)}) ${
                check.parameters.difficulty
             }:${check.parameters.complexity}`}
          </div>
