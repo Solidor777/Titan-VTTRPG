@@ -162,7 +162,7 @@
          flex-wrap: wrap;
 
          .stat {
-            @include tag-padding;
+            @include tag-margin;
          }
       }
    }

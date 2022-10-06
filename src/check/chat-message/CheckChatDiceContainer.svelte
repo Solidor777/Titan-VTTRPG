@@ -1,9 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   const document = getContext("DocumentStore");
-
-   // Results
-   let dice = $document.flags.titan.chatContext.results.dice;
+   // Check reference
+   export let dice = void 0;
 
    function getDieTypeClass(die) {
       if (die.criticalSuccess) {
@@ -49,11 +46,11 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-large;
-         font-weight: bold;
+         @include tag-margin;
          padding: 0.25rem;
+         font-weight: bold;
          height: 2.5rem;
          min-width: 2.5rem;
-         margin: 0.25rem;
 
          &.critical-success {
             background: var(--critical-success-color-bright);

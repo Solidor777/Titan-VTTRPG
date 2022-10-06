@@ -233,7 +233,7 @@
             flex-wrap: wrap;
 
             .cost {
-               @include tag-padding;
+               @include tag-margin;
                @include font-size-small;
             }
          }

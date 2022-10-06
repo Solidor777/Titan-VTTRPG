@@ -142,41 +142,7 @@ export default class TitanItemCheck extends TitanCheck {
       return results;
    }
 
-   _getChatContext(options) {
-      // Create the context object
-      const chatContext = {
-         parameters: this.parameters,
-         results: this.results,
-         type: this._getCheckType(),
-         img: this.parameters.img
-      };
-
-      // Initialize labels
-      if (this.parameters.label) {
-         chatContext.label = this.parameters.label;
-         chatContext.subLabels = [];
-         if (this.parameters.itemName) {
-            chatContext.subLabels.push(this.parameters.itemName);
-         }
-         chatContext.subLabels.push(this._getTypeLabel());
-      }
-      else if (this.parameters.itemName) {
-         chatContext.subLabels = [];
-         chatContext.label = this.parameters.label;
-         chatContext.subLabels.push(this._getTypeLabel());
-      }
-      else {
-         chatContext.label = this._getTypeLabel();
-      }
-
-      return chatContext;
-   }
-
    _getCheckType() {
       return 'itemCheck';
-   }
-
-   _getTypeLabel() {
-      return `${localize(this.parameters.attribute)} (${localize(this.parameters.skill)}) ${this.parameters.difficulty}:${this.parameters.complexity}`;
    }
 }

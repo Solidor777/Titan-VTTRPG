@@ -105,7 +105,7 @@
                @include flex-group-center;
 
                .stat {
-                  @include tag-padding;
+                  @include tag-margin;
                }
             }
 

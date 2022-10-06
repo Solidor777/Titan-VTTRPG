@@ -51,8 +51,4 @@ export default class TitanAttributeCheck extends TitanCheck {
   _getCheckType() {
     return 'attributeCheck';
   }
-
-  _getTypeLabel() {
-    return `${localize(`${this.parameters.attribute}`)} ${this.parameters.difficulty}:${this.parameters.complexity}`;
-  }
 }

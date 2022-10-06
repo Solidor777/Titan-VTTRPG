@@ -195,7 +195,7 @@
                flex-wrap: wrap;
 
                .tag {
-                  @include tag-padding;
+                  @include tag-margin;
                }
             }
 

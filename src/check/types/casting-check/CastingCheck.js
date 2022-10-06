@@ -182,21 +182,11 @@ export default class TitanCastingCheck extends TitanSkillCheck {
       return results;
    }
 
-   _getChatContext(options) {
-      // Create the context object
-      const chatContext = {
-         label: this.parameters.spellName,
-         subLabels: [this._getTypeLabel()],
-         parameters: this.parameters,
-         results: this.results,
-         type: this._getCheckType(),
-         img: this.parameters.img
-      };
-
-      return chatContext;
-   }
-
    _getCheckType() {
       return 'castingCheck';
+   }
+
+   _getTypeLabel() {
+      return this.parameters.spellName;
    }
 }

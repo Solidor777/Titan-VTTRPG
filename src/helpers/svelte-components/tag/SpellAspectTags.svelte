@@ -55,7 +55,7 @@
       flex-wrap: wrap;
 
       .aspect {
-         @include tag-padding;
+         @include tag-margin;
       }
    }
 </style>

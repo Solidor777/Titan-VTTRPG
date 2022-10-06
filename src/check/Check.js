@@ -228,7 +228,7 @@ export default class TitanCheck {
     }
 
     // Create the context object
-    const chatContext = this._getChatContext(options);
+    const chatContext = this._getChatContext();
 
     // Create and post the message
     this.chatMessage = await ChatMessage.create(
@@ -254,26 +254,18 @@ export default class TitanCheck {
     return this.chatMessage;
   }
 
-  _getChatContext(options) {
+  _getChatContext() {
     // Create the context object
     const chatContext = {
-      label: options?.label ? options.label : this._getTypeLabel(),
       parameters: this.parameters,
       results: this.results,
       type: this._getCheckType(),
     };
-    if (options?.label) {
-      chatContext.subLabels = [this._getTypeLabel()];
-    }
 
     return chatContext;
   }
 
   _getCheckType() {
     return 'check';
-  }
-
-  _getTypeLabel() {
-    return `${localize('check')} ${this.parameters.difficulty}:${this.parameters.complexity}`;
   }
 }

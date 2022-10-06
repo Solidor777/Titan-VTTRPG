@@ -129,7 +129,7 @@
             width: 100%;
 
             .option {
-               @include tag-padding;
+               @include tag-margin;
                @include font-size-small;
             }
          }

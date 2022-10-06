@@ -78,7 +78,7 @@
       .trait {
          @include flex-row;
          @include flex-group-center;
-         @include tag-padding;
+         @include tag-margin;
       }
    }
 </style>

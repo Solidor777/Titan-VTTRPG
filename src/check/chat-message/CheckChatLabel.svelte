@@ -1,53 +1,69 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   const document = getContext("DocumentStore");
-
-   // Chat context
-   const chatContext = $document.flags.titan.chatContext;
+   export let check = void 0;
 
    function getLabelClass() {
-      switch (chatContext.type) {
+      switch (check.type) {
          case "resistanceCheck": {
-            return chatContext.parameters.resistance;
+            return check.parameters.resistance;
          }
          case "attributeCheck": {
-            return chatContext.parameters.attribute;
+            return check.parameters.attribute;
          }
          case "skillCheck": {
-            return chatContext.parameters.attribute;
+            return check.parameters.attribute;
          }
          case "attackCheck": {
-            return chatContext.parameters.attribute;
+            return check.parameters.attribute;
          }
          case "castingCheck": {
-            return chatContext.parameters.attribute;
+            return check.parameters.attribute;
          }
          case "itemCheck": {
-            return chatContext.parameters.attribute;
+            return check.parameters.attribute;
          }
          default: {
             return "";
          }
       }
    }
+
+   function getMainLabel() {
+      switch (check.type) {
+         case "attributeCheck": {
+            return `${localize(check.parameters.attribute)} ${check.parameters.difficulty}:${
+               check.parameters.complexity
+            }`;
+         }
+         case "resistanceCheck":
+         case "skillCheck": {
+            return check.typeLabel;
+         }
+         default: {
+            return "TODO";
+         }
+      }
+   }
+
+   const mainLAbel = getMainLabel();
 </script>
 
 <div class="label {getLabelClass()}">
    <!--Image-->
-   {#if chatContext.img}
-      <img src={chatContext.img} alt="item" />
+   {#if check.parameters.img}
+      <img src={check.parameters.img} alt="item" />
    {/if}
 
-   <!--Main Label -->
    <div class="label-text">
+      <!--Type Label -->
       <div class="main-label">
-         {chatContext.label}
+         {mainLAbel}
       </div>
 
       <!--Sub Label -->
-      {#if chatContext.subLabels}
-         {#each chatContext.subLabels as subLabel}
+      {#if check.subLabels}
+         {#each check.subLabels as subLabel}
             <div class="sub-label">
                {subLabel}
             </div>
@@ -75,8 +91,8 @@
          .main-label {
             @include flex-row;
             @include flex-group-center;
-            height: 100%;
             @include font-size-large;
+            height: 100%;
             font-weight: bold;
          }
 
@@ -86,10 +102,9 @@
       }
 
       img {
-         margin-right: 0.5rem;
-         background: black;
-         border-radius: 10px;
-         width: 2.5rem;
+         margin-right: 0.25rem;
+         width: 2rem;
+         border: none;
       }
    }
 </style>

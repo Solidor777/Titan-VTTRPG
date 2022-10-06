@@ -14,6 +14,10 @@
    import CommodityChatMessageShell from "~/item/types/commodity/chat-message/CommodityChatMessageShell.svelte";
    import EffectChatMessageShell from "~/item/types/effect/chat-message/EffectChatMessageShell.svelte";
    import ShieldChatMessageShell from "~/item/types/shield/chat-message/ShieldChatMessageShell.svelte";
+   import AttributeCheckChatMessageShell from "~/check/types/attribute-check/AttributeCheckChatMessageShell.svelte";
+   import ResistanceCheckChatMessageShell from "~/check/types/resistance-check/ResistanceCheckChatMessageShell.svelte";
+   import SkillCheckChatMessageShell from "~/check/types/skill-check/SkillCheckChatMessageShell.svelte";
+   import ItemCheckChatMessageShell from "../check/types/item-check/ItemCheckChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -25,12 +29,12 @@
    // Selector for the chat message type
    function selectComponent() {
       const chatComponents = {
-         attributeCheck: CheckChatMessageShell,
-         skillCheck: CheckChatMessageShell,
-         resistanceCheck: CheckChatMessageShell,
+         attributeCheck: AttributeCheckChatMessageShell,
+         skillCheck: SkillCheckChatMessageShell,
+         resistanceCheck: ResistanceCheckChatMessageShell,
          attackCheck: CheckChatMessageShell,
          castingCheck: CheckChatMessageShell,
-         itemCheck: CheckChatMessageShell,
+         itemCheck: ItemCheckChatMessageShell,
          armor: ArmorChatMessageShell,
          ability: AbilityChatMesssageShell,
          commodity: CommodityChatMessageShell,
