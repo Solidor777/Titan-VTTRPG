@@ -1,12 +1,12 @@
 <script>
    import { getContext } from "svelte";
    import CheckChatDiceContainer from "~/check/chat-message/CheckChatDiceContainer.svelte";
-   import ItemCheckChatHeader from "./ItemCheckChatHeader.svelte";
    import CheckChatResults from "~/check/chat-message/CheckChatResults.svelte";
    import CheckChatDamageButtons from "~/check/chat-message/CheckChatDamageButtons.svelte";
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
    import CheckChatOpposedCheckButton from "~/check/chat-message/CheckChatOpposedCheckButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
+   import AttackCheckChatHeader from "./AttackCheckChatHeader.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -16,7 +16,7 @@
 <div class="check-chat-message">
    <!--Header-->
    <div class="section">
-      <ItemCheckChatHeader {check} />
+      <AttackCheckChatHeader {check} />
    </div>
 
    <!--Dice Container-->

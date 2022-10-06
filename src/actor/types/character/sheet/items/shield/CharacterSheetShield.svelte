@@ -46,7 +46,7 @@
          <!--Controls-->
          <div class="controls">
             <!--Toggle Equipped button-->
-            {#if item.system.equipped === false || item.system.check.length === 0}
+            {#if $document.system.equipped.shield !== item._id || item.system.check.length === 0}
                <div class="button">
                   <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.shield === item._id} />
                </div>

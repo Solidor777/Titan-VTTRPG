@@ -48,7 +48,7 @@
          <!--Controls-->
          <div class="controls">
             <div class="button">
-               {#if item.system.equipped}
+               {#if !item.system.equipped}
                   <!--Toggle Equipped button-->
                   <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
                {:else}
