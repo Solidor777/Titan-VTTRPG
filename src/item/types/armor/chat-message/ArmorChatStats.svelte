@@ -11,7 +11,7 @@
 </script>
 
 <div class="stats">
-   <div class="stat">
+   <div class="stat" data-tooltip={localize("armor.desc")}>
       <IconStatTag icon={"fas fa-helmet-battle"} label={localize("armor")} value={item.system.armor} />
    </div>
 
