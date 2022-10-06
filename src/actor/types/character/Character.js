@@ -975,7 +975,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async removeTemporaryEffects() {
+   async removeTemporaryEffects(report) {
       const systemData = this.parent.system;
 
       // Reset static mods
@@ -1018,10 +1018,32 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          return this.parent.deleteItem(item._id);
       });
 
+      if (report === true) {
+         const chatContext = {
+            type: 'removeTempEffectsReport',
+            actorName: this.parent.name,
+         };
+
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            }
+
+         });
+      }
       return;
    }
 
-   async takeABreather() {
+   async takeABreather(report) {
       // Clear temporary effects
       this.removeTemporaryEffects();
 
@@ -1039,15 +1061,40 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       });
 
+      if (report === true) {
+         const chatContext = {
+            type: 'breatherReport',
+            actorName: this.parent.name,
+         };
+
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            }
+
+         });
+      }
+
       return;
    }
 
-   async rest() {
+   async rest(report) {
       await this.takeABreather();
 
       // Decrease wounds by 1
+      let woundsHealed = false;
       let wounds = this.parent.system.resource.wounds.value;
       if (wounds > 0) {
+         woundsHealed = true;
          wounds -= 1;
          await this.parent.update({
             system: {
@@ -1059,6 +1106,36 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
          });
       }
+
+      if (report === true) {
+         const chatContext = {
+            type: 'restReport',
+            actorName: this.parent.name,
+         };
+
+         if (woundsHealed) {
+            chatContext.woundsHealed = true;
+            chatContext.wounds = this.parent.system.resource.wounds.value;
+            chatContext.maxWounds = this.parent.system.resource.wounds.maxValue;
+         }
+
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            }
+
+         });
+      }
+
 
       return;
    }

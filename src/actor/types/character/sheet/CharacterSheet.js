@@ -168,21 +168,21 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       });
    }
 
-   async removeTemporaryEffects() {
+   async removeTemporaryEffects(report) {
       this._clearTempEffectsFromState();
-      await this.reactive.document.typeComponent.removeTemporaryEffects();
+      await this.reactive.document.typeComponent.removeTemporaryEffects(report);
       return;
    }
 
-   async takeABreather() {
+   async takeABreather(report) {
       this._clearTempEffectsFromState();
-      await this.reactive.document.typeComponent.takeABreather();
+      await this.reactive.document.typeComponent.takeABreather(report);
       return;
    }
 
-   async rest() {
+   async rest(report) {
       this._clearTempEffectsFromState();
-      await this.reactive.document.typeComponent.rest();
+      await this.reactive.document.typeComponent.rest(report);
       return;
    }
 

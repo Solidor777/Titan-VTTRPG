@@ -14,5 +14,8 @@ export default Object.freeze(new Set([
    'spell',
    'weapon',
    'damageReport',
-   'healingReport'
+   'healingReport',
+   'removeTempEffectsReport',
+   'breatherReport',
+   'restReport'
 ]));

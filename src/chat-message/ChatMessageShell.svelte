@@ -19,6 +19,9 @@
    import SkillCheckChatMessageShell from "~/check/types/skill-check/SkillCheckChatMessageShell.svelte";
    import ItemCheckChatMessageShell from "~/check/types/item-check/ItemCheckChatMessageShell.svelte";
    import CastingCheckChatMessageShell from "~/check/types/casting-check/CastingCheckChatMessageShell.svelte";
+   import RemoveTempEffectsReportChatMessageShell from "./reports/RemoveTempEffectsReportChatMessageShell.svelte";
+   import BreatherReportChatMessageShell from "./reports/BreatherReportChatMessageShell.svelte";
+   import RestReportChatMessageShell from "./reports/RestReportChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -46,6 +49,9 @@
          weapon: WeaponChatMessageShell,
          damageReport: DamageReportChatMessageShell,
          healingReport: HealingReportChatMessageShell,
+         removeTempEffectsReport: RemoveTempEffectsReportChatMessageShell,
+         breatherReport: BreatherReportChatMessageShell,
+         restReport: RestReportChatMessageShell,
       };
       return chatComponents[$document.flags.titan.chatContext.type];
    }

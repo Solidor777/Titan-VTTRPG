@@ -16,7 +16,7 @@
       <IconButton
          icon={"fas fa-bed"}
          on:click={() => {
-            application.rest();
+            application.rest(true);
          }}
       />
    </div>
@@ -26,7 +26,7 @@
       <IconButton
          icon={"fas fa-face-exhaling"}
          on:click={() => {
-            application.takeABreather();
+            application.takeABreather(true);
          }}
       />
    </div>
@@ -36,7 +36,7 @@
       <IconButton
          icon={"fas fa-arrow-rotate-left"}
          on:click={() => {
-            application.removeTemporaryEffects();
+            application.removeTemporaryEffects(true);
          }}
       />
    </div>
