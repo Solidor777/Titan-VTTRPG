@@ -3,6 +3,8 @@
    import CheckChatDiceContainer from "~/check/chat-message/CheckChatDiceContainer.svelte";
    import ItemCheckChatHeader from "./ItemCheckChatHeader.svelte";
    import CheckChatResults from "~/check/chat-message/CheckChatResults.svelte";
+   import CheckChatDamageButtons from "../../chat-message/CheckChatDamageButtons.svelte";
+   import CheckChatHealingButton from "../../chat-message/CheckChatHealingButton.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -24,6 +26,22 @@
    <div class="section">
       <CheckChatResults results={check.results} />
    </div>
+
+   <!--Damage Buttons-->
+   <!-- svelte-ignore missing-declaration -->
+   {#if check.results.damage !== undefined && game.user.isGM}
+      <div class="section">
+         <CheckChatDamageButtons results={check.results} />
+      </div>
+   {/if}
+
+   <!--Healing Button-->
+   <!-- svelte-ignore missing-declaration -->
+   {#if check.results.healing !== undefined && game.user.isGM}
+      <div class="section">
+         <CheckChatHealingButton results={check.results} />
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">

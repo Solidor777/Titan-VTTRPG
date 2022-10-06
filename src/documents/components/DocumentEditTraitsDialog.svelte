@@ -143,7 +143,7 @@
             @include flex-row;
             @include flex-group-center;
             width: 100%;
-            --button-border-radius: 0;
+            --button-border-radius: 10px;
             &:not(:first-child) {
                margin-left: 0.25rem;
             }

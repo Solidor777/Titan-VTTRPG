@@ -101,7 +101,7 @@
          @include flex-group-center;
          width: 100%;
          margin-top: 0.25rem;
-         --button-border-radius: 0;
+         --button-border-radius: 10px;
       }
    }
 </style>

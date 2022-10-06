@@ -1,11 +1,9 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   const document = getContext("DocumentStore");
 
    // Results
-   let results = $document.flags.titan.chatContext.results;
+   export let results = void 0;
 
    async function healDamage(healing) {
       // Get the targets
@@ -45,8 +43,8 @@
 
    .healing-button {
       @include flex-row;
+      @include font-size-normal;
       width: 100%;
       --button-border-radius: 10px;
-      @include font-size-normal;
    }
 </style>

@@ -1,11 +1,9 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   const document = getContext("DocumentStore");
 
    // Results
-   let results = $document.flags.titan.chatContext.results;
+   export let results = void 0;
 
    async function applyDamage(damage, ignoreArmor) {
       // Get the targets
@@ -94,10 +92,17 @@
       width: 100%;
 
       .button {
-         padding: 0.2rem;
-         box-sizing: border-box;
-         width: 25%;
+         @include flex-row;
+         width: 100%;
          --button-border-radius: 10px;
+
+         &:not(:first-child) {
+            padding-left: 0.25rem;
+         }
+
+         &:not(:last-child) {
+            padding-right: 0.25rem;
+         }
       }
 
       .fas {
