@@ -1,5 +1,5 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
-import CharacterSheetInventoryAddItemDialog from "./tabs/inventory/CharacterSheetInventoryAddItemDialog";
+import CharacterSheetAddinventoryItemDialog from "./tabs/inventory/CharacterSheetAddinventoryItemDialog";
 
 export default class TitanCharacterSheet extends TitanActorSheet {
    // Toggle equipped
@@ -187,7 +187,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    }
 
    addInventoryItem() {
-      const dialog = new CharacterSheetInventoryAddItemDialog(this);
+      const dialog = new CharacterSheetAddinventoryItemDialog(this);
       dialog.render(true);
       return;
    }

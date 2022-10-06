@@ -7,6 +7,7 @@ export default function createShieldSheetState() {
       isExpanded: {
          checks: [],
          sidebar: {
+            attack: [],
             check: [],
          },
       },

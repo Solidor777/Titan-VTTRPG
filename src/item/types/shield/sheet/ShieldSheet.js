@@ -1,10 +1,10 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
-import TitanItemSheet from '~/item/sheet/ItemSheet.js';
-import ShieldSheetShell from './ShieldSheetShell.svelte';
+import TitanItemSheet from '~/item/sheet/ItemSheet';
+import ShieldEditTraitsDialog from './ShieldEditTraitsDialog';
 import createShieldSheetState from './ShieldSheetState.js';
+import ShieldSheetShell from './ShieldSheetShell.svelte';
 
 export default class TitanShieldSheet extends TitanItemSheet {
-
    /**
     * Default Application options
     *
@@ -30,4 +30,11 @@ export default class TitanShieldSheet extends TitanItemSheet {
    // Import add rules element functions
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
+
+
+   editShieldTraits() {
+      const dialog = new ShieldEditTraitsDialog(this.reactive.document);
+      dialog.render(true);
+      return;
+   }
 }

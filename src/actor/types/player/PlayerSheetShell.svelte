@@ -8,7 +8,7 @@
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import CharacterSheetSkillsTab from "~/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsTab.svelte";
    import CharacterSheetAbilitiesTab from "~/actor/types/character/sheet/tabs/CharacterSheetAbilitiesTab.svelte";
-   import CharacterSheetInventoryTab from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryTab.svelte";
+   import CharacterSheetInventoryTab from "~/actor/types/character/sheet/tabs/CharacterSheetInventoryTab.svelte";
    import CharacterSheetSpellsTab from "~/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte";
    import CharacterSheetEffectsTab from "~/actor/types/character/sheet/tabs/CharacterSheetEffectsTab.svelte";
    import CharacterSheetNotesTab from "~/actor/types/character/sheet/tabs/CharacterSheetNotesTab.svelte";

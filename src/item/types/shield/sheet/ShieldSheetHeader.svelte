@@ -129,12 +129,12 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  &.large-number {
-                     --input-width: 5rem;
-                  }
-
                   &.number {
                      --input-width: 2rem;
+                  }
+
+                  &.large-number {
+                     --input-width: 5rem;
                   }
                }
             }

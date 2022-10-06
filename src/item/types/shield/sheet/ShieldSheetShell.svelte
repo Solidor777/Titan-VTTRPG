@@ -8,9 +8,9 @@
    import Tabs from "~/helpers/svelte-components/Tabs.svelte";
    import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
    import ItemSheetRulesElementsTab from "~/item/component/rules-element/ItemSheetRulesElementsTab.svelte";
-   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
-   import ItemSheetSidebar from "~/item/sheet/ItemSheetSidebar.svelte";
    import ShieldSheetHeader from "./ShieldSheetHeader.svelte";
+   import ShieldSheetSidebar from "./ShieldSheetSidebar.svelte";
+   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -50,7 +50,7 @@
       <!--Content-->
       <div class="body">
          <!--Sidebar-->
-         <div class="sidebar"><ItemSheetSidebar /></div>
+         <div class="sidebar"><ShieldSheetSidebar /></div>
 
          <!--Tabs-->
          <div class="tabs">
