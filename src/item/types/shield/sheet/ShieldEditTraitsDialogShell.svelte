@@ -9,7 +9,7 @@
    // The trait options
    let traitOptions = [
       {
-         name: "magical",
+         name: "magical.armor",
          type: "boolean",
          value: false,
       },

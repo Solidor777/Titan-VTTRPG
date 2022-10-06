@@ -30,8 +30,8 @@
    <!--Traits-->
    <div class="traits-container" transition:slide|local>
       {#if $document.system.trait.length > 0}
-         {#each $document.system.trait as trait, idx (trait.name)}
-            <div class="trait" transition:slide|local>
+         {#each $document.system.trait as trait (trait.name)}
+            <div class="trait" data-tooltip={localize(`${trait.name}.desc`)} transition:slide|local>
                <Tag label={localize(trait.name)} />
             </div>
          {/each}

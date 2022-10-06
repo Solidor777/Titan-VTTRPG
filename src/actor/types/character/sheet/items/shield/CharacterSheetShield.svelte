@@ -12,6 +12,7 @@
    import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
+   import CharacterSheetShieldStats from "./CharacterSheetShieldStats.svelte";
 
    // Reference to the armor id
    export let id = void 0;
@@ -88,6 +89,11 @@
                </div>
             {/if}
 
+            <!--Shield Stats-->
+            <div class="section tags">
+               <CharacterSheetShieldStats {item} />
+            </div>
+
             <!--Item Checks-->
             {#if item.system.check.length > 0}
                <div class="section">
@@ -101,19 +107,6 @@
                   <RichText text={item.system.description} />
                </div>
             {/if}
-
-            <!--Footer-->
-            <div class="section tags small-text">
-               <!--Rarity-->
-               <div class="tag">
-                  <RarityTag rarity={item.system.rarity} />
-               </div>
-
-               <!--Value-->
-               <div class="tag">
-                  <ValueTag value={item.system.value} />
-               </div>
-            </div>
          </div>
       {/if}
    </div>
@@ -171,33 +164,16 @@
 
             &:not(.rich-text) {
                padding-bottom: 0.5rem;
-
-               &:not(.tags) {
-                  padding-top: 0.5rem;
-               }
+               padding-top: 0.5rem;
             }
 
             &:not(:first-child) {
                @include border-top;
             }
 
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-               flex-wrap: wrap;
-
-               .tag {
-                  @include tag-margin;
-               }
-            }
-
             &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
             }
          }
       }
