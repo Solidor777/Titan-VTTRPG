@@ -11,13 +11,14 @@
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
+   const application = getContext("external").application;
 </script>
 
 <div class="tab">
-   <!--Filter-->
-   <div class="filter">
-      <!--Options-->
-      <div class="options">
+   <!--Header-->
+   <div class="header">
+      <!--Filter Options-->
+      <div class="row">
          {#each Object.entries($appState.filterOptions.abilities) as [key]}
             <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.abilities[key]} />
          {/each}
@@ -36,7 +37,7 @@
       </div>
 
       <!--Field-->
-      <div class="field">
+      <div class="row">
          <!--Label-->
          <div class="label">
             {localize("filter")}
@@ -44,7 +45,17 @@
 
          <!--Input-->
          <div class="input">
-            <TextInput bind:value={$appState.filter.inventory} />
+            <TextInput bind:value={$appState.filter.abilities} />
+         </div>
+
+         <!--Add Item Button-->
+         <div>
+            <CharacterSheetItemAddEntryButton
+               label={localize("addNewAbility")}
+               on:click={() => {
+                  application.addItem("ability");
+               }}
+            />
          </div>
       </div>
    </div>
@@ -78,11 +89,6 @@
                isExpandedMap={$appState.isExpanded.abilities}
             />
          </div>
-
-         <!--Add Spell Button-->
-         <div class="add-entry-button">
-            <CharacterSheetItemAddEntryButton itemType={"ability"} label={localize("addNewAbility")} />
-         </div>
       </ScrollingContainer>
    </div>
 </div>
@@ -96,28 +102,21 @@
       height: 100%;
       width: 100%;
 
-      .filter {
+      .header {
          @include flex-column;
          @include flex-group-top;
          @include border-bottom;
          @include panel-1;
          width: 100%;
-         padding-bottom: 0.25rem;
 
-         .options {
+         .row {
             @include flex-row;
             @include flex-group-center;
+            width: 100%;
             .reset {
                --icon-button-font-size: var(--font-size-small);
                --icon-button-radius: 1.75rem;
             }
-         }
-
-         .field {
-            @include flex-row;
-            @include flex-group-center;
-            margin-top: 0.25rem;
-            width: 100%;
 
             .label {
                font-weight: bold;
@@ -141,16 +140,6 @@
             @include flex-group-top;
             width: 100%;
             margin-top: 0.5rem;
-         }
-
-         .add-entry-button {
-            @include flex-row;
-            @include flex-group-center;
-            width: 100%;
-
-            &:not(:first-child) {
-               margin-top: 0.5rem;
-            }
          }
       }
    }
