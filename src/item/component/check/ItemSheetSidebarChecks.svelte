@@ -136,6 +136,7 @@
       width: 100%;
 
       li {
+         @include z-index-app;
          @include flex-column;
          @include flex-group-top;
          width: 100%;

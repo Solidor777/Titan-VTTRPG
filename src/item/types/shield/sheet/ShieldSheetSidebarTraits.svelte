@@ -47,16 +47,19 @@
       @include flex-group-top;
       width: 100%;
       height: 100%;
+      @include z-index-app;
 
       .edit-traits-button {
          @include flex-row;
          @include flex-group-center;
          margin-top: 0.5rem;
+         @include z-index-app;
 
          .button-contents {
             @include flex-row;
             @include flex-group-center;
 
+            @include z-index-app;
             .label {
                @include flex-row;
                @include flex-group-center;
@@ -79,6 +82,7 @@
          @include flex-row;
          @include flex-group-center;
          @include tag-margin;
+         @include z-index-app;
       }
    }
 </style>

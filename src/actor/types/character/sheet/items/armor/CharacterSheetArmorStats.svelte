@@ -47,6 +47,7 @@
       flex-wrap: wrap;
 
       .stat {
+         @include z-index-app;
          @include tag-margin;
       }
    }

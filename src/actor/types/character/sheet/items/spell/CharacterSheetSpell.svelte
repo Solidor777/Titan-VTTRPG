@@ -191,6 +191,7 @@
 
                .tag {
                   @include tag-margin;
+                  @include z-index-app;
                }
             }
 

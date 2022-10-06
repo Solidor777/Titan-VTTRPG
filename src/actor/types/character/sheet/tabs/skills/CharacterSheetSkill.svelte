@@ -210,6 +210,7 @@
       @include flex-space-between;
       @include border;
       @include panel-3;
+      @include z-index-app;
       width: 100%;
       padding: 0.5rem;
 

@@ -51,11 +51,13 @@
       .edit-traits-button {
          @include flex-row;
          @include flex-group-center;
+         @include z-index-app;
          margin-top: 0.5rem;
 
          .button-contents {
             @include flex-row;
             @include flex-group-center;
+            @include z-index-app;
 
             .label {
                @include flex-row;
@@ -74,11 +76,13 @@
       @include flex-row;
       @include flex-group-center;
       flex-wrap: wrap;
+      @include z-index-app;
 
       .trait {
          @include flex-row;
          @include flex-group-center;
          @include tag-margin;
+         @include z-index-app;
       }
    }
 </style>
