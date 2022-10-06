@@ -4,7 +4,8 @@
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
-   import CharacterSheetResistances from "../character/sheet/header/CharacterSheetResistances.svelte";
+   import CharacterSheetResistances from "~/actor/types/character/sheet/header/CharacterSheetResistances.svelte";
+   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -22,8 +23,9 @@
       <div class="xp">
          <!--Available-->
          <div class="available" data-tooltip={localize("xpAvailable")}>
-            {`${$document.system.xp.available} / `}
+            <ModTag baseValue={0} currentValue={$document.system.xp.available} />
          </div>
+         <div class="symbol">/</div>
 
          <!--Earned Input-->
          <div class="earned" data-tooltip={localize("xpEarned")}>
@@ -69,7 +71,7 @@
             @include flex-row;
             @include flex-group-left;
             flex: auto;
-            margin-right: 1rem;
+            margin-right: 0.5rem;
          }
 
          .xp {
@@ -80,9 +82,13 @@
             .available {
                @include flex-row;
                @include flex-group-center;
-               font-weight: bold;
-               margin-right: 0.25rem;
-               flex-wrap: nowrap;
+               width: 2.5rem;
+               height: var(--input-height);
+            }
+
+            .symbol {
+               @include flex-row;
+               margin: 0.25rem;
             }
 
             .earned {
