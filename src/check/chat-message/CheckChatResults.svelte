@@ -69,18 +69,18 @@
       @include border;
       @include flex-column;
       @include flex-group-center;
-      font-weight: bold;
+      @include label;
       @include font-size-normal;
+      font-weight: bold;
       width: 100%;
       padding: 0.5rem;
-      background: var(--label-background-color);
 
       .result {
          @include flex-row;
          @include flex-group-center;
+         @include font-size-large;
          width: 100%;
          font-weight: bold;
-         @include font-size-large;
          &.succeeded {
             color: var(--succeeded-color-dark);
          }

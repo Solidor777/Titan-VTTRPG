@@ -52,7 +52,7 @@
 <div class="resistance" data-resistance={key}>
    <!--Resistance Label-->
    <div class="button {key}" data-tooltip={localize(`${key}.desc`)}>
-      <EfxButton on:click={application.rollAttributeCheck.bind(application, key)}>
+      <EfxButton on:click={application.rollResistanceCheck.bind(application, key)}>
          {localize(`${key}`)}
       </EfxButton>
    </div>
