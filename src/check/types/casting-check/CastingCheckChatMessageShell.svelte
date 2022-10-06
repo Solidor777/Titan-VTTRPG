@@ -6,7 +6,7 @@
    import CheckChatDamageButtons from "~/check/chat-message/CheckChatDamageButtons.svelte";
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
-   import CheckScalingAspects from "~/check/chat-message/CheckScalingAspects.svelte";
+   import CheckChatScalingAspects from "~/check/chat-message/CheckChatScalingAspects.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -42,7 +42,7 @@
    <!--Scaling Aspects-->
    {#if isOwner && scalingAspects && scalingAspects.length > 0 && $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
       <div class="section">
-         <CheckScalingAspects bind:scalingAspects />
+         <CheckChatScalingAspects bind:scalingAspects />
       </div>
    {/if}
 

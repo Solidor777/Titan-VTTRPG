@@ -1,6 +1,6 @@
 <script>
    import { getContext } from "svelte";
-   import CheckScalingAspects from "./CheckScalingAspects.svelte";
+   import CheckChatScalingAspects from "./CheckChatScalingAspects.svelte";
    import CheckChatDiceContainer from "./CheckChatDiceContainer.svelte";
    import CheckChatLabel from "./CheckChatLabel.svelte";
    import CheckChatResults from "./CheckChatResults.svelte";
@@ -43,7 +43,7 @@
 
    {#if isOwner && scalingAspects && scalingAspects.length > 0 && chatContext.results.extraSuccesses !== undefined}
       <div class="info top-margin">
-         <CheckScalingAspects bind:scalingAspects />
+         <CheckChatScalingAspects bind:scalingAspects />
       </div>
    {/if}
 

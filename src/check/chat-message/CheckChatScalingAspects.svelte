@@ -1,5 +1,5 @@
 <script>
-   import CheckScalingAspect from "./CheckScalingAspect.svelte";
+   import CheckChatScalingAspect from "./CheckChatScalingAspect.svelte";
 
    export let scalingAspects = void 0;
 </script>
@@ -9,7 +9,7 @@
    {#each scalingAspects as aspect}
       <!--Aspect-->
       <div class="aspect">
-         <CheckScalingAspect bind:aspect />
+         <CheckChatScalingAspect bind:aspect />
       </div>
    {/each}
 </div>
