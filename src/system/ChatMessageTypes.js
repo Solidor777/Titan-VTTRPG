@@ -10,6 +10,7 @@ export default Object.freeze(new Set([
    'commodity',
    'effect',
    'equipment',
+   'shield',
    'spell',
    'weapon',
    'damageReport',

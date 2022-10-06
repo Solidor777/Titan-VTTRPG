@@ -13,6 +13,7 @@
    import EquipmentChatMessageShell from "~/item/types/equipment/chat-message/EquipmentChatMessageShell.svelte";
    import CommodityChatMessageShell from "~/item/types/commodity/chat-message/CommodityChatMessageShell.svelte";
    import EffectChatMessageShell from "~/item/types/effect/chat-message/EffectChatMessageShell.svelte";
+   import ShieldChatMessageShell from "~/item/types/shield/chat-message/ShieldChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -35,6 +36,7 @@
          commodity: CommodityChatMessageShell,
          equipment: EquipmentChatMessageShell,
          effect: EffectChatMessageShell,
+         shield: ShieldChatMessageShell,
          spell: SpellChatMessageShell,
          weapon: WeaponChatMessageShell,
          damageReport: DamageReportChatMessageShell,

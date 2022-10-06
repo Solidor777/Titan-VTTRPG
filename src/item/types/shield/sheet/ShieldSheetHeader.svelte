@@ -56,6 +56,9 @@
 
          <!--Defense-->
          <div class="stat">
+            <!--Icon-->
+            <i class="fas fa-shield" />
+
             <!--Label-->
             <div class="label">
                {localize("defense")}
