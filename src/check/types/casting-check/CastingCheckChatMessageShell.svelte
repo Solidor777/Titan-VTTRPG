@@ -6,10 +6,21 @@
    import CheckChatDamageButtons from "~/check/chat-message/CheckChatDamageButtons.svelte";
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
+   import CheckScalingAspects from "~/check/chat-message/CheckScalingAspects.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
    const check = $document.flags.titan.chatContext;
+
+   // Whether this user is the owner
+   $: isOwner = $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
+
+   // Scaling aspects list
+   $: scalingAspects = $document.flags.titan.chatContext.parameters.aspect
+      ? $document.flags.titan.chatContext.parameters.aspect.filter((aspect) => {
+           return aspect.scaling;
+        })
+      : false;
 </script>
 
 <div class="check-chat-message">
@@ -27,6 +38,13 @@
    <div class="section">
       <CheckChatResults results={check.results} />
    </div>
+
+   <!--Scaling Aspects-->
+   {#if isOwner && scalingAspects && scalingAspects.length > 0 && $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
+      <div class="section">
+         <CheckScalingAspects bind:scalingAspects />
+      </div>
+   {/if}
 
    <!--Damage Buttons-->
    <!-- svelte-ignore missing-declaration -->

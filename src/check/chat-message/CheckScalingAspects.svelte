@@ -20,9 +20,9 @@
       @include flex-column;
       @include flex-group-top;
       @include border;
+      @include label;
       padding: 0.5rem;
       width: 100%;
-      background: var(--label-background-color);
 
       .aspect {
          @include flex-row;
