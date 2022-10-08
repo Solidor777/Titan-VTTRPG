@@ -13,7 +13,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       results.aspect = foundry.utils.deepClone(parameters.aspect);
 
       // Adjust aspect results
-      this.parameters.aspect.forEach((aspect, idx) => {
+      results.aspect.forEach((aspect, idx) => {
          // Damage
          if (aspect.isDamage) {
             results.damage = results.damage ? results.damage + aspect.initialValue : aspect.initialValue;
@@ -58,10 +58,10 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       // If there is only one scaling
       if (scalingCount === 1 &&
          results.extraSuccesses &&
-         results.extraSuccesses >= this.parameters.aspect[scalingIdx].cost) {
+         results.extraSuccesses >= results.aspect[scalingIdx].cost) {
 
          // Maximize the aspect
-         const aspect = this.parameters.aspect[scalingIdx];
+         const aspect = results.aspect[scalingIdx];
          const delta = Math.floor(results.extraSuccesses / aspect.cost);
          const cost = delta * aspect.cost;
          aspect.currentValue += delta;
@@ -80,7 +80,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
 
       // Adjust final damage
       if (results.damage) {
-         results.damage += this.parameters.damageMod;
+         results.damage += parameters.damageMod;
       }
    }
 

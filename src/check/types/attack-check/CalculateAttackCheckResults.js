@@ -5,10 +5,10 @@ export default function calculateAttackCheckResults(inResults, parameters) {
 
    // Add the damage to the results
    if (results.succeeded) {
-      results.damage = this.parameters.attack.damage + this.parameters.damageMod + 1;
+      results.damage = parameters.attack.damage + parameters.damageMod + 1;
 
       // Add extra damage if appropriate
-      if (results.extraSuccesses && this.parameters.attack.plusExtraSuccessDamage) {
+      if (results.extraSuccesses && parameters.attack.plusExtraSuccessDamage) {
          results.damage += results.extraSuccesses;
       }
    }
