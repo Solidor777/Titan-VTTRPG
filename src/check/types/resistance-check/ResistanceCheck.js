@@ -1,4 +1,3 @@
-import { localize } from '~/helpers/Utility.js';
 import TitanCheck from '~/check/Check.js';
 
 export default class TitanResistanceCheck extends TitanCheck {
@@ -24,24 +23,15 @@ export default class TitanResistanceCheck extends TitanCheck {
     // Initialize resistance parameters
     parameters.resistance = inData.resistance ?? 'reflex';
 
-    return parameters;
-  }
-
-  _calculateDerivedData(inData) {
-    super._calculateDerivedData(inData);
-    const actorRollData = inData.actorRollData;
-
     // Get the resistance value
-    this.parameters.resistanceDice =
-      actorRollData.resistance[this.parameters.resistance].value;
+    this.parameters.resistanceDice = inData.actorRollData.resistance[this.parameters.resistance].value;
 
-    return;
+    return parameters;
   }
 
   _calculateTotalDiceAndExpertise() {
     // Add the training dice to the total dice
-    this.parameters.totalDice =
-      this.parameters.diceMod + this.parameters.resistanceDice;
+    this.parameters.totalDice = this.parameters.diceMod + this.parameters.resistanceDice;
     this.parameters.totalExpertise = 0;
 
     return;
