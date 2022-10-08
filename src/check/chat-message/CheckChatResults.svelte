@@ -1,35 +1,37 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
 
-   // Check reference
-   export let results = void 0;
+   // Document reference
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="results">
    <!--Successes-->
    <div class="stat">
-      {results.successes}
+      {$document.flags.titan.chatContext.results.successes}
       {localize(`successes`)}
    </div>
 
    <!--Succeeded-->
-   {#if results.succeeded}
+   {#if $document.flags.titan.chatContext.results.succeeded}
       <div class="result succeeded">
          {localize(`succeeded`)}
       </div>
 
       <!--Extra Successes-->
-      {#if results.extraSuccesses !== undefined}
+      {#if $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
          <div class="stat">
             {localize(`extraSuccesses`)}:
-            {#if results.extraSuccessesRemaining != undefined}
-               {results.extraSuccessesRemaining}/{results.extraSuccesses}
+            {#if $document.flags.titan.chatContext.results.extraSuccessesRemaining !== undefined}
+               {$document.flags.titan.chatContext.results.extraSuccessesRemaining}/{$document.flags.titan.chatContext
+                  .results.extraSuccesses}
             {:else}
-               {results.extraSuccesses}
+               {$document.flags.titan.chatContext.results.extraSuccesses}
             {/if}
          </div>
       {/if}
-   {:else if results.failed}
+   {:else if $document.flags.titan.chatContext.results.failed}
       <!--Failed-->
       <div class="result failed">
          {localize(`failed`)}
@@ -37,26 +39,26 @@
    {/if}
 
    <!--Expertise Remaining-->
-   {#if results.expertiseRemaining}
+   {#if $document.flags.titan.chatContext.parameters.totalExpertise}
       <div class="stat">
          {localize(`expertiseRemaining`)}:
-         {results.expertiseRemaining}
+         {$document.flags.titan.chatContext.results.expertiseRemaining}
       </div>
    {/if}
 
    <!--Damage-->
-   {#if results.damage !== undefined}
+   {#if $document.flags.titan.chatContext.results.damage !== undefined}
       <div class="stat">
          {localize(`damage`)}:
-         {results.damage}
+         {$document.flags.titan.chatContext.results.damage}
       </div>
    {/if}
 
    <!--Healing-->
-   {#if results.healing !== undefined}
+   {#if $document.flags.titan.chatContext.results.healing !== undefined}
       <div class="stat">
          {localize(`healing`)}:
-         {results.healing}
+         {$document.flags.titan.chatContext.results.healing}
       </div>
    {/if}
 </div>

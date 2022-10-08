@@ -217,11 +217,13 @@
       .column {
          @include flex-column;
          @include flex-group-top;
+         @include z-index-app;
          height: 100%;
 
          .button {
             @include flex-row;
             @include flex-group-center;
+            @include z-index-app;
             min-width: 11rem;
 
             .button-content {
@@ -259,6 +261,7 @@
          .row {
             @include flex-row;
             @include flex-group-right;
+            @include z-index-app;
             width: 100%;
 
             &:not(:first-child) {
@@ -311,6 +314,7 @@
             @include border;
             @include label;
             @include font-size-small;
+            @include z-index-app;
             padding: 0.25rem;
 
             .label {

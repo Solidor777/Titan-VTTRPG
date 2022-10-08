@@ -16,13 +16,15 @@
    </div>
 
    <!--Dice Container-->
-   <div class="section tags">
-      <CheckChatDiceContainer dice={check.results.dice} />
-   </div>
+   {#if check.results.dice.length > 0}
+      <div class="section tags">
+         <CheckChatDiceContainer dice={check.results.dice} />
+      </div>
+   {/if}
 
    <!--Results-->
    <div class="section">
-      <CheckChatResults results={check.results} />
+      <CheckChatResults />
    </div>
 </div>
 

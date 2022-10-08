@@ -1,5 +1,4 @@
 <script>
-   import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    export let check = void 0;
 
