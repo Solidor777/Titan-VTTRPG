@@ -1,4 +1,4 @@
-import calculateCheckResults from "~/check/types/attack-check/CalculateCheckResults";
+import calculateCheckResults from "~/check/CalculateCheckResults.js";
 
 export default function calculateCastingCheckResults(inResults, parameters) {
    const results = calculateCheckResults(inResults, parameters);
