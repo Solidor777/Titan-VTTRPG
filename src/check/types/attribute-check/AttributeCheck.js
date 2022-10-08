@@ -1,54 +1,71 @@
-import { localize } from '~/helpers/Utility.js';
 import TitanCheck from '~/check/Check.js';
 
 export default class TitanAttributeCheck extends TitanCheck {
-  _ensureValidConstruction(options) {
-    if (!super._ensureValidConstruction(options)) {
-      return false;
-    }
+   _ensureValidConstruction(options) {
+      // Check if actor roll data was provided
+      if (!options?.actorRollData) {
+         console.error(
+            'TITAN | Attribute Check failed during construction. No provided Actor Roll Data.'
+         );
+         return false;
+      }
 
-    // Check if actor check data is valid
-    if (!options?.actorRollData) {
-      console.error(
-        'TITAN | Attribute Check failed during construction. No provided Actor Check Data.'
-      );
-      return false;
-    }
+      // Ensure a valid attribute / skill combination
+      if ((!options.skill || options.skill === 'none') && (!options.attribute || options.attribute === 'default')) {
+         console.error(
+            'TITAN | Attribute Check failed during construction. Neither skill nor attribute were provided.'
+         );
+         return false;
+      }
 
-    return true;
-  }
+      return true;
+   }
 
-  _initializeParameters(options) {
-    const parameters = super._initializeParameters(options);
+   _initializeParameters(options) {
+      const parameters = super._initializeParameters(options);
+      const actorRollData = options.actorRollData;
 
-    // Initialize attribute parameters
-    parameters.attribute = options.attribute ?? 'body';
+      // Initialize base parameters
+      parameters.trainingMod = options.trainingMod ?? 0;
+      parameters.doubleTraining = options.doubleTraining ?? false;
 
-    return parameters;
-  }
+      // Determine the skill training and expertise
+      if (options.skill && options.skill !== 'none') {
+         parameters.skill = options.skill;
+         const skillData = actorRollData.skill[parameters.skill];
+         parameters.skillTrainingDice = skillData.training.value;
+         parameters.skillExpertise = skillData.expertise.value;
+      }
 
-  _calculateDerivedData(options) {
-    const actorRollData = options.actorRollData;
+      // Determine the attribute die
+      if (options.attribute && options.attribute !== 'default') {
+         parameters.attribute = options.attribute;
+      }
+      else {
+         parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
+      }
+      parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
 
-    // Get the attribute dice
-    this.parameters.attributeDice =
-      actorRollData.attribute[this.parameters.attribute].value;
+      // Calculate the total training dice
+      let totalTrainingDice = parameters.skillTrainingDice + parameters.trainingMod;
+      if (parameters.doubleTraining) {
+         totalTrainingDice *= 2;
+      }
 
+      // Add the training dice to the total dice
+      parameters.totalDice = parameters.diceMod + parameters.attributeDice + totalTrainingDice;
 
-    return;
-  }
+      // Calculcate the total expertise
+      let totalExpertise = parameters.skillExpertise + parameters.expertiseMod;
+      if (parameters.doubleExpertise) {
+         totalExpertise *= 2;
+      }
+      parameters.totalExpertise = totalExpertise;
 
-  _calculateTotalDiceAndExpertise() {
-    // Calculate the total training dice
-    // Add the training dice to the total dice
-    this.parameters.totalDice =
-      this.parameters.diceMod + this.parameters.attributeDice;
-    this.parameters.totalExpertise = 0;
+      return parameters;
+   }
 
-    return;
-  }
-
-  _getCheckType() {
-    return 'attributeCheck';
-  }
+   _getCheckType() {
+      return 'attributeCheck';
+   }
 }

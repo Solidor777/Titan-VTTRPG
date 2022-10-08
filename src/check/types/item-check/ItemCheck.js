@@ -1,49 +1,37 @@
-import { localize } from '~/helpers/Utility.js';
-import TitanCheck from '~/check/Check.js';
+import TitanAttributeCheck from '~/check/types/attribute-check/AttributeCheck';
+import calculateItemCheckResults from './CalculateItemCheckResults';
 
-export default class TitanItemCheck extends TitanCheck {
+export default class TitanItemCheck extends TitanAttributeCheck {
    _initializeParameters(options) {
-      // Get default parameters
-      const parameters = {
-         attribute: options?.attribute ?? 'body',
-         skill: options?.skill ?? false,
-         difficulty: options?.difficulty ?? 4,
-         complexity: options?.complexity ?? 1,
-         resolveCost: options?.resolveCost ?? false,
-         isDamage: options?.isDamage ?? false,
-         isHealing: options?.isHealing ?? false,
-         resistanceCheck: options?.resistanceCheck ?? false,
-         diceMod: options?.diceMod ?? 0,
-         maximizeSuccesses: options?.maximizeSuccesses ?? false,
-         extraSuccessOnCritical: options?.extraSuccessOnCritical ?? false,
-         extraFailureOnCritical: options?.extraFailureOnCritical ?? false,
-         img: options?.img ?? false,
-         itemName: options?.itemName ?? false,
-         label: options?.label ?? false
-      };
+      const parameters = super._initializeParameters(options);
 
+      // Initialize base parameters
+      parameters.img = options.img;
+      parameters.itemName = options.itemName;
+      parameters.resolveCost = options.resolveCost ?? false;
+      parameters.isDamage = options.isDamage ?? false;
+      parameters.isHealing = options.isHealing ?? false;
+      parameters.resistanceCheck = options.resistanceCheck ?? false;
 
       // Get damage and healing specific parameters
       if (parameters.isDamage || parameters.isHealing) {
+         const actorRollData = options.actorRollData;
          parameters.initialValue = options.initialValue ?? 1;
          parameters.scaling = options.scaling ?? true;
 
          // Damage specific parameters
          if (parameters.isDamage) {
-            parameters.damageMod = options.damageMod ?? 0;
+            parameters.damageMod = options.damageMod ?? actorRollData.mod.damage.value;
+         }
+
+         // Healing specific parameters
+         if (parameters.isHealing) {
+            parameters.healingMod = options.healingMod ?? actorRollData.mod.healing.value;
          }
       }
 
-      // Skill specific parameters
-      if (parameters.skill) {
-         parameters.trainingMod = options.trainingMod ?? 0;
-         parameters.expertiseMod = options.expertiseMod ?? 0;
-         parameters.doubleTraing = options.doubleTraining ?? false;
-         parameters.doubleExpertise = options.doubleExpertise ?? false;
-      }
-
       // Opposed check parameters
-      if (options?.opposedCheck) {
+      if (options.opposedCheck) {
          parameters.opposedCheck = {
             attribute: options.opposedCheck.attribute ?? 'body',
             skill: options.opposedCheck.skill ?? false,
@@ -55,91 +43,8 @@ export default class TitanItemCheck extends TitanCheck {
       return parameters;
    }
 
-   _calculateDerivedData(options) {
-      const actorRollData = options.actorRollData;
-
-      // Get the attribute dice
-      this.parameters.attributeDice = actorRollData.attribute[this.parameters.attribute].value;
-
-      // Get the skill training and expertise values
-      if (this.parameters.skill) {
-         const skill = actorRollData.skill[this.parameters.skill];
-         this.parameters.skillTrainingDice = skill.training.value;
-         this.parameters.skillExpertise = skill.expertise.value;
-      }
-
-      return;
-   }
-
-   _calculateTotalDiceAndExpertise() {
-      // Calculate the total dice
-      this.parameters.totalDice = this.parameters.diceMod + this.parameters.attributeDice;
-
-      // Add skill dice traing if appropriate
-      if (this.parameters.skill !== false) {
-         this.parameters.totalDice += (this.parameters.skillTrainingDice * this.parameters.doubleTraining ? 2 : 1);
-
-         // Add skill expertise
-         this.parameters.totalExpertise = this.parameters.skillExpertise + this.parameters.expertiseMod * this.parameters.doubleExpertise ? 2 : 1;
-      }
-
-      return;
-   }
-
-   _calculateResults() {
-      const results = super._calculateResults();
-      // Add the damage to the results
-      if (results.succeeded) {
-
-         // If damage or healing
-         if (this.parameters.isDamage || this.parameters.isHealing) {
-            // Calculate stat
-            let stat = this.parameters.initialValue;
-
-            // Calculate scaling state 
-            if (results.extraSuccesses && this.parameters.scaling) {
-               stat += results.extraSuccesses;
-            }
-
-            // Set damage
-            if (this.parameters.isDamage) {
-               results.damage = stat + this.parameters.damageMod;
-            }
-
-            // Set healing
-            if (this.parameters.isHealing) {
-               results.healing = stat;
-            }
-         }
-
-         // If resistance check, add it to the results
-         if (this.parameters.resistanceCheck !== false) {
-            switch (this.parameters.resistanceCheck) {
-               case 'reflexes': {
-                  results.reflexesCheck = true;
-                  break;
-               }
-               case 'resilience': {
-                  results.resilienceCheck = true;
-                  break;
-               }
-               case 'willpower': {
-                  results.willpowerCheck = true;
-                  break;
-               }
-               default: {
-                  break;
-               }
-            }
-         }
-
-         // If opposed check and extra successes, increase the complexity of the opposed check
-         if (this.parameters.opposedCheck && results.extraSuccesses) {
-            this.parameters.opposedCheck.complexity += results.extraSuccesses;
-         }
-      }
-
-      return results;
+   _calculateResults(inResults, parameters) {
+      return calculateItemCheckResults(inResults, parameters);
    }
 
    _getCheckType() {

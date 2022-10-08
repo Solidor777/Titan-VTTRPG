@@ -1,9 +1,14 @@
-import { clamp, localize } from '~/helpers/Utility';
-import TitanSkillCheck from '~/check/types/skill-check/SkillCheck.js';
+import { clamp } from '~/helpers/Utility';
+import TitanCheck from '~/check/Check.js';
+import calculateAttackCheckResults from './CalculateAttackCheckResults';
 
-export default class TitanAttackCheck extends TitanSkillCheck {
+export default class TitanAttackCheck extends TitanCheck {
    _ensureValidConstruction(options) {
-      if (!super._ensureValidConstruction(options)) {
+      // Check if actor roll data was provided
+      if (!options?.actorRollData) {
+         console.error(
+            'TITAN | Attack Check failed during construction. No provided Actor Roll Data.'
+         );
          return false;
       }
 
@@ -11,16 +16,15 @@ export default class TitanAttackCheck extends TitanSkillCheck {
       const weaponRollData = options.weaponRollData;
       if (!weaponRollData) {
          console.error(
-            `TITAN | Attack Check failed during construction. Invalid Data. ${options}`
+            `TITAN | Attack Check failed during construction. No provided Weapon Roll Data.`
          );
          return false;
       }
 
       // Check if the attack is valid
-      const checkAttack = weaponRollData.attack[options.attackIdx];
-      if (!checkAttack) {
+      if (!weaponRollData.attack[options.attackIdx]) {
          console.error(
-            `TITAN | Attack Check failed during construction. Attack IDX. ${options}`
+            `TITAN | Attack Check failed during construction. Invalid Attack IDX (${options.attackIdx}).`
          );
          return false;
       }
@@ -29,161 +33,127 @@ export default class TitanAttackCheck extends TitanSkillCheck {
    }
 
    _initializeParameters(options) {
-      const parameters = {
-         attribute: options.attribute ?? false,
-         skill: options.skill ?? false,
-         type: options.type ?? false,
-         targetDefense: options.targetDefense ?? false,
-         attackerMelee: options.attackerMelee ?? options.actorRollData.rating.melee.value,
-         attackerAccuracy: options.attackerAccuracy ?? options.actorRollData.rating.accuracy.value,
-         difficulty: options.difficulty ?? false,
-         damageMod: options.damageMod ?? options.actorRollData.mod.damage.value,
-         complexity: 1,
-         diceMod: options.diceMod ?? 0,
-         trainingMod: options.trainingMod ?? 0,
-         expertiseMod: options.expertiseMod ?? 0,
-         doubleExpertise: options.doubleExpertise ?? false,
-         maximizeSuccesses: options.maximizeSuccesses ?? false,
-         extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
-         extraFailureOnCritical: options.extraFailureOnCritical ?? false,
-         weaponName: options.weaponRollData.name,
-         multiAttack: options.multiAttack ?? null,
-         img: options.weaponRollData.img ?? false,
-      };
-
-      return parameters;
-   }
-
-   _calculateDerivedData(options) {
-      // Get the weapon reference
+      // Cache values for easy reference
+      const actorRollData = options.actorRollData;
       const weaponRollData = options.weaponRollData;
       const targetRollData = options.targetRollData;
-      const checkAttack = weaponRollData.attack[options.attackIdx];
+      const attackData = weaponRollData.attack[options.attackIdx];
 
-      // Get the skill
-      if (!this.parameters.skill) {
-         this.parameters.skill = checkAttack.skill;
+      // Initialize base parameters
+      const parameters = {
+         attack: attackData,
+         attackNotes: weaponRollData.attackNotes,
+         img: weaponRollData.img,
+         complexity: 1,
+         diceMod: options?.diceMod ?? 0,
+         trainingMod: options.trainingMod ?? 0,
+         expertiseMod: options.expertiseMod ?? 0,
+         doubleExpertise: options?.doubleExpertise ?? false,
+         maximizeSuccesses: options?.maximizeSuccesses ?? false,
+         extraSuccessOnCritical: options?.extraSuccessOnCritical ?? false,
+         extraFailureOnCritical: options?.extraFailureOnCritical ?? false,
+         weaponName: weaponRollData.name,
+         type: options.type ?? attackData.type,
+         damageMod: options.damageMod ?? actorRollData.mod.damage.value,
+      };
+
+      // Determine the skill training and expertise
+      if (!options.skill || options.skill === 'none') {
+         parameters.skill = attackData.skill;
       }
-
-      // Get the attribute
-      if (!this.parameters.attribute) {
-         this.parameters.attribute = checkAttack.attribute;
+      else {
+         parameters.skill = options.skill;
       }
+      const skillData = actorRollData.skill[parameters.skill];
+      parameters.skillTrainingDice = skillData.training.value;
+      parameters.skillExpertise = skillData.expertise.value;
 
-      // Get the skill training and expertise value
-      super._calculateDerivedData(options);
-
-      // Cache the attack info
-      this.parameters.attack = checkAttack;
-
-      // Get the attack description) {
-      this.parameters.attackNotes = weaponRollData.attackNotes;
-
-      // Get the attack type
-      if (!this.parameters.type) {
-         this.parameters.type = checkAttack.type;
+      // Determine the attribute dice
+      if (!options.attribute && options.attribute !== 'default') {
+         parameters.attribute = attackData.attribute;
       }
-
-      // Calculate defense rating ratings
-      if (!this.parameters.targetDefense && targetRollData) {
-         this.parameters.targetDefense = targetRollData.rating.defense.value;
+      else {
+         parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
       }
+      parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
 
-      // Calculate the difficulty if difficulty was not provided
-      if (!this.parameters.difficulty) {
-         // If the target is valid
-         if (this.parameters.targetDefense !== false) {
-            // Calculate the attacker rating
-            const attackerRating =
-               this.parameters.type === 'melee' ?
-                  this.parameters.attackerMelee :
-                  this.parameters.attackerAccuracy;
+      // Determine whether this is a multi-attack
+      if (options.multiAttack) {
+         parameters.multiAttack = true;
 
-            // Difficulty = 4 + defense rating - attacker rating
-            this.parameters.difficulty = clamp(
-               this.parameters.targetDefense - attackerRating + 4,
-               2,
-               6
-            );
-         }
-         else {
-            this.parameters.difficulty = 4;
-         }
-      }
-
-      // Calculate whether this is a multi-attack
-      this.parameters.multiAttack = this.parameters.multiAttack ?? weaponRollData.multiAttack;
-
-      // Calculate whether this is a dual attack
-      if (this.parameters.multiAttack) {
-         const traits = checkAttack.trait;
-         for (let idx = 0; idx < traits.length; idx++) {
-            if (traits[idx].name === 'multiAttack') {
-               this.parameters.multiAttack = true;
+         // Determine whether the attack has the multi attack trait
+         for (let idx = 0; idx < attackData.trait.length; idx++) {
+            if (attackData.trait[idx].name === 'multiAttack') {
+               parameters.multiAttackTrait = true;
                break;
             }
          }
       }
 
-      return;
-   }
+      // Determine the target defense
+      if (isNaN(options.targetDefense)) {
+         if (targetRollData) {
+            parameters.targetDefense = targetRollData.rating.defense.value;
+         }
+      }
+      else {
+         parameters.targetDefense = options.targetDefense;
+      }
 
-   _calculateTotalDiceAndExpertise(rollData) {
-      // Calculate the final total dice and expertise
-      super._calculateTotalDiceAndExpertise(rollData);
+      // Calculate the difficulty if difficulty was not provided
+      if (!options.difficulty) {
+         // If the target is valid
+         if (!isNaN(parameters.targetDefense)) {
+            // Calculate the attacker rating
+            parameters.attackerRating =
+               parameters.type === 'melee' ?
+                  (isNaN(options.attackerMelee) ? actorRollData.rating.melee.value : options.attackerMelee) :
+                  (isNaN(options.attackerAccuracy) ? actorRollData.rating.accuracy.value : options.attackerAccuracy);
+
+            // Difficulty = 4 + defense rating - attacker rating
+            this.parameters.difficulty = clamp(this.parameters.targetDefense - parameters.attackerRating + 4, 2, 6);
+         }
+         else {
+            this.parameters.difficulty = 4;
+         }
+      }
+      else {
+         parameters.difficulty = clamp(options.difficulty, 2, 6);
+      }
 
       // Calculate the total training dice
-      let totalTrainingDice =
-         this.parameters.skillTrainingDice + this.parameters.trainingMod;
-      if (this.parameters.doubleTraining) {
+      let totalTrainingDice = parameters.skillTrainingDice + parameters.trainingMod;
+      if (parameters.doubleTraining) {
          totalTrainingDice *= 2;
       }
 
       // Add the training dice to the total dice
-      this.parameters.totalDice =
-         this.parameters.diceMod +
-         this.parameters.attributeDice +
-         totalTrainingDice;
+      parameters.totalDice = parameters.diceMod + parameters.attributeDice + totalTrainingDice;
 
       // Calculcate the total expertise
-      let totalExpertise =
-         this.parameters.skillExpertise + this.parameters.expertiseMod;
-      if (this.parameters.doubleExpertise) {
+      let totalExpertise = parameters.skillExpertise + parameters.expertiseMod;
+      if (parameters.doubleExpertise) {
          totalExpertise *= 2;
       }
-      this.parameters.totalExpertise = totalExpertise;
+      parameters.totalExpertise = totalExpertise;
 
       // Adjust the dice and expertise if this is a multi-attack
-      if (this.parameters.multiAttack) {
+      if (parameters.multiAttack) {
          // Round the total dice up if this is a dual attack
          // Otherwise, round down
-         this.parameters.totalDice = this.parameters.multiAttack ?
-            Math.ceil(this.parameters.totalDice / 2) :
-            Math.floor(this.parameters.totalDice / 2);
+         parameters.totalDice = parameters.multiAttackTrait ?
+            Math.ceil(parameters.totalDice / 2) :
+            Math.floor(parameters.totalDice / 2);
 
          // Round the expertise down
-         this.parameters.totalExpertise = Math.floor(
-            this.parameters.totalExpertise / 2
-         );
+         parameters.totalExpertise = Math.floor(parameters.totalExpertise / 2);
       }
 
-      return;
+      return parameters;
    }
 
-   _calculateResults() {
-      const results = super._calculateResults();
-      // Add the damage to the results
-      if (results.succeeded) {
-         results.damage =
-            this.parameters.attack.damage + this.parameters.damageMod + 1;
-
-         // Add extra damage if appropriate
-         if (results.extraSuccesses && this.parameters.attack.plusExtraSuccessDamage) {
-            results.damage += results.extraSuccesses;
-         }
-      }
-
-      return results;
+   _calculateResults(inResults, parameters) {
+      return calculateAttackCheckResults(inResults, parameters);
    }
 
    _getCheckType() {
