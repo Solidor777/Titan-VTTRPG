@@ -1,6 +1,6 @@
 import { clamp } from '~/helpers/Utility';
 import TitanCheck from '~/check/Check.js';
-import calculateAttackCheckResults from './CalculateAttackCheckResults';
+import calculateAttackCheckResults from './CalculateAttackCheckResults.js';
 
 export default class TitanAttackCheck extends TitanCheck {
    _ensureValidConstruction(options) {
