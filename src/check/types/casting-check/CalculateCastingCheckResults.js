@@ -10,6 +10,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       let scalingCount = 0;
       let scalingIdx = -1;
       results.extraSuccessesRemaining = results.extraSuccesses;
+      results.aspect = foundry.utils.deepClone(parameters.aspect);
 
       // Adjust aspect results
       this.parameters.aspect.forEach((aspect, idx) => {

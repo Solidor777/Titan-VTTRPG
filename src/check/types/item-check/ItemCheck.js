@@ -1,3 +1,4 @@
+import { clamp } from '~/helpers/Utility.js';
 import TitanAttributeCheck from '~/check/types/attribute-check/AttributeCheck';
 import calculateItemCheckResults from './CalculateItemCheckResults';
 
@@ -5,9 +6,13 @@ export default class TitanItemCheck extends TitanAttributeCheck {
    _initializeParameters(options) {
       const parameters = super._initializeParameters(options);
 
+      // Cache data for later
+      const actorRollData = options.actorRollData;
+      const itemRollData = options.itemRollData;
+
       // Initialize base parameters
-      parameters.img = options.img;
-      parameters.itemName = options.itemName;
+      parameters.img = itemRollData.img;
+      parameters.itemName = itemRollData.name;
       parameters.resolveCost = options.resolveCost ?? false;
       parameters.isDamage = options.isDamage ?? false;
       parameters.isHealing = options.isHealing ?? false;
@@ -15,7 +20,6 @@ export default class TitanItemCheck extends TitanAttributeCheck {
 
       // Get damage and healing specific parameters
       if (parameters.isDamage || parameters.isHealing) {
-         const actorRollData = options.actorRollData;
          parameters.initialValue = options.initialValue ?? 1;
          parameters.scaling = options.scaling ?? true;
 
@@ -31,12 +35,13 @@ export default class TitanItemCheck extends TitanAttributeCheck {
       }
 
       // Opposed check parameters
-      if (options.opposedCheck) {
+      const opposedCheck = options.opposedCheck;
+      if (opposedCheck) {
          parameters.opposedCheck = {
-            attribute: options.opposedCheck.attribute ?? 'body',
-            skill: options.opposedCheck.skill ?? false,
-            difficulty: options.opposedCheck.difficulty ?? 4,
-            complexity: options.opposedCheck.complexity ?? 1
+            attribute: opposedCheck.attribute ?? 'body',
+            skill: opposedCheck.skill ?? false,
+            difficulty: opposedCheck.difficulty ? clamp(opposedCheck.difficulty, 2, 6) : 4,
+            complexity: opposedCheck.complexity ? Math.max(0, opposedCheck.complexity) : 0,
          };
       }
 
