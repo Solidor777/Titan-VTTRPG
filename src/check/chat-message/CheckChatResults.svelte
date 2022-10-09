@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import CheckChatResetExpertiseButton from "./CheckChatResetExpertiseButton.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -21,17 +22,18 @@
 
       <!--Extra Successes-->
       {#if $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
-         <div class="stat">
-            {localize(`extraSuccesses`)}:
-            {#if $document.flags.titan.chatContext.results.extraSuccessesRemaining !== undefined}
-               {$document.flags.titan.chatContext.results.extraSuccessesRemaining}/{$document.flags.titan.chatContext
-                  .results.extraSuccesses}
-            {:else}
-               {$document.flags.titan.chatContext.results.extraSuccesses}
-            {/if}
-         </div>
+         {#if $document.flags.titan.chatContext.results.extraSuccessesRemaining !== undefined}
+            <div class="stat">
+               {localize(`extraSuccesses`)}: {$document.flags.titan.chatContext.results
+                  .extraSuccessesRemaining}/{$document.flags.titan.chatContext.results.extraSuccesses}
+            </div>
+         {:else if $document.flags.titan.chatContext.results.extraSuccesses > 0}
+            <div class="stat">
+               {localize(`extraSuccesses`)}: {$document.flags.titan.chatContext.results.extraSuccesses}
+            </div>
+         {/if}
       {/if}
-   {:else if $document.flags.titan.chatContext.results.failed}
+   {:else if $document.flags.titan.chatContext.parameters.complexity > 0}
       <!--Failed-->
       <div class="result failed">
          {localize(`failed`)}
@@ -43,11 +45,14 @@
       <div class="stat">
          {localize(`expertiseRemaining`)}:
          {$document.flags.titan.chatContext.results.expertiseRemaining}
+         <div class="button">
+            <CheckChatResetExpertiseButton />
+         </div>
       </div>
    {/if}
 
    <!--Damage-->
-   {#if $document.flags.titan.chatContext.results.damage !== undefined}
+   {#if $document.flags.titan.chatContext.results.damage > 0}
       <div class="stat">
          {localize(`damage`)}:
          {$document.flags.titan.chatContext.results.damage}
@@ -55,7 +60,7 @@
    {/if}
 
    <!--Healing-->
-   {#if $document.flags.titan.chatContext.results.healing !== undefined}
+   {#if $document.flags.titan.chatContext.results.healing > 0}
       <div class="stat">
          {localize(`healing`)}:
          {$document.flags.titan.chatContext.results.healing}
@@ -92,8 +97,16 @@
       }
 
       .stat {
+         @include flex-row;
+         @include flex-group-center;
          &:not(:first-child) {
             margin-top: 0.25rem;
+         }
+
+         .button {
+            margin-left: 0.25rem;
+            --icon-button-radius: 1.5rem;
+            --icon-button-font-size: 0.9rem;
          }
       }
    }

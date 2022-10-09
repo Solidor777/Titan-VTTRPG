@@ -2,6 +2,9 @@ import calculateCheckResults from "~/check/CalculateCheckResults.js";
 
 export default function calculateCastingCheckResults(inResults, parameters) {
    const results = calculateCheckResults(inResults, parameters);
+   results.damage = 0;
+   results.healing = 0;
+   results.extraSuccessesRemaining = results.extraSuccesses;
 
    // Check if damage or healing is among the aspect
    if (results.succeeded) {
@@ -9,7 +12,6 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       // Initialize state data
       let scalingCount = 0;
       let scalingIdx = -1;
-      results.extraSuccessesRemaining = results.extraSuccesses;
       results.aspect = foundry.utils.deepClone(parameters.aspect);
 
       // Adjust aspect results
@@ -54,6 +56,8 @@ export default function calculateCastingCheckResults(inResults, parameters) {
             }
          }
       });
+
+      results.scalingAspects = scalingCount > 0;
 
       // If there is only one scaling
       if (scalingCount === 1 &&

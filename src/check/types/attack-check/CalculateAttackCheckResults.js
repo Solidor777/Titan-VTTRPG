@@ -2,6 +2,7 @@ import calculateCheckResults from "~/check/CalculateCheckResults.js";
 
 export default function calculateAttackCheckResults(inResults, parameters) {
    const results = calculateCheckResults(inResults, parameters);
+   results.damage = 0;
 
    // Add the damage to the results
    if (results.succeeded) {

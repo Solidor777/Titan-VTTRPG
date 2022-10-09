@@ -2,6 +2,7 @@
    import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { getContext } from "svelte";
+   import recalculateCheckResults from "./RecalculateCheckResults";
 
    export let idx = void 0;
 
@@ -31,6 +32,37 @@
       }
    }
 
+   function applyExpertise() {
+      // If expertise can be applied
+      if (
+         $document.flags.titan.chatContext.results.expertiseRemaining > 0 &&
+         $document.flags.titan.chatContext.results.dice[idx].final < 6
+      ) {
+         // Add the expertise
+         $document.flags.titan.chatContext.results.dice[idx].final += 1;
+         if ($document.flags.titan.chatContext.results.dice[idx].expertiseApplied) {
+            $document.flags.titan.chatContext.results.dice[idx].expertiseApplied += 1;
+         } else {
+            $document.flags.titan.chatContext.results.dice[idx].expertiseApplied = 1;
+         }
+         $document.flags.titan.chatContext.results.expertiseRemaining -= 1;
+
+         // Recalculate the results
+         $document.flags.titan.chatContext.results = recalculateCheckResults($document.flags.titan.chatContext);
+
+         // Update the document
+         $document.update({
+            flags: {
+               titan: {
+                  chatContext: {
+                     results: $document.flags.titan.chatContext.results,
+                  },
+               },
+            },
+         });
+      }
+   }
+
    $: label = getLabel(
       $document.flags.titan.chatContext.results.dice[idx].base,
       $document.flags.titan.chatContext.results.dice[idx].expertiseApplied
@@ -48,64 +80,7 @@
    use:ripple()
    {disabled}
    on:click={() => {
-      const check = $document.flags.titan.chatContext;
-
-      // Increase the expertese applied
-      if (!check.results.dice[idx].expertiseApplied) {
-         check.results.dice[idx].expertiseApplied = 1;
-      } else {
-         check.results.dice[idx].expertiseApplied += 1;
-      }
-      check.results.dice[idx].final += 1;
-
-      // Update the expertise reimaining
-      check.results.expertiseRemaining -= 1;
-
-      // If the result became a success
-      if (!check.results.dice[idx].success && check.results.dice[idx].final >= check.parameters.difficulty) {
-         // Update the number of successes
-         check.results.dice[idx].success = true;
-         const successIncrement = 1;
-
-         // Update whether this is a critical success
-         if (check.results.dice[idx].final === 6) {
-            check.results.dice[idx].criticalSuccess = true;
-
-            if (check.parameters.extraSuccessOnCritical) {
-               successIncrement = 2;
-            }
-         }
-         check.results.successes += successIncrement;
-
-         // Update the number of extra successes
-         if (check.results.successes > check.parameters.complexity) {
-            check.results.extraSuccesses = check.results.successes - check.results.complexity;
-         }
-
-         // Update damage
-         if (check.parameters.isDamage) {
-            check.results.damage = stat += successIncrement;
-         }
-
-         // Update healing
-         if (check.parameters.isHealing) {
-            check.results.healing += successIncrement;
-         }
-
-         /// To do : add healing mod to casting and item checks
-         // Add options menu to all check types
-
-         // If the check became a success
-         if (!check.results.succeeded && check.results.successes >= check.parameters.complexity) {
-            // Set the check to be a success
-            check.results.succeeded = true;
-         }
-      }
-
-      // Update the document
-      $document.update({
-         flags: $document.flags,
-      });
+      applyExpertise();
    }}
 >
    {label}
@@ -128,6 +103,7 @@
       overflow: hidden;
       clip-path: var(--tjs-icon-button-clip-path, none);
       transform-style: preserve-3d;
+      color: var(--button-text-color);
 
       &:disabled {
          cursor: default;

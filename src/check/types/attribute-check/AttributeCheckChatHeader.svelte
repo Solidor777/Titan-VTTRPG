@@ -8,7 +8,9 @@
 <div class="label">
    <div class="content {check.parameters.attribute}">
       <!--Type Label -->
-      {`${localize(check.parameters.attribute)} ${check.parameters.difficulty}:${check.parameters.complexity}`}
+      {`${localize(check.parameters.attribute)}${
+         check.parameters.skill ? ` (${localize(check.parameters.skill)})` : ""
+      } ${check.parameters.difficulty}:${check.parameters.complexity}`}
    </div>
 </div>
 

@@ -7,6 +7,8 @@ export default function calculateCheckResults(inResults, parameters) {
    const extraFailureOnCritical = parameters.extraFailureOnCritical;
    const difficulty = parameters.difficulty;
    results.successes = 0;
+   results.extraSuccesses = 0;
+   results.succeeded = false;
 
    // Calculate failures and successes
    for (let i = 0; i < results.dice.length; i++) {
@@ -45,10 +47,6 @@ export default function calculateCheckResults(inResults, parameters) {
          if (results.successes > complexity) {
             results.extraSuccesses = results.successes - complexity;
          }
-      }
-      // If failed
-      else {
-         results.failed = true;
       }
    }
    return results;
