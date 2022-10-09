@@ -52,7 +52,11 @@
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
    <div class="button {key}" data-tooltip={localize(`${key}.desc`)}>
-      <EfxButton on:click={application.rollAttributeCheck.bind(application, key)}>
+      <EfxButton
+         on:click={() => {
+            application.rollAttributeCheck(key);
+         }}
+      >
          {localize(`${key}`)}
       </EfxButton>
    </div>

@@ -16,9 +16,9 @@ export default class TitanCastingCheck extends TitanCheck {
       }
 
       // Check if the spell is valid
-      if (!options.spellRollData) {
+      if (!options.itemRollData) {
          console.error(
-            `TITAN | Casting Check failed during construction. No provided Spell Roll Data.`
+            `TITAN | Casting Check failed during construction. No provided Item Roll Data.`
          );
          return false;
       }
@@ -29,11 +29,11 @@ export default class TitanCastingCheck extends TitanCheck {
    _initializeParameters(options) {
       // Cache data for later
       const actorRollData = options.actorRollData;
-      const spellRollData = options.spellRollData;
+      const itemRollData = options.itemRollData;
 
       const parameters = {
-         difficulty: options.difficulty ?? spellRollData.castingCheck.difficulty,
-         complexity: options.complexity ?? spellRollData.castingCheck.complexity,
+         difficulty: options.difficulty ?? itemRollData.castingCheck.difficulty,
+         complexity: options.complexity ?? itemRollData.castingCheck.complexity,
          diceMod: options.diceMod ?? 0,
          trainingMod: options.trainingMod ?? 0,
          expertiseMod: options.expertiseMod ?? 0,
@@ -41,16 +41,16 @@ export default class TitanCastingCheck extends TitanCheck {
          maximizeSuccesses: options.maximizeSuccesses ?? false,
          extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
-         spellName: spellRollData.name,
-         aspect: spellRollData.aspect,
+         itemName: itemRollData.name,
+         aspect: itemRollData.aspect,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
-         healingMod: options.healing ?? actorRollData.mod.healing.value,
-         img: spellRollData.img
+         healingMod: options.healingMod ?? actorRollData.mod.healing.value,
+         img: itemRollData.img
       };
 
       // Determine the skill training and expertise
       if (!options.skill || options.skill === 'none') {
-         parameters.skill = spellRollData.skill;
+         parameters.skill = itemRollData.skill;
       }
       else {
          parameters.skill = options.skill;
@@ -61,7 +61,7 @@ export default class TitanCastingCheck extends TitanCheck {
 
       // Determine the attribute die
       if (!options.attribute || options.attribute === 'default') {
-         parameters.attribute === spellRollData.attribute;
+         parameters.attribute === itemRollData.attribute;
       }
       else {
          parameters.attribute = options.attribute;

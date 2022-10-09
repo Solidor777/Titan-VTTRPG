@@ -19,6 +19,7 @@ export default class TitanCheck {
       else {
          // Otherwise, simply copy the data
          this.parameters = options;
+         this.isValid = true;
       }
 
       this.isEvaluated = false;
@@ -43,9 +44,8 @@ export default class TitanCheck {
          extraFailureOnCritical: options?.extraFailureOnCritical ?? false,
       };
 
-      // Calculate the final total dice and expertise
       parameters.totalDice = parameters.diceMod;
-      parameters.totalExpertise = parameters.expertiseMod;
+      parameters.totalExpertise = parameters.expertiseMod * (parameters.doubleExpertise === true ? 2 : 1);
 
       return parameters;
    }
@@ -53,13 +53,13 @@ export default class TitanCheck {
    // Evaluates the check result
    async evaluateCheck() {
       // Get the roll for the check
-      const checkRoll = new Roll(`${this.parameters.totalDice}d6`);
-      await checkRoll.evaluate({ async: true });
+      this.roll = new Roll(`${this.parameters.totalDice}d6`);
+      await this.roll.evaluate({ async: true });
 
       // Calculate the results of the check
-      this.results = this._calculateResults(this._applyExpertise(this._getSortedDiceFromRoll(checkRoll)), this.parameters);
-      this.isEvaluated = true;
+      this.results = this._calculateResults(this._applyExpertise(this._getSortedDiceFromRoll(this.roll)), this.parameters);
 
+      this.isEvaluated = true;
       return this.results;
    }
 
@@ -159,12 +159,17 @@ export default class TitanCheck {
 
    async sendToChat(options) {
       // Ensure the check is evaluated
-      if (!this.evaluated) {
+      if (!this.isEvaluated) {
          await this.evaluateCheck();
       }
 
       // Create the context object
-      const chatContext = this._getChatContext();
+      const chatContext = {
+         parameters: this.parameters,
+         results: this.results,
+         type: this._getCheckType(),
+      };
+
 
       // Create and post the message
       this.chatMessage = await ChatMessage.create(
@@ -188,17 +193,6 @@ export default class TitanCheck {
       );
 
       return this.chatMessage;
-   }
-
-   _getChatContext() {
-      // Create the context object
-      const chatContext = {
-         parameters: this.parameters,
-         results: this.results,
-         type: this._getCheckType(),
-      };
-
-      return chatContext;
    }
 
    _getCheckType() {

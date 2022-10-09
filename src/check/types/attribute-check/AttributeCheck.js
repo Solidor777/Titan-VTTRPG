@@ -35,6 +35,21 @@ export default class TitanAttributeCheck extends TitanCheck {
          const skillData = actorRollData.skill[parameters.skill];
          parameters.skillTrainingDice = skillData.training.value;
          parameters.skillExpertise = skillData.expertise.value;
+
+         // Calculate the total training dice
+         let totalTrainingDice = parameters.skillTrainingDice + parameters.trainingMod;
+         if (parameters.doubleTraining) {
+            totalTrainingDice *= 2;
+         }
+         parameters.totalDice += totalTrainingDice;
+
+         // Calculcate the total expertise
+         let totalExpertise = parameters.skillExpertise + parameters.expertiseMod;
+         if (parameters.doubleExpertise) {
+            totalExpertise *= 2;
+         }
+         parameters.totalExpertise = totalExpertise;
+
       }
 
       // Determine the attribute die
@@ -45,22 +60,9 @@ export default class TitanAttributeCheck extends TitanCheck {
          parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
       }
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
+      parameters.totalDice += parameters.attributeDice;
+      console.log(parameters);
 
-      // Calculate the total training dice
-      let totalTrainingDice = parameters.skillTrainingDice + parameters.trainingMod;
-      if (parameters.doubleTraining) {
-         totalTrainingDice *= 2;
-      }
-
-      // Add the training dice to the total dice
-      parameters.totalDice = parameters.diceMod + parameters.attributeDice + totalTrainingDice;
-
-      // Calculcate the total expertise
-      let totalExpertise = parameters.skillExpertise + parameters.expertiseMod;
-      if (parameters.doubleExpertise) {
-         totalExpertise *= 2;
-      }
-      parameters.totalExpertise = totalExpertise;
 
       return parameters;
    }

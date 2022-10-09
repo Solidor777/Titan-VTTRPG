@@ -82,6 +82,11 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       if (results.damage) {
          results.damage += parameters.damageMod;
       }
+
+      // Adjust final healing
+      if (results.healing) {
+         results.healing += parameters.healingMod;
+      }
    }
 
    return results;

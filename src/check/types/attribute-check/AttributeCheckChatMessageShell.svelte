@@ -17,12 +17,12 @@
 
    <!--Dice Container-->
    <div class="section tags">
-      <CheckChatDiceContainer dice={check.results.dice} />
+      <CheckChatDiceContainer />
    </div>
 
    <!--Results-->
    <div class="section">
-      <CheckChatResults results={check.results} />
+      <CheckChatResults />
    </div>
 </div>
 

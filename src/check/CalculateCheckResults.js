@@ -6,9 +6,10 @@ export default function calculateCheckResults(inResults, parameters) {
    const extraSuccessOnCritical = parameters.extraSuccessOnCritical;
    const extraFailureOnCritical = parameters.extraFailureOnCritical;
    const difficulty = parameters.difficulty;
+   results.successes = 0;
 
    // Calculate failures and successes
-   for (let i = 0; i < results.length; i++) {
+   for (let i = 0; i < results.dice.length; i++) {
       // If this dice was a crit success
       if (results.dice[i].final === 6) {
          // Log the log the critical succcess

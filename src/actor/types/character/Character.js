@@ -481,13 +481,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Otherwise, get a simple check
       const attributeCheck = await this.getAttributeCheck(options);
       if (attributeCheck && attributeCheck.isValid) {
-         await attributeCheck.evaluateCheck();
          await attributeCheck.sendToChat({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
             rollMode: game.settings.get('core', 'rollMode'),
          });
       }
+
+      return;
    }
 
    // Get a resistance check at the actor
@@ -546,8 +547,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.actorRollData = actorRollData;
 
       // Add the weapon data to the check options
-      const weaponRollData = checkWeapon.getRollData();
-      options.weaponRollData = weaponRollData;
+      const itemRollData = checkWeapon.getRollData();
+      options.itemRollData = itemRollData;
 
       // Get the target check data
       let userTargets = Array.from(game.user.targets);
@@ -648,8 +649,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.actorRollData = actorRollData;
 
       // Add the weapon data to the check options
-      const spellRollData = checkSpell.getRollData();
-      options.spellRollData = spellRollData;
+      const itemRollData = checkSpell.getRollData();
+      options.itemRollData = itemRollData;
 
       // Get the check
       const castingCheck = new TitanCastingCheck(options);

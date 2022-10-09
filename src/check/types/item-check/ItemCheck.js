@@ -3,6 +3,26 @@ import TitanAttributeCheck from '~/check/types/attribute-check/AttributeCheck';
 import calculateItemCheckResults from './CalculateItemCheckResults';
 
 export default class TitanItemCheck extends TitanAttributeCheck {
+   _ensureValidConstruction(options) {
+      // Check if actor roll data was provided
+      if (!options?.actorRollData) {
+         console.error(
+            'TITAN | Item Check failed during construction. No provided Actor Roll Data.'
+         );
+         return false;
+      }
+
+      // Check if the item is valid
+      if (!options.itemRollData) {
+         console.error(
+            `TITAN | Item Check failed during construction. No provided Item Roll Data.`
+         );
+         return false;
+      }
+
+      return true;
+   }
+
    _initializeParameters(options) {
       const parameters = super._initializeParameters(options);
 

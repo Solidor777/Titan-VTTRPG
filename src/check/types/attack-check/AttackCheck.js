@@ -13,16 +13,16 @@ export default class TitanAttackCheck extends TitanCheck {
       }
 
       // Check if the weapon is valid
-      const weaponRollData = options.weaponRollData;
-      if (!weaponRollData) {
+      const itemRollData = options.itemRollData;
+      if (!itemRollData) {
          console.error(
-            `TITAN | Attack Check failed during construction. No provided Weapon Roll Data.`
+            `TITAN | Attack Check failed during construction. No provided Item Roll Data.`
          );
          return false;
       }
 
       // Check if the attack is valid
-      if (!weaponRollData.attack[options.attackIdx]) {
+      if (!itemRollData.attack[options.attackIdx]) {
          console.error(
             `TITAN | Attack Check failed during construction. Invalid Attack IDX (${options.attackIdx}).`
          );
@@ -35,15 +35,15 @@ export default class TitanAttackCheck extends TitanCheck {
    _initializeParameters(options) {
       // Cache values for easy reference
       const actorRollData = options.actorRollData;
-      const weaponRollData = options.weaponRollData;
+      const itemRollData = options.itemRollData;
       const targetRollData = options.targetRollData;
-      const attackData = weaponRollData.attack[options.attackIdx];
+      const attackData = itemRollData.attack[options.attackIdx];
 
       // Initialize base parameters
       const parameters = {
          attack: attackData,
-         attackNotes: weaponRollData.attackNotes,
-         img: weaponRollData.img,
+         attackNotes: itemRollData.attackNotes,
+         img: itemRollData.img,
          complexity: 1,
          diceMod: options?.diceMod ?? 0,
          trainingMod: options.trainingMod ?? 0,
@@ -52,7 +52,7 @@ export default class TitanAttackCheck extends TitanCheck {
          maximizeSuccesses: options?.maximizeSuccesses ?? false,
          extraSuccessOnCritical: options?.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options?.extraFailureOnCritical ?? false,
-         weaponName: weaponRollData.name,
+         itemName: itemRollData.name,
          type: options.type ?? attackData.type,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
       };
