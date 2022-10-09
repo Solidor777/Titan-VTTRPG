@@ -17,7 +17,7 @@
    // Initialize check parameters
    let checkParameters = {
       attribute: options.attribute ? options.attribute : "body",
-      skill: options.skill ? options.skill : "athletics",
+      skill: options.skill ? options.skill : "none",
       difficulty: options.difficulty ? options.difficulty : 4,
       complexity: options.complexity ? options.complexity : 0,
       trainingMod: options.trainingMod ? options.trainingMod : 0,

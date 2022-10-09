@@ -461,12 +461,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async rollAttributeCheck(options) {
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
+         if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === "default")) {
+            options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+         }
          const dialog = new AttributeCheckDialog(this.parent, options);
          dialog.render(true);
          return;
       }
 
-      // Otherwise, get a simple check
+      // Get the check
       const attributeCheck = await this.getAttributeCheck(options);
       if (attributeCheck && attributeCheck.isValid) {
          await attributeCheck.sendToChat({
@@ -483,10 +486,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async getResistanceCheck(options) {
 
       // Get the actor check data
-      const actorRollData = this.parent.getRollData();
-      options.actorRollData = actorRollData;
+      options.actorRollData = this.parent.getRollData();
 
-      // Perform the roll
+      // Get the check
       const resistanceCheck = new TitanResistanceCheck(options);
 
       // Return the data
