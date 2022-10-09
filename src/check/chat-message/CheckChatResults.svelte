@@ -45,9 +45,13 @@
       <div class="stat">
          {localize(`expertiseRemaining`)}:
          {$document.flags.titan.chatContext.results.expertiseRemaining}
-         <div class="button">
-            <CheckChatResetExpertiseButton />
-         </div>
+
+         <!--Reset Button-->
+         {#if $document.constructor.getSpeakerActor($document.speaker)?.isOwner}
+            <div class="button">
+               <CheckChatResetExpertiseButton />
+            </div>
+         {/if}
       </div>
    {/if}
 

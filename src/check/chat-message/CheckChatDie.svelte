@@ -69,6 +69,7 @@
    );
    $: dieClass = getDieClass($document.flags.titan.chatContext.results.dice[idx].final);
    $: disabled =
+      !$document.constructor.getSpeakerActor($document.speaker)?.isOwner ||
       $document.flags.titan.chatContext.results.expertiseRemaining === 0 ||
       $document.flags.titan.chatContext.results.dice[idx].final === 6;
 </script>
