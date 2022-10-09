@@ -5,7 +5,6 @@
    import { getContext } from "svelte";
    import DamageReportChatMessageShell from "./reports/DamageReportChatMessageShell.svelte";
    import HealingReportChatMessageShell from "./reports/HealingReportChatMessageShell.svelte";
-   import CheckChatMessageShell from "~/check/chat-message/CheckChatMessageShell.svelte";
    import WeaponChatMessageShell from "~/item/types/weapon/chat-message/WeaponChatMessageShell.svelte";
    import ArmorChatMessageShell from "~/item/types/armor/chat-message/ArmorChatMessageShell.svelte";
    import SpellChatMessageShell from "~/item/types/spell/chat-message/SpellChatMessageShell.svelte";
@@ -16,7 +15,6 @@
    import ShieldChatMessageShell from "~/item/types/shield/chat-message/ShieldChatMessageShell.svelte";
    import AttributeCheckChatMessageShell from "~/check/types/attribute-check/AttributeCheckChatMessageShell.svelte";
    import ResistanceCheckChatMessageShell from "~/check/types/resistance-check/ResistanceCheckChatMessageShell.svelte";
-   import SkillCheckChatMessageShell from "~/check/types/skill-check/SkillCheckChatMessageShell.svelte";
    import ItemCheckChatMessageShell from "~/check/types/item-check/ItemCheckChatMessageShell.svelte";
    import CastingCheckChatMessageShell from "~/check/types/casting-check/CastingCheckChatMessageShell.svelte";
    import AttackCheckChatMessageShell from "~/check/types/attack-check/AttackCheckChatMessageShell.svelte";
@@ -35,7 +33,6 @@
    function selectComponent() {
       const chatComponents = {
          attributeCheck: AttributeCheckChatMessageShell,
-         skillCheck: SkillCheckChatMessageShell,
          resistanceCheck: ResistanceCheckChatMessageShell,
          attackCheck: AttackCheckChatMessageShell,
          castingCheck: CastingCheckChatMessageShell,

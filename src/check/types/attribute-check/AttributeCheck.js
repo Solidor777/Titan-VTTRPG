@@ -61,8 +61,6 @@ export default class TitanAttributeCheck extends TitanCheck {
       }
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
       parameters.totalDice += parameters.attributeDice;
-      console.log(parameters);
-
 
       return parameters;
    }

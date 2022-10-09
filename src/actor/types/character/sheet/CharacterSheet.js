@@ -79,7 +79,6 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
 
       await this.reactive.document.typeComponent.rollAttributeCheck({
-         attribute: this.reactive.document.system.skill[skill].defaultAttribute,
          skill: skill,
          getOptions: getOptions,
       });
@@ -94,7 +93,6 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       await this.reactive.document.typeComponent.rollAttributeCheck({
          attribute: attribute,
          getOptions: getOptions,
-         skill: 'none',
       });
 
       return;

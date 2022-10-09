@@ -85,7 +85,11 @@
    <div class="column">
       <!--Roll Button-->
       <div class="button" data-tooltip={localize(`${key}.desc`)}>
-         <EfxButton on:click={application.rollSkillCheck.bind(application, key)}>
+         <EfxButton
+            on:click={() => {
+               application.rollSkillCheck(key);
+            }}
+         >
             <div class="button-content">
                <!--Icon-->
                <i class="fas fa-dice" />

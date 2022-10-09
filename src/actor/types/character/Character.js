@@ -1,11 +1,10 @@
 import { clamp } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
-import SkillCheckDialog from '~/check/types/skill-check/SkillCheckDialog.js';
+import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
 import CastingCheckDialog from '~/check/types/casting-check/CastingCheckDialog.js';
 import TitanAttributeCheck from '~/check/types/attribute-check/AttributeCheck.js';
-import TitanSkillCheck from '~/check/types/skill-check/SkillCheck.js';
 import TitanResistanceCheck from '~/check/types/resistance-check/ResistanceCheck.js';
 import TitanAttackCheck from '~/check/types/attack-check/AttackCheck.js';
 import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
@@ -453,27 +452,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async getAttributeCheck(options) {
 
       // Get the actor check data
-      const actorRollData = this.parent.getRollData();
-      options.actorRollData = actorRollData;
-
-      // Check if the skill is none
-      if (options.skill === 'none') {
-         // If so, do an attribute check
-         delete options.skill;
-         delete options.trainingMod;
-         const attributeCheck = new TitanAttributeCheck(options);
-         return attributeCheck;
-      }
+      options.actorRollData = this.parent.getRollData();
 
       // Otherwise, do a skill check
-      const skillCheck = new TitanSkillCheck(options);
-      return skillCheck;
+      return new TitanAttributeCheck(options);
    }
 
    async rollAttributeCheck(options) {
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
-         const dialog = new SkillCheckDialog(this.parent, options);
+         const dialog = new AttributeCheckDialog(this.parent, options);
          dialog.render(true);
          return;
       }
