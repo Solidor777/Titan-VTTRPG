@@ -94,7 +94,7 @@
    ];
 </script>
 
-<div class="weapon-edit-trait-dialog">
+<div class="edit-traits-dialog">
    <DocumentEditTraitsDialog
       {document}
       bind:documentTraits={document.system.attack[attackIdx].trait}
@@ -103,7 +103,7 @@
 </div>
 
 <style lang="scss">
-   .weapon-edit-trait-dialog {
+   .edit-traits-dialog {
       --trait-column-count: 2;
    }
 </style>

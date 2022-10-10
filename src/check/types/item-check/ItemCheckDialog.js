@@ -5,7 +5,7 @@ export default class CastingCheckDialog extends TJSDialog {
    constructor(actor, options = {}) {
       super(
          {
-            title: `${localize('castingCheck')} (${actor.name})`,
+            title: `${localize('itemCheck')} (${actor.name})`,
             content: {
                class: CastingCheckDialogShell,
                props: {

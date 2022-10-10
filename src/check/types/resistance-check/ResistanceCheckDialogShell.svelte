@@ -35,7 +35,7 @@
    }
 </script>
 
-<div class="resistance-check-dialog">
+<div class="check-dialog">
    <div class="row">
       <!--Resistance-->
       <div class="row">
@@ -96,7 +96,7 @@
 <style lang="scss">
    @import "../../../styles/Mixins.scss";
 
-   .resistance-check-dialog {
+   .check-dialog {
       @include flex-column;
       justify-items: flex-end;
       @include font-size-normal;

@@ -16,12 +16,12 @@
    ];
 </script>
 
-<div class="shield-edit-trait-dialog">
+<div class="edit-traits-dialog">
    <DocumentEditTraitsDialog bind:document bind:documentTraits={document.system.trait} bind:traitOptions />
 </div>
 
 <style lang="scss">
-   .shield-edit-trait-dialog {
+   .edit-traits-dialog {
       --trait-column-count: 1;
    }
 </style>

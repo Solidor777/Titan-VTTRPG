@@ -84,7 +84,7 @@
    $: totalExpertise = getTotalExpertise(checkParameters, actor);
 </script>
 
-<div class="skill-check-dialog">
+<div class="check-dialog">
    <!--Attribute-->
    <div class="row">
       <div class="label">
@@ -200,7 +200,7 @@
 <style lang="scss">
    @import "../../../styles/Mixins.scss";
 
-   .skill-check-dialog {
+   .check-dialog {
       @include flex-column;
       justify-items: flex-end;
       @include font-size-normal;
