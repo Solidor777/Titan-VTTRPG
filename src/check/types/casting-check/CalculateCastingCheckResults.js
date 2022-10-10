@@ -10,8 +10,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
    if (results.succeeded) {
 
       // Initialize state data
-      let scalingCount = 0;
-      let scalingIdx = -1;
+      results.scalingAspect = [];
       results.aspect = foundry.utils.deepClone(parameters.aspect);
 
       // Adjust aspect results
@@ -31,8 +30,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
 
          // Scaling
          if (aspect.scaling) {
-            scalingCount += 1;
-            scalingIdx = idx;
+            results.scalingAspect.push(aspect);
          }
 
          // Resistance check
@@ -57,15 +55,13 @@ export default function calculateCastingCheckResults(inResults, parameters) {
          }
       });
 
-      results.scalingAspects = scalingCount > 0;
-
       // If there is only one scaling
-      if (scalingCount === 1 &&
+      if (results.scalingAspect.length === 1 &&
          results.extraSuccesses &&
-         results.extraSuccesses >= results.aspect[scalingIdx].cost) {
+         results.extraSuccesses >= results.aspect[0].cost) {
 
          // Maximize the aspect
-         const aspect = results.aspect[scalingIdx];
+         const aspect = results.aspect[0];
          const delta = Math.floor(results.extraSuccesses / aspect.cost);
          const cost = delta * aspect.cost;
          aspect.currentValue += delta;

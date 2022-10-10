@@ -1,15 +1,17 @@
 <script>
+   import { getContext } from "svelte";
    import CheckChatScalingAspect from "./CheckChatScalingAspect.svelte";
 
-   export let scalingAspects = void 0;
+   // Document reference
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="aspects">
    <!--Each aspect-->
-   {#each scalingAspects as aspect}
+   {#each $document.flags.titan.chatContext.results.scalingAspect as aspect, idx}
       <!--Aspect-->
       <div class="aspect">
-         <CheckChatScalingAspect bind:aspect />
+         <CheckChatScalingAspect {idx} />
       </div>
    {/each}
 </div>

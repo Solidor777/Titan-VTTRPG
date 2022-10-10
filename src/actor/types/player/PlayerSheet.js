@@ -17,7 +17,6 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
             class: PlayerSheetShell,
             target: document.body
          },
-         classes: ['titan']
       });
    }
 

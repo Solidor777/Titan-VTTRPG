@@ -24,28 +24,23 @@ export default class SvelteDocumentSheet extends SvelteApplication {
     */
    #storeUnsubscribe;
 
-   constructor(object) {
-      super(object);
+   constructor(document, options = {}) {
+      super(foundry.utils.mergeObject(
+         options,
+         {
+            id: `document-sheet-${document.id}`,
+            title: document.name,
+         }
+      ));
 
-      /**
-       * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
-       *                             Document.
-       *
-       * @memberof SvelteReactive#
-       */
       Object.defineProperty(this.reactive, 'document', {
          get: () => this.#documentStore.get(),
          set: (document) => {
             this.#documentStore.set(document);
          },
       });
-      this.reactive.document = object;
+      this.reactive.document = document;
 
-      /**
-       * @member {object} document - Adds accessors to SvelteReactive to get / set the application state associated with
-       *
-       * @memberof SvelteReactive#
-       */
       Object.defineProperty(this.reactive, 'state', {
          get: () => this.#applicationStateStore,
          set: (state) => {
@@ -62,7 +57,6 @@ export default class SvelteDocumentSheet extends SvelteApplication {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         title: 'No Document Assigned',
          width: 800,
          height: 600,
          resizable: true,

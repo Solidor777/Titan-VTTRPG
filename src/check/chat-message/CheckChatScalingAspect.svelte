@@ -4,27 +4,28 @@
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Aspect
-   export let aspect = void 0;
+   export let idx = void 0;
 
    // Chat context
    const document = getContext("DocumentStore");
-   const chatContext = $document.flags.titan.chatContext;
+
+   $: aspect = $document.flags.titan.chatContext.results.scalingAspect[idx];
 
    function increaseAspect() {
       // Increase the aspect
       aspect.currentValue += aspect.initialValue;
 
       // Decrease the extra successes by the cost
-      chatContext.results.extraSuccessesRemaining -= aspect.cost;
+      $document.flags.titan.chatContext.results.extraSuccessesRemaining -= aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         chatContext.results.damage += aspect.initialValue;
+         $document.flags.titan.chatContext.results.damage += aspect.initialValue;
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         chatContext.results.healing += aspect.initialValue;
+         $document.flags.titan.chatContext.results.healing += aspect.initialValue;
       }
 
       // Update the document
@@ -40,16 +41,16 @@
       aspect.currentValue -= aspect.initialValue;
 
       // Increase the extra successes by the cost
-      chatContext.results.extraSuccessesRemaining += aspect.cost;
+      $document.flags.titan.chatContext.results.extraSuccessesRemaining += aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         chatContext.results.damage -= aspect.initialValue;
+         $document.flags.titan.chatContext.results.damage -= aspect.initialValue;
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         chatContext.results.healing -= aspect.initialValue;
+         $document.flags.titan.chatContext.results.healing -= aspect.initialValue;
       }
 
       // Update the document
@@ -69,16 +70,16 @@
       aspect.currentValue = aspect.initialValue;
 
       // Reset the extra successes
-      chatContext.results.extraSuccessesRemaining += cost;
+      $document.flags.titan.chatContext.results.extraSuccessesRemaining += cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         chatContext.results.damage -= delta;
+         $document.flags.titan.chatContext.results.damage -= delta;
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         chatContext.results.healing -= delta;
+         $document.flags.titan.chatContext.results.healing -= delta;
       }
 
       // Update the document
@@ -102,7 +103,7 @@
    <!--Label and value-->
    <div class="label">
       <div class="label-inner">
-         {aspect.label}: {aspect.currentValue}
+         {aspect.label}: {$document.flags.titan.chatContext.results.scalingAspect[idx].currentValue}
       </div>
       <div>
          + {getExtraSuccessCostLabel()}
@@ -130,7 +131,10 @@
 
       <!--Increase Button-->
       <div class="control">
-         <EfxButton on:click={increaseAspect} disabled={chatContext.results.extraSuccessesRemaining < aspect.cost}>
+         <EfxButton
+            on:click={increaseAspect}
+            disabled={$document.flags.titan.chatContext.results.extraSuccessesRemaining < aspect.cost}
+         >
             <div class="button-inner">
                <i class="fas fa-plus" />
             </div>

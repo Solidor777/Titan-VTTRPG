@@ -12,11 +12,11 @@
    const document = getContext("DocumentStore");
 
    // Scaling aspects list
-   $: scalingAspects = $document.flags.titan.chatContext.parameters.aspect
-      ? $document.flags.titan.chatContext.parameters.aspect.filter((aspect) => {
-           return aspect.scaling;
-        })
-      : false;
+   $: scalingAspect =
+      $document.flags.titan.chatContext.results.scalingAspect &&
+      $document.flags.titan.chatContext.results.scalingAspect.length > 0 &&
+      $document.flags.titan.chatContext.results.extraSuccesses &&
+      $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
 </script>
 
 <div class="check-chat-message">
@@ -37,9 +37,9 @@
 
    {#if $document.flags.titan.chatContext.results.succeeded}
       <!--Scaling Aspects-->
-      {#if $document.constructor.getSpeakerActor($document.speaker)?.isOwner && scalingAspects && scalingAspects.length > 0 && $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
+      {#if scalingAspect}
          <div class="section">
-            <CheckChatScalingAspects bind:scalingAspects />
+            <CheckChatScalingAspects />
          </div>
       {/if}
 
