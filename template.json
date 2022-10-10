@@ -532,6 +532,7 @@
         "complexity": 1,
         "autoCalculateDC": true
       },
+      "castingNotes": "",
       "customAspect": [],
       "standardAspect": {
         "range": {

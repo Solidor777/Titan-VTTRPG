@@ -417,6 +417,7 @@
   "LOCAL.addNewItem.label": "Add New Item",
   "LOCAL.tookARest.label": "Took a Rest",
   "LOCAL.woundsHealed.label": "Wounds Healed",
+  "LOCAL.castingNotes.label": "Casting Notes",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

@@ -45,7 +45,8 @@ export default class TitanCastingCheck extends TitanCheck {
          aspect: itemRollData.aspect,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
          healingMod: options.healingMod ?? actorRollData.mod.healing.value,
-         img: itemRollData.img
+         img: itemRollData.img,
+         castingNotes: itemRollData.castingNotes
       };
 
       // Determine the skill training and expertise

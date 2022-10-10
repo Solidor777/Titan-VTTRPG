@@ -105,6 +105,13 @@
                </div>
             {/if}
 
+            <!--Casting Notes-->
+            {#if item.system.castingNotes !== "" && item.system.castingNotes !== "<p></p>"}
+               <div class="section rich-text">
+                  <RichText text={item.system.castingNotes} />
+               </div>
+            {/if}
+
             <!--Footer-->
             <div class="section tags small-text">
                <!--Rarity-->

@@ -158,7 +158,6 @@
          .label-inner {
             @include flex-row;
             @include flex-group-center;
-            margin-right: 0.25rem;
             height: 100%;
             margin-bottom: 0.25rem;
          }

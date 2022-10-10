@@ -7,6 +7,7 @@
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
    import CheckChatScalingAspects from "~/check/chat-message/CheckChatScalingAspects.svelte";
+   import ChatRichText from "~/helpers/svelte-components/ChatRichText.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -24,6 +25,13 @@
    <div class="section">
       <CastingCheckChatHeader />
    </div>
+
+   <!--Casting Notes-->
+   {#if $document.flags.titan.chatContext.parameters.castingNotes !== "" && $document.flags.titan.chatContext.parameters.castingNotes !== "<p></p>"}
+      <div class="section rich-text">
+         <ChatRichText text={$document.flags.titan.chatContext.parameters.castingNotes} />
+      </div>
+   {/if}
 
    <!--Dice Container-->
    <div class="section tags">
