@@ -1,38 +1,38 @@
 import TitanCheck from '~/check/Check.js';
 
 export default class TitanResistanceCheck extends TitanCheck {
-  _ensureValidConstruction(inData) {
-    if (!super._ensureValidConstruction(inData)) {
-      return false;
-    }
+   _ensureValidConstruction(inData) {
+      if (!super._ensureValidConstruction(inData)) {
+         return false;
+      }
 
-    // Check if actor check data is valid
-    if (!inData?.actorRollData) {
-      console.error(
-        'TITAN | Resistance Check failed during construction. No provided Actor Check Data.'
-      );
-      return false;
-    }
+      // Check if actor check data is valid
+      if (!inData?.actorRollData) {
+         console.error('TITAN | Resistance Check failed during construction. No provided Actor Check Data.');
+         console.trace();
 
-    return true;
-  }
+         return false;
+      }
 
-  _initializeParameters(inData) {
-    const parameters = super._initializeParameters(inData);
+      return true;
+   }
 
-    // Initialize resistance parameters
-    parameters.resistance = inData.resistance ?? 'reflexes';
+   _initializeParameters(inData) {
+      const parameters = super._initializeParameters(inData);
 
-    // Get the resistance value
-    parameters.resistanceDice = inData.actorRollData.resistance[parameters.resistance].value;
+      // Initialize resistance parameters
+      parameters.resistance = inData.resistance ?? 'reflexes';
 
-    // Add the training dice to the total dice
-    parameters.totalDice += parameters.resistanceDice;
+      // Get the resistance value
+      parameters.resistanceDice = inData.actorRollData.resistance[parameters.resistance].value;
 
-    return parameters;
-  }
+      // Add the training dice to the total dice
+      parameters.totalDice += parameters.resistanceDice;
 
-  _getCheckType() {
-    return 'resistanceCheck';
-  }
+      return parameters;
+   }
+
+   _getCheckType() {
+      return 'resistanceCheck';
+   }
 }

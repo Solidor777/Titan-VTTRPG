@@ -522,9 +522,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the weapon check data.
       const checkWeapon = this.parent.items.get(options?.itemId);
       if (!checkWeapon || checkWeapon.type !== 'weapon') {
-         console.error(
-            'TITAN | Attack check failed. Invalid weapon ID provided to actor.'
-         );
+         console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
+         console.trace();
 
          return false;
       }
@@ -562,9 +561,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Get the weapon check data.
          const checkWeapon = this.parent.items.get(options?.itemId);
          if (!checkWeapon) {
-            console.error(
-               'TITAN | Attack check failed. Invalid weapon ID provided to actor.'
-            );
+            console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
+            console.trace();
 
             return false;
          }
@@ -572,9 +570,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Get the attack data
          const checkAttack = checkWeapon.system.attack[options.attackIdx];
          if (!checkAttack) {
-            console.error(
-               'TITAN | Attack check failed. Invalid Attack Index provided to actor.'
-            );
+            console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
+            console.trace();
 
             return false;
          }
@@ -624,9 +621,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the weapon check data.
       const checkSpell = this.parent.items.get(options?.itemId);
       if (!checkSpell || checkSpell.type !== 'spell') {
-         console.error(
-            'TITAN | Casting check failed. Invalid Spell ID provided to actor.'
-         );
+         console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
+         console.trace();
 
          return false;
       }
@@ -653,9 +649,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Get the spell check data.
          const checkSpell = this.parent.items.get(options?.itemId);
          if (!checkSpell || checkSpell.type !== 'spell') {
-            console.error(
-               'TITAN | Casting check failed. Invalid Spell ID provided to actor.'
-            );
+            console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
+            console.trace();
 
             return false;
          }
@@ -694,43 +689,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the Item data.
       const checkItem = this.parent.items.get(options?.itemId);
       if (!checkItem) {
-         console.error(
-            'TITAN | Item Check failed. Invalid Item provided to actor.'
-         );
+         console.error('TITAN | Item Check failed before creation. Invalid Item ID provided to actor.');
+         console.trace();
 
          return false;
       }
-
-      // Get the check data
-      const checkData = checkItem.system.check[0];
-      if (!checkData) {
-         console.error(
-            'TITAN | Item Check failed. Invalid Check IDX provided to actor.'
-         );
-
-         return false;
-      }
-
-      // Populate options
-      options.label = options.label ?? checkData.label;
-      options.attribute = options.attribute ?? checkData.attribute;
-      options.skill = options.skill ?? checkData.skill;
-      options.difficulty = options.difficulty ?? checkData.difficulty;
-      options.complexity = options.complexity ?? checkData.complexity;
-      options.isDamage = options.isDamage ?? checkData.isDamage;
-      options.isHealing = options.isHealing ?? checkData.isHealing;
-      options.initialValue = options.initialValue ?? checkData.initialValue;
-      options.scaling = options.scaling ?? checkData.scaling;
-      options.resistanceCheck = options.resistanceCheck ?? checkData.resistanceCheck;
-      options.opposedCheck = options.opposedCheck ?? checkData.opposedCheck;
-      options.resolveCost = options.resolveCost ?? checkData.resolveCost;
-      options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
-      options.itemName = checkItem.name;
-      options.img = checkItem.img;
+      options.itemRollData = checkItem.getRollData();
 
       // Add the actor check data to the check options
-      const actorRollData = this.parent.getRollData();
-      options.actorRollData = actorRollData;
+      options.actorRollData = this.parent.getRollData();
 
       // Get the check
       const itemCheck = new TitanItemCheck(options);
@@ -883,6 +850,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const armor = this.parent.items.get(armorId);
       if (!armor && armor.type === 'armor') {
          console.error('TITAN | Error equipping Armor. Invalid Armor ID.');
+         console.trace();
+
+         return false;
       }
 
       // Update the armor
@@ -919,6 +889,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const shield = this.parent.items.get(shieldId);
       if (!shield && shield.type === 'shield') {
          console.error('TITAN | Error equipping Shield. Invalid Shield ID.');
+         console.trace();
+
+         return false;
       }
 
       // Update the shield

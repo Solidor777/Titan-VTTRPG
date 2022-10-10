@@ -7,7 +7,9 @@ export function applyUpgrade(flatModifier, actorData) {
       flatModifier.type === undefined ||
       flatModifier.value === undefined) {
       console.error(`TITAN | Error applying Flat Modifier. Invalid Element. (${flatModifier})`);
-      return;
+      console.trace();
+
+      return false;
    }
 
    // Find the value object
@@ -47,7 +49,9 @@ export function applyUpgrade(flatModifier, actorData) {
       }
       default: {
          console.error(`TITAN | Error applying Flat Modifier. Invalid Selector (${flatModifier.selector})`);
-         return;
+         console.trace();
+
+         return false;
       }
    }
 
@@ -60,6 +64,9 @@ export function applyUpgrade(flatModifier, actorData) {
    }
    else {
       console.error(`TITAN | Error applying Flat Modifier. Invalid Value provided. (${flatModifier.value})`);
+      console.trace();
+
+      return false;
    }
 
    return;

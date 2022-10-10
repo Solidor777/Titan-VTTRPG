@@ -6,26 +6,26 @@ export default class TitanAttackCheck extends TitanCheck {
    _ensureValidConstruction(options) {
       // Check if actor roll data was provided
       if (!options?.actorRollData) {
-         console.error(
-            'TITAN | Attack Check failed during construction. No provided Actor Roll Data.'
-         );
+         console.error('TITAN | Attack Check failed during construction. No provided Actor Roll Data.');
+         console.trace();
+
          return false;
       }
 
       // Check if the weapon is valid
       const itemRollData = options.itemRollData;
       if (!itemRollData) {
-         console.error(
-            `TITAN | Attack Check failed during construction. No provided Item Roll Data.`
-         );
+         console.error(`TITAN | Attack Check failed during construction. No provided Item Roll Data.`);
+         console.trace();
+
          return false;
       }
 
       // Check if the attack is valid
       if (!itemRollData.attack[options.attackIdx]) {
-         console.error(
-            `TITAN | Attack Check failed during construction. Invalid Attack IDX (${options.attackIdx}).`
-         );
+         console.error(`TITAN | Attack Check failed during construction. Invalid Attack IDX (${options.attackIdx}).`);
+         console.trace();
+
          return false;
       }
 

@@ -21,42 +21,45 @@
 
    <!--Dice Container-->
    <div class="section tags">
-      <CheckChatDiceContainer dice={check.results.dice} />
+      <CheckChatDiceContainer />
    </div>
 
    <!--Results-->
    <div class="section">
-      <CheckChatResults results={check.results} />
+      <CheckChatResults />
    </div>
 
-   <!--Damage Buttons-->
-   <!-- svelte-ignore missing-declaration -->
-   {#if check.results.damage !== undefined && game.user.isGM}
-      <div class="section">
-         <CheckChatDamageButtons results={check.results} />
-      </div>
-   {/if}
+   <!--If succeeded-->
+   {#if $document.flags.titan.chatContext.results.succeeded}
+      <!--Damage Buttons-->
+      <!-- svelte-ignore missing-declaration -->
+      {#if check.results.damage !== undefined && game.user.isGM}
+         <div class="section">
+            <CheckChatDamageButtons results={check.results} />
+         </div>
+      {/if}
 
-   <!--Healing Button-->
-   <!-- svelte-ignore missing-declaration -->
-   {#if check.results.healing !== undefined && game.user.isGM}
-      <div class="section">
-         <CheckChatHealingButton results={check.results} />
-      </div>
-   {/if}
+      <!--Healing Button-->
+      <!-- svelte-ignore missing-declaration -->
+      {#if check.results.healing && game.user.isGM}
+         <div class="section">
+            <CheckChatHealingButton results={check.results} />
+         </div>
+      {/if}
 
-   <!--Opposed Check Buttons-->
-   {#if check.results.succeeded && check.parameters.opposedCheck}
-      <div class="section">
-         <CheckChatOpposedCheckButton opposedCheck={check.parameters.opposedCheck} />
-      </div>
-   {/if}
+      <!--Opposed Check Buttons-->
+      {#if check.parameters.opposedCheck}
+         <div class="section">
+            <CheckChatOpposedCheckButton opposedCheck={check.parameters.opposedCheck} />
+         </div>
+      {/if}
 
-   <!--Resistance Check Buttons-->
-   {#if check.results.reflexesCheck || check.results.resilienceCheck || check.results.willpowerCheck}
-      <div class="section tags">
-         <CheckChatResistanceCheckButtons results={check.results} />
-      </div>
+      <!--Resistance Check Buttons-->
+      {#if check.results.reflexesCheck || check.results.resilienceCheck || check.results.willpowerCheck}
+         <div class="section tags">
+            <CheckChatResistanceCheckButtons results={check.results} />
+         </div>
+      {/if}
    {/if}
 </div>
 

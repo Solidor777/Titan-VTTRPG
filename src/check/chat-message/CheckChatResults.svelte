@@ -56,19 +56,21 @@
    {/if}
 
    <!--Damage-->
-   {#if $document.flags.titan.chatContext.results.damage > 0}
-      <div class="stat">
-         {localize(`damage`)}:
-         {$document.flags.titan.chatContext.results.damage}
-      </div>
-   {/if}
+   {#if $document.flags.titan.chatContext.results.succeeded}
+      {#if $document.flags.titan.chatContext.results.damage > 0}
+         <div class="stat">
+            {localize(`damage`)}:
+            {$document.flags.titan.chatContext.results.damage}
+         </div>
+      {/if}
 
-   <!--Healing-->
-   {#if $document.flags.titan.chatContext.results.healing > 0}
-      <div class="stat">
-         {localize(`healing`)}:
-         {$document.flags.titan.chatContext.results.healing}
-      </div>
+      <!--Healing-->
+      {#if $document.flags.titan.chatContext.results.healing > 0}
+         <div class="stat">
+            {localize(`healing`)}:
+            {$document.flags.titan.chatContext.results.healing}
+         </div>
+      {/if}
    {/if}
 </div>
 

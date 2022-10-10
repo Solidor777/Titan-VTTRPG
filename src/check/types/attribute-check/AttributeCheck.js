@@ -4,17 +4,17 @@ export default class TitanAttributeCheck extends TitanCheck {
    _ensureValidConstruction(options) {
       // Check if actor roll data was provided
       if (!options?.actorRollData) {
-         console.error(
-            'TITAN | Attribute Check failed during construction. No provided Actor Roll Data.'
-         );
+         console.error('TITAN | Attribute Check failed during construction. No provided Actor Roll Data.');
+         console.trace();
+
          return false;
       }
 
       // Ensure a valid attribute / skill combination
       if ((!options.skill || options.skill === 'none') && (!options.attribute || options.attribute === 'default')) {
-         console.error(
-            'TITAN | Attribute Check failed during construction. Neither skill nor attribute were provided.'
-         );
+         console.error('TITAN | Attribute Check failed during construction. Neither skill nor attribute were provided.');
+         console.trace();
+
          return false;
       }
 

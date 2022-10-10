@@ -12,10 +12,9 @@ export default class SvelteDocumentSheet extends SvelteApplication {
    #documentStore = new TJSDocument(void 0, { delete: this.close.bind(this) });
 
    /**
- * Application store that monitors updates to any assigned document.
- *
- * @type {writable<object>}
- */
+    * Application store that monitors updates to any assigned document.
+    * @type {writable<object>}
+    */
    #applicationStateStore = new writable({});
 
    /**
@@ -168,7 +167,9 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          }
          default: {
             console.error('TITAN | Impossible type in _onDrop.');
-            return;
+            console.trace();
+
+            return false;
          }
       }
    }

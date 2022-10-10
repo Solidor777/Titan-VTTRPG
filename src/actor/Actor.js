@@ -38,6 +38,7 @@ export default class TitanActor extends Actor {
          // Default is an error
          default: {
             console.error('TITAN: Invalid actor type when preparing derived data.');
+            console.trace();
             break;
          }
       }

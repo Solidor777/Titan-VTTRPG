@@ -9,17 +9,17 @@ export default class TitanCastingCheck extends TitanCheck {
 
       // Check if actor roll data was provided
       if (!options?.actorRollData) {
-         console.error(
-            'TITAN | Casting Check failed during construction. No provided Actor Roll Data.'
-         );
+         console.error('TITAN | Casting Check failed during construction. No provided Actor Roll Data.');
+         console.trace();
+
          return false;
       }
 
       // Check if the spell is valid
       if (!options.itemRollData) {
-         console.error(
-            `TITAN | Casting Check failed during construction. No provided Item Roll Data.`
-         );
+         console.error(`TITAN | Casting Check failed during construction. No provided Item Roll Data.`);
+         console.trace();
+
          return false;
       }
 

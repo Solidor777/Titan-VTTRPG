@@ -158,7 +158,7 @@ export default class TitanItem extends Item {
       return {
          label: localize('check'),
          attribute: 'body',
-         skill: 'athletics',
+         skill: 'arcana',
          difficulty: 4,
          complexity: 1,
          resolveCost: 0,

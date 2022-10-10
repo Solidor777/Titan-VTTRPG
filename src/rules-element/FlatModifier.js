@@ -4,22 +4,36 @@ export function applyFlatModifier(flatModifier) {
    // Ensure the modifier is valid
    if (flatModifier === undefined) {
       console.error(`TITAN | Error applying Flat Modifier. Undefined Element.`);
-      return;
+      console.trace();
+
+      return false;
    }
    if (flatModifier.selector === undefined) {
       console.error(`TITAN | Error applying Flat Modifier. Undefined Selector.`);
+      console.trace();
+
+      return false;
    }
 
    if (flatModifier.key === undefined) {
       console.error(`TITAN | Error applying Flat Modifier. Undefined Key.`);
+      console.trace();
+
+      return false;
    }
 
    if (flatModifier.type === undefined) {
       console.error(`TITAN | Error applying Flat Modifier. Undefined Type.`);
+      console.trace();
+
+      return false;
    }
 
    if (flatModifier.value === undefined) {
       console.error(`TITAN | Error applying Flat Modifier. Undefined Value.`);
+      console.trace();
+
+      return false;
    }
 
    // Find the value object
@@ -60,7 +74,9 @@ export function applyFlatModifier(flatModifier) {
       }
       default: {
          console.error(`TITAN | Error applying Flat Modifier. Invalid Selector (${flatModifier.selector})`);
-         return;
+         console.trace();
+
+         return false;
       }
    }
 
@@ -84,7 +100,9 @@ export function applyFlatModifier(flatModifier) {
       }
       default: {
          console.error(`TITAN | Error applying Flat Modifier. Invalid Type (${flatModifier.type})`);
-         return;
+         console.trace();
+
+         return false;
       }
    }
 
