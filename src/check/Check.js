@@ -74,6 +74,7 @@ export default class TitanCheck {
       const retVal = {
          dice: dice.map((die) => {
             return {
+               expertiseApplied: 0,
                base: die,
                final: die
             };
@@ -118,8 +119,7 @@ export default class TitanCheck {
                ) {
                   retVal.expertiseRemaining -= increment;
                   retVal.dice[i].final = difficulty;
-                  retVal.dice[i].expertiseApplied = retVal.dice[i].expertiseApplied ?
-                     retVal.dice[i].expertiseApplied + increment : increment;
+                  retVal.dice[i].expertiseApplied += increment;
 
                   // Abort early if we run out of expertise
                   if (increment > retVal.expertiseRemaining) {
@@ -137,8 +137,7 @@ export default class TitanCheck {
                   ) {
                      retVal.expertiseRemaining -= increment;
                      retVal.dice[i].final = 6;
-                     retVal.dice[i].expertiseApplied = retVal.dice[i].expertiseApplied ?
-                        retVal.dice[i].expertiseApplied + increment : increment;
+                     retVal.dice[i].expertiseApplied += increment;
 
                      // Abort early if we run out of expertise
                      if (increment > retVal.expertiseRemaining) {
@@ -170,6 +169,7 @@ export default class TitanCheck {
          results: this.results,
          type: this._getCheckType(),
          isCheck: true,
+         failuresReRolled: false
       };
 
       // Create and post the message

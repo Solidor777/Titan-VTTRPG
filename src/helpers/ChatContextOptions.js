@@ -6,12 +6,16 @@ async function reRollCheckFailures(li) {
    const message = game.messages.get(li.data("messageId"));
    const chatContext = message.getFlag('titan', 'chatContext');
    let failureCount = 0;
+   let expertiseToRefund = 0;
    const successes = chatContext.results.dice.filter((die) => {
       if (die.success) {
          return true;
       }
       else {
          failureCount += 1;
+         if (die.expertiseApplied) {
+            expertiseToRefund += die.expertiseApplied;
+         }
          return false;
       }
    });
@@ -24,11 +28,13 @@ async function reRollCheckFailures(li) {
       const reRolledDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
       const newDice = successes.concat(reRolledDice.map((die) => {
          return {
+            expertiseApplied: 0,
             base: die,
             final: die
          };
       }));
       chatContext.results.dice = newDice;
+      chatContext.results.expertiseRemaining += expertiseToRefund;
 
       // Recalculate the check
       const newResults = recalculateCheckResults(chatContext);
@@ -38,6 +44,7 @@ async function reRollCheckFailures(li) {
             titan: {
                chatContext: {
                   results: newResults,
+                  failuresReRolled: true
                },
             },
          },

@@ -2,6 +2,7 @@
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import CheckChatResetExpertiseButton from "./CheckChatResetExpertiseButton.svelte";
+   import recalculateCheckResults from "./RecalculateCheckResults";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -74,6 +75,14 @@
             {$document.flags.titan.chatContext.results.healing}
          </div>
       {/if}
+   {/if}
+
+   <!--Rerolled failires-->
+   {#if $document.flags.titan.chatContext.failuresReRolled}
+      <div class="stat">
+         <i class="fas fa-dice" />
+         {localize(`failuresReRolled`)}
+      </div>
    {/if}
 </div>
 
