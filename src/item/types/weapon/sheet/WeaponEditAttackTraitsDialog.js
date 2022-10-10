@@ -1,7 +1,7 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import EditAttackTraitsDialogShell from './WeaponEditAttackTraitsDialogShell.svelte';
 export default class WeaponEditAttackTraitsDialog extends TJSDialog {
-   constructor(document, attackIdx) {
+   constructor(document, options = {}, attackIdx) {
       super(
          {
             title: `${document.name}: ${document.system.attack[attackIdx].label}`,
@@ -13,13 +13,15 @@ export default class WeaponEditAttackTraitsDialog extends TJSDialog {
 
                },
             },
-            // To do: Remove this once the tooltip action is in
-            zIndex: null
+            zIndex: null,
+            id: `dialog-${document.name}`,
+            classes: ['titan'],
          },
          {
             width: 320,
             height: 470,
-         }
+         },
+         options
       );
    }
 }

@@ -20,6 +20,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          {
             id: `document-sheet-${document.id}`,
             title: document.name,
+            classes: ['titan']
          }
       ));
 
