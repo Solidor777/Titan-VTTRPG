@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import ResistanceCheckDialogShell from './ResistanceCheckDialogShell.svelte';
 export default class ResistanceCheckDialog extends TJSDialog {
-   constructor(actor, options = {}) {
+   constructor(actor, options) {
       super(
          {
             title: `${localize('resistanceCheck')} (${actor.name})`,
@@ -21,7 +21,6 @@ export default class ResistanceCheckDialog extends TJSDialog {
             width: 320,
             height: 295,
          },
-         options
       );
    }
 }

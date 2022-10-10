@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import EditAttackTraitsDialogShell from './ArmorEditTraitsDialogShell.svelte';
 export default class ArmorEditTraitsDialog extends TJSDialog {
-   constructor(document, options = {}) {
+   constructor(document, options) {
       super(
          {
             title: `${localize('editTraits')} (${document.name})`,
@@ -20,7 +20,6 @@ export default class ArmorEditTraitsDialog extends TJSDialog {
             width: 320,
             height: 135,
          },
-         options
       );
    }
 }

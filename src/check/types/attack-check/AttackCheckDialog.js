@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import AttackCheckDialogShell from './AttackCheckDialogShell.svelte';
 export default class AttackCheckDialog extends TJSDialog {
-   constructor(actor, options = {}) {
+   constructor(actor, options) {
       super(
          {
             title: `${localize('attackCheck')} (${actor.name})`,
@@ -21,7 +21,6 @@ export default class AttackCheckDialog extends TJSDialog {
             width: 350,
             height: 555,
          },
-         options
       );
    }
 }

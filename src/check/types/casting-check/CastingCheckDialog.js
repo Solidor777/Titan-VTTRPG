@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import CastingCheckDialogShell from './CastingCheckDialogShell.svelte';
 export default class CastingCheckDialog extends TJSDialog {
-   constructor(actor, options = {}) {
+   constructor(actor, options) {
       super(
          {
             title: `${localize('castingCheck')} (${actor.name})`,
@@ -21,7 +21,6 @@ export default class CastingCheckDialog extends TJSDialog {
             width: 350,
             height: 520,
          },
-         options
       );
    }
 }

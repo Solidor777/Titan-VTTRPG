@@ -10,6 +10,7 @@ import TitanAttackCheck from '~/check/types/attack-check/AttackCheck.js';
 import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
 import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 import TitanTypeComponent from '~/helpers/TypeComponent.js';
+import ItemCheckDialog from '../../../check/types/item-check/ItemCheckDialog';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
@@ -577,7 +578,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Get the damage mod
-         options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
+         options.damageMod = this.parent.system.mod.damage.value;
 
          // Get the attacker melee and accuracy
          options.attackerMelee = this.parent.system.rating.melee.value;
@@ -656,14 +657,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Get the spell data
-         options.difficulty = options.difficulty ?? checkSpell.system.check.difficulty;
-         options.complexity = options.complexity ?? checkSpell.system.check.complexity;
-         options.attribute = options.attribute ?? checkSpell.system.check.attribute;
-         options.skill = options.skill ?? checkSpell.system.check.skill;
+         options.difficulty = checkSpell.system.check.difficulty;
+         options.complexity = checkSpell.system.check.complexity;
+         options.attribute = checkSpell.system.check.attribute;
+         options.skill = checkSpell.system.check.skill;
          options.spellName = checkSpell.name;
 
-         // Get the damage mod
-         options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
+         // Get the mods
+         options.damageMod = this.parent.system.mod.damage.value;
+         options.healingMod = this.parent.system.mod.healing.value;
 
          // Create the dialog
          const dialog = new CastingCheckDialog(this.parent, options);
@@ -707,7 +709,38 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async rollItemCheck(options) {
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
-         console.log('ToDo.');
+         // Get the Item check data.
+         const checkItem = this.parent.items.get(options?.itemId);
+         if (!checkItem) {
+            console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
+            console.trace();
+
+            return false;
+         }
+         const checkData = checkItem.system.check[options.checkIdx];
+         if (!checkData) {
+            console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
+            console.trace();
+
+            return false;
+         }
+
+         // Get the spell data
+         options.difficulty = checkData.difficulty;
+         options.complexity = checkData.complexity;
+         options.attribute = checkData.attribute;
+         options.skill = checkData.skill;
+         options.checkName = checkData.label;
+         options.itemName = checkItem.name;
+
+         // Get the mods
+         options.damageMod = this.parent.system.mod.damage.value;
+         options.healingMod = this.parent.system.mod.healing.value;
+
+         // Create the dialog
+         const dialog = new ItemCheckDialog(this.parent, options);
+         dialog.render(true);
+         return;
       }
 
       // Otherwise, get a check

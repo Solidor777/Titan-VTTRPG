@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import AttributeCheckDialogShell from './AttributeCheckDialogShell.svelte';
 export default class SkillCheckDialog extends TJSDialog {
-   constructor(actor, options = {}) {
+   constructor(actor, options) {
       super(
          {
             title: `${localize('skillCheck')} (${actor.name})`,
@@ -21,7 +21,6 @@ export default class SkillCheckDialog extends TJSDialog {
             width: 350,
             height: 490,
          },
-         options
       );
    }
 }

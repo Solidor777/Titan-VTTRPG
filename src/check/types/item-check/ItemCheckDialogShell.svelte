@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize, clamp } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
    import AttributeSelect from "~/helpers/svelte-components/select/AttributeSelect.svelte";
    import SkillSelect from "~/helpers/svelte-components/select/SkillSelect.svelte";
@@ -16,22 +16,23 @@
 
    // Initialize check parameters
    let checkParameters = {
-      attribute: options.attribute ? options.attribute : "body",
-      skill: options.skill ? options.skill : "athletics",
-      difficulty: options.difficulty ? options.difficulty : 4,
-      complexity: options.complexity ? options.complexity : 0,
-      trainingMod: options.trainingMod ? options.trainingMod : 0,
-      doubleTraining: options.doubleTraining ? options.doubleTraining : false,
-      expertiseMod: options.expertiseMod ? options.expertiseMod : 0,
-      doubleExpertise: options.doubleExpertise ? options.doubleExpertise : false,
-      diceMod: options.diceMod ? options.diceMod : 0,
+      attribute: options.attribute ?? "body",
+      skill: options.skill ?? "arcana",
+      difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : 4,
+      complexity: options.complexity ? Math.max(options.complexity, 0) : 0,
+      trainingMod: options.trainingMod ?? 0,
+      doubleTraining: options.doubleTraining ?? false,
+      expertiseMod: options.expertiseMod ?? 0,
+      doubleExpertise: options.doubleExpertise ?? false,
+      diceMod: options.diceMod ?? 0,
       itemId: options.itemId,
+      checkIdx: options.checkIdx,
    };
 
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.typeComponent.rollCastingCheck(checkParameters);
+      await actor.typeComponent.rollItemCheck(checkParameters);
       application.close();
       return;
    }
@@ -88,7 +89,7 @@
 <div class="check-dialog">
    <!--Name-->
    <div class="row row-label">
-      {options.spellName}
+      {options.itemName} ({options.checkName})
    </div>
 
    <!--Attribute-->

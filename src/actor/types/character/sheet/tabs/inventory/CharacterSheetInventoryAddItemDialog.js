@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import CharacterSheetInventoryAddItemDialogShell from './CharacterSheetInventoryAddItemDialogShell.svelte';
 export default class CharacterSheetInventoryAddItemDialog extends TJSDialog {
-   constructor(sheet, options = {}) {
+   constructor(sheet) {
       super(
          {
             title: `${localize('addNewItem')}`,
@@ -20,7 +20,6 @@ export default class CharacterSheetInventoryAddItemDialog extends TJSDialog {
             width: 150,
             height: 170,
          },
-         options
       );
    }
 }

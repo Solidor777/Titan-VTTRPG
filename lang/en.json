@@ -419,6 +419,7 @@
   "LOCAL.tookARest.label": "Took a Rest",
   "LOCAL.woundsHealed.label": "Wounds Healed",
   "LOCAL.castingNotes.label": "Casting Notes",
+  "LOCAL.itemCheck.label": "Item Check",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

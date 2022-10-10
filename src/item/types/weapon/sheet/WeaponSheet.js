@@ -34,7 +34,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
 
    // Opens the attack traits edit dialog
    editAttackTraits(attackIdx) {
-      const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, {}, attackIdx);
+      const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
       dialog.render(true);
       return;
    }
