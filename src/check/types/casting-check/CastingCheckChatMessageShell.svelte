@@ -10,10 +10,6 @@
 
    // Document reference
    const document = getContext("DocumentStore");
-   const check = $document.flags.titan.chatContext;
-
-   // Whether this user is the owner
-   $: isOwner = $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
 
    // Scaling aspects list
    $: scalingAspects = $document.flags.titan.chatContext.parameters.aspect
@@ -26,47 +22,49 @@
 <div class="check-chat-message">
    <!--Header-->
    <div class="section">
-      <CastingCheckChatHeader {check} />
+      <CastingCheckChatHeader />
    </div>
 
    <!--Dice Container-->
    <div class="section tags">
-      <CheckChatDiceContainer dice={check.results.dice} />
+      <CheckChatDiceContainer />
    </div>
 
    <!--Results-->
    <div class="section">
-      <CheckChatResults results={check.results} />
+      <CheckChatResults />
    </div>
 
-   <!--Scaling Aspects-->
-   {#if isOwner && scalingAspects && scalingAspects.length > 0 && $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
-      <div class="section">
-         <CheckChatScalingAspects bind:scalingAspects />
-      </div>
-   {/if}
+   {#if $document.flags.titan.chatContext.results.succeeded}
+      <!--Scaling Aspects-->
+      {#if $document.constructor.getSpeakerActor($document.speaker)?.isOwner && scalingAspects && scalingAspects.length > 0 && $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
+         <div class="section">
+            <CheckChatScalingAspects bind:scalingAspects />
+         </div>
+      {/if}
 
-   <!--Damage Buttons-->
-   <!-- svelte-ignore missing-declaration -->
-   {#if check.results.damage !== undefined && game.user.isGM}
-      <div class="section">
-         <CheckChatDamageButtons results={check.results} />
-      </div>
-   {/if}
+      <!--Damage Buttons-->
+      <!-- svelte-ignore missing-declaration -->
+      {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
+         <div class="section">
+            <CheckChatDamageButtons />
+         </div>
+      {/if}
 
-   <!--Healing Button-->
-   <!-- svelte-ignore missing-declaration -->
-   {#if check.results.healing !== undefined && game.user.isGM}
-      <div class="section">
-         <CheckChatHealingButton results={check.results} />
-      </div>
-   {/if}
+      <!--Healing Button-->
+      <!-- svelte-ignore missing-declaration -->
+      {#if $document.flags.titan.chatContext.results.healing && game.user.isGM}
+         <div class="section">
+            <CheckChatHealingButton />
+         </div>
+      {/if}
 
-   <!--Resistance Check Buttons-->
-   {#if check.results.reflexesCheck || check.results.resilienceCheck || check.results.willpowerCheck}
-      <div class="section tags">
-         <CheckChatResistanceCheckButtons results={check.results} />
-      </div>
+      <!--Resistance Check Buttons-->
+      {#if $document.flags.titan.chatContext.results.reflexesCheck || $document.flags.titan.chatContext.results.resilienceCheck || $document.flags.titan.chatContext.results.willpowerCheck}
+         <div class="section tags">
+            <CheckChatResistanceCheckButtons />
+         </div>
+      {/if}
    {/if}
 </div>
 

@@ -1,16 +1,21 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
 
-   // Check reference
-   export let check = void 0;
+   // Document reference
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="label">
-   <div class="content {check.parameters.attribute}">
+   <div class="content {$document.flags.titan.chatContext.parameters.attribute}">
       <!--Type Label -->
-      {`${localize(check.parameters.attribute)}${
-         check.parameters.skill ? ` (${localize(check.parameters.skill)})` : ""
-      } ${check.parameters.difficulty}:${check.parameters.complexity}`}
+      {`${localize($document.flags.titan.chatContext.parameters.attribute)}${
+         $document.flags.titan.chatContext.parameters.skill
+            ? ` (${localize($document.flags.titan.chatContext.parameters.skill)})`
+            : ""
+      } ${$document.flags.titan.chatContext.parameters.difficulty}:${
+         $document.flags.titan.chatContext.parameters.complexity
+      }`}
    </div>
 </div>
 

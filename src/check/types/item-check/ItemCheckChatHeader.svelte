@@ -1,26 +1,29 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
 
-   // Check reference
-   export let check = void 0;
+   // Document reference
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="label">
-   <div class="content {check.parameters.attribute}">
-      <img src={check.parameters.img} alt="item" />
+   <div class="content {$document.flags.titan.chatContext.parameters.attribute}">
+      <img src={$document.flags.titan.chatContext.parameters.img} alt="item" />
 
       <!--Labels-->
       <div class="labels">
          <!--Label-->
          <div class="label">
-            {check.parameters.itemName}
+            {$document.flags.titan.chatContext.parameters.itemName}
          </div>
 
          <!--Type Label -->
          <div class="sub-label">
-            {`${localize(check.parameters.attribute)} (${localize(check.parameters.skill)}) ${
-               check.parameters.difficulty
-            }:${check.parameters.complexity}`}
+            {`${localize($document.flags.titan.chatContext.parameters.attribute)} (${localize(
+               $document.flags.titan.chatContext.parameters.skill
+            )}) ${$document.flags.titan.chatContext.parameters.difficulty}:${
+               $document.flags.titan.chatContext.parameters.complexity
+            }`}
          </div>
       </div>
    </div>

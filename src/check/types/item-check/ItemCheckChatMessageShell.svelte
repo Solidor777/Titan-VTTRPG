@@ -10,13 +10,12 @@
 
    // Document reference
    const document = getContext("DocumentStore");
-   const check = $document.flags.titan.chatContext;
 </script>
 
 <div class="check-chat-message">
    <!--Header-->
    <div class="section">
-      <ItemCheckChatHeader {check} />
+      <ItemCheckChatHeader />
    </div>
 
    <!--Dice Container-->
@@ -33,31 +32,31 @@
    {#if $document.flags.titan.chatContext.results.succeeded}
       <!--Damage Buttons-->
       <!-- svelte-ignore missing-declaration -->
-      {#if check.results.damage !== undefined && game.user.isGM}
+      {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
          <div class="section">
-            <CheckChatDamageButtons results={check.results} />
+            <CheckChatDamageButtons />
          </div>
       {/if}
 
       <!--Healing Button-->
       <!-- svelte-ignore missing-declaration -->
-      {#if check.results.healing && game.user.isGM}
+      {#if $document.flags.titan.chatContext.results.healing && game.user.isGM}
          <div class="section">
-            <CheckChatHealingButton results={check.results} />
+            <CheckChatHealingButton />
          </div>
       {/if}
 
       <!--Opposed Check Buttons-->
-      {#if check.parameters.opposedCheck}
+      {#if $document.flags.titan.chatContext.parameters.opposedCheck}
          <div class="section">
-            <CheckChatOpposedCheckButton opposedCheck={check.parameters.opposedCheck} />
+            <CheckChatOpposedCheckButton />
          </div>
       {/if}
 
       <!--Resistance Check Buttons-->
-      {#if check.results.reflexesCheck || check.results.resilienceCheck || check.results.willpowerCheck}
+      {#if $document.flags.titan.chatContext.results.reflexesCheck || $document.flags.titan.chatContext.results.resilienceCheck || $document.flags.titan.chatContext.results.willpowerCheck}
          <div class="section tags">
-            <CheckChatResistanceCheckButtons results={check.results} />
+            <CheckChatResistanceCheckButtons />
          </div>
       {/if}
    {/if}

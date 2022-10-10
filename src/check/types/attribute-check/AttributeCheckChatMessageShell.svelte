@@ -6,13 +6,12 @@
 
    // Document reference
    const document = getContext("DocumentStore");
-   const check = $document.flags.titan.chatContext;
 </script>
 
 <div class="check-chat-message">
    <!--Header-->
    <div class="section">
-      <AttributeCheckChatHeader {check} />
+      <AttributeCheckChatHeader />
    </div>
 
    <!--Dice Container-->

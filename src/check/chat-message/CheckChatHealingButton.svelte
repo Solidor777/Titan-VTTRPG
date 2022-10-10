@@ -1,9 +1,10 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   // Results
-   export let results = void 0;
+   // Document reference
+   const document = getContext("DocumentStore");
 
    async function healDamage(healing) {
       // Get the targets
@@ -30,11 +31,11 @@
 <div class="healing-button" data-tooltip={localize("recoverStamina")}>
    <EfxButton
       on:click={() => {
-         healDamage(results.healing);
+         healDamage($document.flags.titan.chatContext.results.healing);
       }}
    >
       <i class="fas fa-heart" />
-      {`${localize("recoverStamina")} (${results.healing})`}
+      {`${localize("recoverStamina")} (${$document.flags.titan.chatContext.results.healing})`}
    </EfxButton>
 </div>
 

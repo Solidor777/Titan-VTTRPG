@@ -1,9 +1,10 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   // Results
-   export let results = void 0;
+   // Document reference
+   const document = getContext("DocumentStore");
 
    async function applyDamage(damage, ignoreArmor) {
       // Get the targets
@@ -51,7 +52,7 @@
    <div class="button" data-tooltip={localize("applyDamage")}>
       <EfxButton
          on:click={() => {
-            applyDamage(results.damage, false);
+            applyDamage($document.flags.titan.chatContext.results.damage, false);
          }}><i class="fas fa-bolt" /></EfxButton
       >
    </div>
@@ -60,7 +61,7 @@
    <div class="button" data-tooltip={localize("applyDamageIgnoreArmor")}>
       <EfxButton
          on:click={() => {
-            applyDamage(results.damage, true);
+            applyDamage($document.flags.titan.chatContext.results.damage, true);
          }}><i class="fas fa-shield-slash" /></EfxButton
       >
    </div>
@@ -69,7 +70,7 @@
    <div class="button" data-tooltip={localize("applyHalfDamage")}>
       <EfxButton
          on:click={() => {
-            applyDamage(Math.ceil(results.damage / 2), false);
+            applyDamage(Math.ceil($document.flags.titan.chatContext.results.damage / 2), false);
          }}><i class="fas fa-heart-half-stroke" /></EfxButton
       >
    </div>
@@ -78,7 +79,7 @@
    <div class="button" data-tooltip={localize("healDamage")}>
       <EfxButton
          on:click={() => {
-            healDamage(results.damage);
+            healDamage($document.flags.titan.chatContext.results.damage);
          }}><i class="fas fa-heart" /></EfxButton
       >
    </div>

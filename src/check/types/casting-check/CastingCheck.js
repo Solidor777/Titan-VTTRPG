@@ -50,7 +50,7 @@ export default class TitanCastingCheck extends TitanCheck {
 
       // Determine the skill training and expertise
       if (!options.skill || options.skill === 'none') {
-         parameters.skill = itemRollData.skill;
+         parameters.skill = itemRollData.castingCheck.skill;
       }
       else {
          parameters.skill = options.skill;
@@ -61,7 +61,7 @@ export default class TitanCastingCheck extends TitanCheck {
 
       // Determine the attribute die
       if (!options.attribute || options.attribute === 'default') {
-         parameters.attribute === itemRollData.attribute;
+         parameters.attribute = itemRollData.castingCheck.attribute;
       }
       else {
          parameters.attribute = options.attribute;

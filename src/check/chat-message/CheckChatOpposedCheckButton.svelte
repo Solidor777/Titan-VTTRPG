@@ -1,8 +1,20 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import { getContext } from "svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
-   async function rollOpposedCheck(options) {
+   // Document reference
+   const document = getContext("DocumentStore");
+
+   // Check Options reference
+   $: opposedCheck = {
+      attribute: $document.flags.titan.chatContext.parameters.opposedCheck.attribute,
+      skill: $document.flags.titan.chatContext.parameters.opposedCheck.skill,
+      difficulty: $document.flags.titan.chatContext.parameters.opposedCheck.difficulty,
+      complexity: $document.flags.titan.chatContext.results.extraSuccesses + 1,
+   };
+
+   async function rollOpposedCheck() {
       // Get the targets
       let userTargets = game.user.isGM ? Array.from(game.user.targets) : Array.from(canvas.tokens.ownedTokens);
       if (userTargets.length <= 0 && game.user.isGM) {
@@ -15,15 +27,12 @@
          const target = userTargets[idx]?.actor;
          if (target && target.system.attribute) {
             // Roll a resistance check
-            await target.typeComponent.rollAttributeCheck(options);
+            await target.typeComponent.rollAttributeCheck(opposedCheck);
          }
       }
 
       return;
    }
-
-   // Check Options reference
-   export let opposedCheck = void 0;
 </script>
 
 <!--Apply healing button-->

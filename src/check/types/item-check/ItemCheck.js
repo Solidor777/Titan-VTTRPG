@@ -130,7 +130,6 @@ export default class TitanItemCheck extends TitanCheck {
                attribute: itemCheckData.opposedCheck.attribute ?? 'body',
                skill: itemCheckData.opposedCheck.skill ?? 'none',
                difficulty: itemCheckData.opposedCheck.difficulty ? clamp(itemCheckData.opposedCheck.difficulty, 2, 6) : 4,
-               complexity: itemCheckData.opposedCheck.complexity ? Math.max(0, itemCheckData.opposedCheck.complexity) : 0,
             };
          }
       }
@@ -142,7 +141,6 @@ export default class TitanItemCheck extends TitanCheck {
             attribute: opposedCheck.attribute ?? itemCheck.attribute,
             skill: opposedCheck.skill ?? itemCheck.skill,
             difficulty: opposedCheck.difficulty ? clamp(opposedCheck.difficulty, 2, 6) : clamp(itemCheck.difficulty, 2, 6),
-            complexity: opposedCheck.complexity ? Math.max(0, opposedCheck.complexity) : Math.max(0, itemCheck.difficulty),
          };
       }
 
