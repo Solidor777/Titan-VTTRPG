@@ -32,6 +32,13 @@
       </div>
    {/if}
 
+   <!--Multi-Attack-->
+   {#if $document.flags.titan.chatContext.parameters.multiAttack}
+      <div class="stat">
+         <IconTag label={localize("multiAttack")} icon={"fas fa-swords"} />
+      </div>
+   {/if}
+
    <!--Traits-->
    {#each $document.flags.titan.chatContext.parameters.attack.trait as trait}
       <div class="stat" data-tooltip={localize(`${trait.name}.desc`)}>

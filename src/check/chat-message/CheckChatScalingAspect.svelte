@@ -96,6 +96,11 @@
    <!--Label and value-->
    <div class="label">
       <div class="label-inner">
+         {#if aspect.label === localize("damage")}
+            <i class="fas fa-bolt" />
+         {:else if aspect.label === localize("healing")}
+            <i class="fas fa-heart" />
+         {/if}
          {aspect.label}: {$document.flags.titan.chatContext.results.scalingAspect[idx].currentValue}
       </div>
       <div class="cost">
@@ -160,6 +165,10 @@
             @include flex-group-center;
             height: 100%;
             margin-bottom: 0.25rem;
+
+            i {
+               margin-right: 0.25rem;
+            }
          }
       }
 

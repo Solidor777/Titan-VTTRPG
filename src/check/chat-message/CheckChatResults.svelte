@@ -43,6 +43,7 @@
    <!--Expertise Remaining-->
    {#if $document.flags.titan.chatContext.parameters.totalExpertise}
       <div class="stat">
+         <i class="fas fa-graduation-cap" />
          {localize(`expertiseRemaining`)}:
          {$document.flags.titan.chatContext.results.expertiseRemaining}
 
@@ -59,6 +60,7 @@
    {#if $document.flags.titan.chatContext.results.succeeded}
       {#if $document.flags.titan.chatContext.results.damage > 0}
          <div class="stat">
+            <i class="fas fa-bolt" />
             {localize(`damage`)}:
             {$document.flags.titan.chatContext.results.damage}
          </div>
@@ -67,6 +69,7 @@
       <!--Healing-->
       {#if $document.flags.titan.chatContext.results.healing > 0}
          <div class="stat">
+            <i class="fas fa-heart" />
             {localize(`healing`)}:
             {$document.flags.titan.chatContext.results.healing}
          </div>
@@ -107,6 +110,10 @@
          @include flex-group-center;
          &:not(:first-child) {
             margin-top: 0.25rem;
+         }
+
+         i {
+            margin-right: 0.25rem;
          }
 
          .button {

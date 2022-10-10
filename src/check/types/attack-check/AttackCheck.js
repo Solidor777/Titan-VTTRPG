@@ -83,8 +83,8 @@ export default class TitanAttackCheck extends TitanCheck {
 
          // Determine whether the attack has the multi attack trait
          for (let idx = 0; idx < attackData.trait.length; idx++) {
-            if (attackData.trait[idx].name === 'multiAttack') {
-               parameters.multiAttackTrait = true;
+            if (attackData.trait[idx].name === 'flurry') {
+               parameters.flurryTrait = true;
                break;
             }
          }
@@ -141,7 +141,7 @@ export default class TitanAttackCheck extends TitanCheck {
       if (parameters.multiAttack) {
          // Round the total dice up if this is a dual attack
          // Otherwise, round down
-         parameters.totalDice = parameters.multiAttackTrait ?
+         parameters.totalDice = parameters.flurryTrait ?
             Math.ceil(parameters.totalDice / 2) :
             Math.floor(parameters.totalDice / 2);
 

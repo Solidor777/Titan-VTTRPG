@@ -47,7 +47,7 @@
          value: false,
       },
       {
-         name: "multiAttack",
+         name: "flurry",
          type: "boolean",
          value: false,
       },
