@@ -300,6 +300,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       if (!this.#storeUnsubscribe) {
          this.#storeUnsubscribe = this.#documentStore.subscribe(this.#handleDocUpdate.bind(this));
       }
+
       super.render(force, options);
       return this;
    }
