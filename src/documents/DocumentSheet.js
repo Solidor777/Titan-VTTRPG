@@ -4,24 +4,14 @@ import { writable } from 'svelte/store';
 import { localize } from '~/helpers/Utility.js';
 import DocumentShell from './DocumentShell.svelte';
 export default class SvelteDocumentSheet extends SvelteApplication {
-   /**
-    * Document store that monitors updates to any assigned document.
-    *
-    * @type {TJSDocument<foundry.abstract.Document>}
-    */
+
+   // Document store that monitors updates to any assigned document.
    #documentStore = new TJSDocument(void 0, { delete: this.close.bind(this) });
 
-   /**
-    * Application store that monitors updates to any assigned document.
-    * @type {writable<object>}
-    */
+   // Application store that monitors updates to any assigned document.
    #applicationStateStore = new writable({});
 
-   /**
-    * Holds the document unsubscription function.
-    *
-    * @type {Function}
-    */
+   // Holds the document unsubscription function.
    #storeUnsubscribe;
 
    constructor(document, options = {}) {
@@ -33,6 +23,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          }
       ));
 
+      // Define document store property
       Object.defineProperty(this.reactive, 'document', {
          get: () => this.#documentStore.get(),
          set: (document) => {
@@ -41,6 +32,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       });
       this.reactive.document = document;
 
+      // Define state store property
       Object.defineProperty(this.reactive, 'state', {
          get: () => this.#applicationStateStore,
          set: (state) => {
@@ -49,12 +41,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       });
    }
 
-   /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
+   // Default Application options
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
          width: 800,
