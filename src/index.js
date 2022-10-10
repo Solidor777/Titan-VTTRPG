@@ -2,6 +2,7 @@ import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Mixins.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import { registerChatContextOptions } from './helpers/ChatContext';
 import registerSystemSettings from './system/RegisterSystemSettings.js';
 import registerTooltipSettings from './system/TooltipManager';
 import TitanStatusEffects from './helpers/StatusEffects.js';
@@ -106,3 +107,5 @@ Hooks.on('preDeleteChatMessage', (message) => {
       message._svelteComponent.$destroy();
    }
 });
+
+Hooks.on("getChatLogEntryContext", registerChatContextOptions);

@@ -10,7 +10,7 @@ import TitanAttackCheck from '~/check/types/attack-check/AttackCheck.js';
 import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
 import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 import TitanTypeComponent from '~/helpers/TypeComponent.js';
-import ItemCheckDialog from '../../../check/types/item-check/ItemCheckDialog';
+import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 

@@ -74,7 +74,8 @@ export default class TitanCheck {
       const retVal = {
          dice: dice.map((die) => {
             return {
-               base: die, final: die
+               base: die,
+               final: die
             };
          }),
          expertiseRemaining: this.parameters.totalExpertise ? this.parameters.totalExpertise : 0
@@ -168,8 +169,8 @@ export default class TitanCheck {
          parameters: this.parameters,
          results: this.results,
          type: this._getCheckType(),
+         isCheck: true,
       };
-
 
       // Create and post the message
       this.chatMessage = await ChatMessage.create(
