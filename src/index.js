@@ -18,6 +18,7 @@ import TitanEquipmentSheet from './item/types/equipment/sheet/EquipmentSheet.js'
 import TitanShieldSheet from './item/types/shield/sheet/ShieldSheet';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from './item/types/weapon/sheet/WeaponSheet.js';
+import TitanTokenDocument from './documents/TokenDocument';
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
@@ -25,6 +26,7 @@ Hooks.once('init', async () => {
    // Register Document Classes
    CONFIG.Actor.documentClass = TitanActor;
    CONFIG.Item.documentClass = TitanItem;
+   CONFIG.Token.documentClass = TitanTokenDocument;
 
    // Register Sheet Classes
    Actors.registerSheet('titan', TitanPlayerSheet, {
