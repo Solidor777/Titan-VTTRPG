@@ -546,7 +546,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          userTargets = Array.from(canvas.tokens.controlled);
       }
 
-      if (userTargets[0]) {
+      if (userTargets[0] && userTargets[0].document.actor._id !== this.parent._id) {
          const targetRollData = userTargets[0].document.actor.getRollData();
          options.targetRollData = targetRollData;
       }
@@ -589,7 +589,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (userTargets.length < 1 && game.user.isGM) {
             userTargets = Array.from(canvas.tokens.controlled);
          }
-         if (userTargets[0]) {
+         if (userTargets[0] && userTargets[0].document.actor._id !== this.parent._id) {
             options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
          }
 
