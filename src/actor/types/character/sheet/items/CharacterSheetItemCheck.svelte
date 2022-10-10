@@ -4,9 +4,9 @@
    import OpposedCheckTag from "~/helpers/svelte-components/tag/OpposedCheckTag.svelte";
    import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import CharacterSheetItemCheckButton from "./CharacterSheetItemCheckButton.svelte";
    import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
+   import ItemCheckButton from "~/helpers/svelte-components/button/ItemCheckButton.svelte";
 
    // Reference to the application
    const application = getContext("external").application;
@@ -29,7 +29,7 @@
    <div class="check">
       <!--Button-->
       <div class="button">
-         <CharacterSheetItemCheckButton
+         <ItemCheckButton
             {check}
             on:click={() => {
                application.rollItemCheck(item._id, checkIdx);

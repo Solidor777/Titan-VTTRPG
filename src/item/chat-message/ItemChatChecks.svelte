@@ -4,6 +4,8 @@
    import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
+   import ItemCheckButton from "~/helpers/svelte-components/button/ItemCheckButton.svelte";
+   import TitanItemCheck from "~/check/types/item-check/ItemCheck.js";
 
    export let item = void 0;
 
@@ -19,19 +21,53 @@
 
       return retVal;
    }
+
+   async function rollItemCheck(check, idx) {
+      const controlledTokens = Array.from(canvas.tokens.controlled);
+      if (controlledTokens.length > 0) {
+         // Initial roll data
+         const itemRollData = item.system;
+         itemRollData.name = item.name;
+         itemRollData.img = item.img;
+
+         // Roll for each controlled token
+         for (let tokenIdx = 0; tokenIdx < controlledTokens.length; tokenIdx++) {
+            // If the target is valid
+            const actor = controlledTokens[tokenIdx]?.actor;
+            if (actor && actor.system.resource?.stamina) {
+               // Get the actor roll data
+               const actorRollData = actor.getRollData();
+
+               // Get a new item check
+               const itemCheck = new TitanItemCheck({
+                  actorRollData: actorRollData,
+                  itemRollData: itemRollData,
+                  checkIdx: idx,
+               });
+               await itemCheck.evaluateCheck();
+               await itemCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: actor }),
+                  rollMode: game.settings.get("core", "rollMode"),
+               });
+            }
+         }
+      }
+   }
 </script>
 
 <ol>
    <!--Each check-->
-   {#each item.system.check as check}
+   {#each item.system.check as check, idx}
       <li>
          <!--Header-->
-         <div class="header {check.attribute}">
-            <!--Icon-->
-            <i class="fas fa-dice" />
-
-            <!--Label-->
-            <div>{check.label}</div>
+         <div class="button">
+            <ItemCheckButton
+               {check}
+               on:click={() => {
+                  rollItemCheck(check, idx);
+               }}
+            />
          </div>
 
          <div class="tags">
@@ -89,18 +125,9 @@
             padding-top: 0.5rem;
          }
 
-         .header {
+         .button {
             @include flex-row;
             @include flex-group-center;
-            @include font-size-normal;
-            @include border;
-            @include attribute-colors;
-            padding: 0.25rem;
-            font-weight: bold;
-
-            i {
-               margin-right: 0.25rem;
-            }
          }
 
          .tags {
