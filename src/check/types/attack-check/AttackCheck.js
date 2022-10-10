@@ -111,10 +111,10 @@ export default class TitanAttackCheck extends TitanCheck {
                   (isNaN(options.attackerAccuracy) ? actorRollData.rating.accuracy.value : options.attackerAccuracy);
 
             // Difficulty = 4 + defense rating - attacker rating
-            this.parameters.difficulty = clamp(this.parameters.targetDefense - parameters.attackerRating + 4, 2, 6);
+            parameters.difficulty = clamp(parameters.targetDefense - parameters.attackerRating + 4, 2, 6);
          }
          else {
-            this.parameters.difficulty = 4;
+            parameters.difficulty = 4;
          }
       }
       else {

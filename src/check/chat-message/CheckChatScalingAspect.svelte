@@ -89,13 +89,6 @@
 
       return;
    }
-
-   function getExtraSuccessCostLabel() {
-      if (aspect.cost > 1) {
-         return `(${aspect.cost} / ${localize("extraSuccesses.short")})`;
-      }
-      return localize("extraSuccesses.short");
-   }
 </script>
 
 <!--Aspect-->
@@ -105,8 +98,8 @@
       <div class="label-inner">
          {aspect.label}: {$document.flags.titan.chatContext.results.scalingAspect[idx].currentValue}
       </div>
-      <div>
-         + {getExtraSuccessCostLabel()}
+      <div class="cost">
+         {localize("cost")}: {`${aspect.cost} ${localize("extraSuccesses.short")}`}
       </div>
    </div>
 

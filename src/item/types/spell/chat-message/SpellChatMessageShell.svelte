@@ -52,7 +52,7 @@
       {/if}
 
       <!--Footer-->
-      <div class="section small-text tags">
+      <div class="section tags">
          <!--Rarity-->
          <div class="tag">
             <RarityTag rarity={item.system.rarity} />
@@ -73,6 +73,7 @@
    .item-chat-message {
       @include flex-column;
       @include font-size-normal;
+      @include font-size-small;
       align-items: flex-start;
       justify-content: center;
       width: 100%;
@@ -114,10 +115,6 @@
             &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
             }
          }
       }

@@ -4,6 +4,7 @@
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // The key / name of the resistance
    export let key;
@@ -60,8 +61,8 @@
    <!--Stats-->
    <div class="stats">
       <!--Base Value-->
-      <div class="input">
-         <DocumentIntegerInput bind:value={$document.system.resistance[key].baseValue} />
+      <div class="base-value">
+         {$document.system.resistance[key].baseValue}
       </div>
       <div class="label">+</div>
 
@@ -120,6 +121,16 @@
          .input {
             @include flex-row;
             @include flex-group-center;
+            height: 100%;
+            width: 1.75rem;
+         }
+
+         .base-value {
+            @include flex-row;
+            @include flex-group-center;
+            @include label;
+            @include border;
+            font-weight: bold;
             height: 100%;
             width: 1.75rem;
          }

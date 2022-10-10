@@ -31,6 +31,7 @@
    .check-chat-message {
       @include flex-column;
       @include flex-group-top;
+      @include font-size-small;
       width: 100%;
 
       .section {
