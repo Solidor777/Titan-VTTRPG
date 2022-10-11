@@ -130,7 +130,6 @@
             @include flex-group-center;
             @include label;
             @include border;
-            font-weight: bold;
             height: 100%;
             width: 1.75rem;
          }
