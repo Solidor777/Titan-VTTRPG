@@ -429,24 +429,32 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       let initiativeFormula = '';
       const initiativeSettings = game.settings.get('titan', 'initiativeFormula');
       if (initiativeSettings === 'roll2d6') {
-         initiativeFormula = '2d6+';
+         initiativeFormula = '2d6 + ';
       }
       else if (initiativeSettings === 'roll1d6') {
-         initiativeFormula = '1d6+';
+         initiativeFormula = '1d6 + ';
       }
 
-      const roll = new Roll(
-         initiativeFormula +
-         initiative.toString() +
-         (options !== undefined && options.bonus !== undefined ?
-            options.bonus.toString() : '')
-      );
-      const retVal = {
-         outRoll: roll,
-         outInitiativeMod: initiative,
-      };
+      return new Roll(`${initiativeFormula}${initiative}`);
+   }
 
-      return retVal;
+   async rollInitiative(options) {
+      const roll = await this.getInitiativeRoll(options);
+      await roll.evaluate({ async: true });
+      const chatMessage = await ChatMessage.create(
+         ChatMessage.applyRollMode(
+            {
+               user: options?.user ? options.user : game.user.id,
+               speaker: options?.speaker ? options.speaker : null,
+               type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+               roll: roll,
+               content: "<p>Test</p>"
+            },
+            options?.rollMode ?
+               options.rollMode :
+               game.settings.get('core', 'rollMode')
+         )
+      );
    }
 
    // Get a skill check from the actor

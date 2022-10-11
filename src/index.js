@@ -24,10 +24,27 @@ import TitanTokenDocument from './documents/TokenDocument';
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
 
+   // Register system settings
+   registerSystemSettings();
+   registerTooltipSettings();
+
    // Register Document Classes
    CONFIG.Actor.documentClass = TitanActor;
    CONFIG.Item.documentClass = TitanItem;
    CONFIG.Token.documentClass = TitanTokenDocument;
+
+   // Register initiative formula 
+   let initiativeFormula = '';
+   const initiativeSettings = game.settings.get('titan', 'initiativeFormula');
+   if (initiativeSettings === 'roll2d6') {
+      initiativeFormula = '2d6+';
+   }
+   else if (initiativeSettings === 'roll1d6') {
+      initiativeFormula = '1d6 + ';
+   }
+   CONFIG.Combat.initiative = {
+      formula: `${initiativeFormula}@rating.initiative.value`
+   };
 
    // Register Sheet Classes
    Actors.registerSheet('titan', TitanPlayerSheet, {
@@ -66,10 +83,6 @@ Hooks.once('init', async () => {
       types: ['weapon'],
       makeDefault: true,
    });
-
-   // Register system settings
-   registerSystemSettings();
-   registerTooltipSettings();
 
    return;
 });
