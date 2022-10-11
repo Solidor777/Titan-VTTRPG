@@ -77,7 +77,7 @@
          <ModTag
             currentValue={$document.system.resistance[key].value}
             baseValue={$document.system.resistance[key].baseValue +
-               $document.system.resistance[key].mod.effect +
+               $document.system.resistance[key].mod.equipment +
                $document.system.resistance[key].mod.ability}
          />
       </div>

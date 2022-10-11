@@ -31,7 +31,6 @@ export default class TitanShieldSheet extends TitanItemSheet {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-
    editShieldTraits() {
       const dialog = new ShieldEditTraitsDialog(this.reactive.document);
       dialog.render(true);

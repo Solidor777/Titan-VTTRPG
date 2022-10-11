@@ -80,7 +80,7 @@
          <ModTag
             currentValue={$document.system.attribute[key].value}
             baseValue={$document.system.attribute[key].baseValue +
-               $document.system.attribute[key].mod.effect +
+               $document.system.attribute[key].mod.equipment +
                $document.system.attribute[key].mod.ability}
          />
       </div>

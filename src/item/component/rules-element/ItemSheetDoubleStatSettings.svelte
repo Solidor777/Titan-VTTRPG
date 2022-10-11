@@ -5,7 +5,6 @@
    import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
    import DocumentModSelect from "~/documents/components/select/DocumentModSelect.svelte";
    import DocumentRatingSelect from "~/documents/components/select/DocumentRatingSelect.svelte";
@@ -135,11 +134,9 @@
          }
       }
    }
-
-   // Setup tabs
 </script>
 
-{#if element && element.operation === "flatModifier"}
+{#if element && element.operation === "doubleStat"}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -161,11 +158,6 @@
          <!--Key-->
          <div class="field select">
             <svelte:component this={getSelector()} bind:value={element.key} />
-         </div>
-
-         <!--Value-->
-         <div class="field number">
-            <DocumentIntegerInput bind:value={element.value} />
          </div>
       </div>
 
@@ -205,11 +197,6 @@
 
             &.select {
                @include flex-group-left;
-            }
-
-            &.number {
-               @include flex-group-center;
-               width: 2rem;
             }
          }
       }

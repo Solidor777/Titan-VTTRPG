@@ -112,12 +112,12 @@ export function applyFlatModifier(flatModifier) {
    return;
 }
 
-export function getFlatModifierTemplate(sourceType) {
+export function getFlatModifierTemplate(uuid) {
    return {
       operation: 'flatModifier',
       selector: 'attribute',
       key: 'body',
       value: 1,
-      uuid: uuidv4()
+      uuid: uuid ?? uuidv4()
    };
 }

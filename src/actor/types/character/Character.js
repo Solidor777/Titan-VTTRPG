@@ -1,5 +1,6 @@
 import { clamp } from '~/helpers/Utility.js';
-import { applyFlatModifier } from '~/rules-element/FlatModifier';
+import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
+import { applyDoubleStat } from '~/rules-element/DoubleStat.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -16,6 +17,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply rules element bindings
    applyFlatModifier = applyFlatModifier.bind(this);
+   applyDoubleStat = applyDoubleStat.bind(this);
 
    // Prepare Character type specific data
    prepareDerivedData() {
@@ -168,11 +170,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Sort the rules elements and process them in order
+
+      // Double Stat
+      const doubleStats = rulesElements.filter((element) => element.operation === 'doubleStat');
+      doubleStats.forEach((doubleStat) => {
+         this.applyDoubleStat(doubleStat);
+      });
+
       // FlatModifier
       const flatMods = rulesElements.filter((element) => element.operation === 'flatModifier');
       flatMods.forEach((flatMod) => {
          this.applyFlatModifier(flatMod);
       });
+
 
       return;
    }

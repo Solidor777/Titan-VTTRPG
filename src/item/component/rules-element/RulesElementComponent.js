@@ -1,4 +1,4 @@
-import { getFlatModifierTemplate } from "~/rules-element/FlatModifier";
+import { getFlatModifierTemplate } from "~/rules-element/FlatModifier.js";
 
 export async function addRulesElement() {
    // Get a new element
