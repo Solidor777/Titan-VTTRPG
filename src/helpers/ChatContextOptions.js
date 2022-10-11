@@ -40,7 +40,7 @@ async function reRollCheckFailures(li) {
       const newResults = recalculateCheckResults(chatContext);
 
       // Update the message
-      message.update({
+      await message.update({
          flags: {
             titan: {
                chatContext: {
@@ -67,7 +67,44 @@ async function doubleExpertise(li) {
       chatContext.parameters.totalExpertise *= 2;
 
       // Update the message
-      message.update({
+      await message.update({
+         flags: {
+            titan: {
+               chatContext: chatContext
+            },
+         },
+      });
+   }
+
+   return;
+}
+
+async function doubleTraining(li) {
+   // If expertise is not already doubled
+   const message = game.messages.get(li.data("messageId"));
+   const chatContext = message.getFlag('titan', 'chatContext');
+
+   // Re roll dice equal to the number of falures
+   if (chatContext.parameters.doubleTraining === false && chatContext.parameters.totalTrainingDice > 0) {
+      chatContext.parameters.doubleTraining = true;
+
+      // Roll the new dice
+      const roll = new Roll(`${chatContext.parameters.totalTrainingDice}d6`);
+      await roll.evaluate({ async: true });
+      const newDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
+      const newDiceResults = chatContext.results.dice.concat(newDice.map((die) => {
+         return {
+            expertiseApplied: 0,
+            base: die,
+            final: die
+         };
+      }));
+
+      // Update the message
+      chatContext.results.totalDice += chatContext.parameters.totalTrainingDice;
+      chatContext.parameters.totalTrainingDice *= 2;
+      chatContext.results.dice = newDiceResults;
+      await message.update({
          flags: {
             titan: {
                chatContext: chatContext
@@ -103,6 +140,19 @@ export function registerChatContextOptions(html, options) {
       return false;
    };
 
+   let canDoubleTraining = (li) => {
+      const message = game.messages.get(li.data("messageId"));
+      if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
+         const chatContext = message.getFlag('titan', 'chatContext');
+         return chatContext.isCheck = true &&
+            chatContext.parameters.doubleTraining === false &&
+            chatContext.parameters.totalTrainingDice > 0;
+      }
+
+      return false;
+   };
+
+
    options.push(
       {
          name: localize("reRollFailures"),
@@ -115,6 +165,12 @@ export function registerChatContextOptions(html, options) {
          icon: '<i class="fas fa-graduation-cap"></i>',
          condition: canDoubleExpertise,
          callback: (li) => doubleExpertise(li)
+      },
+      {
+         name: localize("doubleTraining"),
+         icon: '<i class="fas fa-dumbbell"></i>',
+         condition: canDoubleTraining,
+         callback: (li) => doubleTraining(li)
       },
    );
 }
