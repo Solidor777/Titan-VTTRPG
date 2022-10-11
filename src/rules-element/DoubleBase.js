@@ -1,28 +1,28 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export function applyDoubleStat(doubleStat) {
+export function applyDoubleBase(doubleBase) {
    // Ensure the modifier is valid
-   if (doubleStat === undefined) {
+   if (doubleBase === undefined) {
       console.error(`TITAN | Error applying Double Stat. Undefined Element.`);
       console.trace();
 
       return false;
    }
-   if (doubleStat.selector === undefined) {
+   if (doubleBase.selector === undefined) {
       console.error(`TITAN | Error applying Double Stat. Undefined Selector.`);
       console.trace();
 
       return false;
    }
 
-   if (doubleStat.key === undefined) {
+   if (doubleBase.key === undefined) {
       console.error(`TITAN | Error applying Double Stat. Undefined Key.`);
       console.trace();
 
       return false;
    }
 
-   if (doubleStat.type === undefined) {
+   if (doubleBase.type === undefined) {
       console.error(`TITAN | Error applying Double Stat. Undefined Type.`);
       console.trace();
 
@@ -33,49 +33,49 @@ export function applyDoubleStat(doubleStat) {
    let mods = {};
    let baseValue = 0;
    const systemData = this.parent.system;
-   switch (doubleStat.selector) {
+   switch (doubleBase.selector) {
       case 'attribute': {
-         mods = systemData.attribute[doubleStat.key].mod;
-         baseValue = systemData.attribute[doubleStat.key].baseValue;
+         mods = systemData.attribute[doubleBase.key].mod;
+         baseValue = systemData.attribute[doubleBase.key].baseValue;
          break;
       }
       case 'resistance': {
-         mods = systemData.resistance[doubleStat.key].mod;
-         baseValue = systemData.resistance[doubleStat.key].baseValue;
+         mods = systemData.resistance[doubleBase.key].mod;
+         baseValue = systemData.resistance[doubleBase.key].baseValue;
          break;
       }
       case 'training': {
-         mods = systemData.skill[doubleStat.key].training.mod;
-         baseValue = mods = systemData.skill[doubleStat.key].training.value;
+         mods = systemData.skill[doubleBase.key].training.mod;
+         baseValue = mods = systemData.skill[doubleBase.key].training.value;
          break;
       }
       case 'expertise': {
-         mods = systemData.skill[doubleStat.key].expertise.mod;
-         baseValue = systemData.skill[doubleStat.key].expertise.baseValue;
+         mods = systemData.skill[doubleBase.key].expertise.mod;
+         baseValue = systemData.skill[doubleBase.key].expertise.baseValue;
          break;
       }
       case 'rating': {
-         mods = systemData.rating[doubleStat.key].mod;
-         baseValue = systemData.rating[doubleStat.key].baseValue;
+         mods = systemData.rating[doubleBase.key].mod;
+         baseValue = systemData.rating[doubleBase.key].baseValue;
          break;
       }
       case 'resource': {
-         mods = systemData.resource[doubleStat.key].mod;
-         baseValue = systemData.resource[doubleStat.key].maxBase;
+         mods = systemData.resource[doubleBase.key].mod;
+         baseValue = systemData.resource[doubleBase.key].maxBase;
          break;
       }
       case 'speed': {
-         mods = systemData.speed[doubleStat.key].mod;
-         baseValue = systemData.speed[doubleStat.key].baseValue;
+         mods = systemData.speed[doubleBase.key].mod;
+         baseValue = systemData.speed[doubleBase.key].baseValue;
          break;
       }
       case 'mod': {
-         mods = systemData.mod[doubleStat.key].mod;
-         baseValue = systemData.mod[doubleStat.key].baseValue;
+         mods = systemData.mod[doubleBase.key].mod;
+         baseValue = systemData.mod[doubleBase.key].baseValue;
          break;
       }
       default: {
-         console.error(`TITAN | Error applying Flat Modifier. Invalid Selector (${doubleStat.selector})`);
+         console.error(`TITAN | Error applying Flat Modifier. Invalid Selector (${doubleBase.selector})`);
          console.trace();
 
          return false;
@@ -84,7 +84,7 @@ export function applyDoubleStat(doubleStat) {
 
    // Ensure there is a valid object for the mods
    let type = '';
-   switch (doubleStat.type) {
+   switch (doubleBase.type) {
       case 'ability': {
          type = 'ability';
          break;
@@ -101,7 +101,7 @@ export function applyDoubleStat(doubleStat) {
          break;
       }
       default: {
-         console.error(`TITAN | Error applying Flat Modifier. Invalid Type (${doubleStat.type})`);
+         console.error(`TITAN | Error applying Flat Modifier. Invalid Type (${doubleBase.type})`);
          console.trace();
 
          return false;
@@ -114,9 +114,9 @@ export function applyDoubleStat(doubleStat) {
    return;
 }
 
-export function getDoubleStatTemplate(uuid) {
+export function getDoubleBaseTemplate(uuid) {
    return {
-      operation: 'doubleStat',
+      operation: 'doubleBase',
       selector: 'attribute',
       key: 'body',
       uuid: uuid ?? uuidv4()

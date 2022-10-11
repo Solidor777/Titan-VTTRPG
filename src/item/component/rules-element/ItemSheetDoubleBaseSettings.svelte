@@ -136,7 +136,7 @@
    }
 </script>
 
-{#if element && element.operation === "doubleStat"}
+{#if element && element.operation === "doubleBase"}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">

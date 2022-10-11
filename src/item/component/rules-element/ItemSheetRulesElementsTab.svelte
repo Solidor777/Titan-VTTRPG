@@ -6,7 +6,7 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ItemSheetFlatModifierSettings from "./ItemSheetFlatModifierSettings.svelte";
-   import ItemSheetDoubleStatSettings from "./ItemSheetDoubleStatSettings.svelte";
+   import ItemSheetDoubleBaseSettings from "./ItemSheetDoubleBaseSettings.svelte";
 
    // Setup context variables
    const application = getContext("external").application;
@@ -19,15 +19,15 @@
          value: "flatModifier",
       },
       {
-         label: localize("doubleStat"),
-         value: "doubleStat",
+         label: localize("doubleBase"),
+         value: "doubleBase",
       },
    ];
 
    function selectComponent(operation) {
       const elementComponents = {
          flatModifier: ItemSheetFlatModifierSettings,
-         doubleStat: ItemSheetDoubleStatSettings,
+         doubleBase: ItemSheetDoubleBaseSettings,
       };
 
       return elementComponents[operation];

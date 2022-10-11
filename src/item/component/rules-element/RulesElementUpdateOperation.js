@@ -1,5 +1,5 @@
 import { getFlatModifierTemplate } from "~/rules-element/FlatModifier.js";
-import { getDoubleStatTemplate } from "~/rules-element/DoubleStat.js";
+import { getDoubleBaseTemplate } from "~/rules-element/DoubleBase.js";
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    switch (document.system.rulesElement[elementIdx].operation) {
@@ -7,8 +7,8 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getFlatModifierTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
-      case "doubleStat": {
-         document.system.rulesElement[elementIdx] = getDoubleStatTemplate(document.system.rulesElement[elementIdx].uuid);
+      case "doubleBase": {
+         document.system.rulesElement[elementIdx] = getDoubleBaseTemplate(document.system.rulesElement[elementIdx].uuid);
 
          break;
       }
