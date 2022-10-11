@@ -83,6 +83,7 @@ export default class TitanItemCheck extends TitanCheck {
          if (parameters.doubleTraining) {
             totalTrainingDice *= 2;
          }
+         parameters.totalTrainingDice = totalTrainingDice;
          parameters.totalDice += totalTrainingDice;
 
          // Calculcate the total expertise

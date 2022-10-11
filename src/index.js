@@ -2,7 +2,7 @@ import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Mixins.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
-import { registerChatContextOptions } from './helpers/ChatContextOptions';
+import { registerChatContextOptions } from './helpers/ChatContextOptions.js';
 import registerSystemSettings from './system/RegisterSystemSettings.js';
 import registerTooltipSettings from './system/TooltipManager';
 import TitanStatusEffects from './helpers/StatusEffects.js';

@@ -75,6 +75,7 @@ export default class TitanCastingCheck extends TitanCheck {
       if (parameters.doubleTraining) {
          totalTrainingDice *= 2;
       }
+      parameters.totalTrainingDice = totalTrainingDice;
 
       // Add the training dice to the total dice
       parameters.totalDice = parameters.diceMod + parameters.attributeDice + totalTrainingDice;

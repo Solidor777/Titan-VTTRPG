@@ -77,11 +77,27 @@
       {/if}
    {/if}
 
-   <!--Rerolled failires-->
+   <!--Rerolled failures-->
    {#if $document.flags.titan.chatContext.failuresReRolled}
       <div class="stat">
          <i class="fas fa-dice" />
          {localize(`failuresReRolled`)}
+      </div>
+   {/if}
+
+   <!--Training Doubled-->
+   {#if $document.flags.titan.chatContext.parameters.doubleTraining && $document.flags.titan.chatContext.parameters.totalTrainingDice > 0}
+      <div class="stat">
+         <i class="fas fa-dumbbell" />
+         {localize(`trainingDoubled`)}
+      </div>
+   {/if}
+
+   <!--Expertise Doubled-->
+   {#if $document.flags.titan.chatContext.parameters.doubleExpertise && $document.flags.titan.chatContext.parameters.totalExpertise > 0}
+      <div class="stat">
+         <i class="fas fa-graduation-cap" />
+         {localize(`expertiseDoubled`)}
       </div>
    {/if}
 </div>

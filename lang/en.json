@@ -422,6 +422,8 @@
   "LOCAL.itemCheck.label": "Item Check",
   "LOCAL.failuresReRolled.label": "Failures Re-rolled",
   "LOCAL.reRollFailures.label": "Re-roll Failures",
+  "LOCAL.expertiseDoubled.label": "Expertise Doubled",
+  "LOCAL.trainingDoubled.label": "Training Doubled",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

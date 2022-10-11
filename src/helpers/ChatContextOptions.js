@@ -8,7 +8,7 @@ async function reRollCheckFailures(li) {
    let failureCount = 0;
    let expertiseToRefund = 0;
    const successes = chatContext.results.dice.filter((die) => {
-      if (die.success) {
+      if (die.base >= chatContext.parameters.difficulty) {
          return true;
       }
       else {
@@ -39,6 +39,7 @@ async function reRollCheckFailures(li) {
       // Recalculate the check
       const newResults = recalculateCheckResults(chatContext);
 
+      // Update the message
       message.update({
          flags: {
             titan: {
@@ -50,6 +51,32 @@ async function reRollCheckFailures(li) {
          },
       });
    }
+
+   return;
+}
+
+async function doubleExpertise(li) {
+   // If expertise is not already doubled
+   const message = game.messages.get(li.data("messageId"));
+   const chatContext = message.getFlag('titan', 'chatContext');
+
+   // Re roll dice equal to the number of falures
+   if (chatContext.parameters.doubleExpertise === false && chatContext.parameters.totalExpertise > 0) {
+      chatContext.parameters.doubleExpertise = true;
+      chatContext.results.expertiseRemaining += chatContext.parameters.totalExpertise;
+      chatContext.parameters.totalExpertise *= 2;
+
+      // Update the message
+      message.update({
+         flags: {
+            titan: {
+               chatContext: chatContext
+            },
+         },
+      });
+   }
+
+   return;
 }
 
 export function registerChatContextOptions(html, options) {
@@ -58,7 +85,19 @@ export function registerChatContextOptions(html, options) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message.getFlag('titan', 'chatContext');
-         return chatContext.isCheck = true;
+         return chatContext.isCheck = true && chatContext.failuresReRolled === false;
+      }
+
+      return false;
+   };
+
+   let canDoubleExpertise = (li) => {
+      const message = game.messages.get(li.data("messageId"));
+      if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
+         const chatContext = message.getFlag('titan', 'chatContext');
+         return chatContext.isCheck = true &&
+            chatContext.parameters.doubleExpertise === false &&
+            chatContext.parameters.totalExpertise > 0;
       }
 
       return false;
@@ -70,6 +109,12 @@ export function registerChatContextOptions(html, options) {
          icon: '<i class="fas fa-dice"></i>',
          condition: canUseCheckControls,
          callback: (li) => reRollCheckFailures(li)
+      },
+      {
+         name: localize("doubleExpertise"),
+         icon: '<i class="fas fa-graduation-cap"></i>',
+         condition: canDoubleExpertise,
+         callback: (li) => doubleExpertise(li)
       },
    );
 }
