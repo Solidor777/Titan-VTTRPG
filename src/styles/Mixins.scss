@@ -24,6 +24,7 @@
   text-align: var(--text-alignment);
   height: var(--input-height);
   width: var(--input-width);
+  padding: var(--input-padding);
 }
 
 @mixin input-disabled {
