@@ -40,7 +40,7 @@
 
       .sub-label {
          @include font-size-normal;
-         margin-top: 0.5rem;
+         margin-top: 0.25rem;
       }
    }
 </style>
