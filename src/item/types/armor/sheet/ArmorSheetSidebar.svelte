@@ -17,6 +17,7 @@
       <div class="section" transition:slide|local>
          <ArmorSheetSidebarTraits />
       </div>
+
       <!--Checks-->
       {#if $document.system.check.length > 0}
          <div class="section" transition:slide|local>

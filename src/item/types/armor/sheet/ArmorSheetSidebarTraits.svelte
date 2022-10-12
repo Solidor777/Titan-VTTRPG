@@ -12,7 +12,7 @@
 
 <div class="traits">
    <!--Edit Traits Button-->
-   <div class="edit-traits-button">
+   <div class="button">
       <EfxButton
          on:click={() => {
             application.editArmorTraits();
@@ -22,6 +22,22 @@
             <i class="fas fa-pen-to-square" />
             <div class="label">
                {localize("editTraits")}
+            </div>
+         </div>
+      </EfxButton>
+   </div>
+
+   <!--Add Custom Trait Button-->
+   <div class="button">
+      <EfxButton
+         on:click={() => {
+            application.editArmorTraits();
+         }}
+      >
+         <div class="button-contents">
+            <i class="fas fa-circle-plus" />
+            <div class="label">
+               {localize("addCustomTrait")}
             </div>
          </div>
       </EfxButton>
@@ -48,11 +64,17 @@
       width: 100%;
       height: 100%;
 
-      .edit-traits-button {
+      .button {
          @include flex-row;
          @include flex-group-center;
          @include z-index-app;
          margin-top: 0.5rem;
+         --button-font-size: var(--font-size-small);
+         --button-line-height: 1.25rem;
+
+         &:not(:first-child) {
+            margin-left: 0.25rem;
+         }
 
          .button-contents {
             @include flex-row;

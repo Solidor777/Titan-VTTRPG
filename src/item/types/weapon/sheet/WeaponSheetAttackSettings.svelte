@@ -301,8 +301,13 @@
                @include flex-row;
                @include flex-group-center;
 
-               .button:not(:first-child) {
-                  margin-left: 0.25rem;
+               .button {
+                  --button-font-size: var(--font-size-small);
+                  --button-line-height: 1.25rem;
+
+                  &:not(:first-child) {
+                     margin-left: 0.25rem;
+                  }
                }
             }
 
