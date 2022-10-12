@@ -431,7 +431,7 @@
       "xp": {
         "earned": 0
       },
-      "inspiration": 0
+      "inspiration": false
     },
     "npc": {
       "templates": [

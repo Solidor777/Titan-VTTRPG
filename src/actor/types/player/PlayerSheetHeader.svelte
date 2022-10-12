@@ -6,6 +6,7 @@
    import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
    import CharacterSheetResistances from "~/actor/types/character/sheet/header/CharacterSheetResistances.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
+   import CharacterSheetInspiration from "../character/sheet/header/CharacterSheetInspiration.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -17,6 +18,11 @@
       <!--Character name Sheet-->
       <div class="actor-name">
          <DocumentName />
+      </div>
+
+      <!--Inspiration Toggle-->
+      <div class="inspiration">
+         <CharacterSheetInspiration />
       </div>
 
       <!--Exp-->
@@ -71,7 +77,13 @@
             @include flex-row;
             @include flex-group-left;
             flex: auto;
-            margin-right: 0.5rem;
+            margin-right: 0.25rem;
+         }
+
+         .inspiration {
+            @include flex-row;
+            @include flex-group-center;
+            margin-right: 0.25rem;
          }
 
          .xp {
