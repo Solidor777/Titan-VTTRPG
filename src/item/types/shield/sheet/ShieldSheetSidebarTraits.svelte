@@ -69,7 +69,6 @@
                         },
                      });
                   }}
-                  <Tag
                   label={trait.name}
                />
             </div>
