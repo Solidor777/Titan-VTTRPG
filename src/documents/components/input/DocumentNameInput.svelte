@@ -4,11 +4,9 @@
    const document = getContext("DocumentStore");
 </script>
 
-{#if $document.name !== undefined}
-   <div class="document-name">
-      <DocumentTextInput bind:value={$document.name} />
-   </div>
-{/if}
+<div class="document-name">
+   <DocumentTextInput bind:value={$document.name} />
+</div>
 
 <style lang="scss">
    .document-name {
