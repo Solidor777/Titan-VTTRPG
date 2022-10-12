@@ -1150,7 +1150,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          });
       }
 
-
       return;
    }
 }

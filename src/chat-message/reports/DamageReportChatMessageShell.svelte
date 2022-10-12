@@ -104,6 +104,7 @@
 
          .name {
             @include font-size-normal;
+            margin-top: 0.25rem;
          }
       }
 

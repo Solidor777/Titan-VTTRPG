@@ -80,7 +80,7 @@
   "LOCAL.customAspect.label": "Custom Aspect",
   "LOCAL.customAspects.label": "Custom Aspects",
   "LOCAL.damage.label": "Damage",
-  "LOCAL.damageReport.label": "Damage Report",
+  "LOCAL.damageReport.label": "Took Damage",
   "LOCAL.damageTaken.label": "Damage Taken",
   "LOCAL.dc.label": "DC",
   "LOCAL.deafened.label": "Deafened",
@@ -141,7 +141,8 @@
   "LOCAL.grip.label": "Grip",
   "LOCAL.healDamage.label": "Heal Damage",
   "LOCAL.healing.label": "Healing",
-  "LOCAL.healingReport.label": "Healing Report",
+  "LOCAL.healingReport.label": "Healed Damage",
+  "LOCAL.regainedResolve.label": "Regained Resolve",
   "LOCAL.heavy.label": "Heavy",
   "LOCAL.ignoreArmor.label": "Ignore Armor",
   "LOCAL.incapacitated.label": "Incapacitated",
@@ -463,6 +464,10 @@
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
+  },
+  "SETTINGS.autoIncreaseResolve": {
+    "label": "Auto-increase combatent resolve.",
+    "hint": "When enabled, a combatant's resolve will automatically increase by 1 at the start of their turn."
   },
   "SETTINGS.initiativeFormula": {
     "label": "Initiative Formula",

@@ -17,5 +17,6 @@ export default Object.freeze(new Set([
    'healingReport',
    'removeTempEffectsReport',
    'breatherReport',
-   'restReport'
+   'restReport',
+   'resolveRegainReport'
 ]));

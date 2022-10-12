@@ -9,8 +9,8 @@
 
 <div class="healing-report">
    <div class="label">
-      <i class="fas fa-face-exhaling" />
-      {localize("tookABreather")}
+      <i class="fas fa-hand-fist" />
+      {localize("regainedResolve")}
       <div class="name">
          {chatContext.actorName}
       </div>
@@ -18,12 +18,7 @@
 
    <!--Sub label-->
    <div class="sub-label">
-      {localize("removeTemporaryEffects.desc")}
-   </div>
-
-   <!--Sub label-->
-   <div class="sub-label">
-      {localize("takeABreather.desc")}
+      {localize("resolve")}: {chatContext.resolve.value} / {chatContext.resolve.maxValue}
    </div>
 </div>
 

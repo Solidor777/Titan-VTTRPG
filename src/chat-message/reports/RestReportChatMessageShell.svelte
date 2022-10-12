@@ -9,12 +9,11 @@
 
 <div class="healing-report">
    <div class="label">
-      <i class="fas fa-bed" />{chatContext.actorName}
-   </div>
-
-   <!--Sub label-->
-   <div class="sub-label">
+      <i class="fas fa-bed" />
       {localize("tookARest")}
+      <div class="name">
+         {chatContext.actorName}
+      </div>
    </div>
 
    <!--Sub label-->
@@ -54,8 +53,6 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-normal;
-      @include border;
-      @include panel-2;
       width: 100%;
       padding: (0.25rem);
       font-weight: bold;
@@ -66,6 +63,15 @@
 
       .label {
          @include font-size-large;
+         @include border;
+         @include panel-2;
+         width: 100%;
+         padding: 0.25rem;
+
+         .name {
+            @include font-size-normal;
+            margin-top: 0.25rem;
+         }
       }
 
       .sub-label {

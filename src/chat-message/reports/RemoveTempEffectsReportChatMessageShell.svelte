@@ -24,8 +24,8 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-normal;
-      @include border;
       @include panel-2;
+      @include border;
       width: 100%;
       padding: (0.25rem);
       font-weight: bold;

@@ -10,6 +10,15 @@ export default function registerSystemSettings() {
     default: false,
   });
 
+  game.settings.register('titan', 'autoIncreaseResolve', {
+    config: true,
+    scope: 'client',
+    name: 'SETTINGS.autoIncreaseResolve.label',
+    hint: 'SETTINGS.autoIncreaseResolve.hint',
+    type: Boolean,
+    default: true,
+  });
+
   game.settings.register('titan', 'initiativeFormula', {
     config: true,
     scope: 'world',
