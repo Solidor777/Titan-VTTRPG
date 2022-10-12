@@ -148,18 +148,20 @@
             <div class="traits">
                <!--Header-->
                <div class="traits-header">
-                  <!--Label-->
-                  <div class="label">
-                     {localize("traits")}
-                  </div>
-
-                  <!--Edit Button-->
-                  <div class="edit-traits-button">
-                     <IconButton icon={"fas fa-pen-to-square"} on:click={application.editAttackTraits(idx)} />
+                  <!--Edit Traits-->
+                  <div class="button">
+                     <EfxButton
+                        on:click={() => {
+                           application.editAttackTraits(idx);
+                        }}
+                     >
+                        <i class="fas fa-pen-to-square" />
+                        {localize("editTraits")}
+                     </EfxButton>
                   </div>
 
                   <!--Custom Traits-->
-                  <div class="add-custom-trait">
+                  <div class="button">
                      <EfxButton
                         on:click={() => {
                            application.addCustomTrait(idx);
@@ -299,23 +301,8 @@
                @include flex-row;
                @include flex-group-center;
 
-               .label {
-                  @include flex-row;
-                  @include flex-group-center;
-                  font-weight: bold;
-                  @include font-size-normal;
-               }
-
-               .edit-traits-button {
-                  @include flex-row;
-                  @include flex-group-center;
-                  margin-left: 0.5rem;
-               }
-
-               .add-custom-trait {
-                  @include flex-row;
-                  @include flex-group-center;
-                  margin-left: 0.5rem;
+               .button:not(:first-child) {
+                  margin-left: 0.25rem;
                }
             }
 

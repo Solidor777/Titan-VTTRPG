@@ -19,10 +19,10 @@
          }}
       >
          <div class="button-contents">
+            <i class="fas fa-pen-to-square" />
             <div class="label">
                {localize("editTraits")}
             </div>
-            <i class="fas fa-circle-plus" />
          </div>
       </EfxButton>
    </div>
@@ -65,7 +65,7 @@
             }
 
             i {
-               margin-left: 0.5rem;
+               margin-right: 0.25rem;
             }
          }
       }
