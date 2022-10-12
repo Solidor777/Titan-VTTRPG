@@ -1,12 +1,12 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import WeaponEditAttackTraitsDialogShell from './WeaponEditAttackTraitsDialogShell.svelte';
-export default class WeaponEditAttackTraitsDialog extends TJSDialog {
+import WeaponAddCustomTraitDialogShell from './WeaponAddCustomTraitDialogShell.svelte';
+export default class WeaponAddCustomTraitDialog extends TJSDialog {
    constructor(document, attackIdx) {
       super(
          {
             title: `${document.name}: ${document.system.attack[attackIdx].label}`,
             content: {
-               class: WeaponEditAttackTraitsDialogShell,
+               class: WeaponAddCustomTraitDialogShell,
                props: {
                   attackIdx: attackIdx,
                   document: document,
@@ -18,8 +18,8 @@ export default class WeaponEditAttackTraitsDialog extends TJSDialog {
             classes: ['titan'],
          },
          {
-            width: 320,
-            height: 470,
+            width: 300,
+            height: 300,
          },
       );
    }

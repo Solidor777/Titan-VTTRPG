@@ -58,6 +58,7 @@ export default class TitanWeapon extends TitanTypeComponent {
          damage: 1,
          plusExtraSuccessDamage: true,
          trait: [],
+         customTrait: [],
          uuid: uuidv4()
       };
    }

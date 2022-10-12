@@ -83,7 +83,7 @@
          <div class="expandable-content" transition:slide|local>
             <!--Equip button-->
             {#if item.system.check.length > 0}
-               <div class="section space-evenly">
+               <div class="section">
                   <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
                </div>
             {/if}

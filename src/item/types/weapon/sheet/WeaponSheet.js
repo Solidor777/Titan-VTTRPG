@@ -1,5 +1,6 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
+import WeaponAddCustomTraitDialog from './WeaponAddCustomTraitDialog.js';
 import WeaponEditAttackTraitsDialog from './WeaponEditAttackTraitsDialog.js';
 import WeaponSheetShell from './WeaponSheetShell.svelte';
 import createWeaponSheetState from './WeaponSheetState.js';
@@ -35,6 +36,13 @@ export default class TitanWeaponSheet extends TitanItemSheet {
    // Opens the attack traits edit dialog
    editAttackTraits(attackIdx) {
       const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
+      dialog.render(true);
+      return;
+   }
+
+   // Opens the attack traits edit dialog
+   addCustomTrait(attackIdx) {
+      const dialog = new WeaponAddCustomTraitDialog(this.reactive.document, attackIdx);
       dialog.render(true);
       return;
    }

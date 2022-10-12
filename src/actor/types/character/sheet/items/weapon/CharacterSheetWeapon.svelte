@@ -81,9 +81,14 @@
       <!--Expandable content-->
       {#if isExpanded === true}
          <div class="expandable-content" transition:slide|local>
-            <div class="section space-evenly">
-               <CharacterSheetWeaponMultiAttackButton {item} />
-               <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
+            <div class="section buttons">
+               <div class="button">
+                  <CharacterSheetWeaponMultiAttackButton {item} />
+               </div>
+
+               <div class="button">
+                  <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
+               </div>
             </div>
 
             <!--Attacks-->
@@ -191,9 +196,13 @@
                @include border-top;
             }
 
-            &.space-evenly {
+            &.buttons {
                @include flex-row;
-               @include flex-space-evenly;
+               @include flex-group-center;
+
+               .button:not(:first-child) {
+                  margin-left: 0.25rem;
+               }
             }
 
             &.tags {
@@ -206,7 +215,7 @@
                }
             }
 
-            &:not(.space-evenly) &:not(.tags) {
+            &:not(.buttons) &:not(.tags) {
                @include flex-column;
                @include flex-group-top;
             }

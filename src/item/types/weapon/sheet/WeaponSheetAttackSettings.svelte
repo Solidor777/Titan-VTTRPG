@@ -11,6 +11,8 @@
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
    import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
    import DocumentRangeTypeSelect from "~/documents/components/select/DocumentRangeTypeSelect.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import DeleteTag from "~/helpers/svelte-components/tag/DeleteTag.svelte";
 
    // Attack idx
    export let idx = void 0;
@@ -155,8 +157,20 @@
                   <div class="edit-traits-button">
                      <IconButton icon={"fas fa-pen-to-square"} on:click={application.editAttackTraits(idx)} />
                   </div>
+
+                  <!--Custom Traits-->
+                  <div class="add-custom-trait">
+                     <EfxButton
+                        on:click={() => {
+                           application.addCustomTrait(idx);
+                        }}
+                     >
+                        <i class="fas fa-circle-plus" />
+                        {localize("addCustomTrait")}
+                     </EfxButton>
+                  </div>
                </div>
-               {#if attack.trait.length > 0}
+               {#if attack.trait.length > 0 || attack.customTrait.length > 0}
                   <div class="traits-container">
                      <!--Each trait-->
                      {#each attack.trait as trait (trait.name)}
@@ -168,6 +182,24 @@
                               <!--Bool Trait-->
                               <Tag label={localize(trait.name)} />
                            {/if}
+                        </div>
+                     {/each}
+
+                     <!--Each custom trait-->
+                     {#each attack.customTrait as trait, idx (trait.uuid)}
+                        <div class="trait" data-tooltip={trait.description}>
+                           <!--Bool Trait-->
+                           <DeleteTag
+                              label={trait.name}
+                              deleteFunction={() => {
+                                 attack.customTrait.splice(idx, 1);
+                                 $document.update({
+                                    system: {
+                                       attack: $document.system.attack,
+                                    },
+                                 });
+                              }}
+                           />
                         </div>
                      {/each}
                   </div>
@@ -275,6 +307,12 @@
                }
 
                .edit-traits-button {
+                  @include flex-row;
+                  @include flex-group-center;
+                  margin-left: 0.5rem;
+               }
+
+               .add-custom-trait {
                   @include flex-row;
                   @include flex-group-center;
                   margin-left: 0.5rem;

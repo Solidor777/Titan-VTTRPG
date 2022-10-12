@@ -66,6 +66,13 @@
                   {/if}
                </div>
             {/each}
+
+            <!--Custom Traits-->
+            {#each attack.customTrait as trait}
+               <div class="stat" data-tooltip={trait.description}>
+                  <Tag label={trait.name} />
+               </div>
+            {/each}
          </div>
       </li>
    {/each}

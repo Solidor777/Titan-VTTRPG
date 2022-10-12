@@ -90,6 +90,7 @@
                   />
                </div>
 
+               <!--Normal Traits-->
                {#each attack.trait as trait (trait.name)}
                   <div class="stat" data-tooltip={localize(`${trait.name}.desc`)} transition:slide|local>
                      {#if trait.type === "number"}
@@ -99,6 +100,13 @@
                         <!--Bool Trait-->
                         <Tag label={localize(trait.name)} />
                      {/if}
+                  </div>
+               {/each}
+
+               <!--Custom Traits-->
+               {#each attack.customTrait as trait (trait.uuid)}
+                  <div class="stat" data-tooltip={trait.description} transition:slide|local>
+                     <Tag label={trait.name} />
                   </div>
                {/each}
             </div>
@@ -163,6 +171,7 @@
             @include flex-group-center;
             @include border-bottom-sides;
             @include panel-3;
+            @include font-size-small;
             width: calc(100% - 0.5rem);
             flex-wrap: wrap;
             padding: 0 0.25rem 0.5rem 0.25rem;
