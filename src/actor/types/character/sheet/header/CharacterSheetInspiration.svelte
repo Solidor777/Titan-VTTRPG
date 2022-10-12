@@ -8,7 +8,7 @@
 
 <div class="button" data-tooltip={localize("inspiration")}>
    <IconButton
-      icon={$document.system.inspiration ? "fas fa-circle-star" : ""}
+      icon={$document.system.inspiration ? "fas fa-sun" : ""}
       on:click={() => {
          const inspiration = !$document.system.inspiration;
          $document.update({
