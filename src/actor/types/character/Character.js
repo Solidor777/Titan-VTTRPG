@@ -458,7 +458,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                speaker: options?.speaker ? options.speaker : null,
                type: CONST.CHAT_MESSAGE_TYPES.ROLL,
                roll: roll,
-               content: "<p>Test</p>"
             },
             options?.rollMode ?
                options.rollMode :

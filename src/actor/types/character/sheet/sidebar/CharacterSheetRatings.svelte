@@ -1,26 +1,48 @@
 <script>
    import { getContext } from "svelte";
    import CharacterSheetRating from "./CharacterSheetRating.svelte";
+   import CharacterSheetRatingButton from "./CharacterSheetRatingButton.svelte";
 
-   // The Character Data
+   // Setup context variables
    const document = getContext("DocumentStore");
-
-   // Map of icons to use for the ratings
-   const ratingIcons = {
-      awareness: "eye",
-      defense: "shield",
-      melee: "sword",
-      accuracy: "bow-arrow",
-      initiative: "clock",
-   };
 </script>
 
 <div class="ratings">
-   {#each Object.entries($document.system.rating) as [key]}
-      <div class="rating">
-         <CharacterSheetRating {key} icon={ratingIcons[key]} />
-      </div>
-   {/each}
+   <!--Awareness-->
+   <div class="rating">
+      <CharacterSheetRating key={"awareness"} icon={"eye"} />
+   </div>
+
+   <!--Defense-->
+   <div class="rating">
+      <CharacterSheetRating key={"defense"} icon={"shield"} />
+   </div>
+
+   <!--Melee-->
+   <div class="rating">
+      <CharacterSheetRating key={"melee"} icon={"sword"} />
+   </div>
+
+   <!--Accuracy-->
+   <div class="rating">
+      <CharacterSheetRating key={"accuracy"} icon={"bow-arrow"} />
+   </div>
+
+   <!--Initiative-->
+   <div class="rating">
+      <!-- svelte-ignore missing-declaration -->
+      {#if game.settings.get("titan", "initiativeFormula") !== "flat"}
+         <CharacterSheetRatingButton
+            key={"initiative"}
+            icon={"clock"}
+            onClick={() => {
+               $document.typeComponent.rollInitiative();
+            }}
+         />
+      {:else}
+         <CharacterSheetRating key={"initiative"} icon={"clock"} />
+      {/if}
+   </div>
 </div>
 
 <style lang="scss">
