@@ -4,6 +4,8 @@
    import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import DeleteTag from "~/helpers/svelte-components/tag/DeleteTag.svelte";
+   import DocumentAddCustomTraitDialog from "~/documents/DocumentAddCustomTraitDialog";
 
    // Application statee reference
    const document = getContext("DocumentStore");
@@ -31,7 +33,8 @@
    <div class="button">
       <EfxButton
          on:click={() => {
-            application.editArmorTraits();
+            const dialog = new DocumentAddCustomTraitDialog($document);
+            dialog.render(true);
          }}
       >
          <div class="button-contents">
@@ -45,10 +48,30 @@
 
    <!--Traits-->
    <div class="traits-container" transition:slide|local>
-      {#if $document.system.trait.length > 0}
+      {#if $document.system.trait.length > 0 || $document.system.customTrait.length > 0}
          {#each $document.system.trait as trait (trait.name)}
             <div class="trait" transition:slide|local data-tooltip={localize(`${trait.name}.desc`)}>
                <Tag label={localize(trait.name)} />
+            </div>
+         {/each}
+
+         <!--Custom Traits-->
+         {#each $document.system.customTrait as trait, idx (trait.uuid)}
+            <div class="trait" data-tooltip={trait.description} transition:slide|local>
+               <DeleteTag
+                  deleteFunction={() => {
+                     const customTrait = $document.system.customTrait;
+                     customTrait.splice(idx, 1);
+
+                     $document.update({
+                        system: {
+                           customTrait: customTrait,
+                        },
+                     });
+                  }}
+                  <Tag
+                  label={trait.name}
+               />
             </div>
          {/each}
       {/if}
@@ -104,6 +127,7 @@
          @include flex-row;
          @include flex-group-center;
          @include tag-margin;
+         @include font-size-small;
          @include z-index-app;
       }
    }

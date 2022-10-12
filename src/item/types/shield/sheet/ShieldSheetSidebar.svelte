@@ -17,6 +17,7 @@
       <div class="section" transition:slide|local>
          <ShieldSheetSidebarTraits />
       </div>
+
       <!--Checks-->
       {#if $document.system.check.length > 0}
          <div class="section" transition:slide|local>

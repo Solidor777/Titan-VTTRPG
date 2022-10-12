@@ -483,14 +483,14 @@
       ],
       "armor": 2,
       "trait": [],
-      "rulesElement": []
+      "rulesElement": [],
+      "customTrait": []
     },
     "commodity": {
       "templates": [
         "base",
         "object"
       ],
-      "rulesElement": [],
       "quantity": 1
     },
     "effect": {
@@ -516,7 +516,8 @@
       ],
       "defense": 1,
       "trait": [],
-      "rulesElement": []
+      "rulesElement": [],
+      "customTrait": []
     },
     "spell": {
       "templates": [
@@ -733,7 +734,8 @@
       ],
       "attack": [],
       "attackNotes": "",
-      "multiAttack": false
+      "multiAttack": false,
+      "customTrait": []
     }
   }
 }

@@ -13,7 +13,7 @@
   "readme": "https://github.com/JustinCamden/Titan-VTTRPG/README.md",
   "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
   "changelog": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "compatibility": {
     "minimum": "10"
   },
