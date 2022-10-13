@@ -146,7 +146,8 @@ export default Object.freeze({
       template: {
          label: 'decreaseRating',
          cost: 0,
-         option: []
+         option: [],
+         resistanceCheck: 'none',
       },
       settings: {
          requireOption: true,

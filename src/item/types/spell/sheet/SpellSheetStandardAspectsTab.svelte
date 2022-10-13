@@ -9,7 +9,29 @@
    // Setup context variables
    const appState = getContext("ApplicationStateStore");
 
+   // Aspect Options
    const aspectOptions = foundry.utils.deepClone(spellAspects);
+
+   // Localize Option Labels
+   for (const [aspectKey, aspect] of Object.entries(aspectOptions)) {
+      // Localize value options
+      if (aspect.settings?.initialValueOptions) {
+         aspect.settings.initialValueOptions.forEach((option) => {
+            if (typeof option.label === "string") {
+               option.label = localize(option.label);
+            }
+         });
+      }
+
+      // Localize unit options
+      if (aspect.settings?.unitOptions) {
+         aspect.settings.unitOptions.forEach((option) => {
+            if (typeof option.label === "string") {
+               option.label = localize(option.label);
+            }
+         });
+      }
+   }
 </script>
 
 <div class="standard-aspects-tab">

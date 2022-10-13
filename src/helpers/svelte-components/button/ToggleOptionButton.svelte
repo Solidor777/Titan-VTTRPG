@@ -5,11 +5,7 @@
 </script>
 
 <div class="toggle enabled-{enabled === true}">
-   <EfxButton
-      on:click={() => {
-         enabled = !enabled;
-      }}
-   >
+   <EfxButton on:click>
       <div class="label">
          {label}
       </div>
@@ -24,7 +20,6 @@
       --button-padding: 0.25rem;
       --button-line-height: normal;
       --button-border-radius: 10px;
-      margin: 0.25rem;
 
       &.enabled-true {
          --button-background-color: var(--active-background-color);

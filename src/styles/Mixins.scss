@@ -339,6 +339,10 @@
   margin: 0.5rem 0.25rem 0 0.25rem;
 }
 
+@mixin tag-margin-small {
+  margin: 0.25rem 0.125rem 0 0.125rem;
+}
+
 @mixin font-size-normal {
   font-size: var(--font-size-normal);
 }

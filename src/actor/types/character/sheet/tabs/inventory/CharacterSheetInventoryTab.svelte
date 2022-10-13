@@ -39,7 +39,13 @@
       <!--Filter Options-->
       <div class="row">
          {#each Object.entries($appState.filterOptions.inventory) as [key]}
-            <ToggleOptionButton label={localize(key)} bind:enabled={$appState.filterOptions.inventory[key]} />
+            <ToggleOptionButton
+               label={localize(key)}
+               enabled={$appState.filterOptions.inventory[key]}
+               on:click={() => {
+                  $appState.filterOptions.inventory[key] = !$appState.filterOptions.inventory[key];
+               }}
+            />
          {/each}
 
          <!--Reset button-->
