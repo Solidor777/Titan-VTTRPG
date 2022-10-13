@@ -4,7 +4,7 @@
    import SpellAspects from "~/item/types/spell/SpellAspects.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import SpellSheetStandardAspect from "./SpellSheetStandardAspect.svelte";
+   import SpellSheetStandardAspectSettings from "./SpellSheetStandardAspectSettings.svelte";
 
    // Setup context variables
    const appState = getContext("ApplicationStateStore");
@@ -49,7 +49,7 @@
                   .indexOf($appState.filter.standardAspects.toLowerCase()) !== -1}
                   <!--Filter the Aspects-->
                   <li>
-                     <SpellSheetStandardAspect {aspectOptions} />
+                     <SpellSheetStandardAspectSettings {aspectOptions} />
                   </li>
                {/if}
             {/each}

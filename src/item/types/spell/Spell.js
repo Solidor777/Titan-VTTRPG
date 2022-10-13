@@ -26,7 +26,7 @@ export default class TitanSpell extends TitanTypeComponent {
          // Determine whether the aspect is enabled
          const settings = aspectOptions[aspect.label].settings;
          const template = aspectOptions[aspect.label].template;
-         if (settings?.requireOptions && aspect.option.length === 0) {
+         if (settings?.requireOption && aspect.option.length === 0) {
             aspect.enabled = false;
             aspect.cost = 0;
          }
@@ -65,112 +65,7 @@ export default class TitanSpell extends TitanTypeComponent {
          }
       });
 
-
       return;
-   }
-
-   _calculateStandardAspectCost(aspect, enabledCost, optionCost, allOptionCost, uniqueOptionCost) {
-      // If enabled
-      if (aspect.enabled) {
-         // If all options
-         if (aspect.allOptions) {
-            aspect.cost = allOptionCost;
-         }
-
-         // Otherwise
-         else {
-            // Initialize enabled cost
-            aspect.cost = typeof enabledCost === `object` ? enabledCost[aspect.value] : enabledCost;
-
-            // Calculate option cost
-            if (aspect.option) {
-               for (const [key, value] of Object.entries(aspect.option)) {
-                  if (value === true) {
-                     if (uniqueOptionCost) {
-                        aspect.cost += optionCost[key];
-                     }
-                     else {
-                        aspect.cost += typeof optionCost === 'object' ? optionCost[aspect.value] : optionCost;
-                     }
-                  }
-               }
-            }
-
-            // Cap the action cost
-            if (allOptionCost) {
-               aspect.cost = Math.min(aspect.cost, allOptionCost);
-            }
-         }
-
-         // Halve cost if a resistance is set
-         if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
-            aspect.cost = Math.ceil(aspect.cost / 2);
-         }
-      }
-      else {
-         aspect.cost = 0;
-      }
-   }
-
-   _prepareStandardAspectData(aspect, label, scaling, requireOptions, initialValue, isDamage, isHealing) {
-      if (aspect.enabled) {
-         // Check for options
-         const option = [];
-         if (aspect.option) {
-            for (const [key, value] of Object.entries(aspect.option)) {
-               if (value === true) {
-                  option.push(key);
-               }
-            }
-         }
-
-         if (!requireOptions || option.length > 0) {
-            // Initialize aspect entry
-            const aspectEntry = {
-               label: label,
-               cost: aspect.cost,
-            };
-
-            // Scaling
-            if (scaling) {
-               aspectEntry.scaling = true;
-            }
-
-            // Initial value
-            if (scaling === true) {
-               aspectEntry.initialValue = initialValue;
-               if (aspect.value) {
-                  aspectEntry.label = localize(`${aspect.value}`);
-               }
-            }
-            else if (aspect.value) {
-               aspectEntry.initialValue = aspect.value;
-            }
-
-            // Options
-            if (option.length > 0) {
-               aspectEntry.option = option;
-            }
-
-            // Resistance check
-            if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
-               aspectEntry.resistanceCheck = aspect.resistanceCheck;
-            }
-
-            // Damage
-            if (isDamage) {
-               aspectEntry.isDamage = true;
-            }
-
-            // Healing
-            if (isHealing) {
-               aspectEntry.isHealing = true;
-            }
-
-            // Push to the aspects array
-            this.parent.aspect.push(aspectEntry);
-         }
-      }
    }
 
    addCustomAspect() {
