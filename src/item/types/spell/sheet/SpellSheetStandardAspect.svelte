@@ -169,7 +169,7 @@
          @include z-index-app;
          @include font-size-small;
          @include panel-3;
-         padding: 0.25rem;
+         padding: 0 0.25rem 0.25rem;
          width: calc(100% - 30px);
 
          .row {
@@ -177,6 +177,10 @@
             @include flex-group-center;
             flex-wrap: wrap;
             width: 100%;
+
+            &:first-child:not(.tags) {
+               margin-top: 0.25rem;
+            }
 
             &:not(:first-child) {
                @include border-top;

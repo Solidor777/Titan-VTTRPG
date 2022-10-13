@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import spellAspects from "./SpellAspects.js";
+   import SpellAspects from "~/item/types/spell/SpellAspects.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import SpellSheetStandardAspect from "./SpellSheetStandardAspect.svelte";
@@ -10,7 +10,7 @@
    const appState = getContext("ApplicationStateStore");
 
    // Aspect Options
-   const aspectOptions = foundry.utils.deepClone(spellAspects);
+   const aspectOptions = foundry.utils.deepClone(SpellAspects);
 
    // Localize Option Labels
    for (const [aspectKey, aspect] of Object.entries(aspectOptions)) {

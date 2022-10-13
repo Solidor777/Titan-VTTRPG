@@ -4,6 +4,7 @@ export default Object.freeze({
          label: 'range',
          initialValue: 'self',
          cost: 0,
+         enabled: true
       },
       settings: {
          initialValueOptions: [
@@ -42,6 +43,7 @@ export default Object.freeze({
          label: 'radius',
          initialValue: 5,
          cost: 3,
+         enabled: true
       },
       settings: {
          initialValueOptions: [
@@ -67,6 +69,7 @@ export default Object.freeze({
          initialValue: 1,
          unit: 'rounds',
          cost: 1,
+         enabled: true
       },
       settings: {
          unitOptions: [
@@ -93,7 +96,8 @@ export default Object.freeze({
          cost: 1,
          resistanceCheck: 'none',
          isDamage: true,
-         option: []
+         option: [],
+         enabled: true
       },
       settings: {
          optionCost: 1,
@@ -107,6 +111,7 @@ export default Object.freeze({
          initialValue: 1,
          cost: 1,
          isHealing: true,
+         enabled: true
       }
    },
    decreaseMod: {
@@ -115,6 +120,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -131,6 +137,7 @@ export default Object.freeze({
          label: 'increaseMod',
          option: [],
          cost: 0,
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -148,6 +155,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -165,6 +173,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -182,6 +191,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -193,11 +203,12 @@ export default Object.freeze({
          optionCost: 1,
       }
    },
-   inreaseResistance: {
+   increaseResistance: {
       template: {
          label: 'increaseResistance',
          cost: 0,
          option: [],
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -215,6 +226,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -231,6 +243,7 @@ export default Object.freeze({
          label: 'increaseAttribute',
          cost: 0,
          option: [],
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -248,6 +261,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -279,6 +293,7 @@ export default Object.freeze({
          label: 'increaseSkill',
          cost: 0,
          option: [],
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -311,6 +326,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -328,6 +344,7 @@ export default Object.freeze({
          label: 'increaseSpeed',
          cost: 0,
          option: [],
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -346,6 +363,7 @@ export default Object.freeze({
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         enabled: false
       },
       settings: {
          requireOption: true,
@@ -381,6 +399,7 @@ export default Object.freeze({
          cost: 0,
          allOptions: false,
          option: [],
+         enabled: false
       },
       settings: {
          requireOption: true,
