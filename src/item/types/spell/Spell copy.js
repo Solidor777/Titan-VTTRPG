@@ -18,6 +18,37 @@ export default class TitanSpell extends TitanTypeComponent {
 
    prepareDerivedData() {
 
+      // Process custom aspects
+      this.parent.system.customAspect.forEach((element) => {
+         this._prepareCustomAspectData(element);
+      });
+
+      // Calculate total cost
+      let totalAspectCost = 1;
+      this.parent.aspect.forEach((element) => {
+         totalAspectCost += element.cost;
+      });
+      this.parent.totalAspectCost = totalAspectCost;
+
+      // Calculate suggested complexity and difficulty
+      let suggestedDifficulty = totalAspectCost;
+      let suggestedComplexity = 1;
+      if (suggestedDifficulty > 6) {
+         suggestedComplexity = totalAspectCost - 6;
+         suggestedDifficulty = 6;
+      }
+      else {
+         suggestedDifficulty = Math.max(suggestedDifficulty, 4);
+      }
+      this.parent.suggestedDifficulty = suggestedDifficulty;
+      this.parent.suggestedComplexity = suggestedComplexity;
+
+      // Auto calculate difficulty and complexity if appropriate
+      if (this.parent.system.castingCheck.autoCalculateDC) {
+         this.parent.system.castingCheck.difficulty = suggestedDifficulty;
+         this.parent.system.castingCheck.complexity = suggestedComplexity;
+      }
+
       return;
    }
 

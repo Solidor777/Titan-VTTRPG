@@ -32,8 +32,6 @@ export default function registerSystemSettings() {
       roll2d6: 'SETTINGS.initiativeFormula.roll2d6',
     },
     default: 'roll2d6',
-    onChange: () => {
-      registerInitiativeFormula();
-    }
+    requiresReload: true
   });
 }

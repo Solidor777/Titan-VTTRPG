@@ -1,5 +1,4 @@
 <script>
-   import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
@@ -11,20 +10,9 @@
 
    // Cost of the aspect
    export let cost = void 0;
-
-   // Setup
-   const document = getContext("DocumentStore");
 </script>
 
-<EfxButton
-   on:click={async () => {
-      enabled = !enabled;
-      const system = $document.system;
-      await $document.update({
-         system: system,
-      });
-   }}
->
+<EfxButton on:click>
    <div class="button-content">
       <!--Label-->
       <div class="aspect-label">
