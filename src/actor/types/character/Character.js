@@ -944,10 +944,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async regainResolve() {
       // Check if the actor's resolve is less than max
       const resolve = this.parent.system.resource.resolve;
-      const resolveRegain = Math.min(this.parent.system.mod.resolveRegain.value, resolve.maxValue - resolve.value);
 
       // If so, update the actor
       if (resolve.value < resolve.maxValue) {
+         const resolveRegain = Math.min(this.parent.system.mod.resolveRegain.value, resolve.maxValue - resolve.value);
+
          await this.parent.update({
             system: {
                resource: {
