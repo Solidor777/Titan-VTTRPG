@@ -10,7 +10,7 @@
    <div class="stat label">
       <!--Icon-->
       {#if aspect.isDamage}
-         <i class="fas fa-bolt" />
+         <i class="fas fa-burst" />
       {/if}
       {#if aspect.isHealing}
          <i class="fas fa-heart" />

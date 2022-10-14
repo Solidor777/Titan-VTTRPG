@@ -93,7 +93,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class="fas fa-bolt" />
+                  <i class="fas fa-burst" />
 
                   <!--Label-->
                   <div class="label">{localize("damage")}</div>

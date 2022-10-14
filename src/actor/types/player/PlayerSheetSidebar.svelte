@@ -8,30 +8,28 @@
 
 <div class="sidebar">
    <!--Character Portrait-->
-   <div class="portrait">
+   <div class="section">
       <CharacterSheetPortrait />
    </div>
 
-   <div class="sections">
-      <!--Resources-->
-      <div class="section">
-         <CharacterSheetResources />
-      </div>
+   <!--Resources-->
+   <div class="section">
+      <CharacterSheetResources />
+   </div>
 
-      <!--Mods-->
-      <div class="section">
-         <CharacterSheetMods />
-      </div>
+   <!--Mods-->
+   <div class="section">
+      <CharacterSheetMods />
+   </div>
 
-      <!--Ratings-->
-      <div class="section">
-         <CharacterSheetRatings />
-      </div>
+   <!--Ratings-->
+   <div class="section">
+      <CharacterSheetRatings />
+   </div>
 
-      <!--Speeds-->
-      <div class="section">
-         <CharacterSheetSpeeds />
-      </div>
+   <!--Speeds-->
+   <div class="section">
+      <CharacterSheetSpeeds />
    </div>
 </div>
 
@@ -47,27 +45,15 @@
       width: 100%;
       padding: 0.25rem;
 
-      .portrait {
-         @include flex-row;
-         @include flex-group-center;
-         width: 100%;
-      }
-
-      .sections {
+      .section {
          @include flex-column;
          @include flex-group-top;
          width: 100%;
 
-         .section {
-            @include flex-column;
-            @include flex-group-top;
-            width: 100%;
-
-            &:not(:first-child) {
-               @include border-top;
-               margin-top: 0.25rem;
-               padding-top: 0.25rem;
-            }
+         &:not(:first-child) {
+            @include border-top;
+            margin-top: 0.25rem;
+            padding-top: 0.25rem;
          }
       }
    }

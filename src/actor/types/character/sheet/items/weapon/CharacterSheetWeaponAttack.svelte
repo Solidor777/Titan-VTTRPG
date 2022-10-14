@@ -57,7 +57,7 @@
       <!--Damage-->
       <div class="stat">
          <IconStatTag
-            icon={"fas fa-bolt"}
+            icon={"fas fa-burst"}
             label={localize("damage")}
             value={`${attack.damage}${attack.plusExtraSuccessDamage ? ` + ${localize("extraSuccesses.short")}` : ""}`}
          />

@@ -97,7 +97,7 @@
    <div class="label">
       <div class="label-inner">
          {#if aspect.label === localize("damage")}
-            <i class="fas fa-bolt" />
+            <i class="fas fa-burst" />
          {:else if aspect.label === localize("healing")}
             <i class="fas fa-heart" />
          {/if}

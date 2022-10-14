@@ -11,7 +11,7 @@
    <!--Header-->
    <div class="header">
       <div class="label">
-         <i class="fas fa-bolt" />{localize("damageReport")}
+         <i class="fas fa-burst" />{localize("damageReport")}
       </div>
       <div class="name">
          {chatContext.actorName}

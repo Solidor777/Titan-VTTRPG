@@ -895,6 +895,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   async spendResolve() {
+      const resolve = this.parent.system.resource.resolve;
+      if (resolve.value > 0) {
+
+         // Decrease resolve
+         this.parent.update({
+            system: {
+               resource: {
+                  resolve: {
+                     value: resolve.value - 1
+                  }
+               }
+            }
+         });
+      }
+   }
+
    equipArmor(armorId) {
       // Ensure the armor is valid
       const armor = this.parent.items.get(armorId);

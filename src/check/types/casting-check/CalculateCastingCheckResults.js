@@ -1,3 +1,4 @@
+import { localize } from '~/helpers/Utility.js';
 import calculateCheckResults from "~/check/CalculateCheckResults.js";
 
 export default function calculateCastingCheckResults(inResults, parameters) {
@@ -12,6 +13,10 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       // Initialize state data
       results.scalingAspect = [];
       results.aspect = foundry.utils.deepClone(parameters.aspect);
+      results.aspect.forEach((aspect) => {
+         aspect.label = localize(aspect.label);
+      });
+      results.aspect = results.aspect.concat(foundry.utils.deepClone(parameters.customAspect));
 
       // Adjust aspect results
       results.aspect.forEach((aspect, idx) => {

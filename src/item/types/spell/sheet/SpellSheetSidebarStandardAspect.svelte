@@ -12,7 +12,7 @@
    // Application statee reference
    const document = getContext("DocumentStore");
    const labelIcons = {
-      damage: "fas fa-bolt",
+      damage: "fas fa-burst",
       healing: "fas fa-heart",
       range: "fas fa-ruler",
       radius: "fas fa-bullseye",
@@ -27,7 +27,7 @@
       accuracy: "fas fa-bow-arrow",
       initiative: "fas fa-clock",
       armor: "fas fa-helmet-battle",
-      damage: "fas fa-bolt",
+      damage: "fas fa-burst",
       healing: "fas fa-heart",
    };
 

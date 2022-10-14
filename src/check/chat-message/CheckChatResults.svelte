@@ -61,7 +61,7 @@
    {#if $document.flags.titan.chatContext.results.succeeded}
       {#if $document.flags.titan.chatContext.results.damage > 0}
          <div class="stat">
-            <i class="fas fa-bolt" />
+            <i class="fas fa-burst" />
             {localize(`damage`)}:
             {$document.flags.titan.chatContext.results.damage}
          </div>

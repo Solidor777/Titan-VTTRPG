@@ -2,7 +2,7 @@
    import { localize } from "~/helpers/Utility.js";
 
    const labelIcons = {
-      damage: "fas fa-bolt",
+      damage: "fas fa-burst",
       healing: "fas fa-heart",
       range: "fas fa-ruler",
       radius: "fas fa-bullseye",

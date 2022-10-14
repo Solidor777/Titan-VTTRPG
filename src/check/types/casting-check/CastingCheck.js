@@ -43,6 +43,7 @@ export default class TitanCastingCheck extends TitanCheck {
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
          itemName: itemRollData.name,
          aspect: itemRollData.aspect,
+         customAspect: itemRollData.customAspect,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
          healingMod: options.healingMod ?? actorRollData.mod.healing.value,
          img: itemRollData.img,

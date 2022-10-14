@@ -8,7 +8,7 @@
    // Map of icons to use for the mods
    const modIcons = {
       armor: "helmet-battle",
-      damage: "bolt",
+      damage: "burst",
       healing: "heart",
    };
 </script>

@@ -5,6 +5,7 @@
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    const application = getContext("external").application;
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="portrait">
@@ -40,6 +41,16 @@
          }}
       />
    </div>
+
+   <!--Spend Resolve button-->
+   <div class="button resolve" data-tooltip={localize("spendResolve")}>
+      <IconButton
+         icon={"fas fa-bolt"}
+         on:click={() => {
+            $document.typeComponent.spendResolve();
+         }}
+      />
+   </div>
 </div>
 
 <style lang="scss">
@@ -72,6 +83,11 @@
          &.clear {
             bottom: 0;
             left: 0;
+         }
+
+         &.resolve {
+            bottom: 0;
+            right: 0;
          }
       }
    }

@@ -9,7 +9,7 @@
 
 <div class="healing-report">
    <div class="label">
-      <i class="fas fa-hand-fist" />
+      <i class="fas fa-bolt" />
       {localize("regainedResolve")}
       <div class="name">
          {chatContext.actorName}

@@ -53,7 +53,7 @@
       <EfxButton
          on:click={() => {
             applyDamage($document.flags.titan.chatContext.results.damage, false);
-         }}><i class="fas fa-bolt" /></EfxButton
+         }}><i class="fas fa-burst" /></EfxButton
       >
    </div>
 

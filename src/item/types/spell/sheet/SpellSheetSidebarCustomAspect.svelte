@@ -17,7 +17,7 @@
       <div class="aspect-label">
          <!--Damage Icon-->
          {#if aspect.isDamage}
-            <i class="fas fa-bolt" />
+            <i class="fas fa-burst" />
          {/if}
 
          <!--Healing Icon-->

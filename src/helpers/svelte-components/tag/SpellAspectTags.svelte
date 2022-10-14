@@ -22,6 +22,7 @@
       if (aspect.resistanceCheck) {
          size += 2;
       }
+
       return size;
    }
 
