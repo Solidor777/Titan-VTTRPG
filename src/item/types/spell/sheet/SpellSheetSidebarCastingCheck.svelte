@@ -14,7 +14,7 @@
 <div class="casting-check">
    <!--Head-->
    <div class="header {$document.system.castingCheck.attribute}">
-      {#if $document.aspect && $document.aspect.length > 0}
+      {#if $document.system.aspect.length > 0 || $document.system.customAspect.length}
          <!--Label-->
          <div class="label-button">
             {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
@@ -50,7 +50,7 @@
    </div>
 
    <!--Aspects-->
-   {#if $document.system.aspect.length > 0 && $appState.isExpanded.sidebar.castingCheck}
+   {#if $document.system.aspect.length > 0 || $document.system.customAspect.length}
       <div class="checks" transition:slide|local>
          <SpellSheetSidebarAspects />
       </div>

@@ -1,11 +1,10 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-
    export let resistance = void 0;
+   export let label = void 0;
 </script>
 
 <div class="tag {resistance}">
-   {localize(resistance)}
+   {label}
 </div>
 
 <style lang="scss">

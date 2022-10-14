@@ -39,13 +39,15 @@
       <!--Filter Options-->
       <div class="row">
          {#each Object.entries($appState.filterOptions.inventory) as [key]}
-            <ToggleOptionButton
-               label={localize(key)}
-               enabled={$appState.filterOptions.inventory[key]}
-               on:click={() => {
-                  $appState.filterOptions.inventory[key] = !$appState.filterOptions.inventory[key];
-               }}
-            />
+            <div class="option">
+               <ToggleOptionButton
+                  label={localize(key)}
+                  enabled={$appState.filterOptions.inventory[key]}
+                  on:click={() => {
+                     $appState.filterOptions.inventory[key] = !$appState.filterOptions.inventory[key];
+                  }}
+               />
+            </div>
          {/each}
 
          <!--Reset button-->
@@ -153,6 +155,14 @@
 
             .input {
                @include flex-group-left;
+            }
+
+            .option {
+               margin-top: 0.25rem;
+
+               &:not(:first-child) {
+                  margin-left: 0.25rem;
+               }
             }
          }
       }

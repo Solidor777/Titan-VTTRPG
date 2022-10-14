@@ -4,11 +4,32 @@
    import { localize } from "~/helpers/Utility.js";
    import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import IconTag from "~/helpers/svelte-components/tag/IconTag.svelte";
+   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
 
    export let idx = 0;
 
    // Application statee reference
    const document = getContext("DocumentStore");
+   const labelIcons = {
+      damage: "fas fa-bolt",
+      healing: "fas fa-heart",
+      range: "fas fa-ruler",
+      radius: "fas fa-bullseye",
+      decreaseSpeed: "fas fa-person-running",
+      increaseSpeed: "fas fa-person-running",
+   };
+
+   const optionIcons = {
+      awareness: "fas fa-eye",
+      defense: "fas fa-shield",
+      melee: "fas fa-sword",
+      accuracy: "fas fa-bow-arrow",
+      initiative: "fas fa-clock",
+      armor: "fas fa-helmet-battle",
+      damage: "fas fa-bolt",
+      healing: "fas fa-heart",
+   };
 
    $: aspect = $document.system.aspect[idx];
 </script>
@@ -16,38 +37,28 @@
 {#if aspect}
    <div class="aspect">
       <div class="aspect-label">
-         <!--Damage icon-->
-         {#if aspect.isDamage}
-            <i class="fas fa-bolt" />
+         <!--Icon-->
+         {#if labelIcons[aspect.label]}
+            <i class={labelIcons[aspect.label]} />
          {/if}
 
-         <!--Healing icon-->
-         {#if aspect.isHealing}
-            <i class="fas fa-heart" />
-         {/if}
-
-         <!--Range icon-->
-         {#if aspect.label === "range"}
-            <i class="fas fa-ruler" />
-         {/if}
-
-         <!--Radius icon-->
-         {#if aspect.label === "radius"}
-            <i class="fas fa-bullseye" />
-         {/if}
          {localize(aspect.label)}
       </div>
 
       <!--Initial Value-->
       {#if aspect.initialValue}
          <div class="initial-value">
-            {typeof aspect.initialValue === `string` ? localize(aspect.initialValue) : aspect.initialValue}
+            <!--Scaling value-->
             {#if aspect.scaling}
+               {aspect.initialValue}
                {#if aspect.cost > 1}
                   {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
                {:else}
                   {`+ ${localize("extraSuccesses.short")}`}
                {/if}
+            {:else}
+               <!--Non scaling value-->
+               {localize(aspect.initialValue)}
             {/if}
          </div>
       {/if}
@@ -64,7 +75,15 @@
                {#each aspect.option as option}
                   <!--Each option-->
                   <div class="option">
-                     <Tag label={localize(option)} />
+                     {#if optionIcons[option]}
+                        <IconTag label={localize(option)} icon={optionIcons[option]} />
+                     {:else if aspect.label === "decreaseAttribute" || aspect.label === "increaseAttribute"}
+                        <AttributeTag label={localize(option)} attribute={option} />
+                     {:else if aspect.label === "decreaseResistance" || aspect.label === "increaseResistance"}
+                        <ResistanceTag label={localize(option)} resistance={option} />
+                     {:else}
+                        <Tag label={localize(option)} />
+                     {/if}
                   </div>
                {/each}
             {/if}
@@ -81,7 +100,7 @@
 
             <!--Value-->
             <div class="value">
-               <ResistanceTag resistance={aspect.resistanceCheck} />
+               <ResistanceTag resistance={aspect.resistanceCheck} label={localize(aspect.resistanceCheck)} />
             </div>
          </div>
       {/if}
@@ -124,12 +143,12 @@
       .labeled-stat {
          @include flex-column;
          @include flex-group-top;
+         @include font-size-small;
          margin-top: 0.5rem;
 
          .label {
             @include flex-row;
             @include flex-group-center;
-            @include font-size-small;
             font-weight: bold;
          }
 

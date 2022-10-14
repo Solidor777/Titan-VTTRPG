@@ -1,10 +1,12 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
+   import SpellSheetSidebarCustomAspect from "./SpellSheetSidebarCustomAspect.svelte";
    import SpellSheetSidebarStandardAspect from "./SpellSheetSidebarStandardAspect.svelte";
 
    // Application statee reference
    const document = getContext("DocumentStore");
+
    $: enabledAspects = $document.system.aspect.filter((aspect) => aspect.enabled === true);
 </script>
 
@@ -13,6 +15,12 @@
    {#each enabledAspects as aspect, idx}
       <li transition:slide|local>
          <SpellSheetSidebarStandardAspect {idx} />
+      </li>
+   {/each}
+
+   {#each $document.system.customAspect as aspect, idx}
+      <li transition:slide|local>
+         <SpellSheetSidebarCustomAspect {idx} />
       </li>
    {/each}
 </ol>

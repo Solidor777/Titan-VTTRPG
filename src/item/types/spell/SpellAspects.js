@@ -160,8 +160,10 @@ export default Object.freeze({
       settings: {
          requireOption: true,
          option: [
+            'awareness',
             'accuracy',
             'defense',
+            'initiative',
             'melee',
          ],
          optionCost: 1,
@@ -178,8 +180,10 @@ export default Object.freeze({
       settings: {
          requireOption: true,
          option: [
+            'awareness',
             'accuracy',
             'defense',
+            'initiative',
             'melee',
          ],
          optionCost: 1,
