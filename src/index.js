@@ -21,7 +21,6 @@ import TitanShieldSheet from './item/types/shield/sheet/ShieldSheet';
 import TitanSpellSheet from './item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from './item/types/weapon/sheet/WeaponSheet.js';
 import TitanTokenDocument from './documents/TokenDocument';
-import regainResolve from './system/RegainResolve';
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
@@ -114,7 +113,7 @@ Hooks.on('preDeleteChatMessage', (message) => {
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
-   if (game.settings.get('titan', 'autoIncreaseResolve')) {
-      regainResolve(combat.combatant.actor);
+   if (game.settings.get('titan', 'autoIncreaseResolve') && combat.combatant?.actor?.character) {
+      combat.combatant.actor.character.regainResolve();
    }
 });

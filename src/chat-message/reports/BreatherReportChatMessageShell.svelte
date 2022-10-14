@@ -7,7 +7,9 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="healing-report">
+<div class="report">
+   <img src={chatContext.actorImg} alt="img" />
+
    <div class="label">
       <i class="fas fa-face-exhaling" />
       {localize("tookABreather")}
@@ -30,7 +32,7 @@
 <style lang="scss">
    @import "../../styles/Mixins.scss";
 
-   .healing-report {
+   .report {
       @include flex-column;
       @include flex-group-top;
       @include font-size-normal;
@@ -40,6 +42,12 @@
 
       i {
          margin-right: 0.25rem;
+      }
+
+      img {
+         @include border;
+         height: 5rem;
+         margin-bottom: 0.5rem;
       }
 
       .label {

@@ -18,5 +18,6 @@ export default Object.freeze(new Set([
    'removeTempEffectsReport',
    'breatherReport',
    'restReport',
-   'resolveRegainReport'
+   'regainResolveReport',
+   'spendResolveReport'
 ]));

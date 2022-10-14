@@ -21,7 +21,8 @@
    import RemoveTempEffectsReportChatMessageShell from "./reports/RemoveTempEffectsReportChatMessageShell.svelte";
    import BreatherReportChatMessageShell from "./reports/BreatherReportChatMessageShell.svelte";
    import RestReportChatMessageShell from "./reports/RestReportChatMessageShell.svelte";
-   import ResolveRegainReportChatMessageShell from "./reports/ResolveRegainReportChatMessageShell.svelte";
+   import RegainResolveReportChatMessageShell from "./reports/RegainResolveReportChatMessageShell.svelte";
+   import SpendResolveReportChatMessageShell from "./reports/SpendResolveReportChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -51,7 +52,8 @@
          removeTempEffectsReport: RemoveTempEffectsReportChatMessageShell,
          breatherReport: BreatherReportChatMessageShell,
          restReport: RestReportChatMessageShell,
-         resolveRegainReport: ResolveRegainReportChatMessageShell,
+         regainResolveReport: RegainResolveReportChatMessageShell,
+         spendResolveReport: SpendResolveReportChatMessageShell,
       };
       return chatComponents[$document.flags.titan.chatContext.type];
    }

@@ -350,7 +350,7 @@
             }
           },
           "resolve": {
-            "value": 0,
+            "value": 1,
             "mod": {
               "static": 0
             }

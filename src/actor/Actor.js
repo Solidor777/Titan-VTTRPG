@@ -23,6 +23,7 @@ export default class TitanActor extends Actor {
          // Player
          case 'player': {
             this.typeComponent = new TitanPlayerComponent(this);
+            this.character = this.typeComponent;
             this.player = this.typeComponent;
             break;
          }
@@ -31,6 +32,7 @@ export default class TitanActor extends Actor {
          case 'npc': {
             this._prepareNpcData();
             this.typeComponent = new TitanNPCComponent(this);
+            this.character = this.typeComponent;
             this.npc = this.typeComponent;
             break;
          }

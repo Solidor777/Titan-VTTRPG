@@ -7,7 +7,9 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="damage-report">
+<div class="report">
+   <img src={chatContext.actorImg} alt="img" />
+
    <!--Header-->
    <div class="header">
       <div class="label">
@@ -81,11 +83,17 @@
 <style lang="scss">
    @import "../../styles/Mixins.scss";
 
-   .damage-report {
+   .report {
       @include flex-column;
       @include flex-group-top;
       @include font-size-normal;
       width: 100%;
+
+      img {
+         @include border;
+         height: 5rem;
+         margin-bottom: 0.5rem;
+      }
 
       .header {
          @include border;

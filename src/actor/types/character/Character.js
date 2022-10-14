@@ -823,6 +823,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const chatContext = {
          type: 'damageReport',
          actorName: this.parent.name,
+         actorImg: this.parent.img,
          baseDamage: baseDamage,
          damage: damage,
          ignoreArmor: ignoreArmor ?? false,
@@ -871,6 +872,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const chatContext = {
          type: 'healingReport',
          actorName: this.parent.name,
+         actorImg: this.parent.img,
          healing: healing,
          stamina: this.parent.system.resource.stamina,
          wounds: this.parent.system.resource.wounds,
@@ -896,16 +898,87 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async spendResolve() {
+      // Check if the actor's resolve is less than max
       const resolve = this.parent.system.resource.resolve;
-      if (resolve.value > 0) {
 
-         // Decrease resolve
-         this.parent.update({
+      // If so, update the actor
+      if (resolve.value > 0) {
+         await this.parent.update({
             system: {
                resource: {
                   resolve: {
                      value: resolve.value - 1
                   }
+               }
+            }
+         });
+
+         // Send a report
+         const chatContext = {
+            type: 'spendResolveReport',
+            actorName: this.parent.name,
+            actorImg: this.parent.img,
+            resolve: {
+               value: this.parent.system.resource.resolve.value,
+               maxValue: this.parent.system.resource.resolve.maxValue
+            }
+         };
+
+         ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            }
+         });
+      }
+   }
+
+   async regainResolve() {
+      // Check if the actor's resolve is less than max
+      const resolve = this.parent.system.resource.resolve;
+
+      // If so, update the actor
+      if (resolve.value < resolve.maxValue) {
+         await this.parent.update({
+            system: {
+               resource: {
+                  resolve: {
+                     value: resolve.value + 1
+                  }
+               }
+            }
+         });
+
+         // Send a report
+         const chatContext = {
+            type: 'regainResolveReport',
+            actorName: this.parent.name,
+            actorImg: this.parent.img,
+            resolve: {
+               value: this.parent.system.resource.resolve.value,
+               maxValue: this.parent.system.resource.resolve.maxValue
+            }
+         };
+
+         ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
                }
             }
          });
@@ -1053,6 +1126,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const chatContext = {
             type: 'removeTempEffectsReport',
             actorName: this.parent.name,
+            actorImg: this.parent.img,
          };
 
          await ChatMessage.create({
@@ -1080,6 +1154,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Reset stamina to max
       const stamina = this.parent.system.resource.stamina.maxValue;
+      const resolve = this.parent.system.resource.resolve.maxValue;
 
       // Update the actor
       await this.parent.update({
@@ -1087,6 +1162,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             resource: {
                stamina: {
                   value: stamina
+               },
+               resolve: {
+                  value: resolve
                }
             }
          }
@@ -1096,6 +1174,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const chatContext = {
             type: 'breatherReport',
             actorName: this.parent.name,
+            actorImg: this.parent.img,
          };
 
          await ChatMessage.create({
@@ -1142,6 +1221,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const chatContext = {
             type: 'restReport',
             actorName: this.parent.name,
+            actorImg: this.parent.img,
          };
 
          if (woundsHealed) {

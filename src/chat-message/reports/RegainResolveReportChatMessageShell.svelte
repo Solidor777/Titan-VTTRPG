@@ -7,7 +7,7 @@
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
-<div class="healing-report">
+<div class="report">
    <div class="label">
       <i class="fas fa-bolt" />
       {localize("regainedResolve")}
@@ -25,7 +25,7 @@
 <style lang="scss">
    @import "../../styles/Mixins.scss";
 
-   .healing-report {
+   .report {
       @include flex-column;
       @include flex-group-top;
       @include font-size-normal;

@@ -9,10 +9,9 @@
 
 <div class="report">
    <img src={chatContext.actorImg} alt="img" />
-
    <div class="label">
-      <i class="fas fa-bed" />
-      {localize("tookARest")}
+      <i class="fas fa-bolt" />
+      {localize("spentResolve")}
       <div class="name">
          {chatContext.actorName}
       </div>
@@ -20,32 +19,8 @@
 
    <!--Sub label-->
    <div class="sub-label">
-      {localize("removeTemporaryEffects.desc")}
+      {localize("resolve")}: {chatContext.resolve.value} / {chatContext.resolve.maxValue}
    </div>
-
-   <!--Sub label-->
-   <div class="sub-label">
-      {localize("takeABreather.desc")}
-   </div>
-
-   <!--Wounds Healed-->
-   {#if chatContext.woundsHealed}
-      <div class="stat">
-         <div class="stat-label">
-            {localize("woundsHealed")}:
-         </div>
-
-         <div class="value">1</div>
-      </div>
-
-      <div class="stat">
-         <div class="stat-label">
-            {localize("wounds")}:
-         </div>
-
-         <div class="value">{chatContext.wounds} / {chatContext.maxWounds}</div>
-      </div>
-   {/if}
 </div>
 
 <style lang="scss">
@@ -85,16 +60,6 @@
       .sub-label {
          @include font-size-normal;
          margin-top: 0.5rem;
-      }
-
-      .stat {
-         @include flex-row;
-         margin-top: 0.5rem;
-
-         .value {
-            font-weight: normal;
-            margin-left: 0.25rem;
-         }
       }
    }
 </style>
