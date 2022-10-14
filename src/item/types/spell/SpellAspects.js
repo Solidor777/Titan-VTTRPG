@@ -7,6 +7,7 @@ export default Object.freeze({
          enabled: true
       },
       settings: {
+         sortOrder: 0,
          initialValueOptions: [
             {
                value: 'self',
@@ -46,6 +47,7 @@ export default Object.freeze({
          enabled: true
       },
       settings: {
+         sortOrder: 1,
          initialValueOptions: [
             {
                value: 5,
@@ -72,6 +74,7 @@ export default Object.freeze({
          enabled: true
       },
       settings: {
+         sortOrder: 2,
          unitOptions: [
             {
                value: 'rounds',
@@ -100,6 +103,7 @@ export default Object.freeze({
          enabled: true
       },
       settings: {
+         sortOrder: 3,
          optionCost: 1,
          option: ['ignoreArmor']
       }
@@ -112,6 +116,9 @@ export default Object.freeze({
          cost: 1,
          isHealing: true,
          enabled: true
+      },
+      settings: {
+         sortOrder: 4,
       }
    },
    decreaseMod: {
@@ -123,6 +130,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 5,
          requireOption: true,
          option: [
             'armor',
@@ -140,6 +148,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 6,
          requireOption: true,
          option: [
             'armor',
@@ -158,6 +167,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 7,
          requireOption: true,
          option: [
             'awareness',
@@ -178,6 +188,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 8,
          requireOption: true,
          option: [
             'awareness',
@@ -198,6 +209,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 9,
          requireOption: true,
          option: [
             'reflexes',
@@ -215,6 +227,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 10,
          requireOption: true,
          option: [
             'reflexes',
@@ -233,6 +246,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 11,
          requireOption: true,
          option: [
             'body',
@@ -250,6 +264,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 12,
          requireOption: true,
          option: [
             'body',
@@ -268,6 +283,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 13,
          requireOption: true,
          option: [
             'arcana',
@@ -300,6 +316,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 14,
          requireOption: true,
          option: [
             'arcana',
@@ -333,6 +350,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 15,
          requireOption: true,
          option: [
             'stride',
@@ -351,6 +369,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 16,
          requireOption: true,
          option: [
             'stride',
@@ -370,6 +389,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 17,
          requireOption: true,
          option: [
             'blinded',
@@ -406,6 +426,7 @@ export default Object.freeze({
          enabled: false
       },
       settings: {
+         sortOrder: 18,
          requireOption: true,
          allOptionsCost: 5,
          option: [

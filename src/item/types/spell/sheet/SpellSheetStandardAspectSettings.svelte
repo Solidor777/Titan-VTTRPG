@@ -21,18 +21,18 @@
    function toggleAspect(idx) {
       // If disabled, add the aspect
       if (idx === -1) {
-         $document.system.aspect.push(aspectOptions.template);
+         $document.spell.addStandardAspect(aspectOptions.template);
       } else {
          // Otherwise remove the aspect
          $document.system.aspect.splice(idx, 1);
-      }
 
-      // Update the document
-      $document.update({
-         system: {
-            aspect: $document.system.aspect,
-         },
-      });
+         // Update the document
+         $document.update({
+            system: {
+               aspect: $document.system.aspect,
+            },
+         });
+      }
    }
 
    $: idx = $document.system.aspect.findIndex((aspect) => {

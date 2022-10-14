@@ -18,6 +18,19 @@ export default class TitanSpell extends TitanTypeComponent {
       };
    }
 
+   addStandardAspect(aspect) {
+      let aspects = this.parent.system.aspect;
+      aspects.push(aspect);
+      const aspectOptions = foundry.utils.deepClone(SpellAspects);
+      aspects = aspects.sort((a, b) => aspectOptions[a.label].settings.sortOrder - aspectOptions[b.label].settings.sortOrder);
+
+      this.parent.update({
+         system: {
+            aspect: aspects
+         }
+      });
+   }
+
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
       const aspectOptions = foundry.utils.deepClone(SpellAspects);

@@ -7,8 +7,6 @@
    import IconTag from "~/helpers/svelte-components/tag/IconTag.svelte";
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
 
-   export let idx = 0;
-
    // Application statee reference
    const document = getContext("DocumentStore");
    const labelIcons = {
@@ -16,6 +14,7 @@
       healing: "fas fa-heart",
       range: "fas fa-ruler",
       radius: "fas fa-bullseye",
+      duration: "fas fa-clock",
       decreaseSpeed: "fas fa-person-running",
       increaseSpeed: "fas fa-person-running",
    };
@@ -31,7 +30,7 @@
       healing: "fas fa-heart",
    };
 
-   $: aspect = $document.system.aspect[idx];
+   export let aspect = void 0;
 </script>
 
 {#if aspect}

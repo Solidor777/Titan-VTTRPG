@@ -12,13 +12,13 @@
 
 <ol>
    <!--Each Aspect-->
-   {#each enabledAspects as aspect, idx}
+   {#each enabledAspects as aspect, idx (aspect.label)}
       <li transition:slide|local>
-         <SpellSheetSidebarStandardAspect {idx} />
+         <SpellSheetSidebarStandardAspect {aspect} />
       </li>
    {/each}
 
-   {#each $document.system.customAspect as aspect, idx}
+   {#each $document.system.customAspect as aspect, idx (aspect.uuid)}
       <li transition:slide|local>
          <SpellSheetSidebarCustomAspect {idx} />
       </li>
