@@ -1,552 +1,557 @@
 {
-  "Actor": {
-    "types": [
-      "player",
-      "npc"
-    ],
-    "templates": {
-      "character": {
-        "attribute": {
-          "body": {
-            "baseValue": 1,
-            "mod": {
-              "static": 0
-            }
-          },
-          "mind": {
-            "baseValue": 1,
-            "mod": {
-              "static": 0
-            }
-          },
-          "soul": {
-            "baseValue": 1,
-            "mod": {
-              "static": 0
-            }
-          }
-        },
-        "resistance": {
-          "reflexes": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "resilience": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "willpower": {
-            "mod": {
-              "static": 0
-            }
-          }
-        },
-        "skill": {
-          "arcana": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+   "Actor": {
+      "types": [
+         "player",
+         "npc"
+      ],
+      "templates": {
+         "character": {
+            "attribute": {
+               "body": {
+                  "baseValue": 1,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "mind": {
+                  "baseValue": 1,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "soul": {
+                  "baseValue": 1,
+                  "mod": {
+                     "static": 0
+                  }
+               }
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "athletics": {
-            "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+            "resistance": {
+               "reflexes": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "resilience": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "willpower": {
+                  "mod": {
+                     "static": 0
+                  }
+               }
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "deception": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+            "skill": {
+               "arcana": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "athletics": {
+                  "defaultAttribute": "body",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "deception": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "dexterity": {
+                  "defaultAttribute": "body",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "diplomacy": {
+                  "defaultAttribute": "soul",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "engineering": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "intimidation": {
+                  "defaultAttribute": "body",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "investigation": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "lore": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "medicine": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "meleeWeapons": {
+                  "defaultAttribute": "body",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "metaphysics": {
+                  "defaultAttribute": "soul",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "nature": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "perception": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "performance": {
+                  "defaultAttribute": "soul",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "rangedWeapons": {
+                  "defaultAttribute": "mind",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "subterfuge": {
+                  "defaultAttribute": "body",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               },
+               "stealth": {
+                  "defaultAttribute": "body",
+                  "training": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  },
+                  "expertise": {
+                     "baseValue": 0,
+                     "mod": {
+                        "static": 0
+                     }
+                  }
+               }
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "dexterity": {
-            "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+            "rating": {
+               "awareness": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "defense": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "melee": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "accuracy": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "initiative": {
+                  "mod": {
+                     "static": 0
+                  }
+               }
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "diplomacy": {
-            "defaultAttribute": "soul",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+            "resource": {
+               "stamina": {
+                  "value": 3,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "resolve": {
+                  "value": 1,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "wounds": {
+                  "value": 0,
+                  "mod": {
+                     "static": 0
+                  }
+               }
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "engineering": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+            "speed": {
+               "stride": {
+                  "baseValue": 5,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "fly": {
+                  "baseValue": 0,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "swim": {
+                  "baseValue": 0,
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "burrow": {
+                  "baseValue": 0,
+                  "mod": {
+                     "static": 0
+                  }
+               }
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "intimidation": {
-            "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
+            "equipped": {
+               "armor": null,
+               "shield": null
             },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "investigation": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "lore": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "medicine": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "meleeWeapons": {
-            "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "metaphysics": {
-            "defaultAttribute": "soul",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "nature": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "perception": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "performance": {
-            "defaultAttribute": "soul",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "rangedWeapons": {
-            "defaultAttribute": "mind",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "subterfuge": {
-            "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          },
-          "stealth": {
-            "defaultAttribute": "body",
-            "training": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            },
-            "expertise": {
-              "baseValue": 0,
-              "mod": {
-                "static": 0
-              }
-            }
-          }
-        },
-        "rating": {
-          "awareness": {
             "mod": {
-              "static": 0
-            }
-          },
-          "defense": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "melee": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "accuracy": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "initiative": {
-            "mod": {
-              "static": 0
-            }
-          }
-        },
-        "resource": {
-          "stamina": {
-            "value": 3,
-            "mod": {
-              "static": 0
-            }
-          },
-          "resolve": {
-            "value": 1,
-            "mod": {
-              "static": 0
-            }
-          },
-          "wounds": {
-            "value": 0,
-            "mod": {
-              "static": 0
-            }
-          }
-        },
-        "speed": {
-          "stride": {
-            "baseValue": 5,
-            "mod": {
-              "static": 0
-            }
-          },
-          "fly": {
-            "baseValue": 0,
-            "mod": {
-              "static": 0
-            }
-          },
-          "swim": {
-            "baseValue": 0,
-            "mod": {
-              "static": 0
-            }
-          },
-          "burrow": {
-            "baseValue": 0,
-            "mod": {
-              "static": 0
-            }
-          }
-        },
-        "equipped": {
-          "armor": null,
-          "shield": null
-        },
-        "mod": {
-          "armor": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "damage": {
-            "mod": {
-              "static": 0
-            }
-          },
-          "healing": {
-            "mod": {
-              "static": 0
-            }
-          }
-        },
-        "statusEffect": {
-          "asleep": false,
-          "blinded": false,
-          "contaminated": false,
-          "deafened": false,
-          "frightened": false,
-          "incapacitated": false,
-          "prone": false,
-          "restrained": false,
-          "stunned": false,
-          "unconscious": false
-        },
-        "description": ""
+               "armor": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "damage": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "healing": {
+                  "mod": {
+                     "static": 0
+                  }
+               },
+               "resolveRegain": {
+                  "mod": {
+                     "static": 0
+                  }
+               }
+            },
+            "statusEffect": {
+               "asleep": false,
+               "blinded": false,
+               "contaminated": false,
+               "deafened": false,
+               "frightened": false,
+               "incapacitated": false,
+               "prone": false,
+               "restrained": false,
+               "stunned": false,
+               "unconscious": false
+            },
+            "description": ""
+         }
+      },
+      "player": {
+         "templates": [
+            "character"
+         ],
+         "xp": {
+            "earned": 0
+         },
+         "inspiration": false
+      },
+      "npc": {
+         "templates": [
+            "character"
+         ]
       }
-    },
-    "player": {
-      "templates": [
-        "character"
+   },
+   "Item": {
+      "types": [
+         "ability",
+         "armor",
+         "commodity",
+         "effect",
+         "equipment",
+         "shield",
+         "spell",
+         "weapon"
       ],
-      "xp": {
-        "earned": 0
+      "templates": {
+         "base": {
+            "description": "",
+            "check": []
+         },
+         "object": {
+            "rarity": "common",
+            "value": 0
+         },
+         "equippable": {
+            "equipped": false,
+            "rulesElement": []
+         }
       },
-      "inspiration": false
-    },
-    "npc": {
-      "templates": [
-        "character"
-      ]
-    }
-  },
-  "Item": {
-    "types": [
-      "ability",
-      "armor",
-      "commodity",
-      "effect",
-      "equipment",
-      "shield",
-      "spell",
-      "weapon"
-    ],
-    "templates": {
-      "base": {
-        "description": "",
-        "check": []
+      "ability": {
+         "templates": [
+            "base"
+         ],
+         "xpCost": 2,
+         "rarity": "common",
+         "requirements": "",
+         "rulesElement": [],
+         "action": false,
+         "reaction": false,
+         "passive": false
       },
-      "object": {
-        "rarity": "common",
-        "value": 0
+      "armor": {
+         "templates": [
+            "base",
+            "object"
+         ],
+         "armor": 2,
+         "trait": [],
+         "rulesElement": [],
+         "customTrait": []
       },
-      "equippable": {
-        "equipped": false,
-        "rulesElement": []
+      "commodity": {
+         "templates": [
+            "base",
+            "object"
+         ],
+         "quantity": 1
+      },
+      "effect": {
+         "templates": [
+            "base"
+         ],
+         "rulesElement": [],
+         "effectId": "",
+         "duration": "temporary"
+      },
+      "equipment": {
+         "templates": [
+            "base",
+            "equippable",
+            "object"
+         ],
+         "rulesElement": []
+      },
+      "shield": {
+         "templates": [
+            "base",
+            "object"
+         ],
+         "defense": 1,
+         "trait": [],
+         "rulesElement": [],
+         "customTrait": []
+      },
+      "spell": {
+         "templates": [
+            "base"
+         ],
+         "xpCost": 0,
+         "rarity": "common",
+         "tradition": "any",
+         "castingCheck": {
+            "skill": "arcana",
+            "attribute": "mind",
+            "difficulty": 4,
+            "complexity": 1,
+            "autoCalculateDC": true
+         },
+         "castingNotes": "",
+         "customAspect": [],
+         "aspect": []
+      },
+      "weapon": {
+         "templates": [
+            "base",
+            "equippable",
+            "object"
+         ],
+         "attack": [],
+         "attackNotes": "",
+         "multiAttack": false,
+         "customTrait": []
       }
-    },
-    "ability": {
-      "templates": [
-        "base"
-      ],
-      "xpCost": 2,
-      "rarity": "common",
-      "requirements": "",
-      "rulesElement": [],
-      "action": false,
-      "reaction": false,
-      "passive": false
-    },
-    "armor": {
-      "templates": [
-        "base",
-        "object"
-      ],
-      "armor": 2,
-      "trait": [],
-      "rulesElement": [],
-      "customTrait": []
-    },
-    "commodity": {
-      "templates": [
-        "base",
-        "object"
-      ],
-      "quantity": 1
-    },
-    "effect": {
-      "templates": [
-        "base"
-      ],
-      "rulesElement": [],
-      "effectId": "",
-      "duration": "temporary"
-    },
-    "equipment": {
-      "templates": [
-        "base",
-        "equippable",
-        "object"
-      ],
-      "rulesElement": []
-    },
-    "shield": {
-      "templates": [
-        "base",
-        "object"
-      ],
-      "defense": 1,
-      "trait": [],
-      "rulesElement": [],
-      "customTrait": []
-    },
-    "spell": {
-      "templates": [
-        "base"
-      ],
-      "xpCost": 0,
-      "rarity": "common",
-      "tradition": "any",
-      "castingCheck": {
-        "skill": "arcana",
-        "attribute": "mind",
-        "difficulty": 4,
-        "complexity": 1,
-        "autoCalculateDC": true
-      },
-      "castingNotes": "",
-      "customAspect": [],
-      "aspect": []
-    },
-    "weapon": {
-      "templates": [
-        "base",
-        "equippable",
-        "object"
-      ],
-      "attack": [],
-      "attackNotes": "",
-      "multiAttack": false,
-      "customTrait": []
-    }
-  }
+   }
 }

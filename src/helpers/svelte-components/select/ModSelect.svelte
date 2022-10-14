@@ -22,6 +22,10 @@
          label: localize("healing"),
          value: "healing",
       },
+      {
+         label: localize("resolveRegain"),
+         value: "resolveRegain",
+      },
    ];
 
    // Add none option

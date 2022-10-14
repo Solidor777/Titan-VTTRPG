@@ -1,24 +1,19 @@
 <script>
-   import { getContext } from "svelte";
    import CharacterSheetMod from "./CharacterSheetMod.svelte";
-
-   // The Character Data
-   const document = getContext("DocumentStore");
-
-   // Map of icons to use for the mods
-   const modIcons = {
-      armor: "helmet-battle",
-      damage: "burst",
-      healing: "heart",
-   };
 </script>
 
 <div class="mods">
-   {#each Object.entries($document.system.mod) as [key]}
-      <div class="mod">
-         <CharacterSheetMod {key} icon={modIcons[key]} />
-      </div>
-   {/each}
+   <div class="mod">
+      <CharacterSheetMod key={"armor"} icon={"helmet-battle"} />
+   </div>
+
+   <div class="mod">
+      <CharacterSheetMod key={"damage"} icon={"burst"} />
+   </div>
+
+   <div class="mod">
+      <CharacterSheetMod key={"healing"} icon={"heart"} />
+   </div>
 </div>
 
 <style lang="scss">

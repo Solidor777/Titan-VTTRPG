@@ -9,6 +9,7 @@
 
 <div class="report">
    <img src={chatContext.actorImg} alt="img" />
+
    <div class="label">
       <i class="fas fa-bolt" />
       {localize("spentResolve")}
@@ -35,7 +36,7 @@
       font-weight: bold;
 
       img {
-         @include border;
+         border: none;
          height: 5rem;
          margin-bottom: 0.5rem;
       }

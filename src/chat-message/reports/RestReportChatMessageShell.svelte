@@ -60,7 +60,7 @@
       font-weight: bold;
 
       img {
-         @include border;
+         border: none;
          height: 5rem;
          margin-bottom: 0.5rem;
       }

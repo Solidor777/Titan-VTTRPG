@@ -432,6 +432,7 @@
   "LOCAL.units.label": "Units",
   "LOCAL.spendResolve.label": "Spend Resolve",
   "LOCAL.spentResolve.label": "Spent Resolve",
+  "LOCAL.resolveRegain.label": "Resolve Regain",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

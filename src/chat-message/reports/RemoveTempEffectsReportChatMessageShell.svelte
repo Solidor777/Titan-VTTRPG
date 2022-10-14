@@ -31,7 +31,7 @@
       font-weight: bold;
 
       img {
-         @include border;
+         border: none;
          height: 5rem;
          margin-bottom: 0.5rem;
       }
@@ -50,21 +50,6 @@
          .name {
             @include font-size-normal;
             margin-top: 0.25rem;
-         }
-      }
-
-      .sub-label {
-         @include font-size-normal;
-         margin-top: 0.5rem;
-      }
-
-      .stat {
-         @include flex-row;
-         margin-top: 0.5rem;
-
-         .value {
-            font-weight: normal;
-            margin-left: 0.25rem;
          }
       }
    }

@@ -90,7 +90,7 @@
       width: 100%;
 
       img {
-         @include border;
+         border: none;
          height: 5rem;
          margin-bottom: 0.5rem;
       }

@@ -5,12 +5,15 @@
    // Document reference
    const document = getContext("DocumentStore");
    const chatContext = $document.flags.titan.chatContext;
+   console.log(chatContext);
 </script>
 
 <div class="report">
+   <img src={chatContext.actorImg} alt="img" />
+
    <div class="label">
       <i class="fas fa-bolt" />
-      {localize("regainedResolve")}
+      {localize("regainedResolve")} ({chatContext.resolve.regained})
       <div class="name">
          {chatContext.actorName}
       </div>
@@ -35,6 +38,12 @@
 
       i {
          margin-right: 0.25rem;
+      }
+
+      img {
+         border: none;
+         height: 5rem;
+         margin-bottom: 0.5rem;
       }
 
       .label {
