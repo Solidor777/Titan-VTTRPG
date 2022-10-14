@@ -21,6 +21,7 @@ export default class TitanSpell extends TitanTypeComponent {
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
       const aspectOptions = foundry.utils.deepClone(SpellAspects);
+      let totalAspectCost = 1;
 
       aspects.forEach((aspect) => {
          // Determine whether the aspect is enabled
@@ -62,8 +63,32 @@ export default class TitanSpell extends TitanTypeComponent {
             }
 
             aspect.cost = cost;
+            totalAspectCost += cost;
          }
       });
+
+      // Calculate total cost
+      this.parent.system.customAspect.forEach((aspect) => {
+         totalAspectCost += aspect.cost;
+      });
+      this.totalAspectCost = totalAspectCost;
+
+      // Calculate suggested complexity and difficulty
+      let suggestedDifficulty = totalAspectCost;
+      let suggestedComplexity = 1;
+      if (suggestedDifficulty > 6) {
+         suggestedComplexity = totalAspectCost - 6;
+         suggestedDifficulty = 6;
+      }
+      else {
+         suggestedDifficulty = Math.max(suggestedDifficulty, 4);
+      }
+
+      // Auto calculate difficulty and complexity if appropriate
+      if (this.parent.system.castingCheck.autoCalculateDC) {
+         this.parent.system.castingCheck.difficulty = suggestedDifficulty;
+         this.parent.system.castingCheck.complexity = suggestedComplexity;
+      }
 
       return;
    }

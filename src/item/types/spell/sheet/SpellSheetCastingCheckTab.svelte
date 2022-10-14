@@ -8,7 +8,7 @@
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
    import DocumentCheckDifficultSelect from "~/documents/components/select/DocumentCheckDifficultSelect.svelte";
-   import StatTag from "../../../../helpers/svelte-components/tag/StatTag.svelte";
+   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -99,22 +99,20 @@
          </div>
       </div>
 
-      {#if !$document.system.castingCheck.autoCalculateDC}
-         <div class="row" transition:slide|local>
-            <!--Difficulty-->
-            <div class="stat">
-               <!--Label-->
-               <div class="label">
-                  {localize("totalAspectCost")}:
-               </div>
+      <div class="row">
+         <!--Difficulty-->
+         <div class="stat">
+            <!--Label-->
+            <div class="label">
+               {localize("totalAspectCost")}:
+            </div>
 
-               <!--Value-->
-               <div class="value">
-                  {$document.totalAspectCost}
-               </div>
+            <!--Value-->
+            <div class="value">
+               {$document.spell.totalAspectCost}
             </div>
          </div>
-      {/if}
+      </div>
    </div>
 
    <!--Aspect Costs-->
