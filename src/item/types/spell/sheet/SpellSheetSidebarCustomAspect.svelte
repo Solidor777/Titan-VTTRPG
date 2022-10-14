@@ -8,7 +8,6 @@
 
    // Application statee reference
    const document = getContext("DocumentStore");
-   console.log(idx);
 
    $: aspect = $document.system.customAspect[idx];
 </script>

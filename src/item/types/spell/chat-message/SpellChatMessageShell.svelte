@@ -31,9 +31,9 @@
       </div>
 
       <!--Aspects-->
-      {#if item.aspect && item.aspect.length > 0}
+      {#if item.system.aspect.length > 0 || item.system.customAspect.length > 0}
          <div class="section small-text tags">
-            <SpellAspectTags aspects={item.aspect} />
+            <SpellAspectTags standardAspects={item.system.aspect} customAspects={item.system.customAspect} />
          </div>
       {/if}
 

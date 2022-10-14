@@ -88,51 +88,6 @@ export default class TitanSpell extends TitanTypeComponent {
       return;
    }
 
-   _prepareCustomAspectData(aspect) {
-      // Initialize aspect entry
-      const aspectEntry = {
-         label: aspect.label,
-         cost: Math.max(1, aspect.cost)
-      };
-
-      // Initial value
-      if (aspect.scaling && aspect.initialValue) {
-         aspectEntry.scaling = true;
-         aspectEntry.initialValue = Math.max(0, aspect.initialValue);
-      }
-
-      // Resistance check
-      if (aspect.resistanceCheck !== 'none') {
-         aspectEntry.resistanceCheck = aspect.resistanceCheck;
-      }
-
-      // Damage
-      if (aspect.isDamage) {
-         aspectEntry.isDamage = true;
-      }
-
-      // Healing
-      if (aspect.isHealing) {
-         aspectEntry.isHealing = true;
-      }
-
-      this.parent.aspect.push(aspectEntry);
-
-      return;
-   }
-
-   getRollData(rollData) {
-      rollData.aspect = this.parent.aspect;
-
-      return rollData;
-   }
-
-   getChatContext(chatContext) {
-      chatContext.aspect = this.parent.aspect;
-
-      return chatContext;
-   }
-
    onCreate() {
       if (this.parent.system.tradition === "any") {
          this.parent.system.tradition = localize("any");

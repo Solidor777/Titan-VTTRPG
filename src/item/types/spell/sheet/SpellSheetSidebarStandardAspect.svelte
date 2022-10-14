@@ -36,7 +36,7 @@
 
 {#if aspect}
    <div class="aspect">
-      <div class="aspect-label">
+      <div class="label">
          <!--Icon-->
          {#if labelIcons[aspect.label]}
             <i class={labelIcons[aspect.label]} />
@@ -58,7 +58,11 @@
                {/if}
             {:else}
                <!--Non scaling value-->
-               {localize(aspect.initialValue)}
+               {#if typeof aspect.initialValue === "string"}
+                  {localize(aspect.initialValue)}
+               {:else}
+                  {aspect.initialValue}
+               {/if}
             {/if}
          </div>
       {/if}
@@ -117,7 +121,7 @@
       width: 100%;
       margin: 0.25rem 0;
 
-      .aspect-label {
+      .label {
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;

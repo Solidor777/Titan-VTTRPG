@@ -1,29 +1,40 @@
 <script>
-   import SpellAspectTag from "./SpellAspectTag.svelte";
+   import SpellCustomAspectTag from "./SpellCustomAspectTag.svelte";
+   import SpellStandardAspectTag from "./SpellStandardAspectTag.svelte";
 
    // Aspects list
-   export let aspects = void 0;
+   export let standardAspects = void 0;
+   export let customAspects = void 0;
+
+   function getAspectSize(aspect) {
+      let size = 0;
+
+      if (aspect.scaling) {
+         size += 1;
+      }
+
+      if (aspect.allOptions) {
+         size += 1;
+      } else if (aspect.option) {
+         size += aspect.option.length;
+      }
+
+      if (aspect.resistanceCheck) {
+         size += 2;
+      }
+      return size;
+   }
 
    // Sort the aspects by size
-   $: aspectSizeMap = aspects
+   $: aspectSizeMap = standardAspects
       .map((aspect, idx) => {
-         let size = 0;
-
-         if (aspect.scaling) {
-            size += 1;
-         }
-
-         if (aspect.allOptions) {
-            size += 1;
-         } else if (aspect.option) {
-            size += aspect.option.length;
-         }
-
-         if (aspect.resistanceCheck) {
-            size += 2;
-         }
-         return { idx: idx, size: size };
+         return { idx: idx, size: getAspectSize(aspect), standardAspect: true };
       })
+      .concat(
+         customAspects.map((aspect, idx) => {
+            return { idx: idx, size: getAspectSize(aspect), standardAspect: false };
+         })
+      )
       .sort((a, b) => {
          if (a.size > b.size) {
             return 1;
@@ -37,9 +48,13 @@
 
 <div class="aspects">
    {#each aspectSizeMap as aspectSizeMap}
-      {#if aspects[aspectSizeMap.idx]}
+      {#if aspectSizeMap?.standardAspect === true}
          <div class="aspect">
-            <SpellAspectTag aspect={aspects[aspectSizeMap.idx]} />
+            <SpellStandardAspectTag aspect={standardAspects[aspectSizeMap.idx]} />
+         </div>
+      {:else if aspectSizeMap?.standardAspect === false}
+         <div class="aspect">
+            <SpellCustomAspectTag aspect={customAspects[aspectSizeMap.idx]} />
          </div>
       {/if}
    {/each}
