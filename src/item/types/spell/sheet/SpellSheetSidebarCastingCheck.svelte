@@ -69,7 +69,7 @@
          @include flex-group-center;
          @include border-top-bottom;
          @include attribute-colors;
-         @include panel-1;
+         @include label;
          width: 100%;
          padding: 0.25rem;
          font-weight: bold;

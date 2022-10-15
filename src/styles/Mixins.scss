@@ -85,6 +85,10 @@
   border-color: var(--border-color);
 }
 
+@mixin border-color-button {
+  border-color: var(--button-border-color);
+}
+
 @mixin button {
   box-sizing: border-box;
   display: flex;
@@ -371,11 +375,11 @@
 
   &.greater {
     color: var(--greater-color);
-    background: var(--greater-color);
+    background: var(--greater-background);
   }
 
   &.lesser {
     color: var(--lesser-color);
-    background: var(--lesser-color);
+    background: var(--lesser-background);
   }
 }

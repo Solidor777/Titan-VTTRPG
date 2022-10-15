@@ -11,6 +11,7 @@
    @import "../../../styles/mixins.scss";
 
    .tag {
+      @include label;
       @include flex-row;
       @include flex-group-center;
       @include border;

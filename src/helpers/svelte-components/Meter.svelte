@@ -21,7 +21,7 @@
       width: 100%;
       box-sizing: border-box;
       position: relative;
-      background: var(--input-background);
+      background: var(--meter-background);
       border-radius: 25px;
       padding: 3px;
       box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
@@ -31,7 +31,7 @@
          height: 100%;
          border-radius: 20px;
          background: var(--meter-color);
-         box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+         box-shadow: inset 0 2px 9px var(--meter-shadow-1), inset 0 -2px 6px var(--meter-shadow-2);
          position: relative;
          overflow: hidden;
       }

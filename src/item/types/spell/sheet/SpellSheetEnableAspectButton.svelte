@@ -72,6 +72,7 @@
          z-index: inherit;
 
          .value {
+            @include label;
             @include border;
             @include flex-row;
             @include flex-group-center;

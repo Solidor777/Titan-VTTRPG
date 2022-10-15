@@ -45,7 +45,7 @@
   --icon-button-border-color: black;
   --icon-button-padding: 0.1rem;
   --icon-button-background: rgba(255, 255, 240, 0.8);
-  --icon-button-color-highlight: rgb(255, 233, 174);
+  --icon-button-highlight: rgb(255, 233, 174);
   --icon-button-radius: 2rem;
   --icon-button-font-size: 1rem;
   --icon-button-color: black;
@@ -55,9 +55,9 @@
   --tooltip-delay-input: 0.9s;
 
   // Resource colors
-  --stamina-color: #006f37;
-  --wounds-color: #a80000;
-  --resolve-color: #0096c7;
+  --stamina-color: #008442;
+  --wounds-color: #980000;
+  --resolve-color: #0096c8;
 
   // Resistance colors
   --reflexes-color: #f9ff8f;
@@ -126,7 +126,13 @@
 
   // Mod values
   --lesser-color: #8B0000;
-  --lesser-color: #ffd1d1;
+  --lesser-background: #ffd1d1;
   --greater-color: #023020;
-  --greater-color: #c5ffeb;
+  --greater-background: #c5ffeb;
+
+
+  --meter-shadow-1: rgba(255, 255, 255, 0.3);
+  --meter-shadow-2: rgba(0, 0, 0, 0.4);
+
+  --meter-background: whitesmoke;
 }

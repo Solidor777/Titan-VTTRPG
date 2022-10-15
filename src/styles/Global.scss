@@ -2,31 +2,50 @@
    // Panel styling
    --panel-1-background: #373949;
    --panel-2-background: #424557;
-   --panel-3-background: #44475a;
+   --panel-3-background: #2e303c;
    --panel-1-color: rgba(255, 255, 255, 0.83);
    --panel-2-color: rgba(255, 255, 255, 0.83);
    --panel-3-color: rgba(255, 255, 255, 0.83);
 
    // Input styling
    --input-color: #1d1e26;
-   --input-background: #b1a6f2;
+   --input-background: #c5bcf8;
+
+   --border-color: rgba(255, 255, 255, 0.83);
 
    // Button styling
    --button-border-color: #15171b;
-
-   --button-background: #f2bf8c;
+   --button-background: #f2b58c;
    --button-border-style: solid;
    --button-background-disabled: rgb(208, 208, 208);
    --button-background-highlight: rgb(255, 233, 174);
    --button-color: #15171b;
    --icon-button-border-color: black;
-   --icon-button-background: #f2bf8c;
-   --icon-button-color-highlight: rgb(255, 233, 174);
+   --icon-button-background: #f2b58c;
+   --icon-button-highlight: rgb(255, 233, 174);
    --icon-button-color: #15171b;
+
+   // Resource colors
+   --stamina-color: #37da88;
+   --wounds-color: #c55858;
+   --resolve-color: #3fb6dd;
+
+   // Resistance colors
+   --reflexes-color: #eff49a;
+   --resilience-color: #f2c88c;
+   --willpower-color: #f28cbf;
+
+   // Attribute colors
+   --body-color: #f29d8c;
+   --mind-color: #95f28c;
+   --soul-color: #b5f2e8;
 
    // Label styles
    --label-background: #a6ccf2;
    --label-color: #1d1e26;
+
+
+   --meter-background: rgb(30, 30, 30);
 
    .window-content {
       background: #15161d;

@@ -63,6 +63,7 @@
             @include flex-row;
             @include flex-group-center;
             @include border-left;
+            @include border-color-button;
             padding-left: 0.25rem;
             margin-left: 0.25rem;
          }
@@ -71,6 +72,7 @@
             @include flex-row;
             @include flex-group-center;
             @include border-left;
+            @include border-color-button;
             padding-left: 0.25rem;
             margin-left: 0.25rem;
          }
