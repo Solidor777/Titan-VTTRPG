@@ -1,4 +1,4 @@
-import { clamp } from '~/helpers/Utility.js';
+import { clamp, localize } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
 import { applyDoubleBase } from '~/rules-element/DoubleBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -479,7 +479,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async rollAttributeCheck(options) {
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
-         if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === "default")) {
+         if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
             options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
          }
          const dialog = new AttributeCheckDialog(this.parent, options);
@@ -777,122 +777,140 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    // Apply damage to the actor
    async applyDamage(damage, ignoreArmor) {
       // Calculate the damage amount
-      const baseDamage = damage;
-      if (!ignoreArmor) {
-         damage = Math.max(damage - this.parent.system.mod.armor.value, 0);
-      }
-      const newStamina = this.parent.system.resource.stamina.value - damage;
+      const damageTaken = ignoreArmor ? Math.max(damage - this.parent.system.mod.armor.value, 0) : damage;
+      const stamina = this.parent.system.resource.stamina;
+      const wounds = this.parent.system.resource.wounds;
 
-      // Prepare the update data
-      const updateData = {
+      // Calculate the number of wounds taken
+      let woundsTaken = 0;
+      if (stamina.value < damageTaken) {
+         if (stamina.value + 5 <= damageTaken) {
+            woundsTaken = 3;
+         }
+         else if (stamina.value + 2 <= damageTaken) {
+            woundsTaken = 2;
+         }
+         else {
+            woundsTaken = 1;
+         }
+      }
+
+      // Update the actor
+      stamina.value = Math.max(stamina.value - damageTaken, 0);
+      wounds.value -= woundsTaken;
+      await this.parent.update({
          system: {
             resource: {
                stamina: {
-                  value: Math.max(newStamina, 0),
+                  value: stamina.value
                },
                wounds: {
-                  value: this.parent.system.resource.wounds.value,
-               },
-            },
-         },
-      };
-
-      // If the stamina was dropped below 0
-      if (newStamina < 0) {
-         // Calculate wounds
-         if (newStamina < -1) {
-            if (newStamina < -3) {
-               // 3 Wounds
-               updateData.system.resource.wounds.value += 3;
-            }
-            else {
-               // 2 Wounds
-               updateData.system.resource.wounds.value += 2;
+                  value: wounds.value
+               }
             }
          }
-         else {
-            // 1 Wound
-            updateData.system.resource.wounds.value += 1;
-         }
-      }
-
-      // Update the amount of stamina
-      await this.parent.update(updateData);
-
-      // Create the damage report message
-      const chatContext = {
-         type: 'damageReport',
-         actorName: this.parent.name,
-         actorImg: this.parent.img,
-         baseDamage: baseDamage,
-         damage: damage,
-         ignoreArmor: ignoreArmor ?? false,
-         armor: this.parent.system.mod.armor.value,
-         stamina: this.parent.system.resource.stamina,
-         wounds: this.parent.system.resource.wounds,
-      };
-
-      // Send the damage report to chat
-      await ChatMessage.create({
-         user: game.user.id,
-         speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-         type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-         sound: CONFIG.sounds.notification,
-         whisper: game.users.filter((user) =>
-            this.parent.testUserPermission(user, 'OWNER')
-         ),
-         flags: {
-            titan: {
-               chatContext: chatContext
-            }
-         }
-
       });
+
+      // Report
+      if (game.settings.get('titan', 'reportTakingDamage') === true) {
+         // Create the chat context
+         const chatContext = {
+            type: 'report',
+            img: this.parent.img,
+            header: `${localize('tookDamage')}: ${damageTaken}`,
+            subHeader: [`${this.parent.name}`],
+            icon: 'fas fa-heart',
+            line: [
+               `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
+               `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+            ]
+         };
+
+         // Wounds taken
+         if (woundsTaken > 0) {
+            chatContext.line = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.line];
+         }
+
+         // Damage resisted
+         if (damageTaken !== damage) {
+            chatContext.line = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.line];
+         }
+
+         // Ignore Armor
+         if (ignoreArmor) {
+            chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
+         }
+
+         // Send the damage report to chat
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            }
+         });
+      }
 
       return;
    }
 
-   // Apply damage to the actor
    async healDamage(healing) {
-      // Prepare the update data
-      const updateData = {
-         system: {
-            resource: {
-               stamina: {
-                  value: Math.max(this.parent.system.resource.stamina.value + healing, this.parent.system.resource.stamina.maxValue)
-               },
-            },
-         },
-      };
-
-      // Update the amount of stamin
-      await this.parent.update(updateData);
-
-      // Create the damage report message
-      const chatContext = {
-         type: 'healingReport',
-         actorName: this.parent.name,
-         actorImg: this.parent.img,
-         healing: healing,
-         stamina: this.parent.system.resource.stamina,
-         wounds: this.parent.system.resource.wounds,
-      };
-
-      // Send the damage report to chat
-      await ChatMessage.create({
-         user: game.user.id,
-         speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-         type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-         sound: CONFIG.sounds.notification,
-         whisper: game.users.filter((user) =>
-            this.parent.testUserPermission(user, 'OWNER')
-         ),
-         flags: {
-            titan: {
-               chatContext: chatContext
+      // Check if the actor's stamina is less than max
+      const stamina = this.parent.system.resource.stamina;
+      if (stamina.value < stamina.maxValue) {
+         // Update the actor
+         const staminaHealed = Math.min(healing, stamina.maxValue - stamina.value);
+         stamina.value += staminaHealed;
+         await this.parent.update({
+            system: {
+               resource: {
+                  stamina: {
+                     value: stamina.value
+                  }
+               }
             }
+         });
+
+         // Report
+         if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+            // Create chat context
+            const wounds = this.parent.system.resource.wounds;
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: `${localize('healedDamage')}: ${staminaHealed}`,
+               subHeader: [this.parent.name],
+               icon: 'fas fa-heart',
+               line: [
+                  `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
+                  `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+               ]
+            };
+
+            // Send the damage report to chat
+            await ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  this.parent.testUserPermission(user, 'OWNER')
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
+               }
+            });
          }
-      });
+      }
 
       return;
    }
@@ -900,92 +918,102 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async spendResolve() {
       // Check if the actor's resolve is less than max
       const resolve = this.parent.system.resource.resolve;
-
-      // If so, update the actor
       if (resolve.value > 0) {
+         // Update the actor
+         resolve.value -= 1;
          await this.parent.update({
             system: {
                resource: {
                   resolve: {
-                     value: resolve.value - 1
+                     value: resolve.value
                   }
                }
             }
          });
 
-         // Send a report
-         const chatContext = {
-            type: 'spendResolveReport',
-            actorName: this.parent.name,
-            actorImg: this.parent.img,
-            resolve: {
-               value: this.parent.system.resource.resolve.value,
-               maxValue: this.parent.system.resource.resolve.maxValue
-            }
-         };
+         // Report
+         if (game.settings.get('titan', 'reportSpendingResolve') === true) {
+            // Create chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: `${localize('spentResolve')}`,
+               subHeader: [this.parent.name],
+               icon: 'fas fa-bolt',
+               line: [`${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`]
+            };
 
-         ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
+
+            // Send the chat message
+            ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  this.parent.testUserPermission(user, 'OWNER')
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
                }
-            }
-         });
+            });
+         }
+
       }
+
+      return;
    }
 
    async regainResolve() {
       // Check if the actor's resolve is less than max
       const resolve = this.parent.system.resource.resolve;
-
-      // If so, update the actor
       if (resolve.value < resolve.maxValue) {
-         const resolveRegain = Math.min(this.parent.system.mod.resolveRegain.value, resolve.maxValue - resolve.value);
-
+         // Update the actor
+         const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.maxValue - resolve.value);
+         resolve.value += resolveRegained;
          await this.parent.update({
             system: {
                resource: {
                   resolve: {
-                     value: resolve.value + resolveRegain
+                     value: resolve.value
                   }
                }
             }
          });
 
-         // Send a report
-         const chatContext = {
-            type: 'regainResolveReport',
-            actorName: this.parent.name,
-            actorImg: this.parent.img,
-            resolve: {
-               value: this.parent.system.resource.resolve.value,
-               maxValue: this.parent.system.resource.resolve.maxValue,
-               regained: resolveRegain,
-            }
-         };
+         // Report
+         if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+            // Create chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: `${localize('regainedResolve')}: ${resolveRegained}`,
+               subHeader: [this.parent.name],
+               icon: 'fas fa-bolt',
+               line: [`${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`]
+            };
 
-         ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
+            // Send the chat message
+            ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  this.parent.testUserPermission(user, 'OWNER')
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
                }
-            }
-         });
+            });
+         }
       }
+
+      return;
    }
 
    equipArmor(armorId) {
@@ -1084,7 +1112,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async removeTemporaryEffects(report) {
       const systemData = this.parent.system;
-
       // Reset static mods
       // Attribute
       for (const [key, value] of Object.entries(systemData.attribute)) {
@@ -1125,13 +1152,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          return this.parent.deleteItem(item._id);
       });
 
-      if (report === true) {
+      // Report
+      if (report && game.settings.get('titan', 'reportResting') === true) {
+         // Create chat context
          const chatContext = {
-            type: 'removeTempEffectsReport',
-            actorName: this.parent.name,
-            actorImg: this.parent.img,
+            type: 'report',
+            img: this.parent.img,
+            header: localize('temporaryEffectsRemoved'),
+            subHeader: [this.parent.name],
+            icon: 'fas fa-arrow-rotate-left',
          };
 
+         // Send the damage report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -1145,41 +1177,46 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext: chatContext
                }
             }
-
          });
       }
+
       return;
    }
 
    async takeABreather(report) {
       // Clear temporary effects
-      this.removeTemporaryEffects();
-
-      // Reset stamina to max
-      const stamina = this.parent.system.resource.stamina.maxValue;
-      const resolve = this.parent.system.resource.resolve.maxValue;
+      this.removeTemporaryEffects(false);
 
       // Update the actor
       await this.parent.update({
          system: {
             resource: {
                stamina: {
-                  value: stamina
+                  value: this.parent.system.resource.stamina.maxValue
                },
                resolve: {
-                  value: resolve
+                  value: this.parent.system.resource.resolve.maxValue
                }
             }
          }
       });
 
-      if (report === true) {
+      // Report
+      if (report && game.settings.get('titan', 'reportResting') === true) {
+         // Create chat context
          const chatContext = {
-            type: 'breatherReport',
-            actorName: this.parent.name,
-            actorImg: this.parent.img,
+            type: 'report',
+            img: this.parent.img,
+            header: localize('tookABreather'),
+            subHeader: [this.parent.name],
+            icon: 'fas fa-face-exhaling',
+            line: [
+               localize('temporaryEffectsRemoved'),
+               localize('staminaAndResolveRestored'),
+            ]
          };
 
+         // Send the damage report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -1193,7 +1230,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext: chatContext
                }
             }
-
          });
       }
 
@@ -1201,38 +1237,46 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rest(report) {
-      await this.takeABreather();
+      await this.takeABreather(false);
 
       // Decrease wounds by 1
-      let woundsHealed = false;
-      let wounds = this.parent.system.resource.wounds.value;
-      if (wounds > 0) {
-         woundsHealed = true;
-         wounds -= 1;
+      let woundsHealed = 0;
+      const wounds = this.parent.system.resource.wounds.value;
+      if (wounds.value > 0) {
+         woundsHealed = Math.min(1 + this.parent.system.mod.woundRegain.value, wounds.value);
+         wounds.value -= woundsHealed;
          await this.parent.update({
             system: {
                resource: {
                   wounds: {
-                     value: wounds
+                     value: wounds.value
                   }
                }
             }
          });
       }
 
-      if (report === true) {
+      // Report
+      if (report && game.settings.get('titan', 'reportResting') === true) {
+         // Create chat context
          const chatContext = {
-            type: 'restReport',
-            actorName: this.parent.name,
-            actorImg: this.parent.img,
+            type: 'report',
+            img: this.parent.img,
+            header: localize('tookARest'),
+            subHeader: [this.parent.name],
+            icon: 'fas fa-bed',
+            line: [
+               localize('temporaryEffectsRemoved'),
+               localize('staminaAndResolveRestored'),
+            ]
          };
 
+         // Add line about wounds healed
          if (woundsHealed) {
-            chatContext.woundsHealed = true;
-            chatContext.wounds = this.parent.system.resource.wounds.value;
-            chatContext.maxWounds = this.parent.system.resource.wounds.maxValue;
+            chatContext.line = [...chatContext.line, `${localize('woundsHealed')}: ${woundsHealed}`];
          }
 
+         // Send the damage report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -1246,7 +1290,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext: chatContext
                }
             }
-
          });
       }
 

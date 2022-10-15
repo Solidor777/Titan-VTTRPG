@@ -3,26 +3,20 @@
 <script>
    import { setContext } from "svelte";
    import { getContext } from "svelte";
-   import DamageReportChatMessageShell from "./reports/DamageReportChatMessageShell.svelte";
-   import HealingReportChatMessageShell from "./reports/HealingReportChatMessageShell.svelte";
-   import WeaponChatMessageShell from "~/item/types/weapon/chat-message/WeaponChatMessageShell.svelte";
-   import ArmorChatMessageShell from "~/item/types/armor/chat-message/ArmorChatMessageShell.svelte";
-   import SpellChatMessageShell from "~/item/types/spell/chat-message/SpellChatMessageShell.svelte";
-   import AbilityChatMesssageShell from "~/item/types/ability/chat-message/AbilityChatMesssageShell.svelte";
-   import EquipmentChatMessageShell from "~/item/types/equipment/chat-message/EquipmentChatMessageShell.svelte";
-   import CommodityChatMessageShell from "~/item/types/commodity/chat-message/CommodityChatMessageShell.svelte";
-   import EffectChatMessageShell from "~/item/types/effect/chat-message/EffectChatMessageShell.svelte";
-   import ShieldChatMessageShell from "~/item/types/shield/chat-message/ShieldChatMessageShell.svelte";
-   import AttributeCheckChatMessageShell from "~/check/types/attribute-check/AttributeCheckChatMessageShell.svelte";
-   import ResistanceCheckChatMessageShell from "~/check/types/resistance-check/ResistanceCheckChatMessageShell.svelte";
-   import ItemCheckChatMessageShell from "~/check/types/item-check/ItemCheckChatMessageShell.svelte";
-   import CastingCheckChatMessageShell from "~/check/types/casting-check/CastingCheckChatMessageShell.svelte";
-   import AttackCheckChatMessageShell from "~/check/types/attack-check/AttackCheckChatMessageShell.svelte";
-   import RemoveTempEffectsReportChatMessageShell from "./reports/RemoveTempEffectsReportChatMessageShell.svelte";
-   import BreatherReportChatMessageShell from "./reports/BreatherReportChatMessageShell.svelte";
-   import RestReportChatMessageShell from "./reports/RestReportChatMessageShell.svelte";
-   import RegainResolveReportChatMessageShell from "./reports/RegainResolveReportChatMessageShell.svelte";
-   import SpendResolveReportChatMessageShell from "./reports/SpendResolveReportChatMessageShell.svelte";
+   import WeaponChatMessage from "~/item/types/weapon/chat-message/WeaponChatMessage.svelte";
+   import ArmorChatMessage from "~/item/types/armor/chat-message/ArmorChatMessage.svelte";
+   import SpellChatMessage from "~/item/types/spell/chat-message/SpellChatMessage.svelte";
+   import AbilityChatMesssage from "~/item/types/ability/chat-message/AbilityChatMesssage.svelte";
+   import EquipmentChatMessage from "~/item/types/equipment/chat-message/EquipmentChatMessage.svelte";
+   import CommodityChatMessage from "~/item/types/commodity/chat-message/CommodityChatMessage.svelte";
+   import EffectChatMessage from "~/item/types/effect/chat-message/EffectChatMessage.svelte";
+   import ShieldChatMessage from "~/item/types/shield/chat-message/ShieldChatMessage.svelte";
+   import AttributeCheckChatMessage from "~/check/types/attribute-check/AttributeCheckChatMessage.svelte";
+   import ResistanceCheckChatMessage from "~/check/types/resistance-check/ResistanceCheckChatMessage.svelte";
+   import ItemCheckChatMessage from "~/check/types/item-check/ItemCheckChatMessage.svelte";
+   import CastingCheckChatMessage from "~/check/types/casting-check/CastingCheckChatMessage.svelte";
+   import AttackCheckChatMessage from "~/check/types/attack-check/AttackCheckChatMessage.svelte";
+   import ReportChatMessage from "./ReportChatMessage.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -34,26 +28,20 @@
    // Selector for the chat message type
    function selectComponent() {
       const chatComponents = {
-         attributeCheck: AttributeCheckChatMessageShell,
-         resistanceCheck: ResistanceCheckChatMessageShell,
-         attackCheck: AttackCheckChatMessageShell,
-         castingCheck: CastingCheckChatMessageShell,
-         itemCheck: ItemCheckChatMessageShell,
-         armor: ArmorChatMessageShell,
-         ability: AbilityChatMesssageShell,
-         commodity: CommodityChatMessageShell,
-         equipment: EquipmentChatMessageShell,
-         effect: EffectChatMessageShell,
-         shield: ShieldChatMessageShell,
-         spell: SpellChatMessageShell,
-         weapon: WeaponChatMessageShell,
-         damageReport: DamageReportChatMessageShell,
-         healingReport: HealingReportChatMessageShell,
-         removeTempEffectsReport: RemoveTempEffectsReportChatMessageShell,
-         breatherReport: BreatherReportChatMessageShell,
-         restReport: RestReportChatMessageShell,
-         regainResolveReport: RegainResolveReportChatMessageShell,
-         spendResolveReport: SpendResolveReportChatMessageShell,
+         attributeCheck: AttributeCheckChatMessage,
+         resistanceCheck: ResistanceCheckChatMessage,
+         attackCheck: AttackCheckChatMessage,
+         castingCheck: CastingCheckChatMessage,
+         itemCheck: ItemCheckChatMessage,
+         armor: ArmorChatMessage,
+         ability: AbilityChatMesssage,
+         commodity: CommodityChatMessage,
+         equipment: EquipmentChatMessage,
+         effect: EffectChatMessage,
+         shield: ShieldChatMessage,
+         spell: SpellChatMessage,
+         weapon: WeaponChatMessage,
+         report: ReportChatMessage,
       };
       return chatComponents[$document.flags.titan.chatContext.type];
    }

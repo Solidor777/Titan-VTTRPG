@@ -113,7 +113,7 @@ Hooks.on('preDeleteChatMessage', (message) => {
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
-   if (game.settings.get('titan', 'autoIncreaseResolve') && combat.combatant?.actor?.character) {
+   if (game.settings.get('titan', 'autoIncreaseResolve') === true && combat.combatant?.actor?.character) {
       combat.combatant.actor.character.regainResolve();
    }
 });

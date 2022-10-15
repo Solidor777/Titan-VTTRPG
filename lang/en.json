@@ -80,8 +80,9 @@
   "LOCAL.customAspect.label": "Custom Aspect",
   "LOCAL.customAspects.label": "Custom Aspects",
   "LOCAL.damage.label": "Damage",
-  "LOCAL.damageReport.label": "Took Damage",
+  "LOCAL.tookDamage.label": "Took Damage",
   "LOCAL.damageTaken.label": "Damage Taken",
+  "LOCAL.damageResisted.label": "Damage Resisted",
   "LOCAL.dc.label": "DC",
   "LOCAL.deafened.label": "Deafened",
   "LOCAL.deception.desc.label": "Deception allows you to trick and mislead others using disguises, lies, and other forms of subterfuge.",
@@ -141,7 +142,7 @@
   "LOCAL.grip.label": "Grip",
   "LOCAL.healDamage.label": "Heal Damage",
   "LOCAL.healing.label": "Healing",
-  "LOCAL.healingReport.label": "Healed Damage",
+  "LOCAL.healedDamage.label": "Healed Damage",
   "LOCAL.regainedResolve.label": "Regained Resolve",
   "LOCAL.heavy.label": "Heavy",
   "LOCAL.ignoreArmor.label": "Ignore Armor",
@@ -411,8 +412,8 @@
   "LOCAL.addNewEffect.label": "Add New Effect",
   "LOCAL.notes.label": "Notes",
   "LOCAL.tookABreather.label": "Took a Breather",
-  "LOCAL.removeTemporaryEffects.desc.label": "Temporary Effects Removed",
-  "LOCAL.takeABreather.desc.label": "Stamina and Resolve Fully Restored",
+  "LOCAL.temporaryEffectsRemoved.label": "Temporary Effects Removed",
+  "LOCAL.staminaAndResolveRestored.label": "Stamina and Resolve Fully Restored",
   "LOCAL.shield.label": "Shield",
   "LOCAL.addNewShield.label": "Add New Shield",
   "LOCAL.newShield.label": "New Shield",
@@ -469,15 +470,35 @@
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
   },
-  "SETTINGS.autoIncreaseResolve": {
-    "label": "Auto-increase combatent resolve.",
-    "hint": "When enabled, a combatant's resolve will automatically increase by 1 at the start of their turn."
-  },
   "SETTINGS.initiativeFormula": {
     "label": "Initiative Formula",
     "hint": "Configure which method is used to determine who acts first in combat.",
     "flat": "Highest to lowest Initative, no dice rolls.",
     "roll1d6": "Roll 1d6 + Initiative, higher goes first.",
     "roll2d6": "Roll 2d6 + Initiative, higher goes first."
+  },
+  "SETTINGS.autoIncreaseResolve": {
+    "label": "Auto-increase combatent resolve.",
+    "hint": "When enabled, a combatant's resolve will automatically increase by 1 at the start of their turn."
+  },
+  "SETTINGS.reportTakingDamage": {
+    "label": "Report taking Damage",
+    "hint": "Notify when a controlled actor takes Damage."
+  },
+  "SETTINGS.reportHealingDamage": {
+    "label": "Report healing Damage",
+    "hint": "Notify when a controlled actor heals Damage."
+  },
+  "SETTINGS.reportSpendingResolve": {
+    "label": "Report spending Resolve",
+    "hint": "Notify when a controlled actor spends Resolve."
+  },
+  "SETTINGS.reportRegainingResolve": {
+    "label": "Report regaining Resolve",
+    "hint": "Notify when a controlled actor regains Resolve."
+  },
+  "SETTINGS.reportResting": {
+    "label": "Report Resting",
+    "hint": "Notify when a controlled actor Rests or Takes a breather."
   }
 }

@@ -412,6 +412,11 @@
                   "mod": {
                      "static": 0
                   }
+               },
+               "woundRegain": {
+                  "mod": {
+                     "static": 0
+                  }
                }
             },
             "statusEffect": {

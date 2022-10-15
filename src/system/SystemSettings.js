@@ -1,5 +1,3 @@
-import registerInitiativeFormula from "./Initiative";
-
 export default function registerSystemSettings() {
   game.settings.register('titan', 'getCheckOptions', {
     config: true,
@@ -8,15 +6,6 @@ export default function registerSystemSettings() {
     hint: 'SETTINGS.getCheckOptions.hint',
     type: Boolean,
     default: false,
-  });
-
-  game.settings.register('titan', 'autoIncreaseResolve', {
-    config: true,
-    scope: 'client',
-    name: 'SETTINGS.autoIncreaseResolve.label',
-    hint: 'SETTINGS.autoIncreaseResolve.hint',
-    type: Boolean,
-    default: true,
   });
 
   game.settings.register('titan', 'initiativeFormula', {
@@ -33,5 +22,61 @@ export default function registerSystemSettings() {
     },
     default: 'roll2d6',
     requiresReload: true
+  });
+
+  game.settings.register('titan', 'autoIncreaseResolve', {
+    config: true,
+    scope: 'world',
+    name: 'SETTINGS.autoIncreaseResolve.label',
+    hint: 'SETTINGS.autoIncreaseResolve.hint',
+    type: Boolean,
+    restricted: true,
+    default: true,
+  });
+
+
+  game.settings.register('titan', 'reportTakingDamage', {
+    config: true,
+    scope: 'client',
+    name: 'SETTINGS.reportTakingDamage.label',
+    hint: 'SETTINGS.reportTakingDamage.hint',
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register('titan', 'reportHealingDamage', {
+    config: true,
+    scope: 'client',
+    name: 'SETTINGS.reportHealingDamage.label',
+    hint: 'SETTINGS.reportHealingDamage.hint',
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register('titan', 'reportSpendingResolve', {
+    config: true,
+    scope: 'client',
+    name: 'SETTINGS.reportSpendingResolve.label',
+    hint: 'SETTINGS.reportSpendingResolve.hint',
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register('titan', 'reportRegainingResolve', {
+    config: true,
+    scope: 'client',
+    name: 'SETTINGS.reportRegainingResolve.label',
+    hint: 'SETTINGS.reportRegainingResolve.hint',
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register('titan', 'reportResting', {
+    config: true,
+    scope: 'client',
+    name: 'SETTINGS.reportResting.label',
+    hint: 'SETTINGS.reportResting.hint',
+    type: Boolean,
+    default: true,
   });
 }

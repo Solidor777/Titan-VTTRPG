@@ -21,8 +21,7 @@ export default class TitanSpell extends TitanTypeComponent {
    addStandardAspect(aspect) {
       let aspects = this.parent.system.aspect;
       aspects.push(aspect);
-      const aspectOptions = foundry.utils.deepClone(SpellAspects);
-      aspects = aspects.sort((a, b) => aspectOptions[a.label].settings.sortOrder - aspectOptions[b.label].settings.sortOrder);
+      aspects = aspects.sort((a, b) => SpellAspects[a.label].settings.sortOrder - SpellAspects[b.label].settings.sortOrder);
 
       this.parent.update({
          system: {
@@ -33,13 +32,12 @@ export default class TitanSpell extends TitanTypeComponent {
 
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
-      const aspectOptions = foundry.utils.deepClone(SpellAspects);
       let totalAspectCost = 1;
 
       aspects.forEach((aspect) => {
          // Determine whether the aspect is enabled
-         const settings = aspectOptions[aspect.label].settings;
-         const template = aspectOptions[aspect.label].template;
+         const settings = SpellAspects[aspect.label].settings;
+         const template = SpellAspects[aspect.label].template;
          if (settings?.requireOption && aspect.option.length === 0) {
             aspect.enabled = false;
             aspect.cost = 0;
