@@ -16,8 +16,8 @@
   border-style: var(--input-border-style);
   border-radius: var(--input-border-radius);
   border-width: var(--input-border-width);
-  border-color: var(--input-border-color);
-  background: var(--input-background-color);
+  border-color: var(--input-color);
+  background: var(--input-background);
   font-size: var(--font-size);
   font-family: var(--font-family);
   font-weight: var(--font-weight);
@@ -25,6 +25,7 @@
   height: var(--input-height);
   width: var(--input-width);
   padding: var(--input-padding);
+  color: var(--input-color);
 }
 
 @mixin input-disabled {
@@ -95,22 +96,22 @@
   border-radius: var(--button-border-radius);
   border-width: var(--button-border-width);
   border-color: var(--button-border-color);
-  background: var(--button-background-color);
+  background: var(--button-background);
   font-size: var(--button-font-size);
   font-weight: var(--button-font-weight);
   padding: var(--button-padding);
-  color: var(--button-text-color);
+  color: var(--button-color);
   line-height: var(--button-line-height);
   margin: 0;
 
   &:disabled {
     cursor: default;
-    background: var(--button-background-color-disabled);
+    background: var(--button-background-disabled);
   }
 
   &:hover {
     &:not(:disabled) {
-      background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
+      background: radial-gradient(var(--button-background-highlight), var(--button-background));
     }
   }
 }
@@ -129,22 +130,24 @@
   border-bottom-left-radius: var(--button-border-radius);
   border-width: var(--button-border-width);
   border-color: var(--button-border-color);
-  background: var(--button-background-color);
+  background: var(--button-background);
   font-size: var(--button-font-size);
   font-weight: var(--button-font-weight);
   padding: var(--button-padding);
-  color: var(--button-text-color);
+  color: var(--button-color);
   line-height: var(--button-line-height);
   margin: 0;
 
   &:disabled {
     cursor: default;
-    background: var(--button-background-color-disabled);
+    background: var(--button-background-disabled);
+    color: var(--button-color-disabled);
   }
 
   &:hover {
     &:not(:disabled) {
-      background: radial-gradient(var(--button-background-color-highlight), var(--button-background-color));
+      background: radial-gradient(var(--button-background-highlight), var(--button-background));
+      color: var(--button-color-disabled);
     }
   }
 }
@@ -161,11 +164,12 @@
   border-width: var(--icon-button-border-width);
   border-color: var(--border-color-icon-button);
   font-size: var(--icon-button-font-size);
-  background: var(--icon-button-background-color);
+  background: var(--icon-button-background);
   padding: var(--icon-button-padding);
   line-height: var(--icon-button-line-height);
   width: var(--icon-button-radius);
   height: var(--icon-button-radius);
+  color: var(--icon-button-color);
 }
 
 @mixin flex-row {
@@ -259,43 +263,43 @@
 
 @mixin attribute-colors {
   &.body {
-    background: var(--body-color-bright);
+    background: var(--body-color);
   }
 
   &.mind {
-    background: var(--mind-color-bright);
+    background: var(--mind-color);
   }
 
   &.soul {
-    background: var(--soul-color-bright);
+    background: var(--soul-color);
   }
 }
 
 @mixin resistance-colors {
   &.reflexes {
-    background: var(--reflexes-color-bright);
+    background: var(--reflexes-color);
   }
 
   &.resilience {
-    background: var(--resilience-color-bright);
+    background: var(--resilience-color);
   }
 
   &.willpower {
-    background: var(--willpower-color-bright);
+    background: var(--willpower-color);
   }
 }
 
 @mixin rarity-colors {
   &.uncommon {
-    background: var(--uncommon-color-bright);
+    background: var(--uncommon-color);
   }
 
   &.rare {
-    background: var(--rare-color-bright);
+    background: var(--rare-color);
   }
 
   &.unique {
-    background: var(--unique-color-bright);
+    background: var(--unique-color);
   }
 }
 
@@ -366,12 +370,12 @@
 @mixin mod-colors {
 
   &.greater {
-    color: var(--greater-color-dark);
-    background: var(--greater-color-bright);
+    color: var(--greater-color);
+    background: var(--greater-color);
   }
 
   &.lesser {
-    color: var(--lesser-color-dark);
-    background: var(--lesser-color-bright);
+    color: var(--lesser-color);
+    background: var(--lesser-color);
   }
 }

@@ -14,7 +14,6 @@
       height: 100%;
       --input-height: 2rem;
       --input-padding: 0.25rem;
-      --input-border-radius: 10px;
       --font-size: var(--font-size-extra-large);
    }
 </style>

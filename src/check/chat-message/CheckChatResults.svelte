@@ -122,11 +122,11 @@
          width: 100%;
          font-weight: bold;
          &.succeeded {
-            color: var(--succeeded-color-dark);
+            color: var(--succeeded-color);
          }
 
          &.failed {
-            color: var(--failed-color-dark);
+            color: var(--failed-color);
          }
       }
 

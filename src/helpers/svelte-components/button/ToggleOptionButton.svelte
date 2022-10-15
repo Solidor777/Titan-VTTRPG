@@ -22,7 +22,7 @@
       --button-border-radius: 10px;
 
       &.enabled-true {
-         --button-background-color: var(--active-background-color);
+         --button-background: var(--active-background);
       }
 
       .label {

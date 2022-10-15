@@ -86,7 +86,7 @@
             }
 
             &.active {
-               background: var(--highlight-background-color);
+               background: var(--highlight-background);
             }
          }
       }

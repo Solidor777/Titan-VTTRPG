@@ -34,7 +34,7 @@
          @include border;
          margin: 0.25rem;
          padding: 0.25rem;
-         background: var(--label-background-color);
+         background: var(--label-background);
       }
    }
 </style>

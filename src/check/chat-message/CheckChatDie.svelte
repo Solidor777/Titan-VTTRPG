@@ -104,7 +104,7 @@
       overflow: hidden;
       clip-path: var(--tjs-icon-button-clip-path, none);
       transform-style: preserve-3d;
-      color: var(--button-text-color);
+      color: var(--button-color);
 
       &:disabled {
          cursor: default;
@@ -117,19 +117,19 @@
       }
 
       &.critical-success {
-         background: var(--critical-success-color-bright);
+         background: var(--critical-success-color);
       }
 
       &.success {
-         background: var(--success-color-bright);
+         background: var(--success-color);
       }
 
       &.failure {
-         background: var(--failure-color-bright);
+         background: var(--failure-color);
       }
 
       &.critical-failure {
-         background: var(--critical-failure-color-bright);
+         background: var(--critical-failure-color);
       }
    }
 </style>

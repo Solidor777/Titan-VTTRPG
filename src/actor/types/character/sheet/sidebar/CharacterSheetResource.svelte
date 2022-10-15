@@ -152,15 +152,15 @@
             width: 100%;
 
             &.stamina {
-               --meter-color: var(--stamina-color-dark);
+               --meter-color: var(--stamina-color);
             }
 
             &.wounds {
-               --meter-color: var(--wounds-color-dark);
+               --meter-color: var(--wounds-color);
             }
 
             &.resolve {
-               --meter-color: var(--resolve-color-dark);
+               --meter-color: var(--resolve-color);
             }
          }
       }

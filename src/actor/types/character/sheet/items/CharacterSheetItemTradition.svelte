@@ -26,7 +26,7 @@
       @include flex-group-center;
       @include border;
       padding: 0.25rem;
-      background: var(--label-background-color);
+      background: var(--label-background);
 
       .label {
          margin-right: 0.25rem;

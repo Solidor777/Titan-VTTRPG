@@ -50,7 +50,7 @@
    </div>
 
    <!--Aspects-->
-   {#if $document.system.aspect.length > 0 || $document.system.customAspect.length}
+   {#if $appState.isExpanded.sidebar.castingCheck === true && ($document.system.aspect.length > 0 || $document.system.customAspect.length)}
       <div class="checks" transition:slide|local>
          <SpellSheetSidebarAspects />
       </div>

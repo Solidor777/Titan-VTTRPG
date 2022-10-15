@@ -99,15 +99,15 @@
       .button {
          min-width: 6rem;
          &.body {
-            --button-background-color: var(--body-color-bright);
+            --button-background: var(--body-color);
          }
 
          &.mind {
-            --button-background-color: var(--mind-color-bright);
+            --button-background: var(--mind-color);
          }
 
          &.soul {
-            --button-background-color: var(--soul-color-bright);
+            --button-background: var(--soul-color);
          }
       }
 

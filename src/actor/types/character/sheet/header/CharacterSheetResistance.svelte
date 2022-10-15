@@ -96,15 +96,15 @@
          min-width: 6rem;
 
          &.reflexes {
-            --button-background-color: var(--reflexes-color-bright);
+            --button-background: var(--reflexes-color);
          }
 
          &.resilience {
-            --button-background-color: var(--resilience-color-bright);
+            --button-background: var(--resilience-color);
          }
 
          &.willpower {
-            --button-background-color: var(--willpower-color-bright);
+            --button-background: var(--willpower-color);
          }
       }
 

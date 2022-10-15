@@ -501,5 +501,9 @@
   "SETTINGS.reportResting": {
     "label": "Report Resting",
     "hint": "Notify when a controlled actor Rests or Takes a breather."
+  },
+  "SETTINGS.darkMode": {
+    "label": "Dark Mode",
+    "hint": "Enable or disable dark styling."
   }
 }

@@ -1,0 +1,38 @@
+.dark-mode {
+   // Panel styling
+   --panel-1-background: #383b4b;
+   --panel-2-background: #23252f;
+   --panel-3-background: #403f46;
+   --panel-1-color: rgba(255, 255, 255, 0.83);
+   --panel-2-color: rgba(255, 255, 255, 0.83);
+   --panel-3-color: rgba(255, 255, 255, 0.83);
+
+   // Input styling
+   --input-color: #f8f8f2;
+   --input-background: #232323;
+   // Input styling
+   --input-color: #1d1e26;
+   --input-background: #a5a0c3;
+
+   // Button styling
+   --button-border-color: #15171b;
+   --button-background: rgb(181, 188, 218);
+   --button-border-style: solid;
+   --button-background-disabled: rgb(208, 208, 208);
+   --button-background-highlight: rgb(255, 233, 174);
+   --button-color: #15171b;
+   --icon-button-border-color: black;
+   --icon-button-background: #a3acd4;
+   --icon-button-color-highlight: rgb(255, 233, 174);
+   --icon-button-color: #15171b;
+
+   // Label styles
+   --label-background: #232323;
+   --label-color: #f8f8f2;
+   --label-color: #1d1e26;
+   --label-background: #a5a0c3;
+
+   .window-content {
+      background: #15161d;
+   }
+}

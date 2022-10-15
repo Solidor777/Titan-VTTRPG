@@ -1,6 +1,7 @@
 import './styles/Fonts.scss';
 import './styles/Variables.scss';
 import './styles/Mixins.scss';
+import './styles/Global.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { registerChatContextOptions } from './helpers/ChatContextOptions.js';
 import registerSystemSettings from './system/SystemSettings.js';

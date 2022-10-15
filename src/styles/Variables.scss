@@ -17,10 +17,10 @@
   --input-border-style: solid;
   --input-border-radius: 0px;
   --input-border-width: 0.1rem;
-  --input-border-color: black;
+  --input-color: black;
   --input-height: 1.5rem;
   --input-width: 100%;
-  --input-background-color: white;
+  --input-background: white;
 
   // Button Styling
   --button-border-style: solid;
@@ -28,54 +28,56 @@
   --button-border-width: 0.1rem;
   --button-border-color: black;
   --button-padding: 0.1rem 0.5rem;
-  --button-background-color: rgba(255, 255, 240, 0.8);
-  --button-background-color-disabled: rgb(208, 208, 208);
-  --button-background-color-highlight: rgb(255, 233, 174);
+  --button-background: rgba(255, 255, 240, 0.8);
+  --button-background-disabled: rgb(208, 208, 208);
+  --button-background-highlight: rgb(255, 233, 174);
   --button-font-size: 1rem;
   --button-font-weight: bold;
-  --button-text-color: black;
+  --button-color: black;
   --button-line-height: 1.75rem;
+  --button-color-disabled: black;
+  --button-color-highlight: black;
 
   // Icon Button Styling
   --icon-button-border-style: solid;
   --icon-button-border-radius: 50%;
   --icon-button-border-width: 0.1rem;
-  --icon-button-color-border: black;
+  --icon-button-border-color: black;
   --icon-button-padding: 0.1rem;
-  --icon-button-background-color: rgba(255, 255, 240, 0.8);
+  --icon-button-background: rgba(255, 255, 240, 0.8);
   --icon-button-color-highlight: rgb(255, 233, 174);
   --icon-button-radius: 2rem;
   --icon-button-font-size: 1rem;
-
+  --icon-button-color: black;
 
   // Tool tip delay
   --tooltip-delay-normal: 0.6s;
   --tooltip-delay-input: 0.9s;
 
   // Resource colors
-  --stamina-color-dark: #006f37;
-  --wounds-color-dark: #a80000;
-  --resolve-color-dark: #0096c7;
+  --stamina-color: #006f37;
+  --wounds-color: #a80000;
+  --resolve-color: #0096c7;
 
   // Resistance colors
-  --reflexes-color-bright: #f9ff8f;
-  --resilience-color-bright: #ffd183;
-  --willpower-color-bright: #e4d1ff;
+  --reflexes-color: #f9ff8f;
+  --resilience-color: #ffd183;
+  --willpower-color: #e4d1ff;
 
   // Attribute colors
-  --body-color-bright: #ffae9e;
-  --mind-color-bright: #98ffab;
-  --soul-color-bright: #93fdff;
+  --body-color: #ffae9e;
+  --mind-color: #98ffab;
+  --soul-color: #93fdff;
 
   // Dice result colors
-  --critical-success-color-bright: lightskyblue;
-  --success-color-bright: lightgreen;
-  --failure-color-bright: gold;
-  --critical-failure-color-bright: lightsalmon;
+  --critical-success-color: lightskyblue;
+  --success-color: lightgreen;
+  --failure-color: gold;
+  --critical-failure-color: lightsalmon;
 
   // Check results colors
-  --succeeded-color-dark: darkblue;
-  --failed-color-dark: darkred;
+  --succeeded-color: darkblue;
+  --failed-color: darkred;
 
   // Theme Colors
   --color-primary: #80cbc4;
@@ -86,10 +88,10 @@
   --color-secondary-dark: #6f79a8;
   --color-background: #bab9ae;
   --color-foreground: #e4e3d7;
-  --text-color: white;
-  --highlight-background-color: rgb(255, 233, 174);
+  --color: white;
+  --highlight-background: rgb(255, 233, 174);
   --static-value-background: rgb(208, 208, 208);
-  --active-background-color: #fcdbbf;
+  --active-background: #fcdbbf;
 
   // Panel Styles
   --panel-1-background: #8c8c8c5e;
@@ -104,9 +106,9 @@
   --label-color: black;
 
   // Rarity colors
-  --uncommon-color-bright: #d0ffbb;
-  --rare-color-bright: #acdcff;
-  --unique-color-bright: #ffcfe9;
+  --uncommon-color: #d0ffbb;
+  --rare-color: #acdcff;
+  --unique-color: #ffcfe9;
 
   // Opacity
   --disabled-opacity: 1;
@@ -123,8 +125,8 @@
   --font-size-extra-large: 1.5rem;
 
   // Mod values
-  --lesser-color-dark: #8B0000;
-  --lesser-color-bright: #ffd1d1;
-  --greater-color-dark: #023020;
-  --greater-color-bright: #c5ffeb;
+  --lesser-color: #8B0000;
+  --lesser-color: #ffd1d1;
+  --greater-color: #023020;
+  --greater-color: #c5ffeb;
 }

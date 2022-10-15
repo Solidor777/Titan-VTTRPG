@@ -125,7 +125,7 @@
          width: 100%;
 
          &.drag-hovered {
-            background: var(--highlight-background-color);
+            background: var(--highlight-background);
          }
 
          &:not(:first-child) {

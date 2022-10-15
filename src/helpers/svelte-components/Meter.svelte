@@ -21,7 +21,7 @@
       width: 100%;
       box-sizing: border-box;
       position: relative;
-      background: whitesmoke;
+      background: var(--input-background);
       border-radius: 25px;
       padding: 3px;
       box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);

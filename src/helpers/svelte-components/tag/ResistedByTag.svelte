@@ -23,15 +23,15 @@
       padding: 0.25rem;
 
       &.reflexes {
-         background: var(--reflexes-color-bright);
+         background: var(--reflexes-color);
       }
 
       &.resilience {
-         background: var(--resilience-color-bright);
+         background: var(--resilience-color);
       }
 
       &.willpower {
-         background: var(--willpower-color-bright);
+         background: var(--willpower-color);
       }
 
       .label {

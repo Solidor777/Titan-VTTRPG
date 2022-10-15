@@ -33,15 +33,15 @@
 <style lang="scss">
    .rarity-select {
       &.uncommon {
-         --input-background-color: var(--uncommon-color-bright);
+         --input-background: var(--uncommon-color);
       }
 
       &.rare {
-         --input-background-color: var(--rare-color-bright);
+         --input-background: var(--rare-color);
       }
 
       &.unique {
-         --input-background-color: var(--unique-color-bright);
+         --input-background: var(--unique-color);
       }
    }
 </style>

@@ -43,7 +43,7 @@
       margin: 0.25rem;
 
       &.enabled-true {
-         --button-background-color: var(--active-background-color);
+         --button-background: var(--active-background);
       }
 
       .label {

@@ -40,15 +40,15 @@
 <style lang="scss">
    .attribute-select {
       &.body {
-         --input-background-color: var(--body-color-bright);
+         --input-background: var(--body-color);
       }
 
       &.mind {
-         --input-background-color: var(--mind-color-bright);
+         --input-background: var(--mind-color);
       }
 
       &.soul {
-         --input-background-color: var(--soul-color-bright);
+         --input-background: var(--soul-color);
       }
    }
 </style>
