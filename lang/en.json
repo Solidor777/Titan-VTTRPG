@@ -502,8 +502,15 @@
     "label": "Report Resting",
     "hint": "Notify when a controlled actor Rests or Takes a breather."
   },
-  "SETTINGS.darkMode": {
-    "label": "Dark Mode",
-    "hint": "Enable or disable dark styling."
+  "SETTINGS.darkModeSheets": {
+    "label": "Dark Mode Sheets",
+    "hint": "Enable dark styling for sheets."
+  },
+  "SETTINGS.darkModeChatMessages": {
+    "label": "Dark Mode Chat Messages",
+    "hint": "Enable dark styling for chat messages.",
+    "all": "All",
+    "systemOnly": "System messages only",
+    "disabled": "Disabled"
   }
 }

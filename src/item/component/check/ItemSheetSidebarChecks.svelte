@@ -151,7 +151,7 @@
             @include flex-group-top;
             @include border-bottom;
             @include attribute-colors;
-            @include panel-1;
+            @include label;
             width: 100%;
             padding: 0.25rem;
 

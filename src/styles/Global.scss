@@ -10,7 +10,6 @@
    // Input styling
    --input-color: #1d1e26;
    --input-background: #c5bcf8;
-
    --border-color: rgba(255, 255, 255, 0.83);
 
    // Button styling
@@ -44,10 +43,27 @@
    --label-background: #a6ccf2;
    --label-color: #1d1e26;
 
-
+   // Meter styling
    --meter-background: rgb(30, 30, 30);
 
    .window-content {
       background: #15161d;
+   }
+
+   &.chat-message {
+      background: #15161d;
+      color: rgba(255, 255, 255, 0.83);
+
+      .message-header {
+         color: rgba(255, 255, 255, 0.83);
+      }
+
+      &.whisper {
+         background: #20203e;
+      }
+
+      &.blind {
+         background: #2e1b2e;
+      }
    }
 }

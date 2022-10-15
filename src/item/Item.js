@@ -120,7 +120,8 @@ export default class TitanItem extends Item {
                   titan: {
                      chatContext: chatContext
                   }
-               }
+               },
+               classes: ['titan']
             },
             options?.rollMode ?
                options.rollMode :

@@ -87,11 +87,26 @@ Hooks.once('setup', async () => {
 });
 
 Hooks.on('renderChatMessage', (message, html) => {
+   // Add dark mode styling if appropriate
+   if (game.settings.get('titan', 'darkModeChatMessages') === 'all') {
+      // Add the titan class
+      let content = html.find('.chat-message').prevObject;
+      content.addClass('dark-mode');
+   }
+
    // Check if this is a valid titan chat message
    const chatContext = message.getFlag('titan', 'chatContext');
-
    if (TitanChatMessageTypes.has(chatContext?.type)) {
-      // If so, create the chat message shell and display the message
+      // Add the titan class
+      let content = html.find('.chat-message').prevObject;
+      content.addClass('titan');
+
+      // Add the dark mode class
+      if (game.settings.get('titan', 'darkModeChatMessages') === 'systemOnly') {
+         content.addClass('dark-mode');
+      }
+
+      // Add the svelte component
       const documentStore = new TJSDocument(message);
       message._svelteComponent = new ChatMessageShell({
          target: html[0],
@@ -99,6 +114,7 @@ Hooks.on('renderChatMessage', (message, html) => {
             documentStore: documentStore,
          }
       });
+
    }
 });
 
@@ -106,7 +122,7 @@ Hooks.on('preDeleteChatMessage', (message) => {
    // Check if this is a valid titan chat message
    const flagData = message.getFlag('titan', 'data');
    if (typeof flagData === 'object' && typeof message?._svelteComponent?.$destroy === 'function') {
-      // If so, delete the message shell
+      // If so, delete the svelte component
       message._svelteComponent.$destroy();
    }
 });

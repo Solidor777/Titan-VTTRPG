@@ -80,13 +80,28 @@ export default function registerSystemSettings() {
       default: true,
    });
 
-   game.settings.register('titan', 'darkMode', {
+   game.settings.register('titan', 'darkModeSheets', {
       config: true,
       scope: 'client',
-      name: 'SETTINGS.darkMode.label',
-      hint: 'SETTINGS.darkMode.hint',
+      name: 'SETTINGS.darkModeSheets.label',
+      hint: 'SETTINGS.darkModeSheets.hint',
       type: Boolean,
       default: true,
+      requiresReload: true
+   });
+
+   game.settings.register('titan', 'darkModeChatMessages', {
+      config: true,
+      scope: 'client',
+      name: 'SETTINGS.darkModeChatMessages.label',
+      hint: 'SETTINGS.darkModeChatMessages.hint',
+      type: String,
+      choices: {
+         all: 'SETTINGS.darkModeChatMessages.all',
+         systemOnly: 'SETTINGS.darkModeChatMessages.systemOnly',
+         disabled: 'SETTINGS.darkModeChatMessages.disabled',
+      },
+      default: 'all',
       requiresReload: true
    });
 }
