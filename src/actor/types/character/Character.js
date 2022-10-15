@@ -841,7 +841,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
          }
 
-         // Send the damage report to chat
+         // Send the report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -894,7 +894,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                ]
             };
 
-            // Send the damage report to chat
+            // Send the report to chat
             await ChatMessage.create({
                user: game.user.id,
                speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -1163,7 +1163,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             icon: 'fas fa-arrow-rotate-left',
          };
 
-         // Send the damage report to chat
+         // Send the report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -1216,7 +1216,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             ]
          };
 
-         // Send the damage report to chat
+         // Send the report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -1272,11 +1272,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          };
 
          // Add line about wounds healed
-         if (woundsHealed) {
-            chatContext.line = [...chatContext.line, `${localize('woundsHealed')}: ${woundsHealed}`];
+         if (woundsHealed > 0) {
+            chatContext.line = [
+               ...chatContext.line,
+               `${localize('woundsHealed')}: ${woundsHealed}`,
+               `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+            ];
          }
 
-         // Send the damage report to chat
+         // Send the report to chat
          await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor: this.parent }),
