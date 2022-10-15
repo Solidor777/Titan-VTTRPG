@@ -9,7 +9,7 @@
 <div class="report">
    <!--Img-->
    {#if chatContext.img}
-      <img source={chatContext.img} alt="img" />
+      <img src={chatContext.img} alt="img" />
    {/if}
 
    <!--Header-->
@@ -20,11 +20,7 @@
          {#if chatContext.icon}
             <i class={chatContext.icon} />
          {/if}
-
-         <!--Label-->
-         <div class="label">
-            {chatContext.header}
-         </div>
+         {chatContext.header}
       </div>
 
       <!--Sub Header-->
@@ -37,9 +33,11 @@
 
    <!--Lines-->
    {#if chatContext.line && chatContext.line.length > 0}
-      {#each chatContext.line as line}
-         <div class="line">{line}</div>
-      {/each}
+      <div class="lines">
+         {#each chatContext.line as line}
+            <div class="line">{line}</div>
+         {/each}
+      </div>
    {/if}
 </div>
 
@@ -49,10 +47,13 @@
    .report {
       @include flex-column;
       @include flex-group-top;
+      @include font-size-normal;
       width: 100%;
+      font-weight: bold;
 
       img {
-         border: none;
+         @include panel-1;
+         @include border;
          width: 5rem;
          margin-bottom: 0.5rem;
       }
@@ -60,14 +61,17 @@
       .header {
          @include flex-column;
          @include flex-group-top;
+         @include panel-1;
+         @include border;
          width: 100%;
-         font-weight: bold;
+         padding: 0.25rem;
 
          .main {
             @include flex-row;
             @include flex-group-center;
             @include font-size-large;
             width: 100%;
+            flex-wrap: wrap;
 
             i {
                margin-right: 0.25rem;
@@ -76,7 +80,7 @@
             .label {
                @include flex-row;
                @include flex-group-center;
-               width: 100%;
+               flex-wrap: wrap;
             }
          }
 
@@ -85,17 +89,25 @@
             @include flex-group-center;
             width: 100%;
             margin-top: 0.25rem;
+            flex-wrap: wrap;
          }
       }
 
-      .line {
-         @include flex-row;
-         @include flex-group-center;
-         margin-top: 0.25rem;
+      .lines {
+         @include flex-column;
+         @include flex-group-top;
+         width: 100%;
 
-         :not(:first-child) {
-            @include border-top;
-            padding-top: 0.25rem;
+         .line {
+            @include flex-row;
+            @include flex-group-center;
+            margin-top: 0.25rem;
+            flex-wrap: wrap;
+
+            &:not(:first-child) {
+               @include border-top;
+               padding-top: 0.25rem;
+            }
          }
       }
    }

@@ -797,7 +797,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Update the actor
       stamina.value = Math.max(stamina.value - damageTaken, 0);
-      wounds.value -= woundsTaken;
+      wounds.value += woundsTaken;
       await this.parent.update({
          system: {
             resource: {
@@ -1241,7 +1241,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Decrease wounds by 1
       let woundsHealed = 0;
-      const wounds = this.parent.system.resource.wounds.value;
+      const wounds = this.parent.system.resource.wounds;
       if (wounds.value > 0) {
          woundsHealed = Math.min(1 + this.parent.system.mod.woundRegain.value, wounds.value);
          wounds.value -= woundsHealed;
