@@ -116,6 +116,20 @@
       </div>
    </div>
 
+   <!--Total Dice-->
+   <div class="column">
+      <div class="tag" data-tooltip={totalDiceTooltip}>
+         <!--Label-->
+         <div class="label"><i class="fas fa-dice-d6" />{localize("dice")}</div>
+
+         <!--Total Value-->
+         <div class="value">
+            {$document.system.skill[key].training.value +
+               $document.system.attribute[$document.system.skill[key].defaultAttribute].value}
+         </div>
+      </div>
+   </div>
+
    <!--Training and Expertise-->
    <div class="column">
       <!--Training row-->
@@ -187,20 +201,6 @@
                   $document.system.skill[key].expertise.mod.ability +
                   $document.system.skill[key].expertise.mod.equipment}
             />
-         </div>
-      </div>
-   </div>
-
-   <!--Total Dice-->
-   <div class="column">
-      <div class="tag" data-tooltip={totalDiceTooltip}>
-         <!--Label-->
-         <div class="label"><i class="fas fa-dice-d6" />{localize("dice")}</div>
-
-         <!--Total Value-->
-         <div class="value">
-            {$document.system.skill[key].training.value +
-               $document.system.attribute[$document.system.skill[key].defaultAttribute].value}
          </div>
       </div>
    </div>
