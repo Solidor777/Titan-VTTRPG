@@ -97,6 +97,7 @@
          @include flex-column;
          @include flex-group-top;
          width: 100%;
+         margin-top: 0.25rem;
 
          .line {
             @include flex-row;

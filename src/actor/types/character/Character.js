@@ -1237,8 +1237,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rest(report) {
-      await this.takeABreather(false);
-
       // Decrease wounds by 1
       let woundsHealed = 0;
       const wounds = this.parent.system.resource.wounds;
@@ -1255,6 +1253,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
          });
       }
+
+      await this.takeABreather(false);
 
       // Report
       if (report && game.settings.get('titan', 'reportResting') === true) {

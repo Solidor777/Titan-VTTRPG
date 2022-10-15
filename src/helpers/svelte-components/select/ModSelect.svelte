@@ -26,6 +26,10 @@
          label: localize("resolveRegain"),
          value: "resolveRegain",
       },
+      {
+         label: localize("woundRegain"),
+         value: "woundRegain",
+      },
    ];
 
    // Add none option

@@ -434,6 +434,7 @@
   "LOCAL.spendResolve.label": "Spend Resolve",
   "LOCAL.spentResolve.label": "Spent Resolve",
   "LOCAL.resolveRegain.label": "Resolve Regain",
+  "LOCAL.woundRegain.label": "Wound Regain",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",
