@@ -8,7 +8,11 @@
 
 <div class="label">
    <div class="content {$document.flags.titan.chatContext.parameters.attribute}">
-      <img src={$document.flags.titan.chatContext.parameters.img} alt="item" />
+      <img
+         src={$document.flags.titan.chatContext.parameters.img}
+         alt="item"
+         class={$document.flags.titan.chatContext.parameters.img.indexOf(".svg") === -1 ? "" : "svg"}
+      />
 
       <!--Labels-->
       <div class="labels">

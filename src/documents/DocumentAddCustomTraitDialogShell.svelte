@@ -5,7 +5,7 @@
    import { getContext } from "svelte";
    import { v4 as uuidv4 } from "uuid";
    import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
-   import TextArea from "~/helpers/svelte-components/TextArea.svelte";
+   import TextArea from "~/helpers/svelte-components/input/TextArea.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // The document document owning the trait

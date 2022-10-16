@@ -1,15 +1,19 @@
-import { getFlatModifierTemplate } from "~/rules-element/FlatModifier.js";
-import { getDoubleBaseTemplate } from "~/rules-element/DoubleBase.js";
+import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
+import { getDoubleBaseTemplate } from '~/rules-element/DoubleBase.js';
+import getStartOfTurnMessageTemplate from '~/rules-element/StatOfTurnMessage';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    switch (document.system.rulesElement[elementIdx].operation) {
-      case "flatModifier": {
+      case 'flatModifier': {
          document.system.rulesElement[elementIdx] = getFlatModifierTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
-      case "doubleBase": {
+      case 'doubleBase': {
          document.system.rulesElement[elementIdx] = getDoubleBaseTemplate(document.system.rulesElement[elementIdx].uuid);
-
+         break;
+      }
+      case 'startOfTurnMessage': {
+         document.system.rulesElement[elementIdx] = getStartOfTurnMessageTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
       default: {

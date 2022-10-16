@@ -2,10 +2,10 @@
    export let value = void 0;
 </script>
 
-<textarea bind:value />
+<textarea bind:value on:change />
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import "../../../Styles/Mixins.scss";
 
    textarea {
       @include input;

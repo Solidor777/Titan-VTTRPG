@@ -183,6 +183,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          this.applyFlatModifier(flatMod);
       });
 
+      // Start of turn messages
+      this.startOfTurnMessages = rulesElements.filter((element) => element.operation === 'startOfTurnMessage');
 
       return;
    }
@@ -1298,5 +1300,50 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       return;
+   }
+
+   async onTurnStart() {
+      // Regain resolve
+      if (game.settings.get('titan', 'autoIncreaseResolve') === true) {
+         await this.regainResolve();
+      }
+
+      // Handle start of turn messages
+      if (this.startOfTurnMessages && this.startOfTurnMessages.length > 0) {
+         let lines = [];
+         this.startOfTurnMessages.forEach((message) => {
+            if (message.message !== '') {
+               lines.push(message.message);
+            }
+         });
+
+         if (lines.length > 0) {
+            // Create chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: localize('startOfTurn'),
+               subHeader: [this.parent.name],
+               icon: 'fas fa-clock',
+               line: lines
+            };
+
+            // Send the report to chat
+            await ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  this.parent.testUserPermission(user, 'OWNER')
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
+               }
+            });
+         }
+      }
    }
 }

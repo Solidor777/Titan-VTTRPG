@@ -7,6 +7,7 @@
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ItemSheetFlatModifierSettings from "./ItemSheetFlatModifierSettings.svelte";
    import ItemSheetDoubleBaseSettings from "./ItemSheetDoubleBaseSettings.svelte";
+   import ItemSheetStartOfTurnMessageSettings from "./ItemSheetStartOfTurnMessageSettings.svelte";
 
    // Setup context variables
    const application = getContext("external").application;
@@ -22,12 +23,17 @@
          label: localize("doubleBase"),
          value: "doubleBase",
       },
+      {
+         label: localize("startOfTurn"),
+         value: "startOfTurnMessage",
+      },
    ];
 
    function selectComponent(operation) {
       const elementComponents = {
          flatModifier: ItemSheetFlatModifierSettings,
          doubleBase: ItemSheetDoubleBaseSettings,
+         startOfTurnMessage: ItemSheetStartOfTurnMessageSettings,
       };
 
       return elementComponents[operation];
