@@ -14,11 +14,11 @@ export default class ShieldEditTraitsDialog extends TJSDialog {
             },
             zIndex: null,
             id: `dialog-${document.name}`,
-            classes: ['titan'],
          },
          {
             width: 320,
             height: 135,
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );
    }

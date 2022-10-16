@@ -15,11 +15,11 @@ export default class ItemCheckDialog extends TJSDialog {
             },
             zIndex: null,
             id: `dialog-${actor.name}`,
-            classes: ['titan'],
          },
          {
             width: 350,
             height: 520,
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );
    }

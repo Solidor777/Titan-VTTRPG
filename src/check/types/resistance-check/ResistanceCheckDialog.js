@@ -15,11 +15,11 @@ export default class ResistanceCheckDialog extends TJSDialog {
             },
             zIndex: null,
             id: `dialog-${actor.name}`,
-            classes: ['titan'],
          },
          {
             width: 320,
             height: 295,
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );
    }

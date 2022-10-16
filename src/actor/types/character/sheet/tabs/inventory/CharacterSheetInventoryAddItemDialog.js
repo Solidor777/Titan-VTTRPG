@@ -14,11 +14,11 @@ export default class CharacterSheetInventoryAddItemDialog extends TJSDialog {
             },
             zIndex: null,
             id: `dialog-${sheet.reactive.document.name}`,
-            classes: ['titan'],
          },
          {
             width: 150,
             height: 170,
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );
    }

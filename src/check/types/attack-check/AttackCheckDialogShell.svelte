@@ -8,6 +8,7 @@
    import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
    import IntegerSelect from "~/helpers/svelte-components/select/IntegerSelect.svelte";
    import Select from "~/helpers/svelte-components/select/Select.svelte";
+   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // The actor document making this check
    export let actor;
@@ -245,8 +246,13 @@
 
    <!--Buttons-->
    <div class="row">
-      <button on:click={onRoll}>{localize("roll")}</button>
-      <button on:click={onCancel}>{localize("cancel")}</button>
+      <div class="button">
+         <EfxButton on:click={onRoll}>{localize("roll")}</EfxButton>
+      </div>
+
+      <div class="button">
+         <EfxButton on:click={onCancel}>{localize("cancel")}</EfxButton>
+      </div>
    </div>
 </div>
 
@@ -298,9 +304,10 @@
             margin-right: 0.5rem;
          }
 
-         button {
+         .button {
+            @include flex-row;
+            width: 100%;
             margin-top: 0.5rem;
-            @include font-size-normal;
          }
       }
 

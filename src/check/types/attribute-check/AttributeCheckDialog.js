@@ -1,11 +1,11 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize } from '~/helpers/Utility.js';
 import AttributeCheckDialogShell from './AttributeCheckDialogShell.svelte';
-export default class SkillCheckDialog extends TJSDialog {
+export default class AttributeCheckDialog extends TJSDialog {
    constructor(actor, options) {
       super(
          {
-            title: `${localize('skillCheck')} (${actor.name})`,
+            title: `${localize('attributeCheck')} (${actor.name})`,
             content: {
                class: AttributeCheckDialogShell,
                props: {
@@ -15,11 +15,11 @@ export default class SkillCheckDialog extends TJSDialog {
             },
             zIndex: null,
             id: `dialog-${actor.name}`,
-            classes: ['titan'],
          },
          {
             width: 350,
             height: 490,
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );
    }

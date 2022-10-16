@@ -15,11 +15,11 @@ export default class WeaponAddCustomTraitDialog extends TJSDialog {
             },
             zIndex: null,
             id: `dialog-${document.name}`,
-            classes: ['titan'],
          },
          {
             width: 300,
             height: 300,
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );
    }

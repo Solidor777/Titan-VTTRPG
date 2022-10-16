@@ -1341,7 +1341,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   titan: {
                      chatContext: chatContext
                   }
-               }
+               },
             });
          }
       }

@@ -436,6 +436,7 @@
   "LOCAL.resolveRegain.label": "Resolve Regain",
   "LOCAL.woundRegain.label": "Wound Regain",
   "LOCAL.startOfTurn.label": "Start of Turn",
+  "LOCAL.attributeCheck.label": "Attribute Check",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",
