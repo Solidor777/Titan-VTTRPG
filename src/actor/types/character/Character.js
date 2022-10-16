@@ -453,19 +453,22 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async rollInitiative(options) {
       const roll = await this.getInitiativeRoll(options);
       await roll.evaluate({ async: true });
-      const chatMessage = await ChatMessage.create(
-         ChatMessage.applyRollMode(
-            {
-               user: options?.user ? options.user : game.user.id,
-               speaker: options?.speaker ? options.speaker : null,
-               type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-               roll: roll,
-            },
-            options?.rollMode ?
-               options.rollMode :
-               game.settings.get('core', 'rollMode')
-         )
-      );
+
+      // Construct chat message data
+      let messageData = foundry.utils.mergeObject({
+         speaker: ChatMessage.getSpeaker({
+            actor: this.parent,
+            token: this.parent.token,
+            alias: this.parent.name
+         }),
+         flavor: game.i18n.format("COMBAT.RollsInitiative", { name: this.parent.name }),
+         flags: { "core.initiativeRoll": true }
+      });
+      const chatData = await roll.toMessage(messageData, { create: false });
+      chatData.rollMode = options?.rollMode ?
+         options.rollMode :
+         game.settings.get('core', 'rollMode');
+      await ChatMessage.create(chatData);
    }
 
    // Get a skill check from the actor
@@ -968,56 +971,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async regainResolve() {
-      // Check if the actor's resolve is less than max
-      const resolve = this.parent.system.resource.resolve;
-      if (resolve.value < resolve.maxValue) {
-         // Update the actor
-         const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.maxValue - resolve.value);
-         resolve.value += resolveRegained;
-         await this.parent.update({
-            system: {
-               resource: {
-                  resolve: {
-                     value: resolve.value
-                  }
-               }
-            }
-         });
-
-         // Report
-         if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-            // Create chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: `${localize('regainedResolve')}: ${resolveRegained}`,
-               subHeader: [this.parent.name],
-               icon: 'fas fa-bolt',
-               line: [`${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`]
-            };
-
-            // Send the chat message
-            ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  this.parent.testUserPermission(user, 'OWNER')
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
-               }
-            });
-         }
-      }
-
-      return;
-   }
-
    equipArmor(armorId) {
       // Ensure the armor is valid
       const armor = this.parent.items.get(armorId);
@@ -1303,47 +1256,68 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
+      let lines = [];
+      let updateActor = false;
+
       // Regain resolve
-      if (game.settings.get('titan', 'autoIncreaseResolve') === true) {
-         await this.regainResolve();
+      if (game.settings.get('titan', 'autoRegainResolve') === true) {
+
+         // If the resolve value is below max
+         const resolve = this.parent.system.resource.resolve;
+         if (resolve.value < resolve.maxValue) {
+
+            // Update the actor
+            const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.maxValue - resolve.value);
+            resolve.value += resolveRegained;
+            updateActor = true;
+
+            lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`];
+         }
       }
 
       // Handle start of turn messages
       if (this.startOfTurnMessages && this.startOfTurnMessages.length > 0) {
-         let lines = [];
          this.startOfTurnMessages.forEach((message) => {
             if (message.message !== '') {
                lines.push(message.message);
             }
          });
+      }
 
-         if (lines.length > 0) {
-            // Create chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: localize('startOfTurn'),
-               subHeader: [this.parent.name],
-               icon: 'fas fa-clock',
-               line: lines
-            };
+      // Update actor if appropriate
+      if (updateActor) {
+         this.parent.update({
+            system: this.parent.system
+         });
+      }
 
-            // Send the report to chat
-            await ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  this.parent.testUserPermission(user, 'OWNER')
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
-               },
-            });
-         }
+      // Start of turn report
+      if (lines.length > 0) {
+         // Create chat context
+         const chatContext = {
+            type: 'report',
+            img: this.parent.img,
+            header: localize('startOfTurn'),
+            subHeader: [this.parent.name],
+            icon: 'fas fa-clock',
+            line: lines
+         };
+
+         // Send the report to chat
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            },
+         });
       }
    }
 }

@@ -105,9 +105,9 @@
             margin-top: 0.25rem;
             flex-wrap: wrap;
 
-            &:not(:first-child) {
-               @include border-top;
-               padding-top: 0.25rem;
+            &:not(:last-child) {
+               @include border-bottom;
+               padding-bottom: 0.25rem;
             }
          }
       }

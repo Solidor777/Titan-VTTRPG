@@ -480,7 +480,7 @@
     "roll1d6": "Roll 1d6 + Initiative, higher goes first.",
     "roll2d6": "Roll 2d6 + Initiative, higher goes first."
   },
-  "SETTINGS.autoIncreaseResolve": {
+  "SETTINGS.autoRegainResolve": {
     "label": "Auto-increase combatent resolve.",
     "hint": "When enabled, a combatant's resolve will automatically increase by 1 at the start of their turn."
   },

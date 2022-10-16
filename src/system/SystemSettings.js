@@ -24,11 +24,11 @@ export default function registerSystemSettings() {
       requiresReload: true
    });
 
-   game.settings.register('titan', 'autoIncreaseResolve', {
+   game.settings.register('titan', 'autoRegainResolve', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.autoIncreaseResolve.label',
-      hint: 'SETTINGS.autoIncreaseResolve.hint',
+      name: 'SETTINGS.autoRegainResolve.label',
+      hint: 'SETTINGS.autoRegainResolve.hint',
       type: Boolean,
       restricted: true,
       default: true,
