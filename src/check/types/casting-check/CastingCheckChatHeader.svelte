@@ -41,6 +41,7 @@
          @include flex-group-left;
          @include attribute-colors;
          @include border;
+         @include label;
          padding: 0.5rem;
          font-weight: bold;
 

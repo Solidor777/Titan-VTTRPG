@@ -95,6 +95,7 @@
       @include flex-row;
       @include flex-group-center;
       @include font-size-large;
+      @include label;
       padding: 0.25rem;
       font-weight: bold;
       height: 2.5rem;
