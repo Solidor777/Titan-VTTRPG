@@ -1,6 +1,7 @@
 import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
 import { getDoubleBaseTemplate } from '~/rules-element/DoubleBase.js';
-import getStartOfTurnMessageTemplate from '~/rules-element/StatOfTurnMessage';
+import getStartOfTurnMessageTemplate from '~/rules-element/StartOfTurnMessage.js';
+import getModStaminaTemplate from '~/rules-element/StartOfTurnModStam.js';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    switch (document.system.rulesElement[elementIdx].operation) {
@@ -14,6 +15,10 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
       case 'startOfTurnMessage': {
          document.system.rulesElement[elementIdx] = getStartOfTurnMessageTemplate(document.system.rulesElement[elementIdx].uuid);
+         break;
+      }
+      case 'startOfTurnModStam': {
+         document.system.rulesElement[elementIdx] = getModStaminaTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
       default: {

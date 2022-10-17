@@ -474,6 +474,17 @@
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
   },
+  "SETTINGS.darkModeSheets": {
+    "label": "Dark Mode Sheets",
+    "hint": "Enable dark styling for sheets."
+  },
+  "SETTINGS.darkModeChatMessages": {
+    "label": "Dark Mode Chat Messages",
+    "hint": "Enable dark styling for chat messages.",
+    "all": "All",
+    "systemOnly": "System messages only",
+    "disabled": "Disabled"
+  },
   "SETTINGS.initiativeFormula": {
     "label": "Initiative Formula",
     "hint": "Configure which method is used to determine who acts first in combat.",
@@ -487,41 +498,38 @@
   },
   "SETTINGS.reportTakingDamage": {
     "label": "Report taking Damage",
-    "hint": "Notify when a controlled actor takes Damage.",
+    "hint": "Notify when an actor takes Damage.",
     "owner": "Owner",
     "gmOnly": "GM Only",
-    "none": "None"
+    "disabled": "Disabled"
   },
   "SETTINGS.reportHealingDamage": {
     "label": "Report healing Damage",
-    "hint": "Notify when a controlled actor heals Damage.",
+    "hint": "Notify when an actor heals Damage.",
     "owner": "Owner",
     "gmOnly": "GM Only",
-    "none": "None"
+    "disabled": "Disabled"
   },
   "SETTINGS.reportSpendingResolve": {
     "label": "Report spending Resolve",
-    "hint": "Notify when a controlled actor spends Resolve.",
+    "hint": "Notify when an actor spends Resolve.",
     "owner": "Owner",
     "gmOnly": "GM Only",
-    "none": "None"
+    "disabled": "Disabled"
   },
   "SETTINGS.reportResting": {
     "label": "Report Resting",
-    "hint": "Notify when a controlled actor Rests or Takes a breather.",
+    "hint": "Notify when an actor Rests or Takes a breather.",
     "owner": "Owner",
     "gmOnly": "GM Only",
-    "none": "None"
-  },
-  "SETTINGS.darkModeSheets": {
-    "label": "Dark Mode Sheets",
-    "hint": "Enable dark styling for sheets."
-  },
-  "SETTINGS.darkModeChatMessages": {
-    "label": "Dark Mode Chat Messages",
-    "hint": "Enable dark styling for chat messages.",
-    "all": "All",
-    "systemOnly": "System messages only",
     "disabled": "Disabled"
+  },
+  "SETTINGS.reportRegainingResolve": {
+    "label": "Report Regaining Resolve",
+    "hint": "Report when an actor regains Resolve at the start of their turn."
+  },
+  "SETTINGS.reportEffects": {
+    "label": "Report Effects",
+    "hint": "Report an actor's active Effects at the start of their turn."
   }
 }

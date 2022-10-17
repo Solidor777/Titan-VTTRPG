@@ -186,6 +186,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Start of turn messages
       this.startOfTurnMessages = rulesElements.filter((element) => element.operation === 'startOfTurnMessage');
 
+      // Start of turn stam mods
+      this.startOfTurnModStam = 0;
+      rulesElements.filter((element) => element.operation === 'startOfTurnModStam').forEach((element) => this.startOfTurnModStam += element.mod);
+
       return;
    }
 
@@ -484,7 +488,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async rollAttributeCheck(options) {
       // If get options, then create a dialog for setting options.
       if (options?.getOptions === true) {
-         if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
+         if ((options.skill && options.skill !== 'disabled') && (!options.attribute || options.attribute === 'default')) {
             options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
          }
          const dialog = new AttributeCheckDialog(this.parent, options);
@@ -819,7 +823,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report
       if (report) {
          const reportSettings = game.settings.get('titan', 'reportTakingDamage');
-         if (reportSettings !== 'none') {
+         if (reportSettings !== 'disabled') {
 
             // Create the chat context
             const chatContext = {
@@ -870,15 +874,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       }
 
-      return;
+      return {
+         damageTaken: damageTaken,
+         woundsTaken: woundsTaken
+      };
    }
 
    async healDamage(healing, report) {
       // Check if the actor's stamina is less than max
+      let staminaHealed = 0;
       const stamina = this.parent.system.resource.stamina;
       if (stamina.value < stamina.maxValue) {
          // Update the actor
-         const staminaHealed = Math.min(healing, stamina.maxValue - stamina.value);
+         staminaHealed = Math.min(healing, stamina.maxValue - stamina.value);
          stamina.value += staminaHealed;
          await this.parent.update({
             system: {
@@ -893,7 +901,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Report
          if (report) {
             const reportSettings = game.settings.get('titan', 'reportHealingDamage');
-            if (reportSettings !== 'none') {
+            if (reportSettings !== 'disabled') {
                // Create chat context
                const wounds = this.parent.system.resource.wounds;
                const chatContext = {
@@ -930,7 +938,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       }
 
-      return;
+      return staminaHealed;
    }
 
    async spendResolve(report) {
@@ -952,7 +960,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Report
          if (report) {
             const reportSettings = game.settings.get('titan', 'reportSpendingResolve');
-            if (reportSettings !== 'none') {
+            if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
                   type: 'report',
@@ -1132,7 +1140,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report
       if (report) {
          const reportSettings = game.settings.get('titan', 'reportResting');
-         if (reportSettings !== 'none') {
+         if (reportSettings !== 'disabled') {
             // Create chat context
             const chatContext = {
                type: 'report',
@@ -1187,7 +1195,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report
       if (report) {
          const reportSettings = game.settings.get('titan', 'reportResting');
-         if (reportSettings !== 'none') {
+         if (reportSettings !== 'disabled') {
             // Create chat context
             const chatContext = {
                type: 'report',
@@ -1247,7 +1255,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report
       if (report) {
          const reportSettings = game.settings.get('titan', 'reportResting');
-         if (reportSettings !== 'none') {
+         if (reportSettings !== 'disabled') {
             // Create chat context
             const chatContext = {
                type: 'report',
@@ -1309,8 +1317,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             resolve.value += resolveRegained;
             updateActor = true;
 
-            lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`];
+            // Add resolve update to report
+            if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+               lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`];
+            }
          }
+      }
+
+      // Handle effects messages
+      if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+         this.parent.effects.forEach((effect) => {
+            lines.push(effect.label);
+         });
       }
 
       // Handle start of turn messages
@@ -1320,6 +1338,29 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                lines.push(message.message);
             }
          });
+      }
+
+      // Handle stamina mods
+      if (this.startOfTurnModStam) {
+         const stamina = this.parent.system.resource.stamina;
+         // Healing
+         if (this.startOfTurnModStam > 0) {
+            const staminaHealed = await this.healDamage(this.startOfTurnModStam, false);
+            if (staminaHealed > 0) {
+               lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
+            }
+         }
+         else {
+            // Damage
+            const wounds = this.parent.system.resource.wounds;
+            const damage = await this.applyDamage(this.startOfTurnModStam, true, false);
+            let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`, `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`];
+            if (damage.woundsTaken > 0) {
+               modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
+            }
+            modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
+            lines = [...lines, ...modLines];
+         }
       }
 
       // Update actor if appropriate
@@ -1356,6 +1397,29 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
             },
          });
+      }
+
+      // Open sheet
+      switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
+         case 'pcsOnly': {
+            if (this.parent.hasPlayerOwner) {
+               this.parent.sheet.render(true);
+            }
+            break;
+         }
+         case 'npcsOnly': {
+            if (!this.parent.hasPlayerOwner) {
+               this.parent.sheet.render(true);
+            }
+            break;
+         }
+         case 'all': {
+            this.parent.sheet.render(true);
+            break;
+         }
+         default: {
+            break;
+         }
       }
    }
 }
