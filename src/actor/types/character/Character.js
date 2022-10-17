@@ -1113,6 +1113,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          value.mod.static = 0;
       }
 
+      // Restore resolve
+      this.parent.system.resource.resolve.value = this.parent.system.resource.resolve.maxValue;
+
       // Update the actor
       await this.parent.update({
          system: this.parent.system
@@ -1137,6 +1140,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                header: localize('temporaryEffectsRemoved'),
                subHeader: [this.parent.name],
                icon: 'fas fa-arrow-rotate-left',
+               line: [localize('resolveFullyRestored')]
             };
 
             // Send the report to chat
