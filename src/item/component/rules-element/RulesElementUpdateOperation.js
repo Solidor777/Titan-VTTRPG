@@ -1,7 +1,7 @@
 import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
 import { getDoubleBaseTemplate } from '~/rules-element/DoubleBase.js';
-import getStartOfTurnMessageTemplate from '~/rules-element/StartOfTurnMessage.js';
-import getModStaminaTemplate from '~/rules-element/StartOfTurnModStam.js';
+import getTurnStartMessageTemplate from '~/rules-element/TurnStartMessage.js';
+import getTurnStartStamina from '~/rules-element/TurnStartStamina.js';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    switch (document.system.rulesElement[elementIdx].operation) {
@@ -13,12 +13,12 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getDoubleBaseTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
-      case 'startOfTurnMessage': {
-         document.system.rulesElement[elementIdx] = getStartOfTurnMessageTemplate(document.system.rulesElement[elementIdx].uuid);
+      case 'turnStartMessage': {
+         document.system.rulesElement[elementIdx] = getTurnStartMessageTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
-      case 'startOfTurnModStam': {
-         document.system.rulesElement[elementIdx] = getModStaminaTemplate(document.system.rulesElement[elementIdx].uuid);
+      case 'turnStartStamina': {
+         document.system.rulesElement[elementIdx] = getTurnStartStamina(document.system.rulesElement[elementIdx].uuid);
          break;
       }
       default: {

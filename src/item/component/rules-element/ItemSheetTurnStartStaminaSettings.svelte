@@ -4,7 +4,7 @@
    import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import onRulesElementOperationChanged from "./RulesElementUpdateOperation";
-   import DocumentTextArea from "~/documents/components/input/DocumentTextArea.svelte";
+   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -21,7 +21,7 @@
    // Setup tabs
 </script>
 
-{#if element && element.operation === "startOfTurnMessage"}
+{#if element && element.operation === "turnStartStamina"}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -35,9 +35,9 @@
             />
          </div>
 
-         <!--Message text-->
-         <div class="text">
-            <DocumentTextArea bind:value={element.message} />
+         <!--Value-->
+         <div class="field number">
+            <DocumentIntegerInput bind:value={element.mod} />
          </div>
       </div>
 
@@ -65,8 +65,8 @@
       height: 100%;
 
       .settings {
-         @include flex-column;
-         @include flex-group-top-left;
+         @include flex-row;
+         @include flex-group-left;
          flex-wrap: wrap;
          width: 100%;
          margin-bottom: 0.5rem;
@@ -78,12 +78,11 @@
             &.select {
                @include flex-group-left;
             }
-         }
 
-         .text {
-            @include flex-row;
-            margin-left: 0.25rem;
-            width: 100%;
+            &.number {
+               @include flex-group-center;
+               width: 2rem;
+            }
          }
       }
 

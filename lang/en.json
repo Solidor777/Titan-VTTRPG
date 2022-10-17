@@ -435,8 +435,10 @@
   "LOCAL.spentResolve.label": "Spent Resolve",
   "LOCAL.resolveRegain.label": "Resolve Regain",
   "LOCAL.woundRegain.label": "Wound Regain",
-  "LOCAL.startOfTurn.label": "Start of Turn",
+  "LOCAL.turnStartMessage.label": "Turn Start Message",
+  "LOCAL.turnStartStamina.label": "Turn Start Stamina",
   "LOCAL.attributeCheck.label": "Attribute Check",
+  "LOCAL.turnStart.label": "Turn Start",
   "LOCAL.resolveFullyRestored.label": "Resolve Fully Restored",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
@@ -473,6 +475,14 @@
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
+  },
+  "SETTINGS.autoOpenCombatantSheet": {
+    "label": "Auto-Open Combatant Sheets",
+    "hint": "Configure whethe to automatically open an owned actor's sheet on their initiative turn.",
+    "pcsOnly": "Player owned actors.",
+    "npcsOnly": "(GM Only) Non-Player owned actors.",
+    "all": "(GM Only) All actors.",
+    "disabled": "Disabled"
   },
   "SETTINGS.darkModeSheets": {
     "label": "Dark Mode Sheets",

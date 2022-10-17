@@ -184,11 +184,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Start of turn messages
-      this.startOfTurnMessages = rulesElements.filter((element) => element.operation === 'startOfTurnMessage');
+      this.turnStartMessages = rulesElements.filter((element) => element.operation === 'turnStartMessage');
 
       // Start of turn stam mods
-      this.startOfTurnModStam = 0;
-      rulesElements.filter((element) => element.operation === 'startOfTurnModStam').forEach((element) => this.startOfTurnModStam += element.mod);
+      this.turnStartStamina = 0;
+      rulesElements.filter((element) => element.operation === 'turnStartStamina').forEach((element) => this.turnStartStamina += element.mod);
 
       return;
    }
@@ -1332,8 +1332,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Handle start of turn messages
-      if (this.startOfTurnMessages && this.startOfTurnMessages.length > 0) {
-         this.startOfTurnMessages.forEach((message) => {
+      if (this.turnStartMessages && this.turnStartMessages.length > 0) {
+         this.turnStartMessages.forEach((message) => {
             if (message.message !== '') {
                lines.push(message.message);
             }
@@ -1341,11 +1341,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Handle stamina mods
-      if (this.startOfTurnModStam) {
+      if (this.turnStartStamina) {
          const stamina = this.parent.system.resource.stamina;
          // Healing
-         if (this.startOfTurnModStam > 0) {
-            const staminaHealed = await this.healDamage(this.startOfTurnModStam, false);
+         if (this.turnStartStamina > 0) {
+            const staminaHealed = await this.healDamage(this.turnStartStamina, false);
             if (staminaHealed > 0) {
                lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
             }
@@ -1353,7 +1353,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          else {
             // Damage
             const wounds = this.parent.system.resource.wounds;
-            const damage = await this.applyDamage(this.startOfTurnModStam, true, false);
+            const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
             let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`, `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`];
             if (damage.woundsTaken > 0) {
                modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
@@ -1376,7 +1376,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const chatContext = {
             type: 'report',
             img: this.parent.img,
-            header: localize('startOfTurn'),
+            header: localize('turnStart'),
             subHeader: [this.parent.name],
             icon: 'fas fa-clock',
             line: lines
@@ -1400,26 +1400,29 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Open sheet
-      switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
-         case 'pcsOnly': {
-            if (this.parent.hasPlayerOwner) {
-               this.parent.sheet.render(true);
+      if (this.parent.isOwner) {
+         switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
+            case 'pcsOnly': {
+               if (this.parent.hasPlayerOwner) {
+                  this.parent.sheet.render(true);
+               }
+               break;
             }
-            break;
-         }
-         case 'npcsOnly': {
-            if (!this.parent.hasPlayerOwner) {
-               this.parent.sheet.render(true);
+            case 'npcsOnly': {
+               if (!this.parent.hasPlayerOwner) {
+                  this.parent.sheet.render(true);
+               }
+               break;
             }
-            break;
-         }
-         case 'all': {
-            this.parent.sheet.render(true);
-            break;
-         }
-         default: {
-            break;
+            case 'all': {
+               this.parent.sheet.render(true);
+               break;
+            }
+            default: {
+               break;
+            }
          }
       }
+
    }
 }
