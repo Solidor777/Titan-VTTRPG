@@ -34,50 +34,64 @@ export default function registerSystemSettings() {
       default: true,
    });
 
-
    game.settings.register('titan', 'reportTakingDamage', {
       config: true,
-      scope: 'client',
+      scope: 'world',
       name: 'SETTINGS.reportTakingDamage.label',
       hint: 'SETTINGS.reportTakingDamage.hint',
-      type: Boolean,
-      default: true,
+      type: String,
+      choices: {
+         owner: 'SETTINGS.reportTakingDamage.owner',
+         gmOnly: 'SETTINGS.reportTakingDamage.gmOnly',
+         none: 'SETTINGS.reportTakingDamage.none'
+      },
+      restricted: true,
+      default: 'owner',
    });
 
    game.settings.register('titan', 'reportHealingDamage', {
       config: true,
-      scope: 'client',
+      scope: 'world',
       name: 'SETTINGS.reportHealingDamage.label',
       hint: 'SETTINGS.reportHealingDamage.hint',
-      type: Boolean,
-      default: true,
+      type: String,
+      choices: {
+         owner: 'SETTINGS.reportHealingDamage.owner',
+         gmOnly: 'SETTINGS.reportHealingDamage.gmOnly',
+         none: 'SETTINGS.reportHealingDamage.none'
+      },
+      restricted: true,
+      default: 'owner',
    });
 
    game.settings.register('titan', 'reportSpendingResolve', {
       config: true,
-      scope: 'client',
+      scope: 'world',
       name: 'SETTINGS.reportSpendingResolve.label',
       hint: 'SETTINGS.reportSpendingResolve.hint',
-      type: Boolean,
-      default: true,
-   });
-
-   game.settings.register('titan', 'reportRegainingResolve', {
-      config: true,
-      scope: 'client',
-      name: 'SETTINGS.reportRegainingResolve.label',
-      hint: 'SETTINGS.reportRegainingResolve.hint',
-      type: Boolean,
-      default: true,
+      type: String,
+      choices: {
+         owner: 'SETTINGS.reportSpendingResolve.owner',
+         gmOnly: 'SETTINGS.reportSpendingResolve.gmOnly',
+         none: 'SETTINGS.reportSpendingResolve.none'
+      },
+      restricted: true,
+      default: 'owner',
    });
 
    game.settings.register('titan', 'reportResting', {
       config: true,
-      scope: 'client',
+      scope: 'world',
       name: 'SETTINGS.reportResting.label',
       hint: 'SETTINGS.reportResting.hint',
-      type: Boolean,
-      default: true,
+      type: String,
+      choices: {
+         owner: 'SETTINGS.reportResting.owner',
+         gmOnly: 'SETTINGS.reportResting.gmOnly',
+         none: 'SETTINGS.reportResting.none'
+      },
+      restricted: true,
+      default: 'owner',
    });
 
    game.settings.register('titan', 'darkModeSheets', {

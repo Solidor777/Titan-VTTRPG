@@ -486,23 +486,31 @@
   },
   "SETTINGS.reportTakingDamage": {
     "label": "Report taking Damage",
-    "hint": "Notify when a controlled actor takes Damage."
+    "hint": "Notify when a controlled actor takes Damage.",
+    "owner": "Owner",
+    "gmOnly": "GM Only",
+    "none": "None"
   },
   "SETTINGS.reportHealingDamage": {
     "label": "Report healing Damage",
-    "hint": "Notify when a controlled actor heals Damage."
+    "hint": "Notify when a controlled actor heals Damage.",
+    "owner": "Owner",
+    "gmOnly": "GM Only",
+    "none": "None"
   },
   "SETTINGS.reportSpendingResolve": {
     "label": "Report spending Resolve",
-    "hint": "Notify when a controlled actor spends Resolve."
-  },
-  "SETTINGS.reportRegainingResolve": {
-    "label": "Report regaining Resolve",
-    "hint": "Notify when a controlled actor regains Resolve."
+    "hint": "Notify when a controlled actor spends Resolve.",
+    "owner": "Owner",
+    "gmOnly": "GM Only",
+    "none": "None"
   },
   "SETTINGS.reportResting": {
     "label": "Report Resting",
-    "hint": "Notify when a controlled actor Rests or Takes a breather."
+    "hint": "Notify when a controlled actor Rests or Takes a breather.",
+    "owner": "Owner",
+    "gmOnly": "GM Only",
+    "none": "None"
   },
   "SETTINGS.darkModeSheets": {
     "label": "Dark Mode Sheets",

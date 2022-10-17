@@ -780,7 +780,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    // Apply damage to the actor
-   async applyDamage(damage, ignoreArmor) {
+   async applyDamage(damage, ignoreArmor, report) {
       // Calculate the damage amount
       const damageTaken = ignoreArmor ? Math.max(damage - this.parent.system.mod.armor.value, 0) : damage;
       const stamina = this.parent.system.resource.stamina;
@@ -817,56 +817,63 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Report
-      if (game.settings.get('titan', 'reportTakingDamage') === true) {
-         // Create the chat context
-         const chatContext = {
-            type: 'report',
-            img: this.parent.img,
-            header: `${localize('tookDamage')}: ${damageTaken}`,
-            subHeader: [`${this.parent.name}`],
-            icon: 'fas fa-heart',
-            line: [
-               `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
-               `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
-            ]
-         };
+      if (report) {
+         const reportSettings = game.settings.get('titan', 'reportTakingDamage');
+         if (reportSettings !== 'none') {
 
-         // Wounds taken
-         if (woundsTaken > 0) {
-            chatContext.line = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.line];
-         }
+            // Create the chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: `${localize('tookDamage')}: ${damageTaken}`,
+               subHeader: [`${this.parent.name}`],
+               icon: 'fas fa-heart',
+               line: [
+                  `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
+                  `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+               ]
+            };
 
-         // Damage resisted
-         if (damageTaken !== damage) {
-            chatContext.line = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.line];
-         }
-
-         // Ignore Armor
-         if (ignoreArmor) {
-            chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
-         }
-
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
-               }
+            // Wounds taken
+            if (woundsTaken > 0) {
+               chatContext.line = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.line];
             }
-         });
+
+            // Damage resisted
+            if (damageTaken !== damage) {
+               chatContext.line = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.line];
+            }
+
+            // Ignore Armor
+            if (ignoreArmor) {
+               chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
+            }
+
+            // Send the report to chat
+            await ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  reportSettings === 'owner' ?
+                     this.parent.testUserPermission(user, 'OWNER') :
+                     user.isGM
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
+               }
+            });
+         }
+
       }
 
       return;
    }
 
-   async healDamage(healing) {
+   async healDamage(healing, report) {
       // Check if the actor's stamina is less than max
       const stamina = this.parent.system.resource.stamina;
       if (stamina.value < stamina.maxValue) {
@@ -884,43 +891,49 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          });
 
          // Report
-         if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-            // Create chat context
-            const wounds = this.parent.system.resource.wounds;
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: `${localize('healedDamage')}: ${staminaHealed}`,
-               subHeader: [this.parent.name],
-               icon: 'fas fa-heart',
-               line: [
-                  `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
-                  `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
-               ]
-            };
+         if (report) {
+            const reportSettings = game.settings.get('titan', 'reportHealingDamage');
+            if (reportSettings !== 'none') {
+               // Create chat context
+               const wounds = this.parent.system.resource.wounds;
+               const chatContext = {
+                  type: 'report',
+                  img: this.parent.img,
+                  header: `${localize('healedDamage')}: ${staminaHealed}`,
+                  subHeader: [this.parent.name],
+                  icon: 'fas fa-heart',
+                  line: [
+                     `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
+                     `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+                  ]
+               };
 
-            // Send the report to chat
-            await ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  this.parent.testUserPermission(user, 'OWNER')
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
+               // Send the report to chat
+               await ChatMessage.create({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                  sound: CONFIG.sounds.notification,
+                  whisper: game.users.filter((user) =>
+                     reportSettings === 'owner' ?
+                        this.parent.testUserPermission(user, 'OWNER') :
+                        user.isGM
+                  ),
+                  flags: {
+                     titan: {
+                        chatContext: chatContext
+                     }
                   }
-               }
-            });
+               });
+            }
+
          }
       }
 
       return;
    }
 
-   async spendResolve() {
+   async spendResolve(report) {
       // Check if the actor's resolve is less than max
       const resolve = this.parent.system.resource.resolve;
       if (resolve.value > 0) {
@@ -937,34 +950,40 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          });
 
          // Report
-         if (game.settings.get('titan', 'reportSpendingResolve') === true) {
-            // Create chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: `${localize('spentResolve')}`,
-               subHeader: [this.parent.name],
-               icon: 'fas fa-bolt',
-               line: [`${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`]
-            };
+         if (report) {
+            const reportSettings = game.settings.get('titan', 'reportSpendingResolve');
+            if (reportSettings !== 'none') {
+               // Create chat context
+               const chatContext = {
+                  type: 'report',
+                  img: this.parent.img,
+                  header: `${localize('spentResolve')}`,
+                  subHeader: [this.parent.name],
+                  icon: 'fas fa-bolt',
+                  line: [`${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`]
+               };
 
 
-            // Send the chat message
-            ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  this.parent.testUserPermission(user, 'OWNER')
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
+               // Send the chat message
+               ChatMessage.create({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                  sound: CONFIG.sounds.notification,
+                  whisper: game.users.filter((user) =>
+                     reportSettings === 'owner' ?
+                        this.parent.testUserPermission(user, 'OWNER') :
+                        user.isGM
+                  ),
+                  flags: {
+                     titan: {
+                        chatContext: chatContext
+                     }
                   }
-               }
-            });
+               });
+            }
          }
+
 
       }
 
@@ -1108,31 +1127,36 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Report
-      if (report && game.settings.get('titan', 'reportResting') === true) {
-         // Create chat context
-         const chatContext = {
-            type: 'report',
-            img: this.parent.img,
-            header: localize('temporaryEffectsRemoved'),
-            subHeader: [this.parent.name],
-            icon: 'fas fa-arrow-rotate-left',
-         };
+      if (report) {
+         const reportSettings = game.settings.get('titan', 'reportResting');
+         if (reportSettings !== 'none') {
+            // Create chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: localize('temporaryEffectsRemoved'),
+               subHeader: [this.parent.name],
+               icon: 'fas fa-arrow-rotate-left',
+            };
 
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
+            // Send the report to chat
+            await ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  reportSettings === 'owner' ?
+                     this.parent.testUserPermission(user, 'OWNER') :
+                     user.isGM
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
                }
-            }
-         });
+            });
+         }
       }
 
       return;
@@ -1157,35 +1181,40 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Report
-      if (report && game.settings.get('titan', 'reportResting') === true) {
-         // Create chat context
-         const chatContext = {
-            type: 'report',
-            img: this.parent.img,
-            header: localize('tookABreather'),
-            subHeader: [this.parent.name],
-            icon: 'fas fa-face-exhaling',
-            line: [
-               localize('temporaryEffectsRemoved'),
-               localize('staminaAndResolveRestored'),
-            ]
-         };
+      if (report) {
+         const reportSettings = game.settings.get('titan', 'reportResting');
+         if (reportSettings !== 'none') {
+            // Create chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: localize('tookABreather'),
+               subHeader: [this.parent.name],
+               icon: 'fas fa-face-exhaling',
+               line: [
+                  localize('temporaryEffectsRemoved'),
+                  localize('staminaAndResolveRestored'),
+               ]
+            };
 
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
+            // Send the report to chat
+            await ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  reportSettings === 'owner' ?
+                     this.parent.testUserPermission(user, 'OWNER') :
+                     user.isGM
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
                }
-            }
-         });
+            });
+         }
       }
 
       return;
@@ -1212,44 +1241,49 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       await this.takeABreather(false);
 
       // Report
-      if (report && game.settings.get('titan', 'reportResting') === true) {
-         // Create chat context
-         const chatContext = {
-            type: 'report',
-            img: this.parent.img,
-            header: localize('tookARest'),
-            subHeader: [this.parent.name],
-            icon: 'fas fa-bed',
-            line: [
-               localize('temporaryEffectsRemoved'),
-               localize('staminaAndResolveRestored'),
-            ]
-         };
+      if (report) {
+         const reportSettings = game.settings.get('titan', 'reportResting');
+         if (reportSettings !== 'none') {
+            // Create chat context
+            const chatContext = {
+               type: 'report',
+               img: this.parent.img,
+               header: localize('tookARest'),
+               subHeader: [this.parent.name],
+               icon: 'fas fa-bed',
+               line: [
+                  localize('temporaryEffectsRemoved'),
+                  localize('staminaAndResolveRestored'),
+               ]
+            };
 
-         // Add line about wounds healed
-         if (woundsHealed > 0) {
-            chatContext.line = [
-               ...chatContext.line,
-               `${localize('woundsHealed')}: ${woundsHealed}`,
-               `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
-            ];
-         }
-
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
-               }
+            // Add line about wounds healed
+            if (woundsHealed > 0) {
+               chatContext.line = [
+                  ...chatContext.line,
+                  `${localize('woundsHealed')}: ${woundsHealed}`,
+                  `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+               ];
             }
-         });
+
+            // Send the report to chat
+            await ChatMessage.create({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               sound: CONFIG.sounds.notification,
+               whisper: game.users.filter((user) =>
+                  reportSettings === 'owner' ?
+                     this.parent.testUserPermission(user, 'OWNER') :
+                     user.isGM
+               ),
+               flags: {
+                  titan: {
+                     chatContext: chatContext
+                  }
+               }
+            });
+         }
       }
 
       return;

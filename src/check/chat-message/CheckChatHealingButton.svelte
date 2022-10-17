@@ -19,7 +19,7 @@
          const target = userTargets[idx]?.actor;
          if (target && target.system.resource?.stamina) {
             // Apply damage to the target
-            await target.typeComponent.healDamage(healing);
+            await target.typeComponent.healDamage(healing, true);
          }
       }
 
