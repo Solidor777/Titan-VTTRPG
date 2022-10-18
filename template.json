@@ -1,8 +1,7 @@
 {
    "Actor": {
       "types": [
-         "player",
-         "npc"
+         "player"
       ],
       "templates": {
          "character": {
@@ -543,7 +542,6 @@
             "complexity": 1,
             "autoCalculateDC": true
          },
-         "castingNotes": "",
          "customAspect": [],
          "aspect": []
       },

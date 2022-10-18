@@ -55,6 +55,7 @@ export default class TitanAttackCheck extends TitanCheck {
          itemName: itemRollData.name,
          type: options.type ?? attackData.type,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
+         multiAttack: options.multiAttack ?? itemRollData.multiAttack
       };
 
       // Determine the skill training and expertise
@@ -76,19 +77,6 @@ export default class TitanAttackCheck extends TitanCheck {
          parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
       }
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
-
-      // Determine whether this is a multi-attack
-      if (options.multiAttack) {
-         parameters.multiAttack = true;
-
-         // Determine whether the attack has the multi attack trait
-         for (let idx = 0; idx < attackData.trait.length; idx++) {
-            if (attackData.trait[idx].name === 'flurry') {
-               parameters.flurryTrait = true;
-               break;
-            }
-         }
-      }
 
       // Determine the target defense
       if (isNaN(options.targetDefense)) {
@@ -140,6 +128,15 @@ export default class TitanAttackCheck extends TitanCheck {
 
       // Adjust the dice and expertise if this is a multi-attack
       if (parameters.multiAttack) {
+
+         // Determine whether the attack has the multi attack trait
+         for (let idx = 0; idx < attackData.trait.length; idx++) {
+            if (attackData.trait[idx].name === 'flurry') {
+               parameters.flurryTrait = true;
+               break;
+            }
+         }
+
          // Round the total dice up if this is a dual attack
          // Otherwise, round down
          parameters.totalDice = parameters.flurryTrait ?
