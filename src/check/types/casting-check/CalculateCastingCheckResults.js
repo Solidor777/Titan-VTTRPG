@@ -62,11 +62,10 @@ export default function calculateCastingCheckResults(inResults, parameters) {
 
       // If there is only one scaling
       if (results.scalingAspect.length === 1 &&
-         results.extraSuccesses &&
-         results.extraSuccesses >= results.aspect[0].cost) {
+         results.extraSuccesses >= results.scalingAspect[0].cost) {
 
          // Maximize the aspect
-         const aspect = results.aspect[0];
+         const aspect = results.scalingAspect[0];
          const delta = Math.floor(results.extraSuccesses / aspect.cost);
          const cost = delta * aspect.cost;
          aspect.currentValue += delta;
@@ -94,5 +93,6 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       }
    }
 
+   console.log(results.extraSuccessesRemaining);
    return results;
 }

@@ -72,6 +72,18 @@
       filter: brightness(0);
    }
 
+   .prosemirror {
+      textArea {
+         color: rgba(255, 255, 255, 0.83);
+      }
+
+      .editor-menu {
+         button:not(.pm-dropdown) {
+            color: rgba(255, 255, 255, 0.83);
+         }
+      }
+   }
+
    h1,
    h2,
    h3,
