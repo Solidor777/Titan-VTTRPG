@@ -10,4 +10,4 @@
    const options = [2, 3, 4, 5, 6];
 </script>
 
-<IntegerSelect bind:value {options} {disabled} />
+<IntegerSelect bind:value {options} {disabled} on:change />

@@ -12,7 +12,7 @@
    import SpellSheetCastingCheckTab from "./SpellSheetCastingCheckTab.svelte";
    import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
    import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
-   import SpellSheetDescriptionTab from "./SpellSheetDescriptionTab.svelte";
+   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
 
    // Setup context variables
    export let elementRoot;
@@ -27,7 +27,7 @@
       {
          label: localize("description"),
          id: "description",
-         component: SpellSheetDescriptionTab,
+         component: ItemSheetDescriptionTab,
       },
       {
          label: localize("standardAspects"),

@@ -60,15 +60,15 @@ export default function calculateCastingCheckResults(inResults, parameters) {
          }
       });
 
-      // If there is only one scaling
-      if (results.scalingAspect.length === 1 &&
-         results.extraSuccesses >= results.scalingAspect[0].cost) {
+      // If there is only one scaling aspect we can afford
+      const affordableAspects = results.scalingAspect.filter((aspect) => aspect.cost <= results.extraSuccesses);
+      if (affordableAspects.length === 1) {
 
          // Maximize the aspect
-         const aspect = results.scalingAspect[0];
+         const aspect = affordableAspects[0];
          const delta = Math.floor(results.extraSuccesses / aspect.cost);
          const cost = delta * aspect.cost;
-         aspect.currentValue += delta;
+         aspect.currentValue += (delta * Math.max(aspect.initialValue, 1));
          results.extraSuccessesRemaining -= cost;
 
          // Update damage
@@ -93,6 +93,5 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       }
    }
 
-   console.log(results.extraSuccessesRemaining);
    return results;
 }

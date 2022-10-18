@@ -7,7 +7,7 @@
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
-   import DocumentCheckDifficultSelect from "~/documents/components/select/DocumentCheckDifficultSelect.svelte";
+   import DocumentCheckDifficultySelect from "~/documents/components/select/DocumentCheckDifficultySelect.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
 
    // Setup context variables
@@ -71,7 +71,7 @@
 
             <!--Select-->
             <div class="select">
-               <DocumentCheckDifficultSelect
+               <DocumentCheckDifficultySelect
                   bind:value={$document.system.castingCheck.difficulty}
                   disabled={$document.system.castingCheck.autoCalculateDC}
                />

@@ -124,10 +124,12 @@ export default Object.freeze({
    decreaseMod: {
       template: {
          label: 'decreaseMod',
+         initialValue: 1,
          cost: 0,
          option: [],
          resistanceCheck: 'none',
-         enabled: false
+         scaling: true,
+         enabled: false,
       },
       settings: {
          sortOrder: 5,
@@ -143,8 +145,10 @@ export default Object.freeze({
    increaseMod: {
       template: {
          label: 'increaseMod',
+         initialValue: 1,
          option: [],
          cost: 0,
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -161,9 +165,11 @@ export default Object.freeze({
    decreaseRating: {
       template: {
          label: 'decreaseRating',
+         initialValue: 1,
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -182,10 +188,11 @@ export default Object.freeze({
    increaseRating: {
       template: {
          label: 'increaseRating',
+         initialValue: 1,
          cost: 0,
          option: [],
-         resistanceCheck: 'none',
-         enabled: false
+         scaling: true,
+         enabled: false,
       },
       settings: {
          sortOrder: 8,
@@ -203,9 +210,11 @@ export default Object.freeze({
    decreaseResistance: {
       template: {
          label: 'decreaseResistance',
+         initialValue: 1,
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -222,8 +231,10 @@ export default Object.freeze({
    increaseResistance: {
       template: {
          label: 'increaseResistance',
+         initialValue: 1,
          cost: 0,
          option: [],
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -240,9 +251,11 @@ export default Object.freeze({
    decreaseAttribute: {
       template: {
          label: 'decreaseAttribute',
+         initialValue: 1,
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -259,8 +272,10 @@ export default Object.freeze({
    increaseAttribute: {
       template: {
          label: 'increaseAttribute',
+         initialValue: 1,
          cost: 0,
          option: [],
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -277,9 +292,11 @@ export default Object.freeze({
    decreaseSkill: {
       template: {
          label: 'decreaseSkill',
+         initialValue: 1,
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -311,8 +328,10 @@ export default Object.freeze({
    increaseSkill: {
       template: {
          label: 'increaseSkill',
+         initialValue: 1,
          cost: 0,
          option: [],
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -344,9 +363,11 @@ export default Object.freeze({
    decreaseSpeed: {
       template: {
          label: 'decreaseSpeed',
+         initialValue: 5,
          cost: 0,
          option: [],
          resistanceCheck: 'none',
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -364,8 +385,10 @@ export default Object.freeze({
    increaseSpeed: {
       template: {
          label: 'increaseSpeed',
+         initialValue: 5,
          cost: 0,
          option: [],
+         scaling: true,
          enabled: false
       },
       settings: {
@@ -377,7 +400,7 @@ export default Object.freeze({
             'swim',
             'burrow'
          ],
-         optionCost: 1,
+         optionCost: 2,
       }
    },
    inflictCondition: {

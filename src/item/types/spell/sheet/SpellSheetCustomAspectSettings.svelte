@@ -138,7 +138,7 @@
 
                   <!--Input-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={aspect.initialValue} min={1} />
+                     <DocumentIntegerInput bind:value={aspect.initialValue} min={0} />
                   </div>
                </div>
             </div>

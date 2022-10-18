@@ -26,10 +26,10 @@
       <CastingCheckChatHeader />
    </div>
 
-   <!--Casting Notes-->
-   {#if $document.flags.titan.chatContext.parameters.castingNotes !== "" && $document.flags.titan.chatContext.parameters.castingNotes !== "<p></p>"}
+   <!--Description-->
+   {#if $document.flags.titan.chatContext.results.succeeded && $document.flags.titan.chatContext.parameters.description !== "" && $document.flags.titan.chatContext.parameters.description !== "<p></p>"}
       <div class="section rich-text">
-         <ChatRichText text={$document.flags.titan.chatContext.parameters.castingNotes} />
+         <ChatRichText text={$document.flags.titan.chatContext.parameters.description} />
       </div>
    {/if}
 

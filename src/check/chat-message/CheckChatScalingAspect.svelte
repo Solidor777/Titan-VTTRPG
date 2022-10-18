@@ -13,19 +13,19 @@
 
    function increaseAspect() {
       // Increase the aspect
-      aspect.currentValue += aspect.initialValue;
+      aspect.currentValue += Math.max(aspect.initialValue, 1);
 
       // Decrease the extra successes by the cost
       $document.flags.titan.chatContext.results.extraSuccessesRemaining -= aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         $document.flags.titan.chatContext.results.damage += aspect.initialValue;
+         $document.flags.titan.chatContext.results.damage += Math.max(aspect.initialValue, 1);
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         $document.flags.titan.chatContext.results.healing += aspect.initialValue;
+         $document.flags.titan.chatContext.results.healing += Math.max(aspect.initialValue, 1);
       }
 
       // Update the document
@@ -38,19 +38,19 @@
 
    function decreaseAspect() {
       // Decrease the aspect
-      aspect.currentValue -= aspect.initialValue;
+      aspect.currentValue -= Math.max(aspect.initialValue, 1);
 
       // Increase the extra successes by the cost
       $document.flags.titan.chatContext.results.extraSuccessesRemaining += aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         $document.flags.titan.chatContext.results.damage -= aspect.initialValue;
+         $document.flags.titan.chatContext.results.damage -= Math.max(aspect.initialValue, 1);
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         $document.flags.titan.chatContext.results.healing -= aspect.initialValue;
+         $document.flags.titan.chatContext.results.healing -= Math.max(aspect.initialValue, 1);
       }
 
       // Update the document

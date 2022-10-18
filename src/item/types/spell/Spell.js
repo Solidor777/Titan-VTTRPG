@@ -34,6 +34,7 @@ export default class TitanSpell extends TitanTypeComponent {
       const aspects = this.parent.system.aspect;
       let totalAspectCost = 1;
 
+
       aspects.forEach((aspect) => {
          // Determine whether the aspect is enabled
          const settings = SpellAspects[aspect.label].settings;

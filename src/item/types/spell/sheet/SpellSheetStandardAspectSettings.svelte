@@ -58,7 +58,7 @@
             <div class="row">
                <div class="stat">
                   <DocumentSelect
-                     bind:value={$document.system.aspect[idx].value}
+                     bind:value={$document.system.aspect[idx].initialValue}
                      options={aspectOptions.settings.initialValueOptions}
                   />
                </div>
