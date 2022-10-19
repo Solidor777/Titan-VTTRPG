@@ -343,18 +343,21 @@
             },
             "resource": {
                "stamina": {
+                  "max": 3,
                   "value": 3,
                   "mod": {
                      "static": 0
                   }
                },
                "resolve": {
+                  "max": 1,
                   "value": 1,
                   "mod": {
                      "static": 0
                   }
                },
                "wounds": {
+                  "max": 2,
                   "value": 0,
                   "mod": {
                      "static": 0

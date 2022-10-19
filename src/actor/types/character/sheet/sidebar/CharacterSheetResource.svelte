@@ -74,7 +74,7 @@
 
       <!--The Meter-->
       <div class="meter {key}" data-tooltip={localize(`${key}.valueDesc`)}>
-         <Meter current={$document.system.resource[key].value} max={$document.system.resource[key].maxValue} />
+         <Meter current={$document.system.resource[key].value} max={$document.system.resource[key].max} />
       </div>
 
       <!--Max Value Display-->
@@ -83,7 +83,7 @@
             baseValue={$document.system.resource[key].maxBase +
                $document.system.resource[key].mod.equipment +
                $document.system.resource[key].mod.ability}
-            currentValue={$document.system.resource[key].maxValue}
+            currentValue={$document.system.resource[key].max}
          />
       </div>
    </div>

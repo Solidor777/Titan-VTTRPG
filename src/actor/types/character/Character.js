@@ -411,9 +411,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Resources
       for (const [key, resource] of Object.entries(systemData.resource)) {
-         resource.maxValue = resource.maxBase;
+         resource.max = resource.maxBase;
          for (const [modKey, mod] of (Object.entries(resource.mod))) {
-            resource.maxValue += mod;
+            resource.max += mod;
          }
       }
 
@@ -432,7 +432,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    _clampResources() {
       for (const [key, resource] of Object.entries(this.parent.system.resource)) {
-         resource.value = clamp(resource.value, 0, resource.maxValue);
+         resource.value = clamp(resource.value, 0, resource.max);
       }
    }
 
@@ -833,8 +833,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                subHeader: [`${this.parent.name}`],
                icon: 'fas fa-heart',
                line: [
-                  `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
-                  `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+                  `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
+                  `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                ]
             };
 
@@ -884,9 +884,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Check if the actor's stamina is less than max
       let staminaHealed = 0;
       const stamina = this.parent.system.resource.stamina;
-      if (stamina.value < stamina.maxValue) {
+      if (stamina.value < stamina.max) {
          // Update the actor
-         staminaHealed = Math.min(healing, stamina.maxValue - stamina.value);
+         staminaHealed = Math.min(healing, stamina.max - stamina.value);
          stamina.value += staminaHealed;
          await this.parent.update({
             system: {
@@ -911,8 +911,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   subHeader: [this.parent.name],
                   icon: 'fas fa-heart',
                   line: [
-                     `${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`,
-                     `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+                     `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
+                     `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                   ]
                };
 
@@ -968,7 +968,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   header: `${localize('spentResolve')}`,
                   subHeader: [this.parent.name],
                   icon: 'fas fa-bolt',
-                  line: [`${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`]
+                  line: [`${localize('resolve')}: ${resolve.value} / ${resolve.max}`]
                };
 
 
@@ -1122,7 +1122,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Restore resolve
-      this.parent.system.resource.resolve.value = this.parent.system.resource.resolve.maxValue;
+      this.parent.system.resource.resolve.value = this.parent.system.resource.resolve.max;
 
       // Update the actor
       await this.parent.update({
@@ -1183,10 +1183,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          system: {
             resource: {
                stamina: {
-                  value: this.parent.system.resource.stamina.maxValue
+                  value: this.parent.system.resource.stamina.max
                },
                resolve: {
-                  value: this.parent.system.resource.resolve.maxValue
+                  value: this.parent.system.resource.resolve.max
                }
             }
          }
@@ -1274,7 +1274,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                chatContext.line = [
                   ...chatContext.line,
                   `${localize('woundsHealed')}: ${woundsHealed}`,
-                  `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`
+                  `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                ];
             }
 
@@ -1310,16 +1310,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // If the resolve value is below max
          const resolve = this.parent.system.resource.resolve;
-         if (resolve.value < resolve.maxValue) {
+         if (resolve.value < resolve.max) {
 
             // Update the actor
-            const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.maxValue - resolve.value);
+            const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
             resolve.value += resolveRegained;
             updateActor = true;
 
             // Add resolve update to report
             if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-               lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.maxValue}`];
+               lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
             }
          }
       }
@@ -1354,7 +1354,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Damage
             const wounds = this.parent.system.resource.wounds;
             const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
-            let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.maxValue}`, `${localize('wounds')}: ${wounds.value} / ${wounds.maxValue}`];
+            let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
             if (damage.woundsTaken > 0) {
                modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
             }

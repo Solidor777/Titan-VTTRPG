@@ -39,7 +39,5 @@
   "library": false,
   "gridDistance": 1,
   "gridUnits": "m",
-  "primaryTokenAttribute": "stamina",
-  "secondaryTokenAttribute": "wounds",
   "license": "LICENSE.txt"
 }

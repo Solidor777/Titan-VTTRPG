@@ -3,6 +3,21 @@ import TitanPlayerComponent from './types/player/Player.js';
 import TitanNPCComponent from './types/npc/NPC.js';
 export default class TitanActor extends Actor {
 
+   async _preCreate(data, options, user) {
+      await super._preCreate(data, options, user);
+      console.log(data);
+
+      const initData = {
+         "prototypeToken.bar1": { attribute: "resource.stamina" },
+         "prototypeToken.bar2": { attribute: "resource.wounds" },
+         "prototypeToken.displayName": CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
+         "prototypeToken.displayBars": CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
+         "prototypeToken.disposition": CONST.TOKEN_DISPOSITIONS.NEUTRAL,
+      };
+
+      this.updateSource(initData);
+   }
+
    // Prepare calculated data
    prepareDerivedData() {
       // Create type component if necessary
