@@ -363,6 +363,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const equippedArmor = this.parent.items.get(equippedArmorId);
          if (equippedArmor) {
             armor.mod.equipment += equippedArmor.system.armor;
+            const armorTraits = equippedArmor.system.trait;
+
+            // Add encumbrance
+            for (let idx = 0; idx < armorTraits.length; idx++) {
+               if (armorTraits[idx].name === 'heavy.armor') {
+                  for (const [key, speed] of Object.entries(this.parent.system.speed)) {
+                     let totalSpeed = speed.value;
+                     for (const [modKey, mod] of Object.entries(speed.mod)) {
+                        totalSpeed += mod;
+                     }
+                     if (totalSpeed > 0) {
+                        speed.mod.equipment -= 1;
+                     }
+                  }
+                  break;
+               }
+            }
          }
          else {
             this.parent.system.equipped.armor = null;
@@ -379,7 +396,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Each mod in the stat
          for (const [modKey, mod] of Object.entries(stat.mod)) {
-            stat.value += mod;
+            stat.value = Math.max(stat.value + mod, 0);
          }
       }
 
@@ -413,7 +430,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       for (const [key, resource] of Object.entries(systemData.resource)) {
          resource.max = resource.maxBase;
          for (const [modKey, mod] of (Object.entries(resource.mod))) {
-            resource.max += mod;
+            resource.max = Math.max(resource.max + mod, 0);
          }
       }
 
@@ -424,7 +441,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       for (const [key, mod] of Object.entries(systemData.mod)) {
          mod.value = 0;
          for (const [modKey, modMod] of (Object.entries(mod.mod))) {
-            mod.value += modMod;
+            mod.value = Math.max(mod.value + modMod, 0);
          }
       }
       return;

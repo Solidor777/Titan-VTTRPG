@@ -18,6 +18,16 @@
          type: "boolean",
          value: false,
       },
+      {
+         name: "encumbering",
+         type: "boolean",
+         value: false,
+      },
+      {
+         name: "heavy.armor",
+         type: "boolean",
+         value: false,
+      },
    ];
 </script>
 

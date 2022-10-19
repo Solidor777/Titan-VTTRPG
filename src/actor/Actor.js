@@ -5,7 +5,6 @@ export default class TitanActor extends Actor {
 
    async _preCreate(data, options, user) {
       await super._preCreate(data, options, user);
-      console.log(data);
 
       const initData = {
          "prototypeToken.bar1": { attribute: "resource.stamina" },
