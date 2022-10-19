@@ -65,7 +65,8 @@ export default class TitanItemCheck extends TitanCheck {
          resolveCost: options.resolveCost ?? itemCheckData.resolveCost,
          isDamage: options.isDamage ?? itemCheckData.isDamage,
          isHealing: options.isHealing ?? itemCheckData.isHealing,
-         resistanceCheck: options.resistanceCheck ?? itemCheckData.resistanceCheck
+         resistanceCheck: options.resistanceCheck ?? itemCheckData.resistanceCheck,
+         checkLabel: itemCheckData.label
       };
       parameters.totalDice = parameters.diceMod;
 

@@ -18,6 +18,11 @@
       <div class="labels">
          <!--Label-->
          <div class="label">
+            {$document.flags.titan.chatContext.parameters.checkLabel}
+         </div>
+
+         <!--Check Label -->
+         <div class="sub-label">
             {$document.flags.titan.chatContext.parameters.itemName}
          </div>
 
