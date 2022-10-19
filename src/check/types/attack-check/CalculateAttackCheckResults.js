@@ -6,7 +6,7 @@ export default function calculateAttackCheckResults(inResults, parameters) {
 
    // Add the damage to the results
    if (results.succeeded) {
-      results.damage = parameters.attack.damage + parameters.damageMod + 1;
+      results.damage = parameters.attack.damage + parameters.damageMod;
 
       // Add extra damage if appropriate
       if (results.extraSuccesses && parameters.attack.plusExtraSuccessDamage) {

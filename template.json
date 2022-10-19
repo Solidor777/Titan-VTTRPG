@@ -269,7 +269,7 @@
                   }
                },
                "rangedWeapons": {
-                  "defaultAttribute": "mind",
+                  "defaultAttribute": "body",
                   "training": {
                      "baseValue": 0,
                      "mod": {
@@ -284,7 +284,7 @@
                   }
                },
                "subterfuge": {
-                  "defaultAttribute": "body",
+                  "defaultAttribute": "mind",
                   "training": {
                      "baseValue": 0,
                      "mod": {

@@ -309,7 +309,7 @@
   "LOCAL.stride.label": "Stride",
   "LOCAL.stride.value.label": "Total Stride speed.",
   "LOCAL.stunned.label": "Stunned",
-  "LOCAL.subterfuge.desc.label": "Measures your overall skill at physical trickery, such as picking a pocket or concealing an item.",
+  "LOCAL.subterfuge.desc.label": "Measures your skill with precise sleight of hand, such as picking a pocket or disarming a trap.",
   "LOCAL.subterfuge.label": "Subterfuge",
   "LOCAL.succeeded.label": "Succeeded",
   "LOCAL.successCost.label": "Success Cost",
