@@ -265,7 +265,7 @@
   "LOCAL.resolve.editStaticMod.label": "Edit bonus or penalty to Max Resolve.",
   "LOCAL.resolve.editValue.label": "Edit current Resolve.",
   "LOCAL.resolve.label": "Resolve",
-  "LOCAL.resolve.max.label": "Max Resolve = Soul / 2, rounded up.",
+  "LOCAL.resolve.max.label": "Max Resolve = Soul",
   "LOCAL.resolve.valueDesc.label": "Resolve remaining.",
   "LOCAL.resolveCost.label": "Resolve Cost",
   "LOCAL.restrained.label": "Restrained",
@@ -297,7 +297,7 @@
   "LOCAL.stamina.editStaticMod.label": "Edit bonus or penalty to Max Stamina.",
   "LOCAL.stamina.editValue.label": "Edit current Stamina.",
   "LOCAL.stamina.label": "Stamina",
-  "LOCAL.stamina.max.label": "Max Stamina = (Body + Mind + Soul).",
+  "LOCAL.stamina.max.label": "Max Stamina = (Body + Mind + Soul)",
   "LOCAL.stamina.valueDesc.label": "Stamina remaining. Depleted by damage.",
   "LOCAL.staminaHealed.label": "Stamina Healed",
   "LOCAL.standardAspects.label": "Standard Aspects",
@@ -352,7 +352,7 @@
   "LOCAL.wounds.editStaticMod.label": "Edit bonus or penalty to Max Wounds",
   "LOCAL.wounds.editValue.label": "Edit current Wounds.",
   "LOCAL.wounds.label": "Wounds",
-  "LOCAL.wounds.max.label": "Max Wounds = (Body + Mind + Soul) / 2, rounded up.",
+  "LOCAL.wounds.max.label": "Max Wounds = (Body + Mind + Soul)",
   "LOCAL.wounds.valueDesc.label": "Wounds Taken. Mortally Wounded when Max Wounds are Taken.",
   "LOCAL.woundsTaken.label": "Wounds Taken",
   "LOCAL.zone.label": "Zone",
@@ -481,7 +481,7 @@
   },
   "SETTINGS.autoOpenCombatantSheet": {
     "label": "Auto-Open Combatant Sheets",
-    "hint": "Configure whethe to automatically open an owned actor's sheet on their initiative turn.",
+    "hint": "Configure whethe to automatically open an owned character's sheet on their initiative turn.",
     "pcsOnly": "Player owned actors.",
     "npcsOnly": "(GM Only) Non-Player owned actors.",
     "all": "(GM Only) All actors.",
@@ -543,6 +543,18 @@
   },
   "SETTINGS.reportEffects": {
     "label": "Report Effects",
-    "hint": "Report an actor's active Effects at the start of their turn."
+    "hint": "Report an character's active Effects at the start of their turn."
+  },
+  "SETTINGS.staminaMultiplier": {
+    "label": "Stamina Multiplier",
+    "hint": "Base Stamina as a multiple of an character's Body + Mind + Soul."
+  },
+  "SETTINGS.resolveMultiplier": {
+    "label": "Resolve Multiplier",
+    "hint": "Base Resolve as a multiple of an character's Soul."
+  },
+  "SETTINGS.woundsMultiplier": {
+    "label": "Resolve Multiplier",
+    "hint": "Base Resolve as a multiple of an character's Body + Mind + Soul."
   }
 }

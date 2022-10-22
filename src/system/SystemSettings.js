@@ -154,4 +154,34 @@ export default function registerSystemSettings() {
       restricted: true,
       default: true,
    });
+
+   game.settings.register('titan', 'staminaMultiplier', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.staminaMultiplier.label',
+      hint: 'SETTINGS.staminaMultiplier.hint',
+      type: Number,
+      restricted: true,
+      default: 2,
+   });
+
+   game.settings.register('titan', 'resolveMultiplier', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.resolveMultiplier.label',
+      hint: 'SETTINGS.resolveMultiplier.hint',
+      type: Number,
+      restricted: true,
+      default: 0.5,
+   });
+
+   game.settings.register('titan', 'woundsMultiplier', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.woundsMultiplier.label',
+      hint: 'SETTINGS.woundsMultiplier.hint',
+      type: Number,
+      restricted: true,
+      default: 0.5,
+   });
 }

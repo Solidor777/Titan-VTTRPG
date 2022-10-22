@@ -11,6 +11,9 @@
    <!-- svelte-ignore a11y-missing-content -->
    <a
       class="fas fa-trash"
+      on:keypress={() => {
+         deleteFunction();
+      }}
       on:click={() => {
          deleteFunction();
       }}

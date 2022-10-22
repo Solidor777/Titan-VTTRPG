@@ -33,7 +33,7 @@
    }
 </script>
 
-<img bind:this={img} {alt} {src} on:click={(event) => onEditImage(event)} />
+<img bind:this={img} {alt} {src} on:keypress={(event) => onEditImage(event)} on:click={(event) => onEditImage(event)} />
 
 <style>
    img {

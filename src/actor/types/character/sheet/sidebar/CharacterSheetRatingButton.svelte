@@ -54,6 +54,9 @@
    <a
       class="button"
       data-tooltip={localize(`${key}.desc`)}
+      on:keypress={() => {
+         onClick();
+      }}
       on:click={() => {
          onClick();
       }}

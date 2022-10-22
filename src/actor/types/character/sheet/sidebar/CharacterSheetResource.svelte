@@ -14,7 +14,9 @@
    // Calculate the tooltip for the max value
    function getTotalValueTooltip(maxBase, equipment, effect, ability, staticMod) {
       // Base label
-      let retVal = `<p>${localize(`${key}.max`)}</p><p>${localize("base")}: ${maxBase}</p>`;
+      let retVal = `<p>${localize(`${key}.max`)} * ${game.settings.get("titan", `${key}Multiplier`)}</p><p>${localize(
+         "base"
+      )}: ${maxBase}</p>`;
 
       // Equipment
       if (equipment !== 0) {

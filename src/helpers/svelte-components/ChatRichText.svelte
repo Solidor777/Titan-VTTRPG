@@ -1,6 +1,4 @@
 <script>
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-
    export let text = void 0;
 </script>
 

@@ -96,15 +96,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Calculate base resource values
       // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = totalBaseAttributeValue;
+      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * game.settings.get('titan', 'staminaMultiplier')), 1);
 
       // Resolve = Soul / 2 rounded up
-      systemData.resource.resolve.maxBase = Math.ceil(
-         systemData.attribute.soul.baseValue / 2);
+      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * game.settings.get('titan', 'resolveMultiplier')), 1);
 
       // Wounds = Total Attribute mod / 2 rounded up
-      systemData.resource.wounds.maxBase = Math.ceil(
-         totalBaseAttributeValue / 2);
+      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * game.settings.get('titan', 'woundsMultiplier')), 1);
    }
 
    _resetDynamicMods() {
@@ -700,10 +698,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Get the spell data
-         options.difficulty = checkSpell.system.check.difficulty;
-         options.complexity = checkSpell.system.check.complexity;
-         options.attribute = checkSpell.system.check.attribute;
-         options.skill = checkSpell.system.check.skill;
+         options.difficulty = checkSpell.system.castingCheck.difficulty;
+         options.complexity = checkSpell.system.castingCheck.complexity;
+         options.attribute = checkSpell.system.castingCheck.attribute;
+         options.skill = checkSpell.system.castingCheck.skill;
          options.spellName = checkSpell.name;
 
          // Get the mods
