@@ -429,7 +429,7 @@
   "LOCAL.reRollFailures.label": "Re-roll Failures",
   "LOCAL.expertiseDoubled.label": "Expertise Doubled",
   "LOCAL.trainingDoubled.label": "Training Doubled",
-  "LOCAL.doubleBase.label": "Double Stat",
+  "LOCAL.mulBase.label": "Mul Base",
   "LOCAL.addCustomTrait.label": "Add Custom Trait",
   "LOCAL.newTrait.label": "New Trait",
   "LOCAL.addTrait.label": "Add Trait",

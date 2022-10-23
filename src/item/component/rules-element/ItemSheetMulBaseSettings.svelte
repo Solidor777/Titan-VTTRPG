@@ -12,6 +12,7 @@
    import DocumentResourceSelect from "~/documents/components/select/DocumentResourceSelect.svelte";
    import DocumentSpeedSelect from "~/documents/components/select/DocumentSpeedSelect.svelte";
    import onRulesElementOperationChanged from "./RulesElementUpdateOperation";
+   import DocumentFloatInput from "~/documents/components/input/DocumentFloatInput.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -136,7 +137,7 @@
    }
 </script>
 
-{#if element && element.operation === "doubleBase"}
+{#if element && element.operation === "mulBase"}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -158,6 +159,11 @@
          <!--Key-->
          <div class="field select">
             <svelte:component this={getSelector()} bind:value={element.key} />
+         </div>
+
+         <!--Value-->
+         <div class="field number">
+            <DocumentFloatInput bind:value={element.value} />
          </div>
       </div>
 
@@ -197,6 +203,11 @@
 
             &.select {
                @include flex-group-left;
+            }
+
+            &.number {
+               @include flex-group-center;
+               width: 2rem;
             }
          }
       }

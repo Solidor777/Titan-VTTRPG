@@ -8,7 +8,7 @@
    export let disabled = false;
 
    function validateInput() {
-      value = parseInt(value);
+      value = parseFloat(value);
       if (min !== false) {
          value = Math.max(value, min);
       }
@@ -21,7 +21,7 @@
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {
          event.preventDefault();
-      } else if (/[\.,]/.test(event.key)) {
+      } else if (/[\,]/.test(event.key)) {
          event.preventDefault();
       }
    }

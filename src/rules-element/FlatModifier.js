@@ -1,5 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 
+export function getFlatModifierTemplate(uuid) {
+   return {
+      operation: 'flatModifier',
+      selector: 'attribute',
+      key: 'body',
+      value: 1,
+      uuid: uuid ?? uuidv4()
+   };
+}
+
 export function applyFlatModifier(flatModifier) {
    // Ensure the modifier is valid
    if (flatModifier === undefined) {
@@ -110,14 +120,4 @@ export function applyFlatModifier(flatModifier) {
    mods[type] += flatModifier.value;
 
    return;
-}
-
-export function getFlatModifierTemplate(uuid) {
-   return {
-      operation: 'flatModifier',
-      selector: 'attribute',
-      key: 'body',
-      value: 1,
-      uuid: uuid ?? uuidv4()
-   };
 }

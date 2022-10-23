@@ -6,7 +6,7 @@
    import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ItemSheetFlatModifierSettings from "./ItemSheetFlatModifierSettings.svelte";
-   import ItemSheetDoubleBaseSettings from "./ItemSheetDoubleBaseSettings.svelte";
+   import ItemSheetMulBaseSettings from "./ItemSheetMulBaseSettings.svelte";
    import ItemSheetTurnStartMessageSettings from "./ItemSheetTurnStartMessageSettings.svelte";
    import ItemSheetTurnStartStaminaSettings from "./ItemSheetTurnStartStaminaSettings.svelte";
 
@@ -21,8 +21,8 @@
          value: "flatModifier",
       },
       {
-         label: localize("doubleBase"),
-         value: "doubleBase",
+         label: localize("mulBase"),
+         value: "mulBase",
       },
       {
          label: localize("turnStartMessage"),
@@ -37,7 +37,7 @@
    function selectComponent(operation) {
       const elementComponents = {
          flatModifier: ItemSheetFlatModifierSettings,
-         doubleBase: ItemSheetDoubleBaseSettings,
+         mulBase: ItemSheetMulBaseSettings,
          turnStartMessage: ItemSheetTurnStartMessageSettings,
          turnStartStamina: ItemSheetTurnStartStaminaSettings,
       };

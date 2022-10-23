@@ -1,5 +1,5 @@
 import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
-import { getDoubleBaseTemplate } from '~/rules-element/DoubleBase.js';
+import { getMulBaseTemplate } from '~/rules-element/MulBase.js';
 import getTurnStartMessageTemplate from '~/rules-element/TurnStartMessage.js';
 import getTurnStartStamina from '~/rules-element/TurnStartStamina.js';
 
@@ -9,8 +9,8 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getFlatModifierTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
-      case 'doubleBase': {
-         document.system.rulesElement[elementIdx] = getDoubleBaseTemplate(document.system.rulesElement[elementIdx].uuid);
+      case 'mulBase': {
+         document.system.rulesElement[elementIdx] = getMulBaseTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
       case 'turnStartMessage': {

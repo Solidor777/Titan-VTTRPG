@@ -1,6 +1,6 @@
 import { clamp, localize } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
-import { applyDoubleBase } from '~/rules-element/DoubleBase.js';
+import { applyMulBase } from '~/rules-element/MulBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -17,7 +17,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply rules element bindings
    applyFlatModifier = applyFlatModifier.bind(this);
-   applyDoubleBase = applyDoubleBase.bind(this);
+   applyMulBase = applyMulBase.bind(this);
 
    // Prepare Character type specific data
    prepareDerivedData() {
@@ -169,10 +169,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Sort the rules elements and process them in order
 
-      // Double Stat
-      const doubleBases = rulesElements.filter((element) => element.operation === 'doubleBase');
-      doubleBases.forEach((doubleBase) => {
-         this.applyDoubleBase(doubleBase);
+      // Mul Base
+      const mulBases = rulesElements.filter((element) => element.operation === 'mulBase');
+      mulBases.forEach((mulBase) => {
+         this.applyMulBase(mulBase);
       });
 
       // FlatModifier
