@@ -7,6 +7,7 @@
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -50,6 +51,13 @@
          <div class="tag">
             <StatTag label={localize("quantity")} value={item.system.quantity} />
          </div>
+
+         <!--Custom Traits-->
+         {#each item.system.customTrait as trait}
+            <div class="tag" data-tooltip={trait.description}>
+               <Tag label={trait.name} />
+            </div>
+         {/each}
       </div>
    </div>
 </div>

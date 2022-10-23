@@ -3,6 +3,7 @@
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -29,6 +30,17 @@
             <RichText text={item.system.description} />
          </div>
       {/if}
+
+      <!--Traits-->
+      {#if item.system.customTrait.length > 0}
+         <div class="section tags small-text">
+            {#each item.system.customTrait as trait}
+               <div class="tag" data-tooltip={trait.description}>
+                  <Tag label={trait.name} />
+               </div>
+            {/each}
+         </div>
+      {/if}
    </div>
 </div>
 
@@ -49,19 +61,39 @@
          width: 100%;
 
          .section {
+            @include flex-column;
+            @include flex-group-top;
             width: 100%;
 
             &:not(.rich-text) {
                padding-bottom: 0.5rem;
-               padding-top: 0.5rem;
 
-               &:last-child {
-                  padding-bottom: 0.25rem;
+               &:not(.tags) {
+                  padding-top: 0.5rem;
                }
+            }
+
+            &.tags {
+               @include flex-row;
+               @include flex-group-center;
+               flex-wrap: wrap;
+
+               .tag {
+                  @include tag-margin;
+               }
+            }
+
+            &:not(.tags) {
+               @include flex-column;
+               @include flex-group-top;
             }
 
             &:not(:first-child) {
                @include border-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
             }
          }
       }

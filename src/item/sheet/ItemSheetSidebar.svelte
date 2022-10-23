@@ -1,9 +1,9 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
+   import ItemSheetSidebarTraits from "~/item/sheet/ItemSheetSidebarTraits.svelte";
 
    // Application statee reference
    const appState = getContext("ApplicationStateStore");
@@ -12,8 +12,9 @@
 
 <div class="sidebar">
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
-      <div class="section header" transition:slide|local>
-         {localize("checks")}
+      <!--Traits-->
+      <div class="section">
+         <ItemSheetSidebarTraits />
       </div>
 
       <!--Checks-->
@@ -43,13 +44,6 @@
             @include border-top;
             margin-top: 0.5rem;
          }
-      }
-
-      .header {
-         @include panel-1;
-         @include border-bottom;
-         padding: 0.5rem 0;
-         font-weight: bold;
       }
    }
 </style>

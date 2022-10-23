@@ -12,6 +12,7 @@
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
    import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Reference to the armor id
    export let id = void 0;
@@ -108,6 +109,13 @@
                <div class="tag">
                   <ValueTag value={item.system.value} />
                </div>
+
+               <!--Custom Traits-->
+               {#each item.system.customTrait as trait}
+                  <div class="tag" data-tooltip={trait.description}>
+                     <Tag label={trait.name} />
+                  </div>
+               {/each}
             </div>
          </div>
       {/if}

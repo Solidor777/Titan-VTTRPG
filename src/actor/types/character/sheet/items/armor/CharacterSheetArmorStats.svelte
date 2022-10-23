@@ -35,6 +35,13 @@
          {/if}
       </div>
    {/each}
+
+   <!--Custom traits-->
+   {#each item.system.customTrait as trait}
+      <div class="stat" data-tooltip={trait.description}>
+         <Tag label={trait.name} />
+      </div>
+   {/each}
 </div>
 
 <style lang="scss">

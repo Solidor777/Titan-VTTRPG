@@ -486,7 +486,8 @@
          "rulesElement": [],
          "action": false,
          "reaction": false,
-         "passive": false
+         "passive": false,
+         "customTrait": []
       },
       "armor": {
          "templates": [
@@ -503,7 +504,8 @@
             "base",
             "object"
          ],
-         "quantity": 1
+         "quantity": 1,
+         "customTrait": []
       },
       "effect": {
          "templates": [
@@ -511,7 +513,8 @@
          ],
          "rulesElement": [],
          "effectId": "",
-         "duration": "temporary"
+         "duration": "temporary",
+         "customTrait": []
       },
       "equipment": {
          "templates": [
@@ -519,7 +522,8 @@
             "equippable",
             "object"
          ],
-         "rulesElement": []
+         "rulesElement": [],
+         "customTrait": []
       },
       "shield": {
          "templates": [
@@ -546,7 +550,8 @@
             "autoCalculateDC": true
          },
          "customAspect": [],
-         "aspect": []
+         "aspect": [],
+         "customTrait": []
       },
       "weapon": {
          "templates": [
@@ -556,8 +561,7 @@
          ],
          "attack": [],
          "attackNotes": "",
-         "multiAttack": false,
-         "customTrait": []
+         "multiAttack": false
       }
    }
 }

@@ -63,6 +63,13 @@
                <Tag label={localize("passive")} />
             </div>
          {/if}
+
+         <!--Custom Traits-->
+         {#each item.system.customTrait as trait}
+            <div class="tag" data-tooltip={trait.description}>
+               <Tag label={trait.name} />
+            </div>
+         {/each}
       </div>
    </div>
 </div>

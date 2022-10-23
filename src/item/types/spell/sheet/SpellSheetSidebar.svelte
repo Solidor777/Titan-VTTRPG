@@ -3,6 +3,7 @@
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
+   import ItemSheetSidebarTraits from "../../../sheet/ItemSheetSidebarTraits.svelte";
    import SpellSheetSidebarCastingCheck from "./SpellSheetSidebarCastingCheck.svelte";
 
    // Application statee reference
@@ -12,6 +13,11 @@
 
 <div class="sidebar">
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+      <!--Traits-->
+      <div class="section">
+         <ItemSheetSidebarTraits />
+      </div>
+
       <!--Casting Check-->
       <div class="section">
          <SpellSheetSidebarCastingCheck />
@@ -40,7 +46,10 @@
       .section {
          @include flex-column;
          @include flex-group-top;
-         margin-top: 0.5rem;
+
+         &:not(:first-child) {
+            margin-top: 0.5rem;
+         }
 
          &:not(:first-child) {
             @include border-top;

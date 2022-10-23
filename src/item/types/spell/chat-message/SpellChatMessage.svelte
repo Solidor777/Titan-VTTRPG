@@ -8,6 +8,7 @@
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
    import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -62,6 +63,13 @@
          <div class="tag">
             <StatTag label={localize("tradition")} value={item.system.tradition} />
          </div>
+
+         <!--Custom Traits-->
+         {#each item.system.customTrait as trait}
+            <div class="tag" data-tooltip={trait.description}>
+               <Tag label={trait.name} />
+            </div>
+         {/each}
       </div>
    </div>
 </div>

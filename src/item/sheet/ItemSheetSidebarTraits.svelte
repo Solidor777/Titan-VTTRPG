@@ -3,32 +3,14 @@
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import DeleteTag from "~/helpers/svelte-components/tag/DeleteTag.svelte";
    import DocumentAddCustomTraitDialog from "~/documents/DocumentAddCustomTraitDialog";
 
    // Application statee reference
    const document = getContext("DocumentStore");
-   const application = getContext("external").application;
 </script>
 
 <div class="traits">
-   <!--Edit Traits Button-->
-   <div class="button">
-      <EfxButton
-         on:click={() => {
-            application.editArmorTraits();
-         }}
-      >
-         <div class="button-contents">
-            <i class="fas fa-pen-to-square" />
-            <div class="label">
-               {localize("editTraits")}
-            </div>
-         </div>
-      </EfxButton>
-   </div>
-
    <!--Add Custom Trait Button-->
    <div class="button">
       <EfxButton
@@ -47,14 +29,8 @@
    </div>
 
    <!--Traits-->
-   {#if $document.system.trait.length > 0 || $document.system.customTrait.length > 0}
+   {#if $document.system.customTrait.length > 0}
       <div class="traits-container" transition:slide|local>
-         {#each $document.system.trait as trait (trait.name)}
-            <div class="trait" transition:slide|local data-tooltip={localize(`${trait.name}.desc`)}>
-               <Tag label={localize(trait.name)} />
-            </div>
-         {/each}
-
          <!--Custom Traits-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
             <div class="trait" data-tooltip={trait.description} transition:slide|local>
@@ -78,7 +54,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .traits {
       @include flex-column;

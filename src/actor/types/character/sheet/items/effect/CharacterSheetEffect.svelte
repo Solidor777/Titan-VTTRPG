@@ -9,6 +9,7 @@
    import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
    import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Reference to the weapon id
    export let id = void 0;
@@ -87,6 +88,17 @@
                   <RichText text={item.system.description} />
                </div>
             {/if}
+
+            <!--Traits-->
+            {#if item.system.customTrait.length > 0}
+               <div class="section tags small-text">
+                  {#each item.system.customTrait as trait}
+                     <div class="tag" data-tooltip={trait.description}>
+                        <Tag label={trait.name} />
+                     </div>
+                  {/each}
+               </div>
+            {/if}
          </div>
       {/if}
    </div>
@@ -145,11 +157,34 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding: 0.5rem 0;
+               padding-bottom: 0.5rem;
+
+               &:not(.tags) {
+                  padding-top: 0.5rem;
+               }
+            }
+
+            &.tags {
+               @include flex-row;
+               @include flex-group-center;
+               flex-wrap: wrap;
+
+               .tag {
+                  @include tag-margin;
+               }
+            }
+
+            &:not(.tags) {
+               @include flex-column;
+               @include flex-group-top;
             }
 
             &:not(:first-child) {
                @include border-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
             }
          }
       }
