@@ -78,7 +78,7 @@
          </div>
 
          <!--Add Item Button-->
-         <div>
+         <div class="add-entry-button">
             <CharacterSheetItemAddEntryButton
                label={localize("addNewItem")}
                on:click={() => {
@@ -137,15 +137,22 @@
          @include flex-group-top;
          @include border-bottom;
          @include panel-1;
+         padding: 0.25rem;
          width: 100%;
 
          .row {
             @include flex-row;
             @include flex-group-center;
             width: 100%;
+
+            &:not(:first-child) {
+               margin-top: 0.25rem;
+            }
+
             .reset {
                --icon-button-font-size: var(--font-size-small);
                --icon-button-radius: 1.75rem;
+               margin-left: 0.25rem;
             }
 
             .label {
@@ -158,11 +165,13 @@
             }
 
             .option {
-               margin-top: 0.25rem;
-
                &:not(:first-child) {
                   margin-left: 0.25rem;
                }
+            }
+
+            .add-entry-button {
+               margin-left: 0.25rem;
             }
          }
       }

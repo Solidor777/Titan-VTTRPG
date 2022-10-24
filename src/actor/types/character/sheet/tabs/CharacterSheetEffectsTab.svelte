@@ -70,6 +70,7 @@
          @include border-bottom;
          @include panel-1;
          width: 100%;
+         padding: 0.25rem;
 
          .label {
             font-weight: bold;
