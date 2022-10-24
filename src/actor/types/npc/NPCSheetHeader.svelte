@@ -5,7 +5,7 @@
    import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
    import CharacterSheetResistances from "~/actor/types/character/sheet/header/CharacterSheetResistances.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import DocumentSelect from "../../../documents/components/select/DocumentSelect.svelte";
+   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");

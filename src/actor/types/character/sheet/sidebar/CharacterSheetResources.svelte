@@ -1,5 +1,6 @@
 <script>
    import { getContext } from "svelte";
+   import { slide } from "svelte/transition";
    import CharacterSheetResource from "~/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte";
 
    // Setup context variables
@@ -9,10 +10,12 @@
 <!--Resources-->
 <div class="resources">
    <!--Each Resource Meter-->
-   {#each Object.entries($document.system.resource) as [key]}
-      <div class="resource {key}">
-         <CharacterSheetResource {key} />
-      </div>
+   {#each Object.entries($document.system.resource) as [key] (key)}
+      {#if $document.system.resource[key].maxBase > 0}
+         <div class="resource {key}" transition={key}>
+            <CharacterSheetResource {key} />
+         </div>
+      {/if}
    {/each}
 </div>
 
