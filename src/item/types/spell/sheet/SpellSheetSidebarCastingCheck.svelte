@@ -8,13 +8,24 @@
    // Application statee reference
    const appState = getContext("ApplicationStateStore");
    const document = getContext("DocumentStore");
+
+   function areAspectsEnabled(aspects) {
+      for (let idx = 0; idx < aspects.length; idx++) {
+         if (aspects[idx].enabled) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   $: aspectsEnabled = areAspectsEnabled($document.system.aspect) || $document.system.customAspect.length > 0;
 </script>
 
 <!--Casting Check-->
 <div class="casting-check">
    <!--Head-->
    <div class="header {$document.system.castingCheck.attribute}">
-      {#if $document.system.aspect.length > 0 || $document.system.customAspect.length}
+      {#if aspectsEnabled}
          <!--Label-->
          <div class="label-button">
             {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
@@ -50,7 +61,7 @@
    </div>
 
    <!--Aspects-->
-   {#if $appState.isExpanded.sidebar.castingCheck === true && ($document.system.aspect.length > 0 || $document.system.customAspect.length)}
+   {#if $appState.isExpanded.sidebar.castingCheck === true && aspectsEnabled}
       <div class="checks" transition:slide|local>
          <SpellSheetSidebarAspects />
       </div>
