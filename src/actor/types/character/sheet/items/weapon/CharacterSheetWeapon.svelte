@@ -4,6 +4,7 @@
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
    import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
    import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
@@ -128,6 +129,13 @@
                <div class="tag">
                   <ValueTag value={item.system.value} />
                </div>
+
+               <!--Custom Traits-->
+               {#each item.system.customTrait as trait}
+                  <div class="tag" data-tooltip={trait.description}>
+                     <Tag label={trait.name} />
+                  </div>
+               {/each}
             </div>
          </div>
       {/if}

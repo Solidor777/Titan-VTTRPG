@@ -3,7 +3,7 @@
    import { slide } from "svelte/transition";
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
-   import ItemSheetSidebar from "~/item/sheet/ItemSheetSidebar.svelte";
+   import ItemSheetSidebarTraits from "~/item/sheet/ItemSheetSidebarTraits.svelte";
    import WeaponSheetSidebarAttacks from "./WeaponSheetSidebarAttacks.svelte";
 
    // Application statee reference
@@ -16,7 +16,7 @@
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
       <!--Custom Traits-->
       <div class="section">
-         <ItemSheetSidebar />
+         <ItemSheetSidebarTraits />
       </div>
 
       <!--Attacks-->
