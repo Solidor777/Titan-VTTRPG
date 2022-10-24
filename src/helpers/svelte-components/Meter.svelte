@@ -5,7 +5,7 @@
    export let current = void 0;
 
    // Calculate the meter width
-   $: meterWidth = ((current / max - min) * 100).toString() + "%";
+   $: meterWidth = max > min ? `${(current / max - min) * 100}%`.toString() : "0";
 </script>
 
 <div class="meter">
