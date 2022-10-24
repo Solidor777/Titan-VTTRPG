@@ -1,7 +1,8 @@
 {
    "Actor": {
       "types": [
-         "player"
+         "player",
+         "npc"
       ],
       "templates": {
          "character": {
@@ -343,8 +344,8 @@
             },
             "resource": {
                "stamina": {
-                  "max": 3,
-                  "value": 3,
+                  "max": 6,
+                  "value": 6,
                   "mod": {
                      "static": 0
                   }
@@ -448,7 +449,8 @@
       "npc": {
          "templates": [
             "character"
-         ]
+         ],
+         "xp": 0
       }
    },
    "Item": {

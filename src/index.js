@@ -13,6 +13,7 @@ import ChatMessageShell from './chat-message/ChatMessageShell.svelte';
 import TitanActor from './actor/Actor.js';
 import TitanItem from './item/Item.js';
 import TitanPlayerSheet from './actor/types/player/PlayerSheet.js';
+import TitanNPCSheet from './actor/types/npc/NPCSheet.js';
 import TitanAbilitySheet from './item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from './item/types/armor/sheet/ArmorSheet.js';
 import TitanCommoditySheet from './item/types/commodity/sheet/CommoditySheet.js';
@@ -39,6 +40,10 @@ Hooks.once('init', async () => {
    // Register Sheet Classes
    Actors.registerSheet('titan', TitanPlayerSheet, {
       types: ['player'],
+      makeDefault: true,
+   });
+   Actors.registerSheet('titan', TitanNPCSheet, {
+      types: ['npc'],
       makeDefault: true,
    });
    Items.registerSheet('titan', TitanAbilitySheet, {

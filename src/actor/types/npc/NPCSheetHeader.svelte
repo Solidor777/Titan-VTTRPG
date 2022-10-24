@@ -1,12 +1,10 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
    import CharacterSheetResistances from "~/actor/types/character/sheet/header/CharacterSheetResistances.svelte";
-   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
-   import CharacterSheetInspiration from "~/actor/types/character/sheet/header/CharacterSheetInspiration.svelte";
+   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
    // Setup context variables
    const document = getContext("DocumentStore");
@@ -20,22 +18,11 @@
          <DocumentName />
       </div>
 
-      <!--Inspiration Toggle-->
-      <div class="inspiration">
-         <CharacterSheetInspiration />
-      </div>
-
       <!--Exp-->
       <div class="xp">
          <!--Available-->
-         <div class="available" data-tooltip={localize("xpAvailable")}>
-            <ModTag baseValue={0} currentValue={$document.system.xp.available} />
-         </div>
-         <div class="symbol">/</div>
-
-         <!--Earned Input-->
-         <div class="earned" data-tooltip={localize("xpEarned")}>
-            <DocumentIntegerInput bind:value={$document.system.xp.earned} />
+         <div class="value">
+            <Tag label={$document.system.xp} />
          </div>
 
          <!--Label-->
@@ -80,34 +67,15 @@
             margin-right: 0.25rem;
          }
 
-         .inspiration {
-            @include flex-row;
-            @include flex-group-center;
-            margin-right: 0.25rem;
-         }
-
          .xp {
             @include flex-row;
             @include flex-group-center;
             margin-right: 0.25rem;
 
-            .available {
+            .value {
                @include flex-row;
                @include flex-group-center;
-               width: 2.5rem;
-               height: var(--input-height);
-            }
-
-            .symbol {
-               @include flex-row;
-               margin: 0.25rem;
-            }
-
-            .earned {
-               @include flex-row;
-               @include flex-group-center;
-               margin-right: 0.5rem;
-               width: 2.5rem;
+               margin-right: 0.25rem;
             }
 
             .label {

@@ -11,7 +11,6 @@ export default class TitanActor extends Actor {
          "prototypeToken.bar2": { attribute: "resource.wounds" },
          "prototypeToken.displayName": CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
          "prototypeToken.displayBars": CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
-         "prototypeToken.disposition": CONST.TOKEN_DISPOSITIONS.NEUTRAL,
       };
 
       this.updateSource(initData);
@@ -44,7 +43,6 @@ export default class TitanActor extends Actor {
 
          // NPC
          case 'npc': {
-            this._prepareNpcData();
             this.typeComponent = new TitanNPCComponent(this);
             this.character = this.typeComponent;
             this.npc = this.typeComponent;

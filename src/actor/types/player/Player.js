@@ -4,30 +4,10 @@ export default class TitanPlayerComponent extends TitanCharacterComponent {
    // Prepare Player type specific data
    prepareDerivedData() {
       super.prepareDerivedData();
-      const systemData = this.parent.system;
+      const xp = this.parent.system.xp;
+      xp.available = xp.earned - this._getSpentXP();
 
-      // Calculate the amount of XP spent
-      let spentXp = 0;
-
-      // Add cost of current attribute
-      for (const [key, attribute] of Object.entries(systemData.attribute)) {
-         spentXp += this._getAttributeXPCost(attribute.baseValue);
-      }
-
-      // Add cost of current skill
-      for (const [key, skill] of Object.entries(systemData.skill)) {
-         spentXp += this._getSkillXPCost(skill.training.baseValue);
-         spentXp += this._getSkillXPCost(skill.expertise.baseValue);
-      }
-
-      // Add cost of spells and abilities
-      this.parent.items.forEach((item) => {
-         if (item.type === "spell" || item.type === "ability") {
-            spentXp += item.system.xpCost;
-         }
-      });
-
-      systemData.xp.available = systemData.xp.earned - spentXp;
+      return;
    }
 
    _getAttributeXPCost(value) {
