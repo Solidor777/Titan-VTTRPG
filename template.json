@@ -465,7 +465,8 @@
       "templates": {
          "base": {
             "description": "",
-            "check": []
+            "check": [],
+            "customTrait": []
          },
          "object": {
             "rarity": "common",
@@ -486,8 +487,7 @@
          "rulesElement": [],
          "action": false,
          "reaction": false,
-         "passive": false,
-         "customTrait": []
+         "passive": false
       },
       "armor": {
          "templates": [
@@ -496,16 +496,14 @@
          ],
          "armor": 1,
          "trait": [],
-         "rulesElement": [],
-         "customTrait": []
+         "rulesElement": []
       },
       "commodity": {
          "templates": [
             "base",
             "object"
          ],
-         "quantity": 1,
-         "customTrait": []
+         "quantity": 1
       },
       "effect": {
          "templates": [
@@ -513,8 +511,7 @@
          ],
          "rulesElement": [],
          "effectId": "",
-         "duration": "temporary",
-         "customTrait": []
+         "duration": "temporary"
       },
       "equipment": {
          "templates": [
@@ -522,8 +519,7 @@
             "equippable",
             "object"
          ],
-         "rulesElement": [],
-         "customTrait": []
+         "rulesElement": []
       },
       "shield": {
          "templates": [
@@ -532,8 +528,7 @@
          ],
          "defense": 1,
          "trait": [],
-         "rulesElement": [],
-         "customTrait": []
+         "rulesElement": []
       },
       "spell": {
          "templates": [
@@ -550,8 +545,7 @@
             "autoCalculateDC": true
          },
          "customAspect": [],
-         "aspect": [],
-         "customTrait": []
+         "aspect": []
       },
       "weapon": {
          "templates": [
