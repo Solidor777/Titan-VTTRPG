@@ -450,6 +450,7 @@
          "templates": [
             "character"
          ],
+         "type": "warrior",
          "xp": 0
       }
    },
