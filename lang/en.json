@@ -447,6 +447,7 @@
   "LOCAL.warrior.label": "Warrior",
   "LOCAL.elite.label": "Elite",
   "LOCAL.champion.label": "Champion",
+  "LOCAL.role.label": "Role",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

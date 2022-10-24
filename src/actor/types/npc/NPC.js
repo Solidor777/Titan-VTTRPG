@@ -16,7 +16,7 @@ export default class TitanNPCComponent extends TitanCharacterComponent {
          systemData.attribute.mind.baseValue +
          systemData.attribute.soul.baseValue;
 
-      switch (systemData.type) {
+      switch (systemData.role) {
          case 'champion': {
             systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * game.settings.get('titan', 'staminaMultiplier')), 1);
             systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * game.settings.get('titan', 'resolveMultiplier')), 1);
