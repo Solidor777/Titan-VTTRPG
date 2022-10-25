@@ -505,10 +505,7 @@
   },
   "SETTINGS.initiativeFormula": {
     "label": "Initiative Formula",
-    "hint": "Configure which method is used to determine who acts first in combat.",
-    "flat": "Highest to lowest Initative, no dice rolls.",
-    "roll1d6": "Roll 1d6 + Initiative, higher goes first.",
-    "roll2d6": "Roll 2d6 + Initiative, higher goes first."
+    "hint": "Optional formula to add to a character's Initiative rating during combat."
   },
   "SETTINGS.autoRegainResolve": {
     "label": "Auto-increase combatent resolve.",

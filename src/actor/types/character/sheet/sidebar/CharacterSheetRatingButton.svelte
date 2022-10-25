@@ -3,6 +3,7 @@
    import { getContext } from "svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
+   import EfxButton from "../../../../../helpers/svelte-components/button/EfxButton.svelte";
 
    export let key = void 0;
    export let icon = void 0;
@@ -51,22 +52,22 @@
 <div class="mod">
    <!--Button-->
    <!-- svelte-ignore a11y-missing-attribute -->
-   <a
-      class="button"
-      data-tooltip={localize(`${key}.desc`)}
-      on:keypress={() => {
-         onClick();
-      }}
-      on:click={() => {
-         onClick();
-      }}
-   >
-      <!--Icon-->
-      <i class="fas fa-{icon}" />
-      <div class="label">
-         {localize(key)}
-      </div>
-   </a>
+   <div class="button" data-tooltip={localize(`${key}.desc`)}>
+      <EfxButton
+         on:keypress={() => {
+            onClick();
+         }}
+         on:click={() => {
+            onClick();
+         }}
+      >
+         <!--Icon-->
+         <i class="fas fa-{icon}" />
+         <div class="label">
+            {localize(key)}
+         </div>
+      </EfxButton>
+   </div>
 
    <!--Stats-->
    <div class="stats">

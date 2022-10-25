@@ -56,13 +56,7 @@ export default function registerSystemSettings() {
       hint: 'SETTINGS.initiativeFormula.hint',
       type: String,
       restricted: true,
-      choices: {
-         flat: 'SETTINGS.initiativeFormula.flat',
-         roll1d6: 'SETTINGS.initiativeFormula.roll1d6',
-         roll2d6: 'SETTINGS.initiativeFormula.roll2d6',
-      },
-      default: 'roll2d6',
-      requiresReload: true
+      default: '+2d6',
    });
 
    game.settings.register('titan', 'autoRegainResolve', {

@@ -511,37 +511,32 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const initiative = this.parent.system.rating.initiative.value;
 
       // Get the initiative formula
-      let initiativeFormula = '';
-      const initiativeSettings = game.settings.get('titan', 'initiativeFormula');
-      if (initiativeSettings === 'roll2d6') {
-         initiativeFormula = '2d6 + ';
-      }
-      else if (initiativeSettings === 'roll1d6') {
-         initiativeFormula = '1d6 + ';
-      }
+      const initiativeFormula = game.settings.get('titan', 'initiativeFormula');
 
-      return new Roll(`${initiativeFormula}${initiative}`);
+      return await new Roll(`${initiative}${initiativeFormula}`);
    }
 
    async rollInitiative(options) {
       const roll = await this.getInitiativeRoll(options);
-      await roll.evaluate({ async: true });
+      if (await roll.evaluate({ async: true })) {
+         // Construct chat message data
+         let messageData = foundry.utils.mergeObject({
+            speaker: ChatMessage.getSpeaker({
+               actor: this.parent,
+               token: this.parent.token,
+               alias: this.parent.name
+            }),
+            flavor: game.i18n.format("COMBAT.RollsInitiative", { name: this.parent.name }),
+            flags: { "core.initiativeRoll": true }
+         });
+         const chatData = await roll.toMessage(messageData, { create: false });
+         chatData.rollMode = options?.rollMode ?
+            options.rollMode :
+            game.settings.get('core', 'rollMode');
+         await ChatMessage.create(chatData);
+      }
 
-      // Construct chat message data
-      let messageData = foundry.utils.mergeObject({
-         speaker: ChatMessage.getSpeaker({
-            actor: this.parent,
-            token: this.parent.token,
-            alias: this.parent.name
-         }),
-         flavor: game.i18n.format("COMBAT.RollsInitiative", { name: this.parent.name }),
-         flags: { "core.initiativeRoll": true }
-      });
-      const chatData = await roll.toMessage(messageData, { create: false });
-      chatData.rollMode = options?.rollMode ?
-         options.rollMode :
-         game.settings.get('core', 'rollMode');
-      await ChatMessage.create(chatData);
+      return;
    }
 
    // Get a skill check from the actor

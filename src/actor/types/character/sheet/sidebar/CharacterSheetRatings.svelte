@@ -8,6 +8,18 @@
 </script>
 
 <div class="ratings">
+   <!--Initiative-->
+   <div class="rating">
+      <!-- svelte-ignore missing-declaration -->
+      <CharacterSheetRatingButton
+         key={"initiative"}
+         icon={"clock"}
+         onClick={() => {
+            $document.typeComponent.rollInitiative();
+         }}
+      />
+   </div>
+
    <!--Awareness-->
    <div class="rating">
       <CharacterSheetRating key={"awareness"} icon={"eye"} />
@@ -26,22 +38,6 @@
    <!--Accuracy-->
    <div class="rating">
       <CharacterSheetRating key={"accuracy"} icon={"bow-arrow"} />
-   </div>
-
-   <!--Initiative-->
-   <div class="rating">
-      <!-- svelte-ignore missing-declaration -->
-      {#if game.settings.get("titan", "initiativeFormula") !== "flat"}
-         <CharacterSheetRatingButton
-            key={"initiative"}
-            icon={"clock"}
-            onClick={() => {
-               $document.typeComponent.rollInitiative();
-            }}
-         />
-      {:else}
-         <CharacterSheetRating key={"initiative"} icon={"clock"} />
-      {/if}
    </div>
 </div>
 

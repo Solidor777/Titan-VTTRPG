@@ -17,14 +17,14 @@
       <CharacterSheetResources />
    </div>
 
-   <!--Mods-->
-   <div class="section">
-      <CharacterSheetMods />
-   </div>
-
    <!--Ratings-->
    <div class="section">
       <CharacterSheetRatings />
+   </div>
+
+   <!--Mods-->
+   <div class="section">
+      <CharacterSheetMods />
    </div>
 
    <!--Speeds-->
