@@ -4,9 +4,9 @@
   "description": "A success based roll system design for virtual tabletop.",
   "author": "Solidor - Solidor#1916",
   "url": "https://github.com/JustinCamden/Titan-VTTRPG",
-  "readme": "https://github.com/JustinCamden/Titan-VTTRPG/README.md",
+  "readme": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/README.md",
   "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
-  "changelog": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/CHANGELOG.txt",
+  "changelog": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/CHANGELOG.md",
   "version": "1.0.0",
   "compatibility": {
     "minimum": "10"

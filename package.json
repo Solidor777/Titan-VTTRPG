@@ -4,10 +4,7 @@
   "license": "MIT",
   "private": true,
   "type": "module",
-  "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
-  "contributors": [
-    "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
-  ],
+  "author": "Solidor",
   "dependencies": {
     "@typhonjs-fvtt/runtime": "^0.0.20",
     "@typhonjs-fvtt/svelte-standard": "^0.0.16",
