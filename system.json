@@ -27,7 +27,7 @@
   "system": [],
   "socket": false,
   "manifest": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/system.json",
-  "download": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/0.0.0/module.zip",
+  "download": "https://github.com/JustinCamden/Titan-VTTRPG/raw/main/titan.zip",
   "protected": false,
   "coreTranslation": false,
   "library": false,
