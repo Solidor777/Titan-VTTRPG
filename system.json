@@ -1,0 +1,37 @@
+{
+  "name": "titan",
+  "title": "Titan VTTRPG",
+  "description": "A success based roll system design for virtual tabletop.",
+  "author": "Solidor - Solidor#1916",
+  "url": "https://github.com/JustinCamden/Titan-VTTRPG",
+  "readme": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/README.md",
+  "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
+  "changelog": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/CHANGELOG.md",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "10"
+  },
+  "esmodules": [
+    "index.js"
+  ],
+  "styles": [
+    "style.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "system": [],
+  "socket": false,
+  "manifest": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/system.json",
+  "download": "https://github.com/JustinCamden/Titan-VTTRPG/raw/main/titan.zip",
+  "protected": false,
+  "coreTranslation": false,
+  "library": false,
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "license": "LICENSE.txt"
+}
