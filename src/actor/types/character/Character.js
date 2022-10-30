@@ -850,7 +850,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    // Apply damage to the actor
    async applyDamage(damage, ignoreArmor, report) {
       // Calculate the damage amount
-      const damageTaken = ignoreArmor ? Math.max(damage - this.parent.system.mod.armor.value, 0) : damage;
+      const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
       const stamina = this.parent.system.resource.stamina;
       const wounds = this.parent.system.resource.wounds;
 

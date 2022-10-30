@@ -136,8 +136,11 @@ Hooks.on('preDeleteChatMessage', (message) => {
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
-   const character = combat.combatant?.actor?.character;
-   if (character && character.parent.isOwner) {
-      character.onTurnStart();
+   if (game.user.isGM) {
+      const character = combat.combatant?.actor?.character;
+      if (character) {
+         character.onTurnStart();
+      }
    }
+
 });
