@@ -9,7 +9,9 @@
   "changelog": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/CHANGELOG.md",
   "version": "1.0.0",
   "compatibility": {
-    "minimum": "10"
+    "minimum": "10.288",
+    "verified": "10.288",
+    "maximum": "10"
   },
   "esmodules": [
     "index.js"
