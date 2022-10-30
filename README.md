@@ -1,2 +1,2 @@
 ## About:
-A success based roll system design for virtual tabletop.
+A success based roll system designed for virtual tabletop.

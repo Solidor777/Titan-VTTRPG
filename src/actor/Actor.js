@@ -7,11 +7,19 @@ export default class TitanActor extends Actor {
       await super._preCreate(data, options, user);
 
       const initData = {
-         "prototypeToken.bar1": { attribute: "resource.stamina" },
-         "prototypeToken.bar2": { attribute: "resource.wounds" },
-         "prototypeToken.displayName": CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
-         "prototypeToken.displayBars": CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
+         'prototypeToken.bar1': { attribute: 'resource.stamina' },
+         'prototypeToken.bar2': { attribute: 'resource.wounds' },
+         'prototypeToken.displayName': CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
+         'prototypeToken.displayBars': CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
       };
+      if (data.type === 'player') {
+         initData['prototypeToken.vision'] = true;
+         initData['prototypeToken.actorLink'] = true;
+         initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.NEUTRAL;
+      }
+      else if (data.type === 'npc') {
+         initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.HOSTILE;
+      }
 
       this.updateSource(initData);
    }
@@ -85,7 +93,7 @@ export default class TitanActor extends Actor {
          this.typeComponent.deleteItem(id);
       }
 
-      if (item.type === "effect" && item.system.effectId !== "") {
+      if (item.type === 'effect' && item.system.effectId !== '') {
          const effect = this.effects.get(item.system.effectId);
          effect.delete();
       }
