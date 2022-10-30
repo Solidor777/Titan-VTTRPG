@@ -8,6 +8,8 @@
    // Whether to allow none
    export let allowNone = false;
 
+   export let disabled = false;
+
    // Options
    const options = [
       {
@@ -34,7 +36,7 @@
 </script>
 
 <div class="attribute-select {value}" on:change>
-   <Select {options} bind:value />
+   <Select {options} bind:value {disabled} />
 </div>
 
 <style lang="scss">

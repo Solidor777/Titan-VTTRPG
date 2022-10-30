@@ -8,6 +8,8 @@
    // Whether to allow none
    export let allowNone = false;
 
+   export let disabled = false;
+
    // Options
    export let options = [
       {
@@ -41,4 +43,4 @@
    }
 </script>
 
-<Select {options} bind:value on:change />
+<Select {options} bind:value on:change {disabled} />

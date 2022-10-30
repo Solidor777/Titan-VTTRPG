@@ -8,12 +8,15 @@
    // Whether to allow none
    export let allowNone = false;
 
+   export let disabled = false;
+
    // Document reference
    const document = getContext("DocumentStore");
 </script>
 
 <ModSelect
    {allowNone}
+   disabled={disabled || !$document.isOwner}
    bind:value
    on:change
    on:change={async () => {

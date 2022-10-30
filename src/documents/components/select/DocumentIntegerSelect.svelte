@@ -17,7 +17,7 @@
 <IntegerSelect
    bind:value
    {options}
-   {disabled}
+   disabled={disabled || !$document.isOwner}
    on:change
    on:change={async () => {
       $document.update({

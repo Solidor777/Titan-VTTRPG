@@ -5,6 +5,8 @@
    // Value
    export let value = void 0;
 
+   export let disabled = false;
+
    // Options
    const rarityOptions = [
       {
@@ -27,7 +29,7 @@
 </script>
 
 <div class="rarity-select {value}" on:change>
-   <Select options={rarityOptions} bind:value />
+   <Select options={rarityOptions} bind:value {disabled} />
 </div>
 
 <style lang="scss">

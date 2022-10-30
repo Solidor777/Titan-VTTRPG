@@ -13,7 +13,7 @@
 
 <CheckDifficultySelect
    bind:value
-   {disabled}
+   disabled={disabled || !$document.isOwner}
    on:change
    on:change={async () => {
       $document.update({

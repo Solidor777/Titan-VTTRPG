@@ -21,7 +21,7 @@
    bind:value
    {min}
    {max}
-   {disabled}
+   disabled={disabled || !$document.isOwner}
    on:change
    on:change={() => {
       $document.update({

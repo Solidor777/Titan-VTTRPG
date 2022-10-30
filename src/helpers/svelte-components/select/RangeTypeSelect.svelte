@@ -5,6 +5,8 @@
    // Value
    export let value = void 0;
 
+   export let disabled = false;
+
    // Options
    const rangeTypeOptions = [
       {
@@ -19,5 +21,5 @@
 </script>
 
 <div class="attribute-select {value}" on:change>
-   <Select options={rangeTypeOptions} bind:value />
+   <Select options={rangeTypeOptions} bind:value {disabled} />
 </div>

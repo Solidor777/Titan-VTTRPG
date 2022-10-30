@@ -4,9 +4,10 @@
 
    export let icon = void 0;
    export let efx = ripple();
+   export let disabled = false;
 </script>
 
-<button on:click on:mousedown={preventDefault} use:efx>
+<button on:click on:mousedown={preventDefault} use:efx {disabled}>
    <div><i class={icon} /></div>
 </button>
 

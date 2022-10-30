@@ -3,10 +3,12 @@
 
    // Check reference
    export let check = void 0;
+
+   export let disabled = void 0;
 </script>
 
 <div class="item-check-button {check.attribute}">
-   <EfxButton on:click>
+   <EfxButton on:click {disabled}>
       <div class="button-inner">
          <i class="fa fa-dice" />
          <div>

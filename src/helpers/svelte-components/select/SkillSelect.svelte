@@ -8,6 +8,8 @@
    // Whether to allow none
    export let allowNone = false;
 
+   export let disabled = false;
+
    // Options
    const skillOptions = [
       {
@@ -117,4 +119,4 @@
    }
 </script>
 
-<Select options={skillOptions} bind:value on:change />
+<Select options={skillOptions} bind:value on:change {disabled} />

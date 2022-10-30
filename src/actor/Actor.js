@@ -95,51 +95,53 @@ export default class TitanActor extends Actor {
    }
 
    addItem(type) {
-      let itemName = '';
-      switch (type) {
-         case 'ability': {
-            itemName = localize('newAbility');
-            break;
+      if (this.parent.isOwner) {
+         let itemName = '';
+         switch (type) {
+            case 'ability': {
+               itemName = localize('newAbility');
+               break;
+            }
+            case 'armor': {
+               itemName = localize('newArmor');
+               break;
+            }
+            case 'commodity': {
+               itemName = localize('newCommodity');
+               break;
+            }
+            case 'effect': {
+               itemName = localize('newEffect');
+               break;
+            }
+            case 'equipment': {
+               itemName = localize('newEquipment');
+               break;
+            }
+            case 'shield': {
+               itemName = localize('newShield');
+               break;
+            }
+            case 'spell': {
+               itemName = localize('newSpell');
+               break;
+            }
+            case 'weapon': {
+               itemName = localize('newWeapon');
+               break;
+            }
+            default: {
+               itemName = localize('newItem');
+               break;
+            }
          }
-         case 'armor': {
-            itemName = localize('newArmor');
-            break;
-         }
-         case 'commodity': {
-            itemName = localize('newCommodity');
-            break;
-         }
-         case 'effect': {
-            itemName = localize('newEffect');
-            break;
-         }
-         case 'equipment': {
-            itemName = localize('newEquipment');
-            break;
-         }
-         case 'shield': {
-            itemName = localize('newShield');
-            break;
-         }
-         case 'spell': {
-            itemName = localize('newSpell');
-            break;
-         }
-         case 'weapon': {
-            itemName = localize('newWeapon');
-            break;
-         }
-         default: {
-            itemName = localize('newItem');
-            break;
-         }
+
+         let itemData = {
+            name: itemName,
+            type: type,
+         };
+
+         this.createEmbeddedDocuments('Item', [itemData]);
       }
-
-      let itemData = {
-         name: itemName,
-         type: type,
-      };
-
-      this.createEmbeddedDocuments('Item', [itemData]);
    }
 }

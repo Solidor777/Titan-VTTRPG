@@ -7,6 +7,8 @@
    export let difficulty = 4;
    export let complexity = 1;
 
+   export let disabled = false;
+
    async function rollResistanceCheck() {
       // Get the targets
       let userTargets = game.user.isGM ? Array.from(game.user.targets) : Array.from(canvas.tokens.ownedTokens);
@@ -37,6 +39,7 @@
       on:click={() => {
          rollResistanceCheck();
       }}
+      {disabled}
    >
       {`${localize(`${resistance}`)} ${difficulty}:${complexity}`}
    </EfxButton>

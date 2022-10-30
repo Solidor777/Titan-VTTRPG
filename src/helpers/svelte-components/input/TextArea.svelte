@@ -1,8 +1,9 @@
 <script>
    export let value = void 0;
+   export let disabled = false;
 </script>
 
-<textarea bind:value on:change />
+<textarea bind:value on:change {disabled} />
 
 <style lang="scss">
    @import "../../../Styles/Mixins.scss";

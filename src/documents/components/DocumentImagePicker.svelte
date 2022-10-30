@@ -15,25 +15,27 @@
    const document = getContext("DocumentStore");
 
    let src = getProperty($document, path);
-   function onEditImage(event) {
-      const current = src;
-      const filePicker = new FilePicker({
-         type: "image",
-         current: current,
-         callback: async (newVal) => {
-            src = newVal;
-            let updateData = {};
-            updateData[path] = src;
-            await $document.update(updateData);
-         },
-         top: application.position.top + 40,
-         left: application.position.left + 10,
-      });
-      return filePicker.browse();
+   function onEditImage() {
+      if ($document.isOwner) {
+         const current = src;
+         const filePicker = new FilePicker({
+            type: "image",
+            current: current,
+            callback: async (newVal) => {
+               src = newVal;
+               let updateData = {};
+               updateData[path] = src;
+               await $document.update(updateData);
+            },
+            top: application.position.top + 40,
+            left: application.position.left + 10,
+         });
+         return filePicker.browse();
+      }
    }
 </script>
 
-<img bind:this={img} {alt} {src} on:keypress={(event) => onEditImage(event)} on:click={(event) => onEditImage(event)} />
+<img bind:this={img} {alt} {src} on:keypress={(event) => onEditImage()} on:click={(event) => onEditImage(event)} />
 
 <style>
    img {

@@ -8,12 +8,15 @@
    // The options for the select
    export let options = void 0;
 
+   export let disabled = false;
+
    // Document reference
    const document = getContext("DocumentStore");
 </script>
 
 <Select
    bind:value
+   disabled={disabled || !$document.isOwner}
    {options}
    on:change
    on:change={async () => {

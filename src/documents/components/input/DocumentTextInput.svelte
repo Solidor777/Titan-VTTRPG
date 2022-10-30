@@ -7,12 +7,15 @@
    // The value of the input
    export let value;
 
+   export let disabled = false;
+
    // Document reference
    const document = getContext("DocumentStore");
 </script>
 
 <TextInput
    bind:value
+   disabled={disabled || !$document.isOwner}
    on:change
    on:change={async () => {
       $document.update({
