@@ -1,18 +1,12 @@
 {
   "name": "titan",
   "title": "Titan VTTRPG",
-  "description": "Provides a bare-bones Foundry module template repo to get set up with using the TyphonJS Runtime Library and Svelte with ES Modules.",
-  "author": "Michael Leahy (TyphonJS) - MLeahy#4299",
-  "authors": [
-    {
-      "name": "Michael Leahy (TyphonJS) - MLeahy#4299",
-      "url": "https://www.typhonjs.io"
-    }
-  ],
+  "description": "A success based roll system design for virtual tabletop.",
+  "author": "Solidor - Solidor#1916",
   "url": "https://github.com/JustinCamden/Titan-VTTRPG",
   "readme": "https://github.com/JustinCamden/Titan-VTTRPG/README.md",
   "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
-  "changelog": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/",
+  "changelog": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/CHANGELOG.txt",
   "version": "1.0.0",
   "compatibility": {
     "minimum": "10"
@@ -32,7 +26,7 @@
   ],
   "system": [],
   "socket": false,
-  "manifest": "https://github.com/JustinCamden/Titan-VTTRPG/releases/latest/download/system.json",
+  "manifest": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/system.json",
   "download": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/0.0.0/module.zip",
   "protected": false,
   "coreTranslation": false,
