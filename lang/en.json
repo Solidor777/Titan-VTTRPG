@@ -448,6 +448,7 @@
   "LOCAL.elite.label": "Elite",
   "LOCAL.champion.label": "Champion",
   "LOCAL.role.label": "Role",
+  "LOCAL.blindCheck.label": "Made a Blind Check",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",

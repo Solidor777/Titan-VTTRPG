@@ -21,7 +21,6 @@ export default function registerSystemSettings() {
          disabled: 'SETTINGS.autoOpenCombatantSheet.disabled',
       },
       default: 'pcsOnly',
-      requiresReload: true
    });
 
    game.settings.register('titan', 'darkModeSheets', {

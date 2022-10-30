@@ -17,6 +17,7 @@
    import CastingCheckChatMessage from "~/check/types/casting-check/CastingCheckChatMessage.svelte";
    import AttackCheckChatMessage from "~/check/types/attack-check/AttackCheckChatMessage.svelte";
    import ReportChatMessage from "./ReportChatMessage.svelte";
+   import PrivateRollChatMessageShell from "./PrivateRollChatMessageShell.svelte";
 
    // Context object
    export let documentStore = void 0;
@@ -27,23 +28,26 @@
 
    // Selector for the chat message type
    function selectComponent() {
-      const chatComponents = {
-         attributeCheck: AttributeCheckChatMessage,
-         resistanceCheck: ResistanceCheckChatMessage,
-         attackCheck: AttackCheckChatMessage,
-         castingCheck: CastingCheckChatMessage,
-         itemCheck: ItemCheckChatMessage,
-         armor: ArmorChatMessage,
-         ability: AbilityChatMesssage,
-         commodity: CommodityChatMessage,
-         equipment: EquipmentChatMessage,
-         effect: EffectChatMessage,
-         shield: ShieldChatMessage,
-         spell: SpellChatMessage,
-         weapon: WeaponChatMessage,
-         report: ReportChatMessage,
-      };
-      return chatComponents[$document.flags.titan.chatContext.type];
+      if (game.user.isGM || !$document.blind) {
+         const chatComponents = {
+            attributeCheck: AttributeCheckChatMessage,
+            resistanceCheck: ResistanceCheckChatMessage,
+            attackCheck: AttackCheckChatMessage,
+            castingCheck: CastingCheckChatMessage,
+            itemCheck: ItemCheckChatMessage,
+            armor: ArmorChatMessage,
+            ability: AbilityChatMesssage,
+            commodity: CommodityChatMessage,
+            equipment: EquipmentChatMessage,
+            effect: EffectChatMessage,
+            shield: ShieldChatMessage,
+            spell: SpellChatMessage,
+            weapon: WeaponChatMessage,
+            report: ReportChatMessage,
+         };
+         return chatComponents[$document.flags.titan.chatContext.type];
+      }
+      return PrivateRollChatMessageShell;
    }
 </script>
 

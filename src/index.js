@@ -121,6 +121,7 @@ Hooks.on('renderChatMessage', (message, html) => {
       });
 
    }
+
 });
 
 Hooks.on('preDeleteChatMessage', (message) => {
@@ -136,7 +137,7 @@ Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
    const character = combat.combatant?.actor?.character;
-   if (character) {
+   if (character && character.parent.isOwner) {
       character.onTurnStart();
    }
 });
