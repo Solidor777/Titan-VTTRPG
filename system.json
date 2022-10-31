@@ -1,8 +1,13 @@
 {
-  "name": "titan",
+  "id": "titan",
   "title": "Titan VTTRPG",
   "description": "A success based roll system designed for virtual tabletop.",
-  "author": "Solidor - Solidor#1916",
+  "authors": [
+    {
+      "name": "Solidor - Solidor#1916",
+      "flags": {}
+    }
+  ],
   "url": "https://github.com/JustinCamden/Titan-VTTRPG",
   "readme": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/README.md",
   "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
