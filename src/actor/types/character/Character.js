@@ -1500,8 +1500,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (!armor && armor.type === 'armor') {
             console.error('TITAN | Error equipping Armor. Invalid Armor ID.');
             console.trace();
-
-            return false;
          }
 
          // Update the armor
@@ -1514,9 +1512,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                },
             },
          });
-
-         return;
       }
+
+      return;
    }
 
    unEquipArmor() {

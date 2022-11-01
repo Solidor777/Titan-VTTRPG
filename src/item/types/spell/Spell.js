@@ -19,21 +19,24 @@ export default class TitanSpell extends TitanTypeComponent {
    }
 
    addStandardAspect(aspect) {
-      let aspects = this.parent.system.aspect;
-      aspects.push(aspect);
-      aspects = aspects.sort((a, b) => SpellAspects[a.label].settings.sortOrder - SpellAspects[b.label].settings.sortOrder);
+      if (this.parent.isOwner) {
+         let aspects = this.parent.system.aspect;
+         aspects.push(aspect);
+         aspects = aspects.sort((a, b) => SpellAspects[a.label].settings.sortOrder - SpellAspects[b.label].settings.sortOrder);
 
-      this.parent.update({
-         system: {
-            aspect: aspects
-         }
-      });
+         this.parent.update({
+            system: {
+               aspect: aspects
+            }
+         });
+      }
+
+      return;
    }
 
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
       let totalAspectCost = 1;
-
 
       aspects.forEach((aspect) => {
          // Determine whether the aspect is enabled
@@ -106,21 +109,26 @@ export default class TitanSpell extends TitanTypeComponent {
    }
 
    addCustomAspect() {
-      const system = this.parent.system;
-      system.customAspect.push(this.getCustomAspectTemplate());
-      this.parent.update({
-         system: system
-      });
+      if (this.parent.isOwner) {
+         const system = this.parent.system;
+         system.customAspect.push(this.getCustomAspectTemplate());
+         this.parent.update({
+            system: system
+         });
+
+      }
 
       return;
    }
 
    removeCustomAspect(idx) {
-      const system = this.parent.system;
-      system.customAspect.splice(idx, 1);
-      this.parent.update({
-         system: system
-      });
+      if (this.parent.isOwner) {
+         const system = this.parent.system;
+         system.customAspect.splice(idx, 1);
+         this.parent.update({
+            system: system
+         });
+      }
 
       return;
    }

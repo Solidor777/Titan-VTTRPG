@@ -12,6 +12,7 @@ export default class TitanActor extends Actor {
          'prototypeToken.displayName': CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
          'prototypeToken.displayBars': CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
       };
+
       if (data.type === 'player') {
          initData['prototypeToken.vision'] = true;
          initData['prototypeToken.actorLink'] = true;

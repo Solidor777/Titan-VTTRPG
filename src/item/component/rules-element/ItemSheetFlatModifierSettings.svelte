@@ -148,7 +148,9 @@
                options={operationOptions}
                bind:value={element.operation}
                on:change={() => {
-                  onRulesElementOperationChanged($document, idx);
+                  if ($document.isOwner) {
+                     onRulesElementOperationChanged($document, idx);
+                  }
                }}
             />
          </div>
