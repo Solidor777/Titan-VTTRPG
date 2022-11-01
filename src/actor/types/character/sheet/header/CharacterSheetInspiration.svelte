@@ -10,12 +10,7 @@
    <IconButton
       icon={$document.system.inspiration ? "fas fa-sun" : ""}
       on:click={() => {
-         const inspiration = !$document.system.inspiration;
-         $document.update({
-            system: {
-               inspiration: inspiration,
-            },
-         });
+         $document.character.toggleInspiration();
       }}
    />
 </div>

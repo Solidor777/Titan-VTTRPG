@@ -1596,4 +1596,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       return;
    }
+
+   toggleInspiration() {
+      if (this.parent.isOwner) {
+         this.parent.update({
+            system: {
+               inspiration: !this.parent.system.inspiration
+            }
+         });
+      }
+
+      return;
+   }
 }
