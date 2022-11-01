@@ -81,29 +81,31 @@ export default class TitanActor extends Actor {
       super._onDelete(options, userId);
    }
 
-   deleteItem(id) {
-      // Ensure the item is valid
-      const item = this.items.get(id);
-      if (!item) {
-         return false;
-      }
+   deleteItem(itemId) {
+      if (this.isOwner) {
+         // Ensure the item is valid
+         const item = this.items.get(itemId);
+         if (!item) {
+            return false;
+         }
 
-      // Handle type specific deletion
-      if (this.type === 'player' || this.type === 'npc') {
-         this.typeComponent.deleteItem(id);
-      }
+         // Handle type specific deletion
+         if (this.type === 'player' || this.type === 'npc') {
+            this.typeComponent.deleteItem(itemId);
+         }
 
-      if (item.type === 'effect' && item.system.effectId !== '') {
-         const effect = this.effects.get(item.system.effectId);
-         effect.delete();
-      }
+         if (item.type === 'effect' && item.system.effectId !== '') {
+            const effect = this.effects.get(item.system.effectId);
+            effect.delete();
+         }
 
-      // Delete the item
-      item.delete();
+         // Delete the item
+         item.delete();
+      }
    }
 
    addItem(type) {
-      if (this.parent.isOwner) {
+      if (this.isOwner) {
          let itemName = '';
          switch (type) {
             case 'ability': {

@@ -38,6 +38,7 @@
       diceMod: options.diceMod ?? 0,
       itemId: options.itemId,
       attackIdx: options.attackIdx,
+      multiAttack: options.multiAttack,
    };
 
    // Rating options
@@ -176,6 +177,16 @@
       </div>
       <div class="input">
          <IntegerSelect options={ratingOptions} bind:value={checkParameters.targetDefense} />
+      </div>
+   </div>
+
+   <!--MultiAttack Training-->
+   <div class="row">
+      <div class="label">
+         {localize("multiAttack")}
+      </div>
+      <div class="input">
+         <input type="checkbox" bind:checked={checkParameters.multiAttack} />
       </div>
    </div>
 

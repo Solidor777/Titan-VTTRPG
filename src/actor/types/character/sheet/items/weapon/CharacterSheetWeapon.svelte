@@ -52,7 +52,7 @@
                {#if !item.system.equipped}
                   <!--Toggle Equipped button-->
                   <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
-               {:else}
+               {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
                      attack={item.system.attack[0]}
                      on:click={() => {

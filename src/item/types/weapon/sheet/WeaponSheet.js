@@ -35,25 +35,33 @@ export default class TitanWeaponSheet extends TitanItemSheet {
 
    // Opens the attack traits edit dialog
    editAttackTraits(attackIdx) {
-      const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
-      dialog.render(true);
+      if (this.reactive.document.isOwner) {
+         const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
+         dialog.render(true);
+      }
       return;
    }
 
    // Opens the attack traits edit dialog
    addCustomTrait(attackIdx) {
-      const dialog = new WeaponAddCustomTraitDialog(this.reactive.document, attackIdx);
-      dialog.render(true);
+      if (this.reactive.document.isOwner) {
+         const dialog = new WeaponAddCustomTraitDialog(this.reactive.document, attackIdx);
+         dialog.render(true);
+      }
       return;
    }
 
    async addAttack() {
-      this.reactive.state.addAttack();
-      return await this.reactive.document.weapon.addAttack();
+      if (this.reactive.document.isOwner) {
+         this.reactive.state.addAttack();
+         return await this.reactive.document.weapon.addAttack();
+      }
    }
 
    async removeAttack(idx) {
-      this.reactive.state.removeAttack(idx);
-      return await this.reactive.document.weapon.removeAttack(idx);
+      if (this.reactive.document.isOwner) {
+         this.reactive.state.removeAttack(idx);
+         return await this.reactive.document.weapon.removeAttack(idx);
+      }
    }
 }

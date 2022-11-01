@@ -18,7 +18,7 @@ export default class AttackCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 555,
+            height: 600,
             classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
          },
       );

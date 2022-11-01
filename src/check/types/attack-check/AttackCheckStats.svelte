@@ -14,10 +14,8 @@
    <!--Type-->
    <div class="stat">
       <IconTag
-         icon={$document.flags.titan.chatContext.parameters.attack.type === "melee"
-            ? "fas fa-sword"
-            : "fas fa-bow-arrow"}
-         label={localize($document.flags.titan.chatContext.parameters.attack.type)}
+         icon={$document.flags.titan.chatContext.parameters.type === "melee" ? "fas fa-sword" : "fas fa-bow-arrow"}
+         label={localize($document.flags.titan.chatContext.parameters.type)}
       />
    </div>
 

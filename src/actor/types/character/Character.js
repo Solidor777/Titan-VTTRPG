@@ -517,23 +517,25 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rollInitiative(options) {
-      const roll = await this.getInitiativeRoll(options);
-      if (await roll.evaluate({ async: true })) {
-         // Construct chat message data
-         let messageData = foundry.utils.mergeObject({
-            speaker: ChatMessage.getSpeaker({
-               actor: this.parent,
-               token: this.parent.token,
-               alias: this.parent.name
-            }),
-            flavor: game.i18n.format("COMBAT.RollsInitiative", { name: this.parent.name }),
-            flags: { "core.initiativeRoll": true }
-         });
-         const chatData = await roll.toMessage(messageData, { create: false });
-         chatData.rollMode = options?.rollMode ?
-            options.rollMode :
-            game.settings.get('core', 'rollMode');
-         await ChatMessage.create(chatData);
+      if (this.parent.isOwner) {
+         const roll = await this.getInitiativeRoll(options);
+         if (await roll.evaluate({ async: true })) {
+            // Construct chat message data
+            let messageData = foundry.utils.mergeObject({
+               speaker: ChatMessage.getSpeaker({
+                  actor: this.parent,
+                  token: this.parent.token,
+                  alias: this.parent.name
+               }),
+               flavor: game.i18n.format("COMBAT.RollsInitiative", { name: this.parent.name }),
+               flags: { "core.initiativeRoll": true }
+            });
+            const chatData = await roll.toMessage(messageData, { create: false });
+            chatData.rollMode = options?.rollMode ?
+               options.rollMode :
+               game.settings.get('core', 'rollMode');
+            await ChatMessage.create(chatData);
+         }
       }
 
       return;
@@ -550,24 +552,26 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rollAttributeCheck(options) {
-      // If get options, then create a dialog for setting options.
-      if (options?.getOptions === true) {
-         if ((options.skill && options.skill !== 'disabled') && (!options.attribute || options.attribute === 'default')) {
-            options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+      if (this.parent.isOwner) {
+         // If get options, then create a dialog for setting options.
+         if (options?.getOptions === true) {
+            if ((options.skill && options.skill !== 'disabled') && (!options.attribute || options.attribute === 'default')) {
+               options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+            }
+            const dialog = new AttributeCheckDialog(this.parent, options);
+            dialog.render(true);
+            return;
          }
-         const dialog = new AttributeCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
-      }
 
-      // Get the check
-      const attributeCheck = await this.getAttributeCheck(options);
-      if (attributeCheck && attributeCheck.isValid) {
-         await attributeCheck.sendToChat({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            rollMode: game.settings.get('core', 'rollMode'),
-         });
+         // Get the check
+         const attributeCheck = await this.getAttributeCheck(options);
+         if (attributeCheck && attributeCheck.isValid) {
+            await attributeCheck.sendToChat({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               rollMode: game.settings.get('core', 'rollMode'),
+            });
+         }
       }
 
       return;
@@ -587,22 +591,24 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rollResistanceCheck(options) {
-      // If get options, then create a dialog for setting options.
-      if (options?.getOptions === true) {
-         const dialog = new ResistanceCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
-      }
+      if (this.parent.isOwner) {
+         // If get options, then create a dialog for setting options.
+         if (options?.getOptions === true) {
+            const dialog = new ResistanceCheckDialog(this.parent, options);
+            dialog.render(true);
+            return;
+         }
 
-      // Otherwise, get a simple check
-      const resistanceCheck = await this.getResistanceCheck(options);
-      if (resistanceCheck && resistanceCheck.isValid) {
-         await resistanceCheck.evaluateCheck();
-         await resistanceCheck.sendToChat({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            rollMode: game.settings.get('core', 'rollMode'),
-         });
+         // Otherwise, get a simple check
+         const resistanceCheck = await this.getResistanceCheck(options);
+         if (resistanceCheck && resistanceCheck.isValid) {
+            await resistanceCheck.evaluateCheck();
+            await resistanceCheck.sendToChat({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               rollMode: game.settings.get('core', 'rollMode'),
+            });
+         }
       }
 
       return;
@@ -647,62 +653,66 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rollAttackCheck(options) {
-      // If get options, then create a dialog for setting options.
-      if (options?.getOptions === true) {
-         // Get the weapon check data.
-         const checkWeapon = this.parent.items.get(options?.itemId);
-         if (!checkWeapon) {
-            console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
-            console.trace();
+      if (this.parent.isOwner) {
+         // If get options, then create a dialog for setting options.
+         if (options?.getOptions === true) {
+            // Get the weapon check data.
+            const checkWeapon = this.parent.items.get(options?.itemId);
+            if (!checkWeapon) {
+               console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
+               console.trace();
 
-            return false;
+               return false;
+            }
+
+            // Get the attack data
+            const checkAttack = checkWeapon.system.attack[options.attackIdx];
+            if (!checkAttack) {
+               console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
+               console.trace();
+
+               return false;
+            }
+
+            // Get the damage mod
+            options.damageMod = this.parent.system.mod.damage.value;
+
+            // Get the attacker melee and accuracy
+            options.attackerMelee = this.parent.system.rating.melee.value;
+            options.attackerAccuracy = this.parent.system.rating.accuracy.value;
+
+            // Get the target defense
+            let userTargets = Array.from(game.user.targets);
+            if (userTargets.length < 1 && game.user.isGM) {
+               userTargets = Array.from(canvas.tokens.controlled);
+            }
+            if (userTargets[0] && userTargets[0].document.parent._id !== this.parent._id) {
+               options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
+            }
+
+            // Get the attack type
+            options.type = checkAttack.type;
+            options.weaponName = checkWeapon.name;
+            options.attackName = checkAttack.label;
+            options.multiAttack = options.multiAttack ?? checkWeapon.multiAttack;
+
+            // Create the dialog
+            const dialog = new AttackCheckDialog(this.parent, options);
+            dialog.render(true);
+
+            return;
          }
 
-         // Get the attack data
-         const checkAttack = checkWeapon.system.attack[options.attackIdx];
-         if (!checkAttack) {
-            console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
-            console.trace();
-
-            return false;
+         // Otherwise, get a check
+         const attackCheck = await this.getAttackCheck(options);
+         if (attackCheck && attackCheck.isValid) {
+            await attackCheck.evaluateCheck();
+            await attackCheck.sendToChat({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               rollMode: game.settings.get('core', 'rollMode'),
+            });
          }
-
-         // Get the damage mod
-         options.damageMod = this.parent.system.mod.damage.value;
-
-         // Get the attacker melee and accuracy
-         options.attackerMelee = this.parent.system.rating.melee.value;
-         options.attackerAccuracy = this.parent.system.rating.accuracy.value;
-
-         // Get the target defense
-         let userTargets = Array.from(game.user.targets);
-         if (userTargets.length < 1 && game.user.isGM) {
-            userTargets = Array.from(canvas.tokens.controlled);
-         }
-         if (userTargets[0] && userTargets[0].document.actor._id !== this.parent._id) {
-            options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
-         }
-
-         // Get the attack type
-         options.type = checkAttack.type;
-         options.weaponName = checkWeapon.name;
-         options.attackName = checkAttack.label;
-
-         // Create the dialog
-         const dialog = new AttackCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
-      }
-
-      // Otherwise, get a check
-      const attackCheck = await this.getAttackCheck(options);
-      if (attackCheck && attackCheck.isValid) {
-         await attackCheck.evaluateCheck();
-         await attackCheck.sendToChat({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            rollMode: game.settings.get('core', 'rollMode'),
-         });
       }
 
       return;
@@ -735,43 +745,45 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rollCastingCheck(options) {
-      // If get options, then create a dialog for setting options.
-      if (options?.getOptions === true) {
-         // Get the spell check data.
-         const checkSpell = this.parent.items.get(options?.itemId);
-         if (!checkSpell || checkSpell.type !== 'spell') {
-            console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
-            console.trace();
+      if (this.parent.isOwner) {
+         // If get options, then create a dialog for setting options.
+         if (options?.getOptions === true) {
+            // Get the spell check data.
+            const checkSpell = this.parent.items.get(options?.itemId);
+            if (!checkSpell || checkSpell.type !== 'spell') {
+               console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
+               console.trace();
 
-            return false;
+               return false;
+            }
+
+            // Get the spell data
+            options.difficulty = checkSpell.system.castingCheck.difficulty;
+            options.complexity = checkSpell.system.castingCheck.complexity;
+            options.attribute = checkSpell.system.castingCheck.attribute;
+            options.skill = checkSpell.system.castingCheck.skill;
+            options.spellName = checkSpell.name;
+
+            // Get the mods
+            options.damageMod = this.parent.system.mod.damage.value;
+            options.healingMod = this.parent.system.mod.healing.value;
+
+            // Create the dialog
+            const dialog = new CastingCheckDialog(this.parent, options);
+            dialog.render(true);
+            return;
          }
 
-         // Get the spell data
-         options.difficulty = checkSpell.system.castingCheck.difficulty;
-         options.complexity = checkSpell.system.castingCheck.complexity;
-         options.attribute = checkSpell.system.castingCheck.attribute;
-         options.skill = checkSpell.system.castingCheck.skill;
-         options.spellName = checkSpell.name;
-
-         // Get the mods
-         options.damageMod = this.parent.system.mod.damage.value;
-         options.healingMod = this.parent.system.mod.healing.value;
-
-         // Create the dialog
-         const dialog = new CastingCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
-      }
-
-      // Otherwise, get a check
-      const castingCheck = await this.getCastingCheck(options);
-      if (castingCheck && castingCheck.isValid) {
-         await castingCheck.evaluateCheck();
-         await castingCheck.sendToChat({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            rollMode: game.settings.get('core', 'rollMode'),
-         });
+         // Otherwise, get a check
+         const castingCheck = await this.getCastingCheck(options);
+         if (castingCheck && castingCheck.isValid) {
+            await castingCheck.evaluateCheck();
+            await castingCheck.sendToChat({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               rollMode: game.settings.get('core', 'rollMode'),
+            });
+         }
       }
 
       return;
@@ -797,51 +809,53 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rollItemCheck(options) {
-      // If get options, then create a dialog for setting options.
-      if (options?.getOptions === true) {
-         // Get the Item check data.
-         const checkItem = this.parent.items.get(options?.itemId);
-         if (!checkItem) {
-            console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
-            console.trace();
+      if (this.parent.isOwner) {
+         // If get options, then create a dialog for setting options.
+         if (options?.getOptions === true) {
+            // Get the Item check data.
+            const checkItem = this.parent.items.get(options?.itemId);
+            if (!checkItem) {
+               console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
+               console.trace();
 
-            return false;
+               return false;
+            }
+            const checkData = checkItem.system.check[options.checkIdx];
+            if (!checkData) {
+               console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
+               console.trace();
+
+               return false;
+            }
+
+            // Get the spell data
+            options.difficulty = checkData.difficulty;
+            options.complexity = checkData.complexity;
+            options.attribute = checkData.attribute;
+            options.skill = checkData.skill;
+            options.checkName = checkData.label;
+            options.itemName = checkItem.name;
+
+            // Get the mods
+            options.damageMod = this.parent.system.mod.damage.value;
+            options.healingMod = this.parent.system.mod.healing.value;
+
+            // Create the dialog
+            const dialog = new ItemCheckDialog(this.parent, options);
+            dialog.render(true);
+            return;
          }
-         const checkData = checkItem.system.check[options.checkIdx];
-         if (!checkData) {
-            console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
-            console.trace();
 
-            return false;
+         // Otherwise, get a check
+         const itemCheck = await this.getItemCheck(options);
+         if (itemCheck && itemCheck.isValid) {
+            await itemCheck.evaluateCheck();
+            await itemCheck.sendToChat({
+               user: game.user.id,
+               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+               rollMode: game.settings.get('core', 'rollMode'),
+            });
          }
-
-         // Get the spell data
-         options.difficulty = checkData.difficulty;
-         options.complexity = checkData.complexity;
-         options.attribute = checkData.attribute;
-         options.skill = checkData.skill;
-         options.checkName = checkData.label;
-         options.itemName = checkItem.name;
-
-         // Get the mods
-         options.damageMod = this.parent.system.mod.damage.value;
-         options.healingMod = this.parent.system.mod.healing.value;
-
-         // Create the dialog
-         const dialog = new ItemCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
-      }
-
-      // Otherwise, get a check
-      const itemCheck = await this.getItemCheck(options);
-      if (itemCheck && itemCheck.isValid) {
-         await itemCheck.evaluateCheck();
-         await itemCheck.sendToChat({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            rollMode: game.settings.get('core', 'rollMode'),
-         });
       }
 
       return;
@@ -849,114 +863,37 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply damage to the actor
    async applyDamage(damage, ignoreArmor, report) {
-      // Calculate the damage amount
-      const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
-      const stamina = this.parent.system.resource.stamina;
-      const wounds = this.parent.system.resource.wounds;
+      if (this.parent.isOwner) {
+         // Calculate the damage amount
+         const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
+         const stamina = this.parent.system.resource.stamina;
+         const wounds = this.parent.system.resource.wounds;
 
-      // Calculate the number of wounds taken
-      let woundsTaken = 0;
-      if (stamina.value < damageTaken) {
-         if (stamina.value + 5 <= damageTaken) {
-            woundsTaken = 3;
-         }
-         else if (stamina.value + 2 <= damageTaken) {
-            woundsTaken = 2;
-         }
-         else {
-            woundsTaken = 1;
-         }
-      }
-
-      // Update the actor
-      stamina.value = Math.max(stamina.value - damageTaken, 0);
-      wounds.value += woundsTaken;
-      await this.parent.update({
-         system: {
-            resource: {
-               stamina: {
-                  value: stamina.value
-               },
-               wounds: {
-                  value: wounds.value
-               }
+         // Calculate the number of wounds taken
+         let woundsTaken = 0;
+         if (stamina.value < damageTaken) {
+            if (stamina.value + 5 <= damageTaken) {
+               woundsTaken = 3;
+            }
+            else if (stamina.value + 2 <= damageTaken) {
+               woundsTaken = 2;
+            }
+            else {
+               woundsTaken = 1;
             }
          }
-      });
 
-      // Report
-      if (report) {
-         const reportSettings = game.settings.get('titan', 'reportTakingDamage');
-         if (reportSettings !== 'disabled') {
-
-            // Create the chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: `${localize('tookDamage')}: ${damageTaken}`,
-               subHeader: [`${this.parent.name}`],
-               icon: 'fas fa-heart',
-               line: [
-                  `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
-                  `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
-               ]
-            };
-
-            // Wounds taken
-            if (woundsTaken > 0) {
-               chatContext.line = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.line];
-            }
-
-            // Damage resisted
-            if (damageTaken !== damage) {
-               chatContext.line = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.line];
-            }
-
-            // Ignore Armor
-            if (ignoreArmor) {
-               chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
-            }
-
-            // Send the report to chat
-            await ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  reportSettings === 'owner' ?
-                     this.parent.testUserPermission(user, 'OWNER') :
-                     user.isGM
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
-               }
-            });
-         }
-
-      }
-
-      return {
-         damageTaken: damageTaken,
-         woundsTaken: woundsTaken
-      };
-   }
-
-   async healDamage(healing, report) {
-      // Check if the actor's stamina is less than max
-      let staminaHealed = 0;
-      const stamina = this.parent.system.resource.stamina;
-      if (stamina.value < stamina.max) {
          // Update the actor
-         staminaHealed = Math.min(healing, stamina.max - stamina.value);
-         stamina.value += staminaHealed;
+         stamina.value = Math.max(stamina.value - damageTaken, 0);
+         wounds.value += woundsTaken;
          await this.parent.update({
             system: {
                resource: {
                   stamina: {
                      value: stamina.value
+                  },
+                  wounds: {
+                     value: wounds.value
                   }
                }
             }
@@ -964,21 +901,36 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Report
          if (report) {
-            const reportSettings = game.settings.get('titan', 'reportHealingDamage');
+            const reportSettings = game.settings.get('titan', 'reportTakingDamage');
             if (reportSettings !== 'disabled') {
-               // Create chat context
-               const wounds = this.parent.system.resource.wounds;
+
+               // Create the chat context
                const chatContext = {
                   type: 'report',
                   img: this.parent.img,
-                  header: `${localize('healedDamage')}: ${staminaHealed}`,
-                  subHeader: [this.parent.name],
+                  header: `${localize('tookDamage')}: ${damageTaken}`,
+                  subHeader: [`${this.parent.name}`],
                   icon: 'fas fa-heart',
                   line: [
                      `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
                      `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                   ]
                };
+
+               // Wounds taken
+               if (woundsTaken > 0) {
+                  chatContext.line = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.line];
+               }
+
+               // Damage resisted
+               if (damageTaken !== damage) {
+                  chatContext.line = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.line];
+               }
+
+               // Ignore Armor
+               if (ignoreArmor) {
+                  chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
+               }
 
                // Send the report to chat
                await ChatMessage.create({
@@ -1000,44 +952,200 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
 
          }
+
+         return {
+            damageTaken: damageTaken,
+            woundsTaken: woundsTaken
+         };
       }
 
-      return staminaHealed;
+      return;
+   }
+
+   async healDamage(healing, report) {
+      if (this.parent.isOwner) {
+         // Check if the actor's stamina is less than max
+         let staminaHealed = 0;
+         const stamina = this.parent.system.resource.stamina;
+         if (stamina.value < stamina.max) {
+            // Update the actor
+            staminaHealed = Math.min(healing, stamina.max - stamina.value);
+            stamina.value += staminaHealed;
+            await this.parent.update({
+               system: {
+                  resource: {
+                     stamina: {
+                        value: stamina.value
+                     }
+                  }
+               }
+            });
+
+            // Report
+            if (report) {
+               const reportSettings = game.settings.get('titan', 'reportHealingDamage');
+               if (reportSettings !== 'disabled') {
+                  // Create chat context
+                  const wounds = this.parent.system.resource.wounds;
+                  const chatContext = {
+                     type: 'report',
+                     img: this.parent.img,
+                     header: `${localize('healedDamage')}: ${staminaHealed}`,
+                     subHeader: [this.parent.name],
+                     icon: 'fas fa-heart',
+                     line: [
+                        `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
+                        `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
+                     ]
+                  };
+
+                  // Send the report to chat
+                  await ChatMessage.create({
+                     user: game.user.id,
+                     speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                     type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                     sound: CONFIG.sounds.notification,
+                     whisper: game.users.filter((user) =>
+                        reportSettings === 'owner' ?
+                           this.parent.testUserPermission(user, 'OWNER') :
+                           user.isGM
+                     ),
+                     flags: {
+                        titan: {
+                           chatContext: chatContext
+                        }
+                     }
+                  });
+               }
+            }
+         }
+
+         return staminaHealed;
+      }
+
+      return;
    }
 
    async spendResolve(report) {
-      // Check if the actor's resolve is less than max
-      const resolve = this.parent.system.resource.resolve;
-      if (resolve.value > 0) {
-         // Update the actor
-         resolve.value -= 1;
-         await this.parent.update({
-            system: {
-               resource: {
-                  resolve: {
-                     value: resolve.value
+      if (this.parent.isOwner) {
+         // Check if the actor's resolve is less than max
+         const resolve = this.parent.system.resource.resolve;
+         if (resolve.value > 0) {
+            // Update the actor
+            resolve.value -= 1;
+            await this.parent.update({
+               system: {
+                  resource: {
+                     resolve: {
+                        value: resolve.value
+                     }
                   }
                }
+            });
+
+            // Report
+            if (report) {
+               const reportSettings = game.settings.get('titan', 'reportSpendingResolve');
+               if (reportSettings !== 'disabled') {
+                  // Create chat context
+                  const chatContext = {
+                     type: 'report',
+                     img: this.parent.img,
+                     header: `${localize('spentResolve')}`,
+                     subHeader: [this.parent.name],
+                     icon: 'fas fa-bolt',
+                     line: [`${localize('resolve')}: ${resolve.value} / ${resolve.max}`]
+                  };
+
+
+                  // Send the chat message
+                  ChatMessage.create({
+                     user: game.user.id,
+                     speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                     type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                     sound: CONFIG.sounds.notification,
+                     whisper: game.users.filter((user) =>
+                        reportSettings === 'owner' ?
+                           this.parent.testUserPermission(user, 'OWNER') :
+                           user.isGM
+                     ),
+                     flags: {
+                        titan: {
+                           chatContext: chatContext
+                        }
+                     }
+                  });
+               }
             }
+         }
+      }
+
+      return;
+   }
+
+
+   async removeTemporaryEffects(report) {
+      if (this.parent.isOwner) {
+         const systemData = this.parent.system;
+         // Reset static mods
+         // Attribute
+         for (const [key, value] of Object.entries(systemData.attribute)) {
+            value.mod.static = 0;
+         }
+
+         // Skills
+         for (const [key, value] of Object.entries(systemData.skill)) {
+            value.training.mod.static = 0;
+            value.expertise.mod.static = 0;
+         }
+
+         // Ratings
+         for (const [key, value] of Object.entries(systemData.rating)) {
+            value.mod.static = 0;
+         }
+
+         // Speed
+         for (const [key, value] of Object.entries(systemData.speed)) {
+            value.mod.static = 0;
+         }
+
+         // Mod
+         for (const [key, value] of Object.entries(systemData.mod)) {
+            value.mod.static = 0;
+         }
+
+         // Restore resolve
+         this.parent.system.resource.resolve.value = this.parent.system.resource.resolve.max;
+
+         // Update the actor
+         await this.parent.update({
+            system: this.parent.system
+         });
+
+         // Delete all Temporary Effects
+         let temporaryEffects = this.parent.items.filter((item) => {
+            return item.type === 'effect' && item.system.duration === 'temporary';
+         });
+         temporaryEffects.forEach((item) => {
+            return this.parent.deleteItem(item._id);
          });
 
          // Report
          if (report) {
-            const reportSettings = game.settings.get('titan', 'reportSpendingResolve');
+            const reportSettings = game.settings.get('titan', 'reportResting');
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
                   type: 'report',
                   img: this.parent.img,
-                  header: `${localize('spentResolve')}`,
+                  header: localize('temporaryEffectsRemoved'),
                   subHeader: [this.parent.name],
-                  icon: 'fas fa-bolt',
-                  line: [`${localize('resolve')}: ${resolve.value} / ${resolve.max}`]
+                  icon: 'fas fa-arrow-rotate-left',
+                  line: [localize('resolveFullyRestored')]
                };
 
-
-               // Send the chat message
-               ChatMessage.create({
+               // Send the report to chat
+               await ChatMessage.create({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   type: CONST.CHAT_MESSAGE_TYPES.OTHER,
@@ -1055,241 +1163,65 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                });
             }
          }
-
-
-      }
-
-      return;
-   }
-
-   equipArmor(armorId) {
-      // Ensure the armor is valid
-      const armor = this.parent.items.get(armorId);
-      if (!armor && armor.type === 'armor') {
-         console.error('TITAN | Error equipping Armor. Invalid Armor ID.');
-         console.trace();
-
-         return false;
-      }
-
-      // Update the armor
-      let equippedArmor = this.parent.system.equipped.armor;
-      equippedArmor = armorId;
-      this.parent.update({
-         system: {
-            equipped: {
-               armor: equippedArmor,
-            },
-         },
-      });
-
-      return;
-   }
-
-   unEquipArmor() {
-      // Remove the armor
-      let equippedArmor = this.parent.system.equipped.armor;
-      equippedArmor = null;
-      this.parent.update({
-         system: {
-            equipped: {
-               armor: equippedArmor,
-            },
-         },
-      });
-
-      return;
-   }
-
-   equipShield(shieldId) {
-      // Ensure the shield is valid
-      const shield = this.parent.items.get(shieldId);
-      if (!shield && shield.type === 'shield') {
-         console.error('TITAN | Error equipping Shield. Invalid Shield ID.');
-         console.trace();
-
-         return false;
-      }
-
-      // Update the shield
-      let equippedShield = this.parent.system.equipped.shield;
-      equippedShield = shieldId;
-      this.parent.update({
-         system: {
-            equipped: {
-               shield: equippedShield,
-            },
-         },
-      });
-
-      return;
-   }
-
-   unEquipShield() {
-      // Remove the shield
-      let equippedShield = this.parent.system.equipped.shield;
-      equippedShield = null;
-      this.parent.update({
-         system: {
-            equipped: {
-               shield: equippedShield,
-            },
-         },
-      });
-
-      return;
-   }
-
-   deleteItem(id) {
-      // Remove the armor if appropriate
-      const armorId = this.parent.system.equipped.armor;
-      if (armorId === id) {
-         this.unEquipArmor();
-      }
-
-      // Remove the shield if appropriate
-      const shieldId = this.parent.system.equipped.armor;
-      if (shieldId === id) {
-         this.unEquipShield();
-      }
-
-      return;
-   }
-
-   async removeTemporaryEffects(report) {
-      const systemData = this.parent.system;
-      // Reset static mods
-      // Attribute
-      for (const [key, value] of Object.entries(systemData.attribute)) {
-         value.mod.static = 0;
-      }
-
-      // Skills
-      for (const [key, value] of Object.entries(systemData.skill)) {
-         value.training.mod.static = 0;
-         value.expertise.mod.static = 0;
-      }
-
-      // Ratings
-      for (const [key, value] of Object.entries(systemData.rating)) {
-         value.mod.static = 0;
-      }
-
-      // Speed
-      for (const [key, value] of Object.entries(systemData.speed)) {
-         value.mod.static = 0;
-      }
-
-      // Mod
-      for (const [key, value] of Object.entries(systemData.mod)) {
-         value.mod.static = 0;
-      }
-
-      // Restore resolve
-      this.parent.system.resource.resolve.value = this.parent.system.resource.resolve.max;
-
-      // Update the actor
-      await this.parent.update({
-         system: this.parent.system
-      });
-
-      // Delete all Temporary Effects
-      let temporaryEffects = this.parent.items.filter((item) => {
-         return item.type === 'effect' && item.system.duration === 'temporary';
-      });
-      temporaryEffects.forEach((item) => {
-         return this.parent.deleteItem(item._id);
-      });
-
-      // Report
-      if (report) {
-         const reportSettings = game.settings.get('titan', 'reportResting');
-         if (reportSettings !== 'disabled') {
-            // Create chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: localize('temporaryEffectsRemoved'),
-               subHeader: [this.parent.name],
-               icon: 'fas fa-arrow-rotate-left',
-               line: [localize('resolveFullyRestored')]
-            };
-
-            // Send the report to chat
-            await ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  reportSettings === 'owner' ?
-                     this.parent.testUserPermission(user, 'OWNER') :
-                     user.isGM
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
-               }
-            });
-         }
       }
 
       return;
    }
 
    async takeABreather(report) {
-      // Clear temporary effects
-      this.removeTemporaryEffects(false);
+      if (this.parent.isOwner) {
+         // Clear temporary effects
+         this.removeTemporaryEffects(false);
 
-      // Update the actor
-      await this.parent.update({
-         system: {
-            resource: {
-               stamina: {
-                  value: this.parent.system.resource.stamina.max
-               },
-               resolve: {
-                  value: this.parent.system.resource.resolve.max
-               }
-            }
-         }
-      });
-
-      // Report
-      if (report) {
-         const reportSettings = game.settings.get('titan', 'reportResting');
-         if (reportSettings !== 'disabled') {
-            // Create chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: localize('tookABreather'),
-               subHeader: [this.parent.name],
-               icon: 'fas fa-face-exhaling',
-               line: [
-                  localize('temporaryEffectsRemoved'),
-                  localize('staminaAndResolveRestored'),
-               ]
-            };
-
-            // Send the report to chat
-            await ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  reportSettings === 'owner' ?
-                     this.parent.testUserPermission(user, 'OWNER') :
-                     user.isGM
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
+         // Update the actor
+         await this.parent.update({
+            system: {
+               resource: {
+                  stamina: {
+                     value: this.parent.system.resource.stamina.max
+                  },
+                  resolve: {
+                     value: this.parent.system.resource.resolve.max
                   }
                }
-            });
+            }
+         });
+
+         // Report
+         if (report) {
+            const reportSettings = game.settings.get('titan', 'reportResting');
+            if (reportSettings !== 'disabled') {
+               // Create chat context
+               const chatContext = {
+                  type: 'report',
+                  img: this.parent.img,
+                  header: localize('tookABreather'),
+                  subHeader: [this.parent.name],
+                  icon: 'fas fa-face-exhaling',
+                  line: [
+                     localize('temporaryEffectsRemoved'),
+                     localize('staminaAndResolveRestored'),
+                  ]
+               };
+
+               // Send the report to chat
+               await ChatMessage.create({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                  sound: CONFIG.sounds.notification,
+                  whisper: game.users.filter((user) =>
+                     reportSettings === 'owner' ?
+                        this.parent.testUserPermission(user, 'OWNER') :
+                        user.isGM
+                  ),
+                  flags: {
+                     titan: {
+                        chatContext: chatContext
+                     }
+                  }
+               });
+            }
          }
       }
 
@@ -1297,50 +1229,157 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async rest(report) {
-      // Decrease wounds by 1
-      let woundsHealed = 0;
-      const wounds = this.parent.system.resource.wounds;
-      if (wounds.value > 0) {
-         woundsHealed = Math.min(1 + this.parent.system.mod.woundRegain.value, wounds.value);
-         wounds.value -= woundsHealed;
-         await this.parent.update({
-            system: {
-               resource: {
-                  wounds: {
-                     value: wounds.value
+      if (this.parent.isOwner) {
+         // Decrease wounds by 1
+         let woundsHealed = 0;
+         const wounds = this.parent.system.resource.wounds;
+         if (wounds.value > 0) {
+            woundsHealed = Math.min(1 + this.parent.system.mod.woundRegain.value, wounds.value);
+            wounds.value -= woundsHealed;
+            await this.parent.update({
+               system: {
+                  resource: {
+                     wounds: {
+                        value: wounds.value
+                     }
                   }
                }
+            });
+         }
+
+         await this.takeABreather(false);
+
+         // Report
+         if (report) {
+            const reportSettings = game.settings.get('titan', 'reportResting');
+            if (reportSettings !== 'disabled') {
+               // Create chat context
+               const chatContext = {
+                  type: 'report',
+                  img: this.parent.img,
+                  header: localize('tookARest'),
+                  subHeader: [this.parent.name],
+                  icon: 'fas fa-bed',
+                  line: [
+                     localize('temporaryEffectsRemoved'),
+                     localize('staminaAndResolveRestored'),
+                  ]
+               };
+
+               // Add line about wounds healed
+               if (woundsHealed > 0) {
+                  chatContext.line = [
+                     ...chatContext.line,
+                     `${localize('woundsHealed')}: ${woundsHealed}`,
+                     `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
+                  ];
+               }
+
+               // Send the report to chat
+               await ChatMessage.create({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                  sound: CONFIG.sounds.notification,
+                  whisper: game.users.filter((user) =>
+                     reportSettings === 'owner' ?
+                        this.parent.testUserPermission(user, 'OWNER') :
+                        user.isGM
+                  ),
+                  flags: {
+                     titan: {
+                        chatContext: chatContext
+                     }
+                  }
+               });
             }
-         });
+         }
       }
 
-      await this.takeABreather(false);
+      return;
+   }
 
-      // Report
-      if (report) {
-         const reportSettings = game.settings.get('titan', 'reportResting');
-         if (reportSettings !== 'disabled') {
+   async onTurnStart() {
+      if (this.parent.isOwner && game.user.isGM) {
+         let lines = [];
+         let updateActor = false;
+
+         // Regain resolve
+         if (game.settings.get('titan', 'autoRegainResolve') === true) {
+
+            // If the resolve value is below max
+            const resolve = this.parent.system.resource.resolve;
+            if (resolve.value < resolve.max) {
+
+               // Update the actor
+               const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
+               resolve.value += resolveRegained;
+               updateActor = true;
+
+               // Add resolve update to report
+               if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+                  lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
+               }
+            }
+         }
+
+         // Handle effects messages
+         if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+            this.parent.effects.forEach((effect) => {
+               lines.push(effect.label);
+            });
+         }
+
+         // Handle start of turn messages
+         if (this.turnStartMessages && this.turnStartMessages.length > 0) {
+            this.turnStartMessages.forEach((message) => {
+               if (message.message !== '') {
+                  lines.push(message.message);
+               }
+            });
+         }
+
+         // Handle stamina mods
+         if (this.turnStartStamina) {
+            const stamina = this.parent.system.resource.stamina;
+            // Healing
+            if (this.turnStartStamina > 0) {
+               const staminaHealed = await this.healDamage(this.turnStartStamina, false);
+               if (staminaHealed > 0) {
+                  lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
+               }
+            }
+            else {
+               // Damage
+               const wounds = this.parent.system.resource.wounds;
+               const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
+               let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
+               if (damage.woundsTaken > 0) {
+                  modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
+               }
+               modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
+               lines = [...lines, ...modLines];
+            }
+         }
+
+         // Update actor if appropriate
+         if (updateActor) {
+            this.parent.update({
+               system: this.parent.system
+            });
+         }
+
+         // Start of turn report
+         if (lines.length > 0) {
             // Create chat context
             const chatContext = {
                type: 'report',
                img: this.parent.img,
-               header: localize('tookARest'),
+               header: localize('turnStart'),
                subHeader: [this.parent.name],
-               icon: 'fas fa-bed',
-               line: [
-                  localize('temporaryEffectsRemoved'),
-                  localize('staminaAndResolveRestored'),
-               ]
+               icon: 'fas fa-clock',
+               line: lines
             };
-
-            // Add line about wounds healed
-            if (woundsHealed > 0) {
-               chatContext.line = [
-                  ...chatContext.line,
-                  `${localize('woundsHealed')}: ${woundsHealed}`,
-                  `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
-               ];
-            }
 
             // Send the report to chat
             await ChatMessage.create({
@@ -1349,14 +1388,54 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                sound: CONFIG.sounds.notification,
                whisper: game.users.filter((user) =>
-                  reportSettings === 'owner' ?
-                     this.parent.testUserPermission(user, 'OWNER') :
-                     user.isGM
+                  this.parent.testUserPermission(user, 'OWNER')
                ),
                flags: {
                   titan: {
                      chatContext: chatContext
                   }
+               },
+            });
+         }
+
+         // Open sheet
+         if (this.parent.isOwner) {
+            switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
+               case 'pcsOnly': {
+                  if (this.parent.hasPlayerOwner) {
+                     this.parent.sheet.render(true);
+                  }
+                  break;
+               }
+               case 'npcsOnly': {
+                  if (!this.parent.hasPlayerOwner) {
+                     this.parent.sheet.render(true);
+                  }
+                  break;
+               }
+               case 'all': {
+                  this.parent.sheet.render(true);
+                  break;
+               }
+               default: {
+                  break;
+               }
+            }
+         }
+      }
+
+      return;
+   }
+
+   async toggleMultiAttack(itemId) {
+      if (this.parent.isOwner) {
+         const item = this.parent.items.get(itemId);
+
+         // If the item is valid
+         if (item && item.type === 'weapon') {
+            await item.update({
+               system: {
+                  multiAttack: !item.system.multiAttack
                }
             });
          }
@@ -1365,128 +1444,156 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async onTurnStart() {
-      let lines = [];
-      let updateActor = false;
+   // Toggle equipped
+   async toggleEquipped(itemId) {
+      if (this.parent.isOwner) {
+         const item = this.parent.items.get(itemId);
 
-      // Regain resolve
-      if (game.settings.get('titan', 'autoRegainResolve') === true) {
-
-         // If the resolve value is below max
-         const resolve = this.parent.system.resource.resolve;
-         if (resolve.value < resolve.max) {
-
-            // Update the actor
-            const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
-            resolve.value += resolveRegained;
-            updateActor = true;
-
-            // Add resolve update to report
-            if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-               lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
-            }
-         }
-      }
-
-      // Handle effects messages
-      if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-         this.parent.effects.forEach((effect) => {
-            lines.push(effect.label);
-         });
-      }
-
-      // Handle start of turn messages
-      if (this.turnStartMessages && this.turnStartMessages.length > 0) {
-         this.turnStartMessages.forEach((message) => {
-            if (message.message !== '') {
-               lines.push(message.message);
-            }
-         });
-      }
-
-      // Handle stamina mods
-      if (this.turnStartStamina) {
-         const stamina = this.parent.system.resource.stamina;
-         // Healing
-         if (this.turnStartStamina > 0) {
-            const staminaHealed = await this.healDamage(this.turnStartStamina, false);
-            if (staminaHealed > 0) {
-               lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
-            }
-         }
-         else {
-            // Damage
-            const wounds = this.parent.system.resource.wounds;
-            const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
-            let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
-            if (damage.woundsTaken > 0) {
-               modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
-            }
-            modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
-            lines = [...lines, ...modLines];
-         }
-      }
-
-      // Update actor if appropriate
-      if (updateActor) {
-         this.parent.update({
-            system: this.parent.system
-         });
-      }
-
-      // Start of turn report
-      if (lines.length > 0) {
-         // Create chat context
-         const chatContext = {
-            type: 'report',
-            img: this.parent.img,
-            header: localize('turnStart'),
-            subHeader: [this.parent.name],
-            icon: 'fas fa-clock',
-            line: lines
-         };
-
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
+         // If the item is valid
+         if (item) {
+            // If the item is armor
+            if (item.type === 'armor') {
+               // If the armor is equipped, un-equip it
+               if (this.parent.system.equipped.armor === itemId) {
+                  this.parent.typeComponent.unEquipArmor();
                }
+
+               // Else, equip it
+               else {
+                  this.parent.typeComponent.equipArmor(itemId);
+               }
+            }
+
+            // If the item is a shield
+            else if (item.type === 'shield') {
+               // If the armor is equipped, un-equip it
+               if (this.parent.system.equipped.shield === itemId) {
+                  this.parent.typeComponent.unEquipShield();
+               }
+
+               // Else, equip it
+               else {
+                  this.parent.typeComponent.equipShield(itemId);
+               }
+            }
+
+            // Otherwise, update the equipped value on the item
+            else if (item.system.equipped !== undefined) {
+               const updateData = {
+                  system: {
+                     equipped: !item.system.equipped,
+                  },
+               };
+
+               await item.update(updateData);
+            }
+         }
+      }
+
+      return;
+   }
+
+   equipArmor(armorId) {
+      if (this.parent.isOwner) {
+         // Ensure the armor is valid
+         const armor = this.parent.items.get(armorId);
+         if (!armor && armor.type === 'armor') {
+            console.error('TITAN | Error equipping Armor. Invalid Armor ID.');
+            console.trace();
+
+            return false;
+         }
+
+         // Update the armor
+         let equippedArmor = this.parent.system.equipped.armor;
+         equippedArmor = armorId;
+         this.parent.update({
+            system: {
+               equipped: {
+                  armor: equippedArmor,
+               },
+            },
+         });
+
+         return;
+      }
+   }
+
+   unEquipArmor() {
+      if (this.parent.isOwner) {
+         // Remove the armor
+         let equippedArmor = this.parent.system.equipped.armor;
+         equippedArmor = null;
+         this.parent.update({
+            system: {
+               equipped: {
+                  armor: equippedArmor,
+               },
             },
          });
       }
 
-      // Open sheet
+      return;
+   }
+
+   equipShield(shieldId) {
       if (this.parent.isOwner) {
-         switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
-            case 'pcsOnly': {
-               if (this.parent.hasPlayerOwner) {
-                  this.parent.sheet.render(true);
-               }
-               break;
-            }
-            case 'npcsOnly': {
-               if (!this.parent.hasPlayerOwner) {
-                  this.parent.sheet.render(true);
-               }
-               break;
-            }
-            case 'all': {
-               this.parent.sheet.render(true);
-               break;
-            }
-            default: {
-               break;
-            }
+         // Ensure the shield is valid
+         const shield = this.parent.items.get(shieldId);
+         if (!shield && shield.type === 'shield') {
+            console.error('TITAN | Error equipping Shield. Invalid Shield ID.');
+            console.trace();
+
+            return false;
+         }
+
+         // Update the shield
+         let equippedShield = this.parent.system.equipped.shield;
+         equippedShield = shieldId;
+         this.parent.update({
+            system: {
+               equipped: {
+                  shield: equippedShield,
+               },
+            },
+         });
+      }
+
+      return;
+   }
+
+   unEquipShield() {
+      if (this.parent.isOwner) {
+         // Remove the shield
+         let equippedShield = this.parent.system.equipped.shield;
+         equippedShield = null;
+         this.parent.update({
+            system: {
+               equipped: {
+                  shield: equippedShield,
+               },
+            },
+         });
+      }
+
+      return;
+   }
+
+   deleteItem(id) {
+      if (this.parent.isOwner) {
+         // Remove the armor if appropriate
+         const armorId = this.parent.system.equipped.armor;
+         if (armorId === id) {
+            this.unEquipArmor();
+         }
+
+         // Remove the shield if appropriate
+         const shieldId = this.parent.system.equipped.armor;
+         if (shieldId === id) {
+            this.unEquipShield();
          }
       }
 
+      return;
    }
 }

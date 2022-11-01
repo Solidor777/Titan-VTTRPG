@@ -34,6 +34,17 @@
                $document.flags.titan.chatContext.parameters.complexity
             }`}
          </div>
+
+         <!--Target defense-->
+         {#if $document.flags.titan.chatContext.parameters.targetDefense !== undefined}
+            {`${
+               $document.flags.titan.chatContext.parameters.type === "melee"
+                  ? `${localize("melee")}`
+                  : `${localize("accuracy")}`
+            } ${$document.flags.titan.chatContext.parameters.attackerRating} ${localize("versus")} ${localize(
+               "defense"
+            )} ${$document.flags.titan.chatContext.parameters.targetDefense}`}
+         {/if}
       </div>
    </div>
 </div>
