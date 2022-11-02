@@ -511,6 +511,10 @@
     "systemOnly": "System messages only",
     "disabled": "Disabled"
   },
+  "SETTINGS.darkModeJournals": {
+    "label": "Dark Mode Journals",
+    "hint": "Enable dark styling for journals."
+  },
   "SETTINGS.initiativeFormula": {
     "label": "Initiative Formula",
     "hint": "Optional formula to add to a character's Initiative rating during combat (default is +2d6)."

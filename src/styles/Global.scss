@@ -1,4 +1,4 @@
-.dark-mode {
+.titan.dark-mode {
    // Panel styling
    --panel-1-background: #373949;
    --panel-2-background: #424557;
@@ -6,6 +6,7 @@
    --panel-1-color: rgba(255, 255, 255, 0.83);
    --panel-2-color: rgba(255, 255, 255, 0.83);
    --panel-3-color: rgba(255, 255, 255, 0.83);
+   --color-border-highlight: rgba(255, 255, 255, 0.83);
 
    // Input styling
    --input-color: #1d1e26;
@@ -23,7 +24,6 @@
    --icon-button-background: #f2b58c;
    --icon-button-highlight: rgb(255, 233, 174);
    --icon-button-color: #15171b;
-
    // Resource colors
    --stamina-color: #37da88;
    --wounds-color: #c55858;
@@ -89,5 +89,28 @@
    h3,
    h4 {
       border-color: var(--border-color);
+   }
+
+   .journal-entry-content {
+      background: #262836;
+      color: rgba(255, 255, 255, 0.83);
+
+      .title {
+         color: var(--input-color);
+         background: var(--input-background);
+      }
+   }
+
+   .heading-level select {
+      color: rgba(255, 255, 255, 0.83);
+   }
+
+   .journal-header .title {
+      color: var(--input-color);
+      background: var(--input-background);
+   }
+
+   .journal-sidebar {
+      background: #191a21;
    }
 }

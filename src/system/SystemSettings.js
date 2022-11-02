@@ -57,6 +57,16 @@ export default function registerSystemSettings() {
       requiresReload: true
    });
 
+   game.settings.register('titan', 'darkModeJournals', {
+      config: true,
+      scope: 'client',
+      name: 'SETTINGS.darkModeJournals.label',
+      hint: 'SETTINGS.darkModeJournals.hint',
+      type: Boolean,
+      default: true,
+      requiresReload: true
+   });
+
    game.settings.register('titan', 'initiativeFormula', {
       config: true,
       scope: 'world',

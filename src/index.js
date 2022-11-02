@@ -121,8 +121,8 @@ Hooks.on('renderChatMessage', (message, html) => {
       });
 
    }
-
 });
+
 
 Hooks.on('preDeleteChatMessage', (message) => {
    // Check if this is a valid titan chat message
@@ -130,6 +130,22 @@ Hooks.on('preDeleteChatMessage', (message) => {
    if (typeof flagData === 'object' && typeof message?._svelteComponent?.$destroy === 'function') {
       // If so, delete the svelte component
       message._svelteComponent.$destroy();
+   }
+});
+
+Hooks.on('renderJournalSheet', (journalSheet, html) => {
+   if (game.settings.get('titan', 'darkModeJournals')) {
+      const journal = html.find('journal-entry').prevObject;
+      journal.addClass('titan');
+      journal.addClass('dark-mode');
+   }
+});
+
+Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
+   if (game.settings.get('titan', 'darkModeJournals')) {
+      const journal = html.find('journal-entry').prevObject;
+      journal.addClass('titan');
+      journal.addClass('dark-mode');
    }
 });
 
@@ -142,5 +158,4 @@ Hooks.on("updateCombat", (combat) => {
          character.onTurnStart();
       }
    }
-
 });
