@@ -279,6 +279,8 @@
   "LOCAL.self.label": "Self",
   "LOCAL.sendToChat.label": "Send to Chat",
   "LOCAL.short.label": "Short",
+  "LOCAL.deleteItem.label": "Delete Item",
+  "LOCAL.openItemSheet.label": "Open Item Sheet",
   "LOCAL.single.label": "Single",
   "LOCAL.skill.label": "Skill",
   "LOCAL.skill.totalDice.label": "Total Dice used when rolling this skill.",
@@ -449,6 +451,7 @@
   "LOCAL.champion.label": "Champion",
   "LOCAL.role.label": "Role",
   "LOCAL.blindCheck.label": "Made a Blind Check",
+  "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item?",
   "EFFECT.StatusAsleep": "Asleep",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",
@@ -484,6 +487,10 @@
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
     "hint": "Hold Shift to toggle this setting."
+  },
+  "SETTINGS.confirmDeletingItems": {
+    "label": "Confirm deleting items from Actors.",
+    "hint": "If true, a confirmation dialog will be displayed when attempting to delete an Item from an Actor."
   },
   "SETTINGS.autoOpenCombatantSheet": {
     "label": "Auto-Open Combatant Sheets",

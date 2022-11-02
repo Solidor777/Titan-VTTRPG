@@ -65,17 +65,17 @@
             </div>
 
             <!--Send to Chat button-->
-            <div class="button">
+            <div class="button" data-tooltip={localize("sendToChat")}>
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button">
+            <div class="button" data-tooltip={localize("editItem")}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button">
+            <div class="button" data-tooltip={localize("deleteItem")}>
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>

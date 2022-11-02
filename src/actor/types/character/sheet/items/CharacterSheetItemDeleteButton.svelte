@@ -9,4 +9,9 @@
    export let itemId = void 0;
 </script>
 
-<IconButton icon={"fas fa-trash"} on:click={application.deleteItem.bind(application, itemId)} />
+<IconButton
+   icon={"fas fa-trash"}
+   on:click={() => {
+      application.deleteItem(itemId, false);
+   }}
+/>

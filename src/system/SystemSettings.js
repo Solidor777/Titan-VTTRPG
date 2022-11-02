@@ -8,6 +8,15 @@ export default function registerSystemSettings() {
       default: false,
    });
 
+   game.settings.register('titan', 'confirmDeletingItems', {
+      config: true,
+      scope: 'client',
+      name: 'SETTINGS.confirmDeletingItems.label',
+      hint: 'SETTINGS.confirmDeletingItems.hint',
+      type: Boolean,
+      default: true,
+   });
+
    game.settings.register('titan', 'autoOpenCombatantSheet', {
       config: true,
       scope: 'client',

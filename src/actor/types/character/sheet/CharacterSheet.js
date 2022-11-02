@@ -1,4 +1,5 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
+import CharacterSheetDeleteItemDialog from "./CharacterSheetDeleteItemDialog";
 import CharacterSheetInventoryAddItemDialog from "./tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
 export default class TitanCharacterSheet extends TitanActorSheet {
@@ -115,10 +116,20 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    }
 
    // Delete Item
-   async deleteItem(id) {
+   async deleteItem(itemId, deletionConfirmed) {
+      console.log(deletionConfirmed);
       if (this.reactive.document.isOwner) {
-         this.reactive.state.deleteItem(id);
-         this.reactive.document.deleteItem(id);
+         if (!deletionConfirmed && game.settings.get('titan', 'confirmDeletingItems')) {
+            const item = this.reactive.document.items.get(itemId);
+            if (item) {
+               const dialog = new CharacterSheetDeleteItemDialog(this, item.name, itemId);
+               dialog.render(true);
+            }
+         }
+         else {
+            this.reactive.state.deleteItem(itemId);
+            this.reactive.document.deleteItem(itemId);
+         }
       }
 
       return;

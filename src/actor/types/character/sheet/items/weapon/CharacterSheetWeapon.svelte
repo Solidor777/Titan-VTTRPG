@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
+   import { localize } from "~/helpers/Utility.js";
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
@@ -63,17 +64,17 @@
             </div>
 
             <!--Send to Chat button-->
-            <div class="button">
+            <div class="button" data-tooltip={localize("sendToChat")}>
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button">
+            <div class="button" data-tooltip={localize("editItem")}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button">
+            <div class="button" data-tooltip={localize("deleteItem")}>
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
