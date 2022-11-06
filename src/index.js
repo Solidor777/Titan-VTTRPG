@@ -92,13 +92,6 @@ Hooks.once('setup', async () => {
 });
 
 Hooks.on('renderChatMessage', (message, html) => {
-   // Add dark mode styling if appropriate
-   if (game.settings.get('titan', 'darkModeChatMessages') === 'all') {
-      // Add the titan class
-      let content = html.find('.chat-message').prevObject;
-      content.addClass('dark-mode');
-   }
-
    // Check if this is a valid titan chat message
    const chatContext = message.getFlag('titan', 'chatContext');
    if (TitanChatMessageTypes.has(chatContext?.type)) {
@@ -107,8 +100,8 @@ Hooks.on('renderChatMessage', (message, html) => {
       content.addClass('titan');
 
       // Add the dark mode class
-      if (game.settings.get('titan', 'darkModeChatMessages') === 'systemOnly') {
-         content.addClass('dark-mode');
+      if (game.settings.get('titan', 'darkModeChatMessages') !== 'disabled') {
+         content.addClass('titan-dark-mode');
       }
 
       // Add the svelte component
@@ -121,6 +114,12 @@ Hooks.on('renderChatMessage', (message, html) => {
       });
 
    }
+   else if (game.settings.get('titan', 'darkModeChatMessages') === 'all') {
+      // Add the titan class
+      let content = html.find('.chat-message').prevObject;
+      content.addClass('titan-dark-mode');
+   }
+
 });
 
 
@@ -137,7 +136,7 @@ Hooks.on('renderJournalSheet', (journalSheet, html) => {
    if (game.settings.get('titan', 'darkModeJournals')) {
       const journal = html.find('journal-entry').prevObject;
       journal.addClass('titan');
-      journal.addClass('dark-mode');
+      journal.addClass('titan-dark-mode');
    }
 });
 
@@ -145,7 +144,7 @@ Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
    if (game.settings.get('titan', 'darkModeJournals')) {
       const journal = html.find('journal-entry').prevObject;
       journal.addClass('titan');
-      journal.addClass('dark-mode');
+      journal.addClass('titan-dark-mode');
    }
 });
 

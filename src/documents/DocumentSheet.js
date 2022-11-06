@@ -20,7 +20,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          {
             id: `document-sheet-${document.id}`,
             title: document.name,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'dark-mode'] : ['titan']
+            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          }
       ));
 
