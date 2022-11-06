@@ -29,16 +29,12 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "lang/en.json"
+      "path": "lang/en.json",
+      "flags": {}
     }
   ],
-  "system": [],
-  "socket": false,
   "manifest": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/system.json",
   "download": "https://github.com/JustinCamden/Titan-VTTRPG/raw/main/titan.zip",
-  "protected": false,
-  "coreTranslation": false,
-  "library": false,
   "gridDistance": 1,
   "gridUnits": "m",
   "license": "LICENSE.txt"
