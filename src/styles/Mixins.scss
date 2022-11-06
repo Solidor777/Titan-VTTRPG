@@ -256,15 +256,6 @@
   grid-column-end: span $column-count;
 }
 
-@mixin z-index-app {
-  translate: 0;
-  z-index: var(--z-index-app);
-
-  * {
-    z-index: var(--z-index-app);
-  }
-}
-
 @mixin attribute-colors {
   &.body {
     background: var(--body-color);

@@ -63,7 +63,7 @@
    .aspect {
       @include flex-column;
       @include flex-group-top;
-      @include z-index-app;
+
       width: 100%;
       margin: 0.25rem 0;
 

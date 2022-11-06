@@ -113,13 +113,13 @@
          @include flex-column;
          @include flex-group-top;
          @include list;
-         @include z-index-app;
+
          width: 100%;
 
          li {
             @include flex-row;
             @include flex-group-center;
-            @include z-index-app;
+
             width: 100%;
             margin-top: 0.5rem;
          }

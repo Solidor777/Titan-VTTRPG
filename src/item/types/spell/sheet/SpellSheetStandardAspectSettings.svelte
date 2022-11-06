@@ -166,7 +166,7 @@
          @include flex-column;
          @include flex-group-top;
          @include border-bottom-sides;
-         @include z-index-app;
+
          @include font-size-small;
          @include panel-3;
          padding: 0 0.25rem 0.25rem;

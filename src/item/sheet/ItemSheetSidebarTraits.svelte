@@ -65,7 +65,7 @@
       .button {
          @include flex-row;
          @include flex-group-center;
-         @include z-index-app;
+
          margin-top: 0.5rem;
          --button-font-size: var(--font-size-small);
          --button-line-height: 1.25rem;
@@ -77,7 +77,6 @@
          .button-contents {
             @include flex-row;
             @include flex-group-center;
-            @include z-index-app;
 
             .label {
                @include flex-row;
@@ -96,14 +95,12 @@
       @include flex-row;
       @include flex-group-center;
       flex-wrap: wrap;
-      @include z-index-app;
 
       .trait {
          @include flex-row;
          @include flex-group-center;
          @include tag-margin;
          @include font-size-small;
-         @include z-index-app;
       }
    }
 </style>
