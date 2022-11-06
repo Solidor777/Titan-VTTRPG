@@ -46,6 +46,7 @@
 
    // Meter styling
    --meter-background: rgb(30, 30, 30);
+   --font-color: rgba(255, 255, 255, 0.83);
 
    .window-content {
       background: #262836;
@@ -54,11 +55,6 @@
 
    &.chat-message {
       background: #424557;
-      color: rgba(255, 255, 255, 0.83);
-
-      .message-header {
-         color: rgba(255, 255, 255, 0.83);
-      }
 
       &.whisper {
          background: #20203e;
@@ -74,9 +70,7 @@
    }
 
    .prosemirror {
-      textArea {
-         color: rgba(255, 255, 255, 0.83);
-      }
+      textArea {}
 
       .editor-menu {
          button:not(.pm-dropdown) {
@@ -92,26 +86,23 @@
       border-color: var(--border-color);
    }
 
-   .journal-entry-content {
-      background: #262836;
-      color: rgba(255, 255, 255, 0.83);
+   &.window-app {
+      .journal-entry-content {
+         background: #262836;
 
-      .title {
+         .title {
+            color: var(--input-color);
+            background: var(--input-background);
+         }
+      }
+
+      .journal-header .title {
          color: var(--input-color);
          background: var(--input-background);
       }
-   }
 
-   .heading-level select {
-      color: rgba(255, 255, 255, 0.83);
-   }
-
-   .journal-header .title {
-      color: var(--input-color);
-      background: var(--input-background);
-   }
-
-   .journal-sidebar {
-      background: #191a21;
+      .journal-sidebar {
+         background: #191a21;
+      }
    }
 }

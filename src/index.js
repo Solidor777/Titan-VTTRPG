@@ -135,7 +135,6 @@ Hooks.on('preDeleteChatMessage', (message) => {
 Hooks.on('renderJournalSheet', (journalSheet, html) => {
    if (game.settings.get('titan', 'darkModeJournals')) {
       const journal = html.find('journal-entry').prevObject;
-      journal.addClass('titan');
       journal.addClass('titan-dark-mode');
    }
 });
@@ -143,7 +142,6 @@ Hooks.on('renderJournalSheet', (journalSheet, html) => {
 Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
    if (game.settings.get('titan', 'darkModeJournals')) {
       const journal = html.find('journal-entry').prevObject;
-      journal.addClass('titan');
       journal.addClass('titan-dark-mode');
    }
 });
