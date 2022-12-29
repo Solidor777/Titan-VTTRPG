@@ -2,6 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import DeleteTag from "~/helpers/svelte-components/tag/DeleteTag.svelte";
@@ -50,14 +51,14 @@
    {#if $document.system.trait.length > 0 || $document.system.customTrait.length > 0}
       <div class="traits-container" transition:slide|local>
          {#each $document.system.trait as trait (trait.name)}
-            <div class="trait" transition:slide|local data-tooltip={localize(`${trait.name}.desc`)}>
+            <div class="trait" transition:slide|local use:tooltip={{content: localize(`${trait.name}.desc`)}}>
                <Tag label={localize(trait.name)} />
             </div>
          {/each}
 
          <!--Custom Traits-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
-            <div class="trait" data-tooltip={trait.description} transition:slide|local>
+            <div class="trait" use:tooltip={{content: trait.description}} transition:slide|local>
                <DeleteTag
                   deleteFunction={() => {
                      const customTrait = $document.system.customTrait;

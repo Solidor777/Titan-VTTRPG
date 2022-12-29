@@ -2,6 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
@@ -176,7 +177,7 @@
                   <div class="traits-container">
                      <!--Each trait-->
                      {#each attack.trait as trait (trait.name)}
-                        <div class="trait" data-tooltip={localize(`${trait.name}.desc`)}>
+                        <div class="trait" use:tooltip={{content: localize(`${trait.name}.desc`)}}>
                            {#if trait.type === "number"}
                               <!--Number Trait-->
                               <StatTag label={localize(trait.name)} value={trait.value} />
@@ -189,7 +190,7 @@
 
                      <!--Each custom trait-->
                      {#each attack.customTrait as trait, idx (trait.uuid)}
-                        <div class="trait" data-tooltip={trait.description}>
+                        <div class="trait" use:tooltip={{content: trait.description}}>
                            <!--Bool Trait-->
                            <DeleteTag
                               label={trait.name}

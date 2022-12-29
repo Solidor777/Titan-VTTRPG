@@ -44,6 +44,7 @@ export default class TitanAttackCheck extends TitanCheck {
          attack: attackData,
          attackNotes: itemRollData.attackNotes,
          img: itemRollData.img,
+         itemTrait: itemRollData.customTrait,
          complexity: 1,
          diceMod: options?.diceMod ?? 0,
          trainingMod: options.trainingMod ?? 0,

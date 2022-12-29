@@ -1,5 +1,6 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
@@ -11,7 +12,7 @@
 </script>
 
 <div class="stats">
-   <div class="stat" data-tooltip={localize("defense.desc")}>
+   <div class="stat" use:tooltip={{content: localize("defense.desc")}}>
       <IconStatTag icon={"fas fa-shield"} label={localize("defense")} value={item.system.defense} />
    </div>
 
@@ -27,7 +28,7 @@
 
    <!--Traits-->
    {#each item.system.trait as trait}
-      <div class="stat" data-tooltip={localize(`${trait.name}.desc`)}>
+      <div class="stat" use:tooltip={{content: localize(`${trait.name}.desc`)}}>
          {#if trait.type === "number"}
             <StatTag label={localize(`${trait.name}`)} value={trait.value} />
          {:else}
@@ -38,7 +39,7 @@
 
    <!--Custom Traits-->
    {#each item.system.customTrait as trait}
-      <div class="stat" data-tooltip={trait.description}>
+      <div class="stat" use:tooltip={{content: trait.description}}>
          <Tag label={trait.name} />
       </div>
    {/each}

@@ -1,4 +1,4 @@
-export function autoScroll(node) {
+export default function autoScroll(node) {
   setTimeout(() => {
     const chatMessage = node.parentNode;
     const chatLog = chatMessage.parentNode;

@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
@@ -28,13 +29,13 @@
       <!--Exp-->
       <div class="xp">
          <!--Available-->
-         <div class="available" data-tooltip={localize("xpAvailable")}>
+         <div class="available" use:tooltip={{content: localize("xpAvailable")}}>
             <ModTag baseValue={0} currentValue={$document.system.xp.available} />
          </div>
          <div class="symbol">/</div>
 
          <!--Earned Input-->
-         <div class="earned" data-tooltip={localize("xpEarned")}>
+         <div class="earned" use:tooltip={{content: localize("xpEarned")}}>
             <DocumentIntegerInput bind:value={$document.system.xp.earned} />
          </div>
 

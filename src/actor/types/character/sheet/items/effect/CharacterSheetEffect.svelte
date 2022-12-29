@@ -2,6 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
    import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
@@ -57,17 +58,17 @@
             {/if}
 
             <!--Send to Chat button-->
-            <div class="button" data-tooltip={localize("sendToChat")}>
+            <div class="button" use:tooltip={{content: localize("sendToChat")}}>
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" data-tooltip={localize("editItem")}>
+            <div class="button" use:tooltip={{content: localize("editItem")}}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" data-tooltip={localize("deleteItem")}>
+            <div class="button" use:tooltip={{content: localize("deleteItem")}}>
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -94,7 +95,7 @@
             {#if item.system.customTrait.length > 0}
                <div class="section tags small-text">
                   {#each item.system.customTrait as trait}
-                     <div class="tag" data-tooltip={trait.description}>
+                     <div class="tag" use:tooltip={{content: trait.description}}>
                         <Tag label={trait.name} />
                      </div>
                   {/each}

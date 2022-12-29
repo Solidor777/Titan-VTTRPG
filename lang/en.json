@@ -96,7 +96,7 @@
   "LOCAL.decreaseSpeed.label": "Decrease Speed",
   "LOCAL.defaultAttribute.desc.label": "Default attribute used when rolling this skill.",
   "LOCAL.defense.baseValue.label": "Base Defense = (Body + Dexterity) / 2, rounded up.",
-  "LOCAL.defense.desc.label": "Defense is the ability to defend against attacks.",
+  "LOCAL.defense.desc.label": "The ability to defend against attacks.",
   "LOCAL.defense.editStaticMod.label": "Edit bonus or penalty to Defense.",
   "LOCAL.defense.label": "Defense",
   "LOCAL.defense.value.label": "Total Defense.",

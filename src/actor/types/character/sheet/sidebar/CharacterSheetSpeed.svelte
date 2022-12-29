@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
 
@@ -50,7 +51,7 @@
 <!--Speeds-->
 <div class="speed">
    <!--Label-->
-   <div class="label" data-tooltip={localize(`${key}.desc`)}>
+   <div class="label" use:tooltip={{content: localize(`${key}.desc`)}}>
       <!--Icon-->
       {localize(`${key}`)}
    </div>
@@ -70,7 +71,7 @@
       <div class="symbol">=</div>
 
       <!--Total Value-->
-      <div class="value" data-tooltip={totalValueTooltip}>
+      <div class="value" use:tooltip={{content: totalValueTooltip}}>
          <ModTag
             currentValue={$document.system.speed[key].value}
             baseValue={$document.system.speed[key].baseValue +

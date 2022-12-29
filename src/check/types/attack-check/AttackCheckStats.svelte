@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
    import IconTag from "~/helpers/svelte-components/tag/IconTag.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
@@ -37,9 +38,16 @@
       </div>
    {/if}
 
-   <!--Traits-->
+      <!--Item Traits-->
+   {#each $document.flags.titan.chatContext.parameters.itemTrait as trait}
+      <div class="stat" use:tooltip={{content: trait.description}}>
+         <Tag label={trait.name} />
+      </div>
+   {/each}
+
+   <!--Attack Traits-->
    {#each $document.flags.titan.chatContext.parameters.attack.trait as trait}
-      <div class="stat" data-tooltip={localize(`${trait.name}.desc`)}>
+      <div class="stat" use:tooltip={{content: localize(`${trait.name}.desc`)}}>
          {#if trait.type === "number"}
             <StatTag label={localize(`${trait.name}`)} value={trait.value} />
          {:else}

@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
 
@@ -49,7 +50,7 @@
 
 <div class="mod">
    <!--Label-->
-   <div class="label" data-tooltip={localize(`${key}.desc`)}>
+   <div class="label" use:tooltip={{content: localize(`${key}.desc`)}}>
       <!--Icon-->
       <i class="fas fa-{icon}" />
       {localize(key)}
@@ -65,7 +66,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" data-tooltip={totalValueTooltip}>
+      <div class="value" use:tooltip={{content: totalValueTooltip}}>
          <ModTag
             currentValue={$document.system.rating[key].value}
             baseValue={$document.system.rating[key].baseValue +

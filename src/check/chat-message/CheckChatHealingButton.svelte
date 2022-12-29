@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Document reference
@@ -28,7 +29,7 @@
 </script>
 
 <!--Apply healing button-->
-<div class="healing-button" data-tooltip={localize("recoverStamina")}>
+<div class="healing-button" use:tooltip={{content: localize("recoverStamina")}}>
    <EfxButton
       on:click={() => {
          healDamage($document.flags.titan.chatContext.results.healing);

@@ -3,6 +3,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
@@ -52,7 +53,7 @@
    <ol>
       {#each traitOptions as trait, idx}
          <!--Trait-->
-         <li data-tooltip={localize(`${trait.name}.desc`)}>
+         <li use:tooltip={{content: localize(`${trait.name}.desc`)}}>
             <!--Label-->
             <div class="label">
                {localize(trait.name)}

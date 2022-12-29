@@ -9,6 +9,7 @@
     "@typhonjs-fvtt/runtime": "^0.0.21",
     "@typhonjs-fvtt/svelte-standard": "^0.0.17",
     "svelte": "^3.52.0",
+    "tippy.js": "^6.3.7",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

@@ -1,12 +1,13 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
    const document = getContext("DocumentStore");
 </script>
 
-<div class="button" data-tooltip={localize("inspiration")}>
+<div class="button" use:tooltip={{content: localize("inspiration")}}>
    <IconButton
       icon={$document.system.inspiration ? "fas fa-sun" : ""}
       on:click={() => {

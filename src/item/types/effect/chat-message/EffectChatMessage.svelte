@@ -1,5 +1,6 @@
 <script>
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
@@ -35,7 +36,7 @@
       {#if item.system.customTrait.length > 0}
          <div class="section tags small-text">
             {#each item.system.customTrait as trait}
-               <div class="tag" data-tooltip={trait.description}>
+               <div class="tag" use:tooltip={{content: trait.description}}>
                   <Tag label={trait.name} />
                </div>
             {/each}

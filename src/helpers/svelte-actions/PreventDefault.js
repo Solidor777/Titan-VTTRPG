@@ -1,4 +1,4 @@
-export function preventDefault(event) {
+export default function preventDefault(event) {
   event.preventDefault();
   return;
 }

@@ -1,5 +1,5 @@
 <script>
-   import { preventDefault } from "~/helpers/svelte-actions/PreventDefault.js";
+   import preventDefault from "~/helpers/svelte-actions/PreventDefault.js";
    import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
    import { getContext } from "svelte";
    import recalculateCheckResults from "./RecalculateCheckResults";

@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
@@ -107,7 +108,7 @@
 
       <!--Traits-->
       {#each attack.trait as trait}
-         <div class="stat" data-tooltip={localize(`${trait.name}.desc`)}>
+         <div class="stat" use:tooltip={{content: localize(`${trait.name}.desc`)}}>
             {#if trait.type === "number"}
                <StatTag label={localize(`${trait.name}`)} value={trait.value} />
             {:else}
@@ -118,7 +119,7 @@
 
       <!--Custom Traits-->
       {#each attack.customTrait as trait}
-         <div class="stat" data-tooltip={trait.description}>
+         <div class="stat" use:tooltip={{content: trait.description}}>
             <Tag label={trait.name} />
          </div>
       {/each}

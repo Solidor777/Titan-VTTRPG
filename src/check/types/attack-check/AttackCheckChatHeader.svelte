@@ -45,6 +45,13 @@
                "defense"
             )} ${$document.flags.titan.chatContext.parameters.targetDefense}`}
          {/if}
+
+         <!--Damage -->
+         <div class="sub-label">
+            {`${localize("damage")}: 
+            ${$document.flags.titan.chatContext.parameters.attack.damage + $document.flags.titan.chatContext.parameters.damageMod}
+            ${$document.flags.titan.chatContext.parameters.attack.plusExtraSuccessDamage ? ` + ${localize("extraSuccesses.short")}` : ""}`}
+         </div>
       </div>
    </div>
 </div>

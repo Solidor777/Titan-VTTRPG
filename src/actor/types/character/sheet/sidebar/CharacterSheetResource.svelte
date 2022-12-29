@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import Meter from "~/helpers/svelte-components/Meter.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
@@ -56,7 +57,7 @@
       <div class="spacer" />
 
       <!--Label-->
-      <span class="label" data-tooltip={localize(`${key}.valueDesc`)}>{localize(key)}</span>
+      <span class="label" use:tooltip={{content: localize(`${key}.valueDesc`)}}>{localize(key)}</span>
 
       <!--Static Mod-->
       <div class="static-mod">
@@ -75,12 +76,12 @@
       </div>
 
       <!--The Meter-->
-      <div class="meter {key}" data-tooltip={localize(`${key}.valueDesc`)}>
+      <div class="meter {key}" use:tooltip={{content: localize(`${key}.valueDesc`)}}>
          <Meter current={$document.system.resource[key].value} max={$document.system.resource[key].max} />
       </div>
 
       <!--Max Value Display-->
-      <div class="value" data-tooltip={totalValueTooltip}>
+      <div class="value" use:tooltip={{content: totalValueTooltip}}>
          <ModTag
             baseValue={$document.system.resource[key].maxBase +
                $document.system.resource[key].mod.equipment +

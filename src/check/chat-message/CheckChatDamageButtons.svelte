@@ -1,6 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Document reference
@@ -49,7 +50,7 @@
 
 <div class="damage-buttons">
    <!--Apply damage button-->
-   <div class="button" data-tooltip={localize("applyDamage")}>
+   <div class="button" use:tooltip={{content: localize("applyDamage")}}>
       <EfxButton
          on:click={() => {
             applyDamage($document.flags.titan.chatContext.results.damage, false);
@@ -58,7 +59,7 @@
    </div>
 
    <!--Apply damage ignore armor button-->
-   <div class="button" data-tooltip={localize("applyDamageIgnoreArmor")}>
+   <div class="button" use:tooltip={{content: localize("applyDamageIgnoreArmor")}}>
       <EfxButton
          on:click={() => {
             applyDamage($document.flags.titan.chatContext.results.damage, true);
@@ -67,7 +68,7 @@
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" data-tooltip={localize("applyHalfDamage")}>
+   <div class="button" use:tooltip={{content: localize("applyHalfDamage")}}>
       <EfxButton
          on:click={() => {
             applyDamage(Math.ceil($document.flags.titan.chatContext.results.damage / 2), false);
@@ -76,7 +77,7 @@
    </div>
 
    <!--Apply healing button-->
-   <div class="button" data-tooltip={localize("healDamage")}>
+   <div class="button" use:tooltip={{content: localize("healDamage")}}>
       <EfxButton
          on:click={() => {
             healDamage($document.flags.titan.chatContext.results.damage);

@@ -1,6 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
@@ -84,7 +85,7 @@
 <div class="skill">
    <div class="column">
       <!--Roll Button-->
-      <div class="button" data-tooltip={localize(`${key}.desc`)}>
+      <div class="button" use:tooltip={{content: localize(`${key}.desc`)}}>
          <EfxButton
             on:click={() => {
                application.rollSkillCheck(key);
@@ -105,7 +106,7 @@
       <!--Default Attribute-->
       <div class="attribute">
          <!--Label-->
-         <div class="label" data-tooltip={localize("defaultAttribute.desc")}>
+         <div class="label" use:tooltip={{content: localize("defaultAttribute.desc")}}>
             {localize("attribute")}
          </div>
 
@@ -118,7 +119,7 @@
 
    <!--Total Dice-->
    <div class="column">
-      <div class="tag" data-tooltip={totalDiceTooltip}>
+      <div class="tag" use:tooltip={{content: totalDiceTooltip}}>
          <!--Label-->
          <div class="label"><i class="fas fa-dice-d6" />{localize("dice")}</div>
 
@@ -135,7 +136,7 @@
       <!--Training row-->
       <div class="row">
          <!--Label-->
-         <div class="label" data-tooltip={localize("training.desc")}>
+         <div class="label" use:tooltip={{content: localize("training.desc")}}>
             <!--Icon-->
             <i class="fas fa-graduation-cap" />
 
@@ -158,7 +159,7 @@
 
          <!--Total Value-->
          <div class="symbol">=</div>
-         <div class="value" data-tooltip={trainingTotalValueTooltip}>
+         <div class="value" use:tooltip={{content: trainingTotalValueTooltip}}>
             <ModTag
                currentValue={$document.system.skill[key].training.value}
                baseValue={$document.system.skill[key].training.baseValue +
@@ -171,7 +172,7 @@
       <!--Expertise row-->
       <div class="row">
          <!--Label-->
-         <div class="label" data-tooltip={localize("expertise.desc")}>
+         <div class="label" use:tooltip={{content: localize("expertise.desc")}}>
             <!--Icon-->
             <i class="fas fa-dumbbell" />
 
@@ -194,7 +195,7 @@
 
          <!--Total Value-->
          <div class="symbol">=</div>
-         <div class="value" data-tooltip={expertiseTotalValueTooltip}>
+         <div class="value" use:tooltip={{content: expertiseTotalValueTooltip}}>
             <ModTag
                currentValue={$document.system.skill[key].expertise.value}
                baseValue={$document.system.skill[key].expertise.baseValue +
