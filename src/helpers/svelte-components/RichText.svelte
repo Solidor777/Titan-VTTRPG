@@ -10,5 +10,7 @@
 
    .text {
       overflow: hidden;
+      text-align: left;
+      margin: 0rem 0.25rem;
    }
 </style>

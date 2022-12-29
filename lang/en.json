@@ -280,6 +280,7 @@
   "LOCAL.sendToChat.label": "Send to Chat",
   "LOCAL.short.label": "Short",
   "LOCAL.deleteItem.label": "Delete Item",
+  "LOCAL.editItem.label": "Edit Item",
   "LOCAL.openItemSheet.label": "Open Item Sheet",
   "LOCAL.single.label": "Single",
   "LOCAL.skill.label": "Skill",
