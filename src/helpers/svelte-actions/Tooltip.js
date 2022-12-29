@@ -1,7 +1,6 @@
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
-const content = newParams.content;
 const allowHTML = true;
 const delay = [1000, 250];
 const duration = [400, 250];
@@ -14,6 +13,7 @@ export default function tooltip(node, params) {
          if (newParams?.content) {
 
             if (tippy) {
+               const content = newParams.content;
                tippy.setProps({ content, allowHTML, duration, delay });
             }
 
@@ -37,5 +37,6 @@ export default function tooltip(node, params) {
 }
 
 function initializeTippy(node, params) {
+   const content = params.content;
    return tippy(node, { content, allowHTML, duration, delay });
 }
