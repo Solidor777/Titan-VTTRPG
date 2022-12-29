@@ -33,8 +33,8 @@
       "flags": {}
     }
   ],
-  "manifest": "https://raw.githubusercontent.com/JustinCamden/Titan-VTTRPG/main/system.json",
-  "download": "https://github.com/JustinCamden/Titan-VTTRPG/raw/main/titan.zip",
+  "manifest": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/latest/system.json",
+  "download": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/latest/titan.zip",
   "gridDistance": 1,
   "gridUnits": "m",
   "license": "LICENSE.txt"
