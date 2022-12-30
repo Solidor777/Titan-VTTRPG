@@ -24,6 +24,7 @@ const s_RESOLVE_CONFIG = {
 
 export default () => {
    /** @type {import('vite').UserConfig} */
+
    return {
       root: 'src/', // Source location / esbuild root.
       base: '/systems/titan/', // Base module path that 30001 / served dev directory.
@@ -45,6 +46,10 @@ export default () => {
       css: {
          // Creates a standard configuration for PostCSS with autoprefixer & postcss-preset-env.
          postcss: postcssConfig({ compress: s_COMPRESS, sourceMap: s_SOURCEMAPS })
+      },
+
+      define: {
+         'process.env': {}
       },
 
       // About server options:
