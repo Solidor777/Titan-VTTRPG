@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
@@ -66,17 +66,17 @@
             </div>
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{content: localize("sendToChat")}}>
+            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{content: localize("editItem")}}>
+            <div class="button" use:tooltip={{ content: localize("editItem") }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{content: localize("deleteItem")}}>
+            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -107,13 +107,15 @@
                </div>
 
                <!--Value-->
-               <div class="tag">
-                  <ValueTag value={item.system.value} />
-               </div>
+               {#if item.system.value}
+                  <div class="tag">
+                     <ValueTag value={item.system.value} />
+                  </div>
+               {/if}
 
                <!--Custom Traits-->
                {#each item.system.customTrait as trait}
-                  <div class="tag" use:tooltip={{content: trait.description}}>
+                  <div class="tag" use:tooltip={{ content: trait.description }}>
                      <Tag label={trait.name} />
                   </div>
                {/each}

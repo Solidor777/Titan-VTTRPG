@@ -1,7 +1,7 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
@@ -44,9 +44,11 @@
          </div>
 
          <!--Value-->
-         <div class="tag">
-            <ValueTag value={item.system.value} />
-         </div>
+         {#if item.system.value}
+            <div class="tag">
+               <ValueTag value={item.system.value} />
+            </div>
+         {/if}
 
          <!--Quanity-->
          <div class="tag">
@@ -55,7 +57,7 @@
 
          <!--Custom Traits-->
          {#each item.system.customTrait as trait}
-            <div class="tag" use:tooltip={{content: trait.description}}>
+            <div class="tag" use:tooltip={{ content: trait.description }}>
                <Tag label={trait.name} />
             </div>
          {/each}
