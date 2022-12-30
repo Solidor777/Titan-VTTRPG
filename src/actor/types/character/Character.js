@@ -217,7 +217,31 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       let rulesElements = [];
       this.parent.items.forEach((item) => {
          if (item.system.rulesElement && item.system.rulesElement.length > 0) {
-            rulesElements = [...rulesElements, ...item.system.rulesElement];
+            // Equipment, armor, shields, and weapons only apply elements if they are equipped
+            switch (item.type) {
+               case 'armor': {
+                  if (this.parent.system.equipped.armor === item._id) {
+                     rulesElements = [...rulesElements, ...item.system.rulesElement];
+                  }
+                  break;
+               }
+               case 'shield': {
+                  if (this.parent.system.equipped.shield === item._id) {
+                     rulesElements = [...rulesElements, ...item.system.rulesElement];
+                  }
+                  break;
+               }
+               case 'weapon':
+               case 'equipment': {
+                  if (item.system.equipped) {
+                     rulesElements = [...rulesElements, ...item.system.rulesElement];
+                  }
+                  break;
+               }
+               default: {
+                  rulesElements = [...rulesElements, ...item.system.rulesElement];
+               }
+            }
          }
       });
 
