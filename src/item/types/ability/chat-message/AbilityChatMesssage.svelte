@@ -1,12 +1,13 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
+   import StatTag from "../../../../helpers/svelte-components/tag/StatTag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -65,9 +66,16 @@
             </div>
          {/if}
 
+         <!--XP Cost-->
+         {#if item.system.xpCost}
+            <div class="tag">
+               <StatTag label={localize("xpCost")} value={item.system.xpCost} />
+            </div>
+         {/if}
+
          <!--Custom Traits-->
          {#each item.system.customTrait as trait}
-            <div class="tag" use:tooltip={{content: trait.description}}>
+            <div class="tag" use:tooltip={{ content: trait.description }}>
                <Tag label={trait.name} />
             </div>
          {/each}
