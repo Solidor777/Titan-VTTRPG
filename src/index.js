@@ -99,6 +99,11 @@ Hooks.on('renderChatMessage', (message, html) => {
       let content = html.find('.chat-message').prevObject;
       content.addClass('titan');
 
+      // Adder the owner class
+      if (message.isOwner) {
+         content.addClass('owner');
+      }
+
       // Add the dark mode class
       if (game.settings.get('titan', 'darkModeChatMessages') !== 'disabled') {
          content.addClass('titan-dark-mode');
@@ -112,7 +117,6 @@ Hooks.on('renderChatMessage', (message, html) => {
             documentStore: documentStore,
          }
       });
-
    }
    else if (game.settings.get('titan', 'darkModeChatMessages') === 'all') {
       // Add the titan class

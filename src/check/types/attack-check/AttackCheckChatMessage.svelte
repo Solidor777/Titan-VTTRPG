@@ -9,6 +9,7 @@
    import ChatRichText from "~/helpers/svelte-components/ChatRichText.svelte";
    import AttackCheckChatHeader from "./AttackCheckChatHeader.svelte";
    import AttackCheckStats from "./AttackCheckStats.svelte";
+   import RichText from "../../../helpers/svelte-components/RichText.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -28,7 +29,7 @@
    <!--Attack Notes-->
    {#if $document.flags.titan.chatContext.parameters.attackNotes !== "" && $document.flags.titan.chatContext.parameters.attackNotes !== "<p></p>"}
       <div class="section rich-text">
-         <ChatRichText text={$document.flags.titan.chatContext.parameters.attackNotes} />
+         <RichText text={$document.flags.titan.chatContext.parameters.attackNotes} />
       </div>
    {/if}
 

@@ -108,12 +108,16 @@ export default class TitanItem extends Item {
          chatContext = this.typeComponent.getChatContext(chatContext);
       }
 
+      const speaker = options?.speaker ?? null;
+      const token = (speaker ? (speaker.token ? speaker.token : speaker.getActiveTokens(false, true)[0]) : null);
+
       // Create and post the message
       return await ChatMessage.create(
          ChatMessage.applyRollMode(
             {
                user: options?.user ? options.user : game.user.id,
-               speaker: options?.speaker ? options.speaker : null,
+               speaker: speaker,
+               token: token,
                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                sound: CONFIG.sounds.notification,
                flags: {

@@ -8,6 +8,7 @@
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
    import CheckChatScalingAspects from "~/check/chat-message/CheckChatScalingAspects.svelte";
    import ChatRichText from "~/helpers/svelte-components/ChatRichText.svelte";
+   import RichText from "../../../helpers/svelte-components/RichText.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
@@ -29,7 +30,7 @@
    <!--Description-->
    {#if $document.flags.titan.chatContext.results.succeeded && $document.flags.titan.chatContext.parameters.description !== "" && $document.flags.titan.chatContext.parameters.description !== "<p></p>"}
       <div class="section rich-text">
-         <ChatRichText text={$document.flags.titan.chatContext.parameters.description} />
+         <RichText text={$document.flags.titan.chatContext.parameters.description} />
       </div>
    {/if}
 

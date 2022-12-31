@@ -74,7 +74,6 @@
    }
 
    .prosemirror {
-      textArea {}
 
       .editor-menu {
          button:not(.pm-dropdown) {
@@ -138,6 +137,14 @@
                }
             }
          }
+      }
+   }
+}
+
+.rich-text {
+   &.not-owner {
+      .secret {
+         display: none;
       }
    }
 }
