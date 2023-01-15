@@ -12,6 +12,11 @@
    --color-text-dark-inactive: rgba(255, 255, 255, 0.83);
    --color-border-highlight: rgba(255, 255, 255, 0.83);
 
+   .content-link {
+      --color-text-dark-primary: #191813;
+      color: var(--color-text-dark-primary);
+   }
+
    // Input styling
    --input-color: #1d1e26;
    --input-background: #c5bcf8;
@@ -52,9 +57,20 @@
    --meter-background: rgb(30, 30, 30);
    --font-color: rgba(255, 255, 255, 0.83);
 
+   
    .window-content {
       background: #262836;
-      color: rgba(255, 255, 255, 0.83);
+      color: var(--color-text-dark-primary);
+
+      .content-link {
+         --color-text-dark-primary: #191813;
+         color: var(--color-text-dark-primary);
+
+         i {
+            --color-text-dark-primary: #191813;
+            color: var(--color-text-dark-primary);
+         }
+      }
    }
 
    &.chat-message {
