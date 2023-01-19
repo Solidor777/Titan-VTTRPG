@@ -1,4 +1,5 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
+import { getOptions } from "~/helpers/Utility";
 import CharacterSheetDeleteItemDialog from "./CharacterSheetDeleteItemDialog";
 import CharacterSheetInventoryAddItemDialog from "./tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
@@ -24,11 +25,9 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Check rolls
    async rollResistanceCheck(resistance) {
       if (this.reactive.document.isOwner) {
-         const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
-
          await this.reactive.document.typeComponent.rollResistanceCheck({
             resistance: resistance,
-            getOptions: getOptions,
+            getOptions: getOptions(),
          });
       }
 
@@ -38,11 +37,9 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Function for rolling a skill check
    async rollSkillCheck(skill) {
       if (this.reactive.document.isOwner) {
-         const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
-
          await this.reactive.document.typeComponent.rollAttributeCheck({
             skill: skill,
-            getOptions: getOptions,
+            getOptions: getOptions(),
          });
 
       }
@@ -53,11 +50,9 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Function for rolling a straight attribute check
    async rollAttributeCheck(attribute) {
       if (this.reactive.document.isOwner) {
-         const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
-
          await this.reactive.document.typeComponent.rollAttributeCheck({
             attribute: attribute,
-            getOptions: getOptions,
+            getOptions: getOptions(),
          });
       }
 
@@ -67,12 +62,10 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Function for rolling an attack check
    async rollAttackCheck(itemId, attackIdx) {
       if (this.reactive.document.isOwner) {
-         const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
-
          await this.reactive.document.typeComponent.rollAttackCheck({
             itemId: itemId,
             attackIdx: attackIdx,
-            getOptions: getOptions,
+            getOptions: getOptions(),
          });
       }
 
@@ -82,11 +75,9 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Function for rolling an casting check
    async rollCastingCheck(itemId) {
       if (this.reactive.document.isOwner) {
-         const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
-
          await this.reactive.document.typeComponent.rollCastingCheck({
             itemId: itemId,
-            getOptions: getOptions,
+            getOptions: getOptions(),
          });
       }
 
@@ -96,12 +87,10 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Function for rolling an casting check
    async rollItemCheck(itemId, checkIdx) {
       if (this.reactive.document.isOwner) {
-         const getOptions = game.settings.get('titan', 'getCheckOptions') === true || event.shiftKey;
-
          await this.reactive.document.typeComponent.rollItemCheck({
             itemId: itemId,
             checkIdx: checkIdx,
-            getOptions: getOptions,
+            getOptions: getOptions(),
          });
       }
 

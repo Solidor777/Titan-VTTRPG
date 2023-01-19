@@ -9,10 +9,10 @@
       "flags": {}
     }
   ],
-  "url": "https://github.com/JustinCamden/Titan-VTTRPG",
-  "readme": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/latest/README.md",
-  "bugs": "https://github.com/JustinCamden/Titan-VTTRPG/issues",
-  "changelog": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/latest/CHANGELOG.md",
+  "url": "https://github.com/Solidor777/Titan-VTTRPG",
+  "readme": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/README.md",
+  "bugs": "https://github.com/Solidor777/Titan-VTTRPG/issues",
+  "changelog": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/CHANGELOG.md",
   "version": "1.0.0",
   "compatibility": {
     "minimum": "10.288",
@@ -33,8 +33,8 @@
       "flags": {}
     }
   ],
-  "manifest": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/latest/system.json",
-  "download": "https://github.com/JustinCamden/Titan-VTTRPG/releases/download/latest/system.zip",
+  "manifest": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/system.json",
+  "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/system.zip",
   "gridDistance": 1,
   "gridUnits": "m",
   "license": "LICENSE.txt"
