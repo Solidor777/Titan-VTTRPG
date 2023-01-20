@@ -1192,7 +1192,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async takeABreather(report) {
+   async shortRest(report) {
       if (this.parent.isOwner) {
          // Clear temporary effects
          this.removeTemporaryEffects(false);
@@ -1219,7 +1219,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                const chatContext = {
                   type: 'report',
                   img: this.parent.img,
-                  header: localize('tookABreather'),
+                  header: localize('tookAShortRest'),
                   subHeader: [this.parent.name],
                   icon: 'fas fa-face-exhaling',
                   line: [
@@ -1252,7 +1252,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async rest(report) {
+   async longRest(report) {
       if (this.parent.isOwner) {
          // Decrease wounds by 1
          let woundsHealed = 0;
@@ -1271,7 +1271,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             });
          }
 
-         await this.takeABreather(false);
+         await this.shortRest(false);
 
          // Report
          if (report) {
@@ -1281,7 +1281,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                const chatContext = {
                   type: 'report',
                   img: this.parent.img,
-                  header: localize('tookARest'),
+                  header: localize('tookALongRest'),
                   subHeader: [this.parent.name],
                   icon: 'fas fa-bed',
                   line: [

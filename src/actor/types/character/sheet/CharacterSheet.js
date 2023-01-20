@@ -154,18 +154,18 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       return;
    }
 
-   async takeABreather(report) {
+   async shortRest(report) {
       if (this.reactive.document.isOwner) {
          this._clearTempEffectsFromState();
-         await this.reactive.document.typeComponent.takeABreather(report);
+         await this.reactive.document.typeComponent.shortRest(report);
       }
       return;
    }
 
-   async rest(report) {
+   async longRest(report) {
       if (this.reactive.document.isOwner) {
          this._clearTempEffectsFromState();
-         await this.reactive.document.typeComponent.rest(report);
+         await this.reactive.document.typeComponent.longRest(report);
       }
       return;
    }
