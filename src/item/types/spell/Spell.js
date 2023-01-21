@@ -143,7 +143,7 @@ export default class TitanSpell extends TitanTypeComponent {
          });
       }
 
-      if (this.parent.img === 'icons/svg/item-bag.svg') {
+      if (this.parent.isOwner && this.parent.img === 'icons/svg/item-bag.svg') {
          this.initializeImg();
       }
    }

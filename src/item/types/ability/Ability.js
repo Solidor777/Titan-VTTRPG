@@ -7,7 +7,7 @@ export default class TitanAbility extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (this.parent.img === 'icons/svg/item-bag.svg') {
+      if (this.parent.isOwner && this.parent.img === 'icons/svg/item-bag.svg') {
          this.initializeImg();
       }
    }
