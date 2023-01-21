@@ -3,7 +3,6 @@
 
    // Setup context variables
    const document = getContext("DocumentStore");
-   console.log($document.isOwner);
 
    export let text = void 0;
 </script>

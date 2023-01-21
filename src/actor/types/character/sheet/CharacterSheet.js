@@ -106,7 +106,6 @@ export default class TitanCharacterSheet extends TitanActorSheet {
 
    // Delete Item
    async deleteItem(itemId, deletionConfirmed) {
-      console.log(deletionConfirmed);
       if (this.reactive.document.isOwner) {
          if (!deletionConfirmed && game.settings.get('titan', 'confirmDeletingItems')) {
             const item = this.reactive.document.items.get(itemId);
