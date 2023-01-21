@@ -11,7 +11,7 @@ export default class TitanEffect extends TitanTypeComponent {
          this.initializeImg();
       }
 
-      if (this.parent.parent.isOwner && this.parent.parent) {
+      if (this.parent.parent && this.parent.parent.isOwner) {
          this._initializeEffect();
       }
    }
