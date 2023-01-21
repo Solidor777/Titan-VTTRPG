@@ -7,13 +7,16 @@ export default class TitanEffect extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (this.parent.isOwner && this.parent.img === 'icons/svg/item-bag.svg') {
-         this.initializeImg();
+      if (this.parent.isOwner) {
+         if (this.parent.img === 'icons/svg/item-bag.svg') {
+            this.initializeImg();
+         }
+
+         if (this.parent.parent && this.parent.parent.isOwner) {
+            this._initializeEffect();
+         }
       }
 
-      if (this.parent.parent && this.parent.parent.isOwner) {
-         this._initializeEffect();
-      }
    }
 
    initializeImg() {

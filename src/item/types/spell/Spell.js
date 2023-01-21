@@ -134,17 +134,19 @@ export default class TitanSpell extends TitanTypeComponent {
    }
 
    onCreate() {
-      if (this.parent.system.tradition === "any") {
-         this.parent.system.tradition = localize("any");
-         this.parent.update({
-            system: {
-               tradition: this.parent.system.tradition
-            }
-         });
-      }
+      if (this.parent.isOwner) {
+         if (this.parent.system.tradition === "any") {
+            this.parent.system.tradition = localize("any");
+            this.parent.update({
+               system: {
+                  tradition: this.parent.system.tradition
+               }
+            });
+         }
 
-      if (this.parent.isOwner && this.parent.img === 'icons/svg/item-bag.svg') {
-         this.initializeImg();
+         if (this.parent.img === 'icons/svg/item-bag.svg') {
+            this.initializeImg();
+         }
       }
    }
 
