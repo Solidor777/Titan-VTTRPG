@@ -7,8 +7,7 @@
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
    import CheckChatScalingAspects from "~/check/chat-message/CheckChatScalingAspects.svelte";
-   import ChatRichText from "~/helpers/svelte-components/ChatRichText.svelte";
-   import RichText from "../../../helpers/svelte-components/RichText.svelte";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");

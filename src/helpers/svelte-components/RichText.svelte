@@ -5,9 +5,12 @@
    const document = getContext("DocumentStore");
 
    export let text = void 0;
+   $: displayText = TextEditor.enrichHTML(text, { async: false, secrets: true });
 </script>
 
-<div class="rich-text {$document.isOwner ? '' : 'not-owner'}">{@html text}</div>
+<div class="rich-text {$document.isOwner ? '' : 'not-owner'}">
+   {@html displayText}
+</div>
 
 <style lang="scss">
    @import "../../Styles/Mixins.scss";

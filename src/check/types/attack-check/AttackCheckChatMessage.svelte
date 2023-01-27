@@ -6,10 +6,9 @@
    import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
    import CheckChatOpposedCheckButton from "~/check/chat-message/CheckChatOpposedCheckButton.svelte";
    import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
-   import ChatRichText from "~/helpers/svelte-components/ChatRichText.svelte";
    import AttackCheckChatHeader from "./AttackCheckChatHeader.svelte";
    import AttackCheckStats from "./AttackCheckStats.svelte";
-   import RichText from "../../../helpers/svelte-components/RichText.svelte";
+   import RichText from "~/helpers/svelte-components/RichText.svelte";
 
    // Document reference
    const document = getContext("DocumentStore");
