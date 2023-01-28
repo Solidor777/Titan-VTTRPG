@@ -279,6 +279,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Blinded
             case 'blind': {
                this.parent.system.statusEffect.blinded = true;
+
+               // Decrease Melee, Accuracy, and Defense by 1
+               systemData.rating.melee.effect -= 1;
+               systemData.rating.accuracy.effect -= 1;
+               systemData.rating.defense.effect -= 1;
+
                break;
             }
 
@@ -358,7 +364,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             case 'sleep': {
                // Apply the effect
                const systemData = this.parent.system;
-               systemData.statusEffect.asleep = true;
+               systemData.statusEffect.sleeping = true;
 
                // Calculate the total awareness
                const awareness = this.parent.system.rating.awareness;

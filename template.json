@@ -423,7 +423,6 @@
                }
             },
             "statusEffect": {
-               "asleep": false,
                "blinded": false,
                "contaminated": false,
                "deafened": false,
@@ -432,6 +431,7 @@
                "prone": false,
                "restrained": false,
                "stunned": false,
+               "sleeping": false,
                "unconscious": false
             },
             "description": ""

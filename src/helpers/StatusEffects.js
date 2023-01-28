@@ -11,7 +11,7 @@ export default [
    },
    {
       id: 'sleep',
-      label: 'EFFECT.StatusAsleep',
+      label: 'EFFECT.StatusSleeping',
       icon: 'icons/svg/sleep.svg'
    },
    {

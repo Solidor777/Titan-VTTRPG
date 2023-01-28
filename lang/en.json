@@ -453,7 +453,7 @@
   "LOCAL.role.label": "Role",
   "LOCAL.blindCheck.label": "Made a Blind Check",
   "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item?",
-  "EFFECT.StatusAsleep": "Asleep",
+  "EFFECT.StatusSleeping": "Sleeping",
   "EFFECT.StatusBleeding": "Bleeding",
   "EFFECT.StatusBlessed": "Blessed",
   "EFFECT.StatusBlind": "Blind",
