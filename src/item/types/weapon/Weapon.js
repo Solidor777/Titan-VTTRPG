@@ -68,22 +68,20 @@ export default class TitanWeapon extends TitanTypeComponent {
    }
 
    onCreate() {
-      if (this.parent.isOwner) {
-         if (this.parent.system.attack.length === 0) {
-            this.addAttack();
-         }
-
+      if (this.isFirstOwner()) {
          if (this.parent.img === 'icons/svg/item-bag.svg') {
             this.initializeImg();
+         }
+
+         if (this.parent.system.attack.length === 0) {
+            this.addAttack();
          }
       }
    }
 
-   initializeImg() {
-      this.parent.img = 'icons/svg/sword.svg';
-
-      this.parent.update({
-         img: this.parent.img
+   async initializeImg() {
+      return await this.parent.update({
+         img: 'icons/svg/sword.svg'
       });
    }
 }

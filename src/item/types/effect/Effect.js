@@ -7,38 +7,40 @@ export default class TitanEffect extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (this.parent.isOwner) {
-         if (this.parent.img === 'icons/svg/item-bag.svg') {
+      if (this.isFirstOwner()) {
+         const item = this.parent;
+         const actor = item.parent;
+         if (actor && item.system.effectId === '') {
+            this._initializeEffect();
+         }
+
+         else if (item.img === 'icons/svg/item-bag.svg') {
             this.initializeImg();
          }
 
-         if (this.parent.parent && this.parent.parent.isOwner) {
-            this._initializeEffect();
-         }
       }
-
    }
 
-   initializeImg() {
-      this.parent.img = 'icons/svg/daze.svg';
-
-      this.parent.update({
-         img: this.parent.img
+   async initializeImg() {
+      return await this.parent.update({
+         img: 'icons/svg/daze.svg'
       });
    }
 
    async _initializeEffect() {
-      const parent = this.parent;
-      const actor = this.parent.parent;
+      await this.initializeImg();
+
+      const item = this.parent;
+      const actor = item.parent;
       const effect = await ActiveEffect.create(
          {
-            label: parent.name,
-            icon: parent.img,
-            origin: parent.uuid,
+            label: item.name,
+            icon: item.img,
+            origin: item.uuid,
             disabled: false,
             flags: {
                core: {
-                  statusId: parent.uuid,
+                  statusId: item.uuid,
                },
             },
          },
@@ -47,9 +49,10 @@ export default class TitanEffect extends TitanTypeComponent {
          }
       );
 
-      this.parent.system.effectId = effect._id;
-      this.parent.update({
-         system: parent.system
+      return await item.update({
+         system: {
+            effectId: effect._id
+         }
       });
    }
 
@@ -60,6 +63,17 @@ export default class TitanEffect extends TitanTypeComponent {
          if (effect) {
             effect.icon = this.parent.img;
             effect.label = this.parent.name;
+         }
+      }
+   }
+
+   onDelete() {
+      // Remove any effects derived from this item
+      const item = this.parent;
+      if (item && item.effectId !== '') {
+         const actor = this.parent.parent;
+         if (actor) {
+            actor.effects.filter((effect) => effect.origin === item.uuid).forEach((effect) => effect.delete);
          }
       }
    }

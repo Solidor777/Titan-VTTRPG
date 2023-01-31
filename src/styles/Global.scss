@@ -63,7 +63,6 @@
    --meter-background: rgb(30, 30, 30);
    --font-color: rgba(255, 255, 255, 0.83);
 
-   
    .window-content {
       background: #262836;
       color: var(--color-text-dark-primary);
@@ -96,7 +95,6 @@
    }
 
    .prosemirror {
-
       .editor-menu {
          button:not(.pm-dropdown) {
             color: rgba(255, 255, 255, 0.83);
@@ -146,12 +144,12 @@
                background: var(--button-background);
                color: var(--button-color);
                margin: 0;
-            
+
                &:disabled {
                   cursor: default;
                   background: var(--button-background-disabled);
                }
-            
+
                &:hover {
                   &:not(:disabled) {
                      background: radial-gradient(var(--button-background-highlight), var(--button-background));
@@ -169,4 +167,10 @@
          display: none;
       }
    }
+}
+
+#chat-log .titan-dark-mode.emote.message .message-content {
+   text-align: center;
+   color: var(--panel-1-color);
+   font-style: italic;
 }

@@ -95,11 +95,6 @@ export default class TitanActor extends Actor {
             this.typeComponent.deleteItem(itemId);
          }
 
-         if (item.type === 'effect' && item.system.effectId !== '') {
-            const effect = this.effects.get(item.system.effectId);
-            effect.delete();
-         }
-
          // Delete the item
          item.delete();
       }

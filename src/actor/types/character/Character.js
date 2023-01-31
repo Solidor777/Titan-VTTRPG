@@ -942,7 +942,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   subHeader: [`${this.parent.name}`],
                   icon: 'fas fa-heart',
                   line: [
-                     `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
+                     `${localize('stamina')}: ${stamina.value} / ${stamina.max}`,
                      `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                   ]
                };
@@ -1330,126 +1330,124 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
-      if (this.parent.isOwner && game.user.isGM) {
-         let lines = [];
-         let updateActor = false;
+      let lines = [];
+      let updateActor = false;
 
-         // Regain resolve
-         if (game.settings.get('titan', 'autoRegainResolve') === true) {
+      // Regain resolve
+      if (game.settings.get('titan', 'autoRegainResolve') === true) {
 
-            // If the resolve value is below max
-            const resolve = this.parent.system.resource.resolve;
-            if (resolve.value < resolve.max) {
+         // If the resolve value is below max
+         const resolve = this.parent.system.resource.resolve;
+         if (resolve.value < resolve.max) {
 
-               // Update the actor
-               const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
-               resolve.value += resolveRegained;
-               updateActor = true;
+            // Update the actor
+            const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
+            resolve.value += resolveRegained;
+            updateActor = true;
 
-               // Add resolve update to report
-               if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-                  lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
-               }
+            // Add resolve update to report
+            if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+               lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
             }
          }
+      }
 
-         // Handle effects messages
-         if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-            this.parent.effects.forEach((effect) => {
-               lines.push(effect.label);
-            });
-         }
+      // Handle effects messages
+      if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+         this.parent.effects.forEach((effect) => {
+            lines.push(effect.label);
+         });
+      }
 
-         // Handle start of turn messages
-         if (this.turnStartMessages && this.turnStartMessages.length > 0) {
-            this.turnStartMessages.forEach((message) => {
-               if (message.message !== '') {
-                  lines.push(message.message);
-               }
-            });
-         }
-
-         // Handle stamina mods
-         if (this.turnStartStamina) {
-            const stamina = this.parent.system.resource.stamina;
-            // Healing
-            if (this.turnStartStamina > 0) {
-               const staminaHealed = await this.healDamage(this.turnStartStamina, false);
-               if (staminaHealed > 0) {
-                  lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
-               }
+      // Handle start of turn messages
+      if (this.turnStartMessages && this.turnStartMessages.length > 0) {
+         this.turnStartMessages.forEach((message) => {
+            if (message.message !== '') {
+               lines.push(message.message);
             }
-            else {
-               // Damage
-               const wounds = this.parent.system.resource.wounds;
-               const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
-               let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
-               if (damage.woundsTaken > 0) {
-                  modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
-               }
-               modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
-               lines = [...lines, ...modLines];
+         });
+      }
+
+      // Handle stamina mods
+      if (this.turnStartStamina) {
+         const stamina = this.parent.system.resource.stamina;
+         // Healing
+         if (this.turnStartStamina > 0) {
+            const staminaHealed = await this.healDamage(this.turnStartStamina, false);
+            if (staminaHealed > 0) {
+               lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
             }
          }
-
-         // Update actor if appropriate
-         if (updateActor) {
-            this.parent.update({
-               system: this.parent.system
-            });
+         else {
+            // Damage
+            const wounds = this.parent.system.resource.wounds;
+            const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
+            let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
+            if (damage.woundsTaken > 0) {
+               modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
+            }
+            modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
+            lines = [...lines, ...modLines];
          }
+      }
 
-         // Start of turn report
-         if (lines.length > 0) {
-            // Create chat context
-            const chatContext = {
-               type: 'report',
-               img: this.parent.img,
-               header: localize('turnStart'),
-               subHeader: [this.parent.name],
-               icon: 'fas fa-clock',
-               line: lines
-            };
+      // Update actor if appropriate
+      if (updateActor) {
+         this.parent.update({
+            system: this.parent.system
+         });
+      }
 
-            // Send the report to chat
-            await ChatMessage.create({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-               sound: CONFIG.sounds.notification,
-               whisper: game.users.filter((user) =>
-                  this.parent.testUserPermission(user, 'OWNER')
-               ),
-               flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
-               },
-            });
-         }
+      // Start of turn report
+      if (lines.length > 0) {
+         // Create chat context
+         const chatContext = {
+            type: 'report',
+            img: this.parent.img,
+            header: localize('turnStart'),
+            subHeader: [this.parent.name],
+            icon: 'fas fa-clock',
+            line: lines
+         };
 
-         // Open sheet
-         if (this.parent.isOwner) {
-            switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
-               case 'pcsOnly': {
-                  if (this.parent.hasPlayerOwner) {
-                     this.parent.sheet.render(true);
-                  }
-                  break;
+         // Send the report to chat
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
                }
-               case 'npcsOnly': {
-                  if (!this.parent.hasPlayerOwner) {
-                     this.parent.sheet.render(true);
-                  }
-                  break;
-               }
-               case 'all': {
+            },
+         });
+      }
+
+      // Open sheet
+      if (this.parent.isOwner) {
+         switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
+            case 'pcsOnly': {
+               if (this.parent.hasPlayerOwner) {
                   this.parent.sheet.render(true);
-                  break;
                }
-               default: {
-                  break;
+               break;
+            }
+            case 'npcsOnly': {
+               if (!this.parent.hasPlayerOwner) {
+                  this.parent.sheet.render(true);
                }
+               break;
+            }
+            case 'all': {
+               this.parent.sheet.render(true);
+               break;
+            }
+            default: {
+               break;
             }
          }
       }

@@ -8,16 +8,14 @@ export default class TitanArmor extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (this.parent.isOwner && this.parent.img === 'icons/svg/item-bag.svg') {
+      if (this.isFirstOwner() && this.parent.img === 'icons/svg/item-bag.svg') {
          this.initializeImg();
       }
    }
 
-   initializeImg() {
-      this.parent.img = 'icons/svg/statue.svg';
-
-      this.parent.update({
-         img: this.parent.img
+   async initializeImg() {
+      return await this.parent.update({
+         img: 'icons/svg/statue.svg'
       });
    }
 }

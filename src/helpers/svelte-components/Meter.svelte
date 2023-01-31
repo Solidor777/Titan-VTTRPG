@@ -17,10 +17,8 @@
       margin-left: 0.25rem;
       margin-right: 0.25rem;
       display: flex;
-      height: 100%;
+      height: 1.5rem;
       width: 100%;
-      box-sizing: border-box;
-      position: relative;
       background: var(--meter-background);
       border-radius: 25px;
       padding: 3px;
@@ -32,7 +30,6 @@
          border-radius: 20px;
          background: var(--meter-color);
          box-shadow: inset 0 2px 9px var(--meter-shadow-1), inset 0 -2px 6px var(--meter-shadow-2);
-         position: relative;
          overflow: hidden;
       }
    }
