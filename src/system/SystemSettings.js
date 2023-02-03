@@ -17,19 +17,28 @@ export default function registerSystemSettings() {
       default: true,
    });
 
-   game.settings.register('titan', 'autoOpenCombatantSheet', {
+   game.settings.register('titan', 'autoOpenCharacterSheetsPlayer', {
       config: true,
       scope: 'client',
-      name: 'SETTINGS.autoOpenCombatantSheet.label',
-      hint: 'SETTINGS.autoOpenCombatantSheet.hint',
+      name: 'SETTINGS.autoOpenCharacterSheetsPlayer.label',
+      hint: 'SETTINGS.autoOpenCharacterSheetsPlayer.hint',
+      type: Boolean,
+      default: true,
+   });
+
+   game.settings.register('titan', 'autoOpenCharacterSheetsGM', {
+      config: true,
+      scope: 'client',
+      name: 'SETTINGS.autoOpenCharacterSheetsGM.label',
+      hint: 'SETTINGS.autoOpenCharacterSheetsGM.hint',
       type: String,
       choices: {
-         pcsOnly: 'SETTINGS.autoOpenCombatantSheet.pcsOnly',
-         npcsOnly: 'SETTINGS.autoOpenCombatantSheet.npcsOnly',
-         all: 'SETTINGS.autoOpenCombatantSheet.all',
-         disabled: 'SETTINGS.autoOpenCombatantSheet.disabled',
+         npcsOnly: 'SETTINGS.autoOpenCharacterSheetsGM.npcsOnly',
+         pcsOnly: 'SETTINGS.autoOpenCharacterSheetsGM.pcsOnly',
+         all: 'SETTINGS.autoOpenCharacterSheetsGM.all',
+         disabled: 'SETTINGS.autoOpenCharacterSheetsGM.disabled',
       },
-      default: 'pcsOnly',
+      default: 'npcsOnly',
    });
 
    game.settings.register('titan', 'darkModeSheets', {

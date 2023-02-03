@@ -1331,17 +1331,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async onTurnStart() {
       const messages = [];
+      const actor = this.parent;
       let updateActor = false;
 
       // Regain resolve
       if (getSetting('autoRegainResolve') === true) {
 
          // If the resolve value is below max
-         const resolve = this.parent.system.resource.resolve;
+         const resolve = actor.system.resource.resolve;
          if (resolve.value < resolve.max) {
 
             // Update the actor
-            const resolveRegained = Math.min(this.parent.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
+            const resolveRegained = Math.min(actor.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
             resolve.value += resolveRegained;
             updateActor = true;
 
@@ -1355,7 +1356,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Decrease Effect Duration
       if (getSetting('autoDecreaseEffectDuration')) {
-         this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnStart').forEach((effect) => {
+         actor.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnStart').forEach((effect) => {
             if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
                effect.update({
@@ -1369,9 +1370,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Handle effects messages
       if (getSetting('reportEffects') === true) {
-         this.parent.effects.forEach((effect) => {
+         actor.effects.forEach((effect) => {
             const effectSource = effect.origin.split('.');
-            const effectItem = effectSource.length > 3 ? this.parent.items.get(effectSource[3]) : false;
+            const effectItem = effectSource.length > 3 ? actor.items.get(effectSource[3]) : false;
             if (effectItem) {
                if (effectItem.typeComponent.isPermanent()) {
                   messages.push(effectItem.name);
@@ -1400,7 +1401,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Handle stamina mods
       if (this.turnStartStamina) {
-         const stamina = this.parent.system.resource.stamina;
+         const stamina = actor.system.resource.stamina;
          // Healing
          if (this.turnStartStamina > 0) {
             const staminaHealed = await this.healDamage(this.turnStartStamina, false);
@@ -1410,7 +1411,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
          else {
             // Damage
-            const wounds = this.parent.system.resource.wounds;
+            const wounds = actor.system.resource.wounds;
             const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
             let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
             if (damage.woundsTaken > 0) {
@@ -1423,8 +1424,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Update actor if appropriate
       if (updateActor) {
-         this.parent.update({
-            system: this.parent.system
+         actor.update({
+            system: actor.system
          });
       }
 
@@ -1433,9 +1434,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Create chat context
          const chatContext = {
             type: 'report',
-            img: this.parent.img,
+            img: actor.img,
             header: localize('turnStart'),
-            subHeader: [this.parent.name],
+            subHeader: [actor.name],
             icon: 'fas fa-clock',
             message: messages
          };
@@ -1443,11 +1444,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Send the report to chat
          await ChatMessage.create({
             user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
             type: CONST.CHAT_MESSAGE_TYPES.OTHER,
             sound: CONFIG.sounds.notification,
             whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
+               actor.testUserPermission(user, 'OWNER')
             ),
             flags: {
                titan: {
@@ -1458,28 +1459,31 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Open sheet
-      if (this.parent.isOwner) {
-         switch (getSetting('autoOpenCombatantSheet')) {
-            case 'pcsOnly': {
-               if (this.parent.hasPlayerOwner) {
-                  this.parent.sheet.render(true);
+      if (game.user.isGM) {
+         switch (getSetting('autoOpenCharacterSheetsGM')) {
+            case 'npcsOnly': {
+               if (!actor.hasPlayerOwner) {
+                  actor.sheet.render(true);
                }
                break;
             }
-            case 'npcsOnly': {
-               if (!this.parent.hasPlayerOwner) {
-                  this.parent.sheet.render(true);
+            case 'pcsOnly': {
+               if (actor.hasPlayerOwner) {
+                  actor.sheet.render(true);
                }
                break;
             }
             case 'all': {
-               this.parent.sheet.render(true);
+               actor.sheet.render(true);
                break;
             }
             default: {
                break;
             }
          }
+      }
+      else if (actor.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
+         actor.sheet.render(true);
       }
 
       return;

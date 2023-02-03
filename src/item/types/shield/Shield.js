@@ -8,7 +8,7 @@ export default class TitanShield extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (this.isFirstOwner() && this.parent.img === 'icons/svg/item-bag.svg') {
+      if (isFirstOwner(this.parent) && this.parent.img === 'icons/svg/item-bag.svg') {
          this.initializeImg();
       }
    }

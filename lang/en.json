@@ -492,18 +492,22 @@
   "EFFECT.StatusUpgrade": "Empowered",
   "SETTINGS.getCheckOptions": {
     "label": "Ask for Check Options by default.",
-    "hint": "Hold Shift to toggle this setting."
+    "hint": "If true, an options dialog will pop-up when rolling a check. Hold Shift to toggle this setting."
   },
   "SETTINGS.confirmDeletingItems": {
     "label": "Confirm deleting items from Actors.",
     "hint": "If true, a confirmation dialog will be displayed when attempting to delete an Item from an Actor."
   },
-  "SETTINGS.autoOpenCombatantSheet": {
-    "label": "Auto-Open Combatant Sheets",
-    "hint": "Configure whethe to automatically open an owned character's sheet on their initiative turn.",
-    "pcsOnly": "Player owned actors.",
-    "npcsOnly": "(GM Only) Non-Player owned actors.",
-    "all": "(GM Only) All actors.",
+  "SETTINGS.autoOpenCharacterSheetsPlayer": {
+    "label": "Auto-Open Character Sheets (Player Only)",
+    "hint": "Configure whether to automatically open an owned character's sheet on their turn in combat. This setting only applies to Players."
+  },
+  "SETTINGS.autoOpenCharacterSheetsGM": {
+    "label": "Auto-Open Character Sheets (GM Only)",
+    "hint": "Configure whether to automatically open an owned character's sheet on their turn in combat. This setting only applies to GMs.",
+    "npcsOnly": "Non-Player owned actors",
+    "pcsOnly": "Player owned actors",
+    "all": "All actors",
     "disabled": "Disabled"
   },
   "SETTINGS.darkModeSheets": {

@@ -1,5 +1,5 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
-import { localize } from '~/helpers/Utility';
+import { localize, isFirstOwner } from '~/helpers/Utility';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
 export default class TitanEffect extends TitanTypeComponent {
@@ -8,7 +8,7 @@ export default class TitanEffect extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (this.isFirstOwner()) {
+      if (isFirstOwner(this.parent)) {
          const item = this.parent;
          const actor = item.parent;
          if (actor && item.system.effectId === '') {
@@ -78,7 +78,7 @@ export default class TitanEffect extends TitanTypeComponent {
    }
 
    _updateEffects() {
-      if (this.isFirstOwner()) {
+      if (isFirstOwner(this.parent)) {
          const effects = this._getEffects();
          if (effects.length > 0) {
             const item = this.parent;

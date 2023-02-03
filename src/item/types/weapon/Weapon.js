@@ -68,7 +68,7 @@ export default class TitanWeapon extends TitanTypeComponent {
    }
 
    onCreate() {
-      if (this.isFirstOwner()) {
+      if (isFirstOwner(this.parent)) {
          if (this.parent.img === 'icons/svg/item-bag.svg') {
             this.initializeImg();
          }

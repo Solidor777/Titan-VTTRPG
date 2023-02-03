@@ -4,7 +4,7 @@ import '~/styles/Mixins.scss';
 import '~/styles/Global.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { registerChatContextOptions } from '~/helpers/ChatContextOptions.js';
-import { getSetting } from '~/helpers/Utility';
+import { getSetting, isFirstOwner } from '~/helpers/Utility';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerTooltipSettings from '~/system/TooltipManager';
 import registerInitiativeFormula from '~/system/Initiative';
@@ -155,12 +155,12 @@ Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
    const previousTurnCharacter = combat.combatants.get(combat.previous?.combatantId)?.actor.character;
-   if (previousTurnCharacter && previousTurnCharacter.isFirstOwner()) {
+   if (previousTurnCharacter && isFirstOwner(previousTurnCharacter)) {
       previousTurnCharacter.onTurnEnd();
    }
 
    const currentTurnCharacter = combat.combatant?.actor?.character;
-   if (currentTurnCharacter && currentTurnCharacter.isFirstOwner()) {
+   if (currentTurnCharacter && isFirstOwner(previousTurnCharacter)) {
       currentTurnCharacter.onTurnStart();
    }
 });
