@@ -31,11 +31,11 @@
       {/if}
    </div>
 
-   <!--Lines-->
-   {#if chatContext.line && chatContext.line.length > 0}
+   <!--Messages-->
+   {#if chatContext.message && chatContext.message.length > 0}
       <div class="messages">
-         {#each chatContext.line as line}
-            <div class="line">{line}</div>
+         {#each chatContext.message as message}
+            <div class="message">{@html message}</div>
          {/each}
       </div>
    {/if}
@@ -99,7 +99,7 @@
          width: 100%;
          margin-top: 0.25rem;
 
-         .line {
+         .message {
             @include flex-row;
             @include flex-group-center;
             margin-top: 0.25rem;

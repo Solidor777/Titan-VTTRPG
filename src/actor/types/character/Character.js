@@ -941,7 +941,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   header: `${localize('tookDamage')}: ${damageTaken}`,
                   subHeader: [`${this.parent.name}`],
                   icon: 'fas fa-heart',
-                  line: [
+                  message: [
                      `${localize('stamina')}: ${stamina.value} / ${stamina.max}`,
                      `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                   ]
@@ -949,17 +949,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
                // Wounds taken
                if (woundsTaken > 0) {
-                  chatContext.line = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.line];
+                  chatContext.message = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.message];
                }
 
                // Damage resisted
                if (damageTaken !== damage) {
-                  chatContext.line = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.line];
+                  chatContext.message = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.message];
                }
 
                // Ignore Armor
                if (ignoreArmor) {
-                  chatContext.line = [localize('ignoreArmor'), ...chatContext.line];
+                  chatContext.message = [localize('ignoreArmor'), ...chatContext.message];
                }
 
                // Send the report to chat
@@ -1023,7 +1023,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                      header: `${localize('healedDamage')}: ${staminaHealed}`,
                      subHeader: [this.parent.name],
                      icon: 'fas fa-heart',
-                     line: [
+                     message: [
                         `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
                         `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                      ]
@@ -1084,7 +1084,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                      header: `${localize('spentResolve')}`,
                      subHeader: [this.parent.name],
                      icon: 'fas fa-bolt',
-                     line: [`${localize('resolve')}: ${resolve.value} / ${resolve.max}`]
+                     message: [`${localize('resolve')}: ${resolve.value} / ${resolve.max}`]
                   };
 
 
@@ -1171,7 +1171,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   header: localize('temporaryEffectsRemoved'),
                   subHeader: [this.parent.name],
                   icon: 'fas fa-arrow-rotate-left',
-                  line: [localize('resolveFullyRestored')]
+                  message: [localize('resolveFullyRestored')]
                };
 
                // Send the report to chat
@@ -1228,7 +1228,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   header: localize('tookAShortRest'),
                   subHeader: [this.parent.name],
                   icon: 'fas fa-face-exhaling',
-                  line: [
+                  message: [
                      localize('temporaryEffectsRemoved'),
                      localize('staminaAndResolveRestored'),
                   ]
@@ -1290,7 +1290,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   header: localize('tookALongRest'),
                   subHeader: [this.parent.name],
                   icon: 'fas fa-bed',
-                  line: [
+                  message: [
                      localize('temporaryEffectsRemoved'),
                      localize('staminaAndResolveRestored'),
                   ]
@@ -1298,8 +1298,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
                // Add line about wounds healed
                if (woundsHealed > 0) {
-                  chatContext.line = [
-                     ...chatContext.line,
+                  chatContext.message = [
+                     ...chatContext.message,
                      `${localize('woundsHealed')}: ${woundsHealed}`,
                      `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                   ];
@@ -1330,7 +1330,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
-      let messages = [];
+      const messages = [];
       let updateActor = false;
 
       // Regain resolve
@@ -1347,7 +1347,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
             // Add resolve update to report
             if (getSetting('reportRegainingResolve') === true) {
-               messages = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
+               messages.push(`${localize('regainedResolve')}: ${resolveRegained}`);
+               messages.push(`${localize('resolve')}: ${resolve.value} / ${resolve.max}`)
             }
          }
       }
@@ -1436,7 +1437,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             header: localize('turnStart'),
             subHeader: [this.parent.name],
             icon: 'fas fa-clock',
-            line: messages
+            message: messages
          };
 
          // Send the report to chat
@@ -1485,8 +1486,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnEnd() {
+      const messages = [];
+
       // Decrease Effect Duration
       if (getSetting('autoDecreaseEffectDuration')) {
+         const expiredEffects = [];
          this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnEnd').forEach((effect) => {
             if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
@@ -1496,8 +1500,50 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   }
                })
             }
+
+            if (effect.system.duration.remaining <= 0) {
+               expiredEffects.push(effect);
+            }
+         });
+
+         // Send message about expired effects
+         if (getSetting('reportEffects') && expiredEffects.length > 0) {
+            expiredEffects.forEach((effect) => {
+               messages.push(`${effect.name} (${localize('expired')})`);
+            });
+         }
+      }
+
+      // End of turn report
+      if (messages.length > 0) {
+         // Create chat context
+         const chatContext = {
+            type: 'report',
+            img: this.parent.img,
+            header: localize('turnEnd'),
+            subHeader: [this.parent.name],
+            icon: 'fas fa-clock',
+            message: messages
+         };
+
+         // Send the report to chat
+         await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            sound: CONFIG.sounds.notification,
+            whisper: game.users.filter((user) =>
+               this.parent.testUserPermission(user, 'OWNER')
+            ),
+            flags: {
+               titan: {
+                  chatContext: chatContext
+               }
+            },
          });
       }
+
+      return;
    }
 
    async toggleMultiAttack(itemId) {
