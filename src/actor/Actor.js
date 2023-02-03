@@ -1,6 +1,6 @@
 import { localize } from '~/helpers/Utility';
-import TitanPlayerComponent from './types/player/Player.js';
-import TitanNPCComponent from './types/npc/NPC.js';
+import TitanPlayerComponent from '~/actor/types/player/Player.js';
+import TitanNPCComponent from '~/actor/types/npc/NPC.js';
 export default class TitanActor extends Actor {
 
    async _preCreate(data, options, user) {

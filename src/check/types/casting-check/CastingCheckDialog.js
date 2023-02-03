@@ -1,6 +1,6 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize, getSetting } from '~/helpers/Utility.js';
-import CastingCheckDialogShell from './CastingCheckDialogShell.svelte';
+import CastingCheckDialogShell from '~/check/types/casting-check/CastingCheckDialogShell.svelte';
 export default class CastingCheckDialog extends TJSDialog {
    constructor(actor, options) {
       super(

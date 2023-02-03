@@ -1,9 +1,9 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
-import WeaponAddCustomTraitDialog from './WeaponAddCustomTraitDialog.js';
-import WeaponEditAttackTraitsDialog from './WeaponEditAttackTraitsDialog.js';
-import WeaponSheetShell from './WeaponSheetShell.svelte';
-import createWeaponSheetState from './WeaponSheetState.js';
+import WeaponAddCustomTraitDialog from '~/item/types/weapon/sheet/WeaponAddCustomTraitDialog.js';
+import WeaponEditAttackTraitsDialog from '~/item/types/weapon/sheet/WeaponEditAttackTraitsDialog.js';
+import WeaponSheetShell from '~/item/types/weapon/sheet/WeaponSheetShell.svelte';
+import createWeaponSheetState from '~/item/types/weapon/sheet/WeaponSheetState.js';
 
 export default class TitanWeaponSheet extends TitanItemSheet {
 

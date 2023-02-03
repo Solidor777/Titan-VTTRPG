@@ -1,8 +1,8 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import AbilitySheetShell from './AbilitySheetShell.svelte';
-import createAbilitySheetState from './AbilitySheetState';
+import AbilitySheetShell from '~/item/types/ability/sheet/AbilitySheetShell.svelte';
+import createAbilitySheetState from '~/item/types/ability/sheet/AbilitySheetState';
 
 export default class TitanAbilitySheet extends TitanItemSheet {
    /**

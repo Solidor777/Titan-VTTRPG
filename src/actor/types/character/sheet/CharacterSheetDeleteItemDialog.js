@@ -1,6 +1,6 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize, getSetting } from '~/helpers/Utility.js';
-import CharacterSheetDeleteItemDialogShell from './CharacterSheetDeleteItemDialogShell.svelte';
+import CharacterSheetDeleteItemDialogShell from '~/actor/types/character/sheet/CharacterSheetDeleteItemDialogShell.svelte';
 export default class CharacterSheetDeleteItemDialog extends TJSDialog {
    constructor(sheet, itemName, itemId) {
       super(

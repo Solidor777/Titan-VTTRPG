@@ -1,6 +1,6 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { getSetting } from '~/helpers/Utility';
-import DocumentAddCustomTraitDialogShell from './DocumentAddCustomTraitDialogShell.svelte';
+import DocumentAddCustomTraitDialogShell from '~/documents/DocumentAddCustomTraitDialogShell.svelte';
 export default class DocumentAddCustomTraitDialog extends TJSDialog {
    constructor(document) {
       super(

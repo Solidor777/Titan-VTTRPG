@@ -1,6 +1,6 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import SpellSheetShell from './SpellSheetShell.svelte';
-import createSpellSheetState from './SpellSheetState';
+import SpellSheetShell from '~/item/types/spell/sheet/SpellSheetShell.svelte';
+import createSpellSheetState from '~/item/types/spell/sheet/SpellSheetState';
 
 export default class TitanSpellSheet extends TitanItemSheet {
    /**

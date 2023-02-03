@@ -1,5 +1,5 @@
 import { clamp } from '~/helpers/Utility.js';
-import calculateCheckResults from './CalculateCheckResults.js';
+import calculateCheckResults from '~/check/CalculateCheckResults.js';
 
 export default class TitanCheck {
    // Constructor

@@ -1,7 +1,7 @@
 import { localize } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
 import TitanTypeComponent from '~/helpers/TypeComponent';
-import SpellAspects from './SpellAspects';
+import SpellAspects from '~/item/types/spell/SpellAspects';
 
 
 export default class TitanSpell extends TitanTypeComponent {

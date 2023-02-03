@@ -2,7 +2,7 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { writable } from 'svelte/store';
 import { localize, getSetting } from '~/helpers/Utility.js';
-import DocumentShell from './DocumentShell.svelte';
+import DocumentShell from '~/documents/DocumentShell.svelte';
 export default class SvelteDocumentSheet extends SvelteApplication {
 
    // Document store that monitors updates to any assigned document.

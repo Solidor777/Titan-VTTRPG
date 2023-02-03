@@ -1,6 +1,6 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize, getSetting } from '~/helpers/Utility.js';
-import ResistanceCheckDialogShell from './ResistanceCheckDialogShell.svelte';
+import ResistanceCheckDialogShell from '~/check/types/resistance-check/ResistanceCheckDialogShell.svelte';
 export default class ResistanceCheckDialog extends TJSDialog {
    constructor(actor, options) {
       super(

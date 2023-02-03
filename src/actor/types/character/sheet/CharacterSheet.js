@@ -1,7 +1,7 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
 import { getOptions, getSetting } from "~/helpers/Utility";
-import CharacterSheetDeleteItemDialog from "./CharacterSheetDeleteItemDialog";
-import CharacterSheetInventoryAddItemDialog from "./tabs/inventory/CharacterSheetInventoryAddItemDialog";
+import CharacterSheetDeleteItemDialog from "~/actor/types/character/sheet/CharacterSheetDeleteItemDialog";
+import CharacterSheetInventoryAddItemDialog from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
 export default class TitanCharacterSheet extends TitanActorSheet {
    // Toggle equipped

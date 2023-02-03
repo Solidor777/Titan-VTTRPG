@@ -1,6 +1,6 @@
-import PlayerSheetShell from './PlayerSheetShell.svelte';
+import PlayerSheetShell from '~/actor/types/player/PlayerSheetShell.svelte';
 import TitanCharacterSheet from '~/actor/types/character/sheet/CharacterSheet.js';
-import createPlayerSheetState from './PlayerSheetState';
+import createPlayerSheetState from '~/actor/types/player/PlayerSheetState';
 
 export default class TitanPlayerSheet extends TitanCharacterSheet {
    /**

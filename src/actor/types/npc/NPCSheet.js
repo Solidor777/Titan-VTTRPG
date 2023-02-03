@@ -1,6 +1,6 @@
-import NPCSheetShell from './NPCSheetShell.svelte';
+import NPCSheetShell from '~/actor/types/npc/NPCSheetShell.svelte';
 import TitanCharacterSheet from '~/actor/types/character/sheet/CharacterSheet.js';
-import createNPCSheetState from './NPCSheetState';
+import createNPCSheetState from '~/actor/types/npc/NPCSheetState';
 
 export default class TitanNPCSheet extends TitanCharacterSheet {
    /**

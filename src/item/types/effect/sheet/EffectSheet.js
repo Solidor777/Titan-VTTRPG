@@ -1,7 +1,7 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import EffectSheetShell from './EffectSheetShell.svelte';
-import createEffectSheetState from './EffectSheetState';
+import EffectSheetShell from '~/item/types/effect/sheet/EffectSheetShell.svelte';
+import createEffectSheetState from '~/item/types/effect/sheet/EffectSheetState';
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
     * Default Application options

@@ -1,12 +1,12 @@
 import { localize } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
-import TitanAbility from './types/ability/Ability.js';
-import TitanArmor from './types/armor/Armor.js';
-import TitanEffect from './types/effect/Effect.js';
-import TitanEquipment from './types/equipment/Equipment.js';
-import TitanShield from './types/shield/Shield.js';
-import TitanSpell from './types/spell/Spell.js';
-import TitanWeapon from './types/weapon/Weapon.js';
+import TitanAbility from '~/item/types/ability/Ability.js';
+import TitanArmor from '~/item/types/armor/Armor.js';
+import TitanEffect from '~/item/types/effect/Effect.js';
+import TitanEquipment from '~/item/types/equipment/Equipment.js';
+import TitanShield from '~/item/types/shield/Shield.js';
+import TitanSpell from '~/item/types/spell/Spell.js';
+import TitanWeapon from '~/item/types/weapon/Weapon.js';
 
 export default class TitanItem extends Item {
    prepareDerivedData() {

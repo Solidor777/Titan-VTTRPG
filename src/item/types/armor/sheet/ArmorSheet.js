@@ -1,8 +1,8 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import ArmorEditTraitsDialog from './ArmorEditTraitsDialog';
-import createArmorSheetState from './ArmorSheetState.js';
-import ArmorSheetShell from './ArmorSheetShell.svelte';
+import ArmorEditTraitsDialog from '~/item/types/armor/sheet/ArmorEditTraitsDialog.js';
+import createArmorSheetState from '~/item/types/armor/sheet/ArmorSheetState.js';
+import ArmorSheetShell from '~/item/types/armor/sheet/ArmorSheetShell.svelte';
 
 export default class TitanArmorSheet extends TitanItemSheet {
    /**

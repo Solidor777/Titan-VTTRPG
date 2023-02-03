@@ -1,5 +1,5 @@
 import { localize } from '~/helpers/Utility.js';
-import recalculateCheckResults from '../check/chat-message/RecalculateCheckResults';
+import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 
 async function reRollCheckFailures(li) {
    // Get the successes and failure count

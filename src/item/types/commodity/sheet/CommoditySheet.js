@@ -1,6 +1,6 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
-import CommoditySheetShell from './CommoditySheetShell.svelte';
-import createCommoditySheetState from './CommoditySheetState.js';
+import CommoditySheetShell from '~/item/types/commodity/sheet/CommoditySheetShell.svelte';
+import createCommoditySheetState from '~/item/types/commodity/sheet/CommoditySheetState.js';
 
 export default class TitanCommoditySheet extends TitanItemSheet {
    /**

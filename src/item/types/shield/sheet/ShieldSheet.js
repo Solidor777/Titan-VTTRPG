@@ -1,8 +1,8 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import ShieldEditTraitsDialog from './ShieldEditTraitsDialog';
-import createShieldSheetState from './ShieldSheetState.js';
-import ShieldSheetShell from './ShieldSheetShell.svelte';
+import ShieldEditTraitsDialog from '~/item/types/shield/sheet/ShieldEditTraitsDialog';
+import createShieldSheetState from '~/item/types/shield/sheet/ShieldSheetState.js';
+import ShieldSheetShell from '~/item/types/shield/sheet/ShieldSheetShell.svelte';
 
 export default class TitanShieldSheet extends TitanItemSheet {
    /**

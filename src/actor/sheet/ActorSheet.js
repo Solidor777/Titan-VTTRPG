@@ -1,5 +1,5 @@
 import SvelteDocumentSheet from '~/documents/DocumentSheet';
-import createActorSheetState from './ActorSheetState';
+import createActorSheetState from '~/actor/sheet/ActorSheetState';
 
 export default class TitanActorSheet extends SvelteDocumentSheet {
    /**

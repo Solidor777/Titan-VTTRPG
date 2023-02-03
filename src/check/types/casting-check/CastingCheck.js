@@ -1,5 +1,5 @@
 import TitanCheck from '~/check/Check.js';
-import calculateCastingCheckResults from './CalculateCastingCheckResults';
+import calculateCastingCheckResults from '~/check/types/casting-check/CalculateCastingCheckResults';
 
 export default class TitanCastingCheck extends TitanCheck {
    _ensureValidConstruction(options) {
