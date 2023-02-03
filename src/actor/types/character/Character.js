@@ -270,7 +270,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    _applyStatusEffects() {
-      // Get the temporary effects
+      // Get the combat effects
       const temporaryEffects = this.parent.temporaryEffects;
 
       // Check each effect to see if it is a status effect
@@ -1114,7 +1114,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
 
-   async removeTemporaryEffects(report) {
+   async removeCombatEffects(report) {
       if (this.parent.isOwner) {
          const systemData = this.parent.system;
          // Reset static mods
@@ -1152,9 +1152,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             system: this.parent.system
          });
 
-         // Delete all Temporary Effects
+         // Delete all combat effects
          let temporaryEffects = this.parent.items.filter((item) => {
-            return item.type === 'effect' && item.system.duration === 'temporary';
+            return item.type === 'effect' && item.system.duration.type !== 'permanent';
          });
          temporaryEffects.forEach((item) => {
             return this.parent.deleteItem(item._id);
@@ -1200,8 +1200,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async shortRest(report) {
       if (this.parent.isOwner) {
-         // Clear temporary effects
-         this.removeTemporaryEffects(false);
+         // Clear combat effects
+         this.removeCombatEffects(false);
 
          // Update the actor
          await this.parent.update({

@@ -34,11 +34,11 @@
    </div>
 
    <!--Reset Temp Effects button-->
-   <div class="button clear" use:tooltip={{ content: localize("removeTemporaryEffects") }}>
+   <div class="button clear" use:tooltip={{ content: localize("removeCombatEffects") }}>
       <IconButton
          icon={"fas fa-arrow-rotate-left"}
          on:click={() => {
-            application.removeTemporaryEffects(true);
+            application.removeCombatEffects(true);
          }}
       />
    </div>

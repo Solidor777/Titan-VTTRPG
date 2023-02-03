@@ -1,17 +1,23 @@
 <script>
    import { getContext } from "svelte";
    import { localize } from "~/helpers/Utility.js";
+   import { slide } from "svelte/transition";
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
    import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
+   import DocumentIntegerInput from "../../../../documents/components/input/DocumentIntegerInput.svelte";
 
    // Get Context variables
    const document = getContext("DocumentStore");
 
    const durationOptions = [
       {
-         value: "temporary",
-         label: localize("temporary"),
+         value: "turnEnd",
+         label: localize("turnEnd"),
+      },
+      {
+         value: "turnStart",
+         label: localize("turnStart"),
       },
       {
          value: "permanent",
@@ -35,7 +41,7 @@
 
       <!--Secondary Stats-->
       <div class="secondary-stats">
-         <!--Rarity-->
+         <!--Duration Type-->
          <div class="stat">
             <!-- Label-->
             <div class="label">
@@ -44,9 +50,24 @@
 
             <!--Input-->
             <div class="input">
-               <DocumentSelect options={durationOptions} bind:value={$document.system.duration} />
+               <DocumentSelect options={durationOptions} bind:value={$document.system.duration.type} />
             </div>
          </div>
+
+         <!--Duration Remaining-->
+         {#if $document.system.duration.type !== "permanent"}
+            <div class="stat" transition:slide|local>
+               <!-- Label-->
+               <div class="label">
+                  {localize("remaining")}
+               </div>
+
+               <!--Input-->
+               <div class="input number">
+                  <DocumentIntegerInput min={0} bind:value={$document.system.duration.remaining} />
+               </div>
+            </div>
+         {/if}
       </div>
    </div>
 </div>
@@ -105,6 +126,10 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
+
+                  &.number {
+                     --input-width: 2rem;
+                  }
                }
             }
          }

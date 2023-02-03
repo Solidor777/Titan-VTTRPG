@@ -515,7 +515,11 @@
          ],
          "rulesElement": [],
          "effectId": "",
-         "duration": "temporary"
+         "duration": {
+            "type": "turnEnd",
+            "remaining": 1
+         },
+         "active": "true"
       },
       "equipment": {
          "templates": [

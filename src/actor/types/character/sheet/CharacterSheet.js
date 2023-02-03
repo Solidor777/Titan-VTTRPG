@@ -131,11 +131,11 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       return;
    }
 
-   _clearTempEffectsFromState() {
+   _clearCombatEffectsFromState() {
       if (this.reactive.document.isOwner) {
          // Delete all Temp Effects and Mods
          let temporaryEffects = this.reactive.document.items.filter((item) => {
-            return item.type === 'effect' && item.system.duration === 'temporary';
+            return item.type === 'effect' && item.system.duration.type === 'permanent';
          });
          temporaryEffects.forEach((item) => {
             return this.reactive.state.deleteItem(item._id);
@@ -145,17 +145,17 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       return;
    }
 
-   async removeTemporaryEffects(report) {
+   async removeCombatEffects(report) {
       if (this.reactive.document.isOwner) {
-         this._clearTempEffectsFromState();
-         await this.reactive.document.typeComponent.removeTemporaryEffects(report);
+         this._clearCombatEffectsFromState();
+         await this.reactive.document.typeComponent.removeCombatEffects(report);
       }
       return;
    }
 
    async shortRest(report) {
       if (this.reactive.document.isOwner) {
-         this._clearTempEffectsFromState();
+         this._clearCombatEffectsFromState();
          await this.reactive.document.typeComponent.shortRest(report);
       }
       return;
@@ -163,7 +163,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
 
    async longRest(report) {
       if (this.reactive.document.isOwner) {
-         this._clearTempEffectsFromState();
+         this._clearCombatEffectsFromState();
          await this.reactive.document.typeComponent.longRest(report);
       }
       return;
