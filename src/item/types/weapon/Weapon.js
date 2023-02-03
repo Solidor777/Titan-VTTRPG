@@ -1,4 +1,4 @@
-import { localize } from '~/helpers/Utility.js';
+import { localize, isFirstOwner } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';

@@ -21,3 +21,7 @@ export function isFirstOwner(document) {
   const owners = game.users.filter((user) => user.active && document.canUserModify(user, 'owner'));
   return owners.length > 0 && game.user === owners[0];
 }
+
+export function isHtmlBlank(html) {
+  return (html === '' || html === '<p></p>')
+}

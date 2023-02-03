@@ -4,6 +4,9 @@
    import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
    import DocumentEditorInput from "~/documents/components/input/DocumentEditorInput.svelte";
 
+   export let header = localize("description");
+   export let fieldName = "system.description";
+
    // Setup context variables
    const appState = getContext("ApplicationStateStore");
 </script>
@@ -14,12 +17,12 @@
       <div class="description">
          <!--Header-->
          <h3>
-            {localize("description")}
+            {header}
          </h3>
 
          <!--Body-->
          <div class="body">
-            <DocumentEditorInput fieldName={"system.description"} />
+            <DocumentEditorInput {fieldName} />
          </div>
       </div>
    </ScrollingContainer>
@@ -52,6 +55,7 @@
          .body {
             @include flex-row;
             @include flex-group-left;
+            margin-top: 0.25rem;
             flex-wrap: wrap;
             width: 100%;
             height: 100%;

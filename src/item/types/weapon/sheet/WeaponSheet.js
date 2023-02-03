@@ -1,4 +1,5 @@
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
+import { isHtmlBlank } from '~/helpers/Utility';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
 import WeaponAddCustomTraitDialog from '~/item/types/weapon/sheet/WeaponAddCustomTraitDialog.js';
 import WeaponEditAttackTraitsDialog from '~/item/types/weapon/sheet/WeaponEditAttackTraitsDialog.js';
@@ -26,7 +27,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
 
    constructor(object) {
       super(object);
-      this.reactive.state = createWeaponSheetState();
+      this.reactive.state = createWeaponSheetState(isHtmlBlank(object.system.attackNotes) ? 'itemDescription' : 'attackNotes');
    }
 
    // Import add rules element functions

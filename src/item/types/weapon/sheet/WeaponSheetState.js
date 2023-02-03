@@ -1,9 +1,10 @@
 
 import { writable } from 'svelte/store';
 
-export default function createWeaponSheetState() {
+export default function createWeaponSheetState(activeDescriptionTab) {
    const { set, update, subscribe } = writable({
       activeTab: 'description',
+      activeDescriptionTab: activeDescriptionTab,
       isExpanded: {
          attacks: [],
          checks: [],

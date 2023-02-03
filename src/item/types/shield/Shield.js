@@ -1,3 +1,4 @@
+import { isFirstOwner } from '~/helpers/Utility';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
