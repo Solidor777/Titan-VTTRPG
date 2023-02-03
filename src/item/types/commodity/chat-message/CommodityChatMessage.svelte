@@ -50,7 +50,7 @@
             </div>
          {/if}
 
-         <!--Quanity-->
+         <!--Quantity-->
          <div class="tag">
             <StatTag label={localize("quantity")} value={item.system.quantity} />
          </div>

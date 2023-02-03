@@ -46,7 +46,7 @@
 
          <!--Controls-->
          <div class="controls">
-            <!--Quanity-->
+            <!--Quantity-->
             <div class="field">
                <div class="label">
                   {localize("quantity")}

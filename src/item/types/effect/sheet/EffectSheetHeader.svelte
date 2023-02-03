@@ -45,7 +45,7 @@
          <div class="stat">
             <!-- Label-->
             <div class="label">
-               {localize("duration")}
+               {localize("durationType")}
             </div>
 
             <!--Input-->

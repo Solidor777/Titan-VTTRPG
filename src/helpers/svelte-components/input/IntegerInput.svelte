@@ -6,9 +6,14 @@
    export let min = false;
    export let max = false;
    export let disabled = false;
+   $: input = value;
 
    function validateInput() {
-      value = parseInt(value);
+      value = parseInt(input);
+      if (isNaN(value)) {
+         input = 0;
+         value = 0;
+      }
       if (min !== false) {
          value = Math.max(value, min);
       }
@@ -31,7 +36,7 @@
    type="number"
    on:change={validateInput}
    on:change
-   bind:value
+   bind:value={input}
    on:keypress={(event) => checkInput(event)}
    {disabled}
 />

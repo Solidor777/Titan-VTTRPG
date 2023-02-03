@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
    import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
@@ -12,6 +12,8 @@
    import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
+   import DurationTag from "~/helpers/svelte-components/tag/DurationTag.svelte";
 
    // Reference to the weapon id
    export let id = void 0;
@@ -45,8 +47,30 @@
 
          <!--Controls-->
          <div class="controls">
-            <!--Check-->
-            {#if item.system.check.length > 0}
+            <!--Duration-->
+            {#if item.system.duration.type !== "permanent"}
+               <div class="field">
+                  <div class="label">
+                     {localize("duration")}
+                  </div>
+                  <div class="input">
+                     <IntegerInput
+                        min={0}
+                        bind:value={item.system.duration.remaining}
+                        on:change={() => {
+                           item.update({
+                              system: {
+                                 duration: {
+                                    remaining: item.system.duration.remaining,
+                                 },
+                              },
+                           });
+                        }}
+                     />
+                  </div>
+               </div>
+            {:else if item.system.check.length > 0}
+               <!--Check-->
                <div>
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
@@ -58,17 +82,17 @@
             {/if}
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{content: localize("sendToChat")}}>
+            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{content: localize("editItem")}}>
+            <div class="button" use:tooltip={{ content: localize("editItem") }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{content: localize("deleteItem")}}>
+            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -91,16 +115,28 @@
                </div>
             {/if}
 
-            <!--Traits-->
-            {#if item.system.customTrait.length > 0}
-               <div class="section tags small-text">
+            <div class="section tags small-text">
+               <!--Duration-->
+               <div class="tag">
+                  <DurationTag type={item.system.duration.type} remaining={item.system.duration.remaining} />
+               </div>
+
+               <!--Expired-->
+               {#if item.system.duration.type !== "permanent" && item.system.duration.remaining <= 0}
+                  <div class="tag">
+                     <Tag label={localize("expired")} />
+                  </div>
+               {/if}
+
+               <!--Traits-->
+               {#if item.system.customTrait.length > 0}
                   {#each item.system.customTrait as trait}
-                     <div class="tag" use:tooltip={{content: trait.description}}>
+                     <div class="tag" use:tooltip={{ content: trait.description }}>
                         <Tag label={trait.name} />
                      </div>
                   {/each}
-               </div>
-            {/if}
+               {/if}
+            </div>
          </div>
       {/if}
    </div>
@@ -140,6 +176,19 @@
             .button {
                &:not(:first-child) {
                   margin-left: 0.25rem;
+               }
+            }
+
+            .field {
+               @include flex-row;
+               @include flex-group-center;
+
+               .label {
+                  margin-right: 0.25rem;
+               }
+
+               .input {
+                  width: 2rem;
                }
             }
          }

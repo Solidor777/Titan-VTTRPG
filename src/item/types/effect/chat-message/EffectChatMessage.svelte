@@ -1,10 +1,12 @@
 <script>
    import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import { localize } from "~/helpers/Utility.js";
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
    import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import DurationTag from "~/helpers/svelte-components/tag/DurationTag.svelte";
 
    // Chat context reference
    const document = getContext("DocumentStore");
@@ -32,16 +34,28 @@
          </div>
       {/if}
 
-      <!--Traits-->
-      {#if item.system.customTrait.length > 0}
-         <div class="section tags small-text">
+      <div class="section tags small-text">
+         <!--Duration-->
+         <div class="tag">
+            <DurationTag type={item.system.duration.type} remaining={item.system.duration.remaining} />
+         </div>
+
+         <!--Expired-->
+         {#if item.system.duration.type !== "permanent" && item.system.duration.remaining <= 0}
+            <div class="tag">
+               <Tag label={localize("expired")} />
+            </div>
+         {/if}
+
+         <!--Traits-->
+         {#if item.system.customTrait.length > 0}
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltip={{content: trait.description}}>
+               <div class="tag" use:tooltip={{ content: trait.description }}>
                   <Tag label={trait.name} />
                </div>
             {/each}
-         </div>
-      {/if}
+         {/if}
+      </div>
    </div>
 </div>
 
