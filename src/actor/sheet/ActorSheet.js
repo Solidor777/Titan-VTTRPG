@@ -1,5 +1,4 @@
 import SvelteDocumentSheet from '~/documents/DocumentSheet';
-import createActorSheetState from '~/actor/sheet/ActorSheetState';
 
 export default class TitanActorSheet extends SvelteDocumentSheet {
    /**
@@ -13,11 +12,6 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
          width: 750,
          height: 800,
       });
-   }
-
-   constructor(object) {
-      super(object);
-      this.reactive.state = createActorSheetState();
    }
 
    _getHeaderButtons() {

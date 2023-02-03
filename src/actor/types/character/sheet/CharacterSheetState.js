@@ -1,7 +1,7 @@
 
 import { writable } from 'svelte/store';
 
-export default function createActorSheetState() {
+export default function createCharacterSheetState() {
    const { set, update, subscribe } = writable({
       scrollTop: {
          abilities: 0,

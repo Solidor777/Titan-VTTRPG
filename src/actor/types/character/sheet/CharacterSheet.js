@@ -1,9 +1,15 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
 import { getOptions, getSetting } from "~/helpers/Utility";
+import createCharacterSheetState from "./CharacterSheetState";
 import CharacterSheetDeleteItemDialog from "~/actor/types/character/sheet/CharacterSheetDeleteItemDialog";
 import CharacterSheetInventoryAddItemDialog from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
 export default class TitanCharacterSheet extends TitanActorSheet {
+   constructor(object) {
+      super(object);
+      this.reactive.state = createCharacterSheetState();
+   }
+
    // Toggle equipped
    async toggleEquipped(itemId) {
       if (this.reactive.document.isOwner) {

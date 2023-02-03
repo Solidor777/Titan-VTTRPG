@@ -1198,6 +1198,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   removeExpiredEffects() {
+      const actor = this.parent;
+      const sheet = this.parent._sheet;
+      const expiredItems = actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
+      if (sheet) {
+         expiredItems.forEach((item) => sheet.deleteItem(item._id, true));
+      }
+      else {
+         expiredItems.forEach((item) => actor.deleteItem(item._id));
+      }
+
+      return;
+   }
+
    async shortRest(report) {
       if (this.parent.isOwner) {
          // Clear combat effects
@@ -1700,17 +1714,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   deleteItem(id) {
+   deleteItem(itemId) {
       if (this.parent.isOwner) {
          // Remove the armor if appropriate
          const armorId = this.parent.system.equipped.armor;
-         if (armorId === id) {
+         if (armorId === itemId) {
             this.unEquipArmor();
          }
 
          // Remove the shield if appropriate
          const shieldId = this.parent.system.equipped.armor;
-         if (shieldId === id) {
+         if (shieldId === itemId) {
             this.unEquipShield();
          }
       }
