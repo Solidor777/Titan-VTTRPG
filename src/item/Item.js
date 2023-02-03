@@ -32,6 +32,7 @@ export default class TitanItem extends Item {
             break;
          }
 
+         // Armor
          case 'armor': {
             this.typeComponent = new TitanArmor(this);
             this.armor = this.typeComponent;
@@ -45,7 +46,7 @@ export default class TitanItem extends Item {
             break;
          }
 
-         // Effect
+         // Equipment
          case 'equipment': {
             this.typeComponent = new TitanEquipment(this);
             this.equipment = this.typeComponent;
