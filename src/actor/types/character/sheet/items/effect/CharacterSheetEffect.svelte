@@ -51,7 +51,7 @@
             {#if item.system.duration.type !== "permanent"}
                <div class="field">
                   <div class="label">
-                     {localize("duration")}
+                     {localize("turns")}
                   </div>
                   <div class="input">
                      <IntegerInput

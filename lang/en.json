@@ -448,6 +448,7 @@
   "LOCAL.woundRegain.label": "Wound Regain",
   "LOCAL.turnStartMessage.label": "Turn Start Message",
   "LOCAL.turnStartStamina.label": "Turn Start Stamina",
+  "LOCAL.turns.label": "Turns",
   "LOCAL.attributeCheck.label": "Attribute Check",
   "LOCAL.resolveFullyRestored.label": "Resolve Fully Restored",
   "LOCAL.minion.label": "Minion",

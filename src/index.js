@@ -153,8 +153,13 @@ Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
-   const character = combat.combatant?.actor?.character;
-   if (character && character.isFirstOwner()) {
-      character.onTurnStart();
+   const previousTurnCharacter = combat.combatants.get(combat.previous?.combatantId)?.actor.character;
+   if (previousTurnCharacter && previousTurnCharacter.isFirstOwner()) {
+      console.log(previousTurnCharacter);
+   }
+
+   const currentTurnCharacter = combat.combatant?.actor?.character;
+   if (currentTurnCharacter && currentTurnCharacter.isFirstOwner()) {
+      currentTurnCharacter.onTurnStart();
    }
 });

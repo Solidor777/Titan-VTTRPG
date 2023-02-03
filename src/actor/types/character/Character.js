@@ -1484,6 +1484,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   async onTurnEnd() {
+
+   }
+
    async toggleMultiAttack(itemId) {
       if (this.parent.isOwner) {
          const item = this.parent.items.get(itemId);
