@@ -525,25 +525,29 @@
     "hint": "Optional formula to add to a character's Initiative rating during combat (default is +2d6)."
   },
   "SETTINGS.autoRegainResolve": {
-    "label": "Auto-increase combatent resolve.",
+    "label": "Auto-regain Resolve.",
     "hint": "When enabled, a combatant's resolve will automatically increase by 1 at the start of their turn."
   },
+  "SETTINGS.autoDecreaseEffectDuration": {
+    "label": "Auto-decrease Effect duration.",
+    "hint": "When enabled, a combatant's effects will automatically decrease by 1 at the start or end of their turn."
+  },
   "SETTINGS.reportTakingDamage": {
-    "label": "Report taking Damage",
+    "label": "Report Taking Damage",
     "hint": "Notify when an actor takes Damage.",
     "owner": "Owner",
     "gmOnly": "GM Only",
     "disabled": "Disabled"
   },
   "SETTINGS.reportHealingDamage": {
-    "label": "Report healing Damage",
+    "label": "Report Healing Damage",
     "hint": "Notify when an actor heals Damage.",
     "owner": "Owner",
     "gmOnly": "GM Only",
     "disabled": "Disabled"
   },
   "SETTINGS.reportSpendingResolve": {
-    "label": "Report spending Resolve",
+    "label": "Report Spending Resolve",
     "hint": "Notify when an actor spends Resolve.",
     "owner": "Owner",
     "gmOnly": "GM Only",

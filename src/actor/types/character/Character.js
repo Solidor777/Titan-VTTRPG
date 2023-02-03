@@ -1352,10 +1352,39 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       }
 
+      // Decrease Effects
+      if (game.settings.get('titan', 'autoDecreaseEffectDuration')) {
+         this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnStart').forEach((effect) => {
+            if (effect.system.duration.remaining > 0) {
+               effect.system.duration.remaining -= 1;
+               effect.update({
+                  system: {
+                     duration: effect.system.duration
+                  }
+               })
+            }
+         });
+      }
+
       // Handle effects messages
-      if (game.settings.get('titan', 'reportRegainingResolve') === true) {
+      if (game.settings.get('titan', 'reportEffects') === true) {
          this.parent.effects.forEach((effect) => {
-            lines.push(effect.label);
+            const effectSource = effect.origin.split('.');
+            const effectItem = effectSource.length > 3 ? this.parent.items.get(effectSource[3]) : false;
+            if (effectItem) {
+               if (effectItem.typeComponent.isPermanent()) {
+                  lines.push(effectItem.name);
+               }
+               else if (effectItem.typeComponent.isExpired()) {
+                  lines.push(`${effectItem.name} (${localize('expired')})`);
+               }
+               else {
+                  lines.push((`${effectItem.name}: ${localize(effectItem.system.duration.type)} (${effectItem.system.duration.remaining})`))
+               }
+            }
+            else {
+               lines.push(effect.label);
+            }
          });
       }
 

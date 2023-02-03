@@ -87,6 +87,16 @@ export default function registerSystemSettings() {
       default: true,
    });
 
+   game.settings.register('titan', 'autoDecreaseEffectDuration', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoDecreaseEffectDuration.label',
+      hint: 'SETTINGS.autoDecreaseEffectDuration.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+   });
+
    game.settings.register('titan', 'reportTakingDamage', {
       config: true,
       scope: 'world',
