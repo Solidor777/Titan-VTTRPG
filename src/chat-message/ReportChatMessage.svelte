@@ -33,7 +33,7 @@
 
    <!--Lines-->
    {#if chatContext.line && chatContext.line.length > 0}
-      <div class="lines">
+      <div class="messages">
          {#each chatContext.line as line}
             <div class="line">{line}</div>
          {/each}
@@ -93,7 +93,7 @@
          }
       }
 
-      .lines {
+      .messages {
          @include flex-column;
          @include flex-group-top;
          width: 100%;

@@ -1,5 +1,5 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import { localize } from '~/helpers/Utility.js';
+import { localize, getSetting } from '~/helpers/Utility.js';
 import CharacterSheetDeleteItemDialogShell from './CharacterSheetDeleteItemDialogShell.svelte';
 export default class CharacterSheetDeleteItemDialog extends TJSDialog {
    constructor(sheet, itemName, itemId) {
@@ -20,7 +20,7 @@ export default class CharacterSheetDeleteItemDialog extends TJSDialog {
          {
             width: 250,
             height: 210,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );
    }

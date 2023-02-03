@@ -1,5 +1,5 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import { localize } from '~/helpers/Utility.js';
+import { localize, getSetting } from '~/helpers/Utility.js';
 import ResistanceCheckDialogShell from './ResistanceCheckDialogShell.svelte';
 export default class ResistanceCheckDialog extends TJSDialog {
    constructor(actor, options) {
@@ -19,7 +19,7 @@ export default class ResistanceCheckDialog extends TJSDialog {
          {
             width: 320,
             height: 295,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );
    }

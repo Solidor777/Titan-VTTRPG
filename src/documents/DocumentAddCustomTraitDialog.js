@@ -1,4 +1,5 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { getSetting } from '~/helpers/Utility';
 import DocumentAddCustomTraitDialogShell from './DocumentAddCustomTraitDialogShell.svelte';
 export default class DocumentAddCustomTraitDialog extends TJSDialog {
    constructor(document) {
@@ -18,7 +19,7 @@ export default class DocumentAddCustomTraitDialog extends TJSDialog {
          {
             width: 300,
             height: 300,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );
    }

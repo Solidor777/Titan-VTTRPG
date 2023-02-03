@@ -10,3 +10,7 @@ export function getOptions() {
   const retVal = game.settings.get('titan', 'getCheckOptions') === true;
   return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT) ? !retVal : retVal;
 }
+
+export function getSetting(setting) {
+  return game.settings.get('titan', setting);
+}

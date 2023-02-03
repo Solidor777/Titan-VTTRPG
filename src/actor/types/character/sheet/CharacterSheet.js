@@ -1,5 +1,5 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
-import { getOptions } from "~/helpers/Utility";
+import { getOptions, getSetting } from "~/helpers/Utility";
 import CharacterSheetDeleteItemDialog from "./CharacterSheetDeleteItemDialog";
 import CharacterSheetInventoryAddItemDialog from "./tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
@@ -107,7 +107,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    // Delete Item
    async deleteItem(itemId, deletionConfirmed) {
       if (this.reactive.document.isOwner) {
-         if (!deletionConfirmed && game.settings.get('titan', 'confirmDeletingItems')) {
+         if (!deletionConfirmed && getSetting('confirmDeletingItems')) {
             const item = this.reactive.document.items.get(itemId);
             if (item) {
                const dialog = new CharacterSheetDeleteItemDialog(this, item.name, itemId);

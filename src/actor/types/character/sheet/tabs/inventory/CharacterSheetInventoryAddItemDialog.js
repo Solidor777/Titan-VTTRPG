@@ -1,5 +1,5 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import { localize } from '~/helpers/Utility.js';
+import { localize, getSetting } from '~/helpers/Utility.js';
 import CharacterSheetInventoryAddItemDialogShell from './CharacterSheetInventoryAddItemDialogShell.svelte';
 export default class CharacterSheetInventoryAddItemDialog extends TJSDialog {
    constructor(sheet) {
@@ -18,7 +18,7 @@ export default class CharacterSheetInventoryAddItemDialog extends TJSDialog {
          {
             width: 150,
             height: 170,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );
    }

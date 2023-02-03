@@ -1,7 +1,7 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { writable } from 'svelte/store';
-import { localize } from '~/helpers/Utility.js';
+import { localize, getSetting } from '~/helpers/Utility.js';
 import DocumentShell from './DocumentShell.svelte';
 export default class SvelteDocumentSheet extends SvelteApplication {
 
@@ -20,7 +20,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          {
             id: `document-sheet-${document.id}`,
             title: document.name,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          }
       ));
 

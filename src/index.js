@@ -4,6 +4,7 @@ import './styles/Mixins.scss';
 import './styles/Global.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { registerChatContextOptions } from './helpers/ChatContextOptions.js';
+import { getSetting } from '~/helpers/Utility';
 import registerSystemSettings from './system/SystemSettings.js';
 import registerTooltipSettings from './system/TooltipManager';
 import registerInitiativeFormula from './system/Initiative';
@@ -105,7 +106,7 @@ Hooks.on('renderChatMessage', (message, html) => {
       }
 
       // Add the dark mode class
-      if (game.settings.get('titan', 'darkModeChatMessages') !== 'disabled') {
+      if (getSetting('darkModeChatMessages') !== 'disabled') {
          content.addClass('titan-dark-mode');
       }
 
@@ -118,7 +119,7 @@ Hooks.on('renderChatMessage', (message, html) => {
          }
       });
    }
-   else if (game.settings.get('titan', 'darkModeChatMessages') === 'all') {
+   else if (getSetting('darkModeChatMessages') === 'all') {
       // Add the titan class
       let content = html.find('.chat-message').prevObject;
       content.addClass('titan-dark-mode');
@@ -137,14 +138,14 @@ Hooks.on('preDeleteChatMessage', (message) => {
 });
 
 Hooks.on('renderJournalSheet', (journalSheet, html) => {
-   if (game.settings.get('titan', 'darkModeJournals')) {
+   if (getSetting('darkModeJournals')) {
       const journal = html.find('journal-entry').prevObject;
       journal.addClass('titan-dark-mode');
    }
 });
 
 Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
-   if (game.settings.get('titan', 'darkModeJournals')) {
+   if (getSetting('darkModeJournals')) {
       const journal = html.find('journal-entry').prevObject;
       journal.addClass('titan-dark-mode');
    }
@@ -155,7 +156,7 @@ Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 Hooks.on("updateCombat", (combat) => {
    const previousTurnCharacter = combat.combatants.get(combat.previous?.combatantId)?.actor.character;
    if (previousTurnCharacter && previousTurnCharacter.isFirstOwner()) {
-      console.log(previousTurnCharacter);
+      previousTurnCharacter.onTurnEnd();
    }
 
    const currentTurnCharacter = combat.combatant?.actor?.character;

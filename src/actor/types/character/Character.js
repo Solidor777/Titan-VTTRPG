@@ -1,4 +1,4 @@
-import { clamp, localize } from '~/helpers/Utility.js';
+import { clamp, localize, getSetting } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
 import { applyMulBase } from '~/rules-element/MulBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -150,13 +150,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Calculate base resource values
       // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * game.settings.get('titan', 'staminaMultiplier')), 1);
+      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('staminaMultiplier')), 1);
 
       // Resolve = Soul / 2 rounded up
-      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * game.settings.get('titan', 'resolveMultiplier')), 1);
+      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('resolveMultiplier')), 1);
 
       // Wounds = Total Attribute mod / 2 rounded up
-      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * game.settings.get('titan', 'woundsMultiplier')), 1);
+      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('woundsMultiplier')), 1);
    }
 
    _resetDynamicMods() {
@@ -541,7 +541,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const initiative = this.parent.system.rating.initiative.value;
 
       // Get the initiative formula
-      const initiativeFormula = game.settings.get('titan', 'initiativeFormula');
+      const initiativeFormula = getSetting('initiativeFormula');
 
       return await new Roll(`${initiative}${initiativeFormula}`);
    }
@@ -931,7 +931,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Report
          if (report) {
-            const reportSettings = game.settings.get('titan', 'reportTakingDamage');
+            const reportSettings = getSetting('reportTakingDamage');
             if (reportSettings !== 'disabled') {
 
                // Create the chat context
@@ -1013,7 +1013,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
             // Report
             if (report) {
-               const reportSettings = game.settings.get('titan', 'reportHealingDamage');
+               const reportSettings = getSetting('reportHealingDamage');
                if (reportSettings !== 'disabled') {
                   // Create chat context
                   const wounds = this.parent.system.resource.wounds;
@@ -1075,7 +1075,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
             // Report
             if (report) {
-               const reportSettings = game.settings.get('titan', 'reportSpendingResolve');
+               const reportSettings = getSetting('reportSpendingResolve');
                if (reportSettings !== 'disabled') {
                   // Create chat context
                   const chatContext = {
@@ -1162,7 +1162,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Report
          if (report) {
-            const reportSettings = game.settings.get('titan', 'reportResting');
+            const reportSettings = getSetting('reportResting');
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
@@ -1219,7 +1219,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Report
          if (report) {
-            const reportSettings = game.settings.get('titan', 'reportResting');
+            const reportSettings = getSetting('reportResting');
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
@@ -1281,7 +1281,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Report
          if (report) {
-            const reportSettings = game.settings.get('titan', 'reportResting');
+            const reportSettings = getSetting('reportResting');
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
@@ -1330,11 +1330,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
-      let lines = [];
+      let messages = [];
       let updateActor = false;
 
       // Regain resolve
-      if (game.settings.get('titan', 'autoRegainResolve') === true) {
+      if (getSetting('autoRegainResolve') === true) {
 
          // If the resolve value is below max
          const resolve = this.parent.system.resource.resolve;
@@ -1346,14 +1346,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             updateActor = true;
 
             // Add resolve update to report
-            if (game.settings.get('titan', 'reportRegainingResolve') === true) {
-               lines = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
+            if (getSetting('reportRegainingResolve') === true) {
+               messages = [`${localize('regainedResolve')}: ${resolveRegained}`, `${localize('resolve')}: ${resolve.value} / ${resolve.max}`];
             }
          }
       }
 
-      // Decrease Effects
-      if (game.settings.get('titan', 'autoDecreaseEffectDuration')) {
+      // Decrease Effect Duration
+      if (getSetting('autoDecreaseEffectDuration')) {
          this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnStart').forEach((effect) => {
             if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
@@ -1367,23 +1367,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Handle effects messages
-      if (game.settings.get('titan', 'reportEffects') === true) {
+      if (getSetting('reportEffects') === true) {
          this.parent.effects.forEach((effect) => {
             const effectSource = effect.origin.split('.');
             const effectItem = effectSource.length > 3 ? this.parent.items.get(effectSource[3]) : false;
             if (effectItem) {
                if (effectItem.typeComponent.isPermanent()) {
-                  lines.push(effectItem.name);
+                  messages.push(effectItem.name);
                }
                else if (effectItem.typeComponent.isExpired()) {
-                  lines.push(`${effectItem.name} (${localize('expired')})`);
+                  messages.push(`${effectItem.name} (${localize('expired')})`);
                }
                else {
-                  lines.push((`${effectItem.name}: ${localize(effectItem.system.duration.type)} (${effectItem.system.duration.remaining})`))
+                  messages.push((`${effectItem.name}: ${localize(effectItem.system.duration.type)} (${effectItem.system.duration.remaining})`))
                }
             }
             else {
-               lines.push(effect.label);
+               messages.push(effect.label);
             }
          });
       }
@@ -1392,7 +1392,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (this.turnStartMessages && this.turnStartMessages.length > 0) {
          this.turnStartMessages.forEach((message) => {
             if (message.message !== '') {
-               lines.push(message.message);
+               messages.push(message.message);
             }
          });
       }
@@ -1404,7 +1404,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (this.turnStartStamina > 0) {
             const staminaHealed = await this.healDamage(this.turnStartStamina, false);
             if (staminaHealed > 0) {
-               lines.push(`${localize('staminaHealed')}: ${staminaHealed}`);
+               messages.push(`${localize('staminaHealed')}: ${staminaHealed}`);
             }
          }
          else {
@@ -1416,7 +1416,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
             }
             modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
-            lines = [...lines, ...modLines];
+            messages = [...messages, ...modLines];
          }
       }
 
@@ -1428,7 +1428,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Start of turn report
-      if (lines.length > 0) {
+      if (messages.length > 0) {
          // Create chat context
          const chatContext = {
             type: 'report',
@@ -1436,7 +1436,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             header: localize('turnStart'),
             subHeader: [this.parent.name],
             icon: 'fas fa-clock',
-            line: lines
+            line: messages
          };
 
          // Send the report to chat
@@ -1458,7 +1458,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Open sheet
       if (this.parent.isOwner) {
-         switch (game.settings.get('titan', 'autoOpenCombatantSheet')) {
+         switch (getSetting('autoOpenCombatantSheet')) {
             case 'pcsOnly': {
                if (this.parent.hasPlayerOwner) {
                   this.parent.sheet.render(true);
@@ -1485,7 +1485,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnEnd() {
-
+      // Decrease Effect Duration
+      if (getSetting('autoDecreaseEffectDuration')) {
+         this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnEnd').forEach((effect) => {
+            if (effect.system.duration.remaining > 0) {
+               effect.system.duration.remaining -= 1;
+               effect.update({
+                  system: {
+                     duration: effect.system.duration
+                  }
+               })
+            }
+         });
+      }
    }
 
    async toggleMultiAttack(itemId) {

@@ -1,5 +1,5 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import { localize } from '~/helpers/Utility.js';
+import { localize, getSetting } from '~/helpers/Utility.js';
 import EditAttackTraitsDialogShell from './ShieldEditTraitsDialogShell.svelte';
 export default class ShieldEditTraitsDialog extends TJSDialog {
    constructor(document, options) {
@@ -18,7 +18,7 @@ export default class ShieldEditTraitsDialog extends TJSDialog {
          {
             width: 320,
             height: 135,
-            classes: game.settings.get('titan', 'darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );
    }
