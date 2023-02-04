@@ -39,6 +39,12 @@ export default class TitanWeapon extends TitanTypeComponent {
 
    async addAttack() {
       if (this.parent.isOwner) {
+         // Update sheet
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.addAttack();
+         }
+
          // Create the new attack
          const newAttack = getAttackTemplate();
 
@@ -50,11 +56,6 @@ export default class TitanWeapon extends TitanTypeComponent {
                attack: attack,
             },
          });
-
-         const sheet = this.parent._sheet;
-         if (sheet) {
-            sheet.addAttack();
-         }
       }
 
       return;

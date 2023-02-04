@@ -179,16 +179,17 @@ export default class TitanItem extends Item {
    }
 
    async removeCheck(idx) {
+      // Update sheet
+      const sheet = this._sheet;
+      if (this._sheet) {
+         sheet.removeCheck(idx);
+      }
+
       if (this.isOwner) {
          this.system.check.splice(idx, 1);
          await this.update({
             system: this.system
          });
-
-         const sheet = this._sheet;
-         if (this._sheet) {
-            sheet.removeCheck(idx);
-         }
       }
    }
 
