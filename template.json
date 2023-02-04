@@ -544,7 +544,7 @@
          ],
          "xpCost": 0,
          "rarity": "common",
-         "tradition": "any",
+         "tradition": "",
          "castingCheck": {
             "skill": "arcana",
             "attribute": "mind",

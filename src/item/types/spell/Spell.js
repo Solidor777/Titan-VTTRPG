@@ -5,17 +5,28 @@ import SpellAspects from '~/item/types/spell/SpellAspects';
 
 
 export default class TitanSpell extends TitanTypeComponent {
-   getCustomAspectTemplate() {
-      return {
-         label: localize('customAspect'),
-         scaling: true,
-         initialValue: 1,
-         cost: 1,
-         resistanceCheck: 'none',
-         isDamage: false,
-         isHealing: false,
-         uuid: uuidv4()
-      };
+   getInitialData() {
+      let shouldReturnData = false;
+      const initialData = {};
+
+      // Image
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         shouldReturnData = true;
+         initialData.img = 'icons/svg/explosion.svg';
+      }
+
+      // Tradition
+      if (this.parent.system.tradition === '') {
+         initialData.system = {
+            tradition: localize('any')
+         };
+      }
+
+      if (shouldReturnData) {
+         return initialData;
+      }
+
+      return false;
    }
 
    addStandardAspect(aspect) {
@@ -111,7 +122,7 @@ export default class TitanSpell extends TitanTypeComponent {
    addCustomAspect() {
       if (this.parent.isOwner) {
          const system = this.parent.system;
-         system.customAspect.push(this.getCustomAspectTemplate());
+         system.customAspect.push(getCustomAspectTemplate());
          this.parent.update({
             system: system
          });
@@ -132,28 +143,17 @@ export default class TitanSpell extends TitanTypeComponent {
 
       return;
    }
+}
 
-   onCreate() {
-      if (this.parent.isOwner) {
-         if (this.parent.system.tradition === "any") {
-            this.parent.system.tradition = localize("any");
-            this.parent.update({
-               system: {
-                  tradition: this.parent.system.tradition
-               }
-            });
-         }
-
-         if (this.parent.img === 'icons/svg/item-bag.svg') {
-            this.initializeImg();
-         }
-      }
-   }
-
-   async initializeImg() {
-      this.parent.img = 'icons/svg/explosion.svg';
-      return await this.parent.update({
-         img: this.parent.img
-      });
-   }
+function getCustomAspectTemplate() {
+   return {
+      label: localize('customAspect'),
+      scaling: true,
+      initialValue: 1,
+      cost: 1,
+      resistanceCheck: 'none',
+      isDamage: false,
+      isHealing: false,
+      uuid: uuidv4()
+   };
 }

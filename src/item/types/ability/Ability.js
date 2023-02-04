@@ -1,4 +1,3 @@
-import { isFirstOwner } from '~/helpers/Utility';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 
@@ -7,16 +6,14 @@ export default class TitanAbility extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-   onCreate() {
-      if (isFirstOwner(this.parent) && this.parent.img === 'icons/svg/item-bag.svg') {
-         this.initializeImg();
+   getInitialData() {
+      // Image
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         return {
+            img: 'icons/svg/ice-aura.svg'
+         }
       }
-   }
 
-   async initializeImg() {
-      this.parent.img = 'icons/svg/ice-aura.svg';
-      return await this.parent.update({
-         img: this.parent.img
-      });
+      return false;
    }
 }

@@ -9,17 +9,15 @@ export default class TitanShield extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-   onCreate() {
-      if (isFirstOwner(this.parent) && this.parent.img === 'icons/svg/item-bag.svg') {
-         this.initializeImg();
+   getInitialData() {
+      // Image
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         return {
+            img: 'icons/svg/shield.svg'
+         }
       }
-   }
 
-   async initializeImg() {
-      this.parent.img = 'icons/svg/shield.svg';
-      return await this.parent.update({
-         img: 'icons/svg/shield.svg'
-      });
+      return false;
    }
 
    editShieldTraits() {

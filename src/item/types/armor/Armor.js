@@ -1,4 +1,3 @@
-import { isFirstOwner } from '~/helpers/Utility';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 import ArmorEditTraitsDialog from '~/item/types/armor/ArmorEditTraitsDialog';
@@ -8,17 +7,15 @@ export default class TitanArmor extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-   onCreate() {
-      if (isFirstOwner(this.parent) && this.parent.img === 'icons/svg/item-bag.svg') {
-         this.initializeImg();
+   getInitialData() {
+      // Image
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         return {
+            img: 'icons/svg/statue.svg'
+         }
       }
-   }
 
-   async initializeImg() {
-      this.parent.img = 'icons/svg/statue.svg';
-      return await this.parent.update({
-         img: this.parent.img
-      });
+      return false;
    }
 
    editArmorTraits() {

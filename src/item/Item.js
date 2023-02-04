@@ -9,6 +9,19 @@ import TitanSpell from '~/item/types/spell/Spell.js';
 import TitanWeapon from '~/item/types/weapon/Weapon.js';
 
 export default class TitanItem extends Item {
+   async _preCreate(data, options, user) {
+      await super._preCreate(data, options, user);
+
+      // Perform initializations
+      this._initializeTypeComponent();
+      if (this.typeComponent) {
+         const initialData = this.typeComponent.getInitialData();
+         if (initialData) {
+            this.updateSource(initialData);
+         }
+      }
+   }
+
    prepareDerivedData() {
       // Create type component if necessary
       if (!this.typeComponent) {
@@ -82,7 +95,10 @@ export default class TitanItem extends Item {
 
    _onCreate(data, options, userId) {
       super._onCreate(data, options, userId);
-      this._initializeTypeComponent();
+      if (!this.typeComponent) {
+         this._initializeTypeComponent();
+      }
+
       if (this.typeComponent) {
          this.typeComponent.onCreate();
       }

@@ -9,78 +9,82 @@ export default class TitanEffect extends TitanTypeComponent {
 
    onCreate() {
       if (isFirstOwner(this.parent)) {
-         const item = this.parent;
-         const actor = item.parent;
-         if (actor && item.system.effectId === '') {
-            this._initializeEffect();
-         }
-
-         else if (item.img === 'icons/svg/item-bag.svg') {
-            this.initializeImg();
-         }
-
+         this._initializeEffect();
       }
    }
 
-   async initializeImg() {
-      this.parent.img = 'icons/svg/daze.svg';
-      return await this.parent.update({
-         img: this.parent.img
-      });
+   getInitialData() {
+      // Image
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         return {
+            img: 'icons/svg/daze.svg'
+         }
+      }
+
+      return false;
    }
+
 
    async _initializeEffect() {
-      const item = this.parent;
-      item.system.effectId = "creatingEffect";
-      await this.initializeImg();
+      // Check if an effect has already been created
+      if (!this._getEffects()) {
 
-      const actor = item.parent;
-      const effects = await actor.createEmbeddedDocuments('ActiveEffect',
-         [{
-            label: item.name,
-            icon: item.img,
-            origin: item.uuid,
-            disabled: false,
-            duration: {
-               turns: item.system.duration.turns
-            },
-            flags: {
-               core: {
-                  statusId: item.uuid,
+         // If not, create an effect
+         const item = this.parent;
+         const actor = item.parent;
+         item.system.effectId = "creatingEffect";
+         const effects = await actor.createEmbeddedDocuments('ActiveEffect',
+            [{
+               label: item.name,
+               icon: item.img,
+               origin: item._id,
+               disabled: false,
+               duration: {
+                  turns: item.system.duration.turns
                },
-               'visual-active-effects.data.content': TextEditor.enrichHTML(item.system.description, { async: false, secrets: true })
-            },
-         }],
-      );
+               flags: {
+                  core: {
+                     statusId: item._id,
+                  },
+                  'visual-active-effects.data.content': TextEditor.enrichHTML(item.system.description, { async: false, secrets: true })
+               },
+            }],
+         );
+         const effect = effects[0];
 
-      const effect = effects[0];
-
-      if (item.system.duration !== 'permanent') {
-         await effect.update({
-            duration: {
-               turns: item.system.duration.remaining
-            }
-         })
-      }
-
-      return await item.update({
-         system: {
-            effectId: effect._id
+         // Set the turns remaining on the effect
+         if (item.system.duration !== 'permanent') {
+            await effect.update({
+               duration: {
+                  turns: item.system.duration.remaining
+               }
+            })
          }
-      });
-   }
 
-   prepareDerivedData() {
-      this._updateEffects();
+         // Update the item
+         return await item.update({
+            system: {
+               effectId: effect._id
+            }
+         });
+      }
+      if (item.system.effectId = '' || !parent.effects.get(item.system.effectId)) {
+
+      }
 
       return;
    }
 
-   _updateEffects() {
+   prepareDerivedData() {
+      // If this is the first owner
       if (isFirstOwner(this.parent)) {
+
+         // Get the effects associated with this item 
          const effects = this._getEffects();
-         if (effects.length > 0) {
+         if (effects?.length > 0) {
             const item = this.parent;
+
+            // For each associated effect
             effects.forEach((effect) => {
                const updateData = {};
                let shouldUpdateEffect = false;
@@ -124,26 +128,33 @@ export default class TitanEffect extends TitanTypeComponent {
             });
          }
       }
-
       return;
    }
 
    onDelete() {
-      this._getEffects().forEach((effect) => effect.delete);
+      this._getEffects().forEach((effect) => effect.delete());
 
       return;
    }
 
    _getEffects() {
       const item = this.parent;
-      if (item && item.effectId !== '') {
+      // If an effect id has been set
+      if (item.effectId !== '') {
+
+         // If we have an actor
          const actor = this.parent.parent;
          if (actor) {
-            return actor.effects.filter((effect) => effect.origin === item.uuid);
+
+            // If we have at least one effect
+            const effects = actor.effects.filter((effect) => effect.origin === item._id);
+            if (effects.length > 0) {
+               return effects;
+            }
          }
       };
 
-      return [];
+      return false;
    }
 
    isExpired() {

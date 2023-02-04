@@ -9,10 +9,36 @@ export default class TitanWeapon extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
+   getInitialData() {
+      let shouldReturnData = false;
+      const initialData = {};
+
+      // Image
+      if (this.parent.img === 'icons/svg/item-bag.svg') {
+         shouldReturnData = true;
+         initialData.img = 'icons/svg/sword.svg';
+      }
+
+      // Attack
+      if (this.parent.system.attack.length <= 0) {
+         shouldReturnData = true;
+         initialData.system = {
+            attack: [getAttackTemplate()]
+         }
+      }
+
+      if (shouldReturnData) {
+         return initialData;
+      }
+
+      return false;
+   }
+
+
    async addAttack() {
       if (this.parent.isOwner) {
          // Create the new attack
-         const newAttack = this.getAttackTemplate();
+         const newAttack = getAttackTemplate();
 
          // Add the attack and update the item
          const attack = this.parent.system.attack;
@@ -51,38 +77,19 @@ export default class TitanWeapon extends TitanTypeComponent {
 
       return;
    }
+}
 
-   getAttackTemplate() {
-      return {
-         label: localize('attack'),
-         type: 'melee',
-         range: 1,
-         attribute: 'body',
-         skill: 'meleeWeapons',
-         damage: 1,
-         plusExtraSuccessDamage: true,
-         trait: [],
-         customTrait: [],
-         uuid: uuidv4()
-      };
-   }
-
-   onCreate() {
-      if (isFirstOwner(this.parent)) {
-         if (this.parent.img === 'icons/svg/item-bag.svg') {
-            this.initializeImg();
-         }
-
-         if (this.parent.system.attack.length === 0) {
-            this.addAttack();
-         }
-      }
-   }
-
-   async initializeImg() {
-      this.parent.img = 'icons/svg/sword.svg';
-      return await this.parent.update({
-         img: 'icons/svg/sword.svg'
-      });
-   }
+function getAttackTemplate() {
+   return {
+      label: localize('attack'),
+      type: 'melee',
+      range: 1,
+      attribute: 'body',
+      skill: 'meleeWeapons',
+      damage: 1,
+      plusExtraSuccessDamage: true,
+      trait: [],
+      customTrait: [],
+      uuid: uuidv4()
+   };
 }
