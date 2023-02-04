@@ -15,17 +15,15 @@ export default class TitanItemSheet extends SvelteDocumentSheet {
       return buttons;
    }
 
-   async addCheck() {
-      if (this.reactive.document.isOwner) {
-         this.reactive.state.addCheck();
-         return await this.reactive.document.addCheck();
-      }
+   addCheck() {
+      this.reactive.state.addCheck();
+
+      return;
    }
 
    async removeCheck(idx) {
-      if (this.reactive.document.isOwner) {
-         this.reactive.state.removeCheck(idx);
-         return await this.reactive.document.removeCheck(idx);
-      }
+      this.reactive.state.removeCheck(idx);
+
+      return;
    }
 }

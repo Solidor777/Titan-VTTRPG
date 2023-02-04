@@ -11,7 +11,6 @@
    import ItemSheetTurnStartStaminaSettings from './ItemSheetTurnStartStaminaSettings.svelte';
 
    // Setup context variables
-   const application = getContext('external').application;
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
@@ -78,7 +77,7 @@
       <div class="add-entry-button">
          <EfxButton
             on:click={() => {
-               application.addRulesElement();
+               $document.typeComponent.addRulesElement();
             }}
          >
             <!--Button Content-->

@@ -9,9 +9,6 @@
    // Setup context variables
    const document = getContext('DocumentStore');
 
-   // Application reference
-   const application = getContext('external').application;
-
    export let operationOptions = void 0;
    export let idx = void 0;
 
@@ -46,7 +43,7 @@
          <IconButton
             icon={'fas fa-trash'}
             on:click={() => {
-               application.removeRulesElement(idx);
+               $document.typeComponent.removeRulesElement(idx);
             }}
          />
       </div>

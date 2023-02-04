@@ -20,8 +20,6 @@ export default class TitanAbilitySheet extends TitanItemSheet {
       });
    }
 
-
-
    constructor(object) {
       super(object);
       this.reactive.state = createAbilitySheetState();

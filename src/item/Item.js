@@ -146,18 +146,30 @@ export default class TitanItem extends Item {
       return rollData;
    }
 
-   addCheck() {
+   async addCheck() {
       this.system.check.push(this.getCheckTemplate());
-      return this.update({
+      await this.update({
          system: this.system
       });
+
+      const sheet = this._sheet;
+      if (this._sheet) {
+         sheet.addCheck();
+      }
+
+      return;
    }
 
-   removeCheck(idx) {
+   async removeCheck(idx) {
       this.system.check.splice(idx, 1);
-      return this.update({
+      await this.update({
          system: this.system
       });
+
+      const sheet = this._sheet;
+      if (this._sheet) {
+         sheet.removeCheck(idx);
+      }
    }
 
    getCheckTemplate() {

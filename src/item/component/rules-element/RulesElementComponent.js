@@ -13,11 +13,6 @@ export async function addRulesElement() {
       await this.parent.update({
          system: this.parent.system
       });
-
-      // Alert the type component
-      if (this.typeComponent) {
-         this.typeComponent.onAddRulesElement(idx);
-      }
    }
 
    return;
@@ -30,13 +25,7 @@ export async function removeRulesElement(idx) {
       await this.parent.update({
          system: this.parent.system
       });
-
-      // Alert the type component
-      if (this.typeComponent) {
-         this.typeComponent.onRemoveRulesElement(idx);
-      }
    }
-
 
    return;
 }

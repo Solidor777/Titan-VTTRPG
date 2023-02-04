@@ -8,7 +8,6 @@
    import ItemSheetCheckSettings from './ItemSheetCheckSettings.svelte';
 
    // Setup context variables
-   const application = getContext('external').application;
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
@@ -47,10 +46,10 @@
       <div class="scrolling-content">
          <!--checks List-->
          {#if $document.system.check.length > 0}
-            <ol transition:slide|local>
+            <ol out:slide|local>
                <!--Each check-->
                {#each filteredEntries as idx ($document.system.check[idx].uuid)}
-                  <li transition:slide|local>
+                  <li out:slide|local>
                      <ItemSheetCheckSettings {idx} />
                   </li>
                {/each}
@@ -61,7 +60,7 @@
          <div class="add-entry-button">
             <EfxButton
                on:click={() => {
-                  application.addCheck();
+                  $document.addCheck();
                }}
             >
                <!--Button Content-->

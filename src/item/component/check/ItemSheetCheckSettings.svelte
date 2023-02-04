@@ -15,7 +15,6 @@
    export let idx = void 0;
 
    // Setup context variables
-   const application = getContext('external').application;
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
@@ -58,7 +57,7 @@
             <IconButton
                icon={'fas fa-trash'}
                on:click={async () => {
-                  await application.removeCheck(idx);
+                  $document.removeCheck(idx);
                }}
             />
          </div>

@@ -15,14 +15,6 @@ export default class TitanTypeComponent {
     return chatContext;
   }
 
-  onAddRulesElement(idx) {
-    return;
-  }
-
-  onRemoveRulesElement(idx) {
-    return;
-  }
-
   onCreate() {
     return;
   }
