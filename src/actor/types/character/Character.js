@@ -12,6 +12,7 @@ import TitanCastingCheck from '~/check/types/casting-check/CastingCheck.js';
 import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
+import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
@@ -1113,11 +1114,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async removeExpiredEffects() {
-      const actor = this.parent;
-      const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
-      for (const effect of expiredEffects) {
-         await actor.deleteItem(effect._id);
+   async removeExpiredEffects(confirmed) {
+      if (confirmed || !getSetting('confirmDeletingItems')) {
+         const actor = this.parent;
+         const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
+         for (const effect of expiredEffects) {
+            await this.deleteItem(effect._id, true);
+         }
+      }
+      else {
+
       }
 
       return;
@@ -1167,7 +1173,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             return item.type === 'effect' && item.system.duration.type !== 'permanent';
          });
          for (const effect of combatEffects) {
-            await actor.deleteItem(effect._id);
+            await this.deleteItem(effect._id, true);
          }
 
          // Report
@@ -1689,18 +1695,55 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async deleteItem(itemId) {
-      if (this.parent.isOwner) {
-         // Remove the armor if appropriate
-         const armorId = this.parent.system.equipped.armor;
-         if (armorId === itemId) {
-            await this.unEquipArmor();
-         }
+   async deleteItem(itemId, confirmed) {
+      const actor = this.parent;
+      if (actor.isOwner) {
 
-         // Remove the shield if appropriate
-         const shieldId = this.parent.system.equipped.armor;
-         if (shieldId === itemId) {
-            await this.unEquipShield();
+         //Confirm the item is valid
+         const item = actor.items.get(itemId);
+         if (item) {
+
+            // Check if the deletion is confirmed
+            if (confirmed || !getSetting('confirmDeletingItems')) {
+               // Perform type specific deleting
+               switch (item.type) {
+                  case 'armor': {
+                     const armorId = actor.system.equipped.armor;
+                     if (armorId === itemId) {
+                        await this.unEquipArmor();
+                     }
+                     break;
+                  }
+                  case 'shield': {
+                     const shieldId = actor.system.equipped.armor;
+                     if (shieldId === itemId) {
+                        await this.unEquipShield();
+                     }
+
+                     break;
+                  }
+                  default: {
+                     break;
+                  }
+               }
+
+               // Delete the item
+               await item.delete();
+
+               // Delete the item from the sheet if appropriate
+               const sheet = actor.sheet;
+               if (sheet) {
+                  sheet.deleteItem(itemId);
+               }
+
+               return;
+            }
+
+            // Otherwise, confirm deleting the item
+            const dialog = new ConfirmDeleteItemDialog(actor, item);
+            dialog.render(true);
+
+            return;
          }
       }
 

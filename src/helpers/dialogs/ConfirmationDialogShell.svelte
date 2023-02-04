@@ -30,7 +30,7 @@
    <div class="button">
       <EfxButton
          on:click={() => {
-            application.confirmFunction();
+            application.confirmed();
             application.close();
          }}
       >

@@ -1,12 +1,12 @@
 import { localize } from '~/helpers/Utility.js';
 import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
-export default class CharacterSheetConfirmDeleteItemDialog extends ConfirmationDialog {
+export default class confirmRemoveExpiredEffectsDialog extends ConfirmationDialog {
    constructor(sheet, itemName, itemId) {
       super(
-         `${localize('deleteItem')}`,
+         `${localize('removeExpiredEffects')}`,
          [sheet.reactive.document.name, itemName],
-         localize('confirmDeleteItem'),
-         localize('deleteItem'),
+         localize('confirmRemoveExpiredEffects'),
+         localize('confirm'),
          250,
          210
       );

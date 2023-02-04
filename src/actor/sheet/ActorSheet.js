@@ -28,4 +28,8 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
 
       return buttons;
    }
+
+   async deleteItem(itemId) {
+      return;
+   }
 }

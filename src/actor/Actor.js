@@ -1,6 +1,7 @@
 import { localize } from '~/helpers/Utility';
 import TitanPlayerComponent from '~/actor/types/player/Player.js';
 import TitanNPCComponent from '~/actor/types/npc/NPC.js';
+import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 export default class TitanActor extends Actor {
 
    async _preCreate(data, options, user) {
@@ -82,25 +83,39 @@ export default class TitanActor extends Actor {
       super._onDelete(options, userId);
    }
 
-   deleteItem(itemId) {
+   async deleteItem(itemId, confirmed) {
       if (this.isOwner) {
+         // Handle type specific deletion
+         if (this.type === 'player' || this.type === 'npc') {
+            return this.typeComponent.deleteItem(itemId, confirmed);
+         }
+
          // Ensure the item is valid
          const item = this.items.get(itemId);
          if (!item) {
             return false;
          }
 
-         // Handle type specific deletion
-         if (this.type === 'player' || this.type === 'npc') {
-            this.typeComponent.deleteItem(itemId);
+         // Check if the deletion is confirmed
+         if (confirmed || !getSetting('confirmDeletingItems')) {
+
+            // Delete the item
+            if (this._sheet) {
+               this._sheet.deleteItem(itemId);
+            }
+
+            return await item.delete();
          }
 
-         // Delete the item
-         item.delete();
+         // Otherwise, confirm deleting the item
+         const dialog = new ConfirmDeleteItemDialog(this, item);
+         dialog.render(true);
+
+         return;
       }
    }
 
-   addItem(type) {
+   async addItem(type) {
       if (this.isOwner) {
          let itemName = '';
          switch (type) {
@@ -147,7 +162,7 @@ export default class TitanActor extends Actor {
             type: type,
          };
 
-         this.createEmbeddedDocuments('Item', [itemData]);
+         return await this.createEmbeddedDocuments('Item', [itemData]);
       }
    }
 }

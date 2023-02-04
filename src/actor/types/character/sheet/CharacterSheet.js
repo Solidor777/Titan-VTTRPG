@@ -1,7 +1,6 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
 import { getOptions, getSetting } from "~/helpers/Utility";
 import createCharacterSheetState from "./CharacterSheetState";
-import CharacterSheetConfirmDeleteItemDialog from "~/actor/types/character/sheet/CharacterSheetConfirmDeleteItemDialog";
 import CharacterSheetInventoryAddItemDialog from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
 export default class TitanCharacterSheet extends TitanActorSheet {
@@ -127,20 +126,9 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    }
 
    // Delete Item
-   async deleteItem(itemId, deletionConfirmed) {
-      if (this.reactive.document.isOwner) {
-         if (!deletionConfirmed && getSetting('confirmDeletingItems')) {
-            const item = this.reactive.document.items.get(itemId);
-            if (item) {
-               const dialog = new CharacterSheetConfirmDeleteItemDialog(this, item.name, itemId);
-               dialog.render(true);
-            }
-         }
-         else {
-            this.reactive.state.deleteItem(itemId);
-            this.reactive.document.deleteItem(itemId);
-         }
-      }
+   async deleteItem(itemId) {
+      this.reactive.state.deleteItem(itemId);
+      this.reactive.document.deleteItem(itemId);
 
       return;
    }

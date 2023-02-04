@@ -26,7 +26,7 @@ export default class ConfirmationDialog extends TJSDialog {
       );
    }
 
-   confirmFunction() {
+   confirmed() {
       return;
    }
 }
