@@ -1,23 +1,23 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
-   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
-   import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
-   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
-   import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentResistanceSelect from '~/documents/components/select/DocumentResistanceSelect.svelte';
+   import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
+   import DocumentSkillSelect from '~/documents/components/select/DocumentSkillSelect.svelte';
+   import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
+   import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
 
    // Check idx
    export let idx = void 0;
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const application = getContext('external').application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    $: check = $document.system.check[idx];
    $: isExpanded = $appState.isExpanded.checks[idx];
@@ -56,7 +56,7 @@
          <!--Delete button-->
          <div>
             <IconButton
-               icon={"fas fa-trash"}
+               icon={'fas fa-trash'}
                on:click={async () => {
                   await application.removeCheck(idx);
                }}
@@ -71,7 +71,7 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("attribute")}
+                     {localize('attribute')}
                   </div>
 
                   <!--Value-->
@@ -84,7 +84,7 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("skill")}
+                     {localize('skill')}
                   </div>
 
                   <!--Value-->
@@ -99,7 +99,7 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("difficulty")}
+                     {localize('difficulty')}
                   </div>
 
                   <!--Value-->
@@ -112,12 +112,15 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("complexity")}
+                     {localize('complexity')}
                   </div>
 
                   <!--Value-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={check.complexity} min={1} />
+                     <DocumentIntegerInput
+                        bind:value={check.complexity}
+                        min={1}
+                     />
                   </div>
                </div>
             </div>
@@ -127,12 +130,15 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("resistanceCheck")}
+                     {localize('resistanceCheck')}
                   </div>
 
                   <!--Value-->
                   <div class="input">
-                     <DocumentResistanceSelect bind:value={check.resistanceCheck} allowNone={true} />
+                     <DocumentResistanceSelect
+                        bind:value={check.resistanceCheck}
+                        allowNone={true}
+                     />
                   </div>
                </div>
 
@@ -140,12 +146,15 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("resolveCost")}
+                     {localize('resolveCost')}
                   </div>
 
                   <!--Value-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={check.resolveCost} min={0} />
+                     <DocumentIntegerInput
+                        bind:value={check.resolveCost}
+                        min={0}
+                     />
                   </div>
                </div>
             </div>
@@ -158,7 +167,7 @@
 
                   <!--Label-->
                   <div class="label">
-                     {localize("damage")}
+                     {localize('damage')}
                   </div>
 
                   <!--Value-->
@@ -174,7 +183,7 @@
 
                   <!--Label-->
                   <div class="label">
-                     {localize("healing")}
+                     {localize('healing')}
                   </div>
 
                   <!--Value-->
@@ -190,12 +199,15 @@
                   <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("initialValue")}
+                        {localize('initialValue')}
                      </div>
 
                      <!--Value-->
                      <div class="input number">
-                        <DocumentIntegerInput bind:value={check.initialValue} min={0} />
+                        <DocumentIntegerInput
+                           bind:value={check.initialValue}
+                           min={0}
+                        />
                      </div>
                   </div>
 
@@ -203,7 +215,7 @@
                   <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("scaling")}
+                        {localize('scaling')}
                      </div>
 
                      <!--Value-->
@@ -219,12 +231,14 @@
                <div class="field">
                   <!--Label-->
                   <div class="label">
-                     {localize("opposedCheck")}
+                     {localize('opposedCheck')}
                   </div>
 
                   <!--Value-->
                   <div class="input checkbox">
-                     <DocumentCheckboxInput bind:value={check.opposedCheck.enabled} />
+                     <DocumentCheckboxInput
+                        bind:value={check.opposedCheck.enabled}
+                     />
                   </div>
                </div>
             </div>
@@ -235,12 +249,14 @@
                   <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("attribute")}
+                        {localize('attribute')}
                      </div>
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentAttributeSelect bind:value={check.opposedCheck.attribute} />
+                        <DocumentAttributeSelect
+                           bind:value={check.opposedCheck.attribute}
+                        />
                      </div>
                   </div>
 
@@ -248,12 +264,15 @@
                   <div class="field">
                      <!--Label-->
                      <div class="label">
-                        {localize("skill")}
+                        {localize('skill')}
                      </div>
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentSkillSelect bind:value={check.opposedCheck.skill} allowNone={true} />
+                        <DocumentSkillSelect
+                           bind:value={check.opposedCheck.skill}
+                           allowNone={true}
+                        />
                      </div>
                   </div>
                </div>
@@ -264,7 +283,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .check {
       @include flex-column;

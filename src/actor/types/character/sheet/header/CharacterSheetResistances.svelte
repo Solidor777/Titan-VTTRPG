@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import CharacterSheetResistance from "~/actor/types/character/sheet/header/CharacterSheetResistance.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import CharacterSheetResistance from '~/actor/types/character/sheet/header/CharacterSheetResistance.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="resistances">
@@ -16,7 +16,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .resistances {
       @include flex-column;

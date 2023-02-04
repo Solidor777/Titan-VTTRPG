@@ -1,6 +1,6 @@
 <script>
-   import preventDefault from "~/helpers/svelte-actions/PreventDefault.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
+   import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
+   import { ripple } from '@typhonjs-fvtt/svelte-standard/action';
 
    // List of tabs
    export let tabs = [];
@@ -18,7 +18,7 @@
       <!--For each tab-->
       {#each tabs as tab}
          <button
-            class={activeTab === tab.id ? "active " : ""}
+            class={activeTab === tab.id ? 'active ' : ''}
             on:click={() => {
                activeTab = tab.id;
             }}
@@ -41,7 +41,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .tabs {
       @include flex-column;
@@ -77,7 +77,10 @@
 
             :hover {
                &:not(:disabled) {
-                  clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
+                  clip-path: var(
+                     --tjs-icon-button-clip-path-hover,
+                     var(--tjs-icon-button-clip-path, none)
+                  );
                }
             }
 

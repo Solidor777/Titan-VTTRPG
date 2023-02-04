@@ -1,11 +1,11 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // The document
    export let document = void 0;
@@ -17,7 +17,7 @@
    export let traitOptions = void 0;
 
    // Application reference
-   const application = getContext("external").application;
+   const application = getContext('external').application;
 
    // Initialize trait options to the current value of the traits
    documentTraits.forEach((trait) => {
@@ -35,7 +35,8 @@
          // Filter the active traits
          documentTraits = traitOptions.filter(
             (trait) =>
-               (trait.type === "boolean" && trait.value === true) || (trait.type === "number" && trait.value > 0)
+               (trait.type === 'boolean' && trait.value === true) ||
+               (trait.type === 'number' && trait.value > 0)
          );
 
          // Update the document
@@ -53,7 +54,7 @@
    <ol>
       {#each traitOptions as trait, idx}
          <!--Trait-->
-         <li use:tooltip={{content: localize(`${trait.name}.desc`)}}>
+         <li use:tooltip={{ content: localize(`${trait.name}.desc`) }}>
             <!--Label-->
             <div class="label">
                {localize(trait.name)}
@@ -61,9 +62,12 @@
 
             <!--Input-->
             <div class="input">
-               {#if trait.type === "boolean"}
+               {#if trait.type === 'boolean'}
                   <!--Boolean-->
-                  <input type="checkbox" bind:checked={traitOptions[idx].value} />
+                  <input
+                     type="checkbox"
+                     bind:checked={traitOptions[idx].value}
+                  />
                {:else}
                   <!--Integer-->
                   <IntegerInput bind:value={traitOptions[idx].value} />
@@ -77,7 +81,7 @@
    <div class="row">
       <div class="button">
          <EfxButton on:click={applyTraitEdits}>
-            {localize("applyEdits")}
+            {localize('applyEdits')}
          </EfxButton>
       </div>
 
@@ -86,14 +90,14 @@
             on:click={() => {
                application.close();
             }}
-            >{localize("cancel")}
+            >{localize('cancel')}
          </EfxButton>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
    .attack-trait-dialog {
       ol {
          list-style: none;

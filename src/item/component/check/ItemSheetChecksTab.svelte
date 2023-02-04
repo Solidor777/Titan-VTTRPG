@@ -1,20 +1,21 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import ItemSheetCheckSettings from "./ItemSheetCheckSettings.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import ItemSheetCheckSettings from './ItemSheetCheckSettings.svelte';
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const application = getContext('external').application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    // Initialize expanded state
    $document.system.check.forEach((entry, idx) => {
-      $appState.isExpanded.checks[idx] = $appState.isExpanded.checks[idx] ?? true;
+      $appState.isExpanded.checks[idx] =
+         $appState.isExpanded.checks[idx] ?? true;
    });
 
    // Initialize filter
@@ -22,7 +23,11 @@
    $: {
       filteredEntries = [];
       $document.system.check.forEach((entry, idx) => {
-         if (entry.label.toLowerCase().indexOf($appState.filter.checks.toLowerCase()) !== -1) {
+         if (
+            entry.label
+               .toLowerCase()
+               .indexOf($appState.filter.checks.toLowerCase()) !== -1
+         ) {
             filteredEntries.push(idx);
          }
       });
@@ -66,7 +71,7 @@
 
                   <!--Label-->
                   <div class="label">
-                     {localize("addCheck")}
+                     {localize('addCheck')}
                   </div>
                </div>
             </EfxButton>
@@ -76,7 +81,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .tab {
       @include flex-column;

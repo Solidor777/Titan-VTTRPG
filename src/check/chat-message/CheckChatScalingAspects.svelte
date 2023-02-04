@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from "svelte";
-   import CheckChatScalingAspect from "./CheckChatScalingAspect.svelte";
+   import { getContext } from 'svelte';
+   import CheckChatScalingAspect from './CheckChatScalingAspect.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="aspects">
@@ -17,7 +17,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
+   @import '../../styles/mixins.scss';
    .aspects {
       @include flex-column;
       @include flex-group-top;

@@ -1,24 +1,24 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
-   import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
-   import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
-   import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
-   import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
-   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
-   import CharacterSheetSpellCastingCheck from "./CharacterSheetSpellCastingCheck.svelte";
-   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
+   import CharacterSheetItemExpandButton from '~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import CharacterSheetItemSendToChatButton from '~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   import CharacterSheetItemEditButton from '~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   import CharacterSheetItemDeleteButton from '~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
+   import CharacterSheetCheckButton from '~/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
+   import CharacterSheetSpellCastingCheck from './CharacterSheetSpellCastingCheck.svelte';
+   import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Reference to the weapon id
    export let id = void 0;
@@ -52,22 +52,32 @@
             <div>
                <CharacterSheetCheckButton
                   check={item.system.castingCheck}
-                  on:click={() => $document.typeComponent.rollCastingCheck({ itemId: id }, false)}
+                  on:click={() =>
+                     $document.typeComponent.rollCastingCheck(
+                        { itemId: id },
+                        false
+                     )}
                />
             </div>
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('sendToChat') }}
+            >
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize("editItem") }}>
+            <div class="button" use:tooltip={{ content: localize('editItem') }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('deleteItem') }}
+            >
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -84,7 +94,10 @@
             <!--Spell Aspects-->
             {#if item.system.aspect.length > 0}
                <div class="section tags">
-                  <SpellAspectTags standardAspects={item.system.aspect} customAspects={item.system.customAspect} />
+                  <SpellAspectTags
+                     standardAspects={item.system.aspect}
+                     customAspects={item.system.customAspect}
+                  />
                </div>
             {/if}
 
@@ -96,7 +109,7 @@
             {/if}
 
             <!--Item Description-->
-            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
                <div class="section rich-text">
                   <RichText text={item.system.description} />
                </div>
@@ -111,13 +124,19 @@
 
                <!--Tradition-->
                <div class="tag">
-                  <StatTag label={localize("tradition")} value={item.system.tradition} />
+                  <StatTag
+                     label={localize('tradition')}
+                     value={item.system.tradition}
+                  />
                </div>
 
                <!--XP Cost-->
                {#if item.system.xpCost}
                   <div class="tag">
-                     <StatTag label={localize("xpCost")} value={item.system.xpCost} />
+                     <StatTag
+                        label={localize('xpCost')}
+                        value={item.system.xpCost}
+                     />
                   </div>
                {/if}
 
@@ -134,7 +153,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .item {
       @include flex-column;

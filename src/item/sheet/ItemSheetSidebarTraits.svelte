@@ -1,14 +1,14 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import DeleteTag from "~/helpers/svelte-components/tag/DeleteTag.svelte";
-   import DocumentAddCustomTraitDialog from "~/documents/DocumentAddCustomTraitDialog";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import DeleteTag from '~/helpers/svelte-components/tag/DeleteTag.svelte';
+   import DocumentAddCustomTraitDialog from '~/documents/DocumentAddCustomTraitDialog';
 
    // Application statee reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="traits">
@@ -23,7 +23,7 @@
          <div class="button-contents">
             <i class="fas fa-circle-plus" />
             <div class="label">
-               {localize("addCustomTrait")}
+               {localize('addCustomTrait')}
             </div>
          </div>
       </EfxButton>
@@ -34,7 +34,11 @@
       <div class="traits-container" transition:slide|local>
          <!--Custom Traits-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
-            <div class="trait" use:tooltip={{content: trait.description}} transition:slide|local>
+            <div
+               class="trait"
+               use:tooltip={{ content: trait.description }}
+               transition:slide|local
+            >
                <DeleteTag
                   deleteFunction={() => {
                      const customTrait = $document.system.customTrait;
@@ -55,7 +59,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
 
    .traits {
       @include flex-column;

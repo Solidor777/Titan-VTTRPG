@@ -1,27 +1,27 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
-   import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
-   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
-   import DocumentRangeTypeSelect from "~/documents/components/select/DocumentRangeTypeSelect.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import DeleteTag from "~/helpers/svelte-components/tag/DeleteTag.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
+   import DocumentSkillSelect from '~/documents/components/select/DocumentSkillSelect.svelte';
+   import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
+   import DocumentRangeTypeSelect from '~/documents/components/select/DocumentRangeTypeSelect.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import DeleteTag from '~/helpers/svelte-components/tag/DeleteTag.svelte';
 
    // Attack idx
    export let idx = void 0;
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const application = getContext('external').application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    $: attack = $document.system.attack[idx];
    $: isExpanded = $appState.isExpanded.attacks[idx];
@@ -61,7 +61,7 @@
          <div class="delete-button">
             <!--Delete button-->
             <IconButton
-               icon={"fas fa-trash"}
+               icon={'fas fa-trash'}
                on:click={() => {
                   application.removeAttack(idx);
                }}
@@ -76,7 +76,7 @@
                <!--Type-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("type")}</div>
+                  <div class="label">{localize('type')}</div>
 
                   <!--Input-->
                   <div class="input">
@@ -90,7 +90,7 @@
                   <i class="fas fa-ruler" />
 
                   <!--Label-->
-                  <div class="label">{localize("range")}</div>
+                  <div class="label">{localize('range')}</div>
 
                   <!--Input-->
                   <div class="input number">
@@ -106,7 +106,7 @@
                   <i class="fas fa-burst" />
 
                   <!--Label-->
-                  <div class="label">{localize("damage")}</div>
+                  <div class="label">{localize('damage')}</div>
 
                   <!--Input-->
                   <div class="input number">
@@ -115,8 +115,11 @@
 
                   <!--Plus Success Damage-->
                   <div class="input">
-                     + {localize("extraSuccesses.short")}
-                     <DocumentCheckboxInput bind:value={attack.plusExtraSuccessDamage} min={1} />
+                     + {localize('extraSuccesses.short')}
+                     <DocumentCheckboxInput
+                        bind:value={attack.plusExtraSuccessDamage}
+                        min={1}
+                     />
                   </div>
                </div>
             </div>
@@ -125,7 +128,7 @@
                <!--Attribute select-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("attribute")}</div>
+                  <div class="label">{localize('attribute')}</div>
 
                   <!--Input-->
                   <div class="input">
@@ -136,7 +139,7 @@
                <!--Skill select-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("skill")}</div>
+                  <div class="label">{localize('skill')}</div>
 
                   <!--Input-->
                   <div class="input">
@@ -157,7 +160,7 @@
                         }}
                      >
                         <i class="fas fa-pen-to-square" />
-                        {localize("editTraits")}
+                        {localize('editTraits')}
                      </EfxButton>
                   </div>
 
@@ -169,7 +172,7 @@
                         }}
                      >
                         <i class="fas fa-circle-plus" />
-                        {localize("addCustomTrait")}
+                        {localize('addCustomTrait')}
                      </EfxButton>
                   </div>
                </div>
@@ -177,10 +180,18 @@
                   <div class="traits-container">
                      <!--Each trait-->
                      {#each attack.trait as trait (trait.name)}
-                        <div class="trait" use:tooltip={{content: localize(`${trait.name}.desc`)}}>
-                           {#if trait.type === "number"}
+                        <div
+                           class="trait"
+                           use:tooltip={{
+                              content: localize(`${trait.name}.desc`),
+                           }}
+                        >
+                           {#if trait.type === 'number'}
                               <!--Number Trait-->
-                              <StatTag label={localize(trait.name)} value={trait.value} />
+                              <StatTag
+                                 label={localize(trait.name)}
+                                 value={trait.value}
+                              />
                            {:else}
                               <!--Bool Trait-->
                               <Tag label={localize(trait.name)} />
@@ -190,7 +201,10 @@
 
                      <!--Each custom trait-->
                      {#each attack.customTrait as trait, idx (trait.uuid)}
-                        <div class="trait" use:tooltip={{content: trait.description}}>
+                        <div
+                           class="trait"
+                           use:tooltip={{ content: trait.description }}
+                        >
                            <!--Bool Trait-->
                            <DeleteTag
                               label={trait.name}
@@ -214,7 +228,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .attack {
       @include flex-column;

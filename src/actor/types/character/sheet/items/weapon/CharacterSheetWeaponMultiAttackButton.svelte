@@ -1,28 +1,36 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Item Reference
    export let item = void 0;
    // Reference to the application
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="item-equip-button">
-   <EfxButton on:click={() => $document.typeComponent.toggleMultiAttack(item._id)}>
+   <EfxButton
+      on:click={() => $document.typeComponent.toggleMultiAttack(item._id)}
+   >
       <div class="button-inner">
-         <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
+         <i
+            class={item.system.multiAttack ? 'fas fa-swords' : 'fas fa-sword'}
+         />
          <div class="label">
-            {localize("multiAttack")}
+            {localize('multiAttack')}
          </div>
-         <i class={item.system.multiAttack ? "fas fa-square-check" : "fas fa-square"} />
+         <i
+            class={item.system.multiAttack
+               ? 'fas fa-square-check'
+               : 'fas fa-square'}
+         />
       </div>
    </EfxButton>
 </div>
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .item-equip-button {
       .button-inner {

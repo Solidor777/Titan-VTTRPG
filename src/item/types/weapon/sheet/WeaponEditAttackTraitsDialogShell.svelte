@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import DocumentEditTraitsDialog from "~/documents/components/DocumentEditTraitsDialog.svelte";
+   import DocumentEditTraitsDialog from '~/documents/components/DocumentEditTraitsDialog.svelte';
 
    // The weapon document owning the attack
    export let document = void 0;
@@ -12,83 +12,83 @@
    // Trait options
    let traitOptions = [
       {
-         name: "blast",
-         type: "number",
+         name: 'blast',
+         type: 'number',
          value: 0,
       },
       {
-         name: "cleave",
-         type: "boolean",
+         name: 'cleave',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "close",
-         type: "boolean",
+         name: 'close',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "crushing",
-         type: "boolean",
+         name: 'crushing',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "ineffective",
-         type: "boolean",
+         name: 'ineffective',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "loud.attack",
-         type: "boolean",
+         name: 'loud.attack',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "magical.attack",
-         type: "boolean",
+         name: 'magical.attack',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "flurry",
-         type: "boolean",
+         name: 'flurry',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "penetrating",
-         type: "boolean",
+         name: 'penetrating',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "piercing",
-         type: "boolean",
+         name: 'piercing',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "reload",
-         type: "boolean",
+         name: 'reload',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "rend",
-         type: "boolean",
+         name: 'rend',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "restraining",
-         type: "boolean",
+         name: 'restraining',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "slashing",
-         type: "boolean",
+         name: 'slashing',
+         type: 'boolean',
          value: false,
       },
       {
-         name: "splash",
-         type: "number",
+         name: 'splash',
+         type: 'number',
          value: 0,
       },
       {
-         name: "twoHanded",
-         type: "boolean",
+         name: 'twoHanded',
+         type: 'boolean',
          value: false,
       },
    ];

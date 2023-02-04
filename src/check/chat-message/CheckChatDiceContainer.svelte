@@ -1,8 +1,8 @@
 <script>
-   import { getContext } from "svelte";
-   import CheckChatDie from "./CheckChatDie.svelte";
+   import { getContext } from 'svelte';
+   import CheckChatDie from './CheckChatDie.svelte';
 
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="container">
@@ -16,7 +16,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .container {
       @include flex-row;

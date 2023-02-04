@@ -1,6 +1,6 @@
 <script>
-   import AttributeSelect from "~/helpers/svelte-components/select/AttributeSelect.svelte";
-   import { getContext } from "svelte";
+   import AttributeSelect from '~/helpers/svelte-components/select/AttributeSelect.svelte';
+   import { getContext } from 'svelte';
 
    // The value of the input
    export let value;
@@ -11,7 +11,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <AttributeSelect

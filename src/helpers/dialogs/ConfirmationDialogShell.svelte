@@ -1,16 +1,16 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Character Sheet
    export let headers = void 0;
    export let message = void 0;
    export let confirmLabel = void 0;
 
-   const application = getContext("external").application;
+   const application = getContext('external').application;
 </script>
 
 <div class="add-item-dialog">
@@ -44,13 +44,13 @@
          on:click={() => {
             application.close();
          }}
-         >{localize("cancel")}
+         >{localize('cancel')}
       </EfxButton>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
 
    .add-item-dialog {
       @include flex-column;

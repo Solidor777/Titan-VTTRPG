@@ -1,8 +1,8 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { getContext } from "svelte";
-   import FloatInput from "~/helpers/svelte-components/input/FloatInput.svelte";
+   import { getContext } from 'svelte';
+   import FloatInput from '~/helpers/svelte-components/input/FloatInput.svelte';
 
    // The value of the input
    export let value;
@@ -14,7 +14,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <FloatInput

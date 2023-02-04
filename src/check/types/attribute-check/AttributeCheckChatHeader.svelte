@@ -1,18 +1,22 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="label">
-   <div class="content {$document.flags.titan.chatContext.parameters.attribute}">
+   <div
+      class="content {$document.flags.titan.chatContext.parameters.attribute}"
+   >
       <!--Type Label -->
       {`${localize($document.flags.titan.chatContext.parameters.attribute)}${
          $document.flags.titan.chatContext.parameters.skill
-            ? ` (${localize($document.flags.titan.chatContext.parameters.skill)})`
-            : ""
+            ? ` (${localize(
+                 $document.flags.titan.chatContext.parameters.skill
+              )})`
+            : ''
       } ${$document.flags.titan.chatContext.parameters.difficulty}:${
          $document.flags.titan.chatContext.parameters.complexity
       }`}
@@ -20,7 +24,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
    .label {
       @include flex-row;
       @include flex-group-left;

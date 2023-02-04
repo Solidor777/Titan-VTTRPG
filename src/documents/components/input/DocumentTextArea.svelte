@@ -1,8 +1,8 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { getContext } from "svelte";
-   import TextArea from "~/helpers/svelte-components/input/TextArea.svelte";
+   import { getContext } from 'svelte';
+   import TextArea from '~/helpers/svelte-components/input/TextArea.svelte';
 
    // The value of the input
    export let value;
@@ -10,7 +10,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <TextArea

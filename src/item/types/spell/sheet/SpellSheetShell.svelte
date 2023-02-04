@@ -1,52 +1,52 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-   import { setContext } from "svelte";
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import Tabs from "~/helpers/svelte-components/Tabs.svelte";
-   import ItemSheetChecksTab from "~/item/component/check/ItemSheetChecksTab.svelte";
-   import SpellSheetSidebar from "./SpellSheetSidebar.svelte";
-   import SpellSheetHeader from "./SpellSheetHeader.svelte";
-   import SpellSheetCastingCheckTab from "./SpellSheetCastingCheckTab.svelte";
-   import SpellSheetStandardAspectsTab from "./SpellSheetStandardAspectsTab.svelte";
-   import SpellSheetCustomAspectsTab from "./SpellSheetCustomAspectsTab.svelte";
-   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
+   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+   import { setContext } from 'svelte';
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import Tabs from '~/helpers/svelte-components/Tabs.svelte';
+   import ItemSheetChecksTab from '~/item/component/check/ItemSheetChecksTab.svelte';
+   import SpellSheetSidebar from './SpellSheetSidebar.svelte';
+   import SpellSheetHeader from './SpellSheetHeader.svelte';
+   import SpellSheetCastingCheckTab from './SpellSheetCastingCheckTab.svelte';
+   import SpellSheetStandardAspectsTab from './SpellSheetStandardAspectsTab.svelte';
+   import SpellSheetCustomAspectsTab from './SpellSheetCustomAspectsTab.svelte';
+   import ItemSheetDescriptionTab from '~/item/sheet/ItemSheetDescriptionTab.svelte';
 
    // Setup context variables
    export let elementRoot;
    export let documentStore;
    export let applicationStateStore;
-   setContext("DocumentStore", documentStore);
-   setContext("ApplicationStateStore", applicationStateStore);
-   const appState = getContext("ApplicationStateStore");
+   setContext('DocumentStore', documentStore);
+   setContext('ApplicationStateStore', applicationStateStore);
+   const appState = getContext('ApplicationStateStore');
 
    // Tabs
    const tabs = [
       {
-         label: localize("description"),
-         id: "description",
+         label: localize('description'),
+         id: 'description',
          component: ItemSheetDescriptionTab,
       },
       {
-         label: localize("standardAspects"),
-         id: "standardAspects",
+         label: localize('standardAspects'),
+         id: 'standardAspects',
          component: SpellSheetStandardAspectsTab,
       },
       {
-         label: localize("customAspects"),
-         id: "customAspects",
+         label: localize('customAspects'),
+         id: 'customAspects',
          component: SpellSheetCustomAspectsTab,
       },
       {
-         label: localize("castingCheck"),
-         id: "castingCheck",
+         label: localize('castingCheck'),
+         id: 'castingCheck',
          component: SpellSheetCastingCheckTab,
       },
       {
-         label: localize("checks"),
-         id: "checks",
+         label: localize('checks'),
+         id: 'checks',
          component: ItemSheetChecksTab,
       },
    ];
@@ -73,7 +73,7 @@
 </ApplicationShell>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .item-sheet {
       @include flex-column;

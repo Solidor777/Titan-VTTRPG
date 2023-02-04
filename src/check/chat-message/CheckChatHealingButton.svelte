@@ -1,11 +1,11 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    async function healDamage(healing) {
       // Get the targets
@@ -29,19 +29,24 @@
 </script>
 
 <!--Apply healing button-->
-<div class="healing-button" use:tooltip={{content: localize("recoverStamina")}}>
+<div
+   class="healing-button"
+   use:tooltip={{ content: localize('recoverStamina') }}
+>
    <EfxButton
       on:click={() => {
          healDamage($document.flags.titan.chatContext.results.healing);
       }}
    >
       <i class="fas fa-heart" />
-      {`${localize("recoverStamina")} (${$document.flags.titan.chatContext.results.healing})`}
+      {`${localize('recoverStamina')} (${
+         $document.flags.titan.chatContext.results.healing
+      })`}
    </EfxButton>
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .healing-button {
       @include flex-row;

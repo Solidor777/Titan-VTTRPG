@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { getContext } from "svelte";
+   import { getContext } from 'svelte';
 
    // Path to the image
    export let path;
@@ -9,17 +9,17 @@
    let img;
 
    // Get the sheett
-   const { application } = getContext("external");
+   const { application } = getContext('external');
 
    // Get the contained document
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    let src = getProperty($document, path);
    function onEditImage() {
       if ($document.isOwner) {
          const current = src;
          const filePicker = new FilePicker({
-            type: "image",
+            type: 'image',
             current: current,
             callback: async (newVal) => {
                src = newVal;
@@ -35,7 +35,13 @@
    }
 </script>
 
-<img bind:this={img} {alt} {src} on:keypress={(event) => onEditImage()} on:click={(event) => onEditImage(event)} />
+<img
+   bind:this={img}
+   {alt}
+   {src}
+   on:keypress={(event) => onEditImage()}
+   on:click={(event) => onEditImage(event)}
+/>
 
 <style>
    img {

@@ -1,6 +1,6 @@
 <script>
-   import SpellCustomAspectTag from "./SpellCustomAspectTag.svelte";
-   import SpellStandardAspectTag from "./SpellStandardAspectTag.svelte";
+   import SpellCustomAspectTag from './SpellCustomAspectTag.svelte';
+   import SpellStandardAspectTag from './SpellStandardAspectTag.svelte';
 
    // Aspects list
    export let standardAspects = void 0;
@@ -33,7 +33,11 @@
       })
       .concat(
          customAspects.map((aspect, idx) => {
-            return { idx: idx, size: getAspectSize(aspect), standardAspect: false };
+            return {
+               idx: idx,
+               size: getAspectSize(aspect),
+               standardAspect: false,
+            };
          })
       )
       .sort((a, b) => {
@@ -51,7 +55,9 @@
    {#each aspectSizeMap as aspectSizeMap}
       {#if aspectSizeMap?.standardAspect === true}
          <div class="aspect">
-            <SpellStandardAspectTag aspect={standardAspects[aspectSizeMap.idx]} />
+            <SpellStandardAspectTag
+               aspect={standardAspects[aspectSizeMap.idx]}
+            />
          </div>
       {:else if aspectSizeMap?.standardAspect === false}
          <div class="aspect">
@@ -62,7 +68,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .aspects {
       @include flex-row;

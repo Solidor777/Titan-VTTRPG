@@ -1,12 +1,12 @@
 <script>
-   import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { getContext } from 'svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    export let enabled = void 0;
    export let label = void 0;
 
    // Setup
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Copy of the document data
    let data;
@@ -34,7 +34,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .toggle {
       --button-font-size: var(--font-size-small);

@@ -1,5 +1,5 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Collapsed object
    export let isExpanded = void 0;
@@ -22,13 +22,15 @@
          <div class="name">{name === false ? item.name : name}</div>
 
          <!--Icon-->
-         <i class="fas fa-angle-{isExpanded ? 'double-down' : 'double-right'}" />
+         <i
+            class="fas fa-angle-{isExpanded ? 'double-down' : 'double-right'}"
+         />
       </div>
    </EfxButton>
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .button {
       @include flex-row;

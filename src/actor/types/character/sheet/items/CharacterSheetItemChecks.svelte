@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   import CharacterSheetItemCheck from "./CharacterSheetItemCheck.svelte";
+   import { getContext } from 'svelte';
+   import CharacterSheetItemCheck from './CharacterSheetItemCheck.svelte';
 
    // Reference to the item
    export let item = void 0;
@@ -22,7 +22,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .checks {
       @include flex-column;

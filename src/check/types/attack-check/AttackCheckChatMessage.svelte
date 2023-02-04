@@ -1,17 +1,17 @@
 <script>
-   import { getContext } from "svelte";
-   import CheckChatDiceContainer from "~/check/chat-message/CheckChatDiceContainer.svelte";
-   import CheckChatResults from "~/check/chat-message/CheckChatResults.svelte";
-   import CheckChatDamageButtons from "~/check/chat-message/CheckChatDamageButtons.svelte";
-   import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
-   import CheckChatOpposedCheckButton from "~/check/chat-message/CheckChatOpposedCheckButton.svelte";
-   import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
-   import AttackCheckChatHeader from "./AttackCheckChatHeader.svelte";
-   import AttackCheckStats from "./AttackCheckStats.svelte";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import { getContext } from 'svelte';
+   import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
+   import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
+   import CheckChatDamageButtons from '~/check/chat-message/CheckChatDamageButtons.svelte';
+   import CheckChatHealingButton from '~/check/chat-message/CheckChatHealingButton.svelte';
+   import CheckChatOpposedCheckButton from '~/check/chat-message/CheckChatOpposedCheckButton.svelte';
+   import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
+   import AttackCheckChatHeader from './AttackCheckChatHeader.svelte';
+   import AttackCheckStats from './AttackCheckStats.svelte';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="check-chat-message">
@@ -26,9 +26,11 @@
    </div>
 
    <!--Attack Notes-->
-   {#if $document.flags.titan.chatContext.parameters.attackNotes !== "" && $document.flags.titan.chatContext.parameters.attackNotes !== "<p></p>"}
+   {#if $document.flags.titan.chatContext.parameters.attackNotes !== '' && $document.flags.titan.chatContext.parameters.attackNotes !== '<p></p>'}
       <div class="section rich-text">
-         <RichText text={$document.flags.titan.chatContext.parameters.attackNotes} />
+         <RichText
+            text={$document.flags.titan.chatContext.parameters.attackNotes}
+         />
       </div>
    {/if}
 
@@ -76,7 +78,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    .check-chat-message {
       @include flex-column;
@@ -89,7 +91,9 @@
          @include flex-group-center;
          width: 100%;
 
-         &:not(:first-child):not(.tags):not(.rich-text):not(.rich-text + section) {
+         &:not(:first-child):not(.tags):not(.rich-text):not(
+               .rich-text + section
+            ) {
             margin-top: 0.5rem;
          }
       }

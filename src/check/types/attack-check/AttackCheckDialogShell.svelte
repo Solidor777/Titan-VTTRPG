@@ -1,14 +1,14 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import AttributeSelect from "~/helpers/svelte-components/select/AttributeSelect.svelte";
-   import SkillSelect from "~/helpers/svelte-components/select/SkillSelect.svelte";
-   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
-   import IntegerSelect from "~/helpers/svelte-components/select/IntegerSelect.svelte";
-   import Select from "~/helpers/svelte-components/select/Select.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import AttributeSelect from '~/helpers/svelte-components/select/AttributeSelect.svelte';
+   import SkillSelect from '~/helpers/svelte-components/select/SkillSelect.svelte';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import IntegerSelect from '~/helpers/svelte-components/select/IntegerSelect.svelte';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // The actor document making this check
    export let actor;
@@ -26,10 +26,11 @@
    const checkParameters = {
       attribute: options.attribute ?? attack.attribute,
       skill: options.skill ?? attack.skill,
-      type: options.type ?? "melee",
+      type: options.type ?? 'melee',
       targetDefense: options.targetDefense ?? 1,
       attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
-      attackerAccuracy: options.attackerAccuracy ?? actor.system.rating.accuracy.value,
+      attackerAccuracy:
+         options.attackerAccuracy ?? actor.system.rating.accuracy.value,
       damageMod: options.damageMod ?? 0,
       trainingMod: options.trainingMod ?? 0,
       doubleTraining: options.doubleTraining ?? false,
@@ -47,16 +48,16 @@
    // Type Options
    const typeOptions = [
       {
-         value: "melee",
-         label: localize("melee"),
+         value: 'melee',
+         label: localize('melee'),
       },
       {
-         value: "ranged",
-         label: localize("ranged"),
+         value: 'ranged',
+         label: localize('ranged'),
       },
    ];
 
-   const application = getContext("external").application;
+   const application = getContext('external').application;
 
    async function onRoll() {
       actor.typeComponent.rollAttackCheck(checkParameters, true);
@@ -72,12 +73,15 @@
    // Calculates the total dice
    function getTotalDice(checkParameters, actor) {
       // Get the attribute dice
-      let retVal = actor.system.attribute[checkParameters.attribute].value + checkParameters.diceMod;
+      let retVal =
+         actor.system.attribute[checkParameters.attribute].value +
+         checkParameters.diceMod;
 
       // If there is a skill set
-      if (checkParameters.skill !== "none") {
+      if (checkParameters.skill !== 'none') {
          // Get the training dice
-         let trainingDice = actor.system.skill[checkParameters.skill].training.value;
+         let trainingDice =
+            actor.system.skill[checkParameters.skill].training.value;
          trainingDice += checkParameters.trainingMod;
 
          // Double training if appropriate
@@ -95,7 +99,7 @@
       let retVal = 0;
 
       // If there is a skill set
-      if (checkParameters.skill !== "none") {
+      if (checkParameters.skill !== 'none') {
          // Get the training expertise
          retVal += actor.system.skill[checkParameters.skill].expertise.value;
          retVal += checkParameters.expertiseMod;
@@ -122,7 +126,7 @@
    <!--Attribute-->
    <div class="row">
       <div class="label">
-         {localize("attribute")}
+         {localize('attribute')}
       </div>
       <div class="input">
          <AttributeSelect bind:value={checkParameters.attribute} />
@@ -132,7 +136,7 @@
    <!--Skill-->
    <div class="row">
       <div class="label">
-         {localize("skill")}
+         {localize('skill')}
       </div>
       <div class="input">
          <SkillSelect bind:value={checkParameters.skill} />
@@ -142,7 +146,7 @@
    <!--Type-->
    <div class="row">
       <div class="label">
-         {localize("type")}
+         {localize('type')}
       </div>
       <div class="input">
          <Select options={typeOptions} bind:value={checkParameters.type} />
@@ -151,21 +155,27 @@
 
    <!--Attacker ratings-->
    <div class="row">
-      {#if checkParameters.type === "melee"}
+      {#if checkParameters.type === 'melee'}
          <!--Melee-->
          <div class="label">
-            {localize("attackerMelee")}
+            {localize('attackerMelee')}
          </div>
          <div class="input">
-            <IntegerSelect options={ratingOptions} bind:value={checkParameters.attackerMelee} />
+            <IntegerSelect
+               options={ratingOptions}
+               bind:value={checkParameters.attackerMelee}
+            />
          </div>
       {:else}
          <!--Accuracy-->
          <div class="label">
-            {localize("attackerAccuracy")}
+            {localize('attackerAccuracy')}
          </div>
          <div class="input">
-            <IntegerSelect options={ratingOptions} bind:value={checkParameters.attackerAccuracy} />
+            <IntegerSelect
+               options={ratingOptions}
+               bind:value={checkParameters.attackerAccuracy}
+            />
          </div>
       {/if}
    </div>
@@ -173,17 +183,20 @@
    <!--Defense rating-->
    <div class="row">
       <div class="label">
-         {localize("targetDefense")}
+         {localize('targetDefense')}
       </div>
       <div class="input">
-         <IntegerSelect options={ratingOptions} bind:value={checkParameters.targetDefense} />
+         <IntegerSelect
+            options={ratingOptions}
+            bind:value={checkParameters.targetDefense}
+         />
       </div>
    </div>
 
    <!--MultiAttack Training-->
    <div class="row">
       <div class="label">
-         {localize("multiAttack")}
+         {localize('multiAttack')}
       </div>
       <div class="input">
          <input type="checkbox" bind:checked={checkParameters.multiAttack} />
@@ -193,7 +206,7 @@
    <!--Dice Mod-->
    <div class="row">
       <div class="label">
-         {localize("bonusPenaltyDice")}
+         {localize('bonusPenaltyDice')}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.diceMod} />
@@ -203,7 +216,7 @@
    <!--Training Mod-->
    <div class="row">
       <div class="label">
-         {localize("trainingMod")}
+         {localize('trainingMod')}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.trainingMod} />
@@ -213,7 +226,7 @@
    <!--Expertise Mod-->
    <div class="row">
       <div class="label">
-         {localize("expertiseMod")}
+         {localize('expertiseMod')}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.expertiseMod} />
@@ -223,7 +236,7 @@
    <!--Double Training-->
    <div class="row">
       <div class="label">
-         {localize("doubleTraining")}
+         {localize('doubleTraining')}
       </div>
       <div class="input">
          <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
@@ -233,10 +246,13 @@
    <!--Double Expertise-->
    <div class="row">
       <div class="label">
-         {localize("doubleExpertise")}
+         {localize('doubleExpertise')}
       </div>
       <div class="input">
-         <input type="checkbox" bind:checked={checkParameters.doubleExpertise} />
+         <input
+            type="checkbox"
+            bind:checked={checkParameters.doubleExpertise}
+         />
       </div>
    </div>
 
@@ -244,13 +260,13 @@
    <div class="row">
       <!--Total Dice-->
       <div class="summary">
-         {localize("totalDice") + ": "}
+         {localize('totalDice') + ': '}
          {totalDice}
       </div>
 
       <!--Total Expertise-->
       <div class="summary">
-         {localize("totalExpertise") + ": "}
+         {localize('totalExpertise') + ': '}
          {totalExpertise}
       </div>
    </div>
@@ -258,17 +274,17 @@
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <EfxButton on:click={onRoll}>{localize("roll")}</EfxButton>
+         <EfxButton on:click={onRoll}>{localize('roll')}</EfxButton>
       </div>
 
       <div class="button">
-         <EfxButton on:click={onCancel}>{localize("cancel")}</EfxButton>
+         <EfxButton on:click={onCancel}>{localize('cancel')}</EfxButton>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    .check-dialog {
       @include flex-column;

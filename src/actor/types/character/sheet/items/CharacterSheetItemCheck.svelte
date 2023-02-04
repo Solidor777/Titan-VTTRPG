@@ -1,15 +1,15 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import OpposedCheckTag from "~/helpers/svelte-components/tag/OpposedCheckTag.svelte";
-   import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
-   import ItemCheckButton from "~/helpers/svelte-components/button/ItemCheckButton.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
+   import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
+   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
+   import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
 
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Reference to the item
    export let item = void 0;
@@ -28,7 +28,11 @@
       <div class="button">
          <ItemCheckButton
             {check}
-            on:click={() => $document.typeComponent.rollItemCheck({ itemId: item._id, checkIdx: checkIdx }, false)}
+            on:click={() =>
+               $document.typeComponent.rollItemCheck(
+                  { itemId: item._id, checkIdx: checkIdx },
+                  false
+               )}
          />
       </div>
 
@@ -37,17 +41,19 @@
          <div class="stat">
             <AttributeTag
                attribute={check.attribute}
-               label={`${localize(check.attribute)} (${localize(check.skill)}) ${check.difficulty}:${check.complexity}`}
+               label={`${localize(check.attribute)} (${localize(
+                  check.skill
+               )}) ${check.difficulty}:${check.complexity}`}
             />
          </div>
 
          <!--Dice-->
          <div class="stat">
             <IconStatTag
-               label={localize("dice")}
+               label={localize('dice')}
                value={$document.system.attribute[check.attribute].value +
                   $document.system.skill[check.skill].training.value}
-               icon={"fas fa-dice-d6"}
+               icon={'fas fa-dice-d6'}
             />
          </div>
 
@@ -55,9 +61,9 @@
          {#if $document.system.skill[check.skill].training.value !== 0}
             <div class="stat">
                <IconStatTag
-                  label={localize("training")}
+                  label={localize('training')}
                   value={$document.system.skill[check.skill].training.value}
-                  icon={"fas fa-dumbbell"}
+                  icon={'fas fa-dumbbell'}
                />
             </div>
          {/if}
@@ -66,9 +72,9 @@
          {#if $document.system.skill[check.skill].expertise.value !== 0}
             <div class="stat">
                <IconStatTag
-                  label={localize("expertise")}
+                  label={localize('expertise')}
                   value={$document.system.skill[check.skill].expertise.value}
-                  icon={"fas fa-graduation-cap"}
+                  icon={'fas fa-graduation-cap'}
                />
             </div>
          {/if}
@@ -76,12 +82,15 @@
          <!--Resolve Cost-->
          {#if check.resolveCost > 0}
             <div class="stat">
-               <StatTag label={localize("resolveCost")} value={check.resolveCost} />
+               <StatTag
+                  label={localize('resolveCost')}
+                  value={check.resolveCost}
+               />
             </div>
          {/if}
 
          <!--Resistance Check-->
-         {#if check.resistanceCheck !== "none"}
+         {#if check.resistanceCheck !== 'none'}
             <div class="stat">
                <ResistedByTag resistance={check.resistanceCheck} />
             </div>
@@ -98,7 +107,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .check {
       @include flex-column;

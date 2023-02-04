@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   import ResistanceSelect from "~/helpers/svelte-components/select/ResistanceSelect.svelte";
+   import { getContext } from 'svelte';
+   import ResistanceSelect from '~/helpers/svelte-components/select/ResistanceSelect.svelte';
 
    // Value
    export let value = void 0;
@@ -11,7 +11,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <ResistanceSelect

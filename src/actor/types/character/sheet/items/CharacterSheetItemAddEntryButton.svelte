@@ -1,5 +1,5 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    export let label = void 0;
 </script>
 
@@ -15,7 +15,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .button {
       --button-font-size: var(--font-size-small);

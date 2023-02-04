@@ -1,16 +1,16 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
-   import CharacterSheetResistances from "~/actor/types/character/sheet/header/CharacterSheetResistances.svelte";
-   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
-   import CharacterSheetInspiration from "~/actor/types/character/sheet/header/CharacterSheetInspiration.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
+   import CharacterSheetAttributes from '~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
+   import CharacterSheetResistances from '~/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
+   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
+   import CharacterSheetInspiration from '~/actor/types/character/sheet/header/CharacterSheetInspiration.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="header">
@@ -29,18 +29,24 @@
       <!--Exp-->
       <div class="xp">
          <!--Available-->
-         <div class="available" use:tooltip={{content: localize("xpAvailable")}}>
-            <ModTag baseValue={0} currentValue={$document.system.xp.available} />
+         <div
+            class="available"
+            use:tooltip={{ content: localize('xpAvailable') }}
+         >
+            <ModTag
+               baseValue={0}
+               currentValue={$document.system.xp.available}
+            />
          </div>
          <div class="symbol">/</div>
 
          <!--Earned Input-->
-         <div class="earned" use:tooltip={{content: localize("xpEarned")}}>
+         <div class="earned" use:tooltip={{ content: localize('xpEarned') }}>
             <DocumentIntegerInput bind:value={$document.system.xp.earned} />
          </div>
 
          <!--Label-->
-         <div class="label">{localize("xp")}</div>
+         <div class="label">{localize('xp')}</div>
       </div>
    </div>
 
@@ -59,7 +65,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .header {
       @include panel-1;

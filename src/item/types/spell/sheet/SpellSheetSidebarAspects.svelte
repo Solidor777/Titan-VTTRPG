@@ -1,13 +1,15 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import SpellSheetSidebarCustomAspect from "./SpellSheetSidebarCustomAspect.svelte";
-   import SpellSheetSidebarStandardAspect from "./SpellSheetSidebarStandardAspect.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import SpellSheetSidebarCustomAspect from './SpellSheetSidebarCustomAspect.svelte';
+   import SpellSheetSidebarStandardAspect from './SpellSheetSidebarStandardAspect.svelte';
 
    // Application statee reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
-   $: enabledAspects = $document.system.aspect.filter((aspect) => aspect.enabled === true);
+   $: enabledAspects = $document.system.aspect.filter(
+      (aspect) => aspect.enabled === true
+   );
 </script>
 
 <ol>
@@ -26,7 +28,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    ol {
       @include flex-column;

@@ -1,33 +1,33 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import IconTag from "~/helpers/svelte-components/tag/IconTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
+   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
 
    // Application statee reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const labelIcons = {
-      damage: "fas fa-burst",
-      healing: "fas fa-heart",
-      range: "fas fa-ruler",
-      radius: "fas fa-bullseye",
-      duration: "fas fa-clock",
-      decreaseSpeed: "fas fa-person-running",
-      increaseSpeed: "fas fa-person-running",
+      damage: 'fas fa-burst',
+      healing: 'fas fa-heart',
+      range: 'fas fa-ruler',
+      radius: 'fas fa-bullseye',
+      duration: 'fas fa-clock',
+      decreaseSpeed: 'fas fa-person-running',
+      increaseSpeed: 'fas fa-person-running',
    };
 
    const optionIcons = {
-      awareness: "fas fa-eye",
-      defense: "fas fa-shield",
-      melee: "fas fa-sword",
-      accuracy: "fas fa-bow-arrow",
-      initiative: "fas fa-clock",
-      armor: "fas fa-helmet-battle",
-      damage: "fas fa-burst",
-      healing: "fas fa-heart",
+      awareness: 'fas fa-eye',
+      defense: 'fas fa-shield',
+      melee: 'fas fa-sword',
+      accuracy: 'fas fa-bow-arrow',
+      initiative: 'fas fa-clock',
+      armor: 'fas fa-helmet-battle',
+      damage: 'fas fa-burst',
+      healing: 'fas fa-heart',
    };
 
    export let aspect = void 0;
@@ -51,13 +51,13 @@
             {#if aspect.scaling}
                {aspect.initialValue}
                {#if aspect.cost > 1}
-                  {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
+                  {`+ (${aspect.cost} / ${localize('extraSuccesses.short')})`}
                {:else}
-                  {`+ ${localize("extraSuccesses.short")}`}
+                  {`+ ${localize('extraSuccesses.short')}`}
                {/if}
             {:else}
                <!--Non scaling value-->
-               {#if typeof aspect.initialValue === "string"}
+               {#if typeof aspect.initialValue === 'string'}
                   {localize(aspect.initialValue)}
                {:else}
                   {aspect.initialValue}
@@ -72,18 +72,27 @@
             {#if aspect.allOptions}
                <!--All Options-->
                <div class="option">
-                  <Tag label={localize("all")} />
+                  <Tag label={localize('all')} />
                </div>
             {:else}
                {#each aspect.option as option}
                   <!--Each option-->
                   <div class="option">
                      {#if optionIcons[option]}
-                        <IconTag label={localize(option)} icon={optionIcons[option]} />
-                     {:else if aspect.label === "decreaseAttribute" || aspect.label === "increaseAttribute"}
-                        <AttributeTag label={localize(option)} attribute={option} />
-                     {:else if aspect.label === "decreaseResistance" || aspect.label === "increaseResistance"}
-                        <ResistanceTag label={localize(option)} resistance={option} />
+                        <IconTag
+                           label={localize(option)}
+                           icon={optionIcons[option]}
+                        />
+                     {:else if aspect.label === 'decreaseAttribute' || aspect.label === 'increaseAttribute'}
+                        <AttributeTag
+                           label={localize(option)}
+                           attribute={option}
+                        />
+                     {:else if aspect.label === 'decreaseResistance' || aspect.label === 'increaseResistance'}
+                        <ResistanceTag
+                           label={localize(option)}
+                           resistance={option}
+                        />
                      {:else}
                         <Tag label={localize(option)} />
                      {/if}
@@ -94,16 +103,19 @@
       {/if}
 
       <!--Resistance Check-->
-      {#if aspect.resistanceCheck && aspect.resistanceCheck !== "none"}
+      {#if aspect.resistanceCheck && aspect.resistanceCheck !== 'none'}
          <div class="labeled-stat" transition:slide|local>
             <!--Label-->
             <div class="label">
-               {localize("resistedBy")}
+               {localize('resistedBy')}
             </div>
 
             <!--Value-->
             <div class="value">
-               <ResistanceTag resistance={aspect.resistanceCheck} label={localize(aspect.resistanceCheck)} />
+               <ResistanceTag
+                  resistance={aspect.resistanceCheck}
+                  label={localize(aspect.resistanceCheck)}
+               />
             </div>
          </div>
       {/if}
@@ -111,7 +123,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .aspect {
       @include flex-column;

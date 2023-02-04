@@ -1,12 +1,12 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import { v4 as uuidv4 } from "uuid";
-   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
-   import TextArea from "~/helpers/svelte-components/input/TextArea.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import { v4 as uuidv4 } from 'uuid';
+   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
+   import TextArea from '~/helpers/svelte-components/input/TextArea.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // The weapon document owning the attack
    export let document = void 0;
@@ -15,11 +15,11 @@
    export let attackIdx = void 0;
 
    // Application reference
-   const application = getContext("external").application;
+   const application = getContext('external').application;
 
    const newTrait = {
-      name: localize("newTrait"),
-      description: "",
+      name: localize('newTrait'),
+      description: '',
       uuid: uuidv4(),
    };
 
@@ -45,7 +45,7 @@
    <div class="name">
       <!--Label-->
       <div class="label">
-         {localize("name")}
+         {localize('name')}
       </div>
 
       <!--Input-->
@@ -58,7 +58,7 @@
    <div class="description">
       <!--Label-->
       <div class="label">
-         {localize("description")}
+         {localize('description')}
       </div>
 
       <!--Input-->
@@ -76,7 +76,7 @@
                addTrait();
             }}
          >
-            {localize("addTrait")}
+            {localize('addTrait')}
          </EfxButton>
       </div>
 
@@ -87,14 +87,14 @@
                application.close();
             }}
          >
-            {localize("cancel")}
+            {localize('cancel')}
          </EfxButton>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .add-custom-trait-dialog {
       @include flex-column;

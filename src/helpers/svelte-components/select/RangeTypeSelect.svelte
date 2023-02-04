@@ -1,6 +1,6 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import Select from "~/helpers/svelte-components/select/Select.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    // Value
    export let value = void 0;
@@ -10,12 +10,12 @@
    // Options
    const rangeTypeOptions = [
       {
-         label: localize("melee"),
-         value: "melee",
+         label: localize('melee'),
+         value: 'melee',
       },
       {
-         label: localize("ranged"),
-         value: "ranged",
+         label: localize('ranged'),
+         value: 'ranged',
       },
    ];
 </script>

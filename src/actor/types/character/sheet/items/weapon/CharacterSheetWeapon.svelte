@@ -1,22 +1,22 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
-   import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
-   import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
-   import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
-   import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
-   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import CharacterSheetWeaponMultiAttackButton from "./CharacterSheetWeaponMultiAttackButton.svelte";
-   import CharacterSheetWeaponAttacks from "./CharacterSheetWeaponAttacks.svelte";
-   import CharacterSheetWeaponAttackButton from "./CharacterSheetWeaponAttackButton.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import CharacterSheetItemExpandButton from '~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import CharacterSheetItemSendToChatButton from '~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   import CharacterSheetItemEditButton from '~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   import CharacterSheetItemDeleteButton from '~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   import CharacterSheetItemEquipButton from '~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
+   import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
+   import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   import CharacterSheetWeaponMultiAttackButton from './CharacterSheetWeaponMultiAttackButton.svelte';
+   import CharacterSheetWeaponAttacks from './CharacterSheetWeaponAttacks.svelte';
+   import CharacterSheetWeaponAttackButton from './CharacterSheetWeaponAttackButton.svelte';
 
    // Weapon id
    export let id = void 0;
@@ -25,8 +25,8 @@
    export let isExpanded = void 0;
 
    // Setup context references
-   const document = getContext("DocumentStore");
-   const application = getContext("external").application;
+   const document = getContext('DocumentStore');
+   const application = getContext('external').application;
 
    // Item reference
    $: item = $document.items.get(id);
@@ -53,27 +53,40 @@
             <div class="button">
                {#if !item.system.equipped}
                   <!--Toggle Equipped button-->
-                  <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
+                  <CharacterSheetItemEquipButton
+                     {item}
+                     equipped={item.system.equipped}
+                  />
                {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
                      attack={item.system.attack[0]}
-                     on:click={() => $document.typeComponent.rollAttackCheck({ itemId: item._id, attackIdx: 0 }, false)}
+                     on:click={() =>
+                        $document.typeComponent.rollAttackCheck(
+                           { itemId: item._id, attackIdx: 0 },
+                           false
+                        )}
                   />
                {/if}
             </div>
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('sendToChat') }}
+            >
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize("editItem") }}>
+            <div class="button" use:tooltip={{ content: localize('editItem') }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('deleteItem') }}
+            >
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -88,7 +101,10 @@
                </div>
 
                <div class="button">
-                  <CharacterSheetItemEquipButton {item} equipped={item.system.equipped} />
+                  <CharacterSheetItemEquipButton
+                     {item}
+                     equipped={item.system.equipped}
+                  />
                </div>
             </div>
 
@@ -98,14 +114,14 @@
             </div>
 
             <!--Attack notes-->
-            {#if item.system.attackNotes !== "" && item.system.attackNotes !== "<p></p>"}
+            {#if item.system.attackNotes !== '' && item.system.attackNotes !== '<p></p>'}
                <div class="section rich-text">
                   <RichText text={item.system.attackNotes} />
                </div>
             {/if}
 
             <!--Item Description-->
-            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
                <div class="section rich-text">
                   <RichText text={item.system.description} />
                </div>
@@ -145,7 +161,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .item {
       @include flex-column;

@@ -1,41 +1,49 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    export let key = void 0;
    export let icon = void 0;
    export let onClick = void 0;
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Calculate the tooltip for the max value
-   function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
+   function getTotalValueTooltip(
+      baseValue,
+      equipment,
+      effect,
+      ability,
+      staticMod
+   ) {
       // Base label
-      let retVal = `<p>${localize(`${key}.baseValue`)}</p><p>${localize("base")}: ${baseValue}</p>`;
+      let retVal = `<p>${localize(`${key}.baseValue`)}</p><p>${localize(
+         'base'
+      )}: ${baseValue}</p>`;
 
       // Equipment
       if (equipment !== 0) {
-         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+         retVal += `<p>${localize('equipment')}: ${equipment}</p>`;
       }
 
       // Abilities
       if (ability !== 0) {
-         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+         retVal += `<p>${localize('abilities')}: ${ability}</p>`;
       }
 
       // Effects
       if (effect !== 0) {
-         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+         retVal += `<p>${localize('effects')}: ${effect}</p>`;
       }
 
       // Static mod
       if (staticMod !== 0) {
-         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+         retVal += `<p>${localize('mod')}: ${staticMod}</p>`;
       }
 
       return retVal;
@@ -53,7 +61,7 @@
 <div class="mod">
    <!--Button-->
    <!-- svelte-ignore a11y-missing-attribute -->
-   <div class="button" use:tooltip={{content: localize(`${key}.desc`)}}>
+   <div class="button" use:tooltip={{ content: localize(`${key}.desc`) }}>
       <EfxButton
          on:keypress={() => {
             onClick();
@@ -75,12 +83,14 @@
       <!--Static Mod-->
       <div class="label">+</div>
       <div class="input">
-         <DocumentIntegerInput bind:value={$document.system.rating[key].mod.static} />
+         <DocumentIntegerInput
+            bind:value={$document.system.rating[key].mod.static}
+         />
       </div>
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={{content: totalValueTooltip}}>
+      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
          <ModTag
             currentValue={$document.system.rating[key].value}
             baseValue={$document.system.rating[key].baseValue +
@@ -92,7 +102,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .mod {
       @include flex-row;

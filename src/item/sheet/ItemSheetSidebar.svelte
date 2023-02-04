@@ -1,13 +1,13 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import ItemSheetSidebarChecks from "~/item/component/check/ItemSheetSidebarChecks.svelte";
-   import ItemSheetSidebarTraits from "~/item/sheet/ItemSheetSidebarTraits.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import ItemSheetSidebarChecks from '~/item/component/check/ItemSheetSidebarChecks.svelte';
+   import ItemSheetSidebarTraits from '~/item/sheet/ItemSheetSidebarTraits.svelte';
 
    // Application statee reference
-   const appState = getContext("ApplicationStateStore");
-   const document = getContext("DocumentStore");
+   const appState = getContext('ApplicationStateStore');
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="sidebar">
@@ -27,7 +27,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
    .sidebar {
       @include flex-column;
       @include flex-group-top;

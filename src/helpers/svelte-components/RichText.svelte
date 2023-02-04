@@ -1,11 +1,14 @@
 <script>
-   import { getContext } from "svelte";
+   import { getContext } from 'svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    export let text = void 0;
-   $: displayText = TextEditor.enrichHTML(text, { async: false, secrets: true });
+   $: displayText = TextEditor.enrichHTML(text, {
+      async: false,
+      secrets: true,
+   });
 </script>
 
 <div class="rich-text {$document.isOwner ? '' : 'not-owner'}">
@@ -13,7 +16,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
 
    .rich-text {
       overflow: hidden;

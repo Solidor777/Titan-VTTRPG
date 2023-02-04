@@ -1,18 +1,18 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
-   import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
-   import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import SpellAspectTags from "~/helpers/svelte-components/tag/SpellAspectTags.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
+   import ItemChatChecks from '~/item/chat-message/ItemChatChecks.svelte';
+   import ItemChatLabel from '~/item/chat-message/ItemChatLabel.svelte';
+   import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Chat context reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const item = $document.flags.titan.chatContext;
 </script>
 
@@ -26,16 +26,21 @@
       <div class="section">
          <AttributeTag
             attribute={item.system.castingCheck.attribute}
-            label={`${localize(item.system.castingCheck.attribute)} (${localize(item.system.castingCheck.skill)}) ${
-               item.system.castingCheck.difficulty
-            }:${item.system.castingCheck.complexity}`}
+            label={`${localize(item.system.castingCheck.attribute)} (${localize(
+               item.system.castingCheck.skill
+            )}) ${item.system.castingCheck.difficulty}:${
+               item.system.castingCheck.complexity
+            }`}
          />
       </div>
 
       <!--Aspects-->
       {#if item.system.aspect.length > 0 || item.system.customAspect.length > 0}
          <div class="section small-text tags">
-            <SpellAspectTags standardAspects={item.system.aspect} customAspects={item.system.customAspect} />
+            <SpellAspectTags
+               standardAspects={item.system.aspect}
+               customAspects={item.system.customAspect}
+            />
          </div>
       {/if}
 
@@ -47,7 +52,7 @@
       {/if}
 
       <!--Description-->
-      {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
          <div class="section rich-text">
             <RichText text={item.system.description} />
          </div>
@@ -62,13 +67,16 @@
 
          <!--Tradition-->
          <div class="tag">
-            <StatTag label={localize("tradition")} value={item.system.tradition} />
+            <StatTag
+               label={localize('tradition')}
+               value={item.system.tradition}
+            />
          </div>
 
          <!--XP Cost-->
          {#if item.system.xpCost}
             <div class="tag">
-               <StatTag label={localize("xpCost")} value={item.system.xpCost} />
+               <StatTag label={localize('xpCost')} value={item.system.xpCost} />
             </div>
          {/if}
 
@@ -83,8 +91,8 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../styles/Mixins.scss";
-   @import "../../../../styles/Variables.scss";
+   @import '../../../../styles/Mixins.scss';
+   @import '../../../../styles/Variables.scss';
 
    .item-chat-message {
       @include flex-column;

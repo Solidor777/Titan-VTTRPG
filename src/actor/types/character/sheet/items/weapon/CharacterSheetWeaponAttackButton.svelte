@@ -1,8 +1,8 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import { getContext } from "svelte";
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import { getContext } from 'svelte';
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Check
    export let attack = void 0;
@@ -15,7 +15,8 @@
          <!--Pool-->
          <div class="pool">
             <i class="fas fa-dice-d6" />
-            {$document.system.attribute[attack.attribute].value + $document.system.skill[attack.skill].training.value}
+            {$document.system.attribute[attack.attribute].value +
+               $document.system.skill[attack.skill].training.value}
          </div>
 
          <!--Expertise-->
@@ -30,7 +31,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .button {
       @include flex-row;

@@ -6,7 +6,7 @@
 <textarea bind:value on:change {disabled} />
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    textarea {
       @include input;

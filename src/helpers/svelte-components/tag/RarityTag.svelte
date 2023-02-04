@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    export let rarity = void 0;
 </script>
@@ -9,7 +9,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
 
    .tag {
       @include flex-row;

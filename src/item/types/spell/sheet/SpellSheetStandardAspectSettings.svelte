@@ -1,17 +1,17 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import SpellSheetEnableAspectButton from "./SpellSheetEnableAspectButton.svelte";
-   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
-   import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
-   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
-   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import SpellSheetEnableAspectButton from './SpellSheetEnableAspectButton.svelte';
+   import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
+   import DocumentResistanceSelect from '~/documents/components/select/DocumentResistanceSelect.svelte';
+   import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
+   import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
 
    export let aspectOptions = void 0;
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Determines whether an aspect should have a details div
    function hasDetails() {
@@ -71,7 +71,7 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("units")}
+                     {localize('units')}
                   </div>
 
                   <!--Value-->
@@ -91,13 +91,14 @@
                <div class="stat">
                   <!--Label-->
                   <div class="label">
-                     {localize("resistanceCheck")}
+                     {localize('resistanceCheck')}
                   </div>
 
                   <!--Value-->
                   <div class="input">
                      <DocumentResistanceSelect
-                        bind:value={$document.system.aspect[idx].resistanceCheck}
+                        bind:value={$document.system.aspect[idx]
+                           .resistanceCheck}
                         allowNone={true}
                      />
                   </div>
@@ -112,12 +113,14 @@
                   <div class="stat">
                      <!--Label-->
                      <div class="label">
-                        {localize("allOptions")}
+                        {localize('allOptions')}
                      </div>
 
                      <!--Value-->
                      <div class="input">
-                        <DocumentCheckboxInput bind:value={$document.system.aspect[idx].allOptions} />
+                        <DocumentCheckboxInput
+                           bind:value={$document.system.aspect[idx].allOptions}
+                        />
                      </div>
                   </div>
                </div>
@@ -130,13 +133,23 @@
                      <div class="option">
                         <ToggleOptionButton
                            label={localize(option)}
-                           enabled={$document.system.aspect[idx].option.indexOf(option) !== -1}
+                           enabled={$document.system.aspect[idx].option.indexOf(
+                              option
+                           ) !== -1}
                            on:click={() => {
-                              const optionIdx = $document.system.aspect[idx].option.indexOf(option);
+                              const optionIdx =
+                                 $document.system.aspect[idx].option.indexOf(
+                                    option
+                                 );
                               if (optionIdx === -1) {
-                                 $document.system.aspect[idx].option.push(option);
+                                 $document.system.aspect[idx].option.push(
+                                    option
+                                 );
                               } else {
-                                 $document.system.aspect[idx].option.splice(optionIdx, 1);
+                                 $document.system.aspect[idx].option.splice(
+                                    optionIdx,
+                                    1
+                                 );
                               }
                               $document.update({
                                  system: {
@@ -155,7 +168,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .aspect {
       @include flex-column;

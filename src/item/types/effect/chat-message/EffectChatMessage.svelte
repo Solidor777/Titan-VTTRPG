@@ -1,15 +1,15 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
-   import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import DurationTag from "~/helpers/svelte-components/tag/DurationTag.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import ItemChatChecks from '~/item/chat-message/ItemChatChecks.svelte';
+   import ItemChatLabel from '~/item/chat-message/ItemChatLabel.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
 
    // Chat context reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const item = $document.flags.titan.chatContext;
 </script>
 
@@ -28,7 +28,7 @@
       {/if}
 
       <!--Description-->
-      {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
          <div class="section rich-text">
             <RichText text={item.system.description} />
          </div>
@@ -37,13 +37,16 @@
       <div class="section tags small-text">
          <!--Duration-->
          <div class="tag">
-            <DurationTag type={item.system.duration.type} remaining={item.system.duration.remaining} />
+            <DurationTag
+               type={item.system.duration.type}
+               remaining={item.system.duration.remaining}
+            />
          </div>
 
          <!--Expired-->
-         {#if item.system.duration.type !== "permanent" && item.system.duration.remaining <= 0}
+         {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
             <div class="tag">
-               <Tag label={localize("expired")} />
+               <Tag label={localize('expired')} />
             </div>
          {/if}
 
@@ -60,8 +63,8 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../styles/Mixins.scss";
-   @import "../../../../styles/Variables.scss";
+   @import '../../../../styles/Mixins.scss';
+   @import '../../../../styles/Variables.scss';
 
    .item-chat-message {
       @include flex-column;

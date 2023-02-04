@@ -1,12 +1,12 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import ResistanceSelect from "~/helpers/svelte-components/select/ResistanceSelect.svelte";
-   import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
-   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import ResistanceSelect from '~/helpers/svelte-components/select/ResistanceSelect.svelte';
+   import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // The actor document making this check
    export let actor;
@@ -16,13 +16,13 @@
 
    // Initialize check parameters
    const checkParameters = {
-      resistance: options.resistance ?? "reflexes",
+      resistance: options.resistance ?? 'reflexes',
       difficulty: options.difficulty ?? 4,
       complexity: options.complexity ?? 0,
       diceMod: options.diceMod ?? 0,
    };
 
-   const application = getContext("external").application;
+   const application = getContext('external').application;
 
    async function onRoll() {
       actor.typeComponent.rollResistanceCheck(checkParameters, true);
@@ -41,7 +41,7 @@
       <!--Resistance-->
       <div class="row">
          <div class="label">
-            {localize("resistance")}
+            {localize('resistance')}
          </div>
          <div class="input">
             <ResistanceSelect bind:value={checkParameters.resistance} />
@@ -52,7 +52,7 @@
    <!--Difficulty-->
    <div class="row">
       <div class="label">
-         {localize("difficulty")}
+         {localize('difficulty')}
       </div>
       <div class="input">
          <CheckDifficultySelect bind:value={checkParameters.difficulty} />
@@ -62,7 +62,7 @@
    <!--Complexity-->
    <div class="row">
       <div class="label">
-         {localize("complexity")}
+         {localize('complexity')}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.complexity} min={0} />
@@ -72,7 +72,7 @@
    <!--Dice Mod-->
    <div class="row">
       <div class="label">
-         {localize("bonusPenaltyDice")}
+         {localize('bonusPenaltyDice')}
       </div>
       <div class="input">
          <IntegerInput bind:value={checkParameters.diceMod} />
@@ -82,25 +82,26 @@
    <!--Total Dice-->
    <div class="row">
       <div class="summary">
-         {localize("totalDice") + ": "}
-         {actor.system.resistance[checkParameters.resistance].value + checkParameters.diceMod}
+         {localize('totalDice') + ': '}
+         {actor.system.resistance[checkParameters.resistance].value +
+            checkParameters.diceMod}
       </div>
    </div>
 
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <EfxButton on:click={onRoll}>{localize("roll")}</EfxButton>
+         <EfxButton on:click={onRoll}>{localize('roll')}</EfxButton>
       </div>
 
       <div class="button">
-         <EfxButton on:click={onCancel}>{localize("cancel")}</EfxButton>
+         <EfxButton on:click={onCancel}>{localize('cancel')}</EfxButton>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    .check-dialog {
       @include flex-column;

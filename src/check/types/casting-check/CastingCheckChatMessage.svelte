@@ -1,16 +1,16 @@
 <script>
-   import { getContext } from "svelte";
-   import CheckChatDiceContainer from "~/check/chat-message/CheckChatDiceContainer.svelte";
-   import CastingCheckChatHeader from "./CastingCheckChatHeader.svelte";
-   import CheckChatResults from "~/check/chat-message/CheckChatResults.svelte";
-   import CheckChatDamageButtons from "~/check/chat-message/CheckChatDamageButtons.svelte";
-   import CheckChatHealingButton from "~/check/chat-message/CheckChatHealingButton.svelte";
-   import CheckChatResistanceCheckButtons from "~/check/chat-message/CheckChatResistanceCheckButtons.svelte";
-   import CheckChatScalingAspects from "~/check/chat-message/CheckChatScalingAspects.svelte";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
+   import { getContext } from 'svelte';
+   import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
+   import CastingCheckChatHeader from './CastingCheckChatHeader.svelte';
+   import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
+   import CheckChatDamageButtons from '~/check/chat-message/CheckChatDamageButtons.svelte';
+   import CheckChatHealingButton from '~/check/chat-message/CheckChatHealingButton.svelte';
+   import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
+   import CheckChatScalingAspects from '~/check/chat-message/CheckChatScalingAspects.svelte';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Scaling aspects list
    $: scalingAspect =
@@ -27,9 +27,11 @@
    </div>
 
    <!--Description-->
-   {#if $document.flags.titan.chatContext.results.succeeded && $document.flags.titan.chatContext.parameters.description !== "" && $document.flags.titan.chatContext.parameters.description !== "<p></p>"}
+   {#if $document.flags.titan.chatContext.results.succeeded && $document.flags.titan.chatContext.parameters.description !== '' && $document.flags.titan.chatContext.parameters.description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText text={$document.flags.titan.chatContext.parameters.description} />
+         <RichText
+            text={$document.flags.titan.chatContext.parameters.description}
+         />
       </div>
    {/if}
 
@@ -77,7 +79,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    .check-chat-message {
       @include flex-column;

@@ -1,13 +1,13 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import { getContext } from "svelte";
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import { getContext } from 'svelte';
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Check
    export let check = {
-      attribute: "body",
-      skill: "athletics",
+      attribute: 'body',
+      skill: 'athletics',
       difficulty: 4,
       complexity: 0,
    };
@@ -25,7 +25,9 @@
          <div class="pool">
             <i class="fas fa-dice-d6" />
             {$document.system.attribute[check.attribute].value +
-               (check.skill ? $document.system.skill[check.skill].training.value : 0)}
+               (check.skill
+                  ? $document.system.skill[check.skill].training.value
+                  : 0)}
          </div>
 
          <!--Expertise-->
@@ -40,7 +42,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .item-check-button {
       @include flex-row;

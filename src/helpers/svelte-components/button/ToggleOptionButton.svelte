@@ -1,5 +1,5 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    export let enabled = void 0;
    export let label = void 0;
    export let disabled = false;
@@ -14,7 +14,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .toggle {
       --button-font-size: var(--font-size-small);

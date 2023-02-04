@@ -1,14 +1,14 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import DocumentEditorInput from "~/documents/components/input/DocumentEditorInput.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import DocumentEditorInput from '~/documents/components/input/DocumentEditorInput.svelte';
 
-   export let header = localize("description");
-   export let fieldName = "system.description";
+   export let header = localize('description');
+   export let fieldName = 'system.description';
 
    // Setup context variables
-   const appState = getContext("ApplicationStateStore");
+   const appState = getContext('ApplicationStateStore');
 </script>
 
 <div class="tab">
@@ -29,7 +29,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
    .tab {
       @include flex-row;
       @include flex-group-center;

@@ -1,16 +1,16 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import onRulesElementOperationChanged from "./RulesElementUpdateOperation";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import onRulesElementOperationChanged from './RulesElementUpdateOperation';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Application reference
-   const application = getContext("external").application;
+   const application = getContext('external').application;
 
    export let operationOptions = void 0;
    export let idx = void 0;
@@ -21,7 +21,7 @@
    // Setup tabs
 </script>
 
-{#if element && element.operation === "turnStartStamina"}
+{#if element && element.operation === 'turnStartStamina'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -44,7 +44,7 @@
       <!--Delete Element-->
       <div class="delete-button">
          <IconButton
-            icon={"fas fa-trash"}
+            icon={'fas fa-trash'}
             on:click={() => {
                application.removeRulesElement(idx);
             }}
@@ -54,7 +54,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .element {
       @include flex-row;

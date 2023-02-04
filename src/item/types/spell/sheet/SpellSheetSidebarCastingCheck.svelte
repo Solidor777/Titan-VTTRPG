@@ -1,13 +1,13 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import SpellSheetSidebarAspects from "./SpellSheetSidebarAspects.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import SpellSheetSidebarAspects from './SpellSheetSidebarAspects.svelte';
 
    // Application statee reference
-   const appState = getContext("ApplicationStateStore");
-   const document = getContext("DocumentStore");
+   const appState = getContext('ApplicationStateStore');
+   const document = getContext('DocumentStore');
 
    function areAspectsEnabled(aspects) {
       for (let idx = 0; idx < aspects.length; idx++) {
@@ -18,7 +18,9 @@
       return false;
    }
 
-   $: aspectsEnabled = areAspectsEnabled($document.system.aspect) || $document.system.customAspect.length > 0;
+   $: aspectsEnabled =
+      areAspectsEnabled($document.system.aspect) ||
+      $document.system.customAspect.length > 0;
 </script>
 
 <!--Casting Check-->
@@ -28,8 +30,10 @@
       {#if aspectsEnabled}
          <!--Label-->
          <div class="label-button">
-            {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
-               .system.castingCheck.difficulty}:{$document.system.castingCheck.complexity}
+            {localize($document.system.castingCheck.attribute)} ({localize(
+               $document.system.castingCheck.skill
+            )}) {$document.system.castingCheck.difficulty}:{$document.system
+               .castingCheck.complexity}
          </div>
          <!--Expand button-->
          <div class="spacer">
@@ -54,8 +58,10 @@
       {:else}
          <!--Label-->
          <div class="label-normal">
-            {localize($document.system.castingCheck.attribute)} ({localize($document.system.castingCheck.skill)}) {$document
-               .system.castingCheck.difficulty}:{$document.system.castingCheck.complexity}
+            {localize($document.system.castingCheck.attribute)} ({localize(
+               $document.system.castingCheck.skill
+            )}) {$document.system.castingCheck.difficulty}:{$document.system
+               .castingCheck.complexity}
          </div>
       {/if}
    </div>
@@ -69,7 +75,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
    .casting-check {
       @include flex-column;
       @include flex-group-top;

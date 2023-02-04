@@ -1,18 +1,18 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentSkillSelect from "~/documents/components/select/DocumentSkillSelect.svelte";
-   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
-   import DocumentCheckDifficultySelect from "~/documents/components/select/DocumentCheckDifficultySelect.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentSkillSelect from '~/documents/components/select/DocumentSkillSelect.svelte';
+   import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
+   import DocumentCheckDifficultySelect from '~/documents/components/select/DocumentCheckDifficultySelect.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 </script>
 
 <div class="casting-check-tab">
@@ -23,11 +23,13 @@
          <!--Attribute-->
          <div class="stat">
             <div class="label">
-               {localize("attribute")}
+               {localize('attribute')}
             </div>
 
             <div class="select">
-               <DocumentAttributeSelect bind:value={$document.system.castingCheck.attribute} />
+               <DocumentAttributeSelect
+                  bind:value={$document.system.castingCheck.attribute}
+               />
             </div>
          </div>
 
@@ -36,11 +38,13 @@
          <!--Skill-->
          <div class="stat">
             <div class="label">
-               {localize("skill")}
+               {localize('skill')}
             </div>
 
             <div class="select">
-               <DocumentSkillSelect bind:value={$document.system.castingCheck.skill} />
+               <DocumentSkillSelect
+                  bind:value={$document.system.castingCheck.skill}
+               />
             </div>
          </div>
       </div>
@@ -51,12 +55,14 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("autoCalculateDC")}
+               {localize('autoCalculateDC')}
             </div>
 
             <!--Checkbox-->
             <div class="casting-checkbox">
-               <DocumentCheckboxInput bind:value={$document.system.castingCheck.autoCalculateDC} />
+               <DocumentCheckboxInput
+                  bind:value={$document.system.castingCheck.autoCalculateDC}
+               />
             </div>
          </div>
       </div>
@@ -66,7 +72,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("difficulty")}
+               {localize('difficulty')}
             </div>
 
             <!--Select-->
@@ -84,7 +90,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("complexity")}
+               {localize('complexity')}
             </div>
 
             <!--Input-->
@@ -104,7 +110,7 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize("totalAspectCost")}:
+               {localize('totalAspectCost')}:
             </div>
 
             <!--Value-->
@@ -120,7 +126,7 @@
       <div class="aspect-costs" transition:slide|local>
          <!--Header-->
          <div class="header">
-            {localize("aspectCosts")}
+            {localize('aspectCosts')}
          </div>
 
          <ScrollingContainer bind:scrollTop={$appState.scrollTop.castingCheck}>
@@ -139,7 +145,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .casting-check-tab {
       @include flex-column;

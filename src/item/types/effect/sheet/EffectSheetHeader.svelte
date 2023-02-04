@@ -1,27 +1,27 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
-   import DocumentIntegerInput from "../../../../documents/components/input/DocumentIntegerInput.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import DocumentImagePicker from '~/documents/components/DocumentImagePicker.svelte';
+   import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
+   import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
+   import DocumentIntegerInput from '../../../../documents/components/input/DocumentIntegerInput.svelte';
 
    // Get Context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    const durationOptions = [
       {
-         value: "turnEnd",
-         label: localize("turnEnd"),
+         value: 'turnEnd',
+         label: localize('turnEnd'),
       },
       {
-         value: "turnStart",
-         label: localize("turnStart"),
+         value: 'turnStart',
+         label: localize('turnStart'),
       },
       {
-         value: "permanent",
-         label: localize("permanent"),
+         value: 'permanent',
+         label: localize('permanent'),
       },
    ];
 </script>
@@ -30,7 +30,7 @@
 <div class="header">
    <!--Portrait-->
    <div class="portrait">
-      <DocumentImagePicker path={"img"} alt={"item portrait"} />
+      <DocumentImagePicker path={'img'} alt={'item portrait'} />
    </div>
 
    <!--Name-->
@@ -45,26 +45,32 @@
          <div class="stat">
             <!-- Label-->
             <div class="label">
-               {localize("durationType")}
+               {localize('durationType')}
             </div>
 
             <!--Input-->
             <div class="input">
-               <DocumentSelect options={durationOptions} bind:value={$document.system.duration.type} />
+               <DocumentSelect
+                  options={durationOptions}
+                  bind:value={$document.system.duration.type}
+               />
             </div>
          </div>
 
          <!--Duration Remaining-->
-         {#if $document.system.duration.type !== "permanent"}
+         {#if $document.system.duration.type !== 'permanent'}
             <div class="stat" transition:slide|local>
                <!-- Label-->
                <div class="label">
-                  {localize("remaining")}
+                  {localize('remaining')}
                </div>
 
                <!--Input-->
                <div class="input number">
-                  <DocumentIntegerInput min={0} bind:value={$document.system.duration.remaining} />
+                  <DocumentIntegerInput
+                     min={0}
+                     bind:value={$document.system.duration.remaining}
+                  />
                </div>
             </div>
          {/if}
@@ -73,7 +79,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .header {
       @include border;

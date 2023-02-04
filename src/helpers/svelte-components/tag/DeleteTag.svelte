@@ -21,7 +21,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
 
    .tag {
       @include flex-row;

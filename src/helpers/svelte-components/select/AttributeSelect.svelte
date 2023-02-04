@@ -1,6 +1,6 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import Select from "~/helpers/svelte-components/select/Select.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    // Value
    export let value = void 0;
@@ -13,24 +13,24 @@
    // Options
    const options = [
       {
-         label: localize("body"),
-         value: "body",
+         label: localize('body'),
+         value: 'body',
       },
       {
-         label: localize("mind"),
-         value: "mind",
+         label: localize('mind'),
+         value: 'mind',
       },
       {
-         label: localize("soul"),
-         value: "soul",
+         label: localize('soul'),
+         value: 'soul',
       },
    ];
 
    // Add none option
    if (allowNone) {
       skillOptions.push({
-         label: localize("none"),
-         value: "none",
+         label: localize('none'),
+         value: 'none',
       });
    }
 </script>

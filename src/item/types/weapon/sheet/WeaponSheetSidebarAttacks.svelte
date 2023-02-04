@@ -1,21 +1,22 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import IconStatTag from "../../../../helpers/svelte-components/tag/IconStatTag.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import IconStatTag from '../../../../helpers/svelte-components/tag/IconStatTag.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    // Initialize expanded state
    $document.system.attack.forEach((entry, idx) => {
-      $appState.isExpanded.sidebar.attack[idx] = $appState.isExpanded.sidebar.attack[idx] ?? true;
+      $appState.isExpanded.sidebar.attack[idx] =
+         $appState.isExpanded.sidebar.attack[idx] ?? true;
    });
 </script>
 
@@ -29,7 +30,11 @@
             <!--Label-->
             <div class="label">
                <!--Icon-->
-               <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
+               <i
+                  class="fas fa-{attack.type === 'melee'
+                     ? 'sword'
+                     : 'bow-arrow'}"
+               />
                <!-- Text-->
                <div class="text">
                   {attack.label}
@@ -68,17 +73,23 @@
                <!--Range-->
                {#if attack.range !== 1}
                   <div class="stat" transition:slide|local>
-                     <IconStatTag label={localize("range")} value={attack.range} icon={"fas fa-ruler"} />
+                     <IconStatTag
+                        label={localize('range')}
+                        value={attack.range}
+                        icon={'fas fa-ruler'}
+                     />
                   </div>
                {/if}
 
                <!--Damage-->
                <div class="stat">
                   <IconStatTag
-                     icon={"fas fa-burst"}
-                     label={localize("damage")}
+                     icon={'fas fa-burst'}
+                     label={localize('damage')}
                      value={`${attack.damage}${
-                        attack.plusExtraSuccessDamage ? ` + ${localize("extraSuccesses.short")}` : ""
+                        attack.plusExtraSuccessDamage
+                           ? ` + ${localize('extraSuccesses.short')}`
+                           : ''
                      }`}
                   />
                </div>
@@ -87,16 +98,25 @@
                <div class="stat">
                   <AttributeTag
                      attribute={attack.attribute}
-                     label={`${localize(attack.attribute)} (${localize(attack.skill)})`}
+                     label={`${localize(attack.attribute)} (${localize(
+                        attack.skill
+                     )})`}
                   />
                </div>
 
                <!--Normal Traits-->
                {#each attack.trait as trait (trait.name)}
-                  <div class="stat" use:tooltip={{content: localize(`${trait.name}.desc`)}} transition:slide|local>
-                     {#if trait.type === "number"}
+                  <div
+                     class="stat"
+                     use:tooltip={{ content: localize(`${trait.name}.desc`) }}
+                     transition:slide|local
+                  >
+                     {#if trait.type === 'number'}
                         <!--Number Trait-->
-                        <StatTag label={localize(trait.name)} value={trait.value} />
+                        <StatTag
+                           label={localize(trait.name)}
+                           value={trait.value}
+                        />
                      {:else}
                         <!--Bool Trait-->
                         <Tag label={localize(trait.name)} />
@@ -106,7 +126,11 @@
 
                <!--Custom Traits-->
                {#each attack.customTrait as trait (trait.uuid)}
-                  <div class="stat" use:tooltip={{content: trait.description}} transition:slide|local>
+                  <div
+                     class="stat"
+                     use:tooltip={{ content: trait.description }}
+                     transition:slide|local
+                  >
                      <Tag label={trait.name} />
                   </div>
                {/each}
@@ -117,7 +141,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
    ol {
       @include list;
       @include flex-column;

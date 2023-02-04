@@ -1,8 +1,8 @@
 <script>
-   import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
-   import { getContext } from "svelte";
+   import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
+   import { getContext } from 'svelte';
 
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    export let fieldName = void 0;
 </script>
 
@@ -11,7 +11,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
    .editor {
       @include flex-row;
       @include flex-group-left;

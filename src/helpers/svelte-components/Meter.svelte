@@ -5,7 +5,8 @@
    export let current = void 0;
 
    // Calculate the meter width
-   $: meterWidth = max > min ? `${(current / max - min) * 100}%`.toString() : "0";
+   $: meterWidth =
+      max > min ? `${(current / max - min) * 100}%`.toString() : '0';
 </script>
 
 <div class="meter">
@@ -29,7 +30,8 @@
          height: 100%;
          border-radius: 20px;
          background: var(--meter-color);
-         box-shadow: inset 0 2px 9px var(--meter-shadow-1), inset 0 -2px 6px var(--meter-shadow-2);
+         box-shadow: inset 0 2px 9px var(--meter-shadow-1),
+            inset 0 -2px 6px var(--meter-shadow-2);
          overflow: hidden;
       }
    }

@@ -1,6 +1,6 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
    // Filter Items
    export let filter = void 0;
@@ -8,12 +8,12 @@
 
 <!--Filter-->
 <div class="filter">
-   <div class="label">{localize("filter")}</div>
+   <div class="label">{localize('filter')}</div>
    <div class="input"><TextInput bind:value={filter} /></div>
 </div>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
 
    .filter {
       @include flex-row;

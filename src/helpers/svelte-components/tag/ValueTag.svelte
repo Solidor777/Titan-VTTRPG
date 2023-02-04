@@ -1,12 +1,12 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
    export let value = void 0;
 </script>
 
 <div class="stat">
    <i class="fas fa-coins" />
    <div class="label">
-      {localize("value")}
+      {localize('value')}
    </div>
    <div class="value">
       {value}
@@ -14,7 +14,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
 
    .stat {
       @include flex-row;

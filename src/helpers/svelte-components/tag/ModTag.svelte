@@ -4,12 +4,18 @@
 </script>
 
 <!--Total Value-->
-<div class="tag {baseValue == currentValue ? '' : currentValue > baseValue ? 'greater' : 'lesser'}">
+<div
+   class="tag {baseValue == currentValue
+      ? ''
+      : currentValue > baseValue
+      ? 'greater'
+      : 'lesser'}"
+>
    {currentValue}
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .tag {
       @include flex-row;

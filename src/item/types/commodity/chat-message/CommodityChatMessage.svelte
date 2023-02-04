@@ -1,17 +1,17 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import ItemChatChecks from "~/item/chat-message/ItemChatChecks.svelte";
-   import ItemChatLabel from "~/item/chat-message/ItemChatLabel.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import ItemChatChecks from '~/item/chat-message/ItemChatChecks.svelte';
+   import ItemChatLabel from '~/item/chat-message/ItemChatLabel.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Chat context reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const item = $document.flags.titan.chatContext;
 </script>
 
@@ -30,7 +30,7 @@
       {/if}
 
       <!--Description-->
-      {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
          <div class="section rich-text">
             <RichText text={item.system.description} />
          </div>
@@ -52,7 +52,10 @@
 
          <!--Quantity-->
          <div class="tag">
-            <StatTag label={localize("quantity")} value={item.system.quantity} />
+            <StatTag
+               label={localize('quantity')}
+               value={item.system.quantity}
+            />
          </div>
 
          <!--Custom Traits-->
@@ -66,8 +69,8 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../styles/Mixins.scss";
-   @import "../../../../styles/Variables.scss";
+   @import '../../../../styles/Mixins.scss';
+   @import '../../../../styles/Variables.scss';
 
    .item-chat-message {
       @include flex-column;

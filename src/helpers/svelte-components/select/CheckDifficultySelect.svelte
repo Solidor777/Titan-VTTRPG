@@ -1,5 +1,5 @@
 <script>
-   import IntegerSelect from "~/helpers/svelte-components/select/IntegerSelect.svelte";
+   import IntegerSelect from '~/helpers/svelte-components/select/IntegerSelect.svelte';
 
    // Value
    export let value = void 0;

@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
 
    // Component class for the item
    export let itemComponent = void 0;
@@ -9,7 +9,7 @@
    export let filterFunction = void 0;
 
    // Optional filter for the items
-   export let filter = "";
+   export let filter = '';
 
    // Is expanded map
    export let isExpandedMap = void 0;
@@ -18,11 +18,11 @@
    export let isExpandedDefault = false;
 
    // Character reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Currently drag hovered state
    let isDragHovering = false;
-   let hoveredItemId = "";
+   let hoveredItemId = '';
 
    // Drag item start
    function onDragStart(event, id, type) {
@@ -36,7 +36,7 @@
       hoveredItemId = id;
       isDragHovering = true;
 
-      event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+      event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
 
       return;
    }
@@ -50,7 +50,7 @@
 
    // Drag item end
    function onDragEnd() {
-      hoveredItemId = "";
+      hoveredItemId = '';
       isDragHovering = false;
    }
 
@@ -66,7 +66,10 @@
    // Sort and filter items
    $: items = $document.items
       .filter((item) => {
-         return filterFunction(item) && item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+         return (
+            filterFunction(item) &&
+            item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+         );
       })
       .sort((a, b) => {
          if (a.sort < b.sort) {
@@ -89,24 +92,28 @@
             data-item-id={item._id}
             draggable={true}
             on:dragstart={(event) => {
-               onDragStart(event, item._id, "item");
+               onDragStart(event, item._id, 'item');
             }}
             on:dragenter={() => {
-               onDragEnter(item._id, "item");
+               onDragEnter(item._id, 'item');
             }}
             on:dragend={() => {
                onDragEnd();
             }}
             transition:slide|local
          >
-            <svelte:component this={itemComponent} id={item._id} bind:isExpanded={isExpandedMap[item._id]} />
+            <svelte:component
+               this={itemComponent}
+               id={item._id}
+               bind:isExpanded={isExpandedMap[item._id]}
+            />
          </li>
       {/each}
    </ol>
 {/if}
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    ol {
       @include flex-column;

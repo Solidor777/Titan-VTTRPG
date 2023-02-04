@@ -1,31 +1,31 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import CharacterSheetAttributes from "~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte";
-   import CharacterSheetResistances from "~/actor/types/character/sheet/header/CharacterSheetResistances.svelte";
-   import DocumentSelect from "~/documents/components/select/DocumentSelect.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import DocumentTextInput from "../../../documents/components/input/DocumentTextInput.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
+   import CharacterSheetAttributes from '~/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
+   import CharacterSheetResistances from '~/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
+   import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import DocumentTextInput from '../../../documents/components/input/DocumentTextInput.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const options = [
       {
-         label: localize("minion"),
-         value: "minion",
+         label: localize('minion'),
+         value: 'minion',
       },
       {
-         label: localize("warrior"),
-         value: "warrior",
+         label: localize('warrior'),
+         value: 'warrior',
       },
       {
-         label: localize("elite"),
-         value: "elite",
+         label: localize('elite'),
+         value: 'elite',
       },
       {
-         label: localize("champion"),
-         value: "champion",
+         label: localize('champion'),
+         value: 'champion',
       },
    ];
 </script>
@@ -45,7 +45,7 @@
       <div class="stat text">
          <!--Label-->
          <div class="label">
-            {localize("type")}
+            {localize('type')}
          </div>
 
          <!--Input-->
@@ -58,7 +58,7 @@
       <div class="stat">
          <!--Label-->
          <div class="label">
-            {localize("role")}
+            {localize('role')}
          </div>
 
          <!--Input-->
@@ -69,7 +69,7 @@
 
       <!--Exp-->
       <div class="tag">
-         <StatTag value={$document.system.xp} label={localize("xp")} />
+         <StatTag value={$document.system.xp} label={localize('xp')} />
       </div>
    </div>
 
@@ -88,7 +88,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .header {
       @include panel-1;

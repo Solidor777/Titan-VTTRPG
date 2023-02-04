@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    // Reference to the item
    export let item = void 0;
@@ -9,7 +9,7 @@
 <div class="tradition">
    <!--Label-->
    <div class="label">
-      {localize("tradition")}:
+      {localize('tradition')}:
    </div>
 
    <!--Value-->
@@ -19,7 +19,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .tradition {
       @include flex-row;

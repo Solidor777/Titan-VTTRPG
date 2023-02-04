@@ -1,13 +1,13 @@
 <script>
-   import preventDefault from "~/helpers/svelte-actions/PreventDefault.js";
-   import { ripple } from "@typhonjs-fvtt/svelte-standard/action";
-   import { getContext } from "svelte";
-   import recalculateCheckResults from "./RecalculateCheckResults";
+   import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
+   import { ripple } from '@typhonjs-fvtt/svelte-standard/action';
+   import { getContext } from 'svelte';
+   import recalculateCheckResults from './RecalculateCheckResults';
 
    export let idx = void 0;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    function getLabel(base, expertiseApplied) {
       if (expertiseApplied > 0) {
@@ -18,17 +18,18 @@
    }
 
    function getDieClass(final) {
-      const success = final >= $document.flags.titan.chatContext.parameters.difficulty;
+      const success =
+         final >= $document.flags.titan.chatContext.parameters.difficulty;
       const criticalSuccess = final >= 6;
       const criticalFailure = final === 1;
       if (criticalSuccess) {
-         return "critical-success";
+         return 'critical-success';
       } else if (success) {
-         return "success";
+         return 'success';
       } else if (criticalFailure) {
-         return "critical-failure";
+         return 'critical-failure';
       } else {
-         return "failure";
+         return 'failure';
       }
    }
 
@@ -40,15 +41,23 @@
       ) {
          // Add the expertise
          $document.flags.titan.chatContext.results.dice[idx].final += 1;
-         if ($document.flags.titan.chatContext.results.dice[idx].expertiseApplied) {
-            $document.flags.titan.chatContext.results.dice[idx].expertiseApplied += 1;
+         if (
+            $document.flags.titan.chatContext.results.dice[idx].expertiseApplied
+         ) {
+            $document.flags.titan.chatContext.results.dice[
+               idx
+            ].expertiseApplied += 1;
          } else {
-            $document.flags.titan.chatContext.results.dice[idx].expertiseApplied = 1;
+            $document.flags.titan.chatContext.results.dice[
+               idx
+            ].expertiseApplied = 1;
          }
          $document.flags.titan.chatContext.results.expertiseRemaining -= 1;
 
          // Recalculate the results
-         $document.flags.titan.chatContext.results = recalculateCheckResults($document.flags.titan.chatContext);
+         $document.flags.titan.chatContext.results = recalculateCheckResults(
+            $document.flags.titan.chatContext
+         );
 
          // Update the document
          $document.update({
@@ -67,7 +76,9 @@
       $document.flags.titan.chatContext.results.dice[idx].base,
       $document.flags.titan.chatContext.results.dice[idx].expertiseApplied
    );
-   $: dieClass = getDieClass($document.flags.titan.chatContext.results.dice[idx].final);
+   $: dieClass = getDieClass(
+      $document.flags.titan.chatContext.results.dice[idx].final
+   );
    $: disabled =
       !$document.constructor.getSpeakerActor($document.speaker)?.isOwner ||
       $document.flags.titan.chatContext.results.expertiseRemaining === 0 ||
@@ -88,7 +99,7 @@
 </button>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    button {
       @include border;
@@ -113,7 +124,10 @@
 
       &:hover {
          &:not(:disabled) {
-            clip-path: var(--tjs-icon-button-clip-path-hover, var(--tjs-icon-button-clip-path, none));
+            clip-path: var(
+               --tjs-icon-button-clip-path-hover,
+               var(--tjs-icon-button-clip-path, none)
+            );
          }
       }
 

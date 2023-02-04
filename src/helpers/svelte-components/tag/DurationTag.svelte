@@ -1,17 +1,17 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
    export let type = void 0;
    export let remaining = void 0;
 </script>
 
 <div class="stat">
    <div class="label">
-      {localize("duration")}
+      {localize('duration')}
    </div>
    <div class="value">
       {localize(type)}
    </div>
-   {#if type !== "permanent"}
+   {#if type !== 'permanent'}
       <div class="value">
          {remaining}
       </div>
@@ -19,7 +19,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
 
    .stat {
       @include flex-row;

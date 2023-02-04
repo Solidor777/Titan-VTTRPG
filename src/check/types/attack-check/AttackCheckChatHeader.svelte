@@ -1,17 +1,23 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="label">
-   <div class="content {$document.flags.titan.chatContext.parameters.attribute}">
+   <div
+      class="content {$document.flags.titan.chatContext.parameters.attribute}"
+   >
       <img
          src={$document.flags.titan.chatContext.parameters.img}
          alt="item"
-         class={$document.flags.titan.chatContext.parameters.img.indexOf(".svg") === -1 ? "" : "svg"}
+         class={$document.flags.titan.chatContext.parameters.img.indexOf(
+            '.svg'
+         ) === -1
+            ? ''
+            : 'svg'}
       />
 
       <!--Labels-->
@@ -28,7 +34,9 @@
 
          <!--Type Label -->
          <div class="sub-label">
-            {`${localize($document.flags.titan.chatContext.parameters.attribute)} (${localize(
+            {`${localize(
+               $document.flags.titan.chatContext.parameters.attribute
+            )} (${localize(
                $document.flags.titan.chatContext.parameters.skill
             )}) ${$document.flags.titan.chatContext.parameters.difficulty}:${
                $document.flags.titan.chatContext.parameters.complexity
@@ -38,26 +46,36 @@
          <!--Target defense-->
          {#if $document.flags.titan.chatContext.parameters.targetDefense !== undefined}
             {`${
-               $document.flags.titan.chatContext.parameters.type === "melee"
-                  ? `${localize("melee")}`
-                  : `${localize("accuracy")}`
-            } ${$document.flags.titan.chatContext.parameters.attackerRating} ${localize("versus")} ${localize(
-               "defense"
-            )} ${$document.flags.titan.chatContext.parameters.targetDefense}`}
+               $document.flags.titan.chatContext.parameters.type === 'melee'
+                  ? `${localize('melee')}`
+                  : `${localize('accuracy')}`
+            } ${
+               $document.flags.titan.chatContext.parameters.attackerRating
+            } ${localize('versus')} ${localize('defense')} ${
+               $document.flags.titan.chatContext.parameters.targetDefense
+            }`}
          {/if}
 
          <!--Damage -->
          <div class="sub-label">
-            {`${localize("damage")}: 
-            ${$document.flags.titan.chatContext.parameters.attack.damage + $document.flags.titan.chatContext.parameters.damageMod}
-            ${$document.flags.titan.chatContext.parameters.attack.plusExtraSuccessDamage ? ` + ${localize("extraSuccesses.short")}` : ""}`}
+            {`${localize('damage')}: 
+            ${
+               $document.flags.titan.chatContext.parameters.attack.damage +
+               $document.flags.titan.chatContext.parameters.damageMod
+            }
+            ${
+               $document.flags.titan.chatContext.parameters.attack
+                  .plusExtraSuccessDamage
+                  ? ` + ${localize('extraSuccesses.short')}`
+                  : ''
+            }`}
          </div>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
    .label {
       @include flex-row;
       @include flex-group-left;

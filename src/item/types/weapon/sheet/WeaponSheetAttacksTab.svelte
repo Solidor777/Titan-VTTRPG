@@ -1,20 +1,21 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import WeaponSheetAttackSettings from "./WeaponSheetAttackSettings.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import WeaponSheetAttackSettings from './WeaponSheetAttackSettings.svelte';
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const application = getContext('external').application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    // Initialize expanded state
    $document.system.attack.forEach((entry, idx) => {
-      $appState.isExpanded.attacks[idx] = $appState.isExpanded.attacks[idx] ?? true;
+      $appState.isExpanded.attacks[idx] =
+         $appState.isExpanded.attacks[idx] ?? true;
    });
 
    // Initialize filter
@@ -22,7 +23,11 @@
    $: {
       filteredEntries = [];
       $document.system.attack.forEach((entry, idx) => {
-         if (entry.label.toLowerCase().indexOf($appState.filter.attacks.toLowerCase()) !== -1) {
+         if (
+            entry.label
+               .toLowerCase()
+               .indexOf($appState.filter.attacks.toLowerCase()) !== -1
+         ) {
             filteredEntries.push(idx);
          }
       });
@@ -64,7 +69,7 @@
 
                   <!--Label-->
                   <div class="label">
-                     {localize("addAttack")}
+                     {localize('addAttack')}
                   </div>
                </div>
             </EfxButton>
@@ -75,7 +80,7 @@
 
 <!--For Each attack-->
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .tab {
       @include flex-column;

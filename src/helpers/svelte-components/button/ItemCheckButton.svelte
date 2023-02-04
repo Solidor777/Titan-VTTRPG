@@ -1,5 +1,5 @@
 <script>
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Check reference
    export let check = void 0;
@@ -19,7 +19,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .item-check-button {
       @include flex-row;

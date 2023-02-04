@@ -9,7 +9,7 @@
 <input bind:value on:change {disabled} />
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    input {
       @include input;

@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import CharacterSheetAttribute from "~/actor/types/character/sheet/header/CharacterSheetAttribute.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import CharacterSheetAttribute from '~/actor/types/character/sheet/header/CharacterSheetAttribute.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <!--Attributes-->
@@ -17,7 +17,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
    .attributes {
       @include flex-column;
       @include flex-group-top;

@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   import ResourceSelect from "~/helpers/svelte-components/select/ResourceSelect.svelte";
+   import { getContext } from 'svelte';
+   import ResourceSelect from '~/helpers/svelte-components/select/ResourceSelect.svelte';
 
    // Value
    export let value = void 0;
@@ -11,7 +11,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <ResourceSelect

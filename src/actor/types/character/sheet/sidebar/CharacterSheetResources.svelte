@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import CharacterSheetResource from "~/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import CharacterSheetResource from '~/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <!--Resources-->
@@ -20,7 +20,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .resources {
       @include flex-column;

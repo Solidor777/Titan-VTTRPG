@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   import RangeTypeSelect from "~/helpers/svelte-components/select/RangeTypeSelect.svelte";
+   import { getContext } from 'svelte';
+   import RangeTypeSelect from '~/helpers/svelte-components/select/RangeTypeSelect.svelte';
 
    // The value of the input
    export let value;
@@ -8,7 +8,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <RangeTypeSelect

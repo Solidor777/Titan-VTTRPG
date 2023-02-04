@@ -1,18 +1,18 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
-   import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
-   import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
-   import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
-   import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemEquipButton from "~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte";
-   import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
-   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import CharacterSheetShieldStats from "./CharacterSheetShieldStats.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import CharacterSheetCheckButton from '~/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
+   import CharacterSheetItemExpandButton from '~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import CharacterSheetItemSendToChatButton from '~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   import CharacterSheetItemEditButton from '~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   import CharacterSheetItemDeleteButton from '~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   import CharacterSheetItemEquipButton from '~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
+   import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
+   import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   import CharacterSheetShieldStats from './CharacterSheetShieldStats.svelte';
 
    // Reference to the armor id
    export let id = void 0;
@@ -21,7 +21,7 @@
    export let isExpanded = void 0;
 
    // Setup context references
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Item reference
    $: item = $document.items.get(id);
@@ -48,29 +48,42 @@
             <!--Toggle Equipped button-->
             {#if $document.system.equipped.shield !== item._id || item.system.check.length === 0}
                <div class="button">
-                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.shield === item._id} />
+                  <CharacterSheetItemEquipButton
+                     {item}
+                     equipped={$document.system.equipped.shield === item._id}
+                  />
                </div>
             {:else}
                <div class="button">
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
-                     on:click={() => $document.typeComponent.rollItemCheck({ itemId: item._id, checkIdx: 0 }, false)}
+                     on:click={() =>
+                        $document.typeComponent.rollItemCheck(
+                           { itemId: item._id, checkIdx: 0 },
+                           false
+                        )}
                   />
                </div>
             {/if}
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('sendToChat') }}
+            >
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize("editItem") }}>
+            <div class="button" use:tooltip={{ content: localize('editItem') }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('deleteItem') }}
+            >
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -82,7 +95,10 @@
             <!--Equip button-->
             {#if item.system.check.length > 0}
                <div class="section">
-                  <CharacterSheetItemEquipButton {item} equipped={$document.system.equipped.shield === item._id} />
+                  <CharacterSheetItemEquipButton
+                     {item}
+                     equipped={$document.system.equipped.shield === item._id}
+                  />
                </div>
             {/if}
 
@@ -99,7 +115,7 @@
             {/if}
 
             <!--Item Description-->
-            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
                <div class="section rich-text">
                   <RichText text={item.system.description} />
                </div>
@@ -110,7 +126,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .item {
       @include flex-column;

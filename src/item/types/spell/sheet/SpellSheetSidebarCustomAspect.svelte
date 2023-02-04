@@ -1,13 +1,13 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
    export let idx = 0;
 
    // Application statee reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    $: aspect = $document.system.customAspect[idx];
 </script>
@@ -33,24 +33,27 @@
          {aspect.initialValue}
          {#if aspect.scaling}
             {#if aspect.cost > 1}
-               {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
+               {`+ (${aspect.cost} / ${localize('extraSuccesses.short')})`}
             {:else}
-               {`+ ${localize("extraSuccesses.short")}`}
+               {`+ ${localize('extraSuccesses.short')}`}
             {/if}
          {/if}
       </div>
 
       <!--Resistance Check-->
-      {#if aspect.resistanceCheck && aspect.resistanceCheck !== "none"}
+      {#if aspect.resistanceCheck && aspect.resistanceCheck !== 'none'}
          <div class="labeled-stat" transition:slide|local>
             <!--Label-->
             <div class="label">
-               {localize("resistedBy")}
+               {localize('resistedBy')}
             </div>
 
             <!--Value-->
             <div class="value">
-               <ResistanceTag resistance={aspect.resistanceCheck} label={localize(aspect.resistanceCheck)} />
+               <ResistanceTag
+                  resistance={aspect.resistanceCheck}
+                  label={localize(aspect.resistanceCheck)}
+               />
             </div>
          </div>
       {/if}
@@ -58,7 +61,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .aspect {
       @include flex-column;

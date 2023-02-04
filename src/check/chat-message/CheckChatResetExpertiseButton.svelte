@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from "svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import recalculateCheckResults from "./RecalculateCheckResults";
+   import { getContext } from 'svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import recalculateCheckResults from './RecalculateCheckResults';
 
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    async function resetExpertise() {
       // Remove the expertise from the dice
       $document.flags.titan.chatContext.results.dice.forEach((dice) => {
@@ -14,7 +14,9 @@
       // Recalculate the results
       $document.flags.titan.chatContext.results.expertiseRemaining =
          $document.flags.titan.chatContext.parameters.totalExpertise;
-      const newResults = recalculateCheckResults($document.flags.titan.chatContext);
+      const newResults = recalculateCheckResults(
+         $document.flags.titan.chatContext
+      );
 
       await $document.update({
          flags: {

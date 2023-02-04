@@ -1,19 +1,19 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import SpellSheetCustomAspectSettings from "./SpellSheetCustomAspectSettings.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import SpellSheetCustomAspectSettings from './SpellSheetCustomAspectSettings.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
-   const application = getContext("external").application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
+   const application = getContext('external').application;
 
    // Filter for the aspects to display
-   let filter = "";
+   let filter = '';
    let filteredAspects = [];
    $: {
       filteredAspects = [];
@@ -59,7 +59,7 @@
 
                   <!--Label-->
                   <div class="label">
-                     {localize("addCustomAspect")}
+                     {localize('addCustomAspect')}
                   </div>
                </div>
             </EfxButton>
@@ -69,7 +69,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .tab {
       @include flex-column;

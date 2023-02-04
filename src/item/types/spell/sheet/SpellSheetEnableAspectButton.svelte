@@ -1,6 +1,6 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Value to toggle
    export let enabled = void 0;
@@ -19,7 +19,7 @@
          {label}
          <!--Icon-->
          <div class="icon">
-            <i class={enabled ? "fas fa-square-check" : "fas fa-square"} />
+            <i class={enabled ? 'fas fa-square-check' : 'fas fa-square'} />
          </div>
       </div>
 
@@ -27,7 +27,7 @@
       <div class="cost">
          <!--Label-->
          <div class="cost-label">
-            {localize("cost")}:
+            {localize('cost')}:
          </div>
 
          <!--Value-->
@@ -41,7 +41,7 @@
 </EfxButton>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .button-content {
       @include flex-row;

@@ -1,7 +1,7 @@
 <script>
-   import { getContext } from "svelte";
-   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
-   const document = getContext("DocumentStore");
+   import { getContext } from 'svelte';
+   import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="document-name">

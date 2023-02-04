@@ -1,8 +1,8 @@
 <script>
-   import { getContext } from "svelte";
+   import { getContext } from 'svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
@@ -42,7 +42,7 @@
 </div>
 
 <style lang="scss">
-   @import "../styles/Mixins.scss";
+   @import '../styles/Mixins.scss';
 
    .report {
       @include flex-column;

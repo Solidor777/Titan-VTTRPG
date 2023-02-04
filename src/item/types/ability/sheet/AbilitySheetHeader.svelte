@@ -1,16 +1,16 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
-   import DocumentName from "~/documents/components/input/DocumentNameInput.svelte";
-   import DocumentRaritySelect from "~/documents/components/select/DocumentRaritySelect.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import DocumentImagePicker from '~/documents/components/DocumentImagePicker.svelte';
+   import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
+   import DocumentRaritySelect from '~/documents/components/select/DocumentRaritySelect.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <!--Header-->
@@ -18,7 +18,7 @@
    <div class="main-label">
       <!--Portrait-->
       <div class="portrait">
-         <DocumentImagePicker path={"img"} alt={"item portrait"} />
+         <DocumentImagePicker path={'img'} alt={'item portrait'} />
       </div>
 
       <!--Label Stats-->
@@ -34,7 +34,7 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("rarity")}
+                  {localize('rarity')}
                </div>
 
                <!--Input-->
@@ -47,12 +47,15 @@
             <div class="stat">
                <!--Label-->
                <div class="label">
-                  {localize("xp")}
+                  {localize('xp')}
                </div>
 
                <!--Input-->
                <div class="input number">
-                  <DocumentIntegerInput bind:value={$document.system.xpCost} min={0} />
+                  <DocumentIntegerInput
+                     bind:value={$document.system.xpCost}
+                     min={0}
+                  />
                </div>
             </div>
          </div>
@@ -63,7 +66,7 @@
       <!--Action-->
       <div class="checkbox">
          <div class="label">
-            {localize("action")}
+            {localize('action')}
          </div>
          <div class="input">
             <DocumentCheckboxInput bind:value={$document.system.action} />
@@ -73,7 +76,7 @@
       <!--Reaction-->
       <div class="checkbox">
          <div class="label">
-            {localize("reaction")}
+            {localize('reaction')}
          </div>
          <div class="input">
             <DocumentCheckboxInput bind:value={$document.system.reaction} />
@@ -83,7 +86,7 @@
       <!--Passive-->
       <div class="checkbox">
          <div class="label">
-            {localize("passive")}
+            {localize('passive')}
          </div>
          <div class="input">
             <DocumentCheckboxInput bind:value={$document.system.passive} />
@@ -93,7 +96,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
    .header {
       @include border;
       @include flex-row;

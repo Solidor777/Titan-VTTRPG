@@ -1,13 +1,13 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { getContext } from "svelte";
+   import { getContext } from 'svelte';
 
    // The value of the input
    export let value;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    export let disabled = false;
 </script>

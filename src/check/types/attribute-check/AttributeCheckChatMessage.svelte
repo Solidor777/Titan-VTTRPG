@@ -1,11 +1,11 @@
 <script>
-   import { getContext } from "svelte";
-   import CheckChatDiceContainer from "~/check/chat-message/CheckChatDiceContainer.svelte";
-   import AttributeCheckChatHeader from "./AttributeCheckChatHeader.svelte";
-   import CheckChatResults from "~/check/chat-message/CheckChatResults.svelte";
+   import { getContext } from 'svelte';
+   import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
+   import AttributeCheckChatHeader from './AttributeCheckChatHeader.svelte';
+   import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="check-chat-message">
@@ -26,7 +26,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    .check-chat-message {
       @include flex-column;

@@ -1,13 +1,13 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    const labelIcons = {
-      damage: "fas fa-burst",
-      healing: "fas fa-heart",
-      range: "fas fa-ruler",
-      radius: "fas fa-bullseye",
-      decreaseSpeed: "fas fa-person-running",
-      increaseSpeed: "fas fa-person-running",
+      damage: 'fas fa-burst',
+      healing: 'fas fa-heart',
+      range: 'fas fa-ruler',
+      radius: 'fas fa-bullseye',
+      decreaseSpeed: 'fas fa-person-running',
+      increaseSpeed: 'fas fa-person-running',
    };
 
    // Spell aspect
@@ -32,13 +32,13 @@
          {#if aspect.scaling}
             {aspect.initialValue}
             {#if aspect.cost > 1}
-               {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
+               {`+ (${aspect.cost} / ${localize('extraSuccesses.short')})`}
             {:else}
-               {`+ ${localize("extraSuccesses.short")}`}
+               {`+ ${localize('extraSuccesses.short')}`}
             {/if}
          {:else}
             <!--Non scaling value-->
-            {#if typeof aspect.initialValue === "string"}
+            {#if typeof aspect.initialValue === 'string'}
                {localize(aspect.initialValue)}
             {:else}
                {aspect.initialValue}
@@ -51,7 +51,7 @@
    {#if aspect.allOptions}
       <!--All Options-->
       <div class="stat">
-         {localize("all")}
+         {localize('all')}
       </div>
    {:else if aspect.option}
       {#each aspect.option as option}
@@ -63,16 +63,16 @@
    {/if}
 
    <!--Resistance Check-->
-   {#if aspect.resistanceCheck && aspect.resistanceCheck !== "none"}
+   {#if aspect.resistanceCheck && aspect.resistanceCheck !== 'none'}
       <div class="stat">
-         {localize("resistedBy")}
+         {localize('resistedBy')}
          {localize(aspect.resistanceCheck)}
       </div>
    {/if}
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .aspect {
       @include flex-row;

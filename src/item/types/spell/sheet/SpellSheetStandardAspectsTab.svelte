@@ -1,13 +1,13 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import SpellAspects from "~/item/types/spell/SpellAspects.js";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import SpellSheetStandardAspectSettings from "./SpellSheetStandardAspectSettings.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import SpellAspects from '~/item/types/spell/SpellAspects.js';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import SpellSheetStandardAspectSettings from './SpellSheetStandardAspectSettings.svelte';
 
    // Setup context variables
-   const appState = getContext("ApplicationStateStore");
+   const appState = getContext('ApplicationStateStore');
 
    // Aspect Options
    const aspectOptions = foundry.utils.deepClone(SpellAspects);
@@ -17,7 +17,7 @@
       // Localize value options
       if (aspect.settings?.initialValueOptions) {
          aspect.settings.initialValueOptions.forEach((option) => {
-            if (typeof option.label === "string") {
+            if (typeof option.label === 'string') {
                option.label = localize(option.label);
             }
          });
@@ -26,7 +26,7 @@
       // Localize unit options
       if (aspect.settings?.unitOptions) {
          aspect.settings.unitOptions.forEach((option) => {
-            if (typeof option.label === "string") {
+            if (typeof option.label === 'string') {
                option.label = localize(option.label);
             }
          });
@@ -59,7 +59,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .standard-aspects-tab {
       @include flex-column;

@@ -1,9 +1,9 @@
 <script>
-   import ResistanceCheckButton from "~/helpers/svelte-components/button/ResistanceCheckButton.svelte";
-   import { getContext } from "svelte";
+   import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
+   import { getContext } from 'svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    $: complexity = $document.flags.titan.chatContext.results.extraSuccesses + 1;
 </script>
@@ -12,27 +12,39 @@
    <!--Reflexes-->
    {#if $document.flags.titan.chatContext.results.reflexesCheck}
       <div class="button">
-         <ResistanceCheckButton resistance={"reflexes"} difficulty={4} {complexity} />
+         <ResistanceCheckButton
+            resistance={'reflexes'}
+            difficulty={4}
+            {complexity}
+         />
       </div>
    {/if}
 
    <!--Resilience-->
    {#if $document.flags.titan.chatContext.results.resilienceCheck}
       <div class="button">
-         <ResistanceCheckButton resistance={"resilience"} difficulty={4} {complexity} />
+         <ResistanceCheckButton
+            resistance={'resilience'}
+            difficulty={4}
+            {complexity}
+         />
       </div>
    {/if}
 
    <!--Willpower-->
    {#if $document.flags.titan.chatContext.results.willpowerCheck}
       <div class="button">
-         <ResistanceCheckButton resistance={"willpower"} difficulty={4} {complexity} />
+         <ResistanceCheckButton
+            resistance={'willpower'}
+            difficulty={4}
+            {complexity}
+         />
       </div>
    {/if}
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .buttons {
       @include flex-row;

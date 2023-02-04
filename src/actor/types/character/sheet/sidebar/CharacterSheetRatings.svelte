@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from "svelte";
-   import CharacterSheetRating from "./CharacterSheetRating.svelte";
-   import CharacterSheetRatingButton from "./CharacterSheetRatingButton.svelte";
+   import { getContext } from 'svelte';
+   import CharacterSheetRating from './CharacterSheetRating.svelte';
+   import CharacterSheetRatingButton from './CharacterSheetRatingButton.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="ratings">
@@ -12,8 +12,8 @@
    <div class="rating">
       <!-- svelte-ignore missing-declaration -->
       <CharacterSheetRatingButton
-         key={"initiative"}
-         icon={"clock"}
+         key={'initiative'}
+         icon={'clock'}
          onClick={() => {
             $document.typeComponent.rollInitiative();
          }}
@@ -22,27 +22,27 @@
 
    <!--Awareness-->
    <div class="rating">
-      <CharacterSheetRating key={"awareness"} icon={"eye"} />
+      <CharacterSheetRating key={'awareness'} icon={'eye'} />
    </div>
 
    <!--Defense-->
    <div class="rating">
-      <CharacterSheetRating key={"defense"} icon={"shield"} />
+      <CharacterSheetRating key={'defense'} icon={'shield'} />
    </div>
 
    <!--Melee-->
    <div class="rating">
-      <CharacterSheetRating key={"melee"} icon={"sword"} />
+      <CharacterSheetRating key={'melee'} icon={'sword'} />
    </div>
 
    <!--Accuracy-->
    <div class="rating">
-      <CharacterSheetRating key={"accuracy"} icon={"bow-arrow"} />
+      <CharacterSheetRating key={'accuracy'} icon={'bow-arrow'} />
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .ratings {
       @include flex-column;

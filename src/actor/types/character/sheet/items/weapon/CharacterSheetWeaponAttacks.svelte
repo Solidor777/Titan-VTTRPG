@@ -1,5 +1,5 @@
 <script>
-   import CharacterSheetWeaponAttack from "./CharacterSheetWeaponAttack.svelte";
+   import CharacterSheetWeaponAttack from './CharacterSheetWeaponAttack.svelte';
 
    // Reference to the weapon id
    export let item = void 0;
@@ -16,7 +16,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    ol {
       @include flex-column;

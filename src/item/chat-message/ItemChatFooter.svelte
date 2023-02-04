@@ -3,7 +3,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
+   @import '../../styles/mixins.scss';
 
    .footer {
       @include flex-row;

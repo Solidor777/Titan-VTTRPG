@@ -1,36 +1,36 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import ItemSheetFlatModifierSettings from "./ItemSheetFlatModifierSettings.svelte";
-   import ItemSheetMulBaseSettings from "./ItemSheetMulBaseSettings.svelte";
-   import ItemSheetTurnStartMessageSettings from "./ItemSheetTurnStartMessageSettings.svelte";
-   import ItemSheetTurnStartStaminaSettings from "./ItemSheetTurnStartStaminaSettings.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import ItemSheetFlatModifierSettings from './ItemSheetFlatModifierSettings.svelte';
+   import ItemSheetMulBaseSettings from './ItemSheetMulBaseSettings.svelte';
+   import ItemSheetTurnStartMessageSettings from './ItemSheetTurnStartMessageSettings.svelte';
+   import ItemSheetTurnStartStaminaSettings from './ItemSheetTurnStartStaminaSettings.svelte';
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const application = getContext('external').application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    const operationOptions = [
       {
-         label: localize("flatModifier"),
-         value: "flatModifier",
+         label: localize('flatModifier'),
+         value: 'flatModifier',
       },
       {
-         label: localize("mulBase"),
-         value: "mulBase",
+         label: localize('mulBase'),
+         value: 'mulBase',
       },
       {
-         label: localize("turnStartMessage"),
-         value: "turnStartMessage",
+         label: localize('turnStartMessage'),
+         value: 'turnStartMessage',
       },
       {
-         label: localize("turnStartStamina"),
-         value: "turnStartStamina",
+         label: localize('turnStartStamina'),
+         value: 'turnStartStamina',
       },
    ];
 
@@ -63,7 +63,9 @@
             {#each $document.system.rulesElement as element, idx (element.uuid)}
                <li transition:slide|local>
                   <svelte:component
-                     this={selectComponent($document.system.rulesElement[idx].operation)}
+                     this={selectComponent(
+                        $document.system.rulesElement[idx].operation
+                     )}
                      {idx}
                      {operationOptions}
                   />
@@ -86,7 +88,7 @@
 
                <!--Label-->
                <div class="label">
-                  {localize("addRulesElement")}
+                  {localize('addRulesElement')}
                </div>
             </div>
          </EfxButton>
@@ -95,7 +97,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
    .tab {
       @include flex-column;
       @include flex-group-top;

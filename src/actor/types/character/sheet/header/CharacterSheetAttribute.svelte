@@ -1,40 +1,46 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
    // The key / name of the attribute
    export let key;
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Calculate the tooltip for the total value
-   function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
+   function getTotalValueTooltip(
+      baseValue,
+      equipment,
+      effect,
+      ability,
+      staticMod
+   ) {
       // Base label
-      let retVal = `<p>${localize("base")}: ${baseValue}</p>`;
+      let retVal = `<p>${localize('base')}: ${baseValue}</p>`;
 
       // Equipment
       if (equipment !== 0) {
-         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+         retVal += `<p>${localize('equipment')}: ${equipment}</p>`;
       }
 
       // Abilities
       if (ability !== 0) {
-         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+         retVal += `<p>${localize('abilities')}: ${ability}</p>`;
       }
 
       // Effects
       if (effect !== 0) {
-         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+         retVal += `<p>${localize('effects')}: ${effect}</p>`;
       }
 
       // Static mod
       if (staticMod !== 0) {
-         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+         retVal += `<p>${localize('mod')}: ${staticMod}</p>`;
       }
 
       return retVal;
@@ -52,7 +58,13 @@
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
    <div class="button {key}" use:tooltip={{ content: localize(`${key}.desc`) }}>
-      <EfxButton on:click={() => $document.typeComponent.rollAttributeCheck({ attribute: key }, false)}>
+      <EfxButton
+         on:click={() =>
+            $document.typeComponent.rollAttributeCheck(
+               { attribute: key },
+               false
+            )}
+      >
          {localize(key)}
       </EfxButton>
    </div>
@@ -61,13 +73,17 @@
    <div class="stats">
       <!--Base Value-->
       <div class="input">
-         <DocumentIntegerInput bind:value={$document.system.attribute[key].baseValue} />
+         <DocumentIntegerInput
+            bind:value={$document.system.attribute[key].baseValue}
+         />
       </div>
       <div class="label">+</div>
 
       <!--Static Mod-->
       <div class="input">
-         <DocumentIntegerInput bind:value={$document.system.attribute[key].mod.static} />
+         <DocumentIntegerInput
+            bind:value={$document.system.attribute[key].mod.static}
+         />
       </div>
       <div class="label">=</div>
 
@@ -84,7 +100,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .attribute {
       @include flex-row;

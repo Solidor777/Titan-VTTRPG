@@ -1,6 +1,6 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import Select from "~/helpers/svelte-components/select/Select.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    // Value
    export let value = void 0;
@@ -10,20 +10,20 @@
    // Options
    const rarityOptions = [
       {
-         label: localize("common"),
-         value: "common",
+         label: localize('common'),
+         value: 'common',
       },
       {
-         label: localize("uncommon"),
-         value: "uncommon",
+         label: localize('uncommon'),
+         value: 'uncommon',
       },
       {
-         label: localize("rare"),
-         value: "rare",
+         label: localize('rare'),
+         value: 'rare',
       },
       {
-         label: localize("unique"),
-         value: "unique",
+         label: localize('unique'),
+         value: 'unique',
       },
    ];
 </script>

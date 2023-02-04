@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    // Check reference
    export let check = void 0;
@@ -8,12 +8,14 @@
 <div class="label">
    <div class="content {check.parameters.resistance}">
       <!--Type Label -->
-      {`${localize(check.parameters.resistance)} ${check.parameters.difficulty}:${check.parameters.complexity}`}
+      {`${localize(check.parameters.resistance)} ${
+         check.parameters.difficulty
+      }:${check.parameters.complexity}`}
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
    .label {
       @include flex-row;
       @include flex-group-left;

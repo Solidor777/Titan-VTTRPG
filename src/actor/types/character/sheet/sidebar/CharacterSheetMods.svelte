@@ -1,23 +1,23 @@
 <script>
-   import CharacterSheetMod from "./CharacterSheetMod.svelte";
+   import CharacterSheetMod from './CharacterSheetMod.svelte';
 </script>
 
 <div class="mods">
    <div class="mod">
-      <CharacterSheetMod key={"armor"} icon={"helmet-battle"} />
+      <CharacterSheetMod key={'armor'} icon={'helmet-battle'} />
    </div>
 
    <div class="mod">
-      <CharacterSheetMod key={"damage"} icon={"burst"} />
+      <CharacterSheetMod key={'damage'} icon={'burst'} />
    </div>
 
    <div class="mod">
-      <CharacterSheetMod key={"healing"} icon={"heart"} />
+      <CharacterSheetMod key={'healing'} icon={'heart'} />
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .mods {
       @include flex-column;

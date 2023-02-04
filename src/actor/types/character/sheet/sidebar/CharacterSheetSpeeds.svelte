@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from "svelte";
-   import CharacterSheetSpeed from "~/actor/types/character/sheet/sidebar/CharacterSheetSpeed.svelte";
+   import { getContext } from 'svelte';
+   import CharacterSheetSpeed from '~/actor/types/character/sheet/sidebar/CharacterSheetSpeed.svelte';
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <!--Speeds-->
@@ -16,7 +16,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .speeds {
       @include flex-column;

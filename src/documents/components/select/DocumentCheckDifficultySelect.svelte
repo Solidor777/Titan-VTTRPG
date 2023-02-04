@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from "svelte";
-   import CheckDifficultySelect from "~/helpers/svelte-components/select/CheckDifficultySelect.svelte";
+   import { getContext } from 'svelte';
+   import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
 
    // The value of the input
    export let value = void 0;
@@ -8,7 +8,7 @@
    export let disabled = false;
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <CheckDifficultySelect

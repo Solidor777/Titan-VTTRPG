@@ -1,6 +1,6 @@
 <script>
-   import ItemSheetDescriptionTab from "~/item/sheet/ItemSheetDescriptionTab.svelte";
-   import { localize } from "~/helpers/Utility.js";
+   import ItemSheetDescriptionTab from '~/item/sheet/ItemSheetDescriptionTab.svelte';
+   import { localize } from '~/helpers/Utility.js';
 </script>
 
-<ItemSheetDescriptionTab header={localize("itemDescription")} />
+<ItemSheetDescriptionTab header={localize('itemDescription')} />

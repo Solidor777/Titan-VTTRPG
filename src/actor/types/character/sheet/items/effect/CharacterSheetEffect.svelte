@@ -1,19 +1,19 @@
 <script>
-   import { getContext } from "svelte";
-   import { slide } from "svelte/transition";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import RichText from "~/helpers/svelte-components/RichText.svelte";
-   import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
-   import CharacterSheetItemSendToChatButton from "~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte";
-   import CharacterSheetItemEditButton from "~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte";
-   import CharacterSheetItemDeleteButton from "~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte";
-   import CharacterSheetItemImage from "~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte";
-   import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
-   import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import IntegerInput from "~/helpers/svelte-components/input/IntegerInput.svelte";
-   import DurationTag from "~/helpers/svelte-components/tag/DurationTag.svelte";
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import CharacterSheetItemExpandButton from '~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import CharacterSheetItemSendToChatButton from '~/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   import CharacterSheetItemEditButton from '~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   import CharacterSheetItemDeleteButton from '~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
+   import CharacterSheetCheckButton from '~/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
+   import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
 
    // Reference to the weapon id
    export let id = void 0;
@@ -22,7 +22,7 @@
    export let isExpanded = void 0;
 
    // Setup context references
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Item reference
    $: item = $document.items.get(id);
@@ -47,10 +47,10 @@
          <!--Controls-->
          <div class="controls">
             <!--Duration-->
-            {#if item.system.duration.type !== "permanent"}
+            {#if item.system.duration.type !== 'permanent'}
                <div class="field">
                   <div class="label">
-                     {localize("turns")}
+                     {localize('turns')}
                   </div>
                   <div class="input">
                      <IntegerInput
@@ -73,23 +73,33 @@
                <div>
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
-                     on:click={() => $document.typeComponent.rollItemCheck({ itemId: item._id, checkIdx: 0 }, false)}
+                     on:click={() =>
+                        $document.typeComponent.rollItemCheck(
+                           { itemId: item._id, checkIdx: 0 },
+                           false
+                        )}
                   />
                </div>
             {/if}
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('sendToChat') }}
+            >
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize("editItem") }}>
+            <div class="button" use:tooltip={{ content: localize('editItem') }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
+            <div
+               class="button"
+               use:tooltip={{ content: localize('deleteItem') }}
+            >
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>
@@ -106,7 +116,7 @@
             {/if}
 
             <!--Item Description-->
-            {#if item.system.description !== "" && item.system.description !== "<p></p>"}
+            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
                <div class="section rich-text">
                   <RichText text={item.system.description} />
                </div>
@@ -115,20 +125,26 @@
             <div class="section tags small-text">
                <!--Duration-->
                <div class="tag">
-                  <DurationTag type={item.system.duration.type} remaining={item.system.duration.remaining} />
+                  <DurationTag
+                     type={item.system.duration.type}
+                     remaining={item.system.duration.remaining}
+                  />
                </div>
 
                <!--Expired-->
-               {#if item.system.duration.type !== "permanent" && item.system.duration.remaining <= 0}
+               {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
                   <div class="tag">
-                     <Tag label={localize("expired")} />
+                     <Tag label={localize('expired')} />
                   </div>
                {/if}
 
                <!--Traits-->
                {#if item.system.customTrait.length > 0}
                   {#each item.system.customTrait as trait}
-                     <div class="tag" use:tooltip={{ content: trait.description }}>
+                     <div
+                        class="tag"
+                        use:tooltip={{ content: trait.description }}
+                     >
                         <Tag label={trait.name} />
                      </div>
                   {/each}
@@ -140,7 +156,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .item {
       @include flex-column;

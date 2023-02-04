@@ -1,5 +1,5 @@
 <script>
-   let scrollClass = "";
+   let scrollClass = '';
    function scrollFade(event) {
       /*       const node = event.target;
       const isScrollable = node.scrollHeight > node.clientHeight;
@@ -46,7 +46,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .container {
       @include flex-column;

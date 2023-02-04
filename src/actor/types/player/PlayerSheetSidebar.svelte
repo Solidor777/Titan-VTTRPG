@@ -1,9 +1,9 @@
 <script>
-   import CharacterSheetResources from "~/actor/types/character/sheet/sidebar/CharacterSheetResources.svelte";
-   import CharacterSheetMods from "~/actor/types/character/sheet/sidebar/CharacterSheetMods.svelte";
-   import CharacterSheetRatings from "~/actor/types/character/sheet/sidebar/CharacterSheetRatings.svelte";
-   import CharacterSheetSpeeds from "~/actor/types/character/sheet/sidebar/CharacterSheetSpeeds.svelte";
-   import CharacterSheetPortrait from "~/actor/types/character/sheet/sidebar/CharacterSheetPortrait.svelte";
+   import CharacterSheetResources from '~/actor/types/character/sheet/sidebar/CharacterSheetResources.svelte';
+   import CharacterSheetMods from '~/actor/types/character/sheet/sidebar/CharacterSheetMods.svelte';
+   import CharacterSheetRatings from '~/actor/types/character/sheet/sidebar/CharacterSheetRatings.svelte';
+   import CharacterSheetSpeeds from '~/actor/types/character/sheet/sidebar/CharacterSheetSpeeds.svelte';
+   import CharacterSheetPortrait from '~/actor/types/character/sheet/sidebar/CharacterSheetPortrait.svelte';
 </script>
 
 <div class="sidebar">
@@ -34,7 +34,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .sidebar {
       @include border;

@@ -1,17 +1,17 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import DocumentCheckboxInput from "~/documents/components/input/DocumentCheckboxInput.svelte";
-   import DocumentResistanceSelect from "~/documents/components/select/DocumentResistanceSelect.svelte";
-   import DocumentTextInput from "~/documents/components/input/DocumentTextInput.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
+   import DocumentResistanceSelect from '~/documents/components/select/DocumentResistanceSelect.svelte';
+   import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
 
    // Setup context variables
-   const application = getContext("external").application;
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const application = getContext('external').application;
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    // Idx of the custom aspect being represented
    export let idx = void 0;
@@ -54,7 +54,7 @@
          <div class="delete-button">
             <!--Delete button-->
             <IconButton
-               icon={"fas fa-trash"}
+               icon={'fas fa-trash'}
                on:click={() => {
                   application.removeCustomAspect(idx);
                }}
@@ -69,7 +69,7 @@
                <!--Cost-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("cost")}</div>
+                  <div class="label">{localize('cost')}</div>
 
                   <!--Input-->
                   <div class="input number">
@@ -80,11 +80,14 @@
                <!--Resistance Check-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("resistanceCheck")}</div>
+                  <div class="label">{localize('resistanceCheck')}</div>
 
                   <!--Input-->
                   <div class="input">
-                     <DocumentResistanceSelect bind:value={aspect.resistanceCheck} allowNone={true} />
+                     <DocumentResistanceSelect
+                        bind:value={aspect.resistanceCheck}
+                        allowNone={true}
+                     />
                   </div>
                </div>
             </div>
@@ -96,7 +99,7 @@
                   <i class="fas fa-burst" />
 
                   <!--Label-->
-                  <div class="label">{localize("damage")}</div>
+                  <div class="label">{localize('damage')}</div>
 
                   <!--Input-->
                   <div class="input checkbox">
@@ -110,7 +113,7 @@
                   <i class="fas fa-heart" />
 
                   <!--Label-->
-                  <div class="label">{localize("healing")}</div>
+                  <div class="label">{localize('healing')}</div>
 
                   <!--Input-->
                   <div class="input checkbox">
@@ -123,7 +126,7 @@
                <!--Scaling-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("scaling")}</div>
+                  <div class="label">{localize('scaling')}</div>
 
                   <!--Input-->
                   <div class="input checkbox">
@@ -134,11 +137,14 @@
                <!--Initial Value-->
                <div class="field">
                   <!--Label-->
-                  <div class="label">{localize("initialValue")}</div>
+                  <div class="label">{localize('initialValue')}</div>
 
                   <!--Input-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={aspect.initialValue} min={0} />
+                     <DocumentIntegerInput
+                        bind:value={aspect.initialValue}
+                        min={0}
+                     />
                   </div>
                </div>
             </div>
@@ -148,7 +154,7 @@
 {/if}
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .aspect {
       @include flex-column;
