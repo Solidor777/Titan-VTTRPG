@@ -1,7 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
@@ -11,7 +11,6 @@
 
    // Context references
    const document = getContext("DocumentStore");
-   const application = getContext("external").application;
 
    // Reference to the weapon id
    export let item = void 0;
@@ -28,9 +27,7 @@
    <div class="header {attack.attribute}">
       {#if item.system.equipped}
          <EfxButton
-            on:click={() => {
-               application.rollAttackCheck(item._id, attackIdx);
-            }}
+            on:click={() => $document.typeComponent.rollAttackCheck({ itemId: item._id, attackIdx: attackIdx }, false)}
          >
             <i class="fas fa-{attack.type === 'melee' ? 'sword' : 'bow-arrow'}" />
             {attack.label}
@@ -108,7 +105,7 @@
 
       <!--Traits-->
       {#each attack.trait as trait}
-         <div class="stat" use:tooltip={{content: localize(`${trait.name}.desc`)}}>
+         <div class="stat" use:tooltip={{ content: localize(`${trait.name}.desc`) }}>
             {#if trait.type === "number"}
                <StatTag label={localize(`${trait.name}`)} value={trait.value} />
             {:else}
@@ -119,7 +116,7 @@
 
       <!--Custom Traits-->
       {#each attack.customTrait as trait}
-         <div class="stat" use:tooltip={{content: trait.description}}>
+         <div class="stat" use:tooltip={{ content: trait.description }}>
             <Tag label={trait.name} />
          </div>
       {/each}

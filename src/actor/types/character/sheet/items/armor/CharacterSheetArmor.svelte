@@ -2,7 +2,7 @@
    import { getContext } from "svelte";
    import { slide } from "svelte/transition";
    import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import RichText from "~/helpers/svelte-components/RichText.svelte";
    import CharacterSheetCheckButton from "~/actor/types/character/sheet/CharacterSheetCheckButton.svelte";
    import CharacterSheetItemExpandButton from "~/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte";
@@ -22,7 +22,6 @@
 
    // Setup context references
    const document = getContext("DocumentStore");
-   const application = getContext("external").application;
 
    // Item reference
    $: item = $document.items.get(id);
@@ -55,25 +54,23 @@
                <div class="button">
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
-                     on:click={() => {
-                        application.rollItemCheck(id, 0);
-                     }}
+                     on:click={() => $document.typeComponent.rollItemCheck({ itemId: item._id, checkIdx: 0 }, false)}
                   />
                </div>
             {/if}
 
             <!--Send to Chat button-->
-            <div class="button" use:tooltip={{content: localize("sendToChat")}}>
+            <div class="button" use:tooltip={{ content: localize("sendToChat") }}>
                <CharacterSheetItemSendToChatButton {item} />
             </div>
 
             <!--Edit Button-->
-            <div class="button" use:tooltip={{content: localize("editItem")}}>
+            <div class="button" use:tooltip={{ content: localize("editItem") }}>
                <CharacterSheetItemEditButton {item} />
             </div>
 
             <!--Delete Button-->
-            <div class="button" use:tooltip={{content: localize("deleteItem")}}>
+            <div class="button" use:tooltip={{ content: localize("deleteItem") }}>
                <CharacterSheetItemDeleteButton itemId={item._id} />
             </div>
          </div>

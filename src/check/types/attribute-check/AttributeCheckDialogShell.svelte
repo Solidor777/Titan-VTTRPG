@@ -16,7 +16,7 @@
    export let options = void 0;
 
    // Initialize check parameters
-   let checkParameters = {
+   const checkParameters = {
       attribute: options.attribute ?? "body",
       skill: options.skill ?? "none",
       difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : 4,
@@ -31,7 +31,7 @@
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.typeComponent.rollAttributeCheck(checkParameters);
+      actor.typeComponent.rollAttributeCheck(checkParameters, true);
       application.close();
       return;
    }

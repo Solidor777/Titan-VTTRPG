@@ -15,17 +15,17 @@
    export let options = void 0;
 
    // Initialize check parameters
-   let checkParameters = {
-      resistance: options.resistance ? options.resistance : "reflexes",
-      difficulty: options.difficulty ? options.difficulty : 4,
-      complexity: options.complexity ? options.complexity : 0,
-      diceMod: options.diceMod ? options.diceMod : 0,
+   const checkParameters = {
+      resistance: options.resistance ?? "reflexes",
+      difficulty: options.difficulty ?? 4,
+      complexity: options.complexity ?? 0,
+      diceMod: options.diceMod ?? 0,
    };
 
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.typeComponent.rollResistanceCheck(checkParameters);
+      actor.typeComponent.rollResistanceCheck(checkParameters, true);
       application.close();
       return;
    }

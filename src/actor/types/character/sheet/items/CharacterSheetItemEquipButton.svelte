@@ -8,11 +8,11 @@
    export let equipped = void 0;
 
    // Reference to the application
-   const application = getContext("external").application;
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="item-equip-button">
-   <EfxButton on:click={application.toggleEquipped.bind(application, item._id)}>
+   <EfxButton on:click={() => $document.typeComponent.toggleEquipped(item._id)}>
       <div class="button-inner">
          <div class="label">
             {localize("equipped")}

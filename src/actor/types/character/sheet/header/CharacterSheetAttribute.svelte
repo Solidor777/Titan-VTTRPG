@@ -1,7 +1,7 @@
 <script>
    import { localize } from "~/helpers/Utility.js";
    import { getContext } from "svelte";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
+   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
    import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
    import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
@@ -11,7 +11,6 @@
 
    // Setup context variables
    const document = getContext("DocumentStore");
-   const application = getContext("external").application;
 
    // Calculate the tooltip for the total value
    function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
@@ -52,13 +51,9 @@
 
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
-   <div class="button {key}" use:tooltip={{content: localize(`${key}.desc`)}}>
-      <EfxButton
-         on:click={() => {
-            application.rollAttributeCheck(key);
-         }}
-      >
-         {localize(`${key}`)}
+   <div class="button {key}" use:tooltip={{ content: localize(`${key}.desc`) }}>
+      <EfxButton on:click={() => $document.typeComponent.rollAttributeCheck({ attribute: key }, false)}>
+         {localize(key)}
       </EfxButton>
    </div>
 
@@ -77,7 +72,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={{content: totalValueTooltip}}>
+      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
          <ModTag
             currentValue={$document.system.attribute[key].value}
             baseValue={$document.system.attribute[key].baseValue +

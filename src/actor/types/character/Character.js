@@ -1,4 +1,4 @@
-import { clamp, localize, getSetting, confirmDeletingItems } from '~/helpers/Utility.js';
+import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
 import { applyMulBase } from '~/rules-element/MulBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -583,27 +583,30 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return new TitanAttributeCheck(options);
    }
 
-   async rollAttributeCheck(options) {
+   async rollAttributeCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // If get options, then create a dialog for setting options.
-         if (options?.getOptions === true) {
-            if ((options.skill && options.skill !== 'disabled') && (!options.attribute || options.attribute === 'default')) {
-               options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+         // Check if confirmed
+         if (confirmed || !getCheckOptions()) {
+            // Get the check
+            const attributeCheck = await this.getAttributeCheck(options);
+            if (attributeCheck && attributeCheck.isValid) {
+               await attributeCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               });
             }
-            const dialog = new AttributeCheckDialog(this.parent, options);
-            dialog.render(true);
+
             return;
          }
 
-         // Get the check
-         const attributeCheck = await this.getAttributeCheck(options);
-         if (attributeCheck && attributeCheck.isValid) {
-            await attributeCheck.sendToChat({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               rollMode: game.settings.get('core', 'rollMode'),
-            });
+         // Otherwise, create an options dialog
+         if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
+            options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
          }
+         const dialog = new AttributeCheckDialog(this.parent, options);
+         dialog.render(true);
+         return;
       }
 
       return;
@@ -622,25 +625,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return resistanceCheck;
    }
 
-   async rollResistanceCheck(options) {
+   async rollResistanceCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // If get options, then create a dialog for setting options.
-         if (options?.getOptions === true) {
-            const dialog = new ResistanceCheckDialog(this.parent, options);
-            dialog.render(true);
+         // Check if confirmed
+         if (confirmed || !getCheckOptions()) {
+
+            // Roll the resistance check
+            const resistanceCheck = await this.getResistanceCheck(options);
+            if (resistanceCheck && resistanceCheck.isValid) {
+               await resistanceCheck.evaluateCheck();
+               await resistanceCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               });
+            }
+
             return;
          }
 
-         // Otherwise, get a simple check
-         const resistanceCheck = await this.getResistanceCheck(options);
-         if (resistanceCheck && resistanceCheck.isValid) {
-            await resistanceCheck.evaluateCheck();
-            await resistanceCheck.sendToChat({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               rollMode: game.settings.get('core', 'rollMode'),
-            });
-         }
+         // Otherwise, create an options dialog
+         const dialog = new ResistanceCheckDialog(this.parent, options);
+         dialog.render(true);
       }
 
       return;
@@ -654,7 +660,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
          console.trace();
 
-         return false;
+         return;
       }
 
       // Initialize check options
@@ -684,67 +690,68 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return attackCheck;
    }
 
-   async rollAttackCheck(options) {
+   async rollAttackCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // If get options, then create a dialog for setting options.
-         if (options?.getOptions === true) {
-            // Get the weapon check data.
-            const checkWeapon = this.parent.items.get(options?.itemId);
-            if (!checkWeapon) {
-               console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
-               console.trace();
-
-               return false;
+         // Check if confirmed
+         if (confirmed || !getCheckOptions()) {
+            // Get the attack check
+            const attackCheck = await this.getAttackCheck(options);
+            if (attackCheck && attackCheck.isValid) {
+               await attackCheck.evaluateCheck();
+               await attackCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               });
             }
-
-            // Get the attack data
-            const checkAttack = checkWeapon.system.attack[options.attackIdx];
-            if (!checkAttack) {
-               console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
-               console.trace();
-
-               return false;
-            }
-
-            // Get the damage mod
-            options.damageMod = this.parent.system.mod.damage.value;
-
-            // Get the attacker melee and accuracy
-            options.attackerMelee = this.parent.system.rating.melee.value;
-            options.attackerAccuracy = this.parent.system.rating.accuracy.value;
-
-            // Get the target defense
-            let userTargets = Array.from(game.user.targets);
-            if (userTargets.length < 1 && game.user.isGM) {
-               userTargets = Array.from(canvas.tokens.controlled);
-            }
-            if (userTargets[0] && userTargets[0].document.parent._id !== this.parent._id) {
-               options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
-            }
-
-            // Get the attack type
-            options.type = checkAttack.type;
-            options.weaponName = checkWeapon.name;
-            options.attackName = checkAttack.label;
-            options.multiAttack = options.multiAttack ?? checkWeapon.multiAttack;
-
-            // Create the dialog
-            const dialog = new AttackCheckDialog(this.parent, options);
-            dialog.render(true);
 
             return;
          }
 
-         // Otherwise, get a check
-         const attackCheck = await this.getAttackCheck(options);
-         if (attackCheck && attackCheck.isValid) {
-            await attackCheck.evaluateCheck();
-            await attackCheck.sendToChat({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               rollMode: game.settings.get('core', 'rollMode'),
-            });
+         // Otherwise, create an options dialog
+         // Get the weapon check data.
+         const checkWeapon = this.parent.items.get(options?.itemId);
+         if (!checkWeapon) {
+            console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
+            console.trace();
+
+            return;
          }
+
+         // Get the attack data
+         const checkAttack = checkWeapon.system.attack[options.attackIdx];
+         if (!checkAttack) {
+            console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
+            console.trace();
+
+            return;
+         }
+
+         // Get the damage mod
+         options.damageMod = this.parent.system.mod.damage.value;
+
+         // Get the attacker melee and accuracy
+         options.attackerMelee = this.parent.system.rating.melee.value;
+         options.attackerAccuracy = this.parent.system.rating.accuracy.value;
+
+         // Get the target defense
+         let userTargets = Array.from(game.user.targets);
+         if (userTargets.length < 1 && game.user.isGM) {
+            userTargets = Array.from(canvas.tokens.controlled);
+         }
+         if (userTargets[0] && userTargets[0].document.parent._id !== this.parent._id) {
+            options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
+         }
+
+         // Get the attack type
+         options.type = checkAttack.type;
+         options.weaponName = checkWeapon.name;
+         options.attackName = checkAttack.label;
+         options.multiAttack = options.multiAttack ?? checkWeapon.multiAttack;
+
+         // Create the dialog
+         const dialog = new AttackCheckDialog(this.parent, options);
+         dialog.render(true);
       }
 
       return;
@@ -757,7 +764,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
          console.trace();
 
-         return false;
+         return;
       }
 
       // Initialize check options
@@ -776,46 +783,47 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return castingCheck;
    }
 
-   async rollCastingCheck(options) {
+   async rollCastingCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // If get options, then create a dialog for setting options.
-         if (options?.getOptions === true) {
-            // Get the spell check data.
-            const checkSpell = this.parent.items.get(options?.itemId);
-            if (!checkSpell || checkSpell.type !== 'spell') {
-               console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
-               console.trace();
-
-               return false;
+         // Check if confirmed
+         if (confirmed || !getCheckOptions()) {
+            // Get the check
+            const castingCheck = await this.getCastingCheck(options);
+            if (castingCheck && castingCheck.isValid) {
+               await castingCheck.evaluateCheck();
+               await castingCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               });
             }
 
-            // Get the spell data
-            options.difficulty = checkSpell.system.castingCheck.difficulty;
-            options.complexity = checkSpell.system.castingCheck.complexity;
-            options.attribute = checkSpell.system.castingCheck.attribute;
-            options.skill = checkSpell.system.castingCheck.skill;
-            options.spellName = checkSpell.name;
-
-            // Get the mods
-            options.damageMod = this.parent.system.mod.damage.value;
-            options.healingMod = this.parent.system.mod.healing.value;
-
-            // Create the dialog
-            const dialog = new CastingCheckDialog(this.parent, options);
-            dialog.render(true);
             return;
          }
 
-         // Otherwise, get a check
-         const castingCheck = await this.getCastingCheck(options);
-         if (castingCheck && castingCheck.isValid) {
-            await castingCheck.evaluateCheck();
-            await castingCheck.sendToChat({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               rollMode: game.settings.get('core', 'rollMode'),
-            });
+         // Otherwise, create a confirmation dialog
+         const checkSpell = this.parent.items.get(options?.itemId);
+         if (!checkSpell || checkSpell.type !== 'spell') {
+            console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
+            console.trace();
+
+            return;
          }
+
+         // Get the spell data
+         options.difficulty = checkSpell.system.castingCheck.difficulty;
+         options.complexity = checkSpell.system.castingCheck.complexity;
+         options.attribute = checkSpell.system.castingCheck.attribute;
+         options.skill = checkSpell.system.castingCheck.skill;
+         options.spellName = checkSpell.name;
+
+         // Get the mods
+         options.damageMod = this.parent.system.mod.damage.value;
+         options.healingMod = this.parent.system.mod.healing.value;
+
+         // Create the dialog
+         const dialog = new CastingCheckDialog(this.parent, options);
+         dialog.render(true);
       }
 
       return;
@@ -828,7 +836,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          console.error('TITAN | Item Check failed before creation. Invalid Item ID provided to actor.');
          console.trace();
 
-         return false;
+         return;
       }
       options.itemRollData = checkItem.getRollData();
 
@@ -840,54 +848,56 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return itemCheck;
    }
 
-   async rollItemCheck(options) {
+   async rollItemCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // If get options, then create a dialog for setting options.
-         if (options?.getOptions === true) {
-            // Get the Item check data.
-            const checkItem = this.parent.items.get(options?.itemId);
-            if (!checkItem) {
-               console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
-               console.trace();
-
-               return false;
-            }
-            const checkData = checkItem.system.check[options.checkIdx];
-            if (!checkData) {
-               console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
-               console.trace();
-
-               return false;
+         // Check if confirmed
+         if (confirmed || !getCheckOptions()) {
+            // Otherwise, get a check
+            const itemCheck = await this.getItemCheck(options);
+            if (itemCheck && itemCheck.isValid) {
+               await itemCheck.evaluateCheck();
+               await itemCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               });
             }
 
-            // Get the spell data
-            options.difficulty = checkData.difficulty;
-            options.complexity = checkData.complexity;
-            options.attribute = checkData.attribute;
-            options.skill = checkData.skill;
-            options.checkName = checkData.label;
-            options.itemName = checkItem.name;
-
-            // Get the mods
-            options.damageMod = this.parent.system.mod.damage.value;
-            options.healingMod = this.parent.system.mod.healing.value;
-
-            // Create the dialog
-            const dialog = new ItemCheckDialog(this.parent, options);
-            dialog.render(true);
             return;
          }
 
-         // Otherwise, get a check
-         const itemCheck = await this.getItemCheck(options);
-         if (itemCheck && itemCheck.isValid) {
-            await itemCheck.evaluateCheck();
-            await itemCheck.sendToChat({
-               user: game.user.id,
-               speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-               rollMode: game.settings.get('core', 'rollMode'),
-            });
+         // Otherwise, create a confirmation dialog
+         const checkItem = this.parent.items.get(options?.itemId);
+         if (!checkItem) {
+            console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
+            console.trace();
+
+            return;
          }
+         const checkData = checkItem.system.check[options.checkIdx];
+         if (!checkData) {
+            console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
+            console.trace();
+
+            return;
+         }
+
+         // Get the spell data
+         options.difficulty = checkData.difficulty;
+         options.complexity = checkData.complexity;
+         options.attribute = checkData.attribute;
+         options.skill = checkData.skill;
+         options.checkName = checkData.label;
+         options.itemName = checkItem.name;
+
+         // Get the mods
+         options.damageMod = this.parent.system.mod.damage.value;
+         options.healingMod = this.parent.system.mod.healing.value;
+
+         // Create the dialog
+         const dialog = new ItemCheckDialog(this.parent, options);
+         dialog.render(true);
+         return;
       }
 
       return;
@@ -1334,7 +1344,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
-      const messages = [];
+      let messages = [];
       const actor = this.parent;
       let updateActor = false;
 
@@ -1353,7 +1363,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Add resolve update to report
             if (getSetting('reportRegainingResolve') === true) {
                messages.push(`${localize('regainedResolve')}: ${resolveRegained}`);
-               messages.push(`${localize('resolve')}: ${resolve.value} / ${resolve.max}`)
+               messages.push(`${localize('resolve')}: ${resolve.value} / ${resolve.max}`);
             }
          }
       }
@@ -1367,7 +1377,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   system: {
                      duration: effect.system.duration
                   }
-               })
+               });
             }
          });
       }
@@ -1385,7 +1395,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   messages.push(`${effectItem.name} (${localize('expired')})`);
                }
                else {
-                  messages.push((`${effectItem.name}: ${localize(effectItem.system.duration.type)} (${effectItem.system.duration.remaining})`))
+                  messages.push((`${effectItem.name}: ${localize(effectItem.system.duration.type)} (${effectItem.system.duration.remaining})`));
                }
             }
             else {
@@ -1417,7 +1427,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Damage
             const wounds = actor.system.resource.wounds;
             const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
-            let modLines = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
+            mes = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
             if (damage.woundsTaken > 0) {
                modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
             }
@@ -1506,7 +1516,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   system: {
                      duration: effect.system.duration
                   }
-               })
+               });
             }
 
             if (effect.system.duration.remaining <= 0) {
@@ -1667,7 +1677,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             console.error('TITAN | Error equipping Shield. Invalid Shield ID.');
             console.trace();
 
-            return false;
+            return;
          }
 
          // Update the shield
@@ -1704,7 +1714,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const actor = this.parent;
       if (actor.isOwner) {
 
-         //Confirm the item is valid
+         // Confirm the item is valid
          const item = actor.items.get(itemId);
          if (item) {
 

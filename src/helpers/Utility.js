@@ -6,7 +6,7 @@ export function localize(string) {
   return game.i18n.localize(`LOCAL.${string}.label`);
 }
 
-export function getOptions() {
+export function getCheckOptions() {
   const retVal = game.settings.get('titan', 'getCheckOptions') === true;
   return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT) ? !retVal : retVal;
 }

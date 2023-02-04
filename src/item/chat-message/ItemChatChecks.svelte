@@ -22,7 +22,7 @@
       return retVal;
    }
 
-   async function rollItemCheck(check, idx) {
+   async function rollItemCheck(idx) {
       const controlledTokens = Array.from(canvas.tokens.controlled);
       if (controlledTokens.length > 0) {
          // Initial roll data
@@ -44,12 +44,15 @@
                   itemRollData: itemRollData,
                   checkIdx: idx,
                });
-               await itemCheck.evaluateCheck();
-               await itemCheck.sendToChat({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: actor }),
-                  rollMode: game.settings.get("core", "rollMode"),
-               });
+
+               if (itemCheck.isValid) {
+                  await itemCheck.evaluateCheck();
+                  await itemCheck.sendToChat({
+                     user: game.user.id,
+                     speaker: ChatMessage.getSpeaker({ actor: actor }),
+                     rollMode: game.settings.get("core", "rollMode"),
+                  });
+               }
             }
          }
       }
@@ -65,7 +68,7 @@
             <ItemCheckButton
                {check}
                on:click={() => {
-                  rollItemCheck(check, idx);
+                  rollItemCheck(idx);
                }}
             />
          </div>

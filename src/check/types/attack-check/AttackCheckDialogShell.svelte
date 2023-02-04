@@ -23,7 +23,7 @@
    const attack = weapon.system.attack[options.attackIdx];
 
    // Initialize check parameters
-   let checkParameters = {
+   const checkParameters = {
       attribute: options.attribute ?? attack.attribute,
       skill: options.skill ?? attack.skill,
       type: options.type ?? "melee",
@@ -59,7 +59,7 @@
    const application = getContext("external").application;
 
    async function onRoll() {
-      await actor.typeComponent.rollAttackCheck(checkParameters);
+      actor.typeComponent.rollAttackCheck(checkParameters, true);
       application.close();
       return;
    }

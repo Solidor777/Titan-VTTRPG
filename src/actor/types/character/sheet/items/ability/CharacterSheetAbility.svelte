@@ -23,7 +23,6 @@
 
    // Setup context references
    const document = getContext("DocumentStore");
-   const application = getContext("external").application;
 
    // Item reference
    $: item = $document.items.get(id);
@@ -52,9 +51,7 @@
                <div>
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
-                     on:click={() => {
-                        application.rollItemCheck(id, 0);
-                     }}
+                     on:click={() => $document.typeComponent.rollItemCheck({ itemId: item._id, checkIdx: 0 }, false)}
                   />
                </div>
             {/if}

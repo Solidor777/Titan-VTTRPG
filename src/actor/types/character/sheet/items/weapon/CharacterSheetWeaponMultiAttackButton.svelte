@@ -6,11 +6,11 @@
    // Item Reference
    export let item = void 0;
    // Reference to the application
-   const application = getContext("external").application;
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="item-equip-button">
-   <EfxButton on:click={application.toggleMultiAttack.bind(application, item._id)}>
+   <EfxButton on:click={() => $document.typeComponent.toggleMultiAttack(item._id)}>
       <div class="button-inner">
          <i class={item.system.multiAttack ? "fas fa-swords" : "fas fa-sword"} />
          <div class="label">

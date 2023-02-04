@@ -8,9 +8,6 @@
    import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
    import ItemCheckButton from "~/helpers/svelte-components/button/ItemCheckButton.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
-
    // Reference to the docuement
    const document = getContext("DocumentStore");
 
@@ -31,9 +28,7 @@
       <div class="button">
          <ItemCheckButton
             {check}
-            on:click={() => {
-               application.rollItemCheck(item._id, checkIdx);
-            }}
+            on:click={() => $document.typeComponent.rollItemCheck({ itemId: item._id, checkIdx: checkIdx }, false)}
          />
       </div>
 

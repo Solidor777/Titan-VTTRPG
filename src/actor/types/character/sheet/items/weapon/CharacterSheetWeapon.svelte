@@ -57,9 +57,7 @@
                {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
                      attack={item.system.attack[0]}
-                     on:click={() => {
-                        application.rollAttackCheck(item._id, 0);
-                     }}
+                     on:click={() => $document.typeComponent.rollAttackCheck({ itemId: item._id, attackIdx: 0 }, false)}
                   />
                {/if}
             </div>

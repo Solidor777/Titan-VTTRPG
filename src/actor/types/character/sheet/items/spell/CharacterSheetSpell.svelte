@@ -17,9 +17,6 @@
    import CharacterSheetItemChecks from "~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte";
    import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
 
-   // Reference to the application
-   const application = getContext("external").application;
-
    // Reference to the docuement
    const document = getContext("DocumentStore");
 
@@ -55,9 +52,7 @@
             <div>
                <CharacterSheetCheckButton
                   check={item.system.castingCheck}
-                  on:click={() => {
-                     application.rollCastingCheck(id);
-                  }}
+                  on:click={() => $document.typeComponent.rollCastingCheck({ itemId: id }, false)}
                />
             </div>
 
