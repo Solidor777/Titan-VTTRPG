@@ -10,7 +10,6 @@
    // Setup context variables
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
-   const application = getContext('external').application;
 
    // Filter for the aspects to display
    let filter = '';
@@ -36,20 +35,22 @@
    <!--Scrolling Aspects list-->
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.customAspect}>
-         <ol>
-            <!--Each Aspect-->
-            {#each filteredAspects as idx ($document.system.customAspect[idx].uuid)}
-               <li transition:slide|local>
-                  <SpellSheetCustomAspectSettings {idx} />
-               </li>
-            {/each}
-         </ol>
+         {#if $document.system.customAspect.length > 0}
+            <ol out:slide|local>
+               <!--Each Aspect-->
+               {#each filteredAspects as idx ($document.system.customAspect[idx].uuid)}
+                  <li out:slide|local>
+                     <SpellSheetCustomAspectSettings {idx} />
+                  </li>
+               {/each}
+            </ol>
+         {/if}
 
          <!--Add Entry Button-->
          <div class="add-entry-button">
             <EfxButton
                on:click={() => {
-                  application.addCustomAspect();
+                  $document.typeComponent.addCustomAspect();
                }}
             >
                <!--Button Content-->

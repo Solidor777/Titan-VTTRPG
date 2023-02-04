@@ -25,20 +25,14 @@ export default class TitanSpellSheet extends TitanItemSheet {
       this.reactive.state = createSpellSheetState();
    }
 
-   async addCustomAspect() {
-      if (this.reactive.document.isOwner) {
-         this.reactive.state.addCustomAspect();
-         return await this.reactive.document.spell.addCustomAspect();
-      }
+   addCustomAspect() {
+      this.reactive.state.addCustomAspect();
 
       return;
    }
 
    async removeCustomAspect(idx) {
-      if (this.reactive.document.isOwner) {
-         this.reactive.state.removeCustomAspect(idx);
-         return await this.reactive.document.spell.removeCustomAspect(idx);
-      }
+      this.reactive.state.removeCustomAspect(idx);
 
       return;
    }

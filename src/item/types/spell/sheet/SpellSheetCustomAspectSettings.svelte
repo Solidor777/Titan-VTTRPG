@@ -9,7 +9,6 @@
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
 
    // Setup context variables
-   const application = getContext('external').application;
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
@@ -56,7 +55,7 @@
             <IconButton
                icon={'fas fa-trash'}
                on:click={() => {
-                  application.removeCustomAspect(idx);
+                  $document.typeComponent.removeCustomAspect(idx);
                }}
             />
          </div>

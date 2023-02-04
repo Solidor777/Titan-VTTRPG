@@ -1,7 +1,5 @@
 import { isHtmlBlank } from '~/helpers/Utility';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
-import WeaponAddCustomTraitDialog from '~/item/types/weapon/sheet/WeaponAddCustomTraitDialog.js';
-import WeaponEditAttackTraitsDialog from '~/item/types/weapon/sheet/WeaponEditAttackTraitsDialog.js';
 import WeaponSheetShell from '~/item/types/weapon/sheet/WeaponSheetShell.svelte';
 import createWeaponSheetState from '~/item/types/weapon/sheet/WeaponSheetState.js';
 
@@ -29,37 +27,11 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       this.reactive.state = createWeaponSheetState(isHtmlBlank(object.system.attackNotes) ? 'itemDescription' : 'attackNotes');
    }
 
-
-
-   // Opens the attack traits edit dialog
-   editAttackTraits(attackIdx) {
-      if (this.reactive.document.isOwner) {
-         const dialog = new WeaponEditAttackTraitsDialog(this.reactive.document, attackIdx);
-         dialog.render(true);
-      }
-      return;
+   addAttack() {
+      this.reactive.state.addAttack();
    }
 
-   // Opens the attack traits edit dialog
-   addCustomTrait(attackIdx) {
-      if (this.reactive.document.isOwner) {
-         const dialog = new WeaponAddCustomTraitDialog(this.reactive.document, attackIdx);
-         dialog.render(true);
-      }
-      return;
-   }
-
-   async addAttack() {
-      if (this.reactive.document.isOwner) {
-         this.reactive.state.addAttack();
-         return await this.reactive.document.weapon.addAttack();
-      }
-   }
-
-   async removeAttack(idx) {
-      if (this.reactive.document.isOwner) {
-         this.reactive.state.removeAttack(idx);
-         return await this.reactive.document.weapon.removeAttack(idx);
-      }
+   removeAttack(idx) {
+      this.reactive.state.removeAttack(idx);
    }
 }

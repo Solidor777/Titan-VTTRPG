@@ -1761,7 +1761,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       await item.delete();
 
       // Delete the item from the sheet if appropriate
-      const sheet = this.parent.sheet;
+      const sheet = this.parent._sheet;
       if (sheet) {
          sheet.deleteItem(item._id);
       }

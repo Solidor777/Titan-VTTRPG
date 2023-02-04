@@ -19,7 +19,6 @@
    export let idx = void 0;
 
    // Setup context variables
-   const application = getContext('external').application;
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
@@ -63,7 +62,7 @@
             <IconButton
                icon={'fas fa-trash'}
                on:click={() => {
-                  application.removeAttack(idx);
+                  $document.typeComponent.removeAttack(idx);
                }}
             />
          </div>
@@ -118,7 +117,6 @@
                      + {localize('extraSuccesses.short')}
                      <DocumentCheckboxInput
                         bind:value={attack.plusExtraSuccessDamage}
-                        min={1}
                      />
                   </div>
                </div>
@@ -156,7 +154,7 @@
                   <div class="button">
                      <EfxButton
                         on:click={() => {
-                           application.editAttackTraits(idx);
+                           $document.typeComponent.editAttackTraits(idx);
                         }}
                      >
                         <i class="fas fa-pen-to-square" />
@@ -168,7 +166,7 @@
                   <div class="button">
                      <EfxButton
                         on:click={() => {
-                           application.addCustomTrait(idx);
+                           $document.typeComponent.addCustomTrait(idx);
                         }}
                      >
                         <i class="fas fa-circle-plus" />

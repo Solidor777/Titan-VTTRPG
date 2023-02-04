@@ -1,7 +1,9 @@
-import { localize, isFirstOwner } from '~/helpers/Utility.js';
+import { localize } from '~/helpers/Utility.js';
 import { v4 as uuidv4 } from 'uuid';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
+import WeaponEditAttackTraitsDialog from '~/item/types/weapon/dialogs/WeaponEditAttackTraitsDialog';
+import WeaponAddCustomTraitDialog from '~/item/types/weapon/dialogs/WeaponAddCustomTraitDialog';
 
 export default class TitanWeapon extends TitanTypeComponent {
 
@@ -48,6 +50,11 @@ export default class TitanWeapon extends TitanTypeComponent {
                attack: attack,
             },
          });
+
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.addAttack();
+         }
       }
 
       return;
@@ -73,8 +80,31 @@ export default class TitanWeapon extends TitanTypeComponent {
                },
             });
          }
+
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.removeAttack(idx);
+         }
       }
 
+      return;
+   }
+
+   // Opens the attack traits edit dialog
+   editAttackTraits(attackIdx) {
+      if (this.parent.isOwner) {
+         const dialog = new WeaponEditAttackTraitsDialog(this.parent, attackIdx);
+         dialog.render(true);
+      }
+      return;
+   }
+
+   // Opens the attack traits edit dialog
+   addCustomTrait(attackIdx) {
+      if (this.parent.isOwner) {
+         const dialog = new WeaponAddCustomTraitDialog(this.parent, attackIdx);
+         dialog.render(true);
+      }
       return;
    }
 }

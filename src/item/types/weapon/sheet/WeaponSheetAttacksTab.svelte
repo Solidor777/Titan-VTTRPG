@@ -36,16 +36,18 @@
 
 <div class="tab">
    <!--Filter-->
-   <div class="filter">
-      <TopFilter bind:filter={$appState.filter.attacks} />
-   </div>
+   {#if $document.system.attack.length > 0}
+      <div class="filter" transition:slide|local>
+         <TopFilter bind:filter={$appState.filter.attacks} />
+      </div>
+   {/if}
 
    <!--Scroling Content-->
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.attacks}>
       <div class="scrolling-content">
          <!--Attacks List-->
          {#if $document.system.attack.length > 0}
-            <ol>
+            <ol out:slide|local>
                <!--Each attack-->
                {#each filteredEntries as idx ($document.system.attack[idx].uuid)}
                   <li transition:slide|local>
@@ -59,7 +61,7 @@
          <div class="add-entry-button">
             <EfxButton
                on:click={() => {
-                  application.addAttack();
+                  $document.typeComponent.addAttack();
                }}
             >
                <!--Button Content-->

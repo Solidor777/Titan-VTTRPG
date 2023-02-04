@@ -119,14 +119,18 @@ export default class TitanSpell extends TitanTypeComponent {
       return;
    }
 
-   addCustomAspect() {
+   async addCustomAspect() {
       if (this.parent.isOwner) {
          const system = this.parent.system;
          system.customAspect.push(getCustomAspectTemplate());
-         this.parent.update({
+         await this.parent.update({
             system: system
          });
 
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.addCustomAspect();
+         }
       }
 
       return;
@@ -139,6 +143,11 @@ export default class TitanSpell extends TitanTypeComponent {
          this.parent.update({
             system: system
          });
+
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.removeCustomAspect(idx);
+         }
       }
 
       return;
