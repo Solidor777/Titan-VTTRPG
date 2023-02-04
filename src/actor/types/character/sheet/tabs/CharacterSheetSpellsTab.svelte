@@ -9,7 +9,9 @@
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
-   const application = getContext("external").application;
+
+   // Document reference
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="tab">
@@ -30,7 +32,7 @@
          <CharacterSheetItemAddEntryButton
             label={localize("addNewSpell")}
             on:click={() => {
-               application.addItem("spell");
+               $document.addItem("spell");
             }}
          />
       </div>

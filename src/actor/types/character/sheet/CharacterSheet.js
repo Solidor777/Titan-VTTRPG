@@ -111,16 +111,8 @@ export default class TitanCharacterSheet extends TitanActorSheet {
 
    addInventoryItem() {
       if (this.reactive.document.isOwner) {
-         const dialog = new CharacterSheetInventoryAddItemDialog(this);
+         const dialog = new CharacterSheetInventoryAddItemDialog(this.reactive.document);
          dialog.render(true);
-      }
-      return;
-   }
-
-   // Add item
-   async addItem(type) {
-      if (this.reactive.document.isOwner) {
-         this.reactive.document.addItem(type);
       }
       return;
    }

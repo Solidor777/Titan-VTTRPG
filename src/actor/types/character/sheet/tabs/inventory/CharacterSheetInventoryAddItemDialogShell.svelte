@@ -7,7 +7,7 @@
    import Select from "~/helpers/svelte-components/select/Select.svelte";
 
    // Character Sheet
-   export let sheet = void 0;
+   export let actor = void 0;
 
    const application = getContext("external").application;
 
@@ -40,7 +40,7 @@
 <div class="add-item-dialog">
    <!--Header-->
    <div class="header">
-      {sheet.reactive.document.name}
+      {actor.name}
    </div>
 
    <!--Type Select-->
@@ -52,7 +52,7 @@
    <div class="button">
       <EfxButton
          on:click={() => {
-            sheet.addItem(value);
+            actor.addItem(value);
             application.close();
          }}
       >

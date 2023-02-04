@@ -11,7 +11,9 @@
 
    // Application reference
    const appState = getContext("ApplicationStateStore");
-   const application = getContext("external").application;
+
+   // Document reference
+   const document = getContext("DocumentStore");
 </script>
 
 <div class="tab">
@@ -61,7 +63,7 @@
             <CharacterSheetItemAddEntryButton
                label={localize("addNewAbility")}
                on:click={() => {
-                  application.addItem("ability");
+                  $document.addItem("ability");
                }}
             />
          </div>

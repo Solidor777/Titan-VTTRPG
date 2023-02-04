@@ -2,18 +2,18 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize, getSetting } from '~/helpers/Utility.js';
 import CharacterSheetInventoryAddItemDialogShell from '~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialogShell.svelte';
 export default class CharacterSheetInventoryAddItemDialog extends TJSDialog {
-   constructor(sheet) {
+   constructor(actor) {
       super(
          {
             title: `${localize('addNewItem')}`,
             content: {
                class: CharacterSheetInventoryAddItemDialogShell,
                props: {
-                  sheet: sheet,
+                  actor: actor,
                },
             },
             zIndex: null,
-            id: `dialog-${sheet.reactive.document.name}`,
+            id: `dialog-${actor.name}`,
          },
          {
             width: 150,

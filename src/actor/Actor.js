@@ -157,7 +157,7 @@ export default class TitanActor extends Actor {
             }
          }
 
-         let itemData = {
+         const itemData = {
             name: itemName,
             type: type,
          };
