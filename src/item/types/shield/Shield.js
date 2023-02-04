@@ -1,6 +1,7 @@
 import { isFirstOwner } from '~/helpers/Utility';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
+import ShieldEditTraitsDialog from '~/item/types/shield/ShieldEditTraitsDialog';
 
 export default class TitanShield extends TitanTypeComponent {
 
@@ -15,8 +16,18 @@ export default class TitanShield extends TitanTypeComponent {
    }
 
    async initializeImg() {
+      this.parent.img = 'icons/svg/shield.svg';
       return await this.parent.update({
          img: 'icons/svg/shield.svg'
       });
+   }
+
+   editShieldTraits() {
+      if (this.parent.isOwner) {
+         const dialog = new ShieldEditTraitsDialog(this.parent);
+         dialog.render(true);
+      }
+
+      return;
    }
 }

@@ -80,6 +80,7 @@ export default class TitanWeapon extends TitanTypeComponent {
    }
 
    async initializeImg() {
+      this.parent.img = 'icons/svg/sword.svg';
       return await this.parent.update({
          img: 'icons/svg/sword.svg'
       });

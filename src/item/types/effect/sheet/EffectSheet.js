@@ -23,6 +23,4 @@ export default class TitanEffectSheet extends TitanItemSheet {
       super(object);
       this.reactive.state = createEffectSheetState();
    }
-
-
 }

@@ -25,5 +25,4 @@ export default class TitanEquipmentSheet extends TitanItemSheet {
       super(object);
       this.reactive.state = createEquipmentSheetState();
    }
-
 }

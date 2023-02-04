@@ -97,7 +97,7 @@ export default class TitanItem extends Item {
 
    async sendToChat(options) {
       // Create the context object
-      let chatContext = {
+      const chatContext = {
          type: this.type,
          img: this.img,
          name: this.name,
@@ -136,7 +136,7 @@ export default class TitanItem extends Item {
    }
 
    getRollData() {
-      let rollData = super.getRollData();
+      const rollData = super.getRollData();
       rollData.name = this.name;
       rollData.img = this.img;
       if (this.typeComponent) {
@@ -147,28 +147,32 @@ export default class TitanItem extends Item {
    }
 
    async addCheck() {
-      this.system.check.push(this.getCheckTemplate());
-      await this.update({
-         system: this.system
-      });
+      if (this.isOwner) {
+         this.system.check.push(this.getCheckTemplate());
+         await this.update({
+            system: this.system
+         });
 
-      const sheet = this._sheet;
-      if (this._sheet) {
-         sheet.addCheck();
+         const sheet = this._sheet;
+         if (this._sheet) {
+            sheet.addCheck();
+         }
       }
 
       return;
    }
 
    async removeCheck(idx) {
-      this.system.check.splice(idx, 1);
-      await this.update({
-         system: this.system
-      });
+      if (this.isOwner) {
+         this.system.check.splice(idx, 1);
+         await this.update({
+            system: this.system
+         });
 
-      const sheet = this._sheet;
-      if (this._sheet) {
-         sheet.removeCheck(idx);
+         const sheet = this._sheet;
+         if (this._sheet) {
+            sheet.removeCheck(idx);
+         }
       }
    }
 

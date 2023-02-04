@@ -15,8 +15,9 @@ export default class TitanEquipment extends TitanTypeComponent {
    }
 
    async initializeImg() {
+      this.parent.img = 'icons/svg/combat.svg';
       return await this.parent.update({
-         img: 'icons/svg/combat.svg'
+         img: this.parent.img
       });
    }
 }

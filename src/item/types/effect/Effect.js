@@ -24,9 +24,8 @@ export default class TitanEffect extends TitanTypeComponent {
 
    async initializeImg() {
       this.parent.img = 'icons/svg/daze.svg';
-
       return await this.parent.update({
-         img: 'icons/svg/daze.svg'
+         img: this.parent.img
       });
    }
 

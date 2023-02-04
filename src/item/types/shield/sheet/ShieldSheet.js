@@ -1,5 +1,4 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import ShieldEditTraitsDialog from '~/item/types/shield/sheet/ShieldEditTraitsDialog';
 import createShieldSheetState from '~/item/types/shield/sheet/ShieldSheetState.js';
 import ShieldSheetShell from '~/item/types/shield/sheet/ShieldSheetShell.svelte';
 
@@ -24,16 +23,5 @@ export default class TitanShieldSheet extends TitanItemSheet {
    constructor(object) {
       super(object);
       this.reactive.state = createShieldSheetState();
-   }
-
-
-
-   editShieldTraits() {
-      if (this.reactive.document.isOwner) {
-         const dialog = new ShieldEditTraitsDialog(this.reactive.document);
-         dialog.render(true);
-      }
-
-      return;
    }
 }

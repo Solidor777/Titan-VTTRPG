@@ -14,8 +14,9 @@ export default class TitanAbility extends TitanTypeComponent {
    }
 
    async initializeImg() {
+      this.parent.img = 'icons/svg/ice-aura.svg';
       return await this.parent.update({
-         img: 'icons/svg/ice-aura.svg'
+         img: this.parent.img
       });
    }
 }

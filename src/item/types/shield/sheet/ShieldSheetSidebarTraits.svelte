@@ -18,7 +18,7 @@
    <div class="button">
       <EfxButton
          on:click={() => {
-            application.editShieldTraits();
+            $document.typeComponent.editShieldTraits();
          }}
       >
          <div class="button-contents">

@@ -1,5 +1,4 @@
 import TitanItemSheet from '~/item/sheet/ItemSheet';
-import ArmorEditTraitsDialog from '~/item/types/armor/sheet/ArmorEditTraitsDialog.js';
 import createArmorSheetState from '~/item/types/armor/sheet/ArmorSheetState.js';
 import ArmorSheetShell from '~/item/types/armor/sheet/ArmorSheetShell.svelte';
 
@@ -24,14 +23,5 @@ export default class TitanArmorSheet extends TitanItemSheet {
    constructor(object) {
       super(object);
       this.reactive.state = createArmorSheetState();
-   }
-
-
-
-
-   editArmorTraits() {
-      const dialog = new ArmorEditTraitsDialog(this.reactive.document);
-      dialog.render(true);
-      return;
    }
 }

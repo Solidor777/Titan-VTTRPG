@@ -10,7 +10,6 @@
 
    // Application statee reference
    const document = getContext('DocumentStore');
-   const application = getContext('external').application;
 </script>
 
 <div class="traits">
@@ -18,7 +17,7 @@
    <div class="button">
       <EfxButton
          on:click={() => {
-            application.editArmorTraits();
+            $document.typeComponent.editArmorTraits();
          }}
       >
          <div class="button-contents">

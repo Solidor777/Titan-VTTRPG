@@ -150,10 +150,9 @@ export default class TitanSpell extends TitanTypeComponent {
       }
    }
 
-   initializeImg() {
+   async initializeImg() {
       this.parent.img = 'icons/svg/explosion.svg';
-
-      this.parent.update({
+      return await this.parent.update({
          img: this.parent.img
       });
    }
