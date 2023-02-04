@@ -1119,7 +1119,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const actor = this.parent;
          const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
          for (const effect of expiredEffects) {
-            await this.deleteItem(effect._id, true);
+            await this._internalDeleteItem(effect);
          }
       }
       else {
@@ -1173,7 +1173,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             return item.type === 'effect' && item.system.duration.type !== 'permanent';
          });
          for (const effect of combatEffects) {
-            await this.deleteItem(effect._id, true);
+            await this._internalDeleteItem(effect);
          }
 
          // Report
@@ -1727,16 +1727,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   }
                }
 
-               // Delete the item
-               await item.delete();
-
-               // Delete the item from the sheet if appropriate
-               const sheet = actor.sheet;
-               if (sheet) {
-                  sheet.deleteItem(itemId);
-               }
-
-               return;
+               return this._internalDeleteItem(item);
             }
 
             // Otherwise, confirm deleting the item
@@ -1745,6 +1736,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
             return;
          }
+      }
+
+      return;
+   }
+
+   async _internalDeleteItem(item) {
+      // Delete the item
+      await item.delete();
+
+      // Delete the item from the sheet if appropriate
+      const sheet = this.parent.sheet;
+      if (sheet) {
+         sheet.deleteItem(item._id);
       }
 
       return;

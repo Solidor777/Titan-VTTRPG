@@ -1,5 +1,5 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
-import { getOptions, getSetting } from "~/helpers/Utility";
+import { getOptions } from "~/helpers/Utility";
 import createCharacterSheetState from "./CharacterSheetState";
 import CharacterSheetInventoryAddItemDialog from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
@@ -126,62 +126,8 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    }
 
    // Delete Item
-   async deleteItem(itemId) {
+   deleteItem(itemId) {
       this.reactive.state.deleteItem(itemId);
-      this.reactive.document.deleteItem(itemId);
-
-      return;
-   }
-
-   async removeExpiredEffects(confirmed) {
-      if (this.reactive.document.isOwner) {
-         await this.reactive.document.typeComponent.removeExpiredEffects();
-
-         // Delete all expired effects from the sheet state
-         const expiredEffects = this.reactive.document.items.filter((item) => {
-            return item.type === 'effect' && item.typeComponent.isExpired();
-         });
-         expiredEffects.forEach((item) => {
-            return this.reactive.state.deleteItem(item._id);
-         });
-      }
-
-      return;
-   }
-
-   async removeCombatEffects(report) {
-      if (this.reactive.document.isOwner) {
-         await this.reactive.document.typeComponent.removeCombatEffects(report);
-         this._clearCombatEffectsFromState();
-      }
-
-      return;
-   }
-
-   async shortRest(report) {
-      if (this.reactive.document.isOwner) {
-         await this.reactive.document.typeComponent.shortRest(report);
-         this._clearCombatEffectsFromState();
-      }
-      return;
-   }
-
-   async longRest(report) {
-      if (this.reactive.document.isOwner) {
-         await this.reactive.document.typeComponent.longRest(report);
-         this._clearCombatEffectsFromState();
-      }
-      return;
-   }
-
-   _clearCombatEffectsFromState() {
-      // Delete all combat effects
-      const combatEffects = this.reactive.document.items.filter((item) => {
-         return item.type === 'effect' && item.system.duration.type !== 'permanent';
-      });
-      combatEffects.forEach((item) => {
-         return this.reactive.state.deleteItem(item._id);
-      });
 
       return;
    }

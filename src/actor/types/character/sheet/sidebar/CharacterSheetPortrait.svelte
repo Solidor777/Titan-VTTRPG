@@ -5,7 +5,6 @@
    import DocumentImagePicker from "~/documents/components/DocumentImagePicker.svelte";
    import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
 
-   const application = getContext("external").application;
    const document = getContext("DocumentStore");
 </script>
 
@@ -18,7 +17,7 @@
       <IconButton
          icon={"fas fa-bed"}
          on:click={() => {
-            application.longRest(true);
+            $document.typeComponent.longRest(true);
          }}
       />
    </div>
@@ -28,7 +27,7 @@
       <IconButton
          icon={"fas fa-face-exhaling"}
          on:click={() => {
-            application.shortRest(true);
+            $document.typeComponent.shortRest(true);
          }}
       />
    </div>
@@ -38,7 +37,7 @@
       <IconButton
          icon={"fas fa-arrow-rotate-left"}
          on:click={() => {
-            application.removeCombatEffects(true);
+            $document.typeComponent.removeCombatEffects(true);
          }}
       />
    </div>
