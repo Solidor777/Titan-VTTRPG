@@ -3,7 +3,7 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
 export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
    constructor(actor, item) {
       super(
-         `${localize('deleteItem')}`,
+         localize('deleteItem'),
          [actor.name, item.name],
          localize('confirmDeleteItem'),
          localize('deleteItem'),

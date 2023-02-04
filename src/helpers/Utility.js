@@ -11,6 +11,10 @@ export function getOptions() {
   return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT) ? !retVal : retVal;
 }
 
+export function confirmDeletingItems() {
+  return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT) ? false : game.settings.get('titan', 'confirmDeletingItems');
+}
+
 export function getSetting(setting) {
   return game.settings.get('titan', setting);
 }

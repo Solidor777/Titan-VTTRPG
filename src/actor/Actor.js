@@ -1,4 +1,4 @@
-import { localize } from '~/helpers/Utility';
+import { localize, confirmDeletingItems } from '~/helpers/Utility';
 import TitanPlayerComponent from '~/actor/types/player/Player.js';
 import TitanNPCComponent from '~/actor/types/npc/NPC.js';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
@@ -97,7 +97,7 @@ export default class TitanActor extends Actor {
          }
 
          // Check if the deletion is confirmed
-         if (confirmed || !getSetting('confirmDeletingItems')) {
+         if (confirmed || !confirmDeletingItems()) {
 
             // Delete the item
             if (this._sheet) {

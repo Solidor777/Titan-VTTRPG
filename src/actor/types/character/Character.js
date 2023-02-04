@@ -1,4 +1,4 @@
-import { clamp, localize, getSetting } from '~/helpers/Utility.js';
+import { clamp, localize, getSetting, confirmDeletingItems } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
 import { applyMulBase } from '~/rules-element/MulBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -13,6 +13,7 @@ import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
+import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
@@ -1115,16 +1116,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async removeExpiredEffects(confirmed) {
-      if (confirmed || !getSetting('confirmDeletingItems')) {
+      // Check if the removeal was confirmed
+      if (confirmed || !confirmDeletingItems()) {
          const actor = this.parent;
          const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
          for (const effect of expiredEffects) {
             await this._internalDeleteItem(effect);
          }
-      }
-      else {
 
+         return;
       }
+
+      // Otherwise, confirm removal
+      const dialog = new ConfirmRemoveExpiredEffectsDialog(this);
+      dialog.render(true);
 
       return;
    }
@@ -1704,7 +1709,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (item) {
 
             // Check if the deletion is confirmed
-            if (confirmed || !getSetting('confirmDeletingItems')) {
+            if (confirmed || !confirmDeletingItems()) {
                // Perform type specific deleting
                switch (item.type) {
                   case 'armor': {
