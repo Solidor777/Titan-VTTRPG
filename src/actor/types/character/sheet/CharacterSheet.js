@@ -1,7 +1,7 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
 import { getOptions, getSetting } from "~/helpers/Utility";
 import createCharacterSheetState from "./CharacterSheetState";
-import CharacterSheetDeleteItemDialog from "~/actor/types/character/sheet/CharacterSheetDeleteItemDialog";
+import CharacterSheetConfirmDeleteItemDialog from "~/actor/types/character/sheet/CharacterSheetConfirmDeleteItemDialog";
 import CharacterSheetInventoryAddItemDialog from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog";
 
 export default class TitanCharacterSheet extends TitanActorSheet {
@@ -110,13 +110,29 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       return;
    }
 
+   addInventoryItem() {
+      if (this.reactive.document.isOwner) {
+         const dialog = new CharacterSheetInventoryAddItemDialog(this);
+         dialog.render(true);
+      }
+      return;
+   }
+
+   // Add item
+   async addItem(type) {
+      if (this.reactive.document.isOwner) {
+         this.reactive.document.addItem(type);
+      }
+      return;
+   }
+
    // Delete Item
    async deleteItem(itemId, deletionConfirmed) {
       if (this.reactive.document.isOwner) {
          if (!deletionConfirmed && getSetting('confirmDeletingItems')) {
             const item = this.reactive.document.items.get(itemId);
             if (item) {
-               const dialog = new CharacterSheetDeleteItemDialog(this, item.name, itemId);
+               const dialog = new CharacterSheetConfirmDeleteItemDialog(this, item.name, itemId);
                dialog.render(true);
             }
          }
@@ -129,21 +145,15 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       return;
    }
 
-   // Add item
-   async addItem(type) {
+   async removeExpiredEffects(confirmed) {
       if (this.reactive.document.isOwner) {
-         this.reactive.document.addItem(type);
-      }
-      return;
-   }
+         await this.reactive.document.typeComponent.removeExpiredEffects();
 
-   _clearCombatEffectsFromState() {
-      if (this.reactive.document.isOwner) {
-         // Delete all Temp Effects and Mods
-         let temporaryEffects = this.reactive.document.items.filter((item) => {
-            return item.type === 'effect' && item.system.duration.type === 'permanent';
+         // Delete all expired effects from the sheet state
+         const expiredEffects = this.reactive.document.items.filter((item) => {
+            return item.type === 'effect' && item.typeComponent.isExpired();
          });
-         temporaryEffects.forEach((item) => {
+         expiredEffects.forEach((item) => {
             return this.reactive.state.deleteItem(item._id);
          });
       }
@@ -153,33 +163,38 @@ export default class TitanCharacterSheet extends TitanActorSheet {
 
    async removeCombatEffects(report) {
       if (this.reactive.document.isOwner) {
-         this._clearCombatEffectsFromState();
          await this.reactive.document.typeComponent.removeCombatEffects(report);
+         this._clearCombatEffectsFromState();
       }
+
       return;
    }
 
    async shortRest(report) {
       if (this.reactive.document.isOwner) {
-         this._clearCombatEffectsFromState();
          await this.reactive.document.typeComponent.shortRest(report);
+         this._clearCombatEffectsFromState();
       }
       return;
    }
 
    async longRest(report) {
       if (this.reactive.document.isOwner) {
-         this._clearCombatEffectsFromState();
          await this.reactive.document.typeComponent.longRest(report);
+         this._clearCombatEffectsFromState();
       }
       return;
    }
 
-   addInventoryItem() {
-      if (this.reactive.document.isOwner) {
-         const dialog = new CharacterSheetInventoryAddItemDialog(this);
-         dialog.render(true);
-      }
+   _clearCombatEffectsFromState() {
+      // Delete all combat effects
+      const combatEffects = this.reactive.document.items.filter((item) => {
+         return item.type === 'effect' && item.system.duration.type !== 'permanent';
+      });
+      combatEffects.forEach((item) => {
+         return this.reactive.state.deleteItem(item._id);
+      });
+
       return;
    }
 }

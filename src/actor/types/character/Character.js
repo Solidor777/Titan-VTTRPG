@@ -1113,10 +1113,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   async removeExpiredEffects() {
+      const actor = this.parent;
+      const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
+      for (const effect of expiredEffects) {
+         await actor.deleteItem(effect._id);
+      }
+
+      return;
+   }
 
    async removeCombatEffects(report) {
-      if (this.parent.isOwner) {
-         const systemData = this.parent.system;
+      const actor = this.parent;
+      if (actor.isOwner) {
+         const systemData = actor.system;
          // Reset static mods
          // Attribute
          for (const [key, value] of Object.entries(systemData.attribute)) {
@@ -1145,20 +1155,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Restore resolve
-         this.parent.system.resource.resolve.value = this.parent.system.resource.resolve.max;
+         actor.system.resource.resolve.value = actor.system.resource.resolve.max;
 
          // Update the actor
-         await this.parent.update({
-            system: this.parent.system
+         await actor.update({
+            system: actor.system
          });
 
          // Delete all combat effects
-         let temporaryEffects = this.parent.items.filter((item) => {
+         const combatEffects = actor.items.filter((item) => {
             return item.type === 'effect' && item.system.duration.type !== 'permanent';
          });
-         temporaryEffects.forEach((item) => {
-            return this.parent.deleteItem(item._id);
-         });
+         for (const effect of combatEffects) {
+            await actor.deleteItem(effect._id);
+         }
 
          // Report
          if (report) {
@@ -1167,9 +1177,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Create chat context
                const chatContext = {
                   type: 'report',
-                  img: this.parent.img,
+                  img: actor.img,
                   header: localize('temporaryEffectsRemoved'),
-                  subHeader: [this.parent.name],
+                  subHeader: [actor.name],
                   icon: 'fas fa-arrow-rotate-left',
                   message: [localize('resolveFullyRestored')]
                };
@@ -1177,12 +1187,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Send the report to chat
                await ChatMessage.create({
                   user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  speaker: ChatMessage.getSpeaker({ actor: actor }),
                   type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                   sound: CONFIG.sounds.notification,
                   whisper: game.users.filter((user) =>
                      reportSettings === 'owner' ?
-                        this.parent.testUserPermission(user, 'OWNER') :
+                        actor.testUserPermission(user, 'OWNER') :
                         user.isGM
                   ),
                   flags: {
@@ -1198,38 +1208,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   removeExpiredEffects() {
-      const actor = this.parent;
-      const sheet = this.parent._sheet;
-      const expiredItems = actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
-      if (sheet) {
-         expiredItems.forEach((item) => sheet.deleteItem(item._id, true));
-      }
-      else {
-         expiredItems.forEach((item) => actor.deleteItem(item._id));
-      }
-
-      return;
-   }
-
    async shortRest(report) {
-      if (this.parent.isOwner) {
-         // Clear combat effects
-         this.removeCombatEffects(false);
+      const actor = this.parent;
+      if (actor.isOwner) {
+         // Restore stamina
+         actor.system.resource.stamina.value = actor.system.resource.stamina.max;
 
-         // Update the actor
-         await this.parent.update({
-            system: {
-               resource: {
-                  stamina: {
-                     value: this.parent.system.resource.stamina.max
-                  },
-                  resolve: {
-                     value: this.parent.system.resource.resolve.max
-                  }
-               }
-            }
-         });
+         // Remove combat efects updates the actor
+         await this.removeCombatEffects(false);
 
          // Report
          if (report) {
@@ -1238,9 +1224,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Create chat context
                const chatContext = {
                   type: 'report',
-                  img: this.parent.img,
+                  img: actor.img,
                   header: localize('tookAShortRest'),
-                  subHeader: [this.parent.name],
+                  subHeader: [actor.name],
                   icon: 'fas fa-face-exhaling',
                   message: [
                      localize('temporaryEffectsRemoved'),
@@ -1251,12 +1237,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Send the report to chat
                await ChatMessage.create({
                   user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  speaker: ChatMessage.getSpeaker({ actor: actor }),
                   type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                   sound: CONFIG.sounds.notification,
                   whisper: game.users.filter((user) =>
                      reportSettings === 'owner' ?
-                        this.parent.testUserPermission(user, 'OWNER') :
+                        actor.testUserPermission(user, 'OWNER') :
                         user.isGM
                   ),
                   flags: {
@@ -1273,24 +1259,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async longRest(report) {
-      if (this.parent.isOwner) {
-         // Decrease wounds by 1
+      const actor = this.parent;
+      if (actor.isOwner) {
+         // Decrease wounds
          let woundsHealed = 0;
-         const wounds = this.parent.system.resource.wounds;
+         const wounds = actor.system.resource.wounds;
          if (wounds.value > 0) {
-            woundsHealed = Math.min(1 + this.parent.system.mod.woundRegain.value, wounds.value);
+            woundsHealed = Math.min(1 + actor.system.mod.woundRegain.value, wounds.value);
             wounds.value -= woundsHealed;
-            await this.parent.update({
-               system: {
-                  resource: {
-                     wounds: {
-                        value: wounds.value
-                     }
-                  }
-               }
-            });
          }
 
+         // Short rest updates the actor
          await this.shortRest(false);
 
          // Report
@@ -1300,9 +1279,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Create chat context
                const chatContext = {
                   type: 'report',
-                  img: this.parent.img,
+                  img: actor.img,
                   header: localize('tookALongRest'),
-                  subHeader: [this.parent.name],
+                  subHeader: [actor.name],
                   icon: 'fas fa-bed',
                   message: [
                      localize('temporaryEffectsRemoved'),
@@ -1322,12 +1301,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Send the report to chat
                await ChatMessage.create({
                   user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  speaker: ChatMessage.getSpeaker({ actor: actor }),
                   type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                   sound: CONFIG.sounds.notification,
                   whisper: game.users.filter((user) =>
                      reportSettings === 'owner' ?
-                        this.parent.testUserPermission(user, 'OWNER') :
+                        actor.testUserPermission(user, 'OWNER') :
                         user.isGM
                   ),
                   flags: {
@@ -1592,12 +1571,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (item.type === 'armor') {
                // If the armor is equipped, un-equip it
                if (this.parent.system.equipped.armor === itemId) {
-                  this.parent.typeComponent.unEquipArmor();
+                  this.unEquipArmor();
                }
 
                // Else, equip it
                else {
-                  this.parent.typeComponent.equipArmor(itemId);
+                  this.equipArmor(itemId);
                }
             }
 
@@ -1605,12 +1584,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             else if (item.type === 'shield') {
                // If the armor is equipped, un-equip it
                if (this.parent.system.equipped.shield === itemId) {
-                  this.parent.typeComponent.unEquipShield();
+                  this.unEquipShield();
                }
 
                // Else, equip it
                else {
-                  this.parent.typeComponent.equipShield(itemId);
+                  this.equipShield(itemId);
                }
             }
 
@@ -1630,7 +1609,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   equipArmor(armorId) {
+   async equipArmor(armorId) {
       if (this.parent.isOwner) {
          // Ensure the armor is valid
          const armor = this.parent.items.get(armorId);
@@ -1640,12 +1619,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Update the armor
-         let equippedArmor = this.parent.system.equipped.armor;
-         equippedArmor = armorId;
-         this.parent.update({
+         this.parent.system.equipped.armor = armorId;
+         await this.parent.update({
             system: {
                equipped: {
-                  armor: equippedArmor,
+                  armor: armorId
                },
             },
          });
@@ -1654,15 +1632,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   unEquipArmor() {
+   async unEquipArmor() {
       if (this.parent.isOwner) {
          // Remove the armor
-         let equippedArmor = this.parent.system.equipped.armor;
-         equippedArmor = null;
-         this.parent.update({
+         this.parent.system.equipped.armor = null;
+         await this.parent.update({
             system: {
                equipped: {
-                  armor: equippedArmor,
+                  armor: null
                },
             },
          });
@@ -1671,7 +1648,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   equipShield(shieldId) {
+   async equipShield(shieldId) {
       if (this.parent.isOwner) {
          // Ensure the shield is valid
          const shield = this.parent.items.get(shieldId);
@@ -1683,12 +1660,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Update the shield
-         let equippedShield = this.parent.system.equipped.shield;
-         equippedShield = shieldId;
+         this.parent.system.equipped.shield = shieldId;
          this.parent.update({
             system: {
                equipped: {
-                  shield: equippedShield,
+                  shield: shieldId
                },
             },
          });
@@ -1697,15 +1673,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   unEquipShield() {
+   async unEquipShield() {
       if (this.parent.isOwner) {
          // Remove the shield
-         let equippedShield = this.parent.system.equipped.shield;
-         equippedShield = null;
-         this.parent.update({
+         this.parent.system.equipped.shield = null;
+         await this.parent.update({
             system: {
                equipped: {
-                  shield: equippedShield,
+                  shield: null
                },
             },
          });
@@ -1714,29 +1689,30 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   deleteItem(itemId) {
+   async deleteItem(itemId) {
       if (this.parent.isOwner) {
          // Remove the armor if appropriate
          const armorId = this.parent.system.equipped.armor;
          if (armorId === itemId) {
-            this.unEquipArmor();
+            await this.unEquipArmor();
          }
 
          // Remove the shield if appropriate
          const shieldId = this.parent.system.equipped.armor;
          if (shieldId === itemId) {
-            this.unEquipShield();
+            await this.unEquipShield();
          }
       }
 
       return;
    }
 
-   toggleInspiration() {
+   async toggleInspiration() {
       if (this.parent.isOwner) {
-         this.parent.update({
+         this.parent.system.inspiration = !this.parent.system.inspiration;
+         await this.parent.update({
             system: {
-               inspiration: !this.parent.system.inspiration
+               inspiration: this.parent.system.inspiration
             }
          });
       }

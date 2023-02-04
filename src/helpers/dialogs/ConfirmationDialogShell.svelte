@@ -6,38 +6,39 @@
    import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
 
    // Character Sheet
-   export let sheet = void 0;
-   export let itemName = void 0;
-   export let itemId = void 0;
+   export let headers = void 0;
+   export let message = void 0;
+   export let confirmLabel = void 0;
 
    const application = getContext("external").application;
 </script>
 
 <div class="add-item-dialog">
-   <!--Header-->
-   <div class="header">
-      {sheet.reactive.document.name}
-   </div>
-   <div class="header">
-      {itemName}
-   </div>
+   <!--Headers-->
+   {#each headers as header}
+      <div class="header">
+         {header}
+      </div>
+   {/each}
 
+   <!--Message-->
    <div class="message">
-      {localize("confirmDeleteItem")}
+      {message}
    </div>
 
-   <!--Buttons-->
+   <!--Confirm Button-->
    <div class="button">
       <EfxButton
          on:click={() => {
-            sheet.deleteItem(itemId, true);
+            application.confirmFunction();
             application.close();
          }}
       >
-         {localize("deleteItem")}
+         {confirmLabel}
       </EfxButton>
    </div>
 
+   <!--Cancel button-->
    <div class="button">
       <EfxButton
          on:click={() => {
@@ -49,7 +50,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import "../../Styles/Mixins.scss";
 
    .add-item-dialog {
       @include flex-column;
