@@ -1,22 +1,26 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Check Options reference
    $: opposedCheck = {
-      attribute: $document.flags.titan.chatContext.parameters.opposedCheck.attribute,
+      attribute:
+         $document.flags.titan.chatContext.parameters.opposedCheck.attribute,
       skill: $document.flags.titan.chatContext.parameters.opposedCheck.skill,
-      difficulty: $document.flags.titan.chatContext.parameters.opposedCheck.difficulty,
+      difficulty:
+         $document.flags.titan.chatContext.parameters.opposedCheck.difficulty,
       complexity: $document.flags.titan.chatContext.results.extraSuccesses + 1,
    };
 
    async function rollOpposedCheck() {
       // Get the targets
-      let userTargets = game.user.isGM ? Array.from(game.user.targets) : Array.from(canvas.tokens.ownedTokens);
+      let userTargets = game.user.isGM
+         ? Array.from(game.user.targets)
+         : Array.from(canvas.tokens.ownedTokens);
       if (userTargets.length <= 0 && game.user.isGM) {
          userTargets = Array.from(canvas.tokens.controlled);
       }
@@ -42,18 +46,20 @@
          rollOpposedCheck(opposedCheck);
       }}
    >
-      {#if opposedCheck.skill && opposedCheck.skill !== "none"}
-         {`${localize(`${opposedCheck.attribute}`)} (${localize(`${opposedCheck.skill}`)}) ${opposedCheck.difficulty}:${
+      {#if opposedCheck.skill && opposedCheck.skill !== 'none'}
+         {`${localize(opposedCheck.attribute)} (${localize(
+            `${opposedCheck.skill}`
+         )}) ${opposedCheck.difficulty}:${opposedCheck.complexity}`}
+      {:else}
+         {`${localize(opposedCheck.attribute)} ${opposedCheck.difficulty}:${
             opposedCheck.complexity
          }`}
-      {:else}
-         {`${localize(`${opposedCheck.attribute}`)} ${opposedCheck.difficulty}:${opposedCheck.complexity}`}
       {/if}
    </EfxButton>
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .opposed-check-button {
       @include flex-row;

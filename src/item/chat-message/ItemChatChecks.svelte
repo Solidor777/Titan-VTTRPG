@@ -1,18 +1,18 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import OpposedCheckTag from "~/helpers/svelte-components/tag/OpposedCheckTag.svelte";
-   import ResistedByTag from "~/helpers/svelte-components/tag/ResistedByTag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
-   import ItemCheckButton from "~/helpers/svelte-components/button/ItemCheckButton.svelte";
-   import TitanItemCheck from "~/check/types/item-check/ItemCheck.js";
+   import { localize } from '~/helpers/Utility.js';
+   import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
+   import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
+   import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
+   import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
 
    export let item = void 0;
 
    function getTagFromCheck(check) {
       let retVal = localize(`${check.attribute}`);
-      if (check.skill && check.skill !== "none") {
-         retVal += ` (${localize(`${check.skill}`)})`;
+      if (check.skill && check.skill !== 'none') {
+         retVal += ` (${localize(check.skill)})`;
       }
       retVal += ` ${check.difficulty}`;
       if (check.complexity) {
@@ -31,7 +31,11 @@
          itemRollData.img = item.img;
 
          // Roll for each controlled token
-         for (let tokenIdx = 0; tokenIdx < controlledTokens.length; tokenIdx++) {
+         for (
+            let tokenIdx = 0;
+            tokenIdx < controlledTokens.length;
+            tokenIdx++
+         ) {
             // If the target is valid
             const actor = controlledTokens[tokenIdx]?.actor;
             if (actor && actor.system.resource?.stamina) {
@@ -50,7 +54,7 @@
                   await itemCheck.sendToChat({
                      user: game.user.id,
                      speaker: ChatMessage.getSpeaker({ actor: actor }),
-                     rollMode: game.settings.get("core", "rollMode"),
+                     rollMode: game.settings.get('core', 'rollMode'),
                   });
                }
             }
@@ -76,7 +80,10 @@
          <div class="tags">
             <!--Main Check Stats -->
             <div class="tag">
-               <AttributeTag label={getTagFromCheck(check)} attribute={check.attribute} />
+               <AttributeTag
+                  label={getTagFromCheck(check)}
+                  attribute={check.attribute}
+               />
             </div>
 
             <!--DC-->
@@ -85,12 +92,15 @@
             <!--Resolve Cost-->
             {#if check.resolveCost > 0}
                <div class="tag">
-                  <StatTag label={localize("resolveCost")} value={check.resolveCost} />
+                  <StatTag
+                     label={localize('resolveCost')}
+                     value={check.resolveCost}
+                  />
                </div>
             {/if}
 
             <!--Resistance Check-->
-            {#if check.resistanceCheck !== "none"}
+            {#if check.resistanceCheck !== 'none'}
                <div class="tag">
                   <ResistedByTag resistance={check.resistanceCheck} />
                </div>
@@ -108,7 +118,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../Styles/Mixins.scss";
+   @import '../../Styles/Mixins.scss';
 
    ol {
       @include list;

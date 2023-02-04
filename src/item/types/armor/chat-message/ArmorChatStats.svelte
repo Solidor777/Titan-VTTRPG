@@ -1,19 +1,23 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import IconStatTag from "~/helpers/svelte-components/tag/IconStatTag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import Tag from "~/helpers/svelte-components/tag/Tag.svelte";
-   import RarityTag from "~/helpers/svelte-components/tag/RarityTag.svelte";
-   import ValueTag from "~/helpers/svelte-components/tag/ValueTag.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
 
    // Item reference
    export let item = void 0;
 </script>
 
 <div class="stats">
-   <div class="stat" use:tooltip={{ content: localize("armor.desc") }}>
-      <IconStatTag icon={"fas fa-helmet-battle"} label={localize("armor")} value={item.system.armor} />
+   <div class="stat" use:tooltip={{ content: localize('armor.desc') }}>
+      <IconStatTag
+         icon={'fas fa-helmet-battle'}
+         label={localize('armor')}
+         value={item.system.armor}
+      />
    </div>
 
    <!--Rarity-->
@@ -30,11 +34,14 @@
 
    <!--Traits-->
    {#each item.system.trait as trait}
-      <div class="stat" use:tooltip={{ content: localize(`${trait.name}.desc`) }}>
-         {#if trait.type === "number"}
-            <StatTag label={localize(`${trait.name}`)} value={trait.value} />
+      <div
+         class="stat"
+         use:tooltip={{ content: localize(`${trait.name}.desc`) }}
+      >
+         {#if trait.type === 'number'}
+            <StatTag label={localize(trait.name)} value={trait.value} />
          {:else}
-            <Tag label={localize(`${trait.name}`)} />
+            <Tag label={localize(trait.name)} />
          {/if}
       </div>
    {/each}
@@ -48,7 +55,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
    .stats {
       @include flex-row;
       @include flex-group-center;

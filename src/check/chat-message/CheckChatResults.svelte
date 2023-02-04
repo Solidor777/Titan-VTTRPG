@@ -1,43 +1,45 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import CheckChatResetExpertiseButton from "./CheckChatResetExpertiseButton.svelte";
-   import recalculateCheckResults from "./RecalculateCheckResults";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import CheckChatResetExpertiseButton from './CheckChatResetExpertiseButton.svelte';
+   import recalculateCheckResults from './RecalculateCheckResults';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="results">
    <!--Successes-->
    <div class="stat">
       {$document.flags.titan.chatContext.results.successes}
-      {localize(`successes`)}
+      {localize('successes')}
    </div>
 
    <!--Succeeded-->
    {#if $document.flags.titan.chatContext.results.succeeded}
       <div class="result succeeded">
-         {localize(`succeeded`)}
+         {localize('succeeded')}
       </div>
 
       <!--Extra Successes-->
       {#if $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
          {#if $document.flags.titan.chatContext.results.extraSuccessesRemaining !== undefined}
             <div class="stat">
-               {localize(`extraSuccesses`)}: {$document.flags.titan.chatContext.results
-                  .extraSuccessesRemaining}/{$document.flags.titan.chatContext.results.extraSuccesses}
+               {localize('extraSuccesses')}: {$document.flags.titan.chatContext
+                  .results.extraSuccessesRemaining}/{$document.flags.titan
+                  .chatContext.results.extraSuccesses}
             </div>
          {:else if $document.flags.titan.chatContext.results.extraSuccesses > 0}
             <div class="stat">
-               {localize(`extraSuccesses`)}: {$document.flags.titan.chatContext.results.extraSuccesses}
+               {localize('extraSuccesses')}: {$document.flags.titan.chatContext
+                  .results.extraSuccesses}
             </div>
          {/if}
       {/if}
    {:else if $document.flags.titan.chatContext.parameters.complexity > 0}
       <!--Failed-->
       <div class="result failed">
-         {localize(`failed`)}
+         {localize('failed')}
       </div>
    {/if}
 
@@ -45,7 +47,7 @@
    {#if $document.flags.titan.chatContext.parameters.totalExpertise}
       <div class="stat">
          <i class="fas fa-graduation-cap" />
-         {localize(`expertiseRemaining`)}:
+         {localize('expertiseRemaining')}:
          {$document.flags.titan.chatContext.results.expertiseRemaining}
 
          <!--Reset Button-->
@@ -62,7 +64,7 @@
       {#if $document.flags.titan.chatContext.results.damage > 0}
          <div class="stat">
             <i class="fas fa-burst" />
-            {localize(`damage`)}:
+            {localize('damage')}:
             {$document.flags.titan.chatContext.results.damage}
          </div>
       {/if}
@@ -71,7 +73,7 @@
       {#if $document.flags.titan.chatContext.results.healing > 0}
          <div class="stat">
             <i class="fas fa-heart" />
-            {localize(`healing`)}:
+            {localize('healing')}:
             {$document.flags.titan.chatContext.results.healing}
          </div>
       {/if}
@@ -81,7 +83,7 @@
    {#if $document.flags.titan.chatContext.failuresReRolled}
       <div class="stat">
          <i class="fas fa-dice" />
-         {localize(`failuresReRolled`)}
+         {localize('failuresReRolled')}
       </div>
    {/if}
 
@@ -89,7 +91,7 @@
    {#if $document.flags.titan.chatContext.parameters.doubleTraining && $document.flags.titan.chatContext.parameters.totalTrainingDice > 0}
       <div class="stat">
          <i class="fas fa-dumbbell" />
-         {localize(`trainingDoubled`)}
+         {localize('trainingDoubled')}
       </div>
    {/if}
 
@@ -97,13 +99,13 @@
    {#if $document.flags.titan.chatContext.parameters.doubleExpertise && $document.flags.titan.chatContext.parameters.totalExpertise > 0}
       <div class="stat">
          <i class="fas fa-graduation-cap" />
-         {localize(`expertiseDoubled`)}
+         {localize('expertiseDoubled')}
       </div>
    {/if}
 </div>
 
 <style lang="scss">
-   @import "../../styles/Mixins.scss";
+   @import '../../styles/Mixins.scss';
 
    .results {
       @include border;

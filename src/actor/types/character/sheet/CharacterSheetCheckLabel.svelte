@@ -1,20 +1,20 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
 
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    export let check = {
-      attribute: "body",
-      skill: "athletics",
+      attribute: 'body',
+      skill: 'athletics',
       difficulty: 4,
       complexity: 0,
    };
 
    $: secondRow =
       check.skill &&
-      check.skill !== "none" &&
+      check.skill !== 'none' &&
       $document.system.skill[check.skill].expertise.value > 0 &&
       $document.system.skill[check.skill].training.value > 0;
 </script>
@@ -24,10 +24,10 @@
    <div class="row">
       <!--Skill & Attribute-->
       <div class="skill-attribute">
-         {#if check.skill && check.skill !== "none"}
-            {`${localize(`${check.attribute}`)} (${localize(`${check.skill}`)})`}
+         {#if check.skill && check.skill !== 'none'}
+            {`${localize(check.attribute)} (${localize(check.skill)})`}
          {:else}
-            {localize(`${check.attribute}`)}
+            {localize(check.attribute)}
          {/if}
       </div>
 
@@ -46,25 +46,27 @@
             <!--Label-->
             <div class="label">
                <i class="fas fa-dice-d6" />
-               {localize("dice")}:
+               {localize('dice')}:
             </div>
 
             <!--Value-->
             <div class="value">
                {$document.system.attribute[check.attribute].value +
-                  (check.skill ? $document.system.skill[check.skill].training.value : 0)}
+                  (check.skill
+                     ? $document.system.skill[check.skill].training.value
+                     : 0)}
             </div>
          </div>
 
          <!--Skill stats-->
-         {#if check.skill && check.skill !== "none"}
+         {#if check.skill && check.skill !== 'none'}
             <!--Expertise-->
             {#if $document.system.skill[check.skill].expertise.value > 0}
                <div class="stat">
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-graduation-cap" />
-                     {localize("expertise")}:
+                     {localize('expertise')}:
                   </div>
 
                   <!--Value-->
@@ -80,7 +82,7 @@
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-dumbbell" />
-                     {localize("training")}:
+                     {localize('training')}:
                   </div>
 
                   <!--Value-->
@@ -99,25 +101,27 @@
             <!--Label-->
             <div class="label">
                <i class="fas fa-dice-d6" />
-               {localize("dice")}:
+               {localize('dice')}:
             </div>
 
             <!--Value-->
             <div class="value">
                {$document.system.attribute[check.attribute].value +
-                  (check.skill ? $document.system.skill[check.skill].training.value : 0)}
+                  (check.skill
+                     ? $document.system.skill[check.skill].training.value
+                     : 0)}
             </div>
          </div>
 
          <!--Skill stats-->
-         {#if check.skill && check.skill !== "none"}
+         {#if check.skill && check.skill !== 'none'}
             <!--Expertise-->
             {#if $document.system.skill[check.skill].expertise.value > 0}
                <div class="stat">
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-graduation-cap" />
-                     {localize("expertise")}:
+                     {localize('expertise')}:
                   </div>
 
                   <!--Value-->
@@ -133,7 +137,7 @@
                   <!--Label-->
                   <div class="label">
                      <i class="fas fa-dumbbell" />
-                     {localize("training")}:
+                     {localize('training')}:
                   </div>
 
                   <!--Value-->
@@ -148,7 +152,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../Styles/Mixins.scss";
+   @import '../../../../Styles/Mixins.scss';
 
    .check-label {
       @include flex-column;

@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    // Spell aspect
    export let aspect = void 0;
@@ -26,9 +26,9 @@
          {#if aspect.scaling}
             {aspect.initialValue}
             {#if aspect.cost > 1}
-               {`+ (${aspect.cost} / ${localize("extraSuccesses.short")})`}
+               {`+ (${aspect.cost} / ${localize('extraSuccesses.short')})`}
             {:else}
-               {`+ ${localize("extraSuccesses.short")}`}
+               {`+ ${localize('extraSuccesses.short')}`}
             {/if}
          {:else}
             <!--Non scaling value-->
@@ -38,16 +38,16 @@
    {/if}
 
    <!--Resistance Check-->
-   {#if aspect.resistanceCheck && aspect.resistanceCheck !== "none"}
+   {#if aspect.resistanceCheck && aspect.resistanceCheck !== 'none'}
       <div class="stat">
-         {localize("resistedBy")}
-         {localize(`${aspect.resistanceCheck}`)}
+         {localize('resistedBy')}
+         {localize(aspect.resistanceCheck)}
       </div>
    {/if}
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .aspect {
       @include flex-row;

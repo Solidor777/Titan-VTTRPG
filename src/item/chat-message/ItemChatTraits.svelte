@@ -1,7 +1,7 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   const document = getContext("DocumentStore");
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   const document = getContext('DocumentStore');
 
    // Chat context reference
    const chatContext = $document.flags.titan.chatContext;
@@ -10,8 +10,8 @@
 <div class="traits">
    {#each chatContext.system.traits as trait}
       <div class="trait">
-         {localize(`${trait.name}`)}
-         {#if trait.type === "number"}
+         {localize(trait.name)}
+         {#if trait.type === 'number'}
             {trait.value}
          {/if}
       </div>
@@ -19,7 +19,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
+   @import '../../styles/mixins.scss';
    .traits {
       @include flex-row;
       @include flex-group-center;

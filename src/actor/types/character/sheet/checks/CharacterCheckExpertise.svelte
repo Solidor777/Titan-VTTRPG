@@ -1,12 +1,12 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
 
-   export let skill = "athletics";
-   export let attribute = "";
+   export let skill = 'athletics';
+   export let attribute = '';
 
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <!--Dice Pool-->
@@ -14,7 +14,7 @@
    <!--Label-->
    <div class="label">
       <i class="fas fa-graduation-cap" />
-      {localize("expertise")}:
+      {localize('expertise')}:
    </div>
 
    <!--Value-->
@@ -24,7 +24,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .expertise {
       @include flex-row;

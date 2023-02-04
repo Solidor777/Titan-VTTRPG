@@ -1,9 +1,9 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Resistance to roll
-   export let resistance = "reflexes";
+   export let resistance = 'reflexes';
    export let difficulty = 4;
    export let complexity = 1;
 
@@ -11,7 +11,9 @@
 
    async function rollResistanceCheck() {
       // Get the targets
-      let userTargets = game.user.isGM ? Array.from(game.user.targets) : Array.from(canvas.tokens.ownedTokens);
+      let userTargets = game.user.isGM
+         ? Array.from(game.user.targets)
+         : Array.from(canvas.tokens.ownedTokens);
       if (userTargets.length <= 0 && game.user.isGM) {
          userTargets = Array.from(canvas.tokens.controlled);
       }
@@ -41,12 +43,12 @@
       }}
       {disabled}
    >
-      {`${localize(`${resistance}`)} ${difficulty}:${complexity}`}
+      {`${localize(resistance)} ${difficulty}:${complexity}`}
    </EfxButton>
 </div>
 
 <style lang="scss">
-   @import "../../../styles/Mixins.scss";
+   @import '../../../styles/Mixins.scss';
 
    .button {
       @include flex-row;

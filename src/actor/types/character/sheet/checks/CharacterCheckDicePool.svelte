@@ -1,12 +1,12 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
 
-   export let attribute = "body";
+   export let attribute = 'body';
    export let skill = void 0;
 
    // Reference to the docuement
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <!--Dice Pool-->
@@ -14,17 +14,18 @@
    <!--Label-->
    <div class="label">
       <i class="fas fa-dice-d6" />
-      {localize("dice")}:
+      {localize('dice')}:
    </div>
 
    <!--Value-->
    <div class="value">
-      {$document.system.attribute[attribute].value + (skill ? $document.system.skill[skill].training.value : 0)}
+      {$document.system.attribute[attribute].value +
+         (skill ? $document.system.skill[skill].training.value : 0)}
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .dice-pool {
       @include flex-row;

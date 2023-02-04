@@ -1,19 +1,20 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import { slide } from "svelte/transition";
-   import ResistanceTag from "~/helpers/svelte-components/tag/ResistanceTag.svelte";
-   import StatTag from "~/helpers/svelte-components/tag/StatTag.svelte";
-   import AttributeTag from "~/helpers/svelte-components/tag/AttributeTag.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import { slide } from 'svelte/transition';
+   import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
-   const appState = getContext("ApplicationStateStore");
+   const document = getContext('DocumentStore');
+   const appState = getContext('ApplicationStateStore');
 
    // Initialize expanded state
    $document.system.check.forEach((entry, idx) => {
-      $appState.isExpanded.sidebar.check[idx] = $appState.isExpanded.sidebar.check[idx] ?? true;
+      $appState.isExpanded.sidebar.check[idx] =
+         $appState.isExpanded.sidebar.check[idx] ?? true;
    });
 </script>
 
@@ -37,7 +38,7 @@
                </div>
 
                <div class="spacer">
-                  {#if check.resolveCost > 0 || check.resistanceCheck !== "none" || check.opposedCheck.enabled === true}
+                  {#if check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled === true}
                      {#if $appState.isExpanded.sidebar.check[idx]}
                         <!--Collapse button-->
                         <IconButton
@@ -61,34 +62,43 @@
 
             <!--Value-->
             <div class="value">
-               {#if check.skill !== "none"}
-                  {localize(check.attribute)} {localize(check.skill)} {check.difficulty}:{check.complexity}
+               {#if check.skill !== 'none'}
+                  {localize(check.attribute)}
+                  {localize(check.skill)}
+                  {check.difficulty}:{check.complexity}
                {:else}
-                  {localize(check.attribute)} {check.difficulty}:{check.complexity}
+                  {localize(check.attribute)}
+                  {check.difficulty}:{check.complexity}
                {/if}
             </div>
          </div>
 
-         {#if $appState.isExpanded.sidebar.check[idx] && (check.resolveCost > 0 || check.resistanceCheck !== "none" || check.opposedCheck.enabled === true)}
+         {#if $appState.isExpanded.sidebar.check[idx] && (check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled === true)}
             <div class="stats" transition:slide|local>
                <!--Resolve Cost-->
                {#if check.resolveCost > 0}
                   <div class="stat" transition:slide|local>
-                     <StatTag label={localize("resolveCost")} value={check.resolveCost} />
+                     <StatTag
+                        label={localize('resolveCost')}
+                        value={check.resolveCost}
+                     />
                   </div>
                {/if}
 
                <!--Resistance Check-->
-               {#if check.resistanceCheck !== "none"}
+               {#if check.resistanceCheck !== 'none'}
                   <div class="labeled-stat" transition:slide|local>
                      <!--Label-->
                      <div class="label">
-                        {localize("resistedBy")}
+                        {localize('resistedBy')}
                      </div>
 
                      <!--Value-->
                      <div class="value">
-                        <ResistanceTag resistance={check.resistanceCheck} label={localize(check.resistanceCheck)} />
+                        <ResistanceTag
+                           resistance={check.resistanceCheck}
+                           label={localize(check.resistanceCheck)}
+                        />
                      </div>
                   </div>
                {/if}
@@ -98,16 +108,18 @@
                   <div class="labeled-stat" transition:slide|local>
                      <!--Label-->
                      <div class="label">
-                        {localize("opposedBy")}
+                        {localize('opposedBy')}
                      </div>
 
                      <!--Value-->
-                     <div class="value attribute {check.opposedCheck.attribute}">
-                        {#if check.opposedCheck.skill !== "none"}
+                     <div
+                        class="value attribute {check.opposedCheck.attribute}"
+                     >
+                        {#if check.opposedCheck.skill !== 'none'}
                            <AttributeTag
-                              label={`${localize(check.opposedCheck.attribute)} (${localize(
-                                 check.opposedCheck.skill
-                              )})`}
+                              label={`${localize(
+                                 check.opposedCheck.attribute
+                              )} (${localize(check.opposedCheck.skill)})`}
                               attribute={check.opposedCheck.attribute}
                            />
                         {:else}
@@ -115,7 +127,7 @@
                               label={localize(check.opposedCheck.attribute)}
                               attribute={check.opposedCheck.attribute}
                            />
-                           {localize(`${check.opposedCheck.attribute}`)}
+                           {localize(check.opposedCheck.attribute)}
                         {/if}
                      </div>
                   </div>
@@ -127,7 +139,7 @@
 </ol>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    ol {
       @include flex-column;

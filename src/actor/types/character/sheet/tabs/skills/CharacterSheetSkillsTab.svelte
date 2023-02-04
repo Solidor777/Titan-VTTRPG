@@ -1,21 +1,24 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TopFilter from "~/helpers/svelte-components/TopFilter.svelte";
-   import CharacterSheetSkill from "./CharacterSheetSkill.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import CharacterSheetSkill from './CharacterSheetSkill.svelte';
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Application reference
-   const appState = getContext("ApplicationStateStore");
-   const application = getContext("external").application;
+   const appState = getContext('ApplicationStateStore');
+   const application = getContext('external').application;
 
    // Filtered Skill list
    const skillList = $document.system.skill;
    $: filteredList = Object.entries(skillList).filter(
-      ([key]) => localize(`${key}`).toLowerCase().indexOf($appState.filter.skills.toLowerCase()) !== -1
+      ([key]) =>
+         localize(key)
+            .toLowerCase()
+            .indexOf($appState.filter.skills.toLowerCase()) !== -1
    );
 </script>
 
@@ -40,7 +43,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
    .skill-tab {
       @include flex-column;
       @include flex-group-center;

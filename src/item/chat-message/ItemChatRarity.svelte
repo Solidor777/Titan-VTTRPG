@@ -1,18 +1,18 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
 
    // Chat context reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
    const chatContext = $document.flags.titan.chatContext;
 </script>
 
 <div class="tag {chatContext.system.rarity}">
-   {localize(`${chatContext.system.rarity}`)}
+   {localize(chatContext.system.rarity)}
 </div>
 
 <style lang="scss">
-   @import "../../styles/mixins.scss";
+   @import '../../styles/mixins.scss';
 
    .tag {
       @include flex-row;

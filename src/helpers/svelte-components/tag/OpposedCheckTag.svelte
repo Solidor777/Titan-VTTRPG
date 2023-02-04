@@ -1,5 +1,5 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    export let opposedCheck = void 0;
 </script>
@@ -8,21 +8,23 @@
 <div class="check-label {opposedCheck.attribute}">
    <!--Label-->
    <div class="label main">
-      {localize("opposedCheck")}
+      {localize('opposedCheck')}
    </div>
 
    <!--Skill & Attribute-->
    <div class="label">
-      {#if opposedCheck.skill && opposedCheck.skill !== "none"}
-         {`${localize(`${opposedCheck.attribute}`)} (${localize(`${opposedCheck.skill}`)})`}
+      {#if opposedCheck.skill && opposedCheck.skill !== 'none'}
+         {`${localize(opposedCheck.attribute)} (${localize(
+            `${opposedCheck.skill}`
+         )})`}
       {:else}
-         {localize(`${opposedCheck.attribute}`)}
+         {localize(opposedCheck.attribute)}
       {/if}
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../Styles/Mixins.scss";
+   @import '../../../Styles/Mixins.scss';
 
    .check-label {
       @include flex-row;

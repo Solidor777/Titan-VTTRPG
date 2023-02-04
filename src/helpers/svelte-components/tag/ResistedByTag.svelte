@@ -1,20 +1,20 @@
 <script>
-   import { localize } from "~/helpers/Utility.js";
+   import { localize } from '~/helpers/Utility.js';
 
    export let resistance = void 0;
 </script>
 
 <div class="tag {resistance}">
    <div class="label">
-      {localize("resistedBy")}
+      {localize('resistedBy')}
    </div>
    <div class="value">
-      {localize(`${resistance}`)}
+      {localize(resistance)}
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../styles/mixins.scss";
+   @import '../../../styles/mixins.scss';
 
    .tag {
       @include flex-row;
