@@ -1,5 +1,3 @@
-import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
-
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import AbilitySheetShell from '~/item/types/ability/sheet/AbilitySheetShell.svelte';
 import createAbilitySheetState from '~/item/types/ability/sheet/AbilitySheetState';
@@ -22,9 +20,7 @@ export default class TitanAbilitySheet extends TitanItemSheet {
       });
    }
 
-   // Import add rules element functions
-   addRulesElement = addRulesElement.bind(this);
-   removeRulesElement = removeRulesElement.bind(this);
+
 
    constructor(object) {
       super(object);

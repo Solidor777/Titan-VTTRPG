@@ -1,4 +1,3 @@
-import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import ShieldEditTraitsDialog from '~/item/types/shield/sheet/ShieldEditTraitsDialog';
 import createShieldSheetState from '~/item/types/shield/sheet/ShieldSheetState.js';
@@ -27,9 +26,7 @@ export default class TitanShieldSheet extends TitanItemSheet {
       this.reactive.state = createShieldSheetState();
    }
 
-   // Import add rules element functions
-   addRulesElement = addRulesElement.bind(this);
-   removeRulesElement = removeRulesElement.bind(this);
+
 
    editShieldTraits() {
       if (this.reactive.document.isOwner) {

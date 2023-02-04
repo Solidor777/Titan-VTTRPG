@@ -1,4 +1,3 @@
-import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
 import EquipmentSheetShell from '~/item/types/equipment/sheet/EquipmentSheetShell.svelte';
 import createEquipmentSheetState from '~/item/types/equipment/sheet/EquipmentSheetState.js';
@@ -27,7 +26,4 @@ export default class TitanEquipmentSheet extends TitanItemSheet {
       this.reactive.state = createEquipmentSheetState();
    }
 
-   // Import add rules element functions
-   addRulesElement = addRulesElement.bind(this);
-   removeRulesElement = removeRulesElement.bind(this);
 }

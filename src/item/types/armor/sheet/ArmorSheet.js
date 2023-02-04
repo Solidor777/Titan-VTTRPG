@@ -1,4 +1,3 @@
-import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementSheetCompoment.js';
 import TitanItemSheet from '~/item/sheet/ItemSheet';
 import ArmorEditTraitsDialog from '~/item/types/armor/sheet/ArmorEditTraitsDialog.js';
 import createArmorSheetState from '~/item/types/armor/sheet/ArmorSheetState.js';
@@ -27,9 +26,7 @@ export default class TitanArmorSheet extends TitanItemSheet {
       this.reactive.state = createArmorSheetState();
    }
 
-   // Import add rules element functions
-   addRulesElement = addRulesElement.bind(this);
-   removeRulesElement = removeRulesElement.bind(this);
+
 
 
    editArmorTraits() {
