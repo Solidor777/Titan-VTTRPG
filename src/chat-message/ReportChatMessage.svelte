@@ -1,5 +1,7 @@
 <script>
    import { getContext } from 'svelte';
+   import { getActor } from '~/helpers/Utility';
+   import ChatRemoveExpiredEffectsButton from './ChatRemoveExpiredEffectsButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -37,6 +39,17 @@
          {#each chatContext.message as message}
             <div class="message">{@html message}</div>
          {/each}
+      </div>
+   {/if}
+
+   <!--Remove Expired Effects-->
+   {#if chatContext.effectsExpired}
+      <div class="button">
+         <ChatRemoveExpiredEffectsButton
+            actor={getActor(
+               $document.speaker.actor,
+               $document.speaker.token
+            )} />
       </div>
    {/if}
 </div>
@@ -110,6 +123,13 @@
                padding-bottom: 0.25rem;
             }
          }
+      }
+
+      .button {
+         @include flex-row;
+         @include flex-group-center;
+         width: 100%;
+         margin-top: 0.5rem;
       }
    }
 </style>

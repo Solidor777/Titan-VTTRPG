@@ -52,7 +52,6 @@ export function applyDamageToTargets(damage, ignoreArmor, report = true) {
 
    // Apply healing to each target
    targets.forEach((target) => {
-      console.log(target);
       if (target && target.system.resource?.stamina) {
          target.typeComponent.applyDamage(damage, ignoreArmor, true);
       }
@@ -69,4 +68,9 @@ export function applyHealingToTargets(healing, report = true) {
          target.typeComponent.healDamage(healing, report);
       }
    });
+}
+
+export function getActor(actorId, tokenId) {
+   const token = canvas.tokens.placeables.find((currentToken) => currentToken.id === tokenId);
+   return token ? token.actor : game.actors.get(actorId);
 }

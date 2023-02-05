@@ -1387,17 +1387,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Handle effects messages
-      let expiredEffects = false;
+      let effectsExpired = false;
       if (getSetting('reportEffects') === true) {
          actor.effects.forEach((effect) => {
-            const effectSource = effect.origin.split('.');
-            const effectItem = effectSource.length > 3 ? actor.items.get(effectSource[3]) : false;
+            const effectItem = actor.items.get(effect.origin);
             if (effectItem) {
                if (effectItem.typeComponent.isPermanent()) {
                   messages.push(effectItem.name);
                }
                else if (effectItem.typeComponent.isExpired()) {
-                  expiredEffects = true;
+                  effectsExpired = true;
                   messages.push(`${effectItem.name} (${localize('expired')})`);
                }
                else {
@@ -1459,8 +1458,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             subHeader: [actor.name],
             icon: 'fas fa-clock',
             message: messages,
-            expiredEffects: expiredEffects,
          };
+
+         if (effectsExpired) {
+            chatContext.effectsExpired = true;
+         }
 
          // Send the report to chat
          await ChatMessage.create({
