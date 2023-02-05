@@ -31,6 +31,7 @@
       @include flex-group-center;
       @include attribute-colors;
       @include border;
+      @include label;
       padding: 0.25rem;
 
       .label {

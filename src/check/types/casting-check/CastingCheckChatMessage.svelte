@@ -5,7 +5,7 @@
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
    import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
    import ChatHealingButton from '~/chat-message/ChatHealingButton.svelte';
-   import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
+   import ChatResistanceCheckButtons from '~/chat-message/ChatResistanceCheckButtons.svelte';
    import CheckChatScalingAspects from '~/check/chat-message/CheckChatScalingAspects.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
 
@@ -73,7 +73,16 @@
       <!--Resistance Check Buttons-->
       {#if $document.flags.titan.chatContext.results.reflexesCheck || $document.flags.titan.chatContext.results.resilienceCheck || $document.flags.titan.chatContext.results.willpowerCheck}
          <div class="section tags">
-            <CheckChatResistanceCheckButtons />
+            <ChatResistanceCheckButtons
+               reflexes={$document.flags.titan.chatContext.results
+                  .reflexesCheck}
+               resilience={$document.flags.titan.chatContext.results
+                  .resilienceCheck}
+               willpower={$document.flags.titan.chatContext.results
+                  .willpowerCheck}
+               difficulty={4}
+               complexity={$document.flags.titan.chatContext.results
+                  .extraSuccesses + 1} />
          </div>
       {/if}
    {/if}

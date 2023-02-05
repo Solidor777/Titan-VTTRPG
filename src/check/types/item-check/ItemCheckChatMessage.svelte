@@ -5,8 +5,8 @@
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
    import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
    import ChatHealingButton from '~/chat-message/ChatHealingButton.svelte';
-   import CheckChatOpposedCheckButton from '~/check/chat-message/CheckChatOpposedCheckButton.svelte';
-   import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
+   import ChatAttributeCheckButton from '~/chat-message/ChatAttributeCheckButton.svelte';
+   import ChatResistanceCheckButtons from '~/chat-message/ChatResistanceCheckButtons.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -51,14 +51,31 @@
       <!--Opposed Check Buttons-->
       {#if $document.flags.titan.chatContext.parameters.opposedCheck}
          <div class="section">
-            <CheckChatOpposedCheckButton />
+            <ChatAttributeCheckButton
+               attribute={$document.flags.titan.chatContext.parameters
+                  .opposedCheck.attribute}
+               skill={$document.flags.titan.chatContext.parameters.opposedCheck
+                  .skill}
+               difficulty={$document.flags.titan.chatContext.parameters
+                  .opposedCheck.difficulty}
+               complexity={$document.flags.titan.chatContext.results
+                  .extraSuccesses + 1} />
          </div>
       {/if}
 
       <!--Resistance Check Buttons-->
       {#if $document.flags.titan.chatContext.results.reflexesCheck || $document.flags.titan.chatContext.results.resilienceCheck || $document.flags.titan.chatContext.results.willpowerCheck}
          <div class="section tags">
-            <CheckChatResistanceCheckButtons />
+            <ChatResistanceCheckButtons
+               reflexes={$document.flags.titan.chatContext.results
+                  .reflexesCheck}
+               resilience={$document.flags.titan.chatContext.results
+                  .resilienceCheck}
+               willpower={$document.flags.titan.chatContext.results
+                  .willpowerCheck}
+               difficulty={4}
+               complexity={$document.flags.titan.chatContext.results
+                  .extraSuccesses + 1} />
          </div>
       {/if}
    {/if}
