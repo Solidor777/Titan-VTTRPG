@@ -17,7 +17,7 @@
          $appState.isExpanded.checks[idx] ?? true;
    });
 
-   // Initialize filter
+   // Initialize filtered entries
    let filteredEntries = [];
    $: {
       filteredEntries = [];
@@ -44,7 +44,7 @@
    <!--Scroling Content-->
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
       <div class="scrolling-content">
-         <!--checks List-->
+         <!--Checks List-->
          {#if $document.system.check.length > 0}
             <ol out:slide|local>
                <!--Each check-->

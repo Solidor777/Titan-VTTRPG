@@ -169,6 +169,7 @@ export default class TitanItem extends Item {
             system: this.system
          });
 
+         // Update Sheet
          const sheet = this._sheet;
          if (this._sheet) {
             sheet.addCheck();

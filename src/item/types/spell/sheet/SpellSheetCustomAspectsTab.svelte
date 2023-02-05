@@ -11,14 +11,23 @@
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
-   // Filter for the aspects to display
-   let filter = '';
-   let filteredAspects = [];
+   // Initialize expanded state
+   $document.system.customAspect.forEach((entry, idx) => {
+      $appState.isExpanded.customAspects[idx] =
+         $appState.isExpanded.customAspects[idx] ?? true;
+   });
+
+   // Initialize filtered entries
+   let filteredEntries = [];
    $: {
-      filteredAspects = [];
-      $document.system.customAspect.forEach((aspect, idx) => {
-         if (aspect.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1) {
-            filteredAspects.push(idx);
+      filteredEntries = [];
+      $document.system.customAspect.forEach((entry, idx) => {
+         if (
+            entry.label
+               .toLowerCase()
+               .indexOf($appState.filter.customAspects.toLowerCase()) !== -1
+         ) {
+            filteredEntries.push(idx);
          }
       });
    }
@@ -28,17 +37,18 @@
    <!--Filter-->
    {#if $document.system.customAspect && $document.system.customAspect.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:filter />
+         <TopFilter bind:filter={$appState.filter.customAspects} />
       </div>
    {/if}
 
    <!--Scrolling Aspects list-->
-   <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.customAspect}>
+   <ScrollingContainer bind:scrollTop={$appState.scrollTop.customAspect}>
+      <div class="scrolling-content">
+         <!--Aspects List-->
          {#if $document.system.customAspect.length > 0}
             <ol out:slide|local>
                <!--Each Aspect-->
-               {#each filteredAspects as idx ($document.system.customAspect[idx].uuid)}
+               {#each filteredEntries as idx ($document.system.customAspect[idx].uuid)}
                   <li out:slide|local>
                      <SpellSheetCustomAspectSettings {idx} />
                   </li>
@@ -65,8 +75,8 @@
                </div>
             </EfxButton>
          </div>
-      </ScrollingContainer>
-   </div>
+      </div>
+   </ScrollingContainer>
 </div>
 
 <style lang="scss">

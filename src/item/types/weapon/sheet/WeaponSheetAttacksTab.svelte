@@ -8,7 +8,6 @@
    import WeaponSheetAttackSettings from './WeaponSheetAttackSettings.svelte';
 
    // Setup context variables
-   const application = getContext('external').application;
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
 
@@ -18,7 +17,7 @@
          $appState.isExpanded.attacks[idx] ?? true;
    });
 
-   // Initialize filter
+   // Initialize filtered entries
    let filteredEntries = [];
    $: {
       filteredEntries = [];
@@ -48,9 +47,9 @@
          <!--Attacks List-->
          {#if $document.system.attack.length > 0}
             <ol out:slide|local>
-               <!--Each attack-->
+               <!--Each Attack-->
                {#each filteredEntries as idx ($document.system.attack[idx].uuid)}
-                  <li transition:slide|local>
+                  <li out:slide|local>
                      <WeaponSheetAttackSettings {idx} />
                   </li>
                {/each}

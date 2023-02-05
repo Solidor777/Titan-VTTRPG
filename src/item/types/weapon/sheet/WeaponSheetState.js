@@ -39,10 +39,6 @@ export default function createWeaponSheetState(activeDescriptionTab) {
       update((state) => {
          state.isExpanded.attacks.splice(idx, 1);
          state.isExpanded.sidebar.attack.splice(idx, 1);
-         if (state.isExpanded.attacks.length === 0) {
-            state.isExpanded.attacks.push(true);
-            state.isExpanded.sidebar.attack.push(true);
-         }
          return state;
       });
    }
