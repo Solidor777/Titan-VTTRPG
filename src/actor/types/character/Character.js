@@ -1516,6 +1516,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const messages = [];
 
       // Decrease Effect Duration
+      let effectsExpired = false;
       if (getSetting('autoDecreaseEffectDuration')) {
          const expiredEffects = [];
          this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnEnd').forEach((effect) => {
@@ -1535,6 +1536,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Send message about expired effects
          if (getSetting('reportEffects') && expiredEffects.length > 0) {
+            effectsExpired = true;
             expiredEffects.forEach((effect) => {
                messages.push(`${effect.name} (${localize('expired')})`);
             });
@@ -1552,6 +1554,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             icon: 'fas fa-clock',
             message: messages
          };
+
+         if (effectsExpired) {
+            chatContext.effectsExpired = true;
+         }
 
          // Send the report to chat
          await ChatMessage.create({

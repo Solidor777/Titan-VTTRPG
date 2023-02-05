@@ -22,7 +22,7 @@ export function getSetting(setting) {
 export function isFirstOwner(document) {
    // Check if the current user is the first owner
    // This is to ensure that certain functions only fire once
-   const owners = game.users.filter((user) => user.active && document.canUserModify(user, 'owner'));
+   const owners = game.users.filter((user) => user.active && document.testUserPermission(user, 'OWNER'));
    return owners.length > 0 && game.user === owners[0];
 }
 

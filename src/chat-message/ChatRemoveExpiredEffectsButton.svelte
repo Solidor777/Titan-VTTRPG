@@ -1,6 +1,5 @@
 <script>
-   import { localize, applyHealingToTargets } from '~/helpers/Utility.js';
-   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    export let actor = void 0;
