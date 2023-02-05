@@ -2,10 +2,7 @@
    import { getContext } from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
-   import CheckChatDamageButtons from '~/check/chat-message/CheckChatDamageButtons.svelte';
-   import CheckChatHealingButton from '~/check/chat-message/CheckChatHealingButton.svelte';
-   import CheckChatOpposedCheckButton from '~/check/chat-message/CheckChatOpposedCheckButton.svelte';
-   import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
+   import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
    import AttackCheckChatHeader from './AttackCheckChatHeader.svelte';
    import AttackCheckStats from './AttackCheckStats.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
@@ -29,8 +26,7 @@
    {#if $document.flags.titan.chatContext.parameters.attackNotes !== '' && $document.flags.titan.chatContext.parameters.attackNotes !== '<p></p>'}
       <div class="section rich-text">
          <RichText
-            text={$document.flags.titan.chatContext.parameters.attackNotes}
-         />
+            text={$document.flags.titan.chatContext.parameters.attackNotes} />
       </div>
    {/if}
 
@@ -49,29 +45,8 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
          <div class="section">
-            <CheckChatDamageButtons />
-         </div>
-      {/if}
-
-      <!--Healing Button-->
-      <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.chatContext.results.healing && game.user.isGM}
-         <div class="section">
-            <CheckChatHealingButton />
-         </div>
-      {/if}
-
-      <!--Opposed Check Buttons-->
-      {#if $document.flags.titan.chatContext.results.succeeded && $document.flags.titan.chatContext.parameters.opposedCheck}
-         <div class="section">
-            <CheckChatOpposedCheckButton />
-         </div>
-      {/if}
-
-      <!--Resistance Check Buttons-->
-      {#if $document.flags.titan.chatContext.results.reflexesCheck || $document.flags.titan.chatContext.results.resilienceCheck || $document.flags.titan.chatContext.results.willpowerCheck}
-         <div class="section tags">
-            <CheckChatResistanceCheckButtons />
+            <ChatDamageButtons
+               damage={$document.flags.titan.chatContext.results.damage} />
          </div>
       {/if}
    {/if}

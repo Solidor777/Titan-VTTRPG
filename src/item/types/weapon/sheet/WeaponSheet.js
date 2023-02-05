@@ -1,4 +1,4 @@
-import { isHtmlBlank } from '~/helpers/Utility';
+import { isHTMLBlank } from '~/helpers/Utility';
 import TitanItemSheet from '~/item/sheet/ItemSheet.js';
 import WeaponSheetShell from '~/item/types/weapon/sheet/WeaponSheetShell.svelte';
 import createWeaponSheetState from '~/item/types/weapon/sheet/WeaponSheetState.js';
@@ -24,7 +24,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
 
    constructor(object) {
       super(object);
-      this.reactive.state = createWeaponSheetState(isHtmlBlank(object.system.attackNotes) ? 'itemDescription' : 'attackNotes');
+      this.reactive.state = createWeaponSheetState(isHTMLBlank(object.system.attackNotes) ? 'itemDescription' : 'attackNotes');
    }
 
    addAttack() {

@@ -1387,6 +1387,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Handle effects messages
+      let expiredEffects = false;
       if (getSetting('reportEffects') === true) {
          actor.effects.forEach((effect) => {
             const effectSource = effect.origin.split('.');
@@ -1396,6 +1397,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   messages.push(effectItem.name);
                }
                else if (effectItem.typeComponent.isExpired()) {
+                  expiredEffects = true;
                   messages.push(`${effectItem.name} (${localize('expired')})`);
                }
                else {
@@ -1456,7 +1458,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             header: localize('turnStart'),
             subHeader: [actor.name],
             icon: 'fas fa-clock',
-            message: messages
+            message: messages,
+            expiredEffects: expiredEffects,
          };
 
          // Send the report to chat

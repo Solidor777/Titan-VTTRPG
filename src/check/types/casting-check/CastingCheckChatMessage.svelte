@@ -3,8 +3,8 @@
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import CastingCheckChatHeader from './CastingCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
-   import CheckChatDamageButtons from '~/check/chat-message/CheckChatDamageButtons.svelte';
-   import CheckChatHealingButton from '~/check/chat-message/CheckChatHealingButton.svelte';
+   import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
+   import ChatHealingButton from '~/chat-message/ChatHealingButton.svelte';
    import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
    import CheckChatScalingAspects from '~/check/chat-message/CheckChatScalingAspects.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
@@ -30,8 +30,7 @@
    {#if $document.flags.titan.chatContext.results.succeeded && $document.flags.titan.chatContext.parameters.description !== '' && $document.flags.titan.chatContext.parameters.description !== '<p></p>'}
       <div class="section rich-text">
          <RichText
-            text={$document.flags.titan.chatContext.parameters.description}
-         />
+            text={$document.flags.titan.chatContext.parameters.description} />
       </div>
    {/if}
 
@@ -57,7 +56,8 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
          <div class="section">
-            <CheckChatDamageButtons />
+            <ChatDamageButtons
+               damage={$document.flags.titan.chatContext.results.damage} />
          </div>
       {/if}
 
@@ -65,7 +65,8 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.chatContext.results.healing && game.user.isGM}
          <div class="section">
-            <CheckChatHealingButton />
+            <ChatHealingButton
+               healing={$document.flags.titan.chatContext.results.healing} />
          </div>
       {/if}
 

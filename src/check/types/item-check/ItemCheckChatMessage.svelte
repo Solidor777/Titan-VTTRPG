@@ -3,8 +3,8 @@
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import ItemCheckChatHeader from './ItemCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
-   import CheckChatDamageButtons from '~/check/chat-message/CheckChatDamageButtons.svelte';
-   import CheckChatHealingButton from '~/check/chat-message/CheckChatHealingButton.svelte';
+   import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
+   import ChatHealingButton from '~/chat-message/ChatHealingButton.svelte';
    import CheckChatOpposedCheckButton from '~/check/chat-message/CheckChatOpposedCheckButton.svelte';
    import CheckChatResistanceCheckButtons from '~/check/chat-message/CheckChatResistanceCheckButtons.svelte';
 
@@ -34,7 +34,8 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
          <div class="section">
-            <CheckChatDamageButtons />
+            <ChatDamageButtons
+               damage={$document.flags.titan.chatContext.results.damage} />
          </div>
       {/if}
 
@@ -42,7 +43,8 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.chatContext.results.healing && game.user.isGM}
          <div class="section">
-            <CheckChatHealingButton />
+            <ChatHealingButton
+               healing={$document.flags.titan.chatContext.results.healing} />
          </div>
       {/if}
 
