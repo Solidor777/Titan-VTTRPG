@@ -1,17 +1,17 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
-   import CharacterSheetSpell from "~/actor/types/character/sheet/items/spell/CharacterSheetSpell.svelte";
-   import CharacterSheetItemList from "~/actor/types/character/sheet/items/CharacterSheetItemList.svelte";
-   import CharacterSheetItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterSheetItemAddEntryButton.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
+   import CharacterSheetSpell from '~/actor/types/character/sheet/items/spell/CharacterSheetSpell.svelte';
+   import CharacterSheetItemList from '~/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
+   import CharacterSheetTabHeaderButton from '~/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
 
    // Application reference
-   const appState = getContext("ApplicationStateStore");
+   const appState = getContext('ApplicationStateStore');
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="tab">
@@ -19,7 +19,7 @@
    <div class="header">
       <!--Label-->
       <div class="label">
-         {localize("filter")}
+         {localize('filter')}
       </div>
 
       <!--Input-->
@@ -28,11 +28,12 @@
       </div>
 
       <!--Add Item Button-->
-      <div>
-         <CharacterSheetItemAddEntryButton
-            label={localize("addNewSpell")}
+      <div class="button">
+         <CharacterSheetTabHeaderButton
+            icon={'circle-plus'}
+            label={localize('addNewSpell')}
             on:click={() => {
-               $document.addItem("spell");
+               $document.addItem('spell');
             }}
          />
       </div>
@@ -46,7 +47,7 @@
             <CharacterSheetItemList
                itemComponent={CharacterSheetSpell}
                filterFunction={(item) => {
-                  return item.type === "spell";
+                  return item.type === 'spell';
                }}
                filter={$appState.filter.spells}
                isExpandedMap={$appState.isExpanded.spells}
@@ -57,7 +58,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .tab {
       @include flex-column;
@@ -81,6 +82,10 @@
 
          .input {
             @include flex-group-left;
+         }
+
+         .button {
+            margin-left: 0.25rem;
          }
       }
 

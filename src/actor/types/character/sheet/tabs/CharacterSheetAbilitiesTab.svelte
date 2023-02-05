@@ -1,19 +1,19 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import ToggleOptionButton from "~/helpers/svelte-components/button/ToggleOptionButton.svelte";
-   import TextInput from "~/helpers/svelte-components/input/TextInput.svelte";
-   import IconButton from "~/helpers/svelte-components/button/IconButton.svelte";
-   import ScrollingContainer from "~/helpers/svelte-components/ScrollingContainer.svelte";
-   import CharacterSheetItemList from "~/actor/types/character/sheet/items/CharacterSheetItemList.svelte";
-   import CharacterSheetAbility from "~/actor/types/character/sheet/items/ability/CharacterSheetAbility.svelte";
-   import CharacterSheetItemAddEntryButton from "~/actor/types/character/sheet/items/CharacterSheetItemAddEntryButton.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
+   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import CharacterSheetItemList from '~/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
+   import CharacterSheetAbility from '~/actor/types/character/sheet/items/ability/CharacterSheetAbility.svelte';
+   import CharacterSheetTabHeaderButton from '~/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
 
    // Application reference
-   const appState = getContext("ApplicationStateStore");
+   const appState = getContext('ApplicationStateStore');
 
    // Document reference
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 </script>
 
 <div class="tab">
@@ -27,7 +27,8 @@
                   label={localize(key)}
                   enabled={$appState.filterOptions.abilities[key]}
                   on:click={() => {
-                     $appState.filterOptions.abilities[key] = !$appState.filterOptions.abilities[key];
+                     $appState.filterOptions.abilities[key] =
+                        !$appState.filterOptions.abilities[key];
                   }}
                />
             </div>
@@ -50,7 +51,7 @@
       <div class="row">
          <!--Label-->
          <div class="label">
-            {localize("filter")}
+            {localize('filter')}
          </div>
 
          <!--Input-->
@@ -60,10 +61,11 @@
 
          <!--Add Item Button-->
          <div class="add-entry-button">
-            <CharacterSheetItemAddEntryButton
-               label={localize("addNewAbility")}
+            <CharacterSheetTabHeaderButton
+               label={localize('addNewAbility')}
+               icon={'cirle-plus'}
                on:click={() => {
-                  $document.addItem("ability");
+                  $document.addItem('ability');
                }}
             />
          </div>
@@ -78,18 +80,27 @@
             <CharacterSheetItemList
                itemComponent={CharacterSheetAbility}
                filterFunction={(item) => {
-                  if (item.type !== "ability") {
+                  if (item.type !== 'ability') {
                      return false;
                   }
-                  if ($appState.filterOptions.abilities.action && !item.system.action) {
+                  if (
+                     $appState.filterOptions.abilities.action &&
+                     !item.system.action
+                  ) {
                      return false;
                   }
 
-                  if ($appState.filterOptions.abilities.reaction && !item.system.reaction) {
+                  if (
+                     $appState.filterOptions.abilities.reaction &&
+                     !item.system.reaction
+                  ) {
                      return false;
                   }
 
-                  if ($appState.filterOptions.abilities.passive && !item.system.passive) {
+                  if (
+                     $appState.filterOptions.abilities.passive &&
+                     !item.system.passive
+                  ) {
                      return false;
                   }
 
@@ -104,7 +115,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
    .tab {
       @include flex-column;
       @include flex-group-top;

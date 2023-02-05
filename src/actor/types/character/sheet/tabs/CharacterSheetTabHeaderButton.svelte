@@ -1,12 +1,15 @@
 <script>
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    export let label = void 0;
+   export let icon = void 0;
 </script>
 
 <div class="button">
    <EfxButton on:click>
       <div class="label">
-         <i class="fas fa-circle-plus" />
+         {#if icon}
+            <i class={`fas fa-${icon}`} />
+         {/if}
          <div>
             {label}
          </div>

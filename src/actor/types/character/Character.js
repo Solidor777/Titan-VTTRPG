@@ -1126,21 +1126,25 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async removeExpiredEffects(confirmed) {
-      // Check if the removeal was confirmed
-      if (confirmed || !confirmDeletingItems()) {
-         const actor = this.parent;
-         const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
-         for (const effect of expiredEffects) {
-            await this._internalDeleteItem(effect);
+      // Get the expired effects
+      const actor = this.parent;
+      const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
+      if (expiredEffects.length > 0) {
+         // Check if the removeal was confirmed
+         if (confirmed || !confirmDeletingItems()) {
+            for (const effect of expiredEffects) {
+               await this._internalDeleteItem(effect);
+            }
+
+            return;
          }
 
-         return;
+         // Otherwise, confirm removal
+         else {
+            const dialog = new ConfirmRemoveExpiredEffectsDialog(this);
+            dialog.render(true);
+         }
       }
-
-      // Otherwise, confirm removal
-      const dialog = new ConfirmRemoveExpiredEffectsDialog(this);
-      dialog.render(true);
-
       return;
    }
 
