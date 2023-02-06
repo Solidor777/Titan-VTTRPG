@@ -86,12 +86,35 @@ export default function registerSystemSettings() {
       default: '+2d6',
    });
 
+
    game.settings.register('titan', 'autoRegainResolve', {
       config: true,
       scope: 'world',
       name: 'SETTINGS.autoRegainResolve.label',
       hint: 'SETTINGS.autoRegainResolve.hint',
-      type: Boolean,
+      type: String,
+      choices: {
+         showButton: 'SETTINGS.autoRegainResolve.showButton',
+         enabled: 'SETTINGS.autoRegainResolve.enabled',
+         disabled: 'SETTINGS.autoRegainResolve.disabled'
+      },
+      restricted: true,
+      default: 'showButton',
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'baseResolveRegain', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.baseResolveRegain.label',
+      hint: 'SETTINGS.baseResolveRegain.hint',
+      type: Number,
+      default: 1,
+      range: {
+         min: 0,
+         max: 10,
+         step: 1
+      },
       restricted: true,
       default: true,
    });
@@ -104,6 +127,31 @@ export default function registerSystemSettings() {
       type: Boolean,
       restricted: true,
       default: true,
+   });
+
+   game.settings.register('titan', 'autoRemoveExpiredEffects', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoRemoveExpiredEffects.label',
+      hint: 'SETTINGS.autoRemoveExpiredEffects.hint',
+      type: String,
+      choices: {
+         showButton: 'SETTINGS.autoRemoveExpiredEffects.showButton',
+         enabled: 'SETTINGS.autoRemoveExpiredEffects.enabled',
+         disabled: 'SETTINGS.autoRemoveExpiredEffects.disabled'
+      },
+      restricted: true,
+      default: 'showButton',
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'autoRemoveExpiredEffectsConfirmButton', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoRemoveExpiredEffectsConfirmButton.label',
+      hint: 'SETTINGS.autoRemoveExpiredEffectsConfirmButton.hint',
+      type: Boolean,
+      default: false,
    });
 
    game.settings.register('titan', 'reportTakingDamage', {

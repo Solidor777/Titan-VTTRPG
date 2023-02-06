@@ -46,6 +46,9 @@ export default class TitanEffect extends TitanTypeComponent {
                   core: {
                      statusId: item._id,
                   },
+                  titan: {
+                     itemId: item._id,
+                  },
                   'visual-active-effects.data.content': TextEditor.enrichHTML(item.system.description, { async: false, secrets: true })
                },
             }],

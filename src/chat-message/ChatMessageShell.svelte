@@ -18,6 +18,7 @@
    import AttackCheckChatMessage from '~/check/types/attack-check/AttackCheckChatMessage.svelte';
    import ReportChatMessage from './ReportChatMessage.svelte';
    import PrivateRollChatMessageShell from './PrivateRollChatMessageShell.svelte';
+   import TurnReportChatMessage from './TurnReportChatMessage.svelte';
 
    // Context object
    export let documentStore = void 0;
@@ -44,6 +45,7 @@
             spell: SpellChatMessage,
             weapon: WeaponChatMessage,
             report: ReportChatMessage,
+            turnReport: TurnReportChatMessage,
          };
          return chatComponents[$document.flags.titan.chatContext.type];
       }

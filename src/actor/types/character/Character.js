@@ -1,4 +1,4 @@
-import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems } from '~/helpers/Utility.js';
+import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
 import { applyMulBase } from '~/rules-element/MulBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -1004,6 +1004,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   async regainResolve(resolveRegained, report) {
+      // Update resolve
+      const resolve = this.parent.system.resource.resolve;
+      resolve.value = Math.min(resolve.max, resolve.value += resolveRegained);
+
+      // Update the actor if appropriate
+      await this.parent.update({
+         system: {
+            resource: {
+               resolve: resolve
+            }
+         }
+      });
+
+      return
+   }
+
    async healDamage(healing, report) {
       if (this.parent.isOwner) {
          // Check if the actor's stamina is less than max
@@ -1348,98 +1365,134 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
-      let messages = [];
+      // Initialize variables
+      const chatContext = {};
       const actor = this.parent;
       let updateActor = false;
+      const messages = [];
+
+      // Get the settings for effect automation
+      const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
+      const reportEffects = getSetting('reportEffects');
+      const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
+
+      // Check all active effects
+      const conditions = [];
+      this.parent.effects.filter((effect) => !actor.items.get(effect.origin)).forEach((effect) => {
+         // If this is an orphaned effect, then delete it
+         if (effect.flags?.titan?.itemId) {
+            effect.delete();
+         }
+
+         // Otherwise, if we are reporting active effects, add it to the conditions
+         else if (reportEffects) {
+            conditions.push(effect.label);
+         }
+      });
+
+      // Update chat context
+      if (conditions.length > 0) {
+         chatContext.conditions = conditions;
+      }
+
+      // If we are doing any effect automation
+      if (autoDecreaseEffectDuration || reportEffects || autoRemoveExpiredEffects !== 'disabled') {
+
+         // Sort the effects
+         const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
+         const expiredEffects = []
+         const activeTurnStartEffects = [];
+         const activeTurnEndEffects = [];
+         effectItems.forEach((effect) => {
+            // Decrease the efect duration if appropriate
+            if ((autoDecreaseEffectDuration &&
+               effect.system.duration.type === 'turnStart' &&
+               effect.system.duration.remaining > 0)) {
+               effect.system.duration.remaining -= 1;
+            }
+
+            // Sort the effect into expired or continuing buckets
+            if (effect.typeComponent.isExpired()) {
+               expiredEffects.push(effect);
+            }
+            else {
+               if (effect.system.duration.type === 'turnStart') {
+                  activeTurnStartEffects.push(effect);
+               }
+               else {
+                  activeTurnEndEffects.push(effect);
+               }
+            }
+         });
+
+         // Update chat context
+         if (reportEffects) {
+
+            // Turn start effects
+            if (activeTurnStartEffects.length > 0) {
+               chatContext.turnStartEffects = activeTurnStartEffects.map((effect) => {
+                  return { label: effect.name, remaining: effect.remaining };
+               });
+            }
+
+            // Turn end effects
+            if (activeTurnEndEffects.length > 0) {
+               chatContext.turnEndEffects = activeTurnEndEffects.map((effect) => {
+                  return { label: effect.name, remaining: effect.remaining };
+               });
+            }
+
+            // Expired effects
+            if (expiredEffects.length > 0) {
+               chatContext.expiredEffects = [];
+               expiredEffects.forEach((effect) => {
+                  // Add the effect to the chat context
+                  chatContext.expiredEffects.push(effect.name);
+
+                  // Delete the effect if appropriate
+                  if (autoRemoveExpiredEffects === 'enabled') {
+                     effect.delete();
+                  }
+               });
+            }
+         }
+      }
 
       // Regain resolve
-      if (getSetting('autoRegainResolve') === true) {
+      const autoRegainResolve = getSetting('autoRegainResolve');
+      if (autoRegainResolve !== 'disabled') {
 
          // If the resolve value is below max
          const resolve = actor.system.resource.resolve;
          if (resolve.value < resolve.max) {
 
-            // Update the actor
-            const resolveRegained = Math.min(actor.system.mod.resolveRegain.value + 1, resolve.max - resolve.value);
-            resolve.value += resolveRegained;
-            updateActor = true;
+            // If any resolve would be regained
+            const maxResolveRegained = getSetting('baseResolveRegain') + actor.system.mod.resolveRegain.value;
+            if (maxResolveRegained > 0) {
 
-            // Add resolve update to report
-            if (getSetting('reportRegainingResolve') === true) {
-               messages.push(`${localize('regainedResolve')}: ${resolveRegained}`);
-               messages.push(`${localize('resolve')}: ${resolve.value} / ${resolve.max}`);
+               // Calculate the resolve regains
+               const newResolve = Math.min(resolve.max, resolve.value + maxResolveRegained);
+               const resolveRegained = newResolve - resolve.value;
+
+               // Update the chat context
+               chatContext.resolveRegained = maxResolveRegained;
+
+               // If resolve regained is automatically applied
+               if (autoRegainResolve === 'enabled') {
+                  // Update the actor
+                  resolve.value = newResolve;
+                  updateActor = true;
+               }
+
+               // Add resolve update to the chat context
+               if (getSetting('reportRegainingResolve') === true) {
+                  messages.push(`${localize('regainedResolve')}: ${resolveRegained}`);
+                  messages.push(`${localize('resolve')}: ${resolve.value} / ${resolve.max}`);
+               }
             }
          }
       }
 
-      // Decrease Effect Duration
-      if (getSetting('autoDecreaseEffectDuration')) {
-         actor.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnStart').forEach((effect) => {
-            if (effect.system.duration.remaining > 0) {
-               effect.system.duration.remaining -= 1;
-               effect.update({
-                  system: {
-                     duration: effect.system.duration
-                  }
-               });
-            }
-         });
-      }
-
-      // Handle effects messages
-      let effectsExpired = false;
-      if (getSetting('reportEffects') === true) {
-         actor.effects.forEach((effect) => {
-            const effectItem = actor.items.get(effect.origin);
-            if (effectItem) {
-               if (effectItem.typeComponent.isPermanent()) {
-                  messages.push(effectItem.name);
-               }
-               else if (effectItem.typeComponent.isExpired()) {
-                  effectsExpired = true;
-                  messages.push(`${effectItem.name} (${localize('expired')})`);
-               }
-               else {
-                  messages.push((`${effectItem.name}: ${localize(effectItem.system.duration.type)} (${effectItem.system.duration.remaining})`));
-               }
-            }
-            else {
-               messages.push(effect.label);
-            }
-         });
-      }
-
-      // Handle start of turn messages
-      if (this.turnStartMessages && this.turnStartMessages.length > 0) {
-         this.turnStartMessages.forEach((message) => {
-            if (message.message !== '') {
-               messages.push(message.message);
-            }
-         });
-      }
-
-      // Handle stamina mods
-      if (this.turnStartStamina) {
-         const stamina = actor.system.resource.stamina;
-         // Healing
-         if (this.turnStartStamina > 0) {
-            const staminaHealed = await this.healDamage(this.turnStartStamina, false);
-            if (staminaHealed > 0) {
-               messages.push(`${localize('staminaHealed')}: ${staminaHealed}`);
-            }
-         }
-         else {
-            // Damage
-            const wounds = actor.system.resource.wounds;
-            const damage = await this.applyDamage(this.turnStartStamina * -1, true, false);
-            mes = [`${localize('resolve')}: ${stamina.value} / ${stamina.max}`, `${localize('wounds')}: ${wounds.value} / ${wounds.max}`];
-            if (damage.woundsTaken > 0) {
-               modLines = [`${localize('woundsTaken')}: ${damage.woundsTaken}`, ...modLines];
-            }
-            modLines = [`${localize('tookDamage')}: ${damage.damageTaken}`, ...modLines];
-            messages = [...messages, ...modLines];
-         }
-      }
 
       // Update actor if appropriate
       if (updateActor) {
@@ -1449,20 +1502,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Start of turn report
-      if (messages.length > 0) {
-         // Create chat context
-         const chatContext = {
-            type: 'report',
-            img: actor.img,
-            header: localize('turnStart'),
-            subHeader: [actor.name],
-            icon: 'fas fa-clock',
-            message: messages,
-         };
+      if (messages.length > 0 ||
+         chatContext.expiredEffects ||
+         chatContext.turnStartEffects ||
+         chatContext.turnEndEffects ||
+         chatContext.conditions ||
+         chatContext.resolveRegained) {
 
-         if (effectsExpired) {
-            chatContext.effectsExpired = true;
-         }
+         // Prepare chat context
+         chatContext.type = 'turnReport';
+         chatContext.img = actor.img;
+         chatContext.header = localize('turnStart');
+         chatContext.subHeader = [actor.name];
+         chatContext.icon = 'fas fa-clock';
+         chatContext.messages = messages;
 
          // Send the report to chat
          await ChatMessage.create({
@@ -1515,8 +1568,27 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async onTurnEnd() {
       const messages = [];
 
-      // Decrease Effect Duration
-      let effectsExpired = false;
+      // Get the settings for effect automation
+      const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
+      const reportEffects = getSetting('reportEffects');
+      const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
+
+      // If we are doing any effect automation
+      if (autoDecreaseEffectDuration || reportEffects || autoRemoveExpiredEffects !== 'disabled') {
+         // Sort the effects
+         const effectItems = this.parent.items.filter((effect) => effect.type === 'effect');
+         const expiredEffects = []
+         const activeEffects = [];
+         effectItems.forEach((effect) => {
+            // Decrease the efect duration if appropriate
+            if ((getSetting('autoDecreaseEffectDuration'))) {
+
+            }
+         });
+      }
+
+
+
       if (getSetting('autoDecreaseEffectDuration')) {
          const expiredEffects = [];
          this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnEnd').forEach((effect) => {
@@ -1536,7 +1608,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Send message about expired effects
          if (getSetting('reportEffects') && expiredEffects.length > 0) {
-            effectsExpired = true;
             expiredEffects.forEach((effect) => {
                messages.push(`${effect.name} (${localize('expired')})`);
             });
@@ -1547,7 +1618,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (messages.length > 0) {
          // Create chat context
          const chatContext = {
-            type: 'report',
+            type: 'turnReport',
             img: this.parent.img,
             header: localize('turnEnd'),
             subHeader: [this.parent.name],
@@ -1555,9 +1626,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             message: messages
          };
 
-         if (effectsExpired) {
-            chatContext.effectsExpired = true;
-         }
+         // Add remove temporary effects button if appropriate
 
          // Send the report to chat
          await ChatMessage.create({

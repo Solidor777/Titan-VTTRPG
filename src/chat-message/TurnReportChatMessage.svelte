@@ -1,5 +1,7 @@
 <script>
    import { getContext } from 'svelte';
+   import { getSetting } from '~/helpers/utility';
+   import ChatRegainResolveButton from './ChatRegainResolveButton.svelte';
    import ChatRemoveExpiredEffectsButton from './ChatRemoveExpiredEffectsButton.svelte';
 
    // Document reference
@@ -38,6 +40,27 @@
          {#each chatContext.message as message}
             <div class="message">{@html message}</div>
          {/each}
+      </div>
+   {/if}
+
+   <!--Remove Expired Effects Button-->
+   {#if chatContext.expiredEffects && getSetting('autoRemoveExpiredEffects') === 'showButton'}
+      <div class="button">
+         <ChatRemoveExpiredEffectsButton
+            actorId={$document.speaker.actor}
+            tokenId={$document.speaker.token}
+         />
+      </div>
+   {/if}
+
+   <!--Regain Resolve Button-->
+   {#if chatContext.resolveRegained && getSetting('autoRegainResolve') === 'showButton'}
+      <div class="button">
+         <ChatRegainResolveButton
+            actorId={$document.speaker.actor}
+            tokenId={$document.speaker.token}
+            resolveRegained={chatContext.resolveRegained}
+         />
       </div>
    {/if}
 </div>

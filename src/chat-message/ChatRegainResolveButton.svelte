@@ -4,25 +4,21 @@
 
    export let actorId = void 0;
    export let tokenId = void 0;
+   export let resolveRegained = void 0;
 
-   function removeExpiredEffects() {
-      const actor = getActor(actorId, tokenId);
-      if (actor && actor.character) {
-      }
+   function regainResolve() {
       const character = getActor(actorId, tokenId)?.character;
       if (character) {
-         character.removeExpiredEffects(
-            getSetting('autoRemoveExpiredEffectsConfirmButton') === 'showButton'
-         );
+         character.regainResolve(resolveRegained, false, true);
       }
    }
 </script>
 
 <!--Apply healing button-->
 <div class="button">
-   <EfxButton on:click={() => removeExpiredEffects()}>
-      <i class="fas fa-clock" />
-      {localize('removeExpiredEffects')}
+   <EfxButton on:click={() => regainResolve()}>
+      <i class="fas fa-bolt" />
+      {`${localize('regainResolve')} (${resolveRegained})`}
    </EfxButton>
 </div>
 

@@ -6,7 +6,6 @@ export default class TitanActor extends Actor {
 
    async _preCreate(data, options, user) {
       await super._preCreate(data, options, user);
-
       const initData = {
          'prototypeToken.bar1': { attribute: 'resource.stamina' },
          'prototypeToken.bar2': { attribute: 'resource.wounds' },
@@ -17,7 +16,7 @@ export default class TitanActor extends Actor {
       if (data.type === 'player') {
          initData['prototypeToken.vision'] = true;
          initData['prototypeToken.actorLink'] = true;
-         initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.NEUTRAL;
+         initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.FRIENDLY;
       }
       else if (data.type === 'npc') {
          initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.HOSTILE;

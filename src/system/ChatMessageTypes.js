@@ -13,5 +13,6 @@ export default Object.freeze(new Set([
    'shield',
    'spell',
    'weapon',
-   'report'
+   'report',
+   'turnReport'
 ]));

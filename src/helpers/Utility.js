@@ -71,6 +71,16 @@ export function applyHealingToTargets(healing, report = true) {
 }
 
 export function getActor(actorId, tokenId) {
-   const token = canvas.tokens.placeables.find((currentToken) => currentToken.id === tokenId);
+   const token = canvas?.tokens?.placeables?.find((currentToken) => currentToken.id === tokenId);
    return token ? token.actor : game.actors.get(actorId);
+}
+
+export function documentSort(a, b) {
+   if (a.sort < b.sort) {
+      return -1;
+   }
+   if (a.sort > b.sort) {
+      return 1;
+   }
+   return 0;
 }
