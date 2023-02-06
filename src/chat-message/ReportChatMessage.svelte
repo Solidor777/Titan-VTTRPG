@@ -77,12 +77,6 @@
             i {
                margin-right: 0.25rem;
             }
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               flex-wrap: wrap;
-            }
          }
 
          .sub {

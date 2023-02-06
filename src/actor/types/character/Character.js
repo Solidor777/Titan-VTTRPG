@@ -1369,7 +1369,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const chatContext = {};
       const actor = this.parent;
       let updateActor = false;
-      const message = [];
 
       // Get the settings for effect automation
       const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
@@ -1403,12 +1402,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const expiredEffects = []
          const activeTurnStartEffects = [];
          const activeTurnEndEffects = [];
-         effectItems.forEach((effect) => {
+         for (const effect of effectItems) {
             // Decrease the efect duration if appropriate
             if ((autoDecreaseEffectDuration &&
                effect.system.duration.type === 'turnStart' &&
                effect.system.duration.remaining > 0)) {
                effect.system.duration.remaining -= 1;
+               await effect.update({
+                  system: {
+                     duration: {
+                        remaining: effect.system.duration.remaining
+                     }
+                  }
+               });
             }
 
             // Sort the effect into expired or continuing buckets
@@ -1423,7 +1429,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   activeTurnEndEffects.push(effect);
                }
             }
-         });
+         };
 
          // Update chat context
          if (reportEffects) {
@@ -1431,20 +1437,22 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Turn start effects
             if (activeTurnStartEffects.length > 0) {
                chatContext.turnStartEffects = activeTurnStartEffects.map((effect) => {
-                  return { label: effect.name, remaining: effect.remaining };
+                  return { label: effect.name, img: effect.img, remaining: effect.remaining };
                });
             }
 
             // Turn end effects
             if (activeTurnEndEffects.length > 0) {
                chatContext.turnEndEffects = activeTurnEndEffects.map((effect) => {
-                  return { label: effect.name, remaining: effect.remaining };
+                  return { label: effect.name, img: effect.img, remaining: effect.remaining };
                });
             }
 
             // Expired effects
             if (expiredEffects.length > 0) {
-               chatContext.expiredEffects = expiredEffects.map((effect) => effect.name);
+               chatContext.expiredEffects = expiredEffects.map((effect) => {
+                  return { label: effect.name, img: effect.img };
+               });
             }
          }
 
@@ -1513,10 +1521,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          });
       }
 
-      if (message.length > 0) {
-         chatContext.message = message;
-      }
-
+      // Send the end of turn report if appropriate
       if (Object.keys(chatContext).length > 0) {
 
          // Prepare chat context
@@ -1524,7 +1529,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          chatContext.img = actor.img;
          chatContext.header = localize('turnStart');
          chatContext.subHeader = [actor.name];
-         chatContext.icon = 'fas fa-clock';
 
          // Send the report to chat
          await ChatMessage.create({
@@ -1575,7 +1579,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnEnd() {
-      const messages = [];
+      // Initialize variables
+      const actor = this.parent;
+      const chatContext = {};
 
       // Get the settings for effect automation
       const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
@@ -1584,58 +1590,66 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // If we are doing any effect automation
       if (autoDecreaseEffectDuration || reportEffects || autoRemoveExpiredEffects !== 'disabled') {
+
          // Sort the effects
-         const effectItems = this.parent.items.filter((effect) => effect.type === 'effect');
+         const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
          const expiredEffects = []
-         const activeEffects = [];
-         effectItems.forEach((effect) => {
+         for (const effect of effectItems) {
             // Decrease the efect duration if appropriate
-            if ((getSetting('autoDecreaseEffectDuration'))) {
-
-            }
-         });
-      }
-
-
-
-      if (getSetting('autoDecreaseEffectDuration')) {
-         const expiredEffects = [];
-         this.parent.items.filter((effect) => effect.type === 'effect' && effect.system.duration.type === 'turnEnd').forEach((effect) => {
-            if (effect.system.duration.remaining > 0) {
+            if ((autoDecreaseEffectDuration &&
+               effect.system.duration.type === 'turnEnd' &&
+               effect.system.duration.remaining > 0)) {
                effect.system.duration.remaining -= 1;
-               effect.update({
+               await effect.update({
                   system: {
-                     duration: effect.system.duration
+                     duration: {
+                        remaining: effect.system.duration.remaining
+                     }
                   }
                });
             }
 
-            if (effect.system.duration.remaining <= 0) {
+            // Sort the effect into expired or continuing buckets
+            if (effect.typeComponent.isExpired()) {
                expiredEffects.push(effect);
             }
-         });
+         }
 
-         // Send message about expired effects
-         if (getSetting('reportEffects') && expiredEffects.length > 0) {
-            expiredEffects.forEach((effect) => {
-               messages.push(`${effect.name} (${localize('expired')})`);
-            });
+         // If any effects are expired
+         if (expiredEffects.length > 0) {
+            // Add the effects to the chat context
+            if (reportEffects) {
+               chatContext.expiredEffects = expiredEffects.map((effect) => {
+                  return { label: effect.name, img: effect.img };
+               });
+            }
+
+            // Effect auto removal
+            switch (autoRemoveExpiredEffects) {
+               case 'showButton': {
+                  chatContext.removeExpiredEffectsConfirmed = false;
+                  break;
+               }
+               case 'enabled': {
+                  chatContext.removeExpiredEffectsConfirmed = true;
+                  expiredEffects.forEach((effect) => effect.delete());
+                  break;
+               }
+               default: {
+                  break;
+               }
+            }
          }
       }
 
       // End of turn report
-      if (messages.length > 0) {
-         // Create chat context
-         const chatContext = {
-            type: 'turnReport',
-            img: this.parent.img,
-            header: localize('turnEnd'),
-            subHeader: [this.parent.name],
-            icon: 'fas fa-clock',
-            message: messages
-         };
+      if (Object.keys(chatContext).length > 0) {
 
-         // Add remove temporary effects button if appropriate
+         // Prepare chat context
+         chatContext.type = 'turnReport';
+         chatContext.img = actor.img;
+         chatContext.header = localize('turnEnd');
+         chatContext.subHeader = [actor.name];
 
          // Send the report to chat
          await ChatMessage.create({

@@ -25,7 +25,6 @@ export default class ConfirmationDialog extends TJSDialog {
          },
       );
 
-      console.log(typeof (confirmationCallback))
       if (typeof (confirmationCallback === 'function')) {
          if (confirmationContext) {
             this.confirmationCallback = confirmationCallback.bind(confirmationContext);

@@ -1,6 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import { getSetting, localize } from '~/helpers/utility';
+   import { getSetting } from '~/helpers/utility';
    import ChatReportConfirmRegainingResolveButton from './ChatReportConfirmRegainingResolveButton.svelte';
    import ChatReportRemoveExpiredEffectsButton from './ChatReportRemoveExpiredEffectsButton.svelte';
    import ChatResolveRegained from './ChatResolveRegained.svelte';
@@ -21,9 +21,7 @@
       <!--Main Header-->
       <div class="main">
          <!--Icon-->
-         {#if chatContext.icon}
-            <i class={chatContext.icon} />
-         {/if}
+         <i class={'fas fa-clock'} />
          {chatContext.header}
       </div>
 
@@ -104,12 +102,6 @@
 
             i {
                margin-right: 0.25rem;
-            }
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-               flex-wrap: wrap;
             }
          }
 
