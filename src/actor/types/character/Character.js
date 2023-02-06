@@ -1007,7 +1007,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async regainResolve(resolveRegained, report) {
       // Update resolve
       const resolve = this.parent.system.resource.resolve;
-      resolve.value = Math.min(resolve.max, resolve.value += resolveRegained);
+      resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
 
       // Update the actor if appropriate
       await this.parent.update({
@@ -1369,7 +1369,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const chatContext = {};
       const actor = this.parent;
       let updateActor = false;
-      const messages = [];
+      const message = [];
 
       // Get the settings for effect automation
       const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
@@ -1444,16 +1444,25 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
             // Expired effects
             if (expiredEffects.length > 0) {
-               chatContext.expiredEffects = [];
-               expiredEffects.forEach((effect) => {
-                  // Add the effect to the chat context
-                  chatContext.expiredEffects.push(effect.name);
+               chatContext.expiredEffects = expiredEffects.map((effect) => effect.name);
+            }
+         }
 
-                  // Delete the effect if appropriate
-                  if (autoRemoveExpiredEffects === 'enabled') {
-                     effect.delete();
-                  }
-               });
+         // Effect auto removal
+         if (expiredEffects.length > 0) {
+            switch (autoRemoveExpiredEffects) {
+               case 'showButton': {
+                  chatContext.removeExpiredEffectsConfirmed = false;
+                  break;
+               }
+               case 'enabled': {
+                  chatContext.removeExpiredEffectsConfirmed = true;
+                  expiredEffects.forEach((effect) => effect.delete());
+                  break;
+               }
+               default: {
+                  break;
+               }
             }
          }
       }
@@ -1471,28 +1480,31 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (maxResolveRegained > 0) {
 
                // Calculate the resolve regains
-               const newResolve = Math.min(resolve.max, resolve.value + maxResolveRegained);
-               const resolveRegained = newResolve - resolve.value;
+               const maxResolve = resolve.max;
+               const initialResolve = resolve.value;
+               const newResolve = Math.min(maxResolve, initialResolve + maxResolveRegained);
+               const resolveRegained = newResolve - initialResolve;
 
                // Update the chat context
-               chatContext.resolveRegained = maxResolveRegained;
+               chatContext.resolveRegained = resolveRegained;
+               chatContext.initialResolve = initialResolve;
+               chatContext.newResolve = newResolve;
+               chatContext.maxResolve = maxResolve;
 
-               // If resolve regained is automatically applied
+               // Update the actor if appropriate
                if (autoRegainResolve === 'enabled') {
-                  // Update the actor
                   resolve.value = newResolve;
                   updateActor = true;
-               }
 
-               // Add resolve update to the chat context
-               if (getSetting('reportRegainingResolve') === true) {
-                  messages.push(`${localize('regainedResolve')}: ${resolveRegained}`);
-                  messages.push(`${localize('resolve')}: ${resolve.value} / ${resolve.max}`);
+                  // Flag so the report knows the resolve has already been regained
+                  chatContext.resolveRegainConfirmed = true;
+               }
+               else {
+                  chatContext.resolveRegainConfirmed = false;
                }
             }
          }
       }
-
 
       // Update actor if appropriate
       if (updateActor) {
@@ -1501,13 +1513,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          });
       }
 
-      // Start of turn report
-      if (messages.length > 0 ||
-         chatContext.expiredEffects ||
-         chatContext.turnStartEffects ||
-         chatContext.turnEndEffects ||
-         chatContext.conditions ||
-         chatContext.resolveRegained) {
+      if (message.length > 0) {
+         chatContext.message = message;
+      }
+
+      if (Object.keys(chatContext).length > 0) {
 
          // Prepare chat context
          chatContext.type = 'turnReport';
@@ -1515,7 +1525,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          chatContext.header = localize('turnStart');
          chatContext.subHeader = [actor.name];
          chatContext.icon = 'fas fa-clock';
-         chatContext.messages = messages;
 
          // Send the report to chat
          await ChatMessage.create({

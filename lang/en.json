@@ -463,6 +463,7 @@
    "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item from this actor?",
    "LOCAL.confirmRemoveExpiredEffects.label": "Are you sure you want to remove all expired effects from this actor?",
    "LOCAL.removeExpiredEffects.label": "Remove Expired Efects",
+   "LOCAL.confirmRegainingResolve.label": "Confirm Regaining Resolve",
    "LOCAL.regainResolve.label": "Regain Resolve",
    "EFFECT.StatusSleeping": "Sleeping",
    "EFFECT.StatusBleeding": "Bleeding",

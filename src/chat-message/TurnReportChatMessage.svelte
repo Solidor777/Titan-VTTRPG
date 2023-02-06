@@ -1,8 +1,9 @@
 <script>
    import { getContext } from 'svelte';
-   import { getSetting } from '~/helpers/utility';
-   import ChatRegainResolveButton from './ChatRegainResolveButton.svelte';
-   import ChatRemoveExpiredEffectsButton from './ChatRemoveExpiredEffectsButton.svelte';
+   import { getSetting, localize } from '~/helpers/utility';
+   import ChatReportConfirmRegainingResolveButton from './ChatReportConfirmRegainingResolveButton.svelte';
+   import ChatReportRemoveExpiredEffectsButton from './ChatReportRemoveExpiredEffectsButton.svelte';
+   import ChatResolveRegained from './ChatResolveRegained.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -43,24 +44,28 @@
       </div>
    {/if}
 
-   <!--Remove Expired Effects Button-->
-   {#if chatContext.expiredEffects && getSetting('autoRemoveExpiredEffects') === 'showButton'}
-      <div class="button">
-         <ChatRemoveExpiredEffectsButton
-            actorId={$document.speaker.actor}
-            tokenId={$document.speaker.token}
-         />
-      </div>
+   <!--Resolve regained-->
+   {#if chatContext.resolveRegained && getSetting('reportRegainingResolve') === true}
+      <ChatResolveRegained
+         resolveRegained={chatContext.resolveRegained}
+         resolveValue={$document.flags.titan.chatContext.resolveRegainConfirmed
+            ? chatContext.newResolve
+            : chatContext.initialResolve}
+         resolveMax={chatContext.maxResolve}
+      />
    {/if}
 
    <!--Regain Resolve Button-->
-   {#if chatContext.resolveRegained && getSetting('autoRegainResolve') === 'showButton'}
+   {#if chatContext.resolveRegained && !$document.flags.titan.chatContext.resolveRegainConfirmed && getSetting('autoRegainResolve') === 'showButton'}
       <div class="button">
-         <ChatRegainResolveButton
-            actorId={$document.speaker.actor}
-            tokenId={$document.speaker.token}
-            resolveRegained={chatContext.resolveRegained}
-         />
+         <ChatReportConfirmRegainingResolveButton />
+      </div>
+   {/if}
+
+   <!--Remove Expired Effects Button-->
+   {#if $document.flags.titan.chatContext.removeExpiredEffectsConfirmed === false && getSetting('autoRemoveExpiredEffects') === 'showButton'}
+      <div class="button">
+         <ChatReportRemoveExpiredEffectsButton />
       </div>
    {/if}
 </div>
@@ -132,6 +137,10 @@
             &:not(:last-child) {
                @include border-bottom;
                padding-bottom: 0.25rem;
+            }
+
+            .fas {
+               margin-right: 0.25rem;
             }
          }
       }

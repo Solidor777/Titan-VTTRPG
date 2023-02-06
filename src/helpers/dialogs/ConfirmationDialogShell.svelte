@@ -31,6 +31,9 @@
       <EfxButton
          on:click={() => {
             application.confirmed();
+            if (typeof application.confirmationCallback === 'function') {
+               application.confirmationCallback();
+            }
             application.close();
          }}
       >
