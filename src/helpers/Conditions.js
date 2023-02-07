@@ -42,7 +42,7 @@ export default [
    {
       id: 'stunned',
       label: 'LOCAL.stunned.label',
-      icon: 'icons/svg/daze.svg'
+      icon: 'icons/svg/stoned.svg'
    },
    {
       id: 'sleeping',
