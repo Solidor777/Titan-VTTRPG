@@ -33,13 +33,13 @@
 
    function confirmRemoveExpiredEffects() {
       // Update the document
-      if (!$document.flags.titan.chatContext.removeExpiredEffectsConfirmed) {
-         $document.flags.titan.chatContext.removeExpiredEffectsConfirmed = true;
+      if (!$document.flags.titan.chatContext.expiredEffectsRemoved) {
+         $document.flags.titan.chatContext.expiredEffectsRemoved = true;
          $document.update({
             flags: {
                titan: {
                   chatContext: {
-                     removeExpiredEffectsConfirmed: true,
+                     expiredEffectsRemoved: true,
                   },
                },
             },

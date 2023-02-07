@@ -27,7 +27,7 @@ export function isFirstOwner(document) {
 }
 
 export function isHTMLBlank(html) {
-   return (html === '' || html === '<p></p>')
+   return (!html || html === '' || html === '<p></p>')
 }
 
 export function getCombatTargets() {
@@ -83,4 +83,12 @@ export function documentSort(a, b) {
       return 1;
    }
    return 0;
+}
+
+export function getSVGClass(source) {
+   return source.indexOf('.svg') === -1 ? '' : 'svg';
+}
+
+export function getDarkSVGClass(source) {
+   return source.indexOf('.svg') === -1 ? '' : 'dark-svg';
 }

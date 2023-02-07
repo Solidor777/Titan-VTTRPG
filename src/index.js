@@ -154,13 +154,17 @@ Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on("updateCombat", (combat) => {
+   onUpdateCombat(combat);
+});
+
+async function onUpdateCombat(combat) {
    const previousTurnCharacter = combat.combatants.get(combat.previous?.combatantId)?.actor;
    if (previousTurnCharacter && isFirstOwner(previousTurnCharacter) && previousTurnCharacter.character) {
-      previousTurnCharacter.character.onTurnEnd();
+      await previousTurnCharacter.character.onTurnEnd();
    }
 
    const currentTurnCharacter = combat.combatant?.actor;
    if (currentTurnCharacter && isFirstOwner(currentTurnCharacter) && currentTurnCharacter.character) {
-      currentTurnCharacter.character.onTurnStart();
+      await currentTurnCharacter.character.onTurnStart();
    }
-});
+}

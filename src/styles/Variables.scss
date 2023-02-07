@@ -126,14 +126,22 @@
   --font-size-extra-large: 1.5rem;
 
   // Mod values
-  --lesser-color: #8B0000;
+  --lesser-color: #8b0000;
   --lesser-background: #ffd1d1;
   --greater-color: #023020;
   --greater-background: #c5ffeb;
 
-
+  // Meter values
   --meter-shadow-1: rgba(255, 255, 255, 0.3);
   --meter-shadow-2: rgba(0, 0, 0, 0.4);
-
   --meter-background: whitesmoke;
+
+  // Effect colors
+  --gradientDegree: 135deg;
+  --purple: #9580ff;
+  --cyan: #80ffea;
+  --pink: #ff80bf;
+  --green: #8aff80;
+  --yellow: #ffff80;
+  --red: #ff9580;
 }

@@ -1,376 +1,399 @@
 @mixin background-normal {
-  background: url(../ui/parchment.jpg) repeat;
-  background-image: url(../ui/parchment.jpg);
-  background-position-x: initial;
-  background-position-y: initial;
-  background-size: initial;
-  background-repeat: repeat;
-  background-attachment: initial;
-  background-origin: initial;
-  background-clip: initial;
-  background: initial;
+   background: url(../ui/parchment.jpg) repeat;
+   background-image: url(../ui/parchment.jpg);
+   background-position-x: initial;
+   background-position-y: initial;
+   background-size: initial;
+   background-repeat: repeat;
+   background-attachment: initial;
+   background-origin: initial;
+   background-clip: initial;
+   background: initial;
 }
 
 @mixin input {
-  box-sizing: border-box;
-  border-style: var(--input-border-style);
-  border-radius: var(--input-border-radius);
-  border-width: var(--input-border-width);
-  border-color: var(--input-color);
-  background: var(--input-background);
-  font-size: var(--font-size);
-  font-family: var(--font-family);
-  font-weight: var(--font-weight);
-  text-align: var(--text-alignment);
-  height: var(--input-height);
-  width: var(--input-width);
-  padding: var(--input-padding);
-  color: var(--input-color);
+   box-sizing: border-box;
+   border-style: var(--input-border-style);
+   border-radius: var(--input-border-radius);
+   border-width: var(--input-border-width);
+   border-color: var(--input-color);
+   background: var(--input-background);
+   font-size: var(--font-size);
+   font-family: var(--font-family);
+   font-weight: var(--font-weight);
+   text-align: var(--text-alignment);
+   height: var(--input-height);
+   width: var(--input-width);
+   padding: var(--input-padding);
+   color: var(--input-color);
 }
 
 @mixin input-disabled {
-  border-style: var(--input-border-style);
-  border-width: var(--input-border-width);
-  border-color: var(--input-border-color);
-  color: var(--font-color);
-  background: var(--static-value-background);
-  opacity: var(--disabled-opacity);
+   border-style: var(--input-border-style);
+   border-width: var(--input-border-width);
+   border-color: var(--input-border-color);
+   color: var(--font-color);
+   background: var(--static-value-background);
+   opacity: var(--disabled-opacity);
 }
 
 @mixin border {
-  border-style: var(--border-style);
-  border-radius: var(--border-radius);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-style: var(--border-style);
+   border-radius: var(--border-radius);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-top {
-  border-top: var(--border-style);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-top: var(--border-style);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-top-bottom {
-  border-top: var(--border-style);
-  border-bottom: var(--border-style);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-top: var(--border-style);
+   border-bottom: var(--border-style);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-bottom {
-  border-bottom: var(--border-style);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-bottom: var(--border-style);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-bottom-sides {
-  border-right: var(--border-style);
-  border-left: var(--border-style);
-  border-bottom: var(--border-style);
-  border-bottom-right-radius: var(--border-radius);
-  border-bottom-left-radius: var(--border-radius);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-right: var(--border-style);
+   border-left: var(--border-style);
+   border-bottom: var(--border-style);
+   border-bottom-right-radius: var(--border-radius);
+   border-bottom-left-radius: var(--border-radius);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-left {
-  border-left: var(--border-style);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-left: var(--border-style);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-right {
-  border-right: var(--border-style);
-  border-width: var(--border-width);
-  border-color: var(--border-color);
+   border-right: var(--border-style);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
 }
 
 @mixin border-color-button {
-  border-color: var(--button-border-color);
+   border-color: var(--button-border-color);
 }
 
 @mixin button {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border-style: var(--button-border-style);
-  border-radius: var(--button-border-radius);
-  border-width: var(--button-border-width);
-  border-color: var(--button-border-color);
-  background: var(--button-background);
-  font-size: var(--button-font-size);
-  font-weight: var(--button-font-weight);
-  padding: var(--button-padding);
-  color: var(--button-color);
-  line-height: var(--button-line-height);
-  margin: 0;
+   box-sizing: border-box;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   border-style: var(--button-border-style);
+   border-radius: var(--button-border-radius);
+   border-width: var(--button-border-width);
+   border-color: var(--button-border-color);
+   background: var(--button-background);
+   font-size: var(--button-font-size);
+   font-weight: var(--button-font-weight);
+   padding: var(--button-padding);
+   color: var(--button-color);
+   line-height: var(--button-line-height);
+   margin: 0;
 
-  &:disabled {
-    cursor: default;
-    background: var(--button-background-disabled);
-  }
+   &:disabled {
+      cursor: default;
+      background: var(--button-background-disabled);
+   }
 
-  &:hover {
-    &:not(:disabled) {
-      background: radial-gradient(var(--button-background-highlight), var(--button-background));
-    }
-  }
+   &:hover {
+      &:not(:disabled) {
+         background: radial-gradient(var(--button-background-highlight), var(--button-background));
+      }
+   }
 }
 
 @mixin button-top {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border-right: var(--button-border-style);
-  border-left: var(--button-border-style);
-  border-bottom: var(--button-border-style);
-  border-bottom-right-radius: var(--button-border-radius);
-  border-bottom-left-radius: var(--button-border-radius);
-  border-width: var(--button-border-width);
-  border-color: var(--button-border-color);
-  background: var(--button-background);
-  font-size: var(--button-font-size);
-  font-weight: var(--button-font-weight);
-  padding: var(--button-padding);
-  color: var(--button-color);
-  line-height: var(--button-line-height);
-  margin: 0;
+   box-sizing: border-box;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   border-right: var(--button-border-style);
+   border-left: var(--button-border-style);
+   border-bottom: var(--button-border-style);
+   border-bottom-right-radius: var(--button-border-radius);
+   border-bottom-left-radius: var(--button-border-radius);
+   border-width: var(--button-border-width);
+   border-color: var(--button-border-color);
+   background: var(--button-background);
+   font-size: var(--button-font-size);
+   font-weight: var(--button-font-weight);
+   padding: var(--button-padding);
+   color: var(--button-color);
+   line-height: var(--button-line-height);
+   margin: 0;
 
-  &:disabled {
-    cursor: default;
-    background: var(--button-background-disabled);
-    color: var(--button-color-disabled);
-  }
-
-  &:hover {
-    &:not(:disabled) {
-      background: radial-gradient(var(--button-background-highlight), var(--button-background));
+   &:disabled {
+      cursor: default;
+      background: var(--button-background-disabled);
       color: var(--button-color-disabled);
-    }
-  }
+   }
+
+   &:hover {
+      &:not(:disabled) {
+         background: radial-gradient(var(--button-background-highlight), var(--button-background));
+         color: var(--button-color-disabled);
+      }
+   }
 }
 
 @mixin icon-button {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border-style: var(--icon-button-border-style);
-  border-radius: var(--icon-button-border-radius);
-  border-width: var(--icon-button-border-width);
-  border-color: var(--border-color-icon-button);
-  font-size: var(--icon-button-font-size);
-  background: var(--icon-button-background);
-  padding: var(--icon-button-padding);
-  line-height: var(--icon-button-line-height);
-  width: var(--icon-button-radius);
-  height: var(--icon-button-radius);
-  color: var(--icon-button-color);
+   box-sizing: border-box;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   border-style: var(--icon-button-border-style);
+   border-radius: var(--icon-button-border-radius);
+   border-width: var(--icon-button-border-width);
+   border-color: var(--border-color-icon-button);
+   font-size: var(--icon-button-font-size);
+   background: var(--icon-button-background);
+   padding: var(--icon-button-padding);
+   line-height: var(--icon-button-line-height);
+   width: var(--icon-button-radius);
+   height: var(--icon-button-radius);
+   color: var(--icon-button-color);
 }
 
 @mixin flex-row {
-  display: flex;
-  flex-direction: row;
+   display: flex;
+   flex-direction: row;
 }
 
 @mixin flex-column {
-  display: flex;
-  flex-direction: column;
+   display: flex;
+   flex-direction: column;
 }
 
 @mixin flex-group-center {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
 }
 
 @mixin flex-group-left {
-  align-items: center;
-  justify-content: flex-start;
-  text-align: left;
+   align-items: center;
+   justify-content: flex-start;
+   text-align: left;
 }
 
 @mixin flex-group-right {
-  align-items: center;
-  justify-content: flex-end;
-  text-align: right;
+   align-items: center;
+   justify-content: flex-end;
+   text-align: right;
 }
 
 @mixin flex-group-top {
-  align-items: center;
-  justify-content: flex-start;
-  text-align: center;
+   align-items: center;
+   justify-content: flex-start;
+   text-align: center;
 }
 
 @mixin flex-group-top-right {
-  align-items: flex-end;
-  justify-content: flex-start;
-  text-align: right;
+   align-items: flex-end;
+   justify-content: flex-start;
+   text-align: right;
 }
 
 @mixin flex-group-top-left {
-  align-items: flex-start;
-  justify-content: flex-start;
-  text-align: left;
+   align-items: flex-start;
+   justify-content: flex-start;
+   text-align: left;
 }
 
 @mixin flex-space-between {
-  align-items: center;
-  justify-content: space-between;
-  text-align: center;
+   align-items: center;
+   justify-content: space-between;
+   text-align: center;
 }
 
 @mixin flex-space-evenly {
-  align-items: center;
-  justify-content: space-evenly;
-  text-align: center;
+   align-items: center;
+   justify-content: space-evenly;
+   text-align: center;
 }
 
 @mixin grid($column-count) {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  grid-column: span $column-count / span $column-count;
-  grid-template-columns: repeat($column-count, minmax(0, 1fr));
+   display: grid;
+   margin: 0;
+   padding: 0;
+   grid-column: span $column-count / span $column-count;
+   grid-template-columns: repeat($column-count, minmax(0, 1fr));
 }
 
 @mixin grid-rows($row-count) {
-  display: grid;
-  grid-template-rows: repeat($row-count, 1fr);
-  grid-auto-flow: column;
+   display: grid;
+   grid-template-rows: repeat($row-count, 1fr);
+   grid-auto-flow: column;
 }
 
 @mixin grid-start($column-count) {
-  grid-column-start: $column-count
+   grid-column-start: $column-count;
 }
 
 @mixin grid-span($column-count) {
-  grid-column-end: span $column-count;
+   grid-column-end: span $column-count;
 }
 
 @mixin attribute-colors {
-  &.body {
-    background: var(--body-color);
-  }
+   &.body {
+      background: var(--body-color);
+   }
 
-  &.mind {
-    background: var(--mind-color);
-  }
+   &.mind {
+      background: var(--mind-color);
+   }
 
-  &.soul {
-    background: var(--soul-color);
-  }
+   &.soul {
+      background: var(--soul-color);
+   }
 }
 
 @mixin resistance-colors {
-  &.reflexes {
-    background: var(--reflexes-color);
-  }
+   &.reflexes {
+      background: var(--reflexes-color);
+   }
 
-  &.resilience {
-    background: var(--resilience-color);
-  }
+   &.resilience {
+      background: var(--resilience-color);
+   }
 
-  &.willpower {
-    background: var(--willpower-color);
-  }
+   &.willpower {
+      background: var(--willpower-color);
+   }
 }
 
 @mixin rarity-colors {
-  &.uncommon {
-    background: var(--uncommon-color);
-  }
+   &.uncommon {
+      background: var(--uncommon-color);
+   }
 
-  &.rare {
-    background: var(--rare-color);
-  }
+   &.rare {
+      background: var(--rare-color);
+   }
 
-  &.unique {
-    background: var(--unique-color);
-  }
+   &.unique {
+      background: var(--unique-color);
+   }
 }
 
 @mixin list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+   list-style: none;
+   padding: 0;
+   margin: 0;
 }
 
 @mixin panel-1 {
-  background: var(--panel-1-background);
-  color: var(--panel-1-color);
-  --border-color: var(--panel-1-color);
+   background: var(--panel-1-background);
+   color: var(--panel-1-color);
+   --border-color: var(--panel-1-color);
 }
 
 @mixin panel-2 {
-  background: var(--panel-2-background);
-  color: var(--panel-2-color);
-  --border-color: var(--panel-2-color);
+   background: var(--panel-2-background);
+   color: var(--panel-2-color);
+   --border-color: var(--panel-2-color);
 }
 
 @mixin panel-3 {
-  background: var(--panel-3-background);
-  color: var(--panel-3-color);
-  --border-color: var(--panel-3-color);
+   background: var(--panel-3-background);
+   color: var(--panel-3-color);
+   --border-color: var(--panel-3-color);
 }
 
 @mixin label {
-  background: var(--label-background);
-  color: var(--label-color);
-  --border-color: var(--label-color);
+   background: var(--label-background);
+   color: var(--label-color);
+   --border-color: var(--label-color);
 }
 
 @mixin editor {
-  --tjs-editor-background: var(--editor-background);
-  --tjs-editor-border: var(--editor-border);
-  --tjs-editor-border-radius: var(--editor-border-radius);
+   --tjs-editor-background: var(--editor-background);
+   --tjs-editor-border: var(--editor-border);
+   --tjs-editor-border-radius: var(--editor-border-radius);
 }
 
 @mixin tag-margin {
-  margin: 0.5rem 0.25rem 0 0.25rem;
+   margin: 0.5rem 0.25rem 0 0.25rem;
 }
 
 @mixin tag-margin-small {
-  margin: 0.25rem 0.125rem 0 0.125rem;
+   margin: 0.25rem 0.125rem 0 0.125rem;
 }
 
 @mixin font-size-normal {
-  font-size: var(--font-size-normal);
+   font-size: var(--font-size-normal);
 }
 
 @mixin font-size-small {
-  font-size: var(--font-size-small);
+   font-size: var(--font-size-small);
 }
 
 @mixin font-size-large {
-  font-size: var(--font-size-large);
+   font-size: var(--font-size-large);
 }
 
 @mixin font-size-extra-large {
-  font-size: var(--font-size-extra-large);
+   font-size: var(--font-size-extra-large);
 }
 
 @mixin static-value {
-  background-color: var(--static-value-background);
+   background-color: var(--static-value-background);
 }
 
 @mixin mod-colors {
+   &.greater {
+      color: var(--greater-color);
+      background: var(--greater-background);
+   }
 
-  &.greater {
-    color: var(--greater-color);
-    background: var(--greater-background);
-  }
+   &.lesser {
+      color: var(--lesser-color);
+      background: var(--lesser-background);
+   }
+}
 
-  &.lesser {
-    color: var(--lesser-color);
-    background: var(--lesser-background);
-  }
+@mixin effect-permanent {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--cyan) 0, var(--green) 100%);
+}
+
+@mixin effect-turn-start {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--purple) 0, var(--cyan) 100%);
+}
+
+@mixin effect-turn-end {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--pink) 0, var(--purple) 100%);
+}
+
+@mixin effect-expired {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--yellow) 0, var(--red) 100%);
 }

@@ -1,4 +1,4 @@
-import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort } from '~/helpers/Utility.js';
+import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort, isHTMLBlank } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
 import { applyMulBase } from '~/rules-element/MulBase.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -1385,7 +1385,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Otherwise, if we are reporting active effects, add it to the conditions
          else if (reportEffects) {
-            conditions.push(effect.label);
+            conditions.push({ label: effect.label, img: effect.img });
          }
       });
 
@@ -1399,14 +1399,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Sort the effects
          const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
-         const expiredEffects = []
-         const activeTurnStartEffects = [];
-         const activeTurnEndEffects = [];
-         for (const effect of effectItems) {
-            // Decrease the efect duration if appropriate
-            if ((autoDecreaseEffectDuration &&
-               effect.system.duration.type === 'turnStart' &&
-               effect.system.duration.remaining > 0)) {
+
+         // Decrease the effect duration if appropriate
+         if (autoDecreaseEffectDuration) {
+            for (const effect of effectItems.filter((effect) => effect.system.duration.type === 'turnStart' && effect.system.duration.remaining > 0)) {
                effect.system.duration.remaining -= 1;
                await effect.update({
                   system: {
@@ -1416,61 +1412,110 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   }
                });
             }
+         }
 
-            // Sort the effect into expired or continuing buckets
-            if (effect.typeComponent.isExpired()) {
-               expiredEffects.push(effect);
-            }
-            else {
-               if (effect.system.duration.type === 'turnStart') {
-                  activeTurnStartEffects.push(effect);
-               }
-               else {
-                  activeTurnEndEffects.push(effect);
-               }
-            }
-         };
-
-         // Update chat context
+         // Add effects to the chat context
          if (reportEffects) {
+            // Pre sort effects
+            const permanentEffects = [];
+            const turnEndEffects = [];
+            const turnStartEffects = [];
+            const expiredEffects = [];
+            for (const effect of effectItems) {
 
-            // Turn start effects
-            if (activeTurnStartEffects.length > 0) {
-               chatContext.turnStartEffects = activeTurnStartEffects.map((effect) => {
-                  return { label: effect.name, img: effect.img, remaining: effect.remaining };
-               });
+               // Initial retval
+               const retVal = {
+                  label: effect.name,
+                  img: effect.img,
+                  itemId: effect._id,
+               };
+
+               // Add the description if it is not blank
+               if (!isHTMLBlank(effect.system.description)) {
+                  retVal.description = effect.system.description;
+               }
+
+               // Sort the effect into the correct bucket
+               switch (effect.system.duration.type) {
+                  case 'permanent': {
+                     permanentEffects.push(retVal);
+                     break;
+                  }
+                  case 'turnEnd': {
+                     const remaining = effect.system.duration.remaining;
+                     if (remaining > 0) {
+                        retVal.remaining = remaining;
+                        turnEndEffects.push(retVal);
+                     }
+                     else {
+                        expiredEffects.push(retVal);
+                     }
+                     break;
+                  }
+                  case 'turnStart': {
+                     const remaining = effect.system.duration.remaining;
+                     if (remaining > 0) {
+                        retVal.remaining = remaining;
+                        turnStartEffects.push(retVal);
+                     }
+                     else {
+                        expiredEffects.push(retVal);
+                     }
+                     break;
+                  }
+                  default: {
+                     break;
+                  }
+               }
             }
 
-            // Turn end effects
-            if (activeTurnEndEffects.length > 0) {
-               chatContext.turnEndEffects = activeTurnEndEffects.map((effect) => {
-                  return { label: effect.name, img: effect.img, remaining: effect.remaining };
-               });
+            // Add the effects to the chat context
+            if (permanentEffects.length > 0) {
+               chatContext.permanentEffects = permanentEffects;
             }
 
-            // Expired effects
+            if (turnEndEffects.length > 0) {
+               chatContext.turnEndEffects = turnEndEffects;
+            }
+
+            if (turnStartEffects.length > 0) {
+               chatContext.turnStartEffects = turnStartEffects;
+            }
+
+
             if (expiredEffects.length > 0) {
-               chatContext.expiredEffects = expiredEffects.map((effect) => {
-                  return { label: effect.name, img: effect.img };
-               });
+               chatContext.expiredEffects = expiredEffects;
             }
          }
 
-         // Effect auto removal
-         if (expiredEffects.length > 0) {
-            switch (autoRemoveExpiredEffects) {
-               case 'showButton': {
-                  chatContext.removeExpiredEffectsConfirmed = false;
-                  break;
+         // Remove effects or show button as appropriate
+         switch (autoRemoveExpiredEffects) {
+            case 'showButton': {
+               // Determine if there are any expired effects
+               // Piggyback of previous work if possible
+               let showButton = chatContext.expiredEffects ? true : false;
+               if (!showButton) {
+                  for (const effect of effectItems) {
+                     if (effect.typeComponent.isExpired()) {
+                        showButton = true;
+                        break;
+                     }
+                  }
                }
-               case 'enabled': {
-                  chatContext.removeExpiredEffectsConfirmed = true;
-                  expiredEffects.forEach((effect) => effect.delete());
-                  break;
+
+               if (showButton) {
+                  chatContext.expiredEffectsRemoved = false;
                }
-               default: {
-                  break;
-               }
+
+               break;
+            }
+            case 'enabled': {
+               chatContext.expiredEffectsRemoved = true;
+               effectItems.filter((effect) => effect.typeComponent.isExpired()).forEach((effect) => effect.delete());
+               break;
+            }
+            default: {
+               break;
             }
          }
       }
@@ -1593,12 +1638,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Sort the effects
          const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
-         const expiredEffects = []
-         for (const effect of effectItems) {
-            // Decrease the efect duration if appropriate
-            if ((autoDecreaseEffectDuration &&
-               effect.system.duration.type === 'turnEnd' &&
-               effect.system.duration.remaining > 0)) {
+
+         // Decrease the effect duration if appropriate
+         if (autoDecreaseEffectDuration) {
+            for (const effect of effectItems.filter((effect) => effect.system.duration.type === 'turnEnd' && effect.system.duration.remaining > 0)) {
                effect.system.duration.remaining -= 1;
                await effect.update({
                   system: {
@@ -1608,36 +1651,59 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   }
                });
             }
+         }
 
-            // Sort the effect into expired or continuing buckets
-            if (effect.typeComponent.isExpired()) {
-               expiredEffects.push(effect);
+         // Add expired effects to the chat context
+         if (reportEffects) {
+            const expiredEffects = effectItems.filter((effect) => effect.typeComponent.isExpired()).map((effect) => {
+               const retVal = {
+                  label: effect.name,
+                  img: effect.img,
+                  id: effect._id,
+                  type: effect.system.duration.type,
+                  remaining: 0,
+               };
+
+               if (!isHTMLBlank(effect.system.description)) {
+                  retVal.description = effect.system.description;
+               }
+
+               return retVal;
+            });
+
+            if (expiredEffects.length > 0) {
+               chatContext.expiredEffects = expiredEffects;
             }
          }
 
-         // If any effects are expired
-         if (expiredEffects.length > 0) {
-            // Add the effects to the chat context
-            if (reportEffects) {
-               chatContext.expiredEffects = expiredEffects.map((effect) => {
-                  return { label: effect.name, img: effect.img };
-               });
-            }
+         // Remove effects or show button as appropriate
+         switch (autoRemoveExpiredEffects) {
+            case 'showButton': {
+               // Determine if there are any expired effects
+               // Piggyback of previous work if possible
+               let showButton = chatContext.expiredEffects ? true : false;
+               if (!showButton) {
+                  for (const effect of effectItems) {
+                     if (effect.typeComponent.isExpired()) {
+                        showButton = true;
+                        break;
+                     }
+                  }
+               }
 
-            // Effect auto removal
-            switch (autoRemoveExpiredEffects) {
-               case 'showButton': {
-                  chatContext.removeExpiredEffectsConfirmed = false;
-                  break;
+               if (showButton) {
+                  chatContext.expiredEffectsRemoved = false;
                }
-               case 'enabled': {
-                  chatContext.removeExpiredEffectsConfirmed = true;
-                  expiredEffects.forEach((effect) => effect.delete());
-                  break;
-               }
-               default: {
-                  break;
-               }
+
+               break;
+            }
+            case 'enabled': {
+               chatContext.expiredEffectsRemoved = true;
+               effectItems.filter((effect) => effect.typeComponent.isExpired()).forEach((effect) => effect.delete());
+               break;
+            }
+            default: {
+               break;
             }
          }
       }

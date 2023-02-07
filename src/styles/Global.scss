@@ -193,3 +193,7 @@
    color: var(--panel-1-color);
    font-style: italic;
 }
+
+.dark-svg {
+   filter: brightness(0);
+}

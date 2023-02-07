@@ -1,9 +1,13 @@
 <script>
    import { getContext } from 'svelte';
    import { getSetting } from '~/helpers/utility';
-   import ChatReportConfirmRegainingResolveButton from './ChatReportConfirmRegainingResolveButton.svelte';
-   import ChatReportRemoveExpiredEffectsButton from './ChatReportRemoveExpiredEffectsButton.svelte';
-   import ChatResolveRegained from './ChatResolveRegained.svelte';
+   import ChatReportConfirmRegainingResolveButton from '~/chat-message/ChatReportConfirmRegainingResolveButton.svelte';
+   import ChatReportRemoveExpiredEffectsButton from '~/chat-message/ChatReportRemoveExpiredEffectsButton.svelte';
+   import ChatResolveRegained from '~/chat-message/ChatResolveRegained.svelte';
+   import ChatEffectTagTurnStart from '~/chat-message/ChatEffectTagTurnStart.svelte';
+   import ChatEffectTagPermanent from '~/chat-message/ChatEffectTagPermanent.svelte';
+   import ChatEffectTagTurnEnd from '~/chat-message/ChatEffectTagTurnEnd.svelte';
+   import ChatEffectTagExpired from '~/chat-message/ChatEffectTagExpired.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -60,8 +64,67 @@
       </div>
    {/if}
 
+   <!--Effects-->
+   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects}
+      <div class="effects">
+         <!--Permanent Effects-->
+         {#if chatContext.permanentEffects}
+            {#each chatContext.permanentEffects as effect}
+               <div class="effect">
+                  <ChatEffectTagPermanent
+                     label={effect.label}
+                     img={effect.img}
+                     description={effect.description}
+                  />
+               </div>
+            {/each}
+         {/if}
+
+         <!--Turn Start Effects-->
+         {#if chatContext.turnStartEffects}
+            {#each chatContext.turnStartEffects as effect}
+               <div class="effect">
+                  <ChatEffectTagTurnStart
+                     label={effect.label}
+                     remaining={effect.remaining}
+                     img={effect.img}
+                     description={effect.description}
+                  />
+               </div>
+            {/each}
+         {/if}
+
+         <!--Turn End Effects-->
+         {#if chatContext.turnEndEffects}
+            {#each chatContext.turnEndEffects as effect}
+               <div class="effect">
+                  <ChatEffectTagTurnEnd
+                     label={effect.label}
+                     remaining={effect.remaining}
+                     img={effect.img}
+                     description={effect.description}
+                  />
+               </div>
+            {/each}
+         {/if}
+
+         <!--Expired Effects-->
+         {#if chatContext.expiredEffects}
+            {#each chatContext.expiredEffects as effect}
+               <div class="effect">
+                  <ChatEffectTagExpired
+                     label={effect.label}
+                     img={effect.img}
+                     description={effect.description}
+                  />
+               </div>
+            {/each}
+         {/if}
+      </div>
+   {/if}
+
    <!--Remove Expired Effects Button-->
-   {#if $document.flags.titan.chatContext.removeExpiredEffectsConfirmed === false && getSetting('autoRemoveExpiredEffects') === 'showButton'}
+   {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false && getSetting('autoRemoveExpiredEffects') === 'showButton'}
       <div class="button">
          <ChatReportRemoveExpiredEffectsButton />
       </div>
@@ -134,6 +197,16 @@
             .fas {
                margin-right: 0.25rem;
             }
+         }
+      }
+
+      .effects {
+         @include flex-row;
+         @include flex-group-center;
+         flex-wrap: wrap;
+
+         .effect {
+            @include tag-margin;
          }
       }
 

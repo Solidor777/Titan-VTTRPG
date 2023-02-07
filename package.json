@@ -8,6 +8,7 @@
   "dependencies": {
     "@typhonjs-fvtt/runtime": "^0.0.21",
     "@typhonjs-fvtt/svelte-standard": "^0.0.17",
+    "dracula-ui": "^1.0.6",
     "svelte": "^3.52.0",
     "tippy.js": "^6.3.7",
     "uuid": "^9.0.0"

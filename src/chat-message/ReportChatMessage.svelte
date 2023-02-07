@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import ChatReportRemoveExpiredEffectsButton from './ChatReportRemoveExpiredEffectsButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
