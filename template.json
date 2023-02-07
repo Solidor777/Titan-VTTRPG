@@ -422,7 +422,7 @@
                   }
                }
             },
-            "statusEffect": {
+            "condition": {
                "blinded": false,
                "contaminated": false,
                "deafened": false,
@@ -430,8 +430,8 @@
                "incapacitated": false,
                "prone": false,
                "restrained": false,
-               "stunned": false,
                "sleeping": false,
+               "stunned": false,
                "unconscious": false
             },
             "description": ""

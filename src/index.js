@@ -8,7 +8,7 @@ import { getSetting, isFirstOwner, localize } from '~/helpers/Utility';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerTooltipSettings from '~/system/TooltipManager';
 import registerInitiativeFormula from '~/system/Initiative';
-import TitanStatusEffects from '~/helpers/StatusEffects.js';
+import TitanConditions from '~/helpers/Conditions.js';
 import TitanChatMessageTypes from '~/system/ChatMessageTypes.js';
 import ChatMessageShell from '~/chat-message/ChatMessageShell.svelte';
 import TitanActor from '~/actor/Actor.js';
@@ -84,13 +84,13 @@ Hooks.once('init', async () => {
 });
 
 Hooks.once('setup', async () => {
-   // Set up status effects
-   const statusEffects = TitanStatusEffects.sort((a, b) => {
+   // Set up Conditions
+   const conditions = TitanConditions.sort((a, b) => {
       const textA = game.i18n.localize(a.label);
       const textB = game.i18n.localize(b.label);
       return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
    });
-   statusEffects.forEach((effect) => {
+   conditions.forEach((effect) => {
       const description = localize(`${effect.id}.desc`);
       effect.flags = {
          titan: {
@@ -100,7 +100,7 @@ Hooks.once('setup', async () => {
       }
    });
 
-   CONFIG.statusEffects = statusEffects;
+   CONFIG.statusEffects = conditions;
 
 
    return

@@ -5,7 +5,7 @@
    import ChatEffectTagPermanent from '~/chat-message/ChatEffectTagPermanent.svelte';
    import ChatEffectTagTurnEnd from '~/chat-message/ChatEffectTagTurnEnd.svelte';
    import ChatEffectTagExpired from '~/chat-message/ChatEffectTagExpired.svelte';
-   import ChatConditionTag from './ChatConditionTag.svelte';
+   import ChatConditionTag from '~/chat-message/ChatConditionTag.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');

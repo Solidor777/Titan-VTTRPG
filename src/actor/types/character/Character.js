@@ -82,7 +82,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._calculateBaseResources();
       this._resetDynamicMods();
       this._applyRulesElements();
-      this._applyStatusEffects();
+      this._applyConditions();
       this._applyEquipmentSlots();
       this._applyMods();
       this._clampResources();
@@ -206,9 +206,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          resetMods(mod.mod);
       }
 
-      // Status effects
-      for (let [key, status] of Object.entries(systemData.statusEffect)) {
-         status = false;
+      // Conditions
+      for (let [key, condition] of Object.entries(systemData.condition)) {
+         condition = false;
       }
 
       return;
@@ -271,7 +271,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   _applyStatusEffects() {
+   _applyConditions() {
       // Get the combat effects
       const temporaryEffects = this.parent.temporaryEffects;
 
@@ -279,8 +279,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       temporaryEffects.forEach((effect) => {
          switch (effect.flags.core.statusId) {
             // Blinded
-            case 'blind': {
-               this.parent.system.statusEffect.blinded = true;
+            case 'blinded': {
+               this.parent.system.condition.blinded = true;
 
                // Decrease Melee, Accuracy, and Defense by 1
                systemData.rating.melee.effect -= 1;
@@ -290,32 +290,71 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                break;
             }
 
-            // Defeaned
-            case 'deaf': {
+            // Contaminated
+            case 'contaminated': {
                // Apply the effect
-               this.parent.system.statusEffect.deafened = true;
+               const systemData = this.parent.system;
+               systemData.condition.contaminated = true;
+
+               // Decrease all Skills and Resistances by 1
+               for (const [key, skill] of Object.entries(systemData.skill)) {
+                  skill.training.mod.effect -= 1;
+               }
+               for (const [key, resistance] of Object.entries(systemData.resistance)) {
+                  resistance.mod.effect -= 1;
+               }
+               break;
+            }
+
+            // Defeaned
+            case 'deafened': {
+               // Apply the effect
+               this.parent.system.condition.deafened = true;
                break;
             }
 
             // Frightened
             case 'frightened': {
                // Apply the effect
-               this.parent.system.statusEffect.frightened = true;
+               this.parent.system.condition.frightened = true;
                break;
             }
 
             // Paralysis
-            case 'paralysis': {
+            case 'incapacitated': {
                // Apply the effect
-               this.parent.system.statusEffect.incapacitated = true;
+               this.parent.system.condition.incapacitated = true;
+               break;
+            }
+
+            // Prone
+            case 'prone': {
+               // Apply the effect
+               const systemData = this.parent.system;
+               systemData.condition.prone = true;
+
+               // Decrease Speed by half
+               for (const [speedKey, speed] of Object.entries(systemData.speed)) {
+                  // Calculate the total speed
+                  let speedValue = speed.baseValue;
+                  for (const [modKey, mod] of Object.entries(speed.mod)) {
+                     speedValue += mod;
+                  }
+
+                  // Set the effect mod so that the total speed is 1/2 of normal
+                  if (speedValue > 0) {
+                     speed.mod.effect -= (Math.ceil(speedValue / 2));
+                  }
+               }
+
                break;
             }
 
             // Restrained
-            case 'restrain': {
+            case 'restrained': {
                // Apply the effect
                const systemData = this.parent.system;
-               systemData.statusEffect.restrained = true;
+               systemData.condition.restrained = true;
 
                // Decrease Melee, Accuracy, and Defense by 1
                systemData.rating.melee.effect -= 1;
@@ -339,34 +378,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                break;
             }
 
-            // Prone
-            case 'prone': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.statusEffect.prone = true;
-
-               // Decrease Speed by half
-               for (const [speedKey, speed] of Object.entries(systemData.speed)) {
-                  // Calculate the total speed
-                  let speedValue = speed.baseValue;
-                  for (const [modKey, mod] of Object.entries(speed.mod)) {
-                     speedValue += mod;
-                  }
-
-                  // Set the effect mod so that the total speed is 1/2 of normal
-                  if (speedValue > 0) {
-                     speed.mod.effect -= (Math.ceil(speedValue / 2));
-                  }
-               }
-
-               break;
-            }
-
             // Sleep
             case 'sleep': {
                // Apply the effect
                const systemData = this.parent.system;
-               systemData.statusEffect.sleeping = true;
+               systemData.condition.sleeping = true;
 
                // Calculate the total awareness
                const awareness = this.parent.system.rating.awareness;
@@ -384,10 +400,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
 
             // Sleep
-            case 'stun': {
+            case 'stunned': {
                // Apply the effect
                const systemData = this.parent.system;
-               systemData.statusEffect.stunned = true;
+               systemData.condition.stunned = true;
 
                // Decrease Defense by 1
                systemData.rating.defense.mod.effect -= 1;
@@ -395,25 +411,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                break;
             }
 
-            // Poisoned
-            case 'poison': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.statusEffect.contaminated = true;
-
-               // Decrease all Skills and Resistances by 1
-               for (const [key, skill] of Object.entries(systemData.skill)) {
-                  skill.training.mod.effect -= 1;
-               }
-               for (const [key, resistance] of Object.entries(systemData.resistance)) {
-                  resistance.mod.effect -= 1;
-               }
-               break;
-            }
-
             // Unconscious
             case 'unconscious': {
-               this.parent.system.statusEffect.unconscious = true;
+               this.parent.system.condition.unconscious = true;
                break;
             }
 
