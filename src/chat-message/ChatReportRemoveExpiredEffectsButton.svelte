@@ -40,6 +40,7 @@
                titan: {
                   chatContext: {
                      expiredEffectsRemoved: true,
+                     expiredEffects: false,
                   },
                },
             },

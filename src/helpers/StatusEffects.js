@@ -1,22 +1,22 @@
 export default [
    {
       id: 'dead',
-      label: 'EFFECT.StatusDead',
+      label: 'LOCAL.dead.label',
       icon: 'icons/svg/skull.svg'
    },
    {
       id: 'unconscious',
-      label: 'EFFECT.StatusUnconscious',
+      label: 'LOCAL.unconscious.label',
       icon: 'icons/svg/unconscious.svg'
    },
    {
-      id: 'sleep',
-      label: 'EFFECT.StatusSleeping',
+      id: 'sleeping',
+      label: 'LOCAL.sleeping.label',
       icon: 'icons/svg/sleep.svg'
    },
    {
-      id: 'stun',
-      label: 'EFFECT.StatusStunned',
+      id: 'stunned',
+      label: 'LOCAL.stunned.label',
       icon: 'icons/svg/daze.svg'
    },
    {
@@ -45,8 +45,8 @@ export default [
       icon: 'icons/svg/deaf.svg'
    },
    {
-      id: 'fear',
-      label: 'EFFECT.StatusFear',
+      id: 'frightened',
+      label: 'LOCAL.frightened.label',
       icon: 'icons/svg/terror.svg'
    },
    {

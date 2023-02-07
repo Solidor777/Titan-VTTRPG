@@ -1,17 +1,16 @@
 <script>
+   import { slide } from 'svelte/transition';
    import { getContext } from 'svelte';
    import { getSetting } from '~/helpers/utility';
    import ChatReportConfirmRegainingResolveButton from '~/chat-message/ChatReportConfirmRegainingResolveButton.svelte';
    import ChatReportRemoveExpiredEffectsButton from '~/chat-message/ChatReportRemoveExpiredEffectsButton.svelte';
    import ChatResolveRegained from '~/chat-message/ChatResolveRegained.svelte';
-   import ChatEffectTagTurnStart from '~/chat-message/ChatEffectTagTurnStart.svelte';
-   import ChatEffectTagPermanent from '~/chat-message/ChatEffectTagPermanent.svelte';
-   import ChatEffectTagTurnEnd from '~/chat-message/ChatEffectTagTurnEnd.svelte';
-   import ChatEffectTagExpired from '~/chat-message/ChatEffectTagExpired.svelte';
+   import ChatEffects from '~/chat-message/ChatEffects.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
    const chatContext = $document.flags.titan.chatContext;
+   console.log(chatContext);
 </script>
 
 <div class="report">
@@ -59,73 +58,19 @@
 
    <!--Regain Resolve Button-->
    {#if chatContext.resolveRegained && !$document.flags.titan.chatContext.resolveRegainConfirmed && getSetting('autoRegainResolve') === 'showButton'}
-      <div class="button">
+      <div class="button" out:slide|local>
          <ChatReportConfirmRegainingResolveButton />
       </div>
    {/if}
 
    <!--Effects-->
    {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects}
-      <div class="effects">
-         <!--Permanent Effects-->
-         {#if chatContext.permanentEffects}
-            {#each chatContext.permanentEffects as effect}
-               <div class="effect">
-                  <ChatEffectTagPermanent
-                     label={effect.label}
-                     img={effect.img}
-                     description={effect.description}
-                  />
-               </div>
-            {/each}
-         {/if}
-
-         <!--Turn Start Effects-->
-         {#if chatContext.turnStartEffects}
-            {#each chatContext.turnStartEffects as effect}
-               <div class="effect">
-                  <ChatEffectTagTurnStart
-                     label={effect.label}
-                     remaining={effect.remaining}
-                     img={effect.img}
-                     description={effect.description}
-                  />
-               </div>
-            {/each}
-         {/if}
-
-         <!--Turn End Effects-->
-         {#if chatContext.turnEndEffects}
-            {#each chatContext.turnEndEffects as effect}
-               <div class="effect">
-                  <ChatEffectTagTurnEnd
-                     label={effect.label}
-                     remaining={effect.remaining}
-                     img={effect.img}
-                     description={effect.description}
-                  />
-               </div>
-            {/each}
-         {/if}
-
-         <!--Expired Effects-->
-         {#if chatContext.expiredEffects}
-            {#each chatContext.expiredEffects as effect}
-               <div class="effect">
-                  <ChatEffectTagExpired
-                     label={effect.label}
-                     img={effect.img}
-                     description={effect.description}
-                  />
-               </div>
-            {/each}
-         {/if}
-      </div>
+      <ChatEffects />
    {/if}
 
    <!--Remove Expired Effects Button-->
    {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false && getSetting('autoRemoveExpiredEffects') === 'showButton'}
-      <div class="button">
+      <div class="button" out:slide|local>
          <ChatReportRemoveExpiredEffectsButton />
       </div>
    {/if}
@@ -197,16 +142,6 @@
             .fas {
                margin-right: 0.25rem;
             }
-         }
-      }
-
-      .effects {
-         @include flex-row;
-         @include flex-group-center;
-         flex-wrap: wrap;
-
-         .effect {
-            @include tag-margin;
          }
       }
 

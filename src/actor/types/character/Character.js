@@ -297,8 +297,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                break;
             }
 
-            // Fear
-            case 'fear': {
+            // Frightened
+            case 'frightened': {
                // Apply the effect
                this.parent.system.statusEffect.frightened = true;
                break;
@@ -1385,7 +1385,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Otherwise, if we are reporting active effects, add it to the conditions
          else if (reportEffects) {
-            conditions.push({ label: effect.label, img: effect.img });
+            const retVal = { label: effect.label, img: effect.icon };
+            const description = effect.flags?.titan?.description;
+            if (description) {
+               retVal.description = description;
+            }
+            conditions.push(retVal);
          }
       });
 
