@@ -5,10 +5,10 @@
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
-   import ItemSheetFlatModifierSettings from './ItemSheetFlatModifierSettings.svelte';
-   import ItemSheetMulBaseSettings from './ItemSheetMulBaseSettings.svelte';
-   import ItemSheetTurnStartMessageSettings from './ItemSheetTurnStartMessageSettings.svelte';
-   import ItemSheetTurnStartStaminaSettings from './ItemSheetTurnStartStaminaSettings.svelte';
+   import ItemSheetFlatModifierSettings from '~/item/component/rules-element/ItemSheetFlatModifierSettings.svelte';
+   import ItemSheetMulBaseSettings from '~/item/component/rules-element/ItemSheetMulBaseSettings.svelte';
+   import ItemSheetTurnStartMessageSettings from '~/item/component/rules-element/ItemSheetTurnStartMessageSettings.svelte';
+   import ItemSheetTurnResourceModSettings from '~/item/component/rules-element/ItemSheetTurnResourceModSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -28,8 +28,8 @@
          value: 'turnStartMessage',
       },
       {
-         label: localize('turnStartStamina'),
-         value: 'turnStartStamina',
+         label: localize('turnResourceMod'),
+         value: 'turnResourceMod',
       },
    ];
 
@@ -38,7 +38,7 @@
          flatModifier: ItemSheetFlatModifierSettings,
          mulBase: ItemSheetMulBaseSettings,
          turnStartMessage: ItemSheetTurnStartMessageSettings,
-         turnStartStamina: ItemSheetTurnStartStaminaSettings,
+         turnResourceMod: ItemSheetTurnResourceModSettings,
       };
 
       return elementComponents[operation];

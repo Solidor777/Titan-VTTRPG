@@ -18,7 +18,7 @@
    // Setup tabs
 </script>
 
-{#if element && element.operation === 'turnStartStamina'}
+{#if element && element.operation === 'turnResourceMod'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">

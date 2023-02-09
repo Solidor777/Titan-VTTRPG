@@ -10,124 +10,58 @@ export function getMulBaseTemplate(uuid) {
    };
 }
 
-export function applyMulBase(mulBase) {
-   // Ensure the modifier is valid
-   if (mulBase === undefined) {
-      console.error(`TITAN | Error applying Mul Base. Undefined Element.`);
-      console.trace();
+export function applyMulBaseElements(mulBaseElements) {
+   if (mulBaseElements.length > 0) {
+      // Get actor system data
+      const systemData = this.parent.system;
 
-      return false;
-   }
-   if (mulBase.selector === undefined) {
-      console.error(`TITAN | Error applying Mul Base. Undefined Selector.`);
-      console.trace();
+      // Sort by selector
+      const selectors = {};
+      for (const element of mulBaseElements) {
+         if (!selectors[element.selector]) {
+            selectors[element.selector] = [];
+         }
+         selectors[element.selector].push(element);
+      };
 
-      return false;
-   }
+      // For each selector
+      for (const [selector, selectorElements] of Object.entries(selectors)) {
+         // Sort by key
+         const keys = {};
+         for (const element of selectorElements) {
+            if (!keys[element.key]) {
+               keys[element.key] = [];
+            }
+            keys[element.key].push(element);
+         }
 
-   if (mulBase.key === undefined) {
-      console.error(`TITAN | Error applying Mul Base. Undefined Key.`);
-      console.trace();
+         // For each key
+         for (const [key, keyElements] of Object.entries(keys)) {
+            // Get the stat data
+            const stat = (selector === 'training' || selector === 'expertise') ? systemData.skill[key][selector] : systemData[selector][key];
+            const mod = stat.mod;
+            const baseValue = selector === 'resource' ? stat.maxBase : stat.baseValue;
 
-      return false;
-   }
+            // Sort by type
+            const types = {};
+            for (const element of keyElements) {
+               if (!types[element.type]) {
+                  types[element.type] = [];
+               }
+               types[element.type].push(element.value);
+            }
 
-   if (mulBase.type === undefined) {
-      console.error(`TITAN | Error applying Mul Base. Undefined Type.`);
-      console.trace();
+            // For each type
+            for (const [type, typeElementValues] of Object.entries(types)) {
+               // Apply each mod
+               for (const elementValue of typeElementValues) {
+                  mod[type] += baseValue * (elementValue - 1);
+               }
+            }
 
-      return false;
-   }
-
-   if (mulBase.value === undefined) {
-      console.error(`TITAN | Error applying Mul Base. Undefined Value.`);
-      console.trace();
-
-      return false;
-   }
-
-   // Find the value object
-   let mods = {};
-   let baseValue = 0;
-   const systemData = this.parent.system;
-   switch (mulBase.selector) {
-      case 'attribute': {
-         mods = systemData.attribute[mulBase.key].mod;
-         baseValue = systemData.attribute[mulBase.key].baseValue;
-         break;
-      }
-      case 'resistance': {
-         mods = systemData.resistance[mulBase.key].mod;
-         baseValue = systemData.resistance[mulBase.key].baseValue;
-         break;
-      }
-      case 'training': {
-         mods = systemData.skill[mulBase.key].training.mod;
-         baseValue = mods = systemData.skill[mulBase.key].training.value;
-         break;
-      }
-      case 'expertise': {
-         mods = systemData.skill[mulBase.key].expertise.mod;
-         baseValue = systemData.skill[mulBase.key].expertise.baseValue;
-         break;
-      }
-      case 'rating': {
-         mods = systemData.rating[mulBase.key].mod;
-         baseValue = systemData.rating[mulBase.key].baseValue;
-         break;
-      }
-      case 'resource': {
-         mods = systemData.resource[mulBase.key].mod;
-         baseValue = systemData.resource[mulBase.key].maxBase;
-         break;
-      }
-      case 'speed': {
-         mods = systemData.speed[mulBase.key].mod;
-         baseValue = systemData.speed[mulBase.key].baseValue;
-         break;
-      }
-      case 'mod': {
-         mods = systemData.mod[mulBase.key].mod;
-         baseValue = systemData.mod[mulBase.key].baseValue;
-         break;
-      }
-      default: {
-         console.error(`TITAN | Error applying Flat Modifier. Invalid Selector (${mulBase.selector})`);
-         console.trace();
-
-         return false;
+         }
       }
    }
-
-   // Ensure there is a valid object for the mods
-   let type = '';
-   switch (mulBase.type) {
-      case 'ability': {
-         type = 'ability';
-         break;
-      }
-      case 'armor':
-      case 'equipment':
-      case 'shield':
-      case 'weapon': {
-         type = 'equipment';
-         break;
-      }
-      case 'effect': {
-         type = 'effect';
-         break;
-      }
-      default: {
-         console.error(`TITAN | Error applying Flat Modifier. Invalid Type (${mulBase.type})`);
-         console.trace();
-
-         return false;
-      }
-   }
-
-   // Apply the mod
-
-   mods[type] += baseValue * (mulBase.value - 1);
 
    return;
 }

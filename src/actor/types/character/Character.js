@@ -1,6 +1,7 @@
 import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort, isHTMLBlank } from '~/helpers/Utility.js';
 import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
-import { applyMulBase } from '~/rules-element/MulBase.js';
+import { applyMulBaseElements } from '~/rules-element/MulBase.js';
+import { applyTurnResourceMod } from '~/rules-element/TurnResourceMod';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -19,7 +20,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply rules element bindings
    applyFlatModifier = applyFlatModifier.bind(this);
-   applyMulBase = applyMulBase.bind(this);
+   applyMulBaseElements = applyMulBaseElements.bind(this);
+   applyTurnResourceMod = applyTurnResourceMod.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -250,10 +252,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Sort the rules elements and process them in order
 
       // Mul Base
-      const mulBases = rulesElements.filter((element) => element.operation === 'mulBase');
-      mulBases.forEach((mulBase) => {
-         this.applyMulBase(mulBase);
-      });
+      const mulBaseElements = rulesElements.filter((element) => element.operation === 'mulBase');
+      if (mulBaseElements.length > 0) {
+         this.applyMulBaseElements(mulBaseElements);
+      }
 
       // FlatModifier
       const flatMods = rulesElements.filter((element) => element.operation === 'flatModifier');
@@ -265,8 +267,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this.turnStartMessages = rulesElements.filter((element) => element.operation === 'turnStartMessage');
 
       // Start of turn stam mods
-      this.turnStartStamina = 0;
-      rulesElements.filter((element) => element.operation === 'turnStartStamina').forEach((element) => this.turnStartStamina += element.mod);
+      const turnResourceMod = rulesElements.filter((element) => element.operation === 'turnResourceMod');
+      if (turnResourceMod.length > 0) {
+         applyTurnResourceMod(turnResourceMod);
+      }
 
       return;
    }

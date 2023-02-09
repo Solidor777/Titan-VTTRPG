@@ -1,7 +1,7 @@
 import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
 import { getMulBaseTemplate } from '~/rules-element/MulBase.js';
+import { getTurnResourceModTemplate } from '~/rules-element/TurnResourceMod.js';
 import getTurnStartMessageTemplate from '~/rules-element/TurnStartMessage.js';
-import getTurnStartStamina from '~/rules-element/TurnStartStamina.js';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    switch (document.system.rulesElement[elementIdx].operation) {
@@ -17,9 +17,8 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getTurnStartMessageTemplate(document.system.rulesElement[elementIdx].uuid);
          break;
       }
-      case 'turnStartStamina': {
-         document.system.rulesElement[elementIdx] = getTurnStartStamina(document.system.rulesElement[elementIdx].uuid);
-         break;
+      case 'turnResourceMod': {
+         document.system.rulesElement[elementIdx] = getTurnResourceModTemplate(document.system.rulesElement[elementIdx].uuid);
       }
       default: {
          return;

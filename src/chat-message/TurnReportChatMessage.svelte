@@ -10,7 +10,6 @@
    // Document reference
    const document = getContext('DocumentStore');
    const chatContext = $document.flags.titan.chatContext;
-   console.log(chatContext);
 </script>
 
 <div class="report">
