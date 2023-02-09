@@ -27,7 +27,7 @@ export function isFirstOwner(document) {
 }
 
 export function isHTMLBlank(html) {
-   return (!html || html === '' || html === '<p></p>')
+   return (!html || html === '' || html === '<p></p>');
 }
 
 export function getCombatTargets() {
@@ -53,7 +53,7 @@ export function applyDamageToTargets(damage, ignoreArmor, report = true) {
    // Apply healing to each target
    targets.forEach((target) => {
       if (target && target.system.resource?.stamina) {
-         target.typeComponent.applyDamage(damage, ignoreArmor, true);
+         target.typeComponent.applyDamage(damage, ignoreArmor, report);
       }
    });
 }
@@ -91,4 +91,16 @@ export function getSVGClass(source) {
 
 export function getDarkSVGClass(source) {
    return source.indexOf('.svg') === -1 ? '' : 'dark-svg';
+}
+
+export function sortObjectsIntoContainerByKey(objects, key) {
+   const retVal = {};
+   for (const object of objects) {
+      if (!retVal[object[key]]) {
+         retVal[object[key]] = [];
+      }
+      retVal[object[key]].push(object);
+   }
+
+   return retVal;
 }
