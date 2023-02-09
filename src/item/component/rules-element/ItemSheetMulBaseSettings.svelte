@@ -31,10 +31,6 @@
          value: 'expertise',
       },
       {
-         label: localize('mod'),
-         value: 'mod',
-      },
-      {
          label: localize('rating'),
          value: 'rating',
       },

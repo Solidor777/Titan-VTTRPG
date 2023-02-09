@@ -1,5 +1,5 @@
 import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort, isHTMLBlank } from '~/helpers/Utility.js';
-import { applyFlatModifier } from '~/rules-element/FlatModifier.js';
+import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
 import { applyTurnResourceMod } from '~/rules-element/TurnResourceMod';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
@@ -19,7 +19,7 @@ import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/C
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply rules element bindings
-   applyFlatModifier = applyFlatModifier.bind(this);
+   applyFlatModifierElements = applyFlatModifierElements.bind(this);
    applyMulBaseElements = applyMulBaseElements.bind(this);
    applyTurnResourceMod = applyTurnResourceMod.bind(this);
 
@@ -258,10 +258,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // FlatModifier
-      const flatMods = rulesElements.filter((element) => element.operation === 'flatModifier');
-      flatMods.forEach((flatMod) => {
-         this.applyFlatModifier(flatMod);
-      });
+      const flatModifierElements = rulesElements.filter((element) => element.operation === 'flatModifier');
+      if (flatModifierElements.length > 0) {
+         this.applyFlatModifierElements(flatModifierElements);
+      };
 
       // Start of turn messages
       this.turnStartMessages = rulesElements.filter((element) => element.operation === 'turnStartMessage');
