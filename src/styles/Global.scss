@@ -197,3 +197,23 @@
 .dark-svg {
    filter: brightness(0);
 }
+
+.token-link .fa-link {
+   color: darkorange;
+   text-shadow: 0 0 8px darkorange;
+}
+
+.token-link .fa-unlink {
+   color: brown;
+   text-shadow: 0 0 8px brown;
+}
+
+.token-link-highlight {
+   text-shadow: 0 0 4px darkorange;
+   color: darkorange;
+}
+
+.token-link-warning {
+   text-shadow: 0 0 4px brown;
+   color: brown;
+}

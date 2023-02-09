@@ -19,7 +19,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       results.aspect = results.aspect.concat(foundry.utils.deepClone(parameters.customAspect));
 
       // Adjust aspect results
-      results.aspect.forEach((aspect, idx) => {
+      results.aspect.forEach((aspect) => {
          // Damage
          if (aspect.isDamage) {
             results.damage = results.damage ? results.damage + aspect.initialValue : aspect.initialValue;

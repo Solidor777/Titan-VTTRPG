@@ -43,7 +43,6 @@ export function applyFlatModifierElements(elements) {
                }
             }
          }
-
       }
    }
 

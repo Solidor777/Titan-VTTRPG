@@ -1,5 +1,4 @@
 import TitanActorSheet from "~/actor/sheet/ActorSheet";
-import { getCheckOptions } from "~/helpers/Utility";
 import createCharacterSheetState from "./CharacterSheetState";
 import CharacterSheetInventoryAddItemDialog from "~/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog";
 

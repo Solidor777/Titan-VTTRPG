@@ -29,17 +29,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       let spentXp = 0;
 
       // Add cost of current attribute
-      for (const [key, attribute] of Object.entries(systemData.attribute)) {
+      for (const attribute of Object.values(systemData.attribute)) {
          spentXp += this._getAttributeXPCost(attribute.baseValue);
       }
 
       // Add cost of current skill
-      for (const [key, skill] of Object.entries(systemData.skill)) {
+      for (const skill of Object.values(systemData.skill)) {
          spentXp += this._getSkillXPCost(skill.training.baseValue);
          spentXp += this._getSkillXPCost(skill.expertise.baseValue);
       }
 
       // Add cost of spells and abilities
+
       this.parent.items.forEach((item) => {
          if (item.type === "spell" || item.type === "ability") {
             spentXp += item.system.xpCost;
@@ -173,44 +174,44 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Attributes
-      for (const [key, attribute] of Object.entries(systemData.attribute)) {
+      for (const attribute of Object.values(systemData.attribute)) {
          resetMods(attribute.mod);
       }
 
       // Skills
-      for (const [key, skill] of Object.entries(systemData.skill)) {
+      for (const skill of Object.values(systemData.skill)) {
          resetMods(skill.training.mod);
          resetMods(skill.expertise.mod);
       }
 
       // Resource
-      for (const [key, resource] of Object.entries(systemData.resource)) {
+      for (const resource of Object.values(systemData.resource)) {
          resetMods(resource.mod);
       }
 
       // Resistance
-      for (const [key, resistance] of Object.entries(systemData.resistance)) {
+      for (const resistance of Object.values(systemData.resistance)) {
          resetMods(resistance.mod);
       }
 
       // Rating
-      for (const [key, rating] of Object.entries(systemData.rating)) {
+      for (const rating of Object.values(systemData.rating)) {
          resetMods(rating.mod);
       }
 
       // Speed
-      for (const [key, speed] of Object.entries(systemData.speed)) {
+      for (const speed of Object.values(systemData.speed)) {
          resetMods(speed.mod);
       }
 
       // Mod
-      for (const [key, mod] of Object.entries(systemData.mod)) {
+      for (const mod of Object.values(systemData.mod)) {
          resetMods(mod.mod);
       }
 
       // Conditions
-      for (let [key, condition] of Object.entries(systemData.condition)) {
-         condition = false;
+      for (const condition of Object.keys(systemData.condition)) {
+         systemData.condition[condition] = false;
       }
 
       return;
@@ -261,7 +262,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const flatModifierElements = rulesElements.filter((element) => element.operation === 'flatModifier');
       if (flatModifierElements.length > 0) {
          this.applyFlatModifierElements(flatModifierElements);
-      };
+      }
 
       // Start of turn messages
       this.turnStartMessages = rulesElements.filter((element) => element.operation === 'turnStartMessage');
@@ -301,10 +302,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.condition.contaminated = true;
 
                // Decrease all Skills and Resistances by 1
-               for (const [key, skill] of Object.entries(systemData.skill)) {
+               for (const skill of Object.values(systemData.skill)) {
                   skill.training.mod.effect -= 1;
                }
-               for (const [key, resistance] of Object.entries(systemData.resistance)) {
+               for (const resistance of Object.values(systemData.resistance)) {
                   resistance.mod.effect -= 1;
                }
                break;
@@ -338,10 +339,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.condition.prone = true;
 
                // Decrease Speed by half
-               for (const [speedKey, speed] of Object.entries(systemData.speed)) {
+               for (const speed of Object.values(systemData.speed)) {
                   // Calculate the total speed
                   let speedValue = speed.baseValue;
-                  for (const [modKey, mod] of Object.entries(speed.mod)) {
+                  for (const mod of Object.values(speed.mod)) {
                      speedValue += mod;
                   }
 
@@ -366,10 +367,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.rating.defense.effect -= 1;
 
                // Decrease Speed to 0
-               for (const [speedKey, speed] of Object.entries(systemData.speed)) {
+               for (const speed of Object.values(systemData.speed)) {
                   // Calculate the total speed
                   let speedValue = speed.baseValue;
-                  for (const [modKey, mod] of Object.entries(speed.mod)) {
+                  for (const mod of Object.values(speed.mod)) {
                      speedValue += mod;
                   }
 
@@ -391,7 +392,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Calculate the total awareness
                const awareness = this.parent.system.rating.awareness;
                let awarenessValue = awareness.baseValue + awareness.mod.static + awareness.equipment;
-               for (const [key, mod] of Object.entries(awareness.mod)) {
+               for (const mod of Object.values(awareness.mod)) {
                   awarenessValue += mod;
                }
 
@@ -456,9 +457,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Add encumbrance
             for (let idx = 0; idx < armorTraits.length; idx++) {
                if (armorTraits[idx].name === 'heavy.armor') {
-                  for (const [key, speed] of Object.entries(this.parent.system.speed)) {
+                  for (const speed of Object.values(this.parent.system.speed)) {
                      let totalSpeed = speed.value;
-                     for (const [modKey, mod] of Object.entries(speed.mod)) {
+                     for (const mod of Object.values(speed.mod)) {
                         totalSpeed += mod;
                      }
                      if (totalSpeed > 0) {
@@ -483,14 +484,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          stat.value = stat.baseValue;
 
          // Each mod in the stat
-         for (const [modKey, mod] of Object.entries(stat.mod)) {
+         for (const mod of Object.values(stat.mod)) {
             stat.value = Math.max(stat.value + mod, 0);
          }
       }
 
       function applyModsDeep(stats) {
          // Each stat
-         for (const [key, stat] of Object.entries(stats)) {
+         for (const stat of Object.values(stats)) {
             applyMods(stat);
          }
       }
@@ -499,7 +500,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       applyModsDeep(systemData.attribute);
 
       // Skills
-      for (const [key, skill] of Object.entries(systemData.skill)) {
+      for (const skill of Object.values(systemData.skill)) {
          // Training
          applyMods(skill.training);
 
@@ -515,9 +516,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       applyModsDeep(systemData.rating);
 
       // Resources
-      for (const [key, resource] of Object.entries(systemData.resource)) {
+      for (const resource of Object.values(systemData.resource)) {
          resource.max = resource.maxBase;
-         for (const [modKey, mod] of (Object.entries(resource.mod))) {
+         for (const mod of Object.values(resource.mod)) {
             resource.max = Math.max(resource.max + mod, 0);
          }
       }
@@ -526,9 +527,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       applyModsDeep(systemData.speed);
 
       // Mods
-      for (const [key, mod] of Object.entries(systemData.mod)) {
+      for (const mod of Object.values(systemData.mod)) {
          mod.value = 0;
-         for (const [modKey, modMod] of (Object.entries(mod.mod))) {
+         for (const modMod of Object.values(mod.mod)) {
             mod.value = Math.max(mod.value + modMod, 0);
          }
       }
@@ -536,13 +537,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    _clampResources() {
-      for (const [key, resource] of Object.entries(this.parent.system.resource)) {
+      for (const resource of Object.values(this.parent.system.resource)) {
          resource.value = clamp(resource.value, 0, resource.max);
       }
    }
 
    // Get the initiative check
-   async getInitiativeRoll(options) {
+   async getInitiativeRoll() {
       // Calculate the initiative value
       const initiative = this.parent.system.rating.initiative.value;
 
@@ -1008,7 +1009,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async regainResolve(resolveRegained, report) {
+   async regainResolve(resolveRegained) {
       // Update resolve
       const resolve = this.parent.system.resource.resolve;
       resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
@@ -1022,7 +1023,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       });
 
-      return
+      return;
    }
 
    async healDamage(healing, report) {
@@ -1175,28 +1176,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const systemData = actor.system;
          // Reset static mods
          // Attribute
-         for (const [key, value] of Object.entries(systemData.attribute)) {
+         for (const value of Object.values(systemData.attribute)) {
             value.mod.static = 0;
          }
 
          // Skills
-         for (const [key, value] of Object.entries(systemData.skill)) {
+         for (const value of Object.values(systemData.skill)) {
             value.training.mod.static = 0;
             value.expertise.mod.static = 0;
          }
 
          // Ratings
-         for (const [key, value] of Object.entries(systemData.rating)) {
+         for (const value of Object.values(systemData.rating)) {
             value.mod.static = 0;
          }
 
          // Speed
-         for (const [key, value] of Object.entries(systemData.speed)) {
+         for (const value of Object.values(systemData.speed)) {
             value.mod.static = 0;
          }
 
          // Mod
-         for (const [key, value] of Object.entries(systemData.mod)) {
+         for (const value of Object.values(systemData.mod)) {
             value.mod.static = 0;
          }
 
@@ -1411,7 +1412,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Decrease the effect duration if appropriate
          if (autoDecreaseEffectDuration) {
-            for (const effect of effectItems.filter((effect) => effect.system.duration.type === 'turnStart' && effect.system.duration.remaining > 0)) {
+            for (const effect of effectItems.filter((effectItem) => effectItem.system.duration.type === 'turnStart' && effectItem.system.duration.remaining > 0)) {
                effect.system.duration.remaining -= 1;
                await effect.update({
                   system: {
@@ -1650,7 +1651,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Decrease the effect duration if appropriate
          if (autoDecreaseEffectDuration) {
-            for (const effect of effectItems.filter((effect) => effect.system.duration.type === 'turnEnd' && effect.system.duration.remaining > 0)) {
+            for (const effect of effectItems.filter((effectItem) => effectItem.system.duration.type === 'turnEnd' && effectItem.system.duration.remaining > 0)) {
                effect.system.duration.remaining -= 1;
                await effect.update({
                   system: {

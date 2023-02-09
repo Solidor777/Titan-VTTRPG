@@ -42,10 +42,10 @@ export function applyTurnResourceMod(mods) {
 
 function _sortModsByKey(mods) {
    retVal = {};
-   const staminaMod = 0;
-   const resolveMod = 0;
-   const woundsMod = 0;
-   mods.forEach((mod) => {
+   let staminaMod = 0;
+   let resolveMod = 0;
+   let woundsMod = 0;
+   for (const mod of mods) {
       switch (mod.key) {
          case 'stamina': {
             staminaMod += mod.value;
@@ -60,7 +60,7 @@ function _sortModsByKey(mods) {
             break;
          }
       }
-   });
+   }
 
    if (staminaMod.length > 0) {
       retVal.staminaMod = staminaMod;

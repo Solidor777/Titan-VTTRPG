@@ -50,7 +50,10 @@
       "jsdoc/newline-after-description": "off",
       "indent": [
          "error",
-         3
+         3,
+         {
+            "SwitchCase": 1
+         }
       ],
       "semi": 2,
       "no-unused-vars": [

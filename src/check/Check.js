@@ -27,7 +27,7 @@ export default class TitanCheck {
    }
 
    // Ensure the provided input is valid
-   _ensureValidConstruction(options) {
+   _ensureValidConstruction() {
       return true;
    }
 
@@ -173,7 +173,7 @@ export default class TitanCheck {
       };
 
       const speaker = options?.speaker ?? null;
-      const token = (speaker ? (speaker.token ? speaker.token : typeof (speaker.getActiveTokens) === ' function' ? speaker.getActiveTokens(false, true)[0] : null) : null);
+      const token = (speaker ? (speaker.token ? speaker.token : typeof (speaker.getActiveTokens) === 'function' ? speaker.getActiveTokens(false, true)[0] : null) : null);
 
       // Create and post the message
       this.chatMessage = await ChatMessage.create(

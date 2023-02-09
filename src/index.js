@@ -90,20 +90,20 @@ Hooks.once('setup', async () => {
       const textB = game.i18n.localize(b.label);
       return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
    });
-   conditions.forEach((effect) => {
-      const description = localize(`${effect.id}.desc`);
-      effect.flags = {
+   for (const condition of conditions) {
+      const description = localize(`${condition.id}.desc`);
+      condition.flags = {
          titan: {
             description: description
          },
          'visual-active-effects.data.content': description
-      }
-   });
+      };
+   }
 
    CONFIG.statusEffects = conditions;
 
 
-   return
+   return;
 });
 
 Hooks.on('renderChatMessage', (message, html) => {
@@ -111,7 +111,7 @@ Hooks.on('renderChatMessage', (message, html) => {
    const chatContext = message.getFlag('titan', 'chatContext');
    if (TitanChatMessageTypes.has(chatContext?.type)) {
       // Add the titan class
-      let content = html.find('.chat-message').prevObject;
+      const content = html.find('.chat-message').prevObject;
       content.addClass('titan');
 
       // Adder the owner class
@@ -135,7 +135,7 @@ Hooks.on('renderChatMessage', (message, html) => {
    }
    else if (getSetting('darkModeChatMessages') === 'all') {
       // Add the titan class
-      let content = html.find('.chat-message').prevObject;
+      const content = html.find('.chat-message').prevObject;
       content.addClass('titan-dark-mode');
    }
 
