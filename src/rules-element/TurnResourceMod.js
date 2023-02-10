@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
 export function getTurnResourceModTemplate(uuid) {
    return {
@@ -10,68 +11,39 @@ export function getTurnResourceModTemplate(uuid) {
    };
 }
 
-export function applyTurnResourceMod(mods) {
-   const turnResourceMod = {};
+export function applyTurnResourceModElements(elements) {
+   if (elements.length > 0) {
+      const turnResourceMods = {};
+      // Sort elements by selector
+      const selectors = sortObjectsIntoContainerByKey(elements, 'selector');
 
-   // Sort the mods by selector
-   const turnStartMod = [];
-   const turnEndMod = [];
-   mods.forEech((mod) => {
-      if (mod.selector === 'turnStart') {
-         turnStartMod.push(mod);
-      }
-      else {
-         turnEndMod.push(mod);
-      }
-   });
+      // For each selector
+      for (const [selector, selectorElements] of Object.entries(selectors)) {
+         turnResourceMods[selector] = {};
 
-   // Sort the mods by key
-   if (turnStartMod.length > 0) {
-      turnResourceMod.turnStartMod = _sortModsByKey(turnStartMod);
-   }
+         // Sort elements by key
+         const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
 
-   if (turnEndMod.length > 0) {
-      turnResourceMod.turnEndMod = _sortModsByKey(turnEndMod);
-   }
+         // For each key
+         for (const [key, keyElements] of Object.entries(keys)) {
+            turnResourceMods[selector][key] = {};
 
-   // Apply the mods to the actor
-   if (turnResourceMod.turnStartMod || turnResourceMod.turnEndMod) {
-      this.turnResourceMod = turnResourceMod;
-   }
-}
+            // Sort elements by type
+            const types = sortObjectsIntoContainerByKey(keyElements, 'type');
 
-function _sortModsByKey(mods) {
-   retVal = {};
-   let staminaMod = 0;
-   let resolveMod = 0;
-   let woundsMod = 0;
-   for (const mod of mods) {
-      switch (mod.key) {
-         case 'stamina': {
-            staminaMod += mod.value;
-            break;
-         }
-         case 'resolve': {
-            resolveMod += mod.value;
-            break;
-         }
-         default: {
-            woundsMod += mod.value;
-            break;
+            // For each type
+            for (const [type, typeElements] of Object.entries(types)) {
+               turnResourceMods[selector][key][type] = 0;
+               // Apply each mod
+               for (const element of typeElements) {
+                  [selector][key][type] += (element.value);
+               }
+            }
          }
       }
+
+      this.turnResourceMods = turnResourceMods;
    }
 
-   if (staminaMod.length > 0) {
-      retVal.staminaMod = staminaMod;
-   }
-
-   if (resolveMod.length > 0) {
-      retVal.resolveMod = resolveMod;
-   }
-
-   if (woundsMod.length > 0) {
-      retVal.woundsMod = woundsMod;
-   }
-   return retVal;
+   return;
 }

@@ -5,12 +5,24 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged from './RulesElementUpdateOperation';
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentResourceSelect from '~/documents/components/select/DocumentResourceSelect.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
 
    export let operationOptions = void 0;
    export let idx = void 0;
+
+   const selectorOptions = [
+      {
+         label: localize('turnStart'),
+         value: 'turnStart',
+      },
+      {
+         label: localize('turnEnd'),
+         value: 'turnEnd',
+      },
+   ];
 
    // Dynamic element
    $: element = $document.system.rulesElement[idx];
@@ -30,6 +42,19 @@
                   onRulesElementOperationChanged($document, idx);
                }}
             />
+         </div>
+
+         <!--Selector-->
+         <div class="field select">
+            <DocumentSelect
+               options={selectorOptions}
+               bind:value={element.selector}
+            />
+         </div>
+
+         <!--Key-->
+         <div class="field select">
+            <DocumentResourceSelect bind:value={element.key} />
          </div>
 
          <!--Value-->

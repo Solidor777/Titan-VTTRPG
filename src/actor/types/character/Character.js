@@ -1,7 +1,7 @@
 import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort, isHTMLBlank } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
-import { applyTurnResourceMod } from '~/rules-element/TurnResourceMod';
+import { applyTurnResourceModElements } from '~/rules-element/TurnResourceMod';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -21,7 +21,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    // Apply rules element bindings
    applyFlatModifierElements = applyFlatModifierElements.bind(this);
    applyMulBaseElements = applyMulBaseElements.bind(this);
-   applyTurnResourceMod = applyTurnResourceMod.bind(this);
+   applyTurnResourceModElements = applyTurnResourceModElements.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -251,27 +251,33 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Sort the rules elements and process them in order
+      const mulBaseElements = [];
+      const flatModifierElements = [];
+      const turnResourceMod = [];
+      rulesElements.forEach((element) => {
+         switch (element.operation) {
+            case 'mulbase': {
+               mulBaseElements.push(element);
+               break;
+            }
+            case 'flatModifier': {
+               flatModifierElements.push(element);
+               break;
+            }
+            case 'turnResourceMod': {
+               turnResourceMod.push(element);
+               break;
+            }
+            default: {
+               break;
+            }
+         }
+      });
 
-      // Mul Base
-      const mulBaseElements = rulesElements.filter((element) => element.operation === 'mulBase');
-      if (mulBaseElements.length > 0) {
-         this.applyMulBaseElements(mulBaseElements);
-      }
-
-      // FlatModifier
-      const flatModifierElements = rulesElements.filter((element) => element.operation === 'flatModifier');
-      if (flatModifierElements.length > 0) {
-         this.applyFlatModifierElements(flatModifierElements);
-      }
-
-      // Start of turn messages
-      this.turnStartMessages = rulesElements.filter((element) => element.operation === 'turnStartMessage');
-
-      // Start of turn stam mods
-      const turnResourceMod = rulesElements.filter((element) => element.operation === 'turnResourceMod');
-      if (turnResourceMod.length > 0) {
-         applyTurnResourceMod(turnResourceMod);
-      }
+      // Apply elements
+      this.applyMulBaseElements(mulBaseElements);
+      this.applyFlatModifierElements(flatModifierElements);
+      this.applyTurnResourceModElements(turnResourceMod);
 
       return;
    }
