@@ -1,29 +1,29 @@
 export default class TitanTypeComponent {
-  constructor(parent) {
-    this.parent = parent;
-  }
+   constructor(parent) {
+      this.parent = parent;
+   }
 
-  prepareDerivedData() {
-    return;
-  }
+   prepareDerivedData() {
+      return;
+   }
 
-  getRollData(rollData) {
-    return rollData;
-  }
+   getRollData(rollData) {
+      return rollData;
+   }
 
-  getChatContext(chatContext) {
-    return chatContext;
-  }
+   getChatContext(chatContext) {
+      return chatContext;
+   }
 
-  getInitialData() {
-    return false;
-  }
+   getInitialData() {
+      return false;
+   }
 
-  onCreate() {
-    return;
-  }
+   onCreate() {
+      return;
+   }
 
-  onDelete() {
-    return;
-  }
+   onDelete() {
+      return;
+   }
 }

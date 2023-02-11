@@ -122,7 +122,7 @@ export default class TitanItem extends Item {
       };
 
       if (this.typeComponent) {
-         chatContext = this.typeComponent.getChatContext(chatContext);
+         this.typeComponent.getChatContext(chatContext);
       }
 
       const speaker = options?.speaker ?? null;
