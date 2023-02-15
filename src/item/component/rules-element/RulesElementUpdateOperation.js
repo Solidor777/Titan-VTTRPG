@@ -4,28 +4,31 @@ import { getFastHealingTemplate } from '~/rules-element/FastHealing.js';
 import getTurnStartMessageTemplate from '~/rules-element/TurnStartMessage.js';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
-   switch (document.system.rulesElement[elementIdx].operation) {
+   const element = document.system.rulesElement[elementIdx];
+   switch (element.operation) {
       case 'flatModifier': {
-         document.system.rulesElement[elementIdx] = getFlatModifierTemplate(document.system.rulesElement[elementIdx].uuid);
+         document.system.rulesElement[elementIdx] = getFlatModifierTemplate(element.uuid, element.type);
          break;
       }
       case 'mulBase': {
-         document.system.rulesElement[elementIdx] = getMulBaseTemplate(document.system.rulesElement[elementIdx].uuid);
+         document.system.rulesElement[elementIdx] = getMulBaseTemplate(element.uuid, element.type);
          break;
       }
       case 'turnStartMessage': {
-         document.system.rulesElement[elementIdx] = getTurnStartMessageTemplate(document.system.rulesElement[elementIdx].uuid);
+         document.system.rulesElement[elementIdx] = getTurnStartMessageTemplate(element.uuid, element.type);
          break;
       }
       case 'fastHealing': {
-         document.system.rulesElement[elementIdx] = getFastHealingTemplate(document.system.rulesElement[elementIdx].uuid);
+         document.system.rulesElement[elementIdx] = getFastHealingTemplate(element.uuid, element.type);
+         break;
       }
       default: {
+         console.error(`TITAN: Invalid Rules Element operation ${element.operation}`);
+         console.trace();
          return;
       }
    }
 
-   document.system.rulesElement[elementIdx].type = document.type;
    return await document.update({
       system: {
          rulesElement: document.system.rulesElement

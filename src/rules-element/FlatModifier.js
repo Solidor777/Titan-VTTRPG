@@ -1,13 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
-export function getFlatModifierTemplate(uuid) {
+export function getFlatModifierTemplate(uuid, type) {
    return {
       operation: 'flatModifier',
       selector: 'attribute',
       key: 'body',
       value: 1,
-      uuid: uuid ?? uuidv4()
+      uuid: uuid ?? uuidv4(),
+      type: type ?? ''
    };
 }
 

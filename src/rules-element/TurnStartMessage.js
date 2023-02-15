@@ -4,6 +4,7 @@ export default function getTurnStartMessageTemplate(uuid) {
    return {
       operation: 'turnStartMessage',
       message: '',
-      uuid: uuid ?? uuidv4()
+      uuid: uuid ?? uuidv4(),
+      type: type ?? ''
    };
 }

@@ -6,10 +6,23 @@ export async function addRulesElement() {
       const newElement = getFlatModifierTemplate();
 
       // Set the element type to this item
-      newElement.type = getElementTypeFromItemType(this.parent.type);
+      switch (this.parent.type) {
+         case 'ability': {
+            newElement.type = 'ability';
+            break;
+         }
+         case 'effect': {
+            newElement.type = 'effect';
+            break;
+         }
+         default: {
+            newElement.type = 'equipment';
+            break;
+         }
+      }
 
-      // Add the item to the rules element ware
-      const idx = this.parent.system.rulesElement.push(newElement) - 1;
+      // Add the item to the rules element container
+      this.parent.system.rulesElement.push(newElement);
       await this.parent.update({
          system: this.parent.system
       });
@@ -28,18 +41,4 @@ export async function removeRulesElement(idx) {
    }
 
    return;
-}
-
-function getElementTypeFromItemType(itemType) {
-   switch (itemType) {
-      case 'ability': {
-         return 'ability';
-      }
-      case 'effect': {
-         return 'effect';
-      }
-      default: {
-         return 'equipment';
-      }
-   }
 }

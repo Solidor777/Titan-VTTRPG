@@ -6,15 +6,16 @@
    // Context variables
    const document = getContext('DocumentStore');
 
-   async function confirmRegainResolve() {
+   async function confirmFastHealing() {
       // Get the actor
       const actor = getActor($document.speaker.actor, $document.speaker.token);
       if (actor) {
          const character = actor.character;
          if (character) {
             // Update the actor
-            await character.regainResolve(
-               $document.flags.titan.chatContext.resolveRegain.total,
+            await character.applyHealing(
+               $document.flags.titan.chatContext.fastHealing.total,
+               false,
                true
             );
 
@@ -23,10 +24,10 @@
                flags: {
                   titan: {
                      chatContext: {
-                        resolveRegain: {
+                        fastHealing: {
                            confirmed: true,
                         },
-                        resolve: {
+                        stamina: {
                            value: actor.system.resource.resolve.value,
                         },
                      },
@@ -40,11 +41,11 @@
 
 <!--Regain resolve button-->
 <div class="button">
-   <EfxButton on:click={() => confirmRegainResolve()}>
-      <i class="fas fa-bolt" />
-      {localize('regain%xResolve').replace(
+   <EfxButton on:click={() => confirmFastHealing()}>
+      <i class="fas fa-heart" />
+      {localize('heal%xDamage').replace(
          '%x',
-         $document.flags.titan.chatContext.resolveRegain.total
+         $document.flags.titan.chatContext.fastHealing.total
       )}
    </EfxButton>
 </div>

@@ -4,6 +4,7 @@
    import ChatEffects from '~/chat-message/ChatEffects.svelte';
    import TurnReportConfirmResolveRegainButton from './TurnReportConfirmResolveRegainButton.svelte';
    import TurnReportRemoveExpiredEffectsButton from './TurnReportRemoveExpiredEffectsButton.svelte';
+   import TurnReportConfirmFastHealingButton from './TurnReportConfirmFastHealingButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -33,6 +34,11 @@
       {/if}
    </div>
 
+   <!--Effects-->
+   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects}
+      <ChatEffects />
+   {/if}
+
    <!--Messages-->
    {#if chatContext.message && chatContext.message.length > 0}
       {#each chatContext.message as message}
@@ -40,15 +46,35 @@
       {/each}
    {/if}
 
-   <!--Resolve regained-->
-   {#if chatContext.resolveRegain}
-      <!--Current Resolve-->
+   <!--Stamina-->
+   {#if chatContext.stamina}
+      <div class="message">
+         {`${localize('stamina')}: ${
+            $document.flags.titan.chatContext.stamina.value
+         } / ${$document.flags.titan.chatContext.stamina.max}`}
+      </div>
+   {/if}
+
+   <!--Wounds-->
+   {#if chatContext.wounds}
+      <div class="message">
+         {`${localize('stamina')}: ${
+            $document.flags.titan.chatContext.wounds.value
+         } / ${$document.flags.titan.chatContext.wounds.max}`}
+      </div>
+   {/if}
+
+   <!--Resolve-->
+   {#if chatContext.resolve}
       <div class="message">
          {`${localize('resolve')}: ${
             $document.flags.titan.chatContext.resolve.value
          } / ${$document.flags.titan.chatContext.resolve.max}`}
       </div>
+   {/if}
 
+   <!--Resolve Regain-->
+   {#if chatContext.resolveRegain}
       <!--If confirmed, show how much was was regained-->
       {#if $document.flags.titan.chatContext.resolveRegain.confirmed}
          <div class="message">
@@ -67,9 +93,24 @@
       {/if}
    {/if}
 
-   <!--Effects-->
-   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects}
-      <ChatEffects />
+   <!--Fast Healing-->
+   {#if chatContext.fastHealing}
+      <!--If confirmed, show how much was was regained-->
+      {#if $document.flags.titan.chatContext.fastHealing.confirmed === true}
+         <div class="message">
+            <i class="fas fa-heart" />
+            <div>
+               {localize('healed%xDamage').replace(
+                  '%x',
+                  chatContext.fastHealing.total
+               )}
+            </div>
+         </div>
+      {:else if $document.flags.titan.chatContext.fastHealing.confirmed === false}
+         <div class="button">
+            <TurnReportConfirmFastHealingButton />
+         </div>
+      {/if}
    {/if}
 
    <!--Remove Expired Effects Button-->

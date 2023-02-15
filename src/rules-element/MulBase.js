@@ -1,13 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
-export function getMulBaseTemplate(uuid) {
+export function getMulBaseTemplate(uuid, type) {
    return {
       operation: 'mulBase',
       selector: 'attribute',
       key: 'body',
       value: 2,
-      uuid: uuid ?? uuidv4()
+      uuid: uuid ?? uuidv4(),
+      type: type ?? ''
    };
 }
 

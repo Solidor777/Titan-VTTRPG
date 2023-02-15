@@ -1574,17 +1574,24 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the amount of fast healing to be apply
       if (autoApplyFastHealing !== 'disabled') {
          const fastHealing = this.fastHealing;
-         if (fastHealing && fastHealing[selector]) {
-            chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
+         if (fastHealing) {
+            const selectorFastHealing = fastHealing[selector];
+            if (selectorFastHealing) {
+               turnStaminaMod += getSumOfValuesInObject(selectorFastHealing);
+               chatContext.fastHealing = foundry.utils.deepClone(selectorFastHealing);
+            }
          }
       }
 
       // Get the amount of persistent damage to apply
       if (autoApplyPersistentDamage !== 'disabled') {
-         const persistentDamage = this.persistentDamage?.turnStart;
+         const persistentDamage = this.persistentDamage;
          if (persistentDamage) {
-            turnStaminaMod -= getSumOfValuesInObject(persistentDamage);
-            chatContext.persistentDamage = foundry.utils.deepClone(persistentDamage);
+            const selectorPersistentDamage = persistentDamage[selector];
+            if (selectorPersistentDamage) {
+               turnStaminaMod -= getSumOfValuesInObject(selectorPersistentDamage);
+               chatContext.persistentDamage = foundry.utils.deepClone(selectorPersistentDamage);
+            }
          }
       }
 

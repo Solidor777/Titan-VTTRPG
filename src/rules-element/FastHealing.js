@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
-export function getFastHealingTemplate(uuid) {
+export function getFastHealingTemplate(uuid, type) {
    return {
       operation: 'fastHealing',
       selector: 'turnStart',
       value: 1,
-      uuid: uuid ?? uuidv4()
+      uuid: uuid ?? uuidv4(),
+      type: type ?? ''
    };
 }
 
@@ -27,7 +28,7 @@ export function applyFastHealingElements(elements) {
             fastHealing[selector][type] = 0;
             // Apply each mod
             for (const element of typeElements) {
-               [selector][type] += (element.value);
+               fastHealing[selector][type] += (element.value);
             }
          }
       }
