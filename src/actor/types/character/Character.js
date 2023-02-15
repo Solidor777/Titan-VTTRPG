@@ -795,7 +795,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return castingCheck;
    }
 
-   async rollCastingCheck(options, confirmed) {
+   async rollCastingCheck(options, confirmed = false) {
       if (this.parent.isOwner) {
          // Check if confirmed
          if (confirmed || !getCheckOptions()) {
@@ -916,7 +916,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    // Apply damage to the actor
-   async applyDamage(damage, ignoreArmor, report, updateActor) {
+   async applyDamage(damage = 1, ignoreArmor = false, report = true, updateActor = true) {
       if (this.parent.isOwner) {
          // Calculate the damage amount
          const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
@@ -1019,7 +1019,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async applyHealing(healing, report, updateActor) {
+   async applyHealing(healing = 1, report = true, updateActor = true) {
       if (this.parent.isOwner) {
          // Check if the actor's stamina is less than max
          let staminaHealed = 0;
@@ -1087,7 +1087,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async regainResolve(resolveRegained, updateActor) {
+   async regainResolve(resolveRegained = 1, updateActor = true) {
       // Update resolve
       const resolve = this.parent.system.resource.resolve;
       resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
