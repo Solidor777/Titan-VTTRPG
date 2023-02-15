@@ -116,7 +116,53 @@ export default function registerSystemSettings() {
          step: 1
       },
       restricted: true,
-      default: true,
+   });
+
+   game.settings.register('titan', 'autoApplyFastHealing', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoApplyFastHealing.label',
+      hint: 'SETTINGS.autoApplyFastHealing.hint',
+      type: String,
+      choices: {
+         showButton: 'SETTINGS.autoApplyFastHealing.showButton',
+         enabled: 'SETTINGS.autoApplyFastHealing.enabled',
+         disabled: 'SETTINGS.autoApplyFastHealing.disabled'
+      },
+      restricted: true,
+      default: 'showButton',
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'autoApplyPersistentDamage', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoApplyPersistentDamage.label',
+      hint: 'SETTINGS.autoApplyPersistentDamage.hint',
+      type: String,
+      choices: {
+         showButton: 'SETTINGS.autoApplyPersistentDamage.showButton',
+         enabled: 'SETTINGS.autoApplyPersistentDamage.enabled',
+         disabled: 'SETTINGS.autoApplyPersistentDamage.disabled'
+      },
+      restricted: true,
+      default: 'showButton',
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'baseWoundRegain', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.baseWoundRegain.label',
+      hint: 'SETTINGS.baseWoundRegain.hint',
+      type: Number,
+      default: 1,
+      range: {
+         min: 0,
+         max: 10,
+         step: 1
+      },
+      restricted: true,
    });
 
    game.settings.register('titan', 'autoDecreaseEffectDuration', {
@@ -143,15 +189,6 @@ export default function registerSystemSettings() {
       restricted: true,
       default: 'showButton',
       requiresReload: true,
-   });
-
-   game.settings.register('titan', 'autoRemoveExpiredEffectsConfirmButton', {
-      config: true,
-      scope: 'world',
-      name: 'SETTINGS.autoRemoveExpiredEffectsConfirmButton.label',
-      hint: 'SETTINGS.autoRemoveExpiredEffectsConfirmButton.hint',
-      type: Boolean,
-      default: false,
    });
 
    game.settings.register('titan', 'reportTakingDamage', {

@@ -5,7 +5,6 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged from './RulesElementUpdateOperation';
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
-   import DocumentResourceSelect from '~/documents/components/select/DocumentResourceSelect.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -30,7 +29,7 @@
    // Setup tabs
 </script>
 
-{#if element && element.operation === 'turnResourceMod'}
+{#if element && element.operation === 'fastHealing'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -52,14 +51,9 @@
             />
          </div>
 
-         <!--Key-->
-         <div class="field select">
-            <DocumentResourceSelect bind:value={element.key} />
-         </div>
-
          <!--Value-->
          <div class="field number">
-            <DocumentIntegerInput bind:value={element.mod} />
+            <DocumentIntegerInput bind:value={element.mod} min={1} />
          </div>
       </div>
 

@@ -8,7 +8,7 @@
    import ItemSheetFlatModifierSettings from '~/item/component/rules-element/ItemSheetFlatModifierSettings.svelte';
    import ItemSheetMulBaseSettings from '~/item/component/rules-element/ItemSheetMulBaseSettings.svelte';
    import ItemSheetTurnStartMessageSettings from '~/item/component/rules-element/ItemSheetTurnStartMessageSettings.svelte';
-   import ItemSheetTurnResourceModSettings from '~/item/component/rules-element/ItemSheetTurnResourceModSettings.svelte';
+   import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -28,8 +28,8 @@
          value: 'turnStartMessage',
       },
       {
-         label: localize('turnResourceMod'),
-         value: 'turnResourceMod',
+         label: localize('fastHealing'),
+         value: 'fastHealing',
       },
    ];
 
@@ -38,7 +38,7 @@
          flatModifier: ItemSheetFlatModifierSettings,
          mulBase: ItemSheetMulBaseSettings,
          turnStartMessage: ItemSheetTurnStartMessageSettings,
-         turnResourceMod: ItemSheetTurnResourceModSettings,
+         fastHealing: ItemSheetFastHealingSettings,
       };
 
       return elementComponents[operation];

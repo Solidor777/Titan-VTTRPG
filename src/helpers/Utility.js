@@ -46,26 +46,26 @@ export function isGM() {
    return game.user.isGM;
 }
 
-export function applyDamageToTargets(damage, ignoreArmor, report = true) {
+export function applyDamageToTargets(damage, ignoreArmor, report = true, updateActor = true) {
    // Get targets
    const targets = getCombatTargets();
 
    // Apply healing to each target
    targets.forEach((target) => {
       if (target && target.system.resource?.stamina) {
-         target.typeComponent.applyDamage(damage, ignoreArmor, report);
+         target.typeComponent.applyDamage(damage, ignoreArmor, report, updateActor);
       }
    });
 }
 
-export function applyHealingToTargets(healing, report = true) {
+export function applyHealingToTargets(healing = 1, report = true, updateActor = true) {
    // Get targets
    const targets = getCombatTargets();
 
    // Apply healing to each target
    targets.forEach((target) => {
       if (target && target.system.resource?.stamina) {
-         target.typeComponent.healDamage(healing, report);
+         target.typeComponent.applyHealing(healing, report, updateActor);
       }
    });
 }
@@ -100,6 +100,15 @@ export function sortObjectsIntoContainerByKey(objects, key) {
          retVal[object[key]] = [];
       }
       retVal[object[key]].push(object);
+   }
+
+   return retVal;
+}
+
+export function getSumOfValuesInObject(object) {
+   let retVal = 0;
+   for (const value of Object.values(object)) {
+      retVal += value;
    }
 
    return retVal;

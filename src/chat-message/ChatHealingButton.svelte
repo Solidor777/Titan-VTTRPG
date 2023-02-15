@@ -13,8 +13,9 @@
 <!--Apply healing button-->
 <div
    class="healing-button"
-   use:tooltip={{ content: localize('recoverStamina') }}>
-   <EfxButton on:click={() => applyHealingToTargets(healing, true)}>
+   use:tooltip={{ content: localize('recoverStamina') }}
+>
+   <EfxButton on:click={() => applyHealingToTargets(healing, true, true)}>
       <i class="fas fa-heart" />
       {`${localize('recoverStamina')} (${
          $document.flags.titan.chatContext.results.healing

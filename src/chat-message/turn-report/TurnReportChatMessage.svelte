@@ -1,11 +1,9 @@
 <script>
-   import { slide } from 'svelte/transition';
    import { getContext } from 'svelte';
-   import { getSetting } from '~/helpers/utility';
-   import ChatReportConfirmRegainingResolveButton from '~/chat-message/ChatReportConfirmRegainingResolveButton.svelte';
-   import ChatReportRemoveExpiredEffectsButton from '~/chat-message/ChatReportRemoveExpiredEffectsButton.svelte';
-   import ChatResolveRegained from '~/chat-message/ChatResolveRegained.svelte';
+   import { getSetting, localize } from '~/helpers/utility';
    import ChatEffects from '~/chat-message/ChatEffects.svelte';
+   import TurnReportConfirmResolveRegainButton from './TurnReportConfirmResolveRegainButton.svelte';
+   import TurnReportRemoveExpiredEffectsButton from './TurnReportRemoveExpiredEffectsButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -37,29 +35,36 @@
 
    <!--Messages-->
    {#if chatContext.message && chatContext.message.length > 0}
-      <div class="messages">
-         {#each chatContext.message as message}
-            <div class="message">{@html message}</div>
-         {/each}
-      </div>
+      {#each chatContext.message as message}
+         <div class="message">{@html message}</div>
+      {/each}
    {/if}
 
    <!--Resolve regained-->
-   {#if chatContext.resolveRegained && getSetting('reportRegainingResolve') === true}
-      <ChatResolveRegained
-         resolveRegained={chatContext.resolveRegained}
-         resolveValue={$document.flags.titan.chatContext.resolveRegainConfirmed
-            ? chatContext.newResolve
-            : chatContext.initialResolve}
-         resolveMax={chatContext.maxResolve}
-      />
-   {/if}
-
-   <!--Regain Resolve Button-->
-   {#if chatContext.resolveRegained && !$document.flags.titan.chatContext.resolveRegainConfirmed && getSetting('autoRegainResolve') === 'showButton'}
-      <div class="button" out:slide|local>
-         <ChatReportConfirmRegainingResolveButton />
+   {#if chatContext.resolveRegain}
+      <!--Current Resolve-->
+      <div class="message">
+         {`${localize('resolve')}: ${
+            $document.flags.titan.chatContext.resolve.value
+         } / ${$document.flags.titan.chatContext.resolve.max}`}
       </div>
+
+      <!--If confirmed, show how much was was regained-->
+      {#if $document.flags.titan.chatContext.resolveRegain.confirmed}
+         <div class="message">
+            <i class="fas fa-bolt" />
+            <div>
+               {localize('regained%xResolve').replace(
+                  '%x',
+                  chatContext.resolveRegain.total
+               )}
+            </div>
+         </div>
+      {:else}
+         <div class="button">
+            <TurnReportConfirmResolveRegainButton />
+         </div>
+      {/if}
    {/if}
 
    <!--Effects-->
@@ -69,14 +74,14 @@
 
    <!--Remove Expired Effects Button-->
    {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false && getSetting('autoRemoveExpiredEffects') === 'showButton'}
-      <div class="button" out:slide|local>
-         <ChatReportRemoveExpiredEffectsButton />
+      <div class="button">
+         <TurnReportRemoveExpiredEffectsButton />
       </div>
    {/if}
 </div>
 
 <style lang="scss">
-   @import '../styles/Mixins.scss';
+   @import '../../styles/Mixins.scss';
 
    .report {
       @include flex-column;
@@ -121,26 +126,19 @@
          }
       }
 
-      .messages {
-         @include flex-column;
-         @include flex-group-top;
-         width: 100%;
+      .message {
+         @include flex-row;
+         @include flex-group-center;
          margin-top: 0.25rem;
+         flex-wrap: wrap;
 
-         .message {
-            @include flex-row;
-            @include flex-group-center;
-            margin-top: 0.25rem;
-            flex-wrap: wrap;
+         &:not(:last-child) {
+            @include border-bottom;
+            padding-bottom: 0.25rem;
+         }
 
-            &:not(:last-child) {
-               @include border-bottom;
-               padding-bottom: 0.25rem;
-            }
-
-            .fas {
-               margin-right: 0.25rem;
-            }
+         .fas {
+            margin-right: 0.25rem;
          }
       }
 

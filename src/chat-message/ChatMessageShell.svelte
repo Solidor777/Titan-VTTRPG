@@ -16,9 +16,9 @@
    import ItemCheckChatMessage from '~/check/types/item-check/ItemCheckChatMessage.svelte';
    import CastingCheckChatMessage from '~/check/types/casting-check/CastingCheckChatMessage.svelte';
    import AttackCheckChatMessage from '~/check/types/attack-check/AttackCheckChatMessage.svelte';
-   import ReportChatMessage from './ReportChatMessage.svelte';
-   import PrivateRollChatMessageShell from './PrivateRollChatMessageShell.svelte';
-   import TurnReportChatMessage from './TurnReportChatMessage.svelte';
+   import ReportChatMessage from '~/chat-message/ReportChatMessage.svelte';
+   import PrivateRollChatMessage from '~/chat-message/PrivateRollChatMessage.svelte';
+   import TurnReportChatMessage from '~/chat-message/turn-report/TurnReportChatMessage.svelte';
 
    // Context object
    export let documentStore = void 0;
@@ -49,7 +49,7 @@
          };
          return chatComponents[$document.flags.titan.chatContext.type];
       }
-      return PrivateRollChatMessageShell;
+      return PrivateRollChatMessage;
    }
 </script>
 

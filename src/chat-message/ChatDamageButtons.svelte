@@ -14,7 +14,8 @@
 <div class="damage-buttons">
    <!--Apply damage button-->
    <div class="button" use:tooltip={{ content: localize('applyDamage') }}>
-      <EfxButton on:click={() => applyDamageToTargets(damage, false, true)}
+      <EfxButton
+         on:click={() => applyDamageToTargets(damage, false, true, true)}
          ><i class="fas fa-burst" />
       </EfxButton>
    </div>
@@ -25,21 +26,23 @@
       use:tooltip={{ content: localize('applyDamageIgnoreArmor') }}
    >
       <EfxButton
-         on:click={() => applyDamageToTargets(damage, true, false, true)}
+         on:click={() => applyDamageToTargets(damage, true, false, true, true)}
          ><i class="fas fa-shield-slash" />
       </EfxButton>
    </div>
 
    <!--Apply half damage button-->
    <div class="button" use:tooltip={{ content: localize('applyHalfDamage') }}>
-      <EfxButton on:click={() => applyDamageToTargets(damage, false, true)}>
+      <EfxButton
+         on:click={() => applyDamageToTargets(damage, false, true, true)}
+      >
          <i class="fas fa-heart-half-stroke" />
       </EfxButton>
    </div>
 
    <!--Apply healing button-->
-   <div class="button" use:tooltip={{ content: localize('healDamage') }}>
-      <EfxButton on:click={() => applyHealingToTargets(damage, true)}>
+   <div class="button" use:tooltip={{ content: localize('applyHealing') }}>
+      <EfxButton on:click={() => applyHealingToTargets(damage, true, true)}>
          <i class="fas fa-heart" />
       </EfxButton>
    </div>

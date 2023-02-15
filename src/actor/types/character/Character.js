@@ -1,7 +1,7 @@
 import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort, isHTMLBlank } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
-import { applyTurnResourceModElements } from '~/rules-element/TurnResourceMod';
+import { applyFastHealingElements } from '~/rules-element/FastHealing';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -15,13 +15,14 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
+import { getSumOfValuesInObject } from '../../../helpers/Utility';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply rules element bindings
    applyFlatModifierElements = applyFlatModifierElements.bind(this);
    applyMulBaseElements = applyMulBaseElements.bind(this);
-   applyTurnResourceModElements = applyTurnResourceModElements.bind(this);
+   applyFastHealingElements = applyFastHealingElements.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -253,7 +254,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Sort the rules elements and process them in order
       const mulBaseElements = [];
       const flatModifierElements = [];
-      const turnResourceMod = [];
+      const fastHealingElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -264,8 +265,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                flatModifierElements.push(element);
                break;
             }
-            case 'turnResourceMod': {
-               turnResourceMod.push(element);
+            case 'fastHealing': {
+               fastHealingElements.push(element);
                break;
             }
             default: {
@@ -277,7 +278,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Apply elements
       this.applyMulBaseElements(mulBaseElements);
       this.applyFlatModifierElements(flatModifierElements);
-      this.applyTurnResourceModElements(turnResourceMod);
+      this.applyFastHealingElements(fastHealingElements);
 
       return;
    }
@@ -915,7 +916,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    // Apply damage to the actor
-   async applyDamage(damage, ignoreArmor, report) {
+   async applyDamage(damage, ignoreArmor, report, updateActor) {
       if (this.parent.isOwner) {
          // Calculate the damage amount
          const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
@@ -939,18 +940,21 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Update the actor
          stamina.value = Math.max(stamina.value - damageTaken, 0);
          wounds.value += woundsTaken;
-         await this.parent.update({
-            system: {
-               resource: {
-                  stamina: {
-                     value: stamina.value
-                  },
-                  wounds: {
-                     value: wounds.value
+         if (updateActor) {
+            await this.parent.update({
+               system: {
+                  resource: {
+                     stamina: {
+                        value: stamina.value
+                     },
+                     wounds: {
+                        value: wounds.value
+                     }
                   }
                }
-            }
-         });
+            });
+         }
+
 
          // Report
          if (report) {
@@ -1015,41 +1019,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async regainResolve(resolveRegained) {
-      // Update resolve
-      const resolve = this.parent.system.resource.resolve;
-      resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
-
-      // Update the actor if appropriate
-      await this.parent.update({
-         system: {
-            resource: {
-               resolve: resolve
-            }
-         }
-      });
-
-      return;
-   }
-
-   async healDamage(healing, report) {
+   async applyHealing(healing, report, updateActor) {
       if (this.parent.isOwner) {
          // Check if the actor's stamina is less than max
          let staminaHealed = 0;
          const stamina = this.parent.system.resource.stamina;
          if (stamina.value < stamina.max) {
-            // Update the actor
+            // Update the stamina
             staminaHealed = Math.min(healing, stamina.max - stamina.value);
             stamina.value += staminaHealed;
-            await this.parent.update({
-               system: {
-                  resource: {
-                     stamina: {
-                        value: stamina.value
+
+            // Update the actor
+            if (updateActor) {
+               await this.parent.update({
+                  system: {
+                     resource: {
+                        stamina: {
+                           value: stamina.value
+                        }
                      }
                   }
-               }
-            });
+               });
+            }
 
             // Report
             if (report) {
@@ -1091,6 +1082,25 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          return staminaHealed;
+      }
+
+      return;
+   }
+
+   async regainResolve(resolveRegained, updateActor) {
+      // Update resolve
+      const resolve = this.parent.system.resource.resolve;
+      resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
+
+      // Update the actor if appropriate
+      if (updateActor) {
+         await this.parent.update({
+            system: {
+               resource: {
+                  resolve: resolve
+               }
+            }
+         });
       }
 
       return;
@@ -1153,10 +1163,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   getExpiredEffects() {
+      return this.parent.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
+   }
+
    async removeExpiredEffects(confirmed) {
       // Get the expired effects
-      const actor = this.parent;
-      const expiredEffects = await actor.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
+      const expiredEffects = this.getExpiredEffects();
       if (expiredEffects.length > 0) {
          // Check if the removeal was confirmed
          if (confirmed || !confirmDeletingItems()) {
@@ -1318,7 +1331,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          let woundsHealed = 0;
          const wounds = actor.system.resource.wounds;
          if (wounds.value > 0) {
-            woundsHealed = Math.min(1 + actor.system.mod.woundRegain.value, wounds.value);
+            woundsHealed = Math.min(getSetting('baseWoundsRegain') + actor.system.mod.woundRegain.value, wounds.value);
             wounds.value -= woundsHealed;
          }
 
@@ -1379,7 +1392,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Initialize variables
       const chatContext = {};
       const actor = this.parent;
-      let updateActor = false;
+      let shouldUpdateActor = false;
 
       // Get the settings for effect automation
       const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
@@ -1536,6 +1549,92 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       }
 
+      // Fast healing report
+      const selector = 'turnStart';
+      if (getSetting('reportHealingDamage')) {
+         const fastHealing = this.fastHealing;
+         if (fastHealing && fastHealing[selector]) {
+            chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
+         }
+      }
+
+      // Persistent damage report
+      if (getSetting('reportTakingDamage')) {
+         const persistentDamage = this.persistentDamage;
+         if (persistentDamage && persistentDamage[selector]) {
+            chatContext.persistentDamage = foundry.utils.deepClone(persistentDamage[selector]);
+         }
+      }
+
+      // Auto apply dealing and damage
+      const autoApplyFastHealing = getSetting('autoApplyFastHealing');
+      const autoApplyPersistentDamage = getSetting('autoApplyPersistentDamage');
+      let turnStaminaMod = 0;
+
+      // Get the amount of fast healing to be apply
+      if (autoApplyFastHealing !== 'disabled') {
+         const fastHealing = this.fastHealing;
+         if (fastHealing && fastHealing[selector]) {
+            chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
+         }
+      }
+
+      // Get the amount of persistent damage to apply
+      if (autoApplyPersistentDamage !== 'disabled') {
+         const persistentDamage = this.persistentDamage?.turnStart;
+         if (persistentDamage) {
+            turnStaminaMod -= getSumOfValuesInObject(persistentDamage);
+            chatContext.persistentDamage = foundry.utils.deepClone(persistentDamage);
+         }
+      }
+
+      // If stamina would be changed
+      if (turnStaminaMod !== 0) {
+         const stamina = actor.system.resource.stamina;
+
+         // If stamina would be healed
+         if (turnStaminaMod > 0) {
+
+            // Update the actor if appropriate
+            const confirmed = autoApplyFastHealing === 'enabled';
+            if (confirmed) {
+               await this.applyHealing(turnStaminaMod, false, false);
+               shouldUpdateActor = true;
+            }
+
+            // Update the chat context
+            chatContext.fastHealing = chatContext.fastHealing ?? {};
+            chatContext.fastHealing.total = turnStaminaMod;
+            chatContext.fastHealing.confirmed = confirmed;
+         }
+
+         // If stamina would be damaged
+         else {
+            // Update the actor if appropriate
+            const confirmed = autoApplyPersistentDamage === 'enabled';
+            if (confirmed) {
+               await this.applyDamage(-turnStaminaMod, false, false);
+               shouldUpdateActor = true;
+            }
+
+            // Update the chat context
+            chatContext.persistentDamage = chatContext.persistentDamage ?? {};
+            chatContext.persistentDamage.total = -turnStaminaMod;
+            chatContext.persistentDamage.confirmed = confirmed;
+            const wounds = actor.system.resource.wounds;
+            chatContext.wounds = {
+               max: wounds.max,
+               value: wounds.value
+            };
+         }
+
+         // Update the chat contaxt
+         chatContext.stamina = {
+            max: stamina.max,
+            value: stamina.value
+         };
+      }
+
       // Regain resolve
       const autoRegainResolve = getSetting('autoRegainResolve');
       if (autoRegainResolve !== 'disabled') {
@@ -1548,35 +1647,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             const maxResolveRegained = getSetting('baseResolveRegain') + actor.system.mod.resolveRegain.value;
             if (maxResolveRegained > 0) {
 
-               // Calculate the resolve regains
-               const maxResolve = resolve.max;
-               const initialResolve = resolve.value;
-               const newResolve = Math.min(maxResolve, initialResolve + maxResolveRegained);
-               const resolveRegained = newResolve - initialResolve;
+               // Update the actor if appropriate
+               const confirmed = autoApplyFastHealing === 'enabled';
+               if (confirmed) {
+                  this.regainResolve(maxResolveRegained, false);
+                  shouldUpdateActor = true;
+               }
 
                // Update the chat context
-               chatContext.resolveRegained = resolveRegained;
-               chatContext.initialResolve = initialResolve;
-               chatContext.newResolve = newResolve;
-               chatContext.maxResolve = maxResolve;
-
-               // Update the actor if appropriate
-               if (autoRegainResolve === 'enabled') {
-                  resolve.value = newResolve;
-                  updateActor = true;
-
-                  // Flag so the report knows the resolve has already been regained
-                  chatContext.resolveRegainConfirmed = true;
-               }
-               else {
-                  chatContext.resolveRegainConfirmed = false;
-               }
+               chatContext.resolve = {
+                  value: resolve.value,
+                  max: resolve.max
+               };
+               chatContext.resolveRegain = {
+                  total: maxResolveRegained,
+                  confirmed: confirmed,
+               };
             }
          }
       }
 
       // Update actor if appropriate
-      if (updateActor) {
+      if (shouldUpdateActor) {
          actor.update({
             system: actor.system
          });

@@ -166,7 +166,7 @@
    "LOCAL.effect.permanent.desc.label": "Effect lasts until it is removed",
    "LOCAL.effect.turnEnd.desc.label": "Effect progresses on Turn End",
    "LOCAL.effect.turnStart.desc.label": "Effect progresses on Turn Start",
-   "LOCAL.turnResourceMod.label": "Turn Resource Mod",
+   "LOCAL.fastHealing.label": "Turn Resource Mod",
    "LOCAL.elite.label": "Elite",
    "LOCAL.encumbering.desc.label": "While encumbered, you have Disadvantage on checks to Swim, Fly, or Climb.",
    "LOCAL.encumbering.label": "Encumbering",
@@ -198,7 +198,7 @@
    "LOCAL.frightened.desc.label": "While a <strong><em>Frightened</em></strong> creature can detect the source of their fear, they roll one less dice for all Checks.",
    "LOCAL.frightened.label": "Frightened",
    "LOCAL.grip.label": "Grip",
-   "LOCAL.healDamage.label": "Heal Damage",
+   "LOCAL.applyHealing.label": "Apply Healing",
    "LOCAL.healedDamage.label": "Healed Damage",
    "LOCAL.healing.desc.label": "Bonuses and penalties to Healing performed.",
    "LOCAL.healing.label": "Healing",
@@ -330,6 +330,8 @@
    "LOCAL.reflexes.label": "Reflexes",
    "LOCAL.reflexes.value.label": "Total Reflexes.",
    "LOCAL.regainedResolve.label": "Regained Resolve",
+   "LOCAL.regained%xResolve.label": "Regained %x Resolve",
+   "LOCAL.regain%xResolve.label": "Regain %x Resolve",
    "LOCAL.regainResolve.label": "Regain Resolve",
    "LOCAL.reload.desc.label": "Attacks with the Reload trait require an Action to be reloaded before they can be used again.",
    "LOCAL.reload.label": "Reload",
@@ -543,10 +545,6 @@
       "showButton": "Show Button",
       "enabled": "Enabled",
       "disabled": "Disabled"
-   },
-   "SETTINGS.autoRemoveExpiredEffectsConfirmButton": {
-      "label": "Auto-Remove Expired Effects (Confirm Button?)",
-      "hint": "When Auto-Remove Expired Effects is set to Show Button, this setting determines whether to pop up an additional confirmation dialog."
    },
    "SETTINGS.reportTakingDamage": {
       "label": "Report Taking Damage",
