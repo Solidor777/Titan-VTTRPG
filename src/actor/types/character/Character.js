@@ -1610,9 +1610,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
 
             // Update the chat context
-            chatContext.fastHealing = chatContext.fastHealing ?? {};
-            chatContext.fastHealing.total = turnStaminaMod;
-            chatContext.fastHealing.confirmed = confirmed;
+            chatContext.healingApplied = {
+               total: turnStaminaMod,
+               confirmed: confirmed
+            };
          }
 
          // If stamina would be damaged
@@ -1625,13 +1626,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
 
             // Update the chat context
-            chatContext.persistentDamage = chatContext.persistentDamage ?? {};
-            chatContext.persistentDamage.total = -turnStaminaMod;
-            chatContext.persistentDamage.confirmed = confirmed;
-            const wounds = actor.system.resource.wounds;
-            chatContext.wounds = {
-               max: wounds.max,
-               value: wounds.value
+            chatContext.damageApplied = {
+               total: -turnStaminaMod,
+               confirmed: confirmed
             };
          }
 

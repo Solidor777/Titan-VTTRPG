@@ -2,9 +2,9 @@
    import { getContext } from 'svelte';
    import { getSetting, localize } from '~/helpers/utility';
    import ChatEffects from '~/chat-message/ChatEffects.svelte';
-   import TurnReportConfirmResolveRegainButton from './TurnReportConfirmResolveRegainButton.svelte';
-   import TurnReportRemoveExpiredEffectsButton from './TurnReportRemoveExpiredEffectsButton.svelte';
-   import TurnReportConfirmFastHealingButton from './TurnReportConfirmFastHealingButton.svelte';
+   import TurnReportConfirmResolveRegainButton from '~/chat-message/turn-report/TurnReportConfirmResolveRegainButton.svelte';
+   import TurnReportRemoveExpiredEffectsButton from '~/chat-message/turn-report/TurnReportRemoveExpiredEffectsButton.svelte';
+   import TurnReportConfirmApplyHealingButton from '~/chat-message/turn-report/TurnReportConfirmApplyHealingButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -93,22 +93,22 @@
       {/if}
    {/if}
 
-   <!--Fast Healing-->
-   {#if chatContext.fastHealing}
+   <!--Healing applied-->
+   {#if chatContext.healingApplied}
       <!--If confirmed, show how much was was regained-->
-      {#if $document.flags.titan.chatContext.fastHealing.confirmed === true}
+      {#if $document.flags.titan.chatContext.healingApplied.confirmed === true}
          <div class="message">
             <i class="fas fa-heart" />
             <div>
                {localize('healed%xDamage').replace(
                   '%x',
-                  chatContext.fastHealing.total
+                  chatContext.healingApplied.total
                )}
             </div>
          </div>
-      {:else if $document.flags.titan.chatContext.fastHealing.confirmed === false}
+      {:else if $document.flags.titan.chatContext.healingApplied.confirmed === false}
          <div class="button">
-            <TurnReportConfirmFastHealingButton />
+            <TurnReportConfirmApplyHealingButton />
          </div>
       {/if}
    {/if}
