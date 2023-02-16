@@ -121,7 +121,7 @@
          <div class="message">
             <i class="fas fa-burst" />
             <div>
-               {localize('applied%xDamage').replace(
+               {localize('took%xDamage').replace(
                   '%x',
                   chatContext.damageApplied.total
                )}

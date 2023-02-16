@@ -25,8 +25,7 @@
       class="button"
       use:tooltip={{ content: localize('applyDamageIgnoreArmor') }}
    >
-      <EfxButton
-         on:click={() => applyDamageToTargets(damage, true, false, true, true)}
+      <EfxButton on:click={() => applyDamageToTargets(damage, true, true, true)}
          ><i class="fas fa-shield-slash" />
       </EfxButton>
    </div>

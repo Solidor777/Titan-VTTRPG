@@ -11,15 +11,10 @@
 </script>
 
 <!--Apply healing button-->
-<div
-   class="healing-button"
-   use:tooltip={{ content: localize('recoverStamina') }}
->
+<div class="healing-button" use:tooltip={{ content: localize('applyHealing') }}>
    <EfxButton on:click={() => applyHealingToTargets(healing, true, true)}>
       <i class="fas fa-heart" />
-      {`${localize('recoverStamina')} (${
-         $document.flags.titan.chatContext.results.healing
-      })`}
+      {localize('apply%xHealing').replace('%x', healing)}
    </EfxButton>
 </div>
 

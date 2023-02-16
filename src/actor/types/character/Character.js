@@ -984,9 +984,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                const chatContext = {
                   type: 'report',
                   img: this.parent.img,
-                  header: `${localize('tookDamage')}: ${damageTaken}`,
+                  header: localize('took%xDamage').replace('%x', damageTaken),
                   subHeader: [`${this.parent.name}`],
-                  icon: 'fas fa-heart',
+                  icon: 'fas fa-burst',
                   message: [
                      `${localize('stamina')}: ${stamina.value} / ${stamina.max}`,
                      `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
@@ -995,17 +995,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
                // Wounds taken
                if (woundsTaken > 0) {
-                  chatContext.message = [`${localize('woundsTaken')}: ${woundsTaken}`, ...chatContext.message];
+                  chatContext.message = [localize('suffered%xWounds').replace('%x', woundsTaken), ...chatContext.message];
                }
 
                // Damage resisted
                if (damageTaken !== damage) {
-                  chatContext.message = [`${localize('damageResisted')}: ${damage - damageTaken}`, ...chatContext.message];
+                  chatContext.message = [localize('resisted%xDamage').replace('%x', (damage - damageTaken)), ...chatContext.message];
                }
 
                // Ignore Armor
                if (ignoreArmor) {
-                  chatContext.message = [localize('ignoreArmor'), ...chatContext.message];
+                  chatContext.message = [`${localize('armorIgnored')}`, ...chatContext.message];
                }
 
                // Send the report to chat
@@ -1055,7 +1055,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   const chatContext = {
                      type: 'report',
                      img: this.parent.img,
-                     header: `${localize('healedDamage')}: ${staminaHealed}`,
+                     header: localize('healed%xDamage').replace('%x', staminaHealed),
                      subHeader: [this.parent.name],
                      icon: 'fas fa-heart',
                      message: [
@@ -1303,7 +1303,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                if (woundsHealed > 0) {
                   chatContext.message = [
                      ...chatContext.message,
-                     `${localize('woundsHealed')}: ${woundsHealed}`,
+                     localize('healed%xWounds').replace('%x', woundsHealed),
                      `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
                   ];
                }
