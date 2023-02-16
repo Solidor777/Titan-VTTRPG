@@ -15,7 +15,7 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
-import { getSumOfValuesInObject } from '../../../helpers/Utility';
+import { getGMs, getOwners, getSumOfValuesInObject } from '../../../helpers/Utility';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
@@ -990,22 +990,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Send the report to chat
-               await ChatMessage.create({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                  sound: CONFIG.sounds.notification,
-                  whisper: game.users.filter((user) =>
-                     reportSettings === 'owner' ?
-                        this.parent.testUserPermission(user, 'OWNER') :
-                        user.isGM
-                  ),
-                  flags: {
-                     titan: {
-                        chatContext: chatContext
-                     }
-                  }
-               });
+               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
             }
 
          }
@@ -1061,22 +1046,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   };
 
                   // Send the report to chat
-                  await ChatMessage.create({
-                     user: game.user.id,
-                     speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-                     type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                     sound: CONFIG.sounds.notification,
-                     whisper: game.users.filter((user) =>
-                        reportSettings === 'owner' ?
-                           this.parent.testUserPermission(user, 'OWNER') :
-                           user.isGM
-                     ),
-                     flags: {
-                        titan: {
-                           chatContext: chatContext
-                        }
-                     }
-                  });
+                  this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
                }
             }
          }
@@ -1139,22 +1109,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
 
                   // Send the chat message
-                  ChatMessage.create({
-                     user: game.user.id,
-                     speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-                     type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                     sound: CONFIG.sounds.notification,
-                     whisper: game.users.filter((user) =>
-                        reportSettings === 'owner' ?
-                           this.parent.testUserPermission(user, 'OWNER') :
-                           user.isGM
-                     ),
-                     flags: {
-                        titan: {
-                           chatContext: chatContext
-                        }
-                     }
-                  });
+                  this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
                }
             }
          }
@@ -1251,22 +1206,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                };
 
                // Send the report to chat
-               await ChatMessage.create({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: actor }),
-                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                  sound: CONFIG.sounds.notification,
-                  whisper: game.users.filter((user) =>
-                     reportSettings === 'owner' ?
-                        actor.testUserPermission(user, 'OWNER') :
-                        user.isGM
-                  ),
-                  flags: {
-                     titan: {
-                        chatContext: chatContext
-                     }
-                  }
-               });
+               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
             }
          }
       }
@@ -1301,22 +1241,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                };
 
                // Send the report to chat
-               await ChatMessage.create({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: actor }),
-                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                  sound: CONFIG.sounds.notification,
-                  whisper: game.users.filter((user) =>
-                     reportSettings === 'owner' ?
-                        actor.testUserPermission(user, 'OWNER') :
-                        user.isGM
-                  ),
-                  flags: {
-                     titan: {
-                        chatContext: chatContext
-                     }
-                  }
-               });
+               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
             }
          }
       }
@@ -1365,22 +1290,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Send the report to chat
-               await ChatMessage.create({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: actor }),
-                  type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                  sound: CONFIG.sounds.notification,
-                  whisper: game.users.filter((user) =>
-                     reportSettings === 'owner' ?
-                        actor.testUserPermission(user, 'OWNER') :
-                        user.isGM
-                  ),
-                  flags: {
-                     titan: {
-                        chatContext: chatContext
-                     }
-                  }
-               });
+               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
             }
          }
       }
@@ -1394,6 +1304,100 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const actor = this.parent;
       let shouldUpdateActor = false;
 
+      // Calculate healing or damage
+      if (await this.calculateTurnHealingAndDamage(chatContext, 'turnStart') === true) {
+         shouldUpdateActor = true;
+      }
+
+      // Calculate turn start effects
+      await this.calculateTurnStartEffects(chatContext);
+
+      // Regain resolve
+      if (this.calculateResolveRegain(chatContext)) {
+         shouldUpdateActor = true;
+      }
+
+      // Update actor if appropriate
+      if (shouldUpdateActor) {
+         actor.update({
+            system: actor.system
+         });
+      }
+
+      // Send the end of turn report if appropriate
+      if (Object.keys(chatContext).length > 0) {
+
+         // Prepare chat context
+         chatContext.type = 'turnReport';
+         chatContext.img = actor.img;
+         chatContext.header = localize('turnStart');
+         chatContext.subHeader = [actor.name];
+
+         this.whisperUsers(chatContext, getOwners(this.parent));
+      }
+
+      // Open sheet
+      if (game.user.isGM) {
+         switch (getSetting('autoOpenCharacterSheetsGM')) {
+            case 'npcsOnly': {
+               if (!actor.hasPlayerOwner) {
+                  actor.sheet.render(true);
+               }
+               break;
+            }
+            case 'pcsOnly': {
+               if (actor.hasPlayerOwner) {
+                  actor.sheet.render(true);
+               }
+               break;
+            }
+            case 'all': {
+               actor.sheet.render(true);
+               break;
+            }
+            default: {
+               break;
+            }
+         }
+      }
+
+      else if (actor.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
+         actor.sheet.render(true);
+      }
+
+      return;
+   }
+
+   async onTurnEnd() {
+      // Initialize variables
+      const actor = this.parent;
+      const chatContext = {};
+
+      this.calculateTurnEndEffects(chatContext);
+
+      if (await this.calculateTurnHealingAndDamage(chatContext, 'turnEnd') === true) {
+         actor.update({
+            system: actor.system
+         });
+      }
+
+      // End of turn report
+      if (Object.keys(chatContext).length > 0) {
+
+         // Prepare chat context
+         chatContext.type = 'turnReport';
+         chatContext.img = actor.img;
+         chatContext.header = localize('turnEnd');
+         chatContext.subHeader = [actor.name];
+
+         // Send the report to chat
+         this.whisperUsers(chatContext, getOwners(this.parent));
+      }
+
+      return;
+   }
+
+   async calculateTurnStartEffects(chatContext) {
       // Get the settings for effect automation
       const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
       const reportEffects = getSetting('reportEffects');
@@ -1401,7 +1405,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Check all active effects
       const conditions = [];
-      this.parent.effects.filter((effect) => !actor.items.get(effect.origin)).forEach((effect) => {
+      this.parent.effects.filter((effect) => !this.parent.items.get(effect.origin)).forEach((effect) => {
          // If this is an orphaned effect, then delete it
          if (effect.flags?.titan?.itemId) {
             effect.delete();
@@ -1548,198 +1552,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
          }
       }
-
-      // Fast healing report
-      const selector = 'turnStart';
-      if (getSetting('reportHealingDamage')) {
-         const fastHealing = this.fastHealing;
-         if (fastHealing && fastHealing[selector]) {
-            chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
-         }
-      }
-
-      // Persistent damage report
-      if (getSetting('reportTakingDamage')) {
-         const persistentDamage = this.persistentDamage;
-         if (persistentDamage && persistentDamage[selector]) {
-            chatContext.persistentDamage = foundry.utils.deepClone(persistentDamage[selector]);
-         }
-      }
-
-      // Auto apply dealing and damage
-      const autoApplyFastHealing = getSetting('autoApplyFastHealing');
-      const autoApplyPersistentDamage = getSetting('autoApplyPersistentDamage');
-      let turnStaminaMod = 0;
-
-      // Get the amount of fast healing to be apply
-      if (autoApplyFastHealing !== 'disabled') {
-         const fastHealing = this.fastHealing;
-         if (fastHealing) {
-            const selectorFastHealing = fastHealing[selector];
-            if (selectorFastHealing) {
-               turnStaminaMod += getSumOfValuesInObject(selectorFastHealing);
-               chatContext.fastHealing = foundry.utils.deepClone(selectorFastHealing);
-            }
-         }
-      }
-
-      // Get the amount of persistent damage to apply
-      if (autoApplyPersistentDamage !== 'disabled') {
-         const persistentDamage = this.persistentDamage;
-         if (persistentDamage) {
-            const selectorPersistentDamage = persistentDamage[selector];
-            if (selectorPersistentDamage) {
-               turnStaminaMod -= getSumOfValuesInObject(selectorPersistentDamage);
-               chatContext.persistentDamage = foundry.utils.deepClone(selectorPersistentDamage);
-            }
-         }
-      }
-
-      // If stamina would be changed
-      if (turnStaminaMod !== 0) {
-         const stamina = actor.system.resource.stamina;
-
-         // If stamina would be healed
-         if (turnStaminaMod > 0) {
-
-            // Update the actor if appropriate
-            const confirmed = autoApplyFastHealing === 'enabled';
-            if (confirmed) {
-               await this.applyHealing(turnStaminaMod, false, false);
-               shouldUpdateActor = true;
-            }
-
-            // Update the chat context
-            chatContext.healingApplied = {
-               total: turnStaminaMod,
-               confirmed: confirmed
-            };
-         }
-
-         // If stamina would be damaged
-         else {
-            // Update the actor if appropriate
-            const confirmed = autoApplyPersistentDamage === 'enabled';
-            if (confirmed) {
-               await this.applyDamage(-turnStaminaMod, false, false);
-               shouldUpdateActor = true;
-            }
-
-            // Update the chat context
-            chatContext.damageApplied = {
-               total: -turnStaminaMod,
-               confirmed: confirmed
-            };
-         }
-
-         // Update the chat contaxt
-         chatContext.stamina = {
-            max: stamina.max,
-            value: stamina.value
-         };
-      }
-
-      // Regain resolve
-      const autoRegainResolve = getSetting('autoRegainResolve');
-      if (autoRegainResolve !== 'disabled') {
-
-         // If the resolve value is below max
-         const resolve = actor.system.resource.resolve;
-         if (resolve.value < resolve.max) {
-
-            // If any resolve would be regained
-            const maxResolveRegained = getSetting('baseResolveRegain') + actor.system.mod.resolveRegain.value;
-            if (maxResolveRegained > 0) {
-
-               // Update the actor if appropriate
-               const confirmed = autoApplyFastHealing === 'enabled';
-               if (confirmed) {
-                  this.regainResolve(maxResolveRegained, false);
-                  shouldUpdateActor = true;
-               }
-
-               // Update the chat context
-               chatContext.resolve = {
-                  value: resolve.value,
-                  max: resolve.max
-               };
-               chatContext.resolveRegain = {
-                  total: maxResolveRegained,
-                  confirmed: confirmed,
-               };
-            }
-         }
-      }
-
-      // Update actor if appropriate
-      if (shouldUpdateActor) {
-         actor.update({
-            system: actor.system
-         });
-      }
-
-      // Send the end of turn report if appropriate
-      if (Object.keys(chatContext).length > 0) {
-
-         // Prepare chat context
-         chatContext.type = 'turnReport';
-         chatContext.img = actor.img;
-         chatContext.header = localize('turnStart');
-         chatContext.subHeader = [actor.name];
-
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               actor.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
-               }
-            },
-         });
-      }
-
-      // Open sheet
-      if (game.user.isGM) {
-         switch (getSetting('autoOpenCharacterSheetsGM')) {
-            case 'npcsOnly': {
-               if (!actor.hasPlayerOwner) {
-                  actor.sheet.render(true);
-               }
-               break;
-            }
-            case 'pcsOnly': {
-               if (actor.hasPlayerOwner) {
-                  actor.sheet.render(true);
-               }
-               break;
-            }
-            case 'all': {
-               actor.sheet.render(true);
-               break;
-            }
-            default: {
-               break;
-            }
-         }
-      }
-      else if (actor.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
-         actor.sheet.render(true);
-      }
-
-      return;
    }
 
-   async onTurnEnd() {
-      // Initialize variables
-      const actor = this.parent;
-      const chatContext = {};
-
+   async calculateTurnEndEffects(chatContext) {
       // Get the settings for effect automation
       const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
       const reportEffects = getSetting('reportEffects');
@@ -1820,33 +1635,155 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       }
 
-      // End of turn report
-      if (Object.keys(chatContext).length > 0) {
+      return;
+   }
 
-         // Prepare chat context
-         chatContext.type = 'turnReport';
-         chatContext.img = actor.img;
-         chatContext.header = localize('turnEnd');
-         chatContext.subHeader = [actor.name];
+   async calculateTurnHealingAndDamage(chatContext, selector) {
+      let shouldUpdateActor = false;
 
-         // Send the report to chat
-         await ChatMessage.create({
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            sound: CONFIG.sounds.notification,
-            whisper: game.users.filter((user) =>
-               this.parent.testUserPermission(user, 'OWNER')
-            ),
-            flags: {
-               titan: {
-                  chatContext: chatContext
-               }
-            },
-         });
+      // Fast healing report
+      if (getSetting('reportHealingDamage')) {
+         const fastHealing = this.fastHealing;
+         if (fastHealing && fastHealing[selector]) {
+            chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
+         }
       }
 
-      return;
+      // Persistent damage report
+      if (getSetting('reportTakingDamage')) {
+         const persistentDamage = this.persistentDamage;
+         if (persistentDamage && persistentDamage[selector]) {
+            chatContext.persistentDamage = foundry.utils.deepClone(persistentDamage[selector]);
+         }
+      }
+
+      // Auto apply dealing and damage
+      const autoApplyFastHealing = getSetting('autoApplyFastHealing');
+      const autoApplyPersistentDamage = getSetting('autoApplyPersistentDamage');
+      let turnStaminaMod = 0;
+
+      // Get the amount of fast healing to be apply
+      if (autoApplyFastHealing !== 'disabled') {
+         const fastHealing = this.fastHealing;
+         if (fastHealing) {
+            const selectorFastHealing = fastHealing[selector];
+            if (selectorFastHealing) {
+               turnStaminaMod += getSumOfValuesInObject(selectorFastHealing);
+               chatContext.fastHealing = foundry.utils.deepClone(selectorFastHealing);
+            }
+         }
+      }
+
+      // Get the amount of persistent damage to apply
+      if (autoApplyPersistentDamage !== 'disabled') {
+         const persistentDamage = this.persistentDamage;
+         if (persistentDamage) {
+            const selectorPersistentDamage = persistentDamage[selector];
+            if (selectorPersistentDamage) {
+               turnStaminaMod -= getSumOfValuesInObject(selectorPersistentDamage);
+               chatContext.persistentDamage = foundry.utils.deepClone(selectorPersistentDamage);
+            }
+         }
+      }
+
+      // If stamina would be changed
+      if (turnStaminaMod !== 0) {
+         const stamina = this.parent.system.resource.stamina;
+
+         // If stamina would be healed
+         if (turnStaminaMod > 0) {
+
+            // Update the actor if appropriate
+            const confirmed = autoApplyFastHealing === 'enabled';
+            if (confirmed) {
+               await this.applyHealing(turnStaminaMod, false, false);
+               shouldUpdateActor = true;
+            }
+
+            // Update the chat context
+            chatContext.healingApplied = {
+               total: turnStaminaMod,
+               confirmed: confirmed
+            };
+         }
+
+         // If stamina would be damaged
+         else {
+            // Update the actor if appropriate
+            const confirmed = autoApplyPersistentDamage === 'enabled';
+            if (confirmed) {
+               await this.applyDamage(-turnStaminaMod, false, false);
+               shouldUpdateActor = true;
+            }
+
+            // Update the chat context
+            chatContext.damageApplied = {
+               total: -turnStaminaMod,
+               confirmed: confirmed
+            };
+         }
+
+         // Update the chat contaxt
+         chatContext.stamina = {
+            max: stamina.max,
+            value: stamina.value
+         };
+      }
+
+      return shouldUpdateActor;
+   }
+
+   async calculateResolveRegain(chatContext) {
+      let shouldUpdateActor = false;
+
+      // Calculate resolve regain
+      const autoRegainResolve = getSetting('autoRegainResolve');
+      if (autoRegainResolve !== 'disabled') {
+
+         // If the resolve value is below max
+         const resolve = this.parent.system.resource.resolve;
+         if (resolve.value < resolve.max) {
+
+            // If any resolve would be regained
+            const maxResolveRegained = getSetting('baseResolveRegain') + this.parent.system.mod.resolveRegain.value;
+            if (maxResolveRegained > 0) {
+
+               // Update the actor if appropriate
+               const confirmed = autoApplyFastHealing === 'enabled';
+               if (confirmed) {
+                  this.regainResolve(maxResolveRegained, false);
+                  shouldUpdateActor = true;
+               }
+
+               // Update the chat context
+               chatContext.resolve = {
+                  value: resolve.value,
+                  max: resolve.max
+               };
+               chatContext.resolveRegain = {
+                  total: maxResolveRegained,
+                  confirmed: confirmed,
+               };
+            }
+         }
+      }
+
+      return shouldUpdateActor;
+   }
+
+   async whisperUsers(chatContext, users) {
+      return await ChatMessage.create({
+         user: game.user.id,
+         speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+         type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+         sound: CONFIG.sounds.notification,
+         whisper: users,
+         flags: {
+            titan: {
+               chatContext: chatContext
+            }
+         }
+      });
    }
 
    async toggleMultiAttack(itemId) {

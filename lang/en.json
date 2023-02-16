@@ -199,6 +199,7 @@
    "LOCAL.frightened.label": "Frightened",
    "LOCAL.grip.label": "Grip",
    "LOCAL.applyHealing.label": "Apply Healing",
+   "LOCAL.apply%xDamage.label": "Apply %x Damage",
    "LOCAL.healedDamage.label": "Healed Damage",
    "LOCAL.healed%xDamage.label": "Healed %x Damage",
    "LOCAL.heal%xDamage.label": "Heal %x Damage",

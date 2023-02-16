@@ -5,6 +5,7 @@
    import TurnReportConfirmResolveRegainButton from '~/chat-message/turn-report/TurnReportConfirmResolveRegainButton.svelte';
    import TurnReportRemoveExpiredEffectsButton from '~/chat-message/turn-report/TurnReportRemoveExpiredEffectsButton.svelte';
    import TurnReportConfirmApplyHealingButton from '~/chat-message/turn-report/TurnReportConfirmApplyHealingButton.svelte';
+   import TurnReportConfirmApplyDamageButton from '~/chat-message/turn-report/TurnReportConfirmApplyDamageButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -109,6 +110,26 @@
       {:else if $document.flags.titan.chatContext.healingApplied.confirmed === false}
          <div class="button">
             <TurnReportConfirmApplyHealingButton />
+         </div>
+      {/if}
+   {/if}
+
+   <!--Damage applied-->
+   {#if chatContext.damageApplied}
+      <!--If confirmed, show how much was was regained-->
+      {#if $document.flags.titan.chatContext.damageApplied.confirmed === true}
+         <div class="message">
+            <i class="fas fa-heart" />
+            <div>
+               {localize('healed%xDamage').replace(
+                  '%x',
+                  chatContext.damageApplied.total
+               )}
+            </div>
+         </div>
+      {:else if $document.flags.titan.chatContext.damageApplied.confirmed === false}
+         <div class="button">
+            <TurnReportConfirmApplyDamageButton />
          </div>
       {/if}
    {/if}

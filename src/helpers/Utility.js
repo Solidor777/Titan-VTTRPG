@@ -113,3 +113,15 @@ export function getSumOfValuesInObject(object) {
 
    return retVal;
 }
+
+export function getOwners(document) {
+   return game.users.filter((user) =>
+      document.testUserPermission(user, 'OWNER')
+   );
+}
+
+export function getGMs() {
+   return game.users.filter((user) =>
+      user.isGM
+   );
+}
