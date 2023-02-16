@@ -20,7 +20,7 @@
             );
 
             // Update the chat document
-            $document.update({
+            await $document.update({
                flags: {
                   titan: {
                      chatContext: {
@@ -28,7 +28,7 @@
                            confirmed: true,
                         },
                         stamina: {
-                           value: actor.system.resource.resolve.value,
+                           value: actor.system.resource.stamina.value,
                         },
                      },
                   },

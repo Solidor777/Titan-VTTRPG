@@ -1,7 +1,19 @@
-import { clamp, localize, getSetting, getCheckOptions, confirmDeletingItems, documentSort, isHTMLBlank } from '~/helpers/Utility.js';
+import {
+   clamp,
+   localize,
+   getSetting,
+   getCheckOptions,
+   confirmDeletingItems,
+   documentSort,
+   isHTMLBlank,
+   getGMs,
+   getOwners,
+   getSumOfValuesInObject
+} from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
 import { applyFastHealingElements } from '~/rules-element/FastHealing';
+import { applyPersistentDamageElements } from '~/rules-element/PersistentDamage';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -15,7 +27,7 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
-import { getGMs, getOwners, getSumOfValuesInObject } from '../../../helpers/Utility';
+
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
@@ -23,6 +35,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    applyFlatModifierElements = applyFlatModifierElements.bind(this);
    applyMulBaseElements = applyMulBaseElements.bind(this);
    applyFastHealingElements = applyFastHealingElements.bind(this);
+   applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -255,6 +268,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const mulBaseElements = [];
       const flatModifierElements = [];
       const fastHealingElements = [];
+      const persistentDamageElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -269,6 +283,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                fastHealingElements.push(element);
                break;
             }
+            case 'persistentDamage': {
+               persistentDamageElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -279,6 +297,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this.applyMulBaseElements(mulBaseElements);
       this.applyFlatModifierElements(flatModifierElements);
       this.applyFastHealingElements(fastHealingElements);
+      this.applyPersistentDamageElements(persistentDamageElements);
 
       return;
    }
@@ -1709,6 +1728,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // If stamina would be damaged
          else {
+            const wounds = this.parent.system.resource.wounds;
+            chatContext.wounds = {
+               max: wounds.max,
+               value: wounds.value
+            };
+
             // Update the actor if appropriate
             const confirmed = autoApplyPersistentDamage === 'enabled';
             if (confirmed) {

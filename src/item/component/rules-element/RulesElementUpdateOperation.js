@@ -2,6 +2,7 @@ import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
 import { getMulBaseTemplate } from '~/rules-element/MulBase.js';
 import { getFastHealingTemplate } from '~/rules-element/FastHealing.js';
 import getTurnStartMessageTemplate from '~/rules-element/TurnStartMessage.js';
+import { getPersistentDamageTemplate } from '~/rules-element/PersistentDamage';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -20,6 +21,10 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
       case 'fastHealing': {
          document.system.rulesElement[elementIdx] = getFastHealingTemplate(element.uuid, element.type);
+         break;
+      }
+      case 'persistentDamage': {
+         document.system.rulesElement[elementIdx] = getPersistentDamageTemplate(element.uuid, element.type);
          break;
       }
       default: {

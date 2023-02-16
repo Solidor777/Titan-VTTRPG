@@ -59,7 +59,7 @@
    <!--Wounds-->
    {#if chatContext.wounds}
       <div class="message">
-         {`${localize('stamina')}: ${
+         {`${localize('wounds')}: ${
             $document.flags.titan.chatContext.wounds.value
          } / ${$document.flags.titan.chatContext.wounds.max}`}
       </div>
@@ -119,9 +119,9 @@
       <!--If confirmed, show how much was was regained-->
       {#if $document.flags.titan.chatContext.damageApplied.confirmed === true}
          <div class="message">
-            <i class="fas fa-heart" />
+            <i class="fas fa-burst" />
             <div>
-               {localize('healed%xDamage').replace(
+               {localize('applied%xDamage').replace(
                   '%x',
                   chatContext.damageApplied.total
                )}

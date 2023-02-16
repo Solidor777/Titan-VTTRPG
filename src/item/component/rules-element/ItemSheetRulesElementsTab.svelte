@@ -9,6 +9,7 @@
    import ItemSheetMulBaseSettings from '~/item/component/rules-element/ItemSheetMulBaseSettings.svelte';
    import ItemSheetTurnStartMessageSettings from '~/item/component/rules-element/ItemSheetTurnStartMessageSettings.svelte';
    import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
+   import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -31,6 +32,10 @@
          label: localize('fastHealing'),
          value: 'fastHealing',
       },
+      {
+         label: localize('persistentDamage'),
+         value: 'persistentDamage',
+      },
    ];
 
    function selectComponent(operation) {
@@ -39,6 +44,7 @@
          mulBase: ItemSheetMulBaseSettings,
          turnStartMessage: ItemSheetTurnStartMessageSettings,
          fastHealing: ItemSheetFastHealingSettings,
+         persistentDamage: ItemSheetPersistentDamageSettings,
       };
 
       return elementComponents[operation];

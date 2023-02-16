@@ -39,6 +39,7 @@
    "LOCAL.any.label": "Any",
    "LOCAL.applyDamageIgnoreArmor.label": "Apply Damage (Ignore Armor)",
    "LOCAL.applyDamage.label": "Apply Damage",
+   "LOCAL.applied%xDamage.label": "Applied %x Damage",
    "LOCAL.applyEdits.label": "Apply Edits",
    "LOCAL.applyHalfDamage.label": "Apply Damage (Halved)",
    "LOCAL.arcana.desc.label": "Arcana measures how much you know about arcane magic and creatures.",
@@ -303,6 +304,7 @@
    "LOCAL.opposedBy.label": "Opposed by",
    "LOCAL.opposedCheck.label": "Opposed Check",
    "LOCAL.passive.label": "Passive",
+   "LOCAL.persistentDamage.label": "Persistent Damage.",
    "LOCAL.penetrating.desc.label": "Penetrating weapons ignore 1 point of Armor.",
    "LOCAL.penetrating.label": "Penetrating",
    "LOCAL.perception.desc.label": "Perception measures your ability to be aware of your environment and find hidden details.",
@@ -527,16 +529,26 @@
       "label": "Initiative Formula",
       "hint": "Optional formula to add to a character's Initiative rating during combat (default is +2d6)."
    },
-   "SETTINGS.autoRegainResolve": {
-      "label": "Auto-Regain Resolve",
-      "hint": "When enabled, a combatant's resolve will automatically increase at the start of their turn. Show Button will instead display a button in the chat log.",
+   "SETTINGS.autoApplyFastHealing": {
+      "label": "Auto-Apply Fast Healing",
+      "hint": "When enabled, combatants will automatically apply Fast Healing effects at start or end of their turn, depending on the effect. Show Button will instead display a confirmation button in the chat log.",
       "showButton": "Show Button",
       "enabled": "Enabled",
       "disabled": "Disabled"
    },
-   "SETTINGS.baseResolveRegain": {
-      "label": "Base Resolve Regain",
-      "hint": "When Auto-Regain Resolve is not disabled, this is the base value by which a combatant's resolve will increase by at the start of their turn."
+   "SETTINGS.autoApplyPersistentDamage": {
+      "label": "Auto-Apply Fast Healing",
+      "hint": "When enabled, combatants will automatically apply Persistent Damage effects at start or end of their turn, depending on the effect. Show Button will instead display a confirmation button in the chat log.",
+      "showButton": "Show Button",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+   },
+   "SETTINGS.autoRegainResolve": {
+      "label": "Auto-Regain Resolve",
+      "hint": "When enabled, a combatant's resolve will automatically increase at the start of their turn. Show Button will instead display a confirmation button in the chat log.",
+      "showButton": "Show Button",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
    },
    "SETTINGS.autoDecreaseEffectDuration": {
       "label": "Auto-Decrease Effect Duration.",
@@ -544,7 +556,7 @@
    },
    "SETTINGS.autoRemoveExpiredEffects": {
       "label": "Auto-Remove Expired Effects",
-      "hint": "When enabled, expired effects will be automatically removed from a combatant at the start or end of their turn, depending on the effect. Show Button will instead display a button in the chat log.",
+      "hint": "When enabled, expired effects will be automatically removed from a combatant at the start or end of their turn, depending on the effect. Show Button will instead display a confirmation button in the chat log.",
       "showButton": "Show Button",
       "enabled": "Enabled",
       "disabled": "Disabled"
@@ -596,5 +608,13 @@
    "SETTINGS.woundsMultiplier": {
       "label": "Wounds Multiplier",
       "hint": "Base Wounds as a multiple of an character's Body + Mind + Soul."
+   },
+   "SETTINGS.baseWoundsRegain": {
+      "label": "Base Resolve Regain",
+      "hint": "This is the base value by which a combatant's Wounds will be healed when they take a Long Rest."
+   },
+   "SETTINGS.baseResolveRegain": {
+      "label": "Base Resolve Regain",
+      "hint": "When Auto-Regain Resolve is not disabled, this is the base value by which a combatant's Resolve will increase by at the start of their turn."
    }
 }

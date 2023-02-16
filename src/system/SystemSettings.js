@@ -86,7 +86,6 @@ export default function registerSystemSettings() {
       default: '+2d6',
    });
 
-
    game.settings.register('titan', 'autoRegainResolve', {
       config: true,
       scope: 'world',
@@ -101,21 +100,6 @@ export default function registerSystemSettings() {
       restricted: true,
       default: 'showButton',
       requiresReload: true,
-   });
-
-   game.settings.register('titan', 'baseResolveRegain', {
-      config: true,
-      scope: 'world',
-      name: 'SETTINGS.baseResolveRegain.label',
-      hint: 'SETTINGS.baseResolveRegain.hint',
-      type: Number,
-      default: 1,
-      range: {
-         min: 0,
-         max: 10,
-         step: 1
-      },
-      restricted: true,
    });
 
    game.settings.register('titan', 'autoApplyFastHealing', {
@@ -148,21 +132,6 @@ export default function registerSystemSettings() {
       restricted: true,
       default: 'showButton',
       requiresReload: true,
-   });
-
-   game.settings.register('titan', 'baseWoundRegain', {
-      config: true,
-      scope: 'world',
-      name: 'SETTINGS.baseWoundRegain.label',
-      hint: 'SETTINGS.baseWoundRegain.hint',
-      type: Number,
-      default: 1,
-      range: {
-         min: 0,
-         max: 10,
-         step: 1
-      },
-      restricted: true,
    });
 
    game.settings.register('titan', 'autoDecreaseEffectDuration', {
@@ -236,6 +205,16 @@ export default function registerSystemSettings() {
       default: 'owner',
    });
 
+   game.settings.register('titan', 'reportRegainingResolve', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.reportRegainingResolve.label',
+      hint: 'SETTINGS.reportRegainingResolve.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+   });
+
    game.settings.register('titan', 'reportResting', {
       config: true,
       scope: 'world',
@@ -249,16 +228,6 @@ export default function registerSystemSettings() {
       },
       restricted: true,
       default: 'owner',
-   });
-
-   game.settings.register('titan', 'reportRegainingResolve', {
-      config: true,
-      scope: 'world',
-      name: 'SETTINGS.reportRegainingResolve.label',
-      hint: 'SETTINGS.reportRegainingResolve.hint',
-      type: Boolean,
-      restricted: true,
-      default: true,
    });
 
    game.settings.register('titan', 'reportEffects', {
@@ -299,5 +268,35 @@ export default function registerSystemSettings() {
       type: Number,
       restricted: true,
       default: 0.5,
+   });
+
+   game.settings.register('titan', 'baseWoundsRegain', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.baseWoundsRegain.label',
+      hint: 'SETTINGS.baseWoundsRegain.hint',
+      type: Number,
+      default: 1,
+      range: {
+         min: 0,
+         max: 10,
+         step: 1
+      },
+      restricted: true,
+   });
+
+   game.settings.register('titan', 'baseResolveRegain', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.baseResolveRegain.label',
+      hint: 'SETTINGS.baseResolveRegain.hint',
+      type: Number,
+      default: 1,
+      range: {
+         min: 0,
+         max: 10,
+         step: 1
+      },
+      restricted: true,
    });
 }
