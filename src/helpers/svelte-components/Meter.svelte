@@ -3,14 +3,30 @@
    export let max = 1;
    export let min = 0;
    export let current = void 0;
+   let meterWidth = (current / max - min) * 100;
+   let meterUpdate = false;
 
-   // Calculate the meter width
-   $: meterWidth =
-      max > min ? `${(current / max - min) * 100}%`.toString() : '0';
+   function updateMeterWidth() {
+      if (meterWidth < targetMeterWidth) {
+         meterWidth = Math.min(meterWidth + 5, targetMeterWidth);
+      } else if (meterWidth > targetMeterWidth) {
+         meterWidth = Math.max(meterWidth - 5, targetMeterWidth);
+      } else {
+         clearInterval(meterUpdate);
+         meterUpdate = false;
+      }
+   }
+
+   $: targetMeterWidth = (current / max - min) * 100;
+   $: {
+      if (meterWidth !== targetMeterWidth && meterUpdate === false) {
+         meterUpdate = setInterval(updateMeterWidth, 10);
+      }
+   }
 </script>
 
 <div class="meter">
-   <span style="width: {meterWidth}" />
+   <span style={`width: ${meterWidth}%`} />
 </div>
 
 <style lang="scss">

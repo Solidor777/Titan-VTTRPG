@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import { localize } from '~/helpers/Utility.js';
    import CharacterSheetAttribute from '~/actor/types/character/sheet/header/CharacterSheetAttribute.svelte';
 
    // Setup context variables
@@ -9,7 +8,7 @@
 
 <!--Attributes-->
 <div class="attributes">
-   {#each Object.entries($document.system.attribute) as [key]}
+   {#each Object.keys($document.system.attribute) as key}
       <div class="attribute">
          <CharacterSheetAttribute bind:key />
       </div>

@@ -43,7 +43,7 @@
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.standardAspects}>
          <ol>
             <!--Each Aspect-->
-            {#each Object.entries(aspectOptions) as [key, aspectOptions]}
+            {#each Object.values(aspectOptions) as aspectOptions}
                {#if localize(aspectOptions.template.label)
                   .toLowerCase()
                   .indexOf($appState.filter.standardAspects.toLowerCase()) !== -1}

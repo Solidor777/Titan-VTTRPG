@@ -1,42 +1,64 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js"
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import Meter from "~/helpers/svelte-components/Meter.svelte";
-   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import Meter from '~/helpers/svelte-components/Meter.svelte';
+   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
    // Resource key
    export let key;
+   let icon;
+   switch (key) {
+      case 'stamina': {
+         icon = 'fas fa-heart';
+         break;
+      }
+      case 'resolve': {
+         icon = 'fas fa-bolt';
+         break;
+      }
+      default: {
+         icon = 'fas fa-face-head-bandage';
+         break;
+      }
+   }
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Calculate the tooltip for the max value
-   function getTotalValueTooltip(maxBase, equipment, effect, ability, staticMod) {
+   function getTotalValueTooltip(
+      maxBase,
+      equipment,
+      effect,
+      ability,
+      staticMod
+   ) {
       // Base label
-      let retVal = `<p>${localize(`${key}.max`)} * ${game.settings.get("titan", `${key}Multiplier`)}</p><p>${localize(
-         "base"
-      )}: ${maxBase}</p>`;
+      let retVal = `<p>${localize(`${key}.max`)} * ${game.settings.get(
+         'titan',
+         `${key}Multiplier`
+      )}</p><p>${localize('base')}: ${maxBase}</p>`;
 
       // Equipment
       if (equipment !== 0) {
-         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+         retVal += `<p>${localize('equipment')}: ${equipment}</p>`;
       }
 
       // Abilities
       if (ability !== 0) {
-         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+         retVal += `<p>${localize('abilities')}: ${ability}</p>`;
       }
 
       // Effects
       if (effect !== 0) {
-         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+         retVal += `<p>${localize('effects')}: ${effect}</p>`;
       }
 
       // Static mod
       if (staticMod !== 0) {
-         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+         retVal += `<p>${localize('mod')}: ${staticMod}</p>`;
       }
 
       return retVal;
@@ -54,16 +76,24 @@
 <div class="resource">
    <!--Label row-->
    <div class="row">
-      <div class="spacer" />
+      <div class="spacer">
+         <i class={icon} />
+      </div>
 
       <!--Label-->
-      <span class="label" use:tooltip={{content: localize(`${key}.valueDesc`)}}>{localize(key)}</span>
+      <span
+         class="label"
+         use:tooltip={{ content: localize(`${key}.valueDesc`) }}
+         >{localize(key)}</span
+      >
 
       <!--Static Mod-->
       <div class="static-mod">
          <div class="symbol">+</div>
          <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.resource[key].mod.static} />
+            <DocumentIntegerInput
+               bind:value={$document.system.resource[key].mod.static}
+            />
          </div>
       </div>
    </div>
@@ -72,16 +102,24 @@
    <div class="row">
       <!--Current Value Input-->
       <div class="input">
-         <DocumentIntegerInput bind:value={$document.system.resource[key].value} />
+         <DocumentIntegerInput
+            bind:value={$document.system.resource[key].value}
+         />
       </div>
 
       <!--The Meter-->
-      <div class="meter {key}" use:tooltip={{content: localize(`${key}.valueDesc`)}}>
-         <Meter current={$document.system.resource[key].value} max={$document.system.resource[key].max} />
+      <div
+         class="meter {key}"
+         use:tooltip={{ content: localize(`${key}.valueDesc`) }}
+      >
+         <Meter
+            current={$document.system.resource[key].value}
+            max={$document.system.resource[key].max}
+         />
       </div>
 
       <!--Max Value Display-->
-      <div class="value" use:tooltip={{content: totalValueTooltip}}>
+      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
          <ModTag
             baseValue={$document.system.resource[key].maxBase +
                $document.system.resource[key].mod.equipment +
@@ -93,7 +131,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../Styles/Mixins.scss";
+   @import '../../../../../Styles/Mixins.scss';
 
    .resource {
       @include flex-column;
@@ -145,6 +183,9 @@
          .spacer {
             @include flex-row;
             width: 2.75rem;
+            i {
+               margin-left: 0.375rem;
+            }
          }
 
          .meter {

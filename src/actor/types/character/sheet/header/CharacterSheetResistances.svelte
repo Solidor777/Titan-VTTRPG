@@ -8,7 +8,7 @@
 </script>
 
 <div class="resistances">
-   {#each Object.entries($document.system.resistance) as [key]}
+   {#each Object.keys($document.system.resistance) as key}
       <div class="resistance">
          <CharacterSheetResistance bind:key />
       </div>

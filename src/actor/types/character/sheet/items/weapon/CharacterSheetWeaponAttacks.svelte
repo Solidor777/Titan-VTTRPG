@@ -8,7 +8,7 @@
 <!--Attacks list-->
 <ol>
    <!--Each Attack-->
-   {#each Object.entries(item.system.attack) as [attackIdx]}
+   {#each Object.keys(item.system.attack) as attackIdx}
       <li>
          <CharacterSheetWeaponAttack {attackIdx} {item} />
       </li>

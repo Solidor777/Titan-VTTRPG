@@ -38,7 +38,7 @@
    <div class="header">
       <!--Filter Options-->
       <div class="row">
-         {#each Object.entries($appState.filterOptions.inventory) as [key]}
+         {#each Object.keys($appState.filterOptions.inventory) as key}
             <div class="option">
                <ToggleOptionButton
                   label={localize(key)}

@@ -11,7 +11,7 @@
 </script>
 
 <ol>
-   {#each Object.entries(item.system.attack) as [attackIdx, attack]}
+   {#each Object.values(item.system.attack) as attack}
       <!--Each attack-->
       <li>
          <div class="row header">

@@ -10,7 +10,7 @@
 <!--Resources-->
 <div class="resources">
    <!--Each Resource Meter-->
-   {#each Object.entries($document.system.resource) as [key] (key)}
+   {#each Object.keys($document.system.resource) as key}
       {#if $document.system.resource[key].maxBase > 0}
          <div class="resource {key}" transition={key}>
             <CharacterSheetResource {key} />

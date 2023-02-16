@@ -8,7 +8,7 @@
 
 <!--Speeds-->
 <div class="speeds">
-   {#each Object.entries($document.system.speed) as [key]}
+   {#each Object.keys($document.system.speed) as key}
       <div class="speed">
          <CharacterSheetSpeed {key} />
       </div>
