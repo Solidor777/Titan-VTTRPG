@@ -16,9 +16,16 @@
    import ItemCheckChatMessage from '~/check/types/item-check/ItemCheckChatMessage.svelte';
    import CastingCheckChatMessage from '~/check/types/casting-check/CastingCheckChatMessage.svelte';
    import AttackCheckChatMessage from '~/check/types/attack-check/AttackCheckChatMessage.svelte';
-   import ReportChatMessage from '~/chat-message/ReportChatMessage.svelte';
    import PrivateRollChatMessage from '~/chat-message/PrivateRollChatMessage.svelte';
-   import TurnReportChatMessage from '~/chat-message/turn-report/TurnReportChatMessage.svelte';
+   import TurnReportChatMessage from '~/chat-message/report/TurnReportChatMessage.svelte';
+   import DamageReportChatMessage from '~/chat-message/report/DamageReportChatMessage.svelte';
+   import HealingReportChatMessage from '~/chat-message/report/HealingReportChatMessage.svelte';
+   import SpendResolveReportChatMessage from '~/chat-message/report/SpendResolveReportChatMessage.svelte';
+   import RemoveCombatEffectsReportChatMessage from '~/chat-message/report/RemoveCombatEffectsReportChatMessage.svelte';
+   import ShortRestReportChatMessage from '~/chat-message/report/ShortRestReportChatMessage.svelte';
+   import LongRestReportChatMessage from '~/chat-message/report/LongRestReportChatMessage.svelte';
+   import TurnStartReportChatMessage from '~/chat-message/report/TurnStartReportChatMessage.svelte';
+   import TurnEndReportChatMessage from '~/chat-message/report/TurnEndReportChatMessage.svelte';
 
    // Context object
    export let documentStore = void 0;
@@ -44,8 +51,15 @@
             shield: ShieldChatMessage,
             spell: SpellChatMessage,
             weapon: WeaponChatMessage,
-            report: ReportChatMessage,
             turnReport: TurnReportChatMessage,
+            damageReport: DamageReportChatMessage,
+            healingReport: HealingReportChatMessage,
+            spendResolveReport: SpendResolveReportChatMessage,
+            removeCombatEffectsReport: RemoveCombatEffectsReportChatMessage,
+            shortRestReport: ShortRestReportChatMessage,
+            longRestReport: LongRestReportChatMessage,
+            turnStartReport: TurnStartReportChatMessage,
+            turnEndReport: TurnEndReportChatMessage,
          };
          return chatComponents[$document.flags.titan.chatContext.type];
       }

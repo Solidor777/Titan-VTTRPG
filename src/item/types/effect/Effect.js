@@ -18,7 +18,7 @@ export default class TitanEffect extends TitanTypeComponent {
       if (this.parent.img === 'icons/svg/item-bag.svg') {
          return {
             img: 'icons/svg/daze.svg'
-         }
+         };
       }
 
       return false;
@@ -61,7 +61,7 @@ export default class TitanEffect extends TitanTypeComponent {
                duration: {
                   turns: item.system.duration.remaining
                }
-            })
+            });
          }
 
          // Update the item
@@ -70,9 +70,6 @@ export default class TitanEffect extends TitanTypeComponent {
                effectId: effect._id
             }
          });
-      }
-      if (item.system.effectId = '' || !parent.effects.get(item.system.effectId)) {
-
       }
 
       return;
@@ -117,8 +114,8 @@ export default class TitanEffect extends TitanTypeComponent {
                }
 
                // Update visual active effects description if appropriate
-               const description = item.system.description === ''
-                  || item.system.description === '<p></p>' ? '' : TextEditor.enrichHTML(item.system.description, { async: false, secrets: true });
+               const description = item.system.description === '' ||
+                  item.system.description === '<p></p>' ? '' : TextEditor.enrichHTML(item.system.description, { async: false, secrets: true });
                if (description !== effect['flags.visual-active-effects.data.content']) {
                   shouldUpdateEffect = true;
                   updateData['flags.visual-active-effects.data.content'] = description;
@@ -155,7 +152,7 @@ export default class TitanEffect extends TitanTypeComponent {
                return effects;
             }
          }
-      };
+      }
 
       return false;
    }

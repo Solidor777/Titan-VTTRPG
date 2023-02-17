@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import CharacterSheetResource from '~/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte';
 
    // Setup context variables

@@ -6,28 +6,33 @@
    // Context variables
    const document = getContext('DocumentStore');
 
-   async function confirmRegainResolve() {
+   async function confirmdamageApplied() {
       // Get the actor
       const actor = getActor($document.speaker.actor, $document.speaker.token);
       if (actor) {
          const character = actor.character;
          if (character) {
             // Update the actor
-            await character.regainResolve(
-               $document.flags.titan.chatContext.resolveRegain.total,
+            await character.applyDamage(
+               $document.flags.titan.chatContext.damageApplied.total,
+               false,
+               false,
                true
             );
 
             // Update the chat document
-            $document.update({
+            await $document.update({
                flags: {
                   titan: {
                      chatContext: {
-                        resolveRegain: {
+                        damageApplied: {
                            confirmed: true,
                         },
-                        resolve: {
-                           value: actor.system.resource.resolve.value,
+                        stamina: {
+                           value: actor.system.resource.stamina.value,
+                        },
+                        wounds: {
+                           value: actor.system.resource.wounds.value,
                         },
                      },
                   },
@@ -40,17 +45,17 @@
 
 <!--Regain resolve button-->
 <div class="button">
-   <EfxButton on:click={() => confirmRegainResolve()}>
-      <i class="fas fa-bolt" />
-      {localize('regain%xResolve').replace(
+   <EfxButton on:click={() => confirmdamageApplied()}>
+      <i class="fas fa-heart" />
+      {localize('apply%xDamage').replace(
          '%x',
-         $document.flags.titan.chatContext.resolveRegain.total
+         $document.flags.titan.chatContext.damageApplied.total
       )}
    </EfxButton>
 </div>
 
 <style lang="scss">
-   @import '../../styles/Mixins.scss';
+   @import '../../../styles/Mixins.scss';
 
    .button {
       @include flex-row;

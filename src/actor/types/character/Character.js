@@ -1,6 +1,5 @@
 import {
    clamp,
-   localize,
    getSetting,
    getCheckOptions,
    confirmDeletingItems,
@@ -943,22 +942,22 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const wounds = this.parent.system.resource.wounds;
 
          // Calculate the number of wounds taken
-         let woundsTaken = 0;
+         let woundsSuffered = 0;
          if (stamina.value < damageTaken) {
             if (stamina.value + 5 <= damageTaken) {
-               woundsTaken = 3;
+               woundsSuffered = 3;
             }
             else if (stamina.value + 2 <= damageTaken) {
-               woundsTaken = 2;
+               woundsSuffered = 2;
             }
             else {
-               woundsTaken = 1;
+               woundsSuffered = 1;
             }
          }
 
          // Update the actor
          stamina.value = Math.max(stamina.value - damageTaken, 0);
-         wounds.value += woundsTaken;
+         wounds.value += woundsSuffered;
          if (updateActor) {
             await this.parent.update({
                system: {
@@ -982,30 +981,34 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
                // Create the chat context
                const chatContext = {
-                  type: 'report',
+                  type: 'damageReport',
                   img: this.parent.img,
-                  header: localize('took%xDamage').replace('%x', damageTaken),
-                  subHeader: [`${this.parent.name}`],
-                  icon: 'fas fa-burst',
-                  message: [
-                     `${localize('stamina')}: ${stamina.value} / ${stamina.max}`,
-                     `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
-                  ]
+                  name: this.parent.name,
+                  damageTaken: damageTaken,
+                  stamina: {
+                     value: stamina.value,
+                     max: stamina.max
+                  },
+                  wounds: {
+                     value: wounds.value,
+                     max: wounds.max
+                  }
                };
 
-               // Wounds taken
-               if (woundsTaken > 0) {
-                  chatContext.message = [localize('suffered%xWounds').replace('%x', woundsTaken), ...chatContext.message];
-               }
-
                // Damage resisted
-               if (damageTaken !== damage) {
-                  chatContext.message = [localize('resisted%xDamage').replace('%x', (damage - damageTaken)), ...chatContext.message];
+               const damageResisted = damage - damageTaken;
+               if (damageResisted > 0) {
+                  chatContext.damageResisted = damageResisted;
                }
 
                // Ignore Armor
-               if (ignoreArmor) {
-                  chatContext.message = [`${localize('armorIgnored')}`, ...chatContext.message];
+               else if (ignoreArmor) {
+                  chatContext.ignoredArmor = true;
+               }
+
+               // Wounds soffered
+               if (woundsSuffered > 0) {
+                  chatContext.woundsSuffered = woundsSuffered;
                }
 
                // Send the report to chat
@@ -1016,7 +1019,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          return {
             damageTaken: damageTaken,
-            woundsTaken: woundsTaken
+            woundsSuffered: woundsSuffered
          };
       }
 
@@ -1026,12 +1029,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async applyHealing(healing = 1, report = true, updateActor = true) {
       if (this.parent.isOwner) {
          // Check if the actor's stamina is less than max
-         let staminaHealed = 0;
+         let damageHealed = 0;
          const stamina = this.parent.system.resource.stamina;
          if (stamina.value < stamina.max) {
             // Update the stamina
-            staminaHealed = Math.min(healing, stamina.max - stamina.value);
-            stamina.value += staminaHealed;
+            damageHealed = Math.min(healing, stamina.max - stamina.value);
+            stamina.value += damageHealed;
 
             // Update the actor
             if (updateActor) {
@@ -1053,15 +1056,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   // Create chat context
                   const wounds = this.parent.system.resource.wounds;
                   const chatContext = {
-                     type: 'report',
+                     type: 'healingReport',
                      img: this.parent.img,
-                     header: localize('healed%xDamage').replace('%x', staminaHealed),
-                     subHeader: [this.parent.name],
-                     icon: 'fas fa-heart',
-                     message: [
-                        `${localize('resolve')}: ${stamina.value} / ${stamina.max}`,
-                        `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
-                     ]
+                     name: this.parent.name,
+                     damageHealed: damageHealed,
+                     stamina: {
+                        value: stamina.value,
+                        max: stamina.max
+                     },
+                     wounds: {
+                        value: wounds.value,
+                        max: wounds.max
+                     }
                   };
 
                   // Send the report to chat
@@ -1070,7 +1076,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
          }
 
-         return staminaHealed;
+         return damageHealed;
       }
 
       return;
@@ -1118,12 +1124,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                if (reportSettings !== 'disabled') {
                   // Create chat context
                   const chatContext = {
-                     type: 'report',
+                     type: 'spendResolveReport',
                      img: this.parent.img,
-                     header: `${localize('spentResolve')}`,
-                     subHeader: [this.parent.name],
-                     icon: 'fas fa-bolt',
-                     message: [`${localize('resolve')}: ${resolve.value} / ${resolve.max}`]
+                     name: this.parent.name,
+                     resolveSpent: 1,
+                     resolve: {
+                        value: resolve.value,
+                        max: resolve.max
+                     }
                   };
 
 
@@ -1216,12 +1224,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
-                  type: 'report',
+                  type: 'removeCombatEffectsReport',
                   img: actor.img,
-                  header: localize('temporaryEffectsRemoved'),
-                  subHeader: [actor.name],
-                  icon: 'fas fa-arrow-rotate-left',
-                  message: [localize('resolveFullyRestored')]
+                  name: actor.name
                };
 
                // Send the report to chat
@@ -1248,15 +1253,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
-                  type: 'report',
+                  type: 'shortRestReport',
                   img: actor.img,
-                  header: localize('tookAShortRest'),
-                  subHeader: [actor.name],
-                  icon: 'fas fa-face-exhaling',
-                  message: [
-                     localize('temporaryEffectsRemoved'),
-                     localize('staminaAndResolveRestored'),
-                  ]
+                  name: actor.name,
                };
 
                // Send the report to chat
@@ -1288,24 +1287,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (reportSettings !== 'disabled') {
                // Create chat context
                const chatContext = {
-                  type: 'report',
+                  type: 'longRestReport',
+                  name: actor.name,
                   img: actor.img,
-                  header: localize('tookALongRest'),
-                  subHeader: [actor.name],
-                  icon: 'fas fa-bed',
-                  message: [
-                     localize('temporaryEffectsRemoved'),
-                     localize('staminaAndResolveRestored'),
-                  ]
                };
 
                // Add line about wounds healed
                if (woundsHealed > 0) {
-                  chatContext.message = [
-                     ...chatContext.message,
-                     localize('healed%xWounds').replace('%x', woundsHealed),
-                     `${localize('wounds')}: ${wounds.value} / ${wounds.max}`
-                  ];
+                  chatContext.woundsHealed = woundsHealed;
+                  chatContext.wounds = {
+                     value: wounds.value,
+                     max: wounds.max
+                  };
                }
 
                // Send the report to chat
@@ -1347,10 +1340,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (Object.keys(chatContext).length > 0) {
 
          // Prepare chat context
-         chatContext.type = 'turnReport';
+         chatContext.type = 'turnStartReport';
          chatContext.img = actor.img;
-         chatContext.header = localize('turnStart');
-         chatContext.subHeader = [actor.name];
+         chatContext.name = actor.name;
 
          this.whisperUsers(chatContext, getOwners(this.parent));
       }
@@ -1392,8 +1384,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const actor = this.parent;
       const chatContext = {};
 
-      this.calculateTurnEndEffects(chatContext);
-
+      await this.calculateTurnEndEffects(chatContext);
       if (await this.calculateTurnHealingAndDamage(chatContext, 'turnEnd') === true) {
          actor.update({
             system: actor.system
@@ -1404,10 +1395,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (Object.keys(chatContext).length > 0) {
 
          // Prepare chat context
-         chatContext.type = 'turnReport';
+         chatContext.type = 'turnEndReport';
+         chatContext.name = actor.name;
          chatContext.img = actor.img;
-         chatContext.header = localize('turnEnd');
-         chatContext.subHeader = [actor.name];
 
          // Send the report to chat
          this.whisperUsers(chatContext, getOwners(this.parent));
