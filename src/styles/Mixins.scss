@@ -397,3 +397,15 @@
    --border-color: var(--label-color);
    background: linear-gradient(var(--gradientDegree), var(--yellow) 0, var(--red) 100%);
 }
+
+@mixin fast-healing {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--green) 0, var(--yellow) 100%);
+}
+
+@mixin persistent-damage {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--red) 0, var(--orange) 100%);
+}

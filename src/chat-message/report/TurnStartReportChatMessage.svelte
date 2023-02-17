@@ -7,6 +7,8 @@
    import ReportConfirmApplyHealingButton from '~/chat-message/report/components/ReportConfirmApplyHealingButton.svelte';
    import ReportConfirmApplyDamageButton from '~/chat-message/report/components/ReportConfirmApplyDamageButton.svelte';
    import ReportHeader from '~/chat-message/report/components/ReportHeader.svelte';
+   import ChatFastHealingTag from '~/chat-message/ChatFastHealingTag.svelte';
+   import ChatPersistentDamageTag from '~/chat-message/ChatPersistentDamageTag.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -25,11 +27,20 @@
       <ChatEffects />
    {/if}
 
-   <!--Messages-->
-   {#if chatContext.message && chatContext.message.length > 0}
-      {#each chatContext.message as message}
-         <div class="message">{@html message}</div>
-      {/each}
+   <!--Fast Healing-->
+   {#if chatContext.fastHealing}
+      <div class="tag">
+         <ChatFastHealingTag fastHealing={chatContext.fastHealing} />
+      </div>
+   {/if}
+
+   <!--Persistent Damage-->
+   {#if chatContext.persistentDamage}
+      <div class="tag">
+         <ChatPersistentDamageTag
+            persistentDamage={chatContext.persistentDamage}
+         />
+      </div>
    {/if}
 
    <!--Stamina-->
@@ -136,6 +147,10 @@
       @include font-size-normal;
       width: 100%;
       font-weight: bold;
+
+      .tag {
+         margin-top: 0.5rem;
+      }
 
       .message {
          @include flex-row;

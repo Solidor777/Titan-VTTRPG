@@ -17,7 +17,6 @@
    import CastingCheckChatMessage from '~/check/types/casting-check/CastingCheckChatMessage.svelte';
    import AttackCheckChatMessage from '~/check/types/attack-check/AttackCheckChatMessage.svelte';
    import PrivateRollChatMessage from '~/chat-message/PrivateRollChatMessage.svelte';
-   import TurnReportChatMessage from '~/chat-message/report/TurnReportChatMessage.svelte';
    import DamageReportChatMessage from '~/chat-message/report/DamageReportChatMessage.svelte';
    import HealingReportChatMessage from '~/chat-message/report/HealingReportChatMessage.svelte';
    import SpendResolveReportChatMessage from '~/chat-message/report/SpendResolveReportChatMessage.svelte';
@@ -51,7 +50,6 @@
             shield: ShieldChatMessage,
             spell: SpellChatMessage,
             weapon: WeaponChatMessage,
-            turnReport: TurnReportChatMessage,
             damageReport: DamageReportChatMessage,
             healingReport: HealingReportChatMessage,
             spendResolveReport: SpendResolveReportChatMessage,

@@ -1653,6 +1653,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Fast healing report
       if (getSetting('reportHealingDamage')) {
          const fastHealing = this.fastHealing;
+         if (selector === 'turnEnd') {
+            console.log(fastHealing);
+         }
          if (fastHealing && fastHealing[selector]) {
             chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
          }
