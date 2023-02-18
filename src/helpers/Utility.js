@@ -125,3 +125,29 @@ export function getGMs() {
       user.isGM
    );
 }
+
+
+export function getPlayerOwners(document) {
+   return game.users.filter((user) => document.testUserPermission(user, 'OWNER') && !user.isGM);
+}
+
+export function getBestPlayerOwner(document) {
+   const playerOwners = getPlayerOwners(document);
+   if (playerOwners.length > 0) {
+      if (playerOwners.length > 1) {
+         const activeOwners = playerOwners.filter((owner) => owner.active);
+         if (activeOwners.length > 0) {
+            if (activeOwners.length > 1) {
+               const userPlayerOwner = activeOwners.filter(owner.id === game.user.id);
+               if (userPlayerOwner) {
+                  return userPlayerOwner;
+               }
+            }
+
+            return activeOwners[0];
+         }
+      }
+      return playerOwners[0];
+   }
+   return false;
+}

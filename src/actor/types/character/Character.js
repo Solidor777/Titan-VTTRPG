@@ -7,7 +7,8 @@ import {
    isHTMLBlank,
    getGMs,
    getOwners,
-   getSumOfValuesInObject
+   getSumOfValuesInObject,
+   getBestPlayerOwner
 } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
@@ -621,7 +622,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             const attributeCheck = await this.getAttributeCheck(options);
             if (attributeCheck && attributeCheck.isValid) {
                await attributeCheck.sendToChat({
-                  user: game.user.id,
+                  user: this.getChatUserId(),
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -665,7 +666,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (resistanceCheck && resistanceCheck.isValid) {
                await resistanceCheck.evaluateCheck();
                await resistanceCheck.sendToChat({
-                  user: game.user.id,
+                  user: this.getChatUserId(),
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -729,7 +730,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (attackCheck && attackCheck.isValid) {
                await attackCheck.evaluateCheck();
                await attackCheck.sendToChat({
-                  user: game.user.id,
+                  user: this.getChatUserId(),
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -822,7 +823,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (castingCheck && castingCheck.isValid) {
                await castingCheck.evaluateCheck();
                await castingCheck.sendToChat({
-                  user: game.user.id,
+                  user: this.getChatUserId(),
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -887,7 +888,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (itemCheck && itemCheck.isValid) {
                await itemCheck.evaluateCheck();
                await itemCheck.sendToChat({
-                  user: game.user.id,
+                  user: this.getChatUserId(),
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -1653,9 +1654,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Fast healing report
       if (getSetting('reportHealingDamage')) {
          const fastHealing = this.fastHealing;
-         if (selector === 'turnEnd') {
-            console.log(fastHealing);
-         }
          if (fastHealing && fastHealing[selector]) {
             chatContext.fastHealing = foundry.utils.deepClone(fastHealing[selector]);
          }
@@ -1767,7 +1765,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (maxResolveRegained > 0) {
 
                // Update the actor if appropriate
-               const confirmed = autoApplyFastHealing === 'enabled';
+               const confirmed = autoRegainResolve === 'enabled';
                if (confirmed) {
                   this.regainResolve(maxResolveRegained, false);
                   shouldUpdateActor = true;
@@ -1791,7 +1789,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async whisperUsers(chatContext, users) {
       return await ChatMessage.create({
-         user: game.user.id,
+         user: this.getChatUserId(),
          speaker: ChatMessage.getSpeaker({ actor: this.parent }),
          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
          sound: CONFIG.sounds.notification,
@@ -2020,5 +2018,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       return;
+   }
+
+   getChatUserId() {
+      const playerOwner = getBestPlayerOwner(this.parent);
+      return playerOwner ? playerOwner.id : game.user.id;
    }
 }
