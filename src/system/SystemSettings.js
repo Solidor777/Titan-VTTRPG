@@ -38,6 +38,7 @@ export default function registerSystemSettings() {
          all: 'SETTINGS.autoOpenCharacterSheetsGM.all',
          disabled: 'SETTINGS.autoOpenCharacterSheetsGM.disabled',
       },
+      restricted: true,
       default: 'npcsOnly',
    });
 

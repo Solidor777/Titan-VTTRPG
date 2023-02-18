@@ -4,7 +4,7 @@ import '~/styles/Mixins.scss';
 import '~/styles/Global.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { registerChatContextOptions } from '~/helpers/ChatContextOptions.js';
-import { getSetting, isFirstOwner, localize } from '~/helpers/Utility';
+import { getSetting, localize } from '~/helpers/Utility';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerTooltipSettings from '~/system/TooltipManager';
 import registerInitiativeFormula from '~/system/Initiative';
@@ -173,12 +173,12 @@ Hooks.on("updateCombat", (combat) => {
 
 async function onUpdateCombat(combat) {
    const previousTurnCharacter = combat.combatants.get(combat.previous?.combatantId)?.actor;
-   if (previousTurnCharacter && isFirstOwner(previousTurnCharacter) && previousTurnCharacter.character) {
+   if (previousTurnCharacter && previousTurnCharacter.character) {
       await previousTurnCharacter.character.onTurnEnd();
    }
 
    const currentTurnCharacter = combat.combatant?.actor;
-   if (currentTurnCharacter && isFirstOwner(currentTurnCharacter) && currentTurnCharacter.character) {
+   if (currentTurnCharacter && currentTurnCharacter.character) {
       await currentTurnCharacter.character.onTurnStart();
    }
 }

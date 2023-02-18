@@ -8,7 +8,8 @@ import {
    getGMs,
    getOwners,
    getSumOfValuesInObject,
-   getBestPlayerOwner
+   getBestPlayerOwner,
+   isFirstOwner
 } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
@@ -1318,41 +1319,45 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnStart() {
-      // Initialize variables
-      const chatContext = {};
       const actor = this.parent;
-      let shouldUpdateActor = false;
+      // Operations that should only be performed once
+      if (isFirstOwner(this.parent)) {
+         // Initialize variables
+         const chatContext = {};
+         let shouldUpdateActor = false;
 
-      // Calculate healing or damage
-      if (await this.calculateTurnHealingAndDamage(chatContext, 'turnStart') === true) {
-         shouldUpdateActor = true;
+         // Calculate healing or damage
+         if (await this.calculateTurnHealingAndDamage(chatContext, 'turnStart') === true) {
+            shouldUpdateActor = true;
+         }
+
+         // Calculate turn start effects
+         await this.calculateTurnStartEffects(chatContext);
+
+         // Regain resolve
+         if (this.calculateResolveRegain(chatContext)) {
+            shouldUpdateActor = true;
+         }
+
+         // Update actor if appropriate
+         if (shouldUpdateActor) {
+            actor.update({
+               system: actor.system
+            });
+         }
+
+         // Send the end of turn report if appropriate
+         if (Object.keys(chatContext).length > 0) {
+
+            // Prepare chat context
+            chatContext.type = 'turnStartReport';
+            chatContext.img = actor.img;
+            chatContext.name = actor.name;
+
+            this.whisperUsers(chatContext, getOwners(this.parent));
+         }
       }
 
-      // Calculate turn start effects
-      await this.calculateTurnStartEffects(chatContext);
-
-      // Regain resolve
-      if (this.calculateResolveRegain(chatContext)) {
-         shouldUpdateActor = true;
-      }
-
-      // Update actor if appropriate
-      if (shouldUpdateActor) {
-         actor.update({
-            system: actor.system
-         });
-      }
-
-      // Send the end of turn report if appropriate
-      if (Object.keys(chatContext).length > 0) {
-
-         // Prepare chat context
-         chatContext.type = 'turnStartReport';
-         chatContext.img = actor.img;
-         chatContext.name = actor.name;
-
-         this.whisperUsers(chatContext, getOwners(this.parent));
-      }
 
       // Open sheet
       if (game.user.isGM) {
@@ -1378,7 +1383,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
          }
       }
-
       else if (actor.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
          actor.sheet.render(true);
       }
@@ -1387,27 +1391,30 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onTurnEnd() {
-      // Initialize variables
       const actor = this.parent;
-      const chatContext = {};
+      // Operations that should only be performed once
+      if (isFirstOwner(actor)) {
+         // Initialize variables
+         const chatContext = {};
 
-      await this.calculateTurnEndEffects(chatContext);
-      if (await this.calculateTurnHealingAndDamage(chatContext, 'turnEnd') === true) {
-         actor.update({
-            system: actor.system
-         });
-      }
+         await this.calculateTurnEndEffects(chatContext);
+         if (await this.calculateTurnHealingAndDamage(chatContext, 'turnEnd') === true) {
+            actor.update({
+               system: actor.system
+            });
+         }
 
-      // End of turn report
-      if (Object.keys(chatContext).length > 0) {
+         // End of turn report
+         if (Object.keys(chatContext).length > 0) {
 
-         // Prepare chat context
-         chatContext.type = 'turnEndReport';
-         chatContext.name = actor.name;
-         chatContext.img = actor.img;
+            // Prepare chat context
+            chatContext.type = 'turnEndReport';
+            chatContext.name = actor.name;
+            chatContext.img = actor.img;
 
-         // Send the report to chat
-         this.whisperUsers(chatContext, getOwners(this.parent));
+            // Send the report to chat
+            this.whisperUsers(chatContext, getOwners(this.parent));
+         }
       }
 
       return;
