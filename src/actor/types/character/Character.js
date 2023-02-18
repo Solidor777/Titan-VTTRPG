@@ -622,7 +622,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             const attributeCheck = await this.getAttributeCheck(options);
             if (attributeCheck && attributeCheck.isValid) {
                await attributeCheck.sendToChat({
-                  user: this.getChatUserId(),
+                  user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -666,7 +666,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (resistanceCheck && resistanceCheck.isValid) {
                await resistanceCheck.evaluateCheck();
                await resistanceCheck.sendToChat({
-                  user: this.getChatUserId(),
+                  user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -730,7 +730,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (attackCheck && attackCheck.isValid) {
                await attackCheck.evaluateCheck();
                await attackCheck.sendToChat({
-                  user: this.getChatUserId(),
+                  user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -823,7 +823,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (castingCheck && castingCheck.isValid) {
                await castingCheck.evaluateCheck();
                await castingCheck.sendToChat({
-                  user: this.getChatUserId(),
+                  user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -888,7 +888,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (itemCheck && itemCheck.isValid) {
                await itemCheck.evaluateCheck();
                await itemCheck.sendToChat({
-                  user: this.getChatUserId(),
+                  user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
                });
@@ -1795,7 +1795,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async whisperUsers(chatContext, users) {
       return await ChatMessage.create({
-         user: this.getChatUserId(),
+         user: this.getReportUserID(),
          speaker: ChatMessage.getSpeaker({ actor: this.parent }),
          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
          sound: CONFIG.sounds.notification,
@@ -2026,7 +2026,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   getChatUserId() {
+   getReportUserID() {
       const playerOwner = getBestPlayerOwner(this.parent);
       return playerOwner ? playerOwner.id : game.user.id;
    }
