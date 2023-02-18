@@ -1084,19 +1084,22 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async regainResolve(resolveRegained = 1, updateActor = true) {
-      // Update resolve
-      const resolve = this.parent.system.resource.resolve;
-      resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
+      if (this.parent.isOwner) {
+         // Update resolve
+         const resolve = this.parent.system.resource.resolve;
+         resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
 
-      // Update the actor if appropriate
-      if (updateActor) {
-         await this.parent.update({
-            system: {
-               resource: {
-                  resolve: resolve
+         // Update the actor if appropriate
+         if (updateActor) {
+            await this.parent.update({
+               system: {
+                  resource: {
+                     resolve: resolve
+                  }
                }
-            }
-         });
+            });
+         }
+
       }
 
       return;
@@ -1151,24 +1154,27 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async removeExpiredEffects(confirmed) {
-      // Get the expired effects
-      const expiredEffects = this.getExpiredEffects();
-      if (expiredEffects.length > 0) {
-         // Check if the removeal was confirmed
-         if (confirmed || !confirmDeletingItems()) {
-            for (const effect of expiredEffects) {
-               await this._internalDeleteItem(effect);
+      if (this.parent.isOwner) {
+         // Get the expired effects
+         const expiredEffects = this.getExpiredEffects();
+         if (expiredEffects.length > 0) {
+            // Check if the removeal was confirmed
+            if (confirmed || !confirmDeletingItems()) {
+               for (const effect of expiredEffects) {
+                  await this._internalDeleteItem(effect);
+               }
+
+               return;
             }
 
-            return;
-         }
-
-         // Otherwise, confirm removal
-         else {
-            const dialog = new ConfirmRemoveExpiredEffectsDialog(this);
-            dialog.render(true);
+            // Otherwise, confirm removal
+            else {
+               const dialog = new ConfirmRemoveExpiredEffectsDialog(this);
+               dialog.render(true);
+            }
          }
       }
+
       return;
    }
 

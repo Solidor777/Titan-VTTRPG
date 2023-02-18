@@ -132,7 +132,9 @@ export default class TitanEffect extends TitanTypeComponent {
    }
 
    onDelete() {
-      this._getEffects().forEach((effect) => effect.delete());
+      if (isFirstOwner(this.parent)) {
+         this._getEffects().forEach((effect) => effect.delete());
+      }
 
       return;
    }
