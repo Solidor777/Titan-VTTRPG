@@ -94,12 +94,45 @@ export default function registerSystemSettings() {
       hint: 'SETTINGS.autoRegainResolve.hint',
       type: String,
       choices: {
-         showButton: 'SETTINGS.autoRegainResolve.showButton',
          enabled: 'SETTINGS.autoRegainResolve.enabled',
+         showButton: 'SETTINGS.autoRegainResolve.showButton',
          disabled: 'SETTINGS.autoRegainResolve.disabled'
       },
       restricted: true,
-      default: 'showButton',
+      default: 'enabled',
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'autoSpendResolveDoubleTraining', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoSpendResolveDoubleTraining.label',
+      hint: 'SETTINGS.autoSpendResolveDoubleTraining.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'autoSpendResolveDoubleExpertise', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoSpendResolveDoubleExpertise.label',
+      hint: 'SETTINGS.autoSpendResolveDoubleExpertise.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+      requiresReload: true,
+   });
+
+   game.settings.register('titan', 'autoSpendResolveReRollFailures', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoSpendResolveReRollFailures.label',
+      hint: 'SETTINGS.autoSpendResolveReRollFailures.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
       requiresReload: true,
    });
 
@@ -110,12 +143,12 @@ export default function registerSystemSettings() {
       hint: 'SETTINGS.autoApplyFastHealing.hint',
       type: String,
       choices: {
-         showButton: 'SETTINGS.autoApplyFastHealing.showButton',
          enabled: 'SETTINGS.autoApplyFastHealing.enabled',
+         showButton: 'SETTINGS.autoApplyFastHealing.showButton',
          disabled: 'SETTINGS.autoApplyFastHealing.disabled'
       },
       restricted: true,
-      default: 'showButton',
+      default: 'enabled',
       requiresReload: true,
    });
 
@@ -126,12 +159,12 @@ export default function registerSystemSettings() {
       hint: 'SETTINGS.autoApplyPersistentDamage.hint',
       type: String,
       choices: {
-         showButton: 'SETTINGS.autoApplyPersistentDamage.showButton',
          enabled: 'SETTINGS.autoApplyPersistentDamage.enabled',
+         showButton: 'SETTINGS.autoApplyPersistentDamage.showButton',
          disabled: 'SETTINGS.autoApplyPersistentDamage.disabled'
       },
       restricted: true,
-      default: 'showButton',
+      default: 'enabled',
       requiresReload: true,
    });
 
@@ -152,12 +185,12 @@ export default function registerSystemSettings() {
       hint: 'SETTINGS.autoRemoveExpiredEffects.hint',
       type: String,
       choices: {
-         showButton: 'SETTINGS.autoRemoveExpiredEffects.showButton',
          enabled: 'SETTINGS.autoRemoveExpiredEffects.enabled',
+         showButton: 'SETTINGS.autoRemoveExpiredEffects.showButton',
          disabled: 'SETTINGS.autoRemoveExpiredEffects.disabled'
       },
       restricted: true,
-      default: 'showButton',
+      default: 'enabled',
       requiresReload: true,
    });
 
@@ -241,31 +274,31 @@ export default function registerSystemSettings() {
       default: true,
    });
 
-   game.settings.register('titan', 'staminaMultiplier', {
+   game.settings.register('titan', 'baseStaminaMultiplier', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.staminaMultiplier.label',
-      hint: 'SETTINGS.staminaMultiplier.hint',
+      name: 'SETTINGS.baseStaminaMultiplier.label',
+      hint: 'SETTINGS.baseStaminaMultiplier.hint',
       type: Number,
       restricted: true,
       default: 2,
    });
 
-   game.settings.register('titan', 'resolveMultiplier', {
+   game.settings.register('titan', 'baseResolveMultiplier', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.resolveMultiplier.label',
-      hint: 'SETTINGS.resolveMultiplier.hint',
+      name: 'SETTINGS.baseResolveMultiplier.label',
+      hint: 'SETTINGS.baseResolveMultiplier.hint',
       type: Number,
       restricted: true,
       default: 0.5,
    });
 
-   game.settings.register('titan', 'woundsMultiplier', {
+   game.settings.register('titan', 'baseWoundsMultiplier', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.woundsMultiplier.label',
-      hint: 'SETTINGS.woundsMultiplier.hint',
+      name: 'SETTINGS.baseWoundsMultiplier.label',
+      hint: 'SETTINGS.baseWoundsMultiplier.hint',
       type: Number,
       restricted: true,
       default: 0.5,

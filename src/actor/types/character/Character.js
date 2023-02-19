@@ -170,13 +170,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Calculate base resource values
       // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('staminaMultiplier')), 1);
+      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseStaminaMultiplier')), 1);
 
       // Resolve = Soul / 2 rounded up
-      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('resolveMultiplier')), 1);
+      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('baseResolveMultiplier')), 1);
 
       // Wounds = Total Attribute mod / 2 rounded up
-      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('woundsMultiplier')), 1);
+      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseWoundsMultiplier')), 1);
    }
 
    _resetDynamicMods() {
@@ -623,6 +623,22 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Get the check
             const attributeCheck = await this.getAttributeCheck(options);
             if (attributeCheck && attributeCheck.isValid) {
+
+               // Expend resolve if appropriate
+               let resolveSpent = 0;
+               if (attributeCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+                  resolveSpent += 1;
+               }
+               if (attributeCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+                  resolveSpent += 1;
+               }
+               if (resolveSpent > 0) {
+                  await this.spendResolve(resolveSpent, true);
+               }
+
+
+               // Send the check to chat
+               await attributeCheck.evaluateCheck();
                await attributeCheck.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
@@ -730,6 +746,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Get the attack check
             const attackCheck = await this.getAttackCheck(options);
             if (attackCheck && attackCheck.isValid) {
+               // Expend resolve if appropriate
+               let resolveSpent = 0;
+               if (attackCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+                  resolveSpent += 1;
+               }
+               if (attackCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+                  resolveSpent += 1;
+               }
+               if (resolveSpent > 0) {
+                  await this.spendResolve(resolveSpent, true);
+               }
+
                await attackCheck.evaluateCheck();
                await attackCheck.sendToChat({
                   user: game.user.id,
@@ -823,6 +851,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Get the check
             const castingCheck = await this.getCastingCheck(options);
             if (castingCheck && castingCheck.isValid) {
+               // Expend resolve if appropriate
+               let resolveSpent = 0;
+               if (castingCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+                  resolveSpent += 1;
+               }
+               if (castingCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+                  resolveSpent += 1;
+               }
+               if (resolveSpent > 0) {
+                  await this.spendResolve(resolveSpent, true);
+               }
+
                await castingCheck.evaluateCheck();
                await castingCheck.sendToChat({
                   user: game.user.id,
@@ -888,6 +928,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Otherwise, get a check
             const itemCheck = await this.getItemCheck(options);
             if (itemCheck && itemCheck.isValid) {
+               // Expend resolve if appropriate
+               let resolveSpent = 0;
+               console.log(itemCheck.parameters);
+               if (itemCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+                  resolveSpent += 1;
+               }
+               if (itemCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+                  resolveSpent += 1;
+               }
+               if (resolveSpent > 0) {
+                  await this.spendResolve(resolveSpent, true);
+               }
+
+
                await itemCheck.evaluateCheck();
                await itemCheck.sendToChat({
                   user: game.user.id,
@@ -1107,13 +1161,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async spendResolve(report) {
+   async spendResolve(resolveSpent, report) {
       if (this.parent.isOwner) {
          // Check if the actor's resolve is less than max
          const resolve = this.parent.system.resource.resolve;
-         if (resolve.value > 0) {
-            // Update the actor
-            resolve.value -= 1;
+         const initialResolve = resolve.value;
+         // Update the actor
+         if (resolve.value >= resolveSpent) {
+            resolve.value -= resolveSpent;
             await this.parent.update({
                system: {
                   resource: {
@@ -1123,27 +1178,30 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   }
                }
             });
+         }
 
-            // Report
-            if (report) {
-               const reportSettings = getSetting('reportSpendingResolve');
-               if (reportSettings !== 'disabled') {
-                  // Create chat context
-                  const chatContext = {
-                     type: 'spendResolveReport',
-                     img: this.parent.img,
-                     name: this.parent.name,
-                     resolveSpent: 1,
-                     resolve: {
-                        value: resolve.value,
-                        max: resolve.max
-                     }
-                  };
-
-
-                  // Send the chat message
-                  this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+         // Report
+         if (report) {
+            const reportSettings = getSetting('reportSpendingResolve');
+            if (reportSettings !== 'disabled') {
+               // Create chat context
+               const chatContext = {
+                  type: 'spendResolveReport',
+                  img: this.parent.img,
+                  name: this.parent.name,
+                  resolveSpent: 1,
+                  resolve: {
+                     value: resolve.value,
+                     max: resolve.max
+                  }
+               };
+               if (initialResolve < resolveSpent) {
+                  chatContext.resolveShortage = resolveSpent - initialResolve;
                }
+
+
+               // Send the chat message
+               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
             }
          }
       }

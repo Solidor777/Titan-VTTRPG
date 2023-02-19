@@ -19,19 +19,19 @@ export default class TitanNPCComponent extends TitanCharacterComponent {
 
       switch (systemData.role) {
          case 'champion': {
-            systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('staminaMultiplier')), 1);
-            systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('resolveMultiplier')), 1);
-            systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('woundsMultiplier')), 1);
+            systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseStaminaMultiplier')), 1);
+            systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('baseResolveMultiplier')), 1);
+            systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseWoundsMultiplier')), 1);
             break;
          }
          case 'elite': {
-            systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('staminaMultiplier')), 1);
-            systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('resolveMultiplier')), 1);
+            systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseStaminaMultiplier')), 1);
+            systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('baseResolveMultiplier')), 1);
             systemData.resource.wounds.maxBase = 0;
             break;
          }
          case 'warrior': {
-            systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('staminaMultiplier')), 1);
+            systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseStaminaMultiplier')), 1);
             systemData.resource.resolve.maxBase = 0;
             systemData.resource.wounds.maxBase = 0;
             break;

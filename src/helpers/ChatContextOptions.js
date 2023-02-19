@@ -1,4 +1,4 @@
-import { localize } from '~/helpers/Utility.js';
+import { localize, getSetting, getActor } from '~/helpers/Utility.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 
 async function reRollCheckFailures(li) {
@@ -50,6 +50,17 @@ async function reRollCheckFailures(li) {
             },
          },
       });
+
+      // Spend resolve if appropriate
+      if (getSetting('autoSpendResolveReRollFailures')) {
+         const actor = getActor(message.speaker.actor, message.speaker.token);
+         if (actor) {
+            const character = actor.character;
+            if (character) {
+               character.spendResolve(1, true);
+            }
+         }
+      }
    }
 
    return;
@@ -74,6 +85,17 @@ async function doubleExpertise(li) {
             },
          },
       });
+
+      // Spend resolve if appropriate
+      if (getSetting('autoSpendResolveDoubleExpertise')) {
+         const actor = getActor(message.speaker.actor, message.speaker.token);
+         if (actor) {
+            const character = actor.character;
+            if (character) {
+               character.spendResolve(1, true);
+            }
+         }
+      }
    }
 
    return;
@@ -111,6 +133,17 @@ async function doubleTraining(li) {
             },
          },
       });
+
+      // Spend resolve if appropriate
+      if (getSetting('autoSpendResolveDoubleTraining')) {
+         const actor = getActor(message.speaker.actor, message.speaker.token);
+         if (actor) {
+            const character = actor.character;
+            if (character) {
+               character.spendResolve(1, true);
+            }
+         }
+      }
    }
 
    return;

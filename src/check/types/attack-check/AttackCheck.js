@@ -49,6 +49,7 @@ export default class TitanAttackCheck extends TitanCheck {
          diceMod: options?.diceMod ?? 0,
          trainingMod: options.trainingMod ?? 0,
          expertiseMod: options.expertiseMod ?? 0,
+         doubleTraining: options.doubleTraining ?? 0,
          doubleExpertise: options?.doubleExpertise ?? false,
          maximizeSuccesses: options?.maximizeSuccesses ?? false,
          extraSuccessOnCritical: options?.extraSuccessOnCritical ?? false,

@@ -59,7 +59,7 @@
       <IconButton
          icon={'fas fa-bolt'}
          on:click={() => {
-            $document.typeComponent.spendResolve(true);
+            $document.typeComponent.spendResolve(1, true);
          }}
       />
    </div>

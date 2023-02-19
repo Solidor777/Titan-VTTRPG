@@ -57,6 +57,7 @@ export default class TitanItemCheck extends TitanCheck {
          trainingMod: options.TrainingMod ?? 0,
          expertiseMod: options.expertiseMod ?? 0,
          doubleExpertise: options.doubleExpertise ?? false,
+         doubleTraining: options.doubleTraining ?? false,
          maximizeSuccesses: options.maximizeSuccesses ?? false,
          extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,

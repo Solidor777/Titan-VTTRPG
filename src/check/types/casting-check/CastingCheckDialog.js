@@ -18,7 +18,7 @@ export default class CastingCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 520,
+            height: 510,
             classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );

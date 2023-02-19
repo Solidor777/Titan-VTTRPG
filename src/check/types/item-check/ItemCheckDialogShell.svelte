@@ -203,12 +203,14 @@
    </div>
 
    <!--Buttons-->
-   <div class="button">
-      <EfxButton on:click={onRoll}>{localize('roll')}</EfxButton>
-   </div>
+   <div class="row">
+      <div class="button">
+         <EfxButton on:click={onRoll}>{localize('roll')}</EfxButton>
+      </div>
 
-   <div class="button">
-      <EfxButton on:click={onCancel}>{localize('cancel')}</EfxButton>
+      <div class="button">
+         <EfxButton on:click={onCancel}>{localize('cancel')}</EfxButton>
+      </div>
    </div>
 </div>
 
@@ -217,7 +219,6 @@
 
    .check-dialog {
       @include flex-column;
-      justify-items: flex-end;
       @include font-size-normal;
 
       .row {

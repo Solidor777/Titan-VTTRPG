@@ -240,7 +240,7 @@
          {localize('doubleTraining')}
       </div>
       <div class="input">
-         <CheckboxInput value={checkParameters.doubleTraining} />
+         <CheckboxInput bind:value={checkParameters.doubleTraining} />
       </div>
    </div>
 

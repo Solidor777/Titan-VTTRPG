@@ -83,7 +83,6 @@
    "LOCAL.conditions.label": "Conditions",
    "LOCAL.condition.label": "Condition",
    "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item from this actor?",
-   "LOCAL.confirmRegainingResolve.label": "Confirm Regaining Resolve",
    "LOCAL.confirmRemoveExpiredEffects.label": "Are you sure you want to remove all expired effects from this actor?",
    "LOCAL.confirm": "Confirm",
    "LOCAL.contaminated.label": "Contaminated",
@@ -508,6 +507,18 @@
       "enabled": "Enabled",
       "disabled": "Disabled"
    },
+   "SETTINGS.autoSpendResolveDoubleTraining": {
+      "label": "Auto-Spend Resolve when Doubling Training",
+      "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Double Training on a check."
+   },
+   "SETTINGS.autoSpendResolveDoubleExpertise": {
+      "label": "Auto-Spend Resolve when Doubling Expertise",
+      "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Double Expertise on a check."
+   },
+   "SETTINGS.autoSpendResolveReRollFailures": {
+      "label": "Auto-Spend Resolve when Re-Rolling Failures",
+      "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Re-Roll failures on a check."
+   },
    "SETTINGS.autoDecreaseEffectDuration": {
       "label": "Auto-Decrease Effect Duration.",
       "hint": "When enabled, a combatant's temporary effects will automatically decrease their duration by 1 at the start or end of their turn, depending on the effect."
@@ -555,16 +566,16 @@
       "label": "Report Effects",
       "hint": "Report an character's active Effects at the start of their turn."
    },
-   "SETTINGS.staminaMultiplier": {
-      "label": "Stamina Multiplier",
+   "SETTINGS.baseStaminaMultiplier": {
+      "label": "Base Stamina Multiplier",
       "hint": "Base Stamina as a multiple of an character's Body + Mind + Soul."
    },
-   "SETTINGS.resolveMultiplier": {
-      "label": "Resolve Multiplier",
+   "SETTINGS.baseResolveMultiplier": {
+      "label": "Base Resolve Multiplier",
       "hint": "Base Resolve as a multiple of an character's Soul."
    },
-   "SETTINGS.woundsMultiplier": {
-      "label": "Wounds Multiplier",
+   "SETTINGS.baseWoundsMultiplier": {
+      "label": "Base Wounds Multiplier",
       "hint": "Base Wounds as a multiple of an character's Body + Mind + Soul."
    },
    "SETTINGS.baseWoundsRegain": {
