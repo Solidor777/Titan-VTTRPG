@@ -9,6 +9,7 @@
    import IntegerSelect from '~/helpers/svelte-components/select/IntegerSelect.svelte';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
    // The actor document making this check
    export let actor;
@@ -199,7 +200,7 @@
          {localize('multiAttack')}
       </div>
       <div class="input">
-         <input type="checkbox" bind:checked={checkParameters.multiAttack} />
+         <CheckboxInput bind:value={checkParameters.multiAttack} />
       </div>
    </div>
 
@@ -239,7 +240,7 @@
          {localize('doubleTraining')}
       </div>
       <div class="input">
-         <input type="checkbox" bind:checked={checkParameters.doubleTraining} />
+         <CheckboxInput value={checkParameters.doubleTraining} />
       </div>
    </div>
 
@@ -249,10 +250,7 @@
          {localize('doubleExpertise')}
       </div>
       <div class="input">
-         <input
-            type="checkbox"
-            bind:checked={checkParameters.doubleExpertise}
-         />
+         <CheckboxInput bind:value={checkParameters.doubleExpertise} />
       </div>
    </div>
 

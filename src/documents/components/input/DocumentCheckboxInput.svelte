@@ -2,6 +2,7 @@
 
 <script>
    import { getContext } from 'svelte';
+   import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
    // The value of the input
    export let value;
@@ -12,9 +13,8 @@
    export let disabled = false;
 </script>
 
-<input
-   type="checkbox"
-   bind:checked={value}
+<CheckboxInput
+   bind:value
    disabled={disabled || !$document.isOwner}
    on:change
    on:change={async () => {

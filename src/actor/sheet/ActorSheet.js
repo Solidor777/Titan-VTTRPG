@@ -1,4 +1,5 @@
 import SvelteDocumentSheet from '~/documents/DocumentSheet';
+import { localize } from '../../helpers/Utility';
 
 export default class TitanActorSheet extends SvelteDocumentSheet {
    /**
@@ -7,11 +8,26 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
     * @returns {object} options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
+
+   actor = this.reactive.document;
+
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
          width: 750,
          height: 800,
       });
+   }
+
+   _onConfigureToken(event) {
+      if (event) {
+         event.preventDefault();
+      }
+      const actor = this.reactive.document;
+      const token = actor.token ?? actor.prototypeToken;
+      return new CONFIG.Token.prototypeSheetClass(token, {
+         left: Math.max(this.position.left - 570, 10),
+         top: this.position.top,
+      }).render(true);
    }
 
    _getHeaderButtons() {
@@ -22,7 +38,7 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
       if (isGM || (actor.isOwner && game.user.can('TOKEN_CONFIGURE'))) {
          // Token configure button
          buttons.unshift({
-            label: this.token ? 'Token' : 'TOKEN.TitlePrototype',
+            label: actor.token ? localize('token') : localize('prototypeToken'),
             class: 'configure-token',
             icon: 'fas fa-user-circle',
             onclick: (ev) => this._onConfigureToken(ev),

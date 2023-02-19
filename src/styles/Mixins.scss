@@ -12,7 +12,6 @@
 }
 
 @mixin input {
-   box-sizing: border-box;
    border-style: var(--input-border-style);
    border-radius: var(--input-border-radius);
    border-width: var(--input-border-width);
@@ -359,7 +358,8 @@
 }
 
 @mixin static-value {
-   background-color: var(--static-value-background);
+   color: var(--font-color);
+   background: var(--static-value-background);
 }
 
 @mixin mod-colors {

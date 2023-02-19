@@ -75,13 +75,13 @@ export default class SvelteDocumentSheet extends SvelteApplication {
    }
 
    // Drag Drop Handling
-   _canDragStart(selector) {
+   _canDragStart() {
       return true;
    }
-   _canDragDrop(selector) {
+   _canDragDrop() {
       return this.reactive.document.isOwner || game.user.isGM;
    }
-   _onDragOver(event) { }
+   _onDragOver() { }
 
    _onDragStart(event) {
       {
@@ -260,18 +260,6 @@ export default class SvelteDocumentSheet extends SvelteApplication {
       }).render(true);
    }
 
-   _onConfigureToken(event) {
-      if (event) {
-         event.preventDefault();
-      }
-      const actor = this.reactive.document;
-      const token = actor.isToken ? actor.token : actor.prototypeToken;
-      new CONFIG.Token.prototypeSheetClass(token, {
-         left: Math.max(this.position.left - 560 - 10, 10),
-         top: this.position.top,
-      }).render(true);
-   }
-
    async close(options = {}) {
       await super.close(options);
 
@@ -288,10 +276,8 @@ export default class SvelteDocumentSheet extends SvelteApplication {
     *
     * @param {object}                     options -
     */
-   async #handleDocUpdate(doc, options) {
-      const { action, data, documentType } = options;
-
-      // I need to add a 'subscribe' action to TJSDocument so must check void.
+   async #handleDocumentUpdate(doc, options) {
+      const { action } = options;
       if ((action === void 0 || action === 'update' || action === 'subscribe') && doc) {
          this.reactive.title = doc?.isToken ? `[Token] ${doc?.name}` : doc?.name ?? 'No Document Assigned';
       }
@@ -299,7 +285,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
 
    render(force = false, options = {}) {
       if (!this.#storeUnsubscribe) {
-         this.#storeUnsubscribe = this.#documentStore.subscribe(this.#handleDocUpdate.bind(this));
+         this.#storeUnsubscribe = this.#documentStore.subscribe(this.#handleDocumentUpdate.bind(this));
       }
 
       super.render(force, options);

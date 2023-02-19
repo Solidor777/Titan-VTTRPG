@@ -491,7 +491,8 @@
    "LOCAL.xpCost.label": "XP Cost",
    "LOCAL.xpEarned.label": "XP earned.",
    "LOCAL.xp.label": "XP",
-   "LOCAL.zone.label": "Zone",
+   "LOCAL.token.label": "Token",
+   "LOCAL.prototypeToken.label": "Prototype Token",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a check. Hold Shift to toggle this setting."

@@ -2,6 +2,8 @@ import { localize } from '~/helpers/Utility.js';
 import SvelteDocumentSheet from '~/documents/DocumentSheet';
 export default class TitanItemSheet extends SvelteDocumentSheet {
 
+   item = this.reactive.document;
+
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
@@ -9,7 +11,7 @@ export default class TitanItemSheet extends SvelteDocumentSheet {
          class: 'send-to-chat',
          icon: 'fas fa-comment',
          label: localize('sendToChat'),
-         onclick: (ev) => this.reactive.document.sendToChat(),
+         onclick: () => this.reactive.document.sendToChat(),
       });
 
       return buttons;

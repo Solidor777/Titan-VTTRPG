@@ -48,19 +48,16 @@
       @include flex-space-between;
       width: 100%;
       margin: 0;
-      z-index: inherit;
 
       .aspect-label {
          @include flex-row;
          @include flex-group-left;
          margin-left: 0.5rem;
-         z-index: inherit;
 
          .icon {
             @include flex-row;
             @include flex-group-right;
             margin-left: 0.5rem;
-            z-index: inherit;
          }
       }
 
@@ -69,18 +66,16 @@
          @include flex-group-right;
          font-weight: bold;
          margin-right: 0.5rem;
-         z-index: inherit;
 
          .value {
-            @include label;
-            @include border;
             @include flex-row;
             @include flex-group-center;
+            @include static-value;
+            @include border;
+
             height: 1.5rem;
             width: 1.5rem;
-            background: var(--static-value-background);
             margin-left: 0.25rem;
-            z-index: inherit;
          }
       }
    }

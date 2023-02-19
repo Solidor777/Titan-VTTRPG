@@ -8,7 +8,7 @@ export default class TitanEffect extends TitanTypeComponent {
    removeRulesElement = removeRulesElement.bind(this);
 
    onCreate() {
-      if (isFirstOwner(this.parent)) {
+      if (this.parent.parent && isFirstOwner(this.parent.parent)) {
          this._initializeEffect();
       }
    }
@@ -132,7 +132,7 @@ export default class TitanEffect extends TitanTypeComponent {
    }
 
    onDelete() {
-      if (isFirstOwner(this.parent)) {
+      if (this.parent.parent && isFirstOwner(this.parent.parent)) {
          this._getEffects().forEach((effect) => effect.delete());
       }
 

@@ -6,6 +6,7 @@
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
    // The document
    export let document = void 0;
@@ -64,10 +65,7 @@
             <div class="input">
                {#if trait.type === 'boolean'}
                   <!--Boolean-->
-                  <input
-                     type="checkbox"
-                     bind:checked={traitOptions[idx].value}
-                  />
+                  <CheckboxInput bind:value={traitOptions[idx].value} />
                {:else}
                   <!--Integer-->
                   <IntegerInput bind:value={traitOptions[idx].value} />
