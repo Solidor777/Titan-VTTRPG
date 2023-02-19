@@ -58,7 +58,7 @@
    "LOCAL.blast.label": "Blast",
    "LOCAL.blindCheck.label": "Made a Blind Check",
    "LOCAL.blinded.label": "Blinded",
-   "LOCAL.blinded.desc.label": "<p>A <strong>Blinded</strong> creature cannot see.</p><p>A <strong>Blinded</strong> creature automatically fails any <strong>Awareness</strong> and Perception Checks that rely on sight.</p><p>A <strong>Blinded</strong> creature's <strong>Melee</strong>, <strong>Accuracy</strong>, and <strong>Defense</strong> decrease by 1.</p>",
+   "LOCAL.blinded.desc.label": "<p>A <strong>Blinded</strong> creature cannot see.</p><p>A <strong>Blinded</strong> creature automatically fails any <strong>Awareness</strong> and <strong>Perception</strong> checks that rely on sight.</p><p>A <strong>Blinded</strong> creature's <strong>Melee</strong>, <strong>Accuracy</strong>, and <strong>Defense</strong> decrease by 1.</p>",
    "LOCAL.body.desc.label": "<strong>Body</strong> is your overall strength, speed, and physical fitness.",
    "LOCAL.body.label": "Body",
    "LOCAL.body.value.label": "Total Body",
@@ -86,7 +86,7 @@
    "LOCAL.confirmRemoveExpiredEffects.label": "Are you sure you want to remove all expired effects from this actor?",
    "LOCAL.confirm": "Confirm",
    "LOCAL.contaminated.label": "Contaminated",
-   "LOCAL.contaminated.desc.label": "A <strong>Contaminated</strong> creature rolls 1 less die for all Checks.",
+   "LOCAL.contaminated.desc.label": "A <strong>Contaminated</strong> creature rolls 1 less die for all checks.",
    "LOCAL.cost.label": "Cost",
    "LOCAL.crushing.desc.label": "A <strong>Crushing</strong> attack is heavy and solid, and deals bludgeoning blows to enemies.",
    "LOCAL.crushing.label": "Crushing",
@@ -101,7 +101,7 @@
    "LOCAL.dead.desc.label": "A <strong>Dead</strong> creature can take no actions of any kind.",
    "LOCAL.dead.label": "Dead",
    "LOCAL.deafened.label": "Deafened",
-   "LOCAL.deafened.desc.label": "<p>A <strong>Deafened</strong> creature cannot hear.</p><p>A <strong>Deafened</strong> automatically fails any <strong>Awareness</strong> and Perception Checks that rely on hearing.</p>",
+   "LOCAL.deafened.desc.label": "<p>A <strong>Deafened</strong> creature cannot hear.</p><p>A <strong>Deafened</strong> automatically fails any <strong>Awareness</strong> and <strong>Perception</strong> checks that rely on hearing.</p>",
    "LOCAL.deception.desc.label": "<strong>Deception</strong> is your ability to lie and mislead.",
    "LOCAL.deception.label": "Deception",
    "LOCAL.decreaseAttribute.label": "Decrease Attribute",
@@ -145,7 +145,7 @@
    "LOCAL.effect.turnStart.desc.label": "Effect duration progresses on <strong>Turn Start</strong>",
    "LOCAL.fastHealing.label": "Fast Healing",
    "LOCAL.elite.label": "Elite",
-   "LOCAL.encumbering.desc.label": "When wearing armor with the <strong>Encumbering trait</strong>, you have Disadvantage on Checks to <strong>Swim</strong>, <strong>Fly</strong>, or <strong>Climb</strong>.",
+   "LOCAL.encumbering.desc.label": "When wearing armor with the <strong>Encumbering trait</strong>, you have <strong>Disadvantage</strong> on checks to <strong>Swim</strong>, <strong>Fly</strong>, or <strong>Climb</strong>.",
    "LOCAL.encumbering.label": "Encumbering",
    "LOCAL.engineering.desc.label": "<strong>Engineering</strong> is your ability to create, understand, and repair complex items.",
    "LOCAL.engineering.label": "Engineering",
@@ -170,7 +170,7 @@
    "LOCAL.fly.desc.label": "<strong>Fly</strong> is the ability to move by soaring through the atmosphere",
    "LOCAL.fly.label": "Fly",
    "LOCAL.fly.value.label": "Total Fly Speed",
-   "LOCAL.frightened.desc.label": "While a <strong>Frightened</strong> creature can detect the source of their fear, they roll one less dice for all Checks.",
+   "LOCAL.frightened.desc.label": "While a <strong>Frightened</strong> creature can detect the source of their fear, they roll one less dice for all checks.",
    "LOCAL.frightened.label": "Frightened",
    "LOCAL.grip.label": "Grip",
    "LOCAL.applyHealing.label": "Apply Healing",
@@ -179,11 +179,11 @@
    "LOCAL.heal%xDamage.label": "Heal %x Damage",
    "LOCAL.healing.desc.label": "Bonuses and penalties to healing performed.",
    "LOCAL.healing.label": "Healing",
-   "LOCAL.heavy.armor.desc.label": "While wearing <strong>Heavy Armor</strong>, all your speeds are decreased by 1, and you have Greater Disadvantage on Checks to <strong>Swim</strong>, <strong>Fly</strong>, or <strong>Climb</strong>.",
+   "LOCAL.heavy.armor.desc.label": "While wearing <strong>Heavy Armor</strong>, all your speeds are decreased by 1, and you have <strong>Greater Disadvantage</strong> on checks to <strong>Swim</strong>, <strong>Fly</strong>, or <strong>Climb</strong>.",
    "LOCAL.heavy.armor.label": "Heavy",
    "LOCAL.heavy.label": "Heavy",
    "LOCAL.ignoreArmor.label": "Ignore Armor",
-   "LOCAL.incapacitated.desc.label": "<p>An <strong>Incapacitated</strong> creature can't Move, take Actions, or spend Resolve.</p><p><strong>Incapacitated</strong> creatures cannot defend themselves. The Difficulty to hit an <strong>Incapacitated</strong> creature is always 2, and they automated fail <strong>Reflex</strong> Checks.</p>",
+   "LOCAL.incapacitated.desc.label": "<p>An <strong>Incapacitated</strong> creature can't Move, take Actions, or spend Resolve.</p><p><strong>Incapacitated</strong> creatures cannot defend themselves. The Difficulty to hit an <strong>Incapacitated</strong> creature is always 2, and they automated fail <strong>Reflex</strong> checks.</p>",
    "LOCAL.incapacitated.label": "Incapacitated",
    "LOCAL.increaseAttribute.label": "Increase Attribute",
    "LOCAL.increaseMod.label": "Increase Mod",
@@ -200,7 +200,7 @@
    "LOCAL.initiative.desc.label": "<strong>Initiative</strong> is your general readiness, and determines your turn order in combat.",
    "LOCAL.initiative.label": "Initiative",
    "LOCAL.initiative.value.label": "Total Initiative Rating",
-   "LOCAL.inspiration.label": "Inspiration",
+   "LOCAL.inspiration.desc.label": "<p><strong>Inspiration</strong> is given as a reward for role-play.</p><p>You can spend your <strong>Inspiration</strong> to:</p><ul><li><p>Gain <strong>Advantage</strong> on a check</p></li><li><p>Recover from being <strong>Mortally Wounded</strong> at the start of your turn</p></li><li><p>Immediately regain 1 <strong>Resolve</strong></p></li></ul>",
    "LOCAL.instant.label": "Instant",
    "LOCAL.intimidation.desc.label": "<strong>Intimidation</strong> allows you to bend others to your will using threats.",
    "LOCAL.intimidation.label": "Intimidation",
@@ -214,7 +214,7 @@
    "LOCAL.long.label": "Long",
    "LOCAL.lore.desc.label": "<strong>Lore</strong> measures your overall breadth of knowledge in topics you are familiar with.",
    "LOCAL.lore.label": "Lore",
-   "LOCAL.loud.armor.desc.label": "When wearing armor with the <strong>Loud</strong> trait, you have Disadvantage on checks to remain undetected by creatures with hearing.",
+   "LOCAL.loud.armor.desc.label": "When wearing armor with the <strong>Loud</strong> trait, you have <strong>Disadvantage</strong> on checks to remain undetected by creatures with hearing.",
    "LOCAL.loud.armor.label": "Loud",
    "LOCAL.loud.attack.desc.label": "An attack with the <strong>Loud</strong> trait alerts everyone within hearing of your presence when it is used.",
    "LOCAL.loud.attack.label": "Loud",
@@ -566,23 +566,23 @@
       "label": "Report Effects",
       "hint": "Report an character's active Effects at the start of their turn."
    },
-   "SETTINGS.baseStaminaMultiplier": {
+   "SETTINGS.staminaBaseMultiplier": {
       "label": "Base Stamina Multiplier",
       "hint": "Base Stamina as a multiple of an character's Body + Mind + Soul."
    },
-   "SETTINGS.baseResolveMultiplier": {
+   "SETTINGS.resolveBaseMultiplier": {
       "label": "Base Resolve Multiplier",
       "hint": "Base Resolve as a multiple of an character's Soul."
    },
-   "SETTINGS.baseWoundsMultiplier": {
+   "SETTINGS.woundsBaseMultiplier": {
       "label": "Base Wounds Multiplier",
       "hint": "Base Wounds as a multiple of an character's Body + Mind + Soul."
    },
-   "SETTINGS.baseWoundsRegain": {
+   "SETTINGS.woundsBaseRegain": {
       "label": "Base Resolve Regain",
       "hint": "This is the base value by which a combatant's Wounds will be healed when they take a Long Rest."
    },
-   "SETTINGS.baseResolveRegain": {
+   "SETTINGS.resolveBaseRegain": {
       "label": "Base Resolve Regain",
       "hint": "When Auto-Regain Resolve is not disabled, this is the base value by which a combatant's Resolve will increase by at the start of their turn."
    }

@@ -170,13 +170,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Calculate base resource values
       // Stamina = Total Attribute Mod
-      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseStaminaMultiplier')), 1);
+      systemData.resource.stamina.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('staminaBaseMultiplier')), 1);
 
       // Resolve = Soul / 2 rounded up
-      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('baseResolveMultiplier')), 1);
+      systemData.resource.resolve.maxBase = Math.ceil(Math.ceil(systemData.attribute.soul.baseValue * getSetting('resolveBaseMultiplier')), 1);
 
       // Wounds = Total Attribute mod / 2 rounded up
-      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('baseWoundsMultiplier')), 1);
+      systemData.resource.wounds.maxBase = Math.max(Math.ceil(totalBaseAttributeValue * getSetting('woundsBaseMultiplier')), 1);
    }
 
    _resetDynamicMods() {
@@ -1341,7 +1341,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          let woundsHealed = 0;
          const wounds = actor.system.resource.wounds;
          if (wounds.value > 0) {
-            woundsHealed = Math.min(getSetting('baseWoundsRegain') + actor.system.mod.woundRegain.value, wounds.value);
+            woundsHealed = Math.min(getSetting('woundsBaseRegain') + actor.system.mod.woundRegain.value, wounds.value);
             wounds.value -= woundsHealed;
          }
 
@@ -1833,7 +1833,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (resolve.value < resolve.max) {
 
             // If any resolve would be regained
-            const maxResolveRegained = getSetting('baseResolveRegain') + this.parent.system.mod.resolveRegain.value;
+            const maxResolveRegained = getSetting('resolveBaseRegain') + this.parent.system.mod.resolveRegain.value;
             if (maxResolveRegained > 0) {
 
                // Update the actor if appropriate

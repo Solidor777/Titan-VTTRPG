@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import { localize, getSetting } from '~/helpers/Utility.js';
    import CharacterSheetResource from '~/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte';
 
    // Setup context variables
@@ -8,14 +9,44 @@
 
 <!--Resources-->
 <div class="resources">
-   <!--Each Resource Meter-->
-   {#each Object.keys($document.system.resource) as key}
-      {#if $document.system.resource[key].maxBase > 0}
-         <div class="resource {key}" transition={key}>
-            <CharacterSheetResource {key} />
-         </div>
-      {/if}
-   {/each}
+   <!--Stamina-->
+
+   {#if $document.system.resource.stamina.maxBase > 0}
+      <div class="resource stamina">
+         <CharacterSheetResource
+            key={'stamina'}
+            icon={'fas fa-heart'}
+            resourceTooltip={`${localize('stamina.max')} * ${getSetting(
+               'staminaBaseMultiplier'
+            )}`}
+         />
+      </div>
+   {/if}
+   <!--Wounds-->
+   {#if $document.system.resource.wounds.maxBase > 0}
+      <div class="resource wounds">
+         <CharacterSheetResource
+            key={'wounds'}
+            icon={'fas fa-face-head-bandage'}
+            resourceTooltip={`${localize('wounds.max')} * ${getSetting(
+               'woundsBaseMultiplier'
+            )}`}
+         />
+      </div>
+   {/if}
+
+   <!--Resolve-->
+   {#if $document.system.resource.resolve.maxBase > 0}
+      <div class="resource resolve">
+         <CharacterSheetResource
+            key={'resolve'}
+            icon={'fas fa-bolt'}
+            resourceTooltip={`${localize('resolve.max')} * ${getSetting(
+               'resolveBaseMultiplier'
+            )}`}
+         />
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -34,6 +65,18 @@
             @include border-top;
             padding-top: 0.25rem;
             margin-top: 0.25rem;
+         }
+
+         &.stamina {
+            --meter-color: var(--stamina-color);
+         }
+
+         &.wounds {
+            --meter-color: var(--wounds-color);
+         }
+
+         &.resolve {
+            --meter-color: var(--resolve-color);
          }
       }
    }

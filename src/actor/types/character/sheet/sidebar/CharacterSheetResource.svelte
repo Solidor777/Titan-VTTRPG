@@ -7,22 +7,9 @@
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
    // Resource key
-   export let key;
-   let icon;
-   switch (key) {
-      case 'stamina': {
-         icon = 'fas fa-heart';
-         break;
-      }
-      case 'resolve': {
-         icon = 'fas fa-bolt';
-         break;
-      }
-      default: {
-         icon = 'fas fa-face-head-bandage';
-         break;
-      }
-   }
+   export let key = void 0;
+   export let icon = void 0;
+   export let resourceTooltip = void 0;
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -36,10 +23,9 @@
       staticMod
    ) {
       // Base label
-      let retVal = `<p>${localize(`${key}.max`)} * ${game.settings.get(
-         'titan',
-         `${key}Multiplier`
-      )}</p><p>${localize('base')}: ${maxBase}</p>`;
+      let retVal = `<p>${resourceTooltip}</p><p>${localize(
+         'base'
+      )}: ${maxBase}</p>`;
 
       // Equipment
       if (equipment !== 0) {
@@ -194,18 +180,6 @@
             height: 100%;
             flex: 1;
             width: 100%;
-
-            &.stamina {
-               --meter-color: var(--stamina-color);
-            }
-
-            &.wounds {
-               --meter-color: var(--wounds-color);
-            }
-
-            &.resolve {
-               --meter-color: var(--resolve-color);
-            }
          }
       }
    }

@@ -7,7 +7,7 @@
    const document = getContext('DocumentStore');
 </script>
 
-<div class="button" use:tooltip={{ content: localize('inspiration') }}>
+<div class="button" use:tooltip={{ content: localize('inspiration.desc') }}>
    <IconButton
       icon={$document.system.inspiration ? 'fas fa-sun' : ''}
       on:click={() => {

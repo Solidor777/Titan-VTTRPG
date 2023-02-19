@@ -274,41 +274,41 @@ export default function registerSystemSettings() {
       default: true,
    });
 
-   game.settings.register('titan', 'baseStaminaMultiplier', {
+   game.settings.register('titan', 'staminaBaseMultiplier', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.baseStaminaMultiplier.label',
-      hint: 'SETTINGS.baseStaminaMultiplier.hint',
+      name: 'SETTINGS.staminaBaseMultiplier.label',
+      hint: 'SETTINGS.staminaBaseMultiplier.hint',
       type: Number,
       restricted: true,
       default: 2,
    });
 
-   game.settings.register('titan', 'baseResolveMultiplier', {
+   game.settings.register('titan', 'resolveBaseMultiplier', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.baseResolveMultiplier.label',
-      hint: 'SETTINGS.baseResolveMultiplier.hint',
+      name: 'SETTINGS.resolveBaseMultiplier.label',
+      hint: 'SETTINGS.resolveBaseMultiplier.hint',
       type: Number,
       restricted: true,
       default: 0.5,
    });
 
-   game.settings.register('titan', 'baseWoundsMultiplier', {
+   game.settings.register('titan', 'woundsBaseMultiplier', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.baseWoundsMultiplier.label',
-      hint: 'SETTINGS.baseWoundsMultiplier.hint',
+      name: 'SETTINGS.woundsBaseMultiplier.label',
+      hint: 'SETTINGS.woundsBaseMultiplier.hint',
       type: Number,
       restricted: true,
       default: 0.5,
    });
 
-   game.settings.register('titan', 'baseWoundsRegain', {
+   game.settings.register('titan', 'woundsBaseRegain', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.baseWoundsRegain.label',
-      hint: 'SETTINGS.baseWoundsRegain.hint',
+      name: 'SETTINGS.woundsBaseRegain.label',
+      hint: 'SETTINGS.woundsBaseRegain.hint',
       type: Number,
       default: 1,
       range: {
@@ -319,11 +319,11 @@ export default function registerSystemSettings() {
       restricted: true,
    });
 
-   game.settings.register('titan', 'baseResolveRegain', {
+   game.settings.register('titan', 'resolveBaseRegain', {
       config: true,
       scope: 'world',
-      name: 'SETTINGS.baseResolveRegain.label',
-      hint: 'SETTINGS.baseResolveRegain.hint',
+      name: 'SETTINGS.resolveBaseRegain.label',
+      hint: 'SETTINGS.resolveBaseRegain.hint',
       type: Number,
       default: 1,
       range: {
