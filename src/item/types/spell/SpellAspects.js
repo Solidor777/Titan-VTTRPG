@@ -416,7 +416,7 @@ export default Object.freeze({
          requireOption: true,
          option: [
             'blinded',
-            'charmed',
+            'contaminated',
             'deafened',
             'frightened',
             'incapacitated',
@@ -428,7 +428,7 @@ export default Object.freeze({
          ],
          optionCosts: {
             blinded: 4,
-            charmed: 2,
+            contaminated: 4,
             deafened: 1,
             frightened: 3,
             incapacitated: 6,
@@ -454,7 +454,7 @@ export default Object.freeze({
          allOptionsCost: 5,
          option: [
             'blinded',
-            'charmed',
+            'contaminated',
             'deafened',
             'frightened',
             'incapacitated',

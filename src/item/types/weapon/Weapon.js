@@ -26,7 +26,7 @@ export default class TitanWeapon extends TitanTypeComponent {
          shouldReturnData = true;
          initialData.system = {
             attack: [getAttackTemplate()]
-         }
+         };
       }
 
       if (shouldReturnData) {
