@@ -312,12 +312,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          switch (effect.flags.core.statusId) {
             // Blinded
             case 'blinded': {
-               this.parent.system.condition.blinded = true;
+               const systemData = this.parent.system;
+               systemData.condition.blinded = true;
 
                // Decrease Melee, Accuracy, and Defense by 1
-               systemData.rating.melee.effect -= 1;
-               systemData.rating.accuracy.effect -= 1;
-               systemData.rating.defense.effect -= 1;
+               systemData.rating.melee.mod.effect -= 1;
+               systemData.rating.accuracy.mod.effect -= 1;
+               systemData.rating.defense.mod.effect -= 1;
 
                break;
             }
@@ -389,9 +390,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                systemData.condition.restrained = true;
 
                // Decrease Melee, Accuracy, and Defense by 1
-               systemData.rating.melee.effect -= 1;
-               systemData.rating.accuracy.effect -= 1;
-               systemData.rating.defense.effect -= 1;
+               systemData.rating.melee.mod.effect -= 1;
+               systemData.rating.accuracy.mod.effect -= 1;
+               systemData.rating.defense.mod.effect -= 1;
 
                // Decrease Speed to 0
                for (const speed of Object.values(systemData.speed)) {
