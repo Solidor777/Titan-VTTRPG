@@ -54,7 +54,7 @@
    <!--Spend Resolve button-->
    <div
       class="button resolve"
-      use:tooltip={{ content: localize('spendResolve') }}
+      use:tooltip={{ content: localize('spend%xResolve').replace('%x', 1) }}
    >
       <IconButton
          icon={'fas fa-bolt'}
