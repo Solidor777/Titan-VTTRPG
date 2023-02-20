@@ -2,7 +2,6 @@
    import { localize } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
    import CheckChatResetExpertiseButton from './CheckChatResetExpertiseButton.svelte';
-   import recalculateCheckResults from './RecalculateCheckResults';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -11,8 +10,16 @@
 <div class="results">
    <!--Successes-->
    <div class="stat">
-      {$document.flags.titan.chatContext.results.successes}
-      {localize('successes')}
+      <div class="border-right">
+         {`${localize('dc')} ${
+            $document.flags.titan.chatContext.parameters.difficulty
+         }:${$document.flags.titan.chatContext.parameters.complexity}`}
+      </div>
+      <div>
+         {`${$document.flags.titan.chatContext.results.successes} ${localize(
+            'successes'
+         )}`}
+      </div>
    </div>
 
    <!--Succeeded-->
@@ -147,6 +154,12 @@
             margin-left: 0.25rem;
             --icon-button-radius: 1.5rem;
             --icon-button-font-size: 0.9rem;
+         }
+
+         .border-right {
+            @include border-right;
+            margin-right: 0.5rem;
+            padding-right: 0.5rem;
          }
       }
    }

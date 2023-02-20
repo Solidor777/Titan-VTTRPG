@@ -17,8 +17,6 @@
                  $document.flags.titan.chatContext.parameters.skill
               )})`
             : ''
-      } ${$document.flags.titan.chatContext.parameters.difficulty}:${
-         $document.flags.titan.chatContext.parameters.complexity
       }`}
    </div>
 </div>

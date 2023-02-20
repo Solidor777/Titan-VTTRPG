@@ -24,7 +24,7 @@
       <div class="labels">
          <!--Label-->
          <div class="label">
-            {$document.flags.titan.chatContext.parameters.itemName}
+            {`${$document.flags.titan.chatContext.parameters.itemName}`}
          </div>
 
          <!--Attack -->
@@ -38,9 +38,7 @@
                $document.flags.titan.chatContext.parameters.attribute
             )} (${localize(
                $document.flags.titan.chatContext.parameters.skill
-            )}) ${$document.flags.titan.chatContext.parameters.difficulty}:${
-               $document.flags.titan.chatContext.parameters.complexity
-            }`}
+            )})`}
          </div>
 
          <!--Target defense-->
