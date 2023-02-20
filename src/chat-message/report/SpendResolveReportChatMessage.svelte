@@ -13,8 +13,24 @@
    <!--Header-->
    <ReportHeader
       icon={'fas fa-bolt'}
-      label={localize('spent%xResolve').replace('%x', chatContext.resolveSpent)}
+      label={localize(
+         chatContext.resolveShortage
+            ? 'attemptedToSpend%xResolve'
+            : 'spent%xResolve'
+      ).replace('%x', chatContext.resolveSpent)}
    />
+
+   <!--Resolve Shortage-->
+   {#if chatContext.resolveShortage}
+      <div class="message">
+         <div>
+            {localize('need%xMoreResolve').replace(
+               '%x',
+               chatContext.resolveShortage
+            )}
+         </div>
+      </div>
+   {/if}
 
    <!--Resolve-->
    <div class="message">

@@ -363,6 +363,8 @@
    "LOCAL.spells.label": "Spells",
    "LOCAL.spell.label": "Spell",
    "LOCAL.suffered%xWounds.label": "Suffered %x Wounds",
+   "LOCAL.attemptedToSpend%xResolve.label": "Attempted to Spend %x Resolve",
+   "LOCAL.need%xMoreResolve.label": "Need %x more Resolve",
    "LOCAL.spendResolve.label": "Spend Resolve",
    "LOCAL.spend%xResolve.label": "Spend %x Resolve",
    "LOCAL.spentResolve.label": "Spent Resolve",

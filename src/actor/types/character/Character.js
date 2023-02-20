@@ -1188,7 +1188,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   type: 'spendResolveReport',
                   img: this.parent.img,
                   name: this.parent.name,
-                  resolveSpent: 1,
+                  resolveSpent: resolveSpent,
                   resolve: {
                      value: resolve.value,
                      max: resolve.max
