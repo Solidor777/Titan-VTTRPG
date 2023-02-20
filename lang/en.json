@@ -519,6 +519,10 @@
       "label": "Auto-Spend Resolve when Re-Rolling Failures",
       "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Re-Roll failures on a check."
    },
+   "SETTINGS.autoSpendResolveChecks": {
+      "label": "Auto-Spend Resolve when using Checks",
+      "hint": "When enabled, a combatant's Resolve will automatically be decreased when they perform a Check with a resolve cost."
+   },
    "SETTINGS.autoDecreaseEffectDuration": {
       "label": "Auto-Decrease Effect Duration.",
       "hint": "When enabled, a combatant's temporary effects will automatically decrease their duration by 1 at the start or end of their turn, depending on the effect."

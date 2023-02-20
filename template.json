@@ -486,6 +486,7 @@
             "base"
          ],
          "xpCost": 2,
+         "resolveCost": 0,
          "rarity": "common",
          "requirements": "",
          "rulesElement": [],

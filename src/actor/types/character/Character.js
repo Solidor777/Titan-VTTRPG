@@ -930,17 +930,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (itemCheck && itemCheck.isValid) {
                // Expend resolve if appropriate
                let resolveSpent = 0;
-               console.log(itemCheck.parameters);
                if (itemCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
                   resolveSpent += 1;
                }
                if (itemCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
                   resolveSpent += 1;
                }
+               if (itemCheck.parameters.resolveCost && getSetting('autoSpendResolveChecks')) {
+                  resolveSpent += itemCheck.parameters.resolveCost;
+               }
                if (resolveSpent > 0) {
                   await this.spendResolve(resolveSpent, true);
                }
-
 
                await itemCheck.evaluateCheck();
                await itemCheck.sendToChat({

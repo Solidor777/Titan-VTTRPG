@@ -136,6 +136,17 @@ export default function registerSystemSettings() {
       requiresReload: true,
    });
 
+   game.settings.register('titan', 'autoSpendResolveChecks', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.autoSpendResolveChecks.label',
+      hint: 'SETTINGS.autoSpendResolveChecks.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+      requiresReload: true,
+   });
+
    game.settings.register('titan', 'autoApplyFastHealing', {
       config: true,
       scope: 'world',

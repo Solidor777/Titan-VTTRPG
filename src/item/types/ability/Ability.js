@@ -11,7 +11,7 @@ export default class TitanAbility extends TitanTypeComponent {
       if (this.parent.img === 'icons/svg/item-bag.svg') {
          return {
             img: 'icons/svg/ice-aura.svg'
-         }
+         };
       }
 
       return false;

@@ -40,6 +40,15 @@
                $document.flags.titan.chatContext.parameters.skill
             )})`}
          </div>
+
+         <!--Resolve Cost -->
+         {#if $document.flags.titan.chatContext.parameters.resolveCost}
+            <div class="sub-label">
+               {`${localize('resolveCost')}: ${
+                  $document.flags.titan.chatContext.parameters.resolveCost
+               }`}
+            </div>
+         {/if}
       </div>
    </div>
 </div>
