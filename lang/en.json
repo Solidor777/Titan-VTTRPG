@@ -364,6 +364,7 @@
    "LOCAL.spell.label": "Spell",
    "LOCAL.suffered%xWounds.label": "Suffered %x Wounds",
    "LOCAL.spendResolve.label": "Spend Resolve",
+   "LOCAL.spend%xResolve.label": "Spend %x Resolve",
    "LOCAL.spentResolve.label": "Spent Resolve",
    "LOCAL.spent%xResolve.label": "Spent %x Resolve",
    "LOCAL.splash.desc.label": "Attacks with the <strong>Splash</strong> trait deal half-damage to adjacent creatures.",
@@ -536,31 +537,19 @@
    },
    "SETTINGS.reportTakingDamage": {
       "label": "Report Taking Damage",
-      "hint": "Notify when an actor takes damage.",
-      "owner": "Owner",
-      "gmOnly": "GM Only",
-      "disabled": "Disabled"
+      "hint": "Notify when an actor takes damage."
    },
    "SETTINGS.reportHealingDamage": {
       "label": "Report Healing Damage",
-      "hint": "Notify when an actor heals damage.",
-      "owner": "Owner",
-      "gmOnly": "GM Only",
-      "disabled": "Disabled"
+      "hint": "Notify when an actor heals damage."
    },
    "SETTINGS.reportSpendingResolve": {
       "label": "Report Spending Resolve",
-      "hint": "Notify when an actor spends Resolve.",
-      "owner": "Owner",
-      "gmOnly": "GM Only",
-      "disabled": "Disabled"
+      "hint": "Notify when an actor spends Resolve."
    },
    "SETTINGS.reportResting": {
       "label": "Report Resting",
-      "hint": "Notify when an actor Rests.",
-      "owner": "Owner",
-      "gmOnly": "GM Only",
-      "disabled": "Disabled"
+      "hint": "Notify when an actor Rests."
    },
    "SETTINGS.reportRegainingResolve": {
       "label": "Report Regaining Resolve",

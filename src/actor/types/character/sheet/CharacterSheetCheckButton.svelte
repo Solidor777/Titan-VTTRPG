@@ -22,7 +22,7 @@
          </div>
 
          <!--Pool-->
-         <div class="pool">
+         <div class="stat">
             <i class="fas fa-dice-d6" />
             {$document.system.attribute[check.attribute].value +
                (check.skill
@@ -32,9 +32,17 @@
 
          <!--Expertise-->
          {#if check.skill && $document.system.skill[check.skill].expertise.value > 0}
-            <div class="expertise">
-               <i class="fa fa-graduation-cap" />
+            <div class="stat">
+               <i class="fas fa-graduation-cap" />
                {$document.system.skill[check.skill].expertise.value}
+            </div>
+         {/if}
+
+         <!--Resolve Cost-->
+         {#if check.resolveCost}
+            <div class="stat">
+               <i class="fas fa-bolt" />
+               {check.resolveCost}
             </div>
          {/if}
       </div>
@@ -71,16 +79,7 @@
             margin-right: 0.25rem;
          }
 
-         .pool {
-            @include flex-row;
-            @include flex-group-center;
-            @include border-left;
-            @include border-color-button;
-            padding-left: 0.25rem;
-            margin-left: 0.25rem;
-         }
-
-         .expertise {
+         .stat {
             @include flex-row;
             @include flex-group-center;
             @include border-left;

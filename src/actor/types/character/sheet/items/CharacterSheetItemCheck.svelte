@@ -1,12 +1,14 @@
 <script>
    import { getContext } from 'svelte';
-   import { localize } from '~/helpers/Utility.js';
+   import { localize, getSetting } from '~/helpers/Utility.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
+   import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
 
    // Reference to the docuement
    const document = getContext('DocumentStore');
@@ -17,23 +19,57 @@
    // The idx of the check
    export let checkIdx = void 0;
 
+   const autoSpendResolve = getSetting('autoSpendResolveChecks');
+
    // Reference to the weapon id
    $: check = item.system.check[checkIdx];
+
+   function rollItemCheck() {
+      return $document.typeComponent.rollItemCheck(
+         { itemId: item._id, checkIdx: checkIdx },
+         false
+      );
+   }
+
+   async function spendResolve() {
+      return await $document.typeComponent.spendResolve(
+         check.resolveCost,
+         true,
+         true
+      );
+   }
 </script>
 
 <!--Check-->
 {#if check}
    <div class="check">
-      <!--Button-->
-      <div class="button">
-         <ItemCheckButton
-            {check}
-            on:click={() =>
-               $document.typeComponent.rollItemCheck(
-                  { itemId: item._id, checkIdx: checkIdx },
-                  false
-               )}
-         />
+      <!--Buttons-->
+      <div class="buttons">
+         {#if check.resolveCost}
+            {#if autoSpendResolve}
+               <!--Combined Item Check and Spend Resolve button-->
+               <ItemCheckResolveButton
+                  {check}
+                  on:click={async () => rollItemCheck()}
+               />
+            {:else}
+               <!--Item Check Button-->
+               <div>
+                  <ItemCheckButton {check} on:click={() => rollItemCheck()} />
+               </div>
+
+               <!--Resolve Cost Button-->
+               <div class="resolve-cost-button">
+                  <SpendResolveButton
+                     cost={check.resolveCost}
+                     on:click={() => spendResolve()}
+                  />
+               </div>
+            {/if}
+         {:else}
+            <!--Check Button-->
+            <ItemCheckButton {check} on:click={() => rollItemCheck()} />
+         {/if}
       </div>
 
       <div class="stats">
@@ -82,9 +118,10 @@
          <!--Resolve Cost-->
          {#if check.resolveCost > 0}
             <div class="stat">
-               <StatTag
+               <IconStatTag
                   label={localize('resolveCost')}
                   value={check.resolveCost}
+                  icon={'fas fa-bolt'}
                />
             </div>
          {/if}
@@ -113,6 +150,14 @@
       @include flex-column;
       @include flex-group-top;
       width: 100%;
+
+      .buttons {
+         @include flex-row;
+
+         .resolve-cost-button {
+            margin-left: 0.5rem;
+         }
+      }
 
       .stats {
          @include flex-row;

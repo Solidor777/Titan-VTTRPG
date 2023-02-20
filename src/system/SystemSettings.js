@@ -210,14 +210,9 @@ export default function registerSystemSettings() {
       scope: 'world',
       name: 'SETTINGS.reportTakingDamage.label',
       hint: 'SETTINGS.reportTakingDamage.hint',
-      type: String,
-      choices: {
-         owner: 'SETTINGS.reportTakingDamage.owner',
-         gmOnly: 'SETTINGS.reportTakingDamage.gmOnly',
-         none: 'SETTINGS.reportTakingDamage.disabled'
-      },
+      type: Boolean,
       restricted: true,
-      default: 'owner',
+      default: true,
    });
 
    game.settings.register('titan', 'reportHealingDamage', {
@@ -225,14 +220,9 @@ export default function registerSystemSettings() {
       scope: 'world',
       name: 'SETTINGS.reportHealingDamage.label',
       hint: 'SETTINGS.reportHealingDamage.hint',
-      type: String,
-      choices: {
-         owner: 'SETTINGS.reportHealingDamage.owner',
-         gmOnly: 'SETTINGS.reportHealingDamage.gmOnly',
-         none: 'SETTINGS.reportHealingDamage.disabled'
-      },
+      type: Boolean,
       restricted: true,
-      default: 'owner',
+      default: true,
    });
 
    game.settings.register('titan', 'reportSpendingResolve', {
@@ -240,14 +230,9 @@ export default function registerSystemSettings() {
       scope: 'world',
       name: 'SETTINGS.reportSpendingResolve.label',
       hint: 'SETTINGS.reportSpendingResolve.hint',
-      type: String,
-      choices: {
-         owner: 'SETTINGS.reportSpendingResolve.owner',
-         gmOnly: 'SETTINGS.reportSpendingResolve.gmOnly',
-         none: 'SETTINGS.reportSpendingResolve.disabled'
-      },
+      type: Boolean,
       restricted: true,
-      default: 'owner',
+      default: true,
    });
 
    game.settings.register('titan', 'reportRegainingResolve', {
@@ -265,14 +250,9 @@ export default function registerSystemSettings() {
       scope: 'world',
       name: 'SETTINGS.reportResting.label',
       hint: 'SETTINGS.reportResting.hint',
-      type: String,
-      choices: {
-         owner: 'SETTINGS.reportResting.owner',
-         gmOnly: 'SETTINGS.reportResting.gmOnly',
-         none: 'SETTINGS.reportResting.disabled'
-      },
+      type: Boolean,
       restricted: true,
-      default: 'owner',
+      default: true,
    });
 
    game.settings.register('titan', 'reportEffects', {

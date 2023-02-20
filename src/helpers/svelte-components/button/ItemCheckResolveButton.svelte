@@ -10,9 +10,13 @@
 <div class="item-check-button {check.attribute}">
    <EfxButton on:click {disabled}>
       <div class="button-inner">
-         <i class="fas fa-dice" />
+         <i class="fa fa-dice" />
          <div>
             {check.label}
+         </div>
+         <i class="divider fas fa-bolt" />
+         <div>
+            {check.resolveCost}
          </div>
       </div>
    </EfxButton>
@@ -46,6 +50,13 @@
 
          i {
             margin-right: 0.25rem;
+         }
+
+         .divider {
+            @include border-left;
+            border-color: var(--button-border-color);
+            margin-left: 0.25rem;
+            padding-left: 0.25rem;
          }
       }
    }

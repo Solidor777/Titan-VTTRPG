@@ -5,7 +5,6 @@ import {
    confirmDeletingItems,
    documentSort,
    isHTMLBlank,
-   getGMs,
    getOwners,
    getSumOfValuesInObject,
    getBestPlayerOwner,
@@ -633,7 +632,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   resolveSpent += 1;
                }
                if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true);
+                  await this.spendResolve(resolveSpent, true, false);
                }
 
 
@@ -755,7 +754,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   resolveSpent += 1;
                }
                if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true);
+                  await this.spendResolve(resolveSpent, true, false);
                }
 
                await attackCheck.evaluateCheck();
@@ -860,7 +859,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   resolveSpent += 1;
                }
                if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true);
+                  await this.spendResolve(resolveSpent, true, false);
                }
 
                await castingCheck.evaluateCheck();
@@ -940,7 +939,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   resolveSpent += itemCheck.parameters.resolveCost;
                }
                if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true);
+                  await this.spendResolve(resolveSpent, true, false);
                }
 
                await itemCheck.evaluateCheck();
@@ -992,7 +991,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    // Apply damage to the actor
-   async applyDamage(damage = 1, ignoreArmor = false, report = true, updateActor = true) {
+   async applyDamage(damage = 1, ignoreArmor = false, shouldReport = true, updateActor = true) {
       if (this.parent.isOwner) {
          // Calculate the damage amount
          const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
@@ -1033,9 +1032,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
 
          // Report
-         if (report) {
-            const reportSettings = getSetting('reportTakingDamage');
-            if (reportSettings !== 'disabled') {
+         if (shouldReport) {
+            const shouldReportSettings = getSetting('reportTakingDamage');
+            if (shouldReportSettings) {
 
                // Create the chat context
                const chatContext = {
@@ -1070,7 +1069,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Send the report to chat
-               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
 
          }
@@ -1084,7 +1083,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async applyHealing(healing = 1, report = true, updateActor = true) {
+   async applyHealing(healing = 1, shouldReport = true, updateActor = true) {
       if (this.parent.isOwner) {
          // Check if the actor's stamina is less than max
          let damageHealed = 0;
@@ -1108,9 +1107,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
 
             // Report
-            if (report) {
-               const reportSettings = getSetting('reportHealingDamage');
-               if (reportSettings !== 'disabled') {
+            if (shouldReport) {
+               const shouldReportSettings = getSetting('reportHealingDamage');
+               if (shouldReportSettings) {
                   // Create chat context
                   const wounds = this.parent.system.resource.wounds;
                   const chatContext = {
@@ -1129,7 +1128,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   };
 
                   // Send the report to chat
-                  this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+                  this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
                }
             }
          }
@@ -1156,13 +1155,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
             });
          }
-
       }
 
       return;
    }
 
-   async spendResolve(resolveSpent, report) {
+   async spendResolve(resolveSpent = 1, shouldReport = true, shouldReportPlaySound = true) {
       if (this.parent.isOwner) {
          // Check if the actor's resolve is less than max
          const resolve = this.parent.system.resource.resolve;
@@ -1182,9 +1180,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Report
-         if (report) {
-            const reportSettings = getSetting('reportSpendingResolve');
-            if (reportSettings !== 'disabled') {
+         if (shouldReport === true) {
+            const shouldReportSettings = getSetting('reportSpendingResolve');
+            if (shouldReportSettings) {
                // Create chat context
                const chatContext = {
                   type: 'spendResolveReport',
@@ -1200,9 +1198,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext.resolveShortage = resolveSpent - initialResolve;
                }
 
-
-               // Send the chat message
-               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, shouldReportPlaySound);
             }
          }
       }
@@ -1239,7 +1235,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async removeCombatEffects(report) {
+   async removeCombatEffects(shouldReport) {
       const actor = this.parent;
       if (actor.isOwner) {
          const systemData = actor.system;
@@ -1287,9 +1283,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Report
-         if (report) {
-            const reportSettings = getSetting('reportResting');
-            if (reportSettings !== 'disabled') {
+         if (shouldReport) {
+            const shouldReportSettings = getSetting('reportResting');
+            if (shouldReportSettings) {
                // Create chat context
                const chatContext = {
                   type: 'removeCombatEffectsReport',
@@ -1298,7 +1294,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                };
 
                // Send the report to chat
-               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
          }
       }
@@ -1306,7 +1302,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async shortRest(report) {
+   async shortRest(shouldReport) {
       const actor = this.parent;
       if (actor.isOwner) {
          // Restore stamina
@@ -1316,9 +1312,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          await this.removeCombatEffects(false);
 
          // Report
-         if (report) {
-            const reportSettings = getSetting('reportResting');
-            if (reportSettings !== 'disabled') {
+         if (shouldReport) {
+            const shouldReportSettings = getSetting('reportResting');
+            if (shouldReportSettings) {
                // Create chat context
                const chatContext = {
                   type: 'shortRestReport',
@@ -1327,7 +1323,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                };
 
                // Send the report to chat
-               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
          }
       }
@@ -1335,7 +1331,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async longRest(report) {
+   async longRest(shouldReport) {
       const actor = this.parent;
       if (actor.isOwner) {
          // Decrease wounds
@@ -1350,9 +1346,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          await this.shortRest(false);
 
          // Report
-         if (report) {
-            const reportSettings = getSetting('reportResting');
-            if (reportSettings !== 'disabled') {
+         if (shouldReport) {
+            const shouldReportSettings = getSetting('reportResting');
+            if (shouldReportSettings) {
                // Create chat context
                const chatContext = {
                   type: 'longRestReport',
@@ -1370,7 +1366,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Send the report to chat
-               this.whisperUsers(chatContext, reportSettings === 'owner' ? getOwners(this.parent) : getGMs());
+               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
          }
       }
@@ -1414,7 +1410,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             chatContext.img = actor.img;
             chatContext.name = actor.name;
 
-            this.whisperUsers(chatContext, getOwners(this.parent));
+            this.whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
          }
       }
 
@@ -1473,7 +1469,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             chatContext.img = actor.img;
 
             // Send the report to chat
-            this.whisperUsers(chatContext, getOwners(this.parent));
+            this.whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
          }
       }
 
@@ -1860,19 +1856,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return shouldUpdateActor;
    }
 
-   async whisperUsers(chatContext, users) {
-      return await ChatMessage.create({
-         user: this.getReportUserID(),
+   async whisperUsers(chatContext, users, userId, playSound = true) {
+      const whisperMessage = {
+         user: userId,
          speaker: ChatMessage.getSpeaker({ actor: this.parent }),
          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-         sound: CONFIG.sounds.notification,
          whisper: users,
          flags: {
             titan: {
                chatContext: chatContext
             }
          }
-      });
+      };
+
+      if (playSound) {
+         whisperMessage.sound = CONFIG.sounds.notification;
+      }
+      return await ChatMessage.create(whisperMessage);
    }
 
    async toggleMultiAttack(itemId) {
@@ -2093,7 +2093,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   getReportUserID() {
+   getTurnReportUserID() {
       const playerOwner = getBestPlayerOwner(this.parent);
       return playerOwner ? playerOwner.id : game.user.id;
    }

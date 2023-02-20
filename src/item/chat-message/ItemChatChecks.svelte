@@ -1,13 +1,17 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import { localize, getSetting } from '~/helpers/Utility.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import TitanItemCheck from '~/check/types/item-check/ItemCheck.js';
+   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
+   import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
+   import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
 
    export let item = void 0;
+
+   const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    function getTagFromCheck(check) {
       let retVal = localize(`${check.attribute}`);
@@ -50,6 +54,18 @@
                });
 
                if (itemCheck.isValid) {
+                  // Spend resolve if appropriate
+                  if (
+                     itemCheck.parameters.resolveCost &&
+                     autoSpendResolve &&
+                     actor.character
+                  ) {
+                     await actor.character.spendResolve(
+                        itemCheck.parameters.resolveCost,
+                        true,
+                        false
+                     );
+                  }
                   await itemCheck.evaluateCheck();
                   await itemCheck.sendToChat({
                      user: game.user.id,
@@ -61,6 +77,24 @@
          }
       }
    }
+
+   async function spendResolve(resolveToSpend) {
+      // Get controlled tokens
+      const controlledTokens = Array.from(canvas.tokens.controlled);
+      if (controlledTokens.length > 0) {
+         for (
+            let tokenIdx = 0;
+            tokenIdx < controlledTokens.length;
+            tokenIdx++
+         ) {
+            // If the target is valid
+            const character = controlledTokens[tokenIdx]?.actor?.character;
+            if (character) {
+               character.spendResolve(resolveToSpend, true, true);
+            }
+         }
+      }
+   }
 </script>
 
 <ol>
@@ -68,14 +102,41 @@
    {#each item.system.check as check, idx}
       <li>
          <!--Header-->
-         <div class="button">
-            <ItemCheckButton
-               {check}
-               on:click={() => {
-                  rollItemCheck(idx);
-               }}
-            />
-         </div>
+
+         {#if check.resolveCost}
+            {#if autoSpendResolve}
+               <!--Combined Item Check and Spend Resolve button-->
+               <div class="button">
+                  <ItemCheckResolveButton
+                     {check}
+                     on:click={async () => {
+                        rollItemCheck(idx);
+                     }}
+                  />
+               </div>
+            {:else}
+               <!--Item Check Button-->
+               <div class="button">
+                  <ItemCheckButton
+                     {check}
+                     on:click={() => rollItemCheck(idx)}
+                  />
+               </div>
+
+               <!--Resolve Cost Button-->
+               <div class="button">
+                  <SpendResolveButton
+                     cost={check.resolveCost}
+                     on:click={() => spendResolve(check.resolveCost)}
+                  />
+               </div>
+            {/if}
+         {:else}
+            <!--Check Button-->
+            <div class="button">
+               <ItemCheckButton {check} on:click={() => rollItemCheck(idx)} />
+            </div>
+         {/if}
 
          <div class="tags">
             <!--Main Check Stats -->
@@ -92,9 +153,10 @@
             <!--Resolve Cost-->
             {#if check.resolveCost > 0}
                <div class="tag">
-                  <StatTag
+                  <IconStatTag
                      label={localize('resolveCost')}
                      value={check.resolveCost}
+                     icon={'fas fa-bolt'}
                   />
                </div>
             {/if}
@@ -141,6 +203,10 @@
          .button {
             @include flex-row;
             @include flex-group-center;
+
+            &:not(:first-child) {
+               margin-top: 0.5rem;
+            }
          }
 
          .tags {

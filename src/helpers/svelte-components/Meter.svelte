@@ -3,14 +3,15 @@
    export let max = 1;
    export let min = 0;
    export let current = void 0;
+   export let meterScaleSpeed = 10;
    let meterWidth = (current / max - min) * 100;
    let meterUpdate = false;
 
    function updateMeterWidth() {
       if (meterWidth < targetMeterWidth) {
-         meterWidth = Math.min(meterWidth + 5, targetMeterWidth);
+         meterWidth = Math.min(meterWidth + meterScaleSpeed, targetMeterWidth);
       } else if (meterWidth > targetMeterWidth) {
-         meterWidth = Math.max(meterWidth - 5, targetMeterWidth);
+         meterWidth = Math.max(meterWidth - meterScaleSpeed, targetMeterWidth);
       } else {
          clearInterval(meterUpdate);
          meterUpdate = false;

@@ -1,18 +1,19 @@
 <script>
+   import { localize } from '~/helpers/Utility.js';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
    // Check reference
-   export let check = void 0;
+   export let cost = void 0;
 
    export let disabled = void 0;
 </script>
 
-<div class="item-check-button {check.attribute}">
+<div class="item-check-button">
    <EfxButton on:click {disabled}>
       <div class="button-inner">
-         <i class="fas fa-dice" />
+         <i class="fa fa-bolt" />
          <div>
-            {check.label}
+            {localize('spend%xResolve').replace('%x', cost)}
          </div>
       </div>
    </EfxButton>
@@ -23,18 +24,6 @@
 
    .item-check-button {
       @include flex-row;
-
-      &.body {
-         --button-background: var(--body-color);
-      }
-
-      &.mind {
-         --button-background: var(--mind-color);
-      }
-
-      &.soul {
-         --button-background: var(--soul-color);
-      }
 
       .button-inner {
          @include flex-row;
