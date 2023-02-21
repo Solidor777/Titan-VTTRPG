@@ -15,7 +15,7 @@
    export let attackIdx = void 0;
 
    // Application reference
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    const newTrait = {
       name: localize('newTrait'),

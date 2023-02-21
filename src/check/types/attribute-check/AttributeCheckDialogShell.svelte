@@ -29,7 +29,7 @@
       diceMod: options.diceMod ?? 0,
    };
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    async function onRoll() {
       actor.typeComponent.rollAttributeCheck(checkParameters, true);

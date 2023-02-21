@@ -10,7 +10,7 @@
 
    // Application statee reference
    const document = getContext('DocumentStore');
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 </script>
 
 <div class="traits">

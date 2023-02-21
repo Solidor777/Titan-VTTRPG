@@ -244,7 +244,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this.effects = Object.keys(sortedEffects).length > 0 ? sortedEffects : false;
 
       // Added conditions if appropriate
-      const conditions = this.parent.temporaryEffects.filter((effect) => effect.flags.titan?.condition === true);
+      const conditions = this.parent.temporaryEffects.filter((effect) => effect.flags.titan?.type === 'condition');
       this.conditions = conditions.length > 0 ? conditions : false;
 
       return;
@@ -586,6 +586,103 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       for (const resource of Object.values(this.parent.system.resource)) {
          resource.value = clamp(resource.value, 0, resource.max);
       }
+   }
+
+   async _checkUpdateEffects() {
+      if (isFirstOwner(this.parent) && this.updatingEffects !== true) {
+         this.updatingEffects = true;
+
+         // Cleanup orphaned active effects
+         for (const effect of this.parent.effects) {
+            if (effect.flags.titan?.type === 'effect' && !this.parent.items.get(effect.origin)) {
+               await effect.delete();
+            }
+         }
+
+         // For each effect item
+         for (const effectItem of this.parent.items.filter((item) => item.type === 'effect')) {
+            const effects = this.parent.effects.filter((effect) => effect.origin === effectItem._id);
+
+            // Update effects if appropriate
+            if (effects.length > 0) {
+
+               // Delete duplicate ffects
+               for (let idx = 1; idx < effects.length; idx++) {
+                  await effects[idx].delete();
+               }
+
+               // Update the effect if appropriate
+               const effect = effects[0];
+               const updateData = {};
+               let shouldUpdateEffect = false;
+
+               // Update the icon
+               const icon = effectItem.img;
+               if (effect.icon !== icon) {
+                  shouldUpdateEffect = true;
+                  updateData.icon = icon;
+               }
+
+               // Update the duration remaining if appropriate
+               const isPermanent = effectItem.system.duration.type === 'permanent';
+               const remaining = isPermanent ? 0 : effectItem.system.duration.remaining;
+               if (effect.duration.turns !== remaining) {
+                  shouldUpdateEffect = true;
+                  updateData.duration = {
+                     turns: remaining
+                  };
+               }
+
+               // Update the label
+               const label = isPermanent || remaining > 0 ? effectItem.name : `${effectItem.name} (${localize('expired')})`;
+               if (effect.label !== label) {
+                  shouldUpdateEffect = true;
+                  updateData.label = label;
+               }
+
+               // Update visual active effects description if appropriate
+               const description = effectItem.system.description === '' ||
+                  effectItem.system.description === '<p></p>' ? '' : TextEditor.enrichHTML(effectItem.system.description, { async: false, secrets: true });
+               if (description !== effect['flags.visual-active-effects.data.content']) {
+                  shouldUpdateEffect = true;
+                  updateData['flags.visual-active-effects.data.content'] = description;
+               }
+
+               // Update effect if appropriate
+               if (shouldUpdateEffect) {
+                  await effect.update(updateData);
+               }
+            }
+
+            // Otherwise, create an effect
+            else {
+               await this.parent.createEmbeddedDocuments('ActiveEffect',
+                  [{
+                     label: effectItem.name,
+                     icon: effectItem.img,
+                     origin: effectItem._id,
+                     disabled: false,
+                     duration: {
+                        turns: effectItem.system.duration.turns
+                     },
+                     flags: {
+                        core: {
+                           statusId: effectItem._id,
+                        },
+                        titan: {
+                           type: 'effect'
+                        },
+                        'visual-active-effects.data.content': TextEditor.enrichHTML(effectItem.system.description, { async: false, secrets: true })
+                     },
+                  }],
+               );
+            }
+         }
+
+         this.updatingEffects = false;
+      }
+
+      return;
    }
 
    // Get the initiative check

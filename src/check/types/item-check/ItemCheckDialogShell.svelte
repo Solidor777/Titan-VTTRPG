@@ -31,7 +31,7 @@
       checkIdx: options.checkIdx,
    };
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    async function onRoll() {
       await actor.typeComponent.rollItemCheck(checkParameters, true);

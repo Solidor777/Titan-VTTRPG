@@ -10,7 +10,7 @@
    export let message = void 0;
    export let confirmLabel = void 0;
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 </script>
 
 <div class="add-item-dialog">

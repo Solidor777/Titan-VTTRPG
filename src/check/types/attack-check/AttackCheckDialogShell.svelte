@@ -58,7 +58,7 @@
       },
    ];
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    async function onRoll() {
       actor.typeComponent.rollAttackCheck(checkParameters, true);

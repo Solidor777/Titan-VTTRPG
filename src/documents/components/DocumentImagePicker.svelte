@@ -9,7 +9,7 @@
    let img;
 
    // Get the sheett
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    // Get the contained document
    const document = getContext('DocumentStore');

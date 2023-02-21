@@ -26,7 +26,7 @@
 
    // Setup context references
    const document = getContext('DocumentStore');
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    // Item reference
    $: item = $document.items.get(id);

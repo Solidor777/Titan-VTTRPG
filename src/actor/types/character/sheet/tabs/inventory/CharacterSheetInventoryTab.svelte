@@ -15,7 +15,7 @@
 
    // Application reference
    const appState = getContext('ApplicationStateStore');
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    const itemComponents = {
       weapon: CharacterSheetWeapon,

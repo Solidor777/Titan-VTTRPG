@@ -10,7 +10,7 @@
 
    // Application reference
    const appState = getContext('ApplicationStateStore');
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    // Filtered Skill list
    const skillList = $document.system.skill;

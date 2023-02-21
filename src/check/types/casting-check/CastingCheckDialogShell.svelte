@@ -30,7 +30,7 @@
       itemId: options.itemId,
    };
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    async function onRoll() {
       await actor.typeComponent.rollCastingCheck(checkParameters, true);

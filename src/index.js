@@ -95,7 +95,7 @@ Hooks.once('setup', async () => {
       condition.flags = {
          titan: {
             description: description,
-            condition: true
+            type: 'condition'
          },
          'visual-active-effects.data.content': description
       };

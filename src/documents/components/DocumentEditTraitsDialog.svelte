@@ -18,7 +18,7 @@
    export let traitOptions = void 0;
 
    // Application reference
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    // Initialize trait options to the current value of the traits
    documentTraits.forEach((trait) => {
