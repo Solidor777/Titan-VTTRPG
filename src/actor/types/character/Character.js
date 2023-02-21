@@ -105,6 +105,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._applyEquipmentSlots();
       this._applyMods();
       this._clampResources();
+      this._checkUpdateActiveEffects();
 
       return;
    }
@@ -588,7 +589,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
    }
 
-   async _checkUpdateEffects() {
+   async _checkUpdateActiveEffects() {
       if (isFirstOwner(this.parent) && this.updatingEffects !== true) {
          this.updatingEffects = true;
 

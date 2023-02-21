@@ -514,7 +514,6 @@
             "base"
          ],
          "rulesElement": [],
-         "effectId": "",
          "duration": {
             "type": "turnEnd",
             "remaining": 1,
