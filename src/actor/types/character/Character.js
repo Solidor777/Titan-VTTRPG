@@ -8,7 +8,8 @@ import {
    getOwners,
    getSumOfValuesInObject,
    getBestPlayerOwner,
-   isFirstOwner
+   isFirstOwner,
+   sortObjectsIntoContainerByFunction
 } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
@@ -98,6 +99,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._calculateBaseResistances();
       this._calculateBaseResources();
       this._resetDynamicMods();
+      this._sortEffects();
       this._applyRulesElements();
       this._applyConditions();
       this._applyEquipmentSlots();
@@ -231,6 +233,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   _sortEffects() {
+      // Sort effects by duration type
+      const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
+      const sortedEffects = sortObjectsIntoContainerByFunction(effectItems, (effect) => {
+         return effect.typeComponent?.isExpired() ? 'expired' : effect.system.duration.type;
+      });
+
+      // Cache effects
+      this.effects = Object.keys(sortedEffects).length > 0 ? sortedEffects : false;
+
+      // Added conditions if appropriate
+      const conditions = this.parent.temporaryEffects.filter((effect) => effect.flags.titan?.condition === true);
+      this.conditions = conditions.length > 0 ? conditions : false;
+
+      return;
+   }
+
    _applyRulesElements() {
       // Get all the rules elements
       let rulesElements = [];
@@ -303,157 +322,157 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    _applyConditions() {
-      // Get the combat effects
-      const temporaryEffects = this.parent.temporaryEffects;
+      // If there are any valid conditions
+      if (this.conditions) {
+         // Check each effect to see if it is a status effect
+         this.conditions.forEach((condition) => {
+            switch (condition.flags.core.statusId) {
+               // Blinded
+               case 'blinded': {
+                  const systemData = this.parent.system;
+                  systemData.condition.blinded = true;
 
-      // Check each effect to see if it is a status effect
-      temporaryEffects.forEach((effect) => {
-         switch (effect.flags.core.statusId) {
-            // Blinded
-            case 'blinded': {
-               const systemData = this.parent.system;
-               systemData.condition.blinded = true;
+                  // Decrease Melee, Accuracy, and Defense by 1
+                  systemData.rating.melee.mod.effect -= 1;
+                  systemData.rating.accuracy.mod.effect -= 1;
+                  systemData.rating.defense.mod.effect -= 1;
 
-               // Decrease Melee, Accuracy, and Defense by 1
-               systemData.rating.melee.mod.effect -= 1;
-               systemData.rating.accuracy.mod.effect -= 1;
-               systemData.rating.defense.mod.effect -= 1;
-
-               break;
-            }
-
-            // Contaminated
-            case 'contaminated': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.condition.contaminated = true;
-
-               // Decrease all Skills and Resistances by 1
-               for (const skill of Object.values(systemData.skill)) {
-                  skill.training.mod.effect -= 1;
+                  break;
                }
-               for (const resistance of Object.values(systemData.resistance)) {
-                  resistance.mod.effect -= 1;
+
+               // Contaminated
+               case 'contaminated': {
+                  // Apply the effect
+                  const systemData = this.parent.system;
+                  systemData.condition.contaminated = true;
+
+                  // Decrease all Skills and Resistances by 1
+                  for (const skill of Object.values(systemData.skill)) {
+                     skill.training.mod.effect -= 1;
+                  }
+                  for (const resistance of Object.values(systemData.resistance)) {
+                     resistance.mod.effect -= 1;
+                  }
+                  break;
                }
-               break;
-            }
 
-            // Defeaned
-            case 'deafened': {
-               // Apply the effect
-               this.parent.system.condition.deafened = true;
-               break;
-            }
+               // Defeaned
+               case 'deafened': {
+                  // Apply the effect
+                  this.parent.system.condition.deafened = true;
+                  break;
+               }
 
-            // Frightened
-            case 'frightened': {
-               // Apply the effect
-               this.parent.system.condition.frightened = true;
-               break;
-            }
+               // Frightened
+               case 'frightened': {
+                  // Apply the effect
+                  this.parent.system.condition.frightened = true;
+                  break;
+               }
 
-            // Paralysis
-            case 'incapacitated': {
-               // Apply the effect
-               this.parent.system.condition.incapacitated = true;
-               break;
-            }
+               // Paralysis
+               case 'incapacitated': {
+                  // Apply the effect
+                  this.parent.system.condition.incapacitated = true;
+                  break;
+               }
 
-            // Prone
-            case 'prone': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.condition.prone = true;
+               // Prone
+               case 'prone': {
+                  // Apply the effect
+                  const systemData = this.parent.system;
+                  systemData.condition.prone = true;
 
-               // Decrease Speed by half
-               for (const speed of Object.values(systemData.speed)) {
-                  // Calculate the total speed
-                  let speedValue = speed.baseValue;
-                  for (const mod of Object.values(speed.mod)) {
-                     speedValue += mod;
+                  // Decrease Speed by half
+                  for (const speed of Object.values(systemData.speed)) {
+                     // Calculate the total speed
+                     let speedValue = speed.baseValue;
+                     for (const mod of Object.values(speed.mod)) {
+                        speedValue += mod;
+                     }
+
+                     // Set the effect mod so that the total speed is 1/2 of normal
+                     if (speedValue > 0) {
+                        speed.mod.effect -= (Math.ceil(speedValue / 2));
+                     }
                   }
 
-                  // Set the effect mod so that the total speed is 1/2 of normal
-                  if (speedValue > 0) {
-                     speed.mod.effect -= (Math.ceil(speedValue / 2));
+                  break;
+               }
+
+               // Restrained
+               case 'restrained': {
+                  // Apply the effect
+                  const systemData = this.parent.system;
+                  systemData.condition.restrained = true;
+
+                  // Decrease Melee, Accuracy, and Defense by 1
+                  systemData.rating.melee.mod.effect -= 1;
+                  systemData.rating.accuracy.mod.effect -= 1;
+                  systemData.rating.defense.mod.effect -= 1;
+
+                  // Decrease Speed to 0
+                  for (const speed of Object.values(systemData.speed)) {
+                     // Calculate the total speed
+                     let speedValue = speed.baseValue;
+                     for (const mod of Object.values(speed.mod)) {
+                        speedValue += mod;
+                     }
+
+                     // Set the effect speed so that the total speed is 0 
+                     if (speedValue > 0) {
+                        speed.mod.effect -= speedValue;
+                     }
                   }
+
+                  break;
                }
 
-               break;
-            }
+               // Sleep
+               case 'sleep': {
+                  // Apply the effect
+                  const systemData = this.parent.system;
+                  systemData.condition.sleeping = true;
 
-            // Restrained
-            case 'restrained': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.condition.restrained = true;
-
-               // Decrease Melee, Accuracy, and Defense by 1
-               systemData.rating.melee.mod.effect -= 1;
-               systemData.rating.accuracy.mod.effect -= 1;
-               systemData.rating.defense.mod.effect -= 1;
-
-               // Decrease Speed to 0
-               for (const speed of Object.values(systemData.speed)) {
-                  // Calculate the total speed
-                  let speedValue = speed.baseValue;
-                  for (const mod of Object.values(speed.mod)) {
-                     speedValue += mod;
+                  // Calculate the total awareness
+                  const awareness = this.parent.system.rating.awareness;
+                  let awarenessValue = awareness.baseValue + awareness.mod.static + awareness.equipment;
+                  for (const mod of Object.values(awareness.mod)) {
+                     awarenessValue += mod;
                   }
 
-                  // Set the effect speed so that the total speed is 0 
-                  if (speedValue > 0) {
-                     speed.mod.effect -= speedValue;
+                  // Set the effect mod so that the total awareness is 1/2 of norma;
+                  if (awarenessValue > 0) {
+                     awareness.mod.effect -= (Math.ceil(awarenessValue / 2));
                   }
+
+                  break;
                }
 
-               break;
-            }
+               // Sleep
+               case 'stunned': {
+                  // Apply the effect
+                  const systemData = this.parent.system;
+                  systemData.condition.stunned = true;
 
-            // Sleep
-            case 'sleep': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.condition.sleeping = true;
+                  // Decrease Defense by 1
+                  systemData.rating.defense.mod.effect -= 1;
 
-               // Calculate the total awareness
-               const awareness = this.parent.system.rating.awareness;
-               let awarenessValue = awareness.baseValue + awareness.mod.static + awareness.equipment;
-               for (const mod of Object.values(awareness.mod)) {
-                  awarenessValue += mod;
+                  break;
                }
 
-               // Set the effect mod so that the total awareness is 1/2 of norma;
-               if (awarenessValue > 0) {
-                  awareness.mod.effect -= (Math.ceil(awarenessValue / 2));
+               // Unconscious
+               case 'unconscious': {
+                  this.parent.system.condition.unconscious = true;
+                  break;
                }
 
-               break;
+               default: {
+                  break;
+               }
             }
-
-            // Sleep
-            case 'stunned': {
-               // Apply the effect
-               const systemData = this.parent.system;
-               systemData.condition.stunned = true;
-
-               // Decrease Defense by 1
-               systemData.rating.defense.mod.effect -= 1;
-
-               break;
-            }
-
-            // Unconscious
-            case 'unconscious': {
-               this.parent.system.condition.unconscious = true;
-               break;
-            }
-
-            default: {
-               break;
-            }
-         }
-      });
+         });
+      }
    }
 
    _applyEquipmentSlots() {
@@ -1477,44 +1496,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async calculateTurnStartEffects(chatContext) {
-      // Get the settings for effect automation
-      const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
-      const reportEffects = getSetting('reportEffects');
-      const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
-
-      // Check all active effects
-      const conditions = [];
-      this.parent.effects.filter((effect) => !this.parent.items.get(effect.origin)).forEach((effect) => {
-         // If this is an orphaned effect, then delete it
-         if (effect.flags?.titan?.itemId) {
-            effect.delete();
-         }
-
-         // Otherwise, if we are reporting active effects, add it to the conditions
-         else if (reportEffects) {
-            const retVal = { label: effect.label, img: effect.icon };
-            const description = effect.flags?.titan?.description;
-            if (description) {
-               retVal.description = description;
-            }
-            conditions.push(retVal);
-         }
-      });
-
-      // Update chat context
-      if (conditions.length > 0) {
-         chatContext.conditions = conditions;
-      }
-
-      // If we are doing any effect automation
-      if (autoDecreaseEffectDuration || reportEffects || autoRemoveExpiredEffects !== 'disabled') {
-
-         // Sort the effects
-         const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
-
-         // Decrease the effect duration if appropriate
-         if (autoDecreaseEffectDuration) {
-            for (const effect of effectItems.filter((effectItem) => effectItem.system.duration.type === 'turnStart' && effectItem.system.duration.remaining > 0)) {
+      // Decrease effect duration if appropriate
+      if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnStart) {
+         for (const effect of this.effects.turnStart) {
+            if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
                await effect.update({
                   system: {
@@ -1525,105 +1510,54 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                });
             }
          }
+      }
 
-         // Add effects to the chat context
-         if (reportEffects) {
-            // Pre sort effects
-            const permanentEffects = [];
-            const turnEndEffects = [];
-            const turnStartEffects = [];
-            const expiredEffects = [];
-            for (const effect of effectItems) {
-
-               // Initial retval
-               const retVal = {
-                  label: effect.name,
-                  img: effect.img,
-                  itemId: effect._id,
-               };
-
-               // Add the description if it is not blank
-               if (!isHTMLBlank(effect.system.description)) {
-                  retVal.description = effect.system.description;
-               }
-
-               // Sort the effect into the correct bucket
-               switch (effect.system.duration.type) {
-                  case 'permanent': {
-                     permanentEffects.push(retVal);
-                     break;
-                  }
-                  case 'turnEnd': {
-                     const remaining = effect.system.duration.remaining;
-                     if (remaining > 0) {
-                        retVal.remaining = remaining;
-                        turnEndEffects.push(retVal);
-                     }
-                     else {
-                        expiredEffects.push(retVal);
-                     }
-                     break;
-                  }
-                  case 'turnStart': {
-                     const remaining = effect.system.duration.remaining;
-                     if (remaining > 0) {
-                        retVal.remaining = remaining;
-                        turnStartEffects.push(retVal);
-                     }
-                     else {
-                        expiredEffects.push(retVal);
-                     }
-                     break;
-                  }
-                  default: {
-                     break;
-                  }
-               }
+      // Report effects if appropriate
+      if (getSetting('reportEffects')) {
+         // Add efects to chat context
+         if (this.effects) {
+            if (this.effects.permanent) {
+               chatContext.permanentEffects = this.effects.permanent.map(this.getEffectReportData);
             }
 
-            // Add the effects to the chat context
-            if (permanentEffects.length > 0) {
-               chatContext.permanentEffects = permanentEffects;
+            if (this.effects.turnStart) {
+               chatContext.turnStartEffects = this.effects.turnStart.map(this.getEffectReportData);
             }
 
-            if (turnEndEffects.length > 0) {
-               chatContext.turnEndEffects = turnEndEffects;
+            if (this.effects.turnEnd) {
+               chatContext.turnEndEffects = this.effects.turnEnd.map(this.getEffectReportData);
             }
 
-            if (turnStartEffects.length > 0) {
-               chatContext.turnStartEffects = turnStartEffects;
-            }
-
-
-            if (expiredEffects.length > 0) {
-               chatContext.expiredEffects = expiredEffects;
+            if (this.effects.expired) {
+               chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
             }
          }
 
-         // Remove effects or show button as appropriate
-         switch (autoRemoveExpiredEffects) {
+         // Add conditons to chat context
+         if (this.conditions) {
+            chatContext.conditions = [];
+            this.conditions.forEach((condition) => {
+               const retVal = { label: condition.label, img: condition.icon };
+               const description = effect.flags?.titan?.description;
+               if (description) {
+                  retVal.description = description;
+               }
+               chatContext.conditions.push(retVal);
+            });
+         }
+      }
+
+      // Remove expired effects if appropriate
+      const expiredEffects = this.effects.expired;
+      if (expiredEffects) {
+         switch (getSetting('autoRemoveExpiredEffects')) {
             case 'showButton': {
-               // Determine if there are any expired effects
-               // Piggyback of previous work if possible
-               let showButton = chatContext.expiredEffects ? true : false;
-               if (!showButton) {
-                  for (const effect of effectItems) {
-                     if (effect.typeComponent.isExpired()) {
-                        showButton = true;
-                        break;
-                     }
-                  }
-               }
-
-               if (showButton) {
-                  chatContext.expiredEffectsRemoved = false;
-               }
-
+               chatContext.expiredEffectsRemoved = false;
                break;
             }
             case 'enabled': {
                chatContext.expiredEffectsRemoved = true;
-               effectItems.filter((effect) => effect.typeComponent.isExpired()).forEach((effect) => effect.delete());
+               expiredEffects.forEach((effect) => effect.delete());
                break;
             }
             default: {
@@ -1634,20 +1568,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async calculateTurnEndEffects(chatContext) {
-      // Get the settings for effect automation
-      const autoDecreaseEffectDuration = (getSetting('autoDecreaseEffectDuration'));
-      const reportEffects = getSetting('reportEffects');
-      const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
-
-      // If we are doing any effect automation
-      if (autoDecreaseEffectDuration || reportEffects || autoRemoveExpiredEffects !== 'disabled') {
-
-         // Sort the effects
-         const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
-
-         // Decrease the effect duration if appropriate
-         if (autoDecreaseEffectDuration) {
-            for (const effect of effectItems.filter((effectItem) => effectItem.system.duration.type === 'turnEnd' && effectItem.system.duration.remaining > 0)) {
+      // Decrease effect duration if appropriate
+      if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnEnd) {
+         for (const effect of this.effects.turnEnd) {
+            if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
                await effect.update({
                   system: {
@@ -1658,54 +1582,27 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                });
             }
          }
+      }
 
-         // Add expired effects to the chat context
-         if (reportEffects) {
-            const expiredEffects = effectItems.filter((effect) => effect.typeComponent.isExpired()).map((effect) => {
-               const retVal = {
-                  label: effect.name,
-                  img: effect.img,
-                  id: effect._id,
-                  type: effect.system.duration.type,
-                  remaining: 0,
-               };
-
-               if (!isHTMLBlank(effect.system.description)) {
-                  retVal.description = effect.system.description;
-               }
-
-               return retVal;
-            });
-
-            if (expiredEffects.length > 0) {
-               chatContext.expiredEffects = expiredEffects;
-            }
+      // Report effects if appropriate
+      if (getSetting('reportEffects')) {
+         // Add efects to chat context
+         if (this.effects?.expired) {
+            chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
          }
+      }
 
-         // Remove effects or show button as appropriate
-         switch (autoRemoveExpiredEffects) {
+      // Remove expired effects if appropriate
+      const expiredEffects = this.effects.expired;
+      if (expiredEffects) {
+         switch (getSetting('autoRemoveExpiredEffects')) {
             case 'showButton': {
-               // Determine if there are any expired effects
-               // Piggyback of previous work if possible
-               let showButton = chatContext.expiredEffects ? true : false;
-               if (!showButton) {
-                  for (const effect of effectItems) {
-                     if (effect.typeComponent.isExpired()) {
-                        showButton = true;
-                        break;
-                     }
-                  }
-               }
-
-               if (showButton) {
-                  chatContext.expiredEffectsRemoved = false;
-               }
-
+               chatContext.expiredEffectsRemoved = false;
                break;
             }
             case 'enabled': {
                chatContext.expiredEffectsRemoved = true;
-               effectItems.filter((effect) => effect.typeComponent.isExpired()).forEach((effect) => effect.delete());
+               expiredEffects.forEach((effect) => effect.delete());
                break;
             }
             default: {
@@ -2096,5 +1993,25 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getTurnReportUserID() {
       const playerOwner = getBestPlayerOwner(this.parent);
       return playerOwner ? playerOwner.id : game.user.id;
+   }
+
+   getEffectReportData(effect) {
+      // Initial retval
+      const retVal = {
+         label: effect.name,
+         img: effect.img,
+         itemId: effect._id,
+      };
+
+      // Add the description if it is not blank
+      if (!isHTMLBlank(effect.system.description)) {
+         retVal.description = effect.system.description;
+      }
+
+      if (effect.type !== 'permanent') {
+         retVal.remaining = effect.system.duration.remaining;
+      }
+
+      return retVal;
    }
 }

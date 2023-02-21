@@ -96,10 +96,24 @@ export function getDarkSVGClass(source) {
 export function sortObjectsIntoContainerByKey(objects, key) {
    const retVal = {};
    for (const object of objects) {
-      if (!retVal[object[key]]) {
-         retVal[object[key]] = [];
+      const sortedKey = object[key];
+      if (!retVal[sortedKey]) {
+         retVal[sortedKey] = [];
       }
-      retVal[object[key]].push(object);
+      retVal[sortedKey].push(object);
+   }
+
+   return retVal;
+}
+
+export function sortObjectsIntoContainerByFunction(objects, sortFunction) {
+   const retVal = {};
+   for (const object of objects) {
+      const sortedKey = sortFunction(object);
+      if (!retVal[sortedKey]) {
+         retVal[sortedKey] = [];
+      }
+      retVal[sortedKey].push(object);
    }
 
    return retVal;

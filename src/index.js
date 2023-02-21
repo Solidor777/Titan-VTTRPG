@@ -94,7 +94,8 @@ Hooks.once('setup', async () => {
       const description = localize(`${condition.id}.desc`);
       condition.flags = {
          titan: {
-            description: description
+            description: description,
+            condition: true
          },
          'visual-active-effects.data.content': description
       };

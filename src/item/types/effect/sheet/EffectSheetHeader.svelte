@@ -20,6 +20,10 @@
          label: localize('turnStart'),
       },
       {
+         value: 'initiativeOrder',
+         label: localize('initiativeOrder'),
+      },
+      {
          value: 'permanent',
          label: localize('permanent'),
       },
