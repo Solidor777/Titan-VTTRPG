@@ -5,7 +5,8 @@
    import DocumentImagePicker from '~/documents/components/DocumentImagePicker.svelte';
    import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
    import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
-   import DocumentIntegerInput from '../../../../documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentTextInput from '../../../../documents/components/input/DocumentTextInput.svelte';
 
    // Get Context variables
    const document = getContext('DocumentStore');
@@ -20,12 +21,16 @@
          label: localize('turnStart'),
       },
       {
-         value: 'initiativeOrder',
-         label: localize('initiativeOrder'),
+         value: 'initiative',
+         label: localize('initiative'),
       },
       {
          value: 'permanent',
          label: localize('permanent'),
+      },
+      {
+         value: 'custom',
+         label: localize('custom'),
       },
    ];
 </script>
@@ -60,6 +65,33 @@
                />
             </div>
          </div>
+
+         {#if $document.system.duration.type === 'custom'}
+            <!--Custom-->
+            <div class="stat text">
+               <!-- Label-->
+               <div class="label">
+                  {localize('custom')}
+               </div>
+
+               <!--Input-->
+               <div class="input text">
+                  <DocumentTextInput
+                     bind:value={$document.system.duration.custom}
+                  />
+               </div>
+            </div>
+         {:else if $document.system.duration.type === 'initiative'}
+            <div class="stat" transition:slide|local>
+               <!--Input-->
+               <div class="input number">
+                  <DocumentIntegerInput
+                     min={0}
+                     bind:value={$document.system.duration.initiative}
+                  />
+               </div>
+            </div>
+         {/if}
 
          <!--Duration Remaining-->
          {#if $document.system.duration.type !== 'permanent'}
@@ -124,6 +156,15 @@
                   @include border-left;
                   margin-left: 0.5rem;
                   padding-left: 0.5rem;
+               }
+
+               &.text {
+                  width: 100%;
+                  flex: 1;
+
+                  .input {
+                     width: 100%;
+                  }
                }
 
                .label {

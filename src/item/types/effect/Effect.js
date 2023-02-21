@@ -24,7 +24,6 @@ export default class TitanEffect extends TitanTypeComponent {
       return false;
    }
 
-
    async _initializeEffect() {
       // Check if an effect has already been created
       if (!this._getEffects()) {

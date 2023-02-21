@@ -517,7 +517,9 @@
          "effectId": "",
          "duration": {
             "type": "turnEnd",
-            "remaining": 1
+            "remaining": 1,
+            "initiative": 1,
+            "custom": ""
          },
          "active": "true"
       },

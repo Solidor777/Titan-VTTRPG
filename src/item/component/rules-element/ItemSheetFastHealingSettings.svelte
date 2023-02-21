@@ -38,9 +38,7 @@
             <DocumentSelect
                options={operationOptions}
                bind:value={element.operation}
-               on:change={() => {
-                  onRulesElementOperationChanged($document, idx);
-               }}
+               on:change={() => onRulesElementOperationChanged($document, idx)}
             />
          </div>
 

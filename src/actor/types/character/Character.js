@@ -1516,18 +1516,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (getSetting('reportEffects')) {
          // Add efects to chat context
          if (this.effects) {
+
+            // Permanent effects
             if (this.effects.permanent) {
                chatContext.permanentEffects = this.effects.permanent.map(this.getEffectReportData);
             }
 
+            // Turn start effects
             if (this.effects.turnStart) {
                chatContext.turnStartEffects = this.effects.turnStart.map(this.getEffectReportData);
             }
 
+            // Turn end effects
             if (this.effects.turnEnd) {
                chatContext.turnEndEffects = this.effects.turnEnd.map(this.getEffectReportData);
             }
 
+            // Initiative order effects
+            if (this.effects.initiative) {
+               chatContext.initiativeEffects = this.effects.initiative.map(this.getEffectReportData);
+            }
+
+            // Expired effects
             if (this.effects.expired) {
                chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
             }
@@ -2008,8 +2018,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          retVal.description = effect.system.description;
       }
 
-      if (effect.type !== 'permanent') {
+      // Add the duration if it has a duration
+      if (effect.duration.type !== 'permenant') {
          retVal.remaining = effect.system.duration.remaining;
+      }
+
+      // Add the custom field if appropriate
+      if (effect.duration.type === 'custom') {
+         retVal.custom = effect.system.duration.custom;
       }
 
       return retVal;
