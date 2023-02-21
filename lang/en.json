@@ -196,7 +196,6 @@
    "LOCAL.ineffective.label": "Ineffective",
    "LOCAL.inflictCondition.label": "Inflict Conditions",
    "LOCAL.initialValue.label": "Initial Value",
-   "LOCAL.initiative.label": "Initiative Order",
    "LOCAL.initiative.baseValue.label": "Base Initiative = (Mind + Training in Perception & Dexterity) / 2, rounded up.",
    "LOCAL.initiative.desc.label": "<strong>Initiative</strong> is your general readiness, and determines your turn order in combat.",
    "LOCAL.initiative.label": "Initiative",
