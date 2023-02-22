@@ -155,7 +155,7 @@ export function registerChatContextOptions(html, options) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message.getFlag('titan', 'chatContext');
-         return chatContext.isCheck === true && chatContext.failuresReRolled === false;
+         return chatContext?.isCheck === true && chatContext.failuresReRolled === false;
       }
 
       return false;
@@ -165,7 +165,7 @@ export function registerChatContextOptions(html, options) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message.getFlag('titan', 'chatContext');
-         return chatContext.isCheck === true &&
+         return chatContext?.isCheck === true &&
             chatContext.parameters.doubleExpertise === false &&
             chatContext.parameters.totalExpertise > 0;
       }
@@ -177,7 +177,7 @@ export function registerChatContextOptions(html, options) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message.getFlag('titan', 'chatContext');
-         return chatContext.isCheck === true &&
+         return chatContext?.isCheck === true &&
             chatContext.parameters.doubleTraining === false &&
             chatContext.parameters.totalTrainingDice > 0;
       }

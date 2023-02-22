@@ -9,7 +9,8 @@ import {
    getSumOfValuesInObject,
    getBestPlayerOwner,
    isFirstOwner,
-   sortObjectsIntoContainerByFunction
+   sortObjectsIntoContainerByFunction,
+   localize
 } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
@@ -1491,6 +1492,41 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   async onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound) {
+      if (this.effects?.initiative) {
+         // Get effects to advance
+         let effectsToAdvance = null;
+         if (isNewRound) {
+            effectsToAdvance = this.effects.initiative.filter((effect) => {
+               const initiative = effect.system.duration.initiative;
+               return (initiative >= currentInitiative || initiative < previousInitiative);
+            });
+         }
+         else {
+            effectsToAdvance = this.effects.initiative.filter((effect) => {
+               const initiative = effect.system.duration.initiative;
+               return (initiative >= currentInitiative && initiative < previousInitiative);
+            });
+         }
+
+         // Advance each effect
+         for (const effect of effectsToAdvance) {
+            if (effect.system.duration.remaining > 0) {
+               effect.system.duration.remaining -= 1;
+               await effect.update({
+                  system: {
+                     duration: {
+                        remaining: effect.system.duration.remaining
+                     }
+                  }
+               });
+            }
+         }
+      }
+
+      return;
+   }
+
    async onTurnStart() {
       const actor = this.parent;
       // Operations that should only be performed once
@@ -2116,14 +2152,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          retVal.description = effect.system.description;
       }
 
-      // Add the duration if it has a duration
-      if (effect.duration.type !== 'permenant') {
-         retVal.remaining = effect.system.duration.remaining;
-      }
-
-      // Add the custom field if appropriate
-      if (effect.duration.type === 'custom') {
-         retVal.custom = effect.system.duration.custom;
+      switch (effect.system.duration.type) {
+         case 'custom': {
+            retVal.custom = effect.system.duration.custom;
+            retVal.remaining = effect.system.duration.remaining;
+            break;
+         }
+         case 'turnEnd':
+         case 'turnStart': {
+            retVal.remaining = effect.system.duration.remaining;
+            break;
+         }
+         default: {
+            break;
+         }
       }
 
       return retVal;

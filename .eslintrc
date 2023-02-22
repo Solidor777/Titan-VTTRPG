@@ -63,6 +63,12 @@
             "args": "after-used",
             "ignoreRestSiblings": false
          }
+      ],
+      "no-fallthrough": [
+         "error",
+         {
+            "allowEmptyCase": true
+         }
       ]
    }
 }
