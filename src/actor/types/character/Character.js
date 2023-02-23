@@ -1699,7 +1699,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report effects if appropriate
       if (getSetting('reportEffects')) {
          // Add efects to chat context
-         console.log(this.effects);
          if (this.effects) {
 
             // Permanent effects
