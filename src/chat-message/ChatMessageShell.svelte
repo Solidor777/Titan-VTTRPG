@@ -25,6 +25,7 @@
    import LongRestReportChatMessage from '~/chat-message/report/LongRestReportChatMessage.svelte';
    import TurnStartReportChatMessage from '~/chat-message/report/TurnStartReportChatMessage.svelte';
    import TurnEndReportChatMessage from '~/chat-message/report/TurnEndReportChatMessage.svelte';
+   import EffectsExpiredReportChatMessage from '~/chat-message/report/EffectsExpiredReportChatMessage.svelte';
 
    // Context object
    export let documentStore = void 0;
@@ -58,6 +59,7 @@
             longRestReport: LongRestReportChatMessage,
             turnStartReport: TurnStartReportChatMessage,
             turnEndReport: TurnEndReportChatMessage,
+            effectsExpiredReport: EffectsExpiredReportChatMessage,
          };
          return chatComponents[$document.flags.titan.chatContext.type];
       }

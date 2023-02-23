@@ -20,5 +20,6 @@ export default Object.freeze(new Set([
    'spendResolveReport',
    'removeCombatEffectsReport',
    'shortRestReport',
-   'longRestReport'
+   'longRestReport',
+   'effectsExpiredReport'
 ]));

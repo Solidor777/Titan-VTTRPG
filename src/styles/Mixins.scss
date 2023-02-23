@@ -398,6 +398,18 @@
    background: linear-gradient(var(--gradientDegree), var(--yellow) 0, var(--red) 100%);
 }
 
+@mixin effect-initiative {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--red) 0, var(--purple) 100%);
+}
+
+@mixin effect-custom {
+   color: var(--label-color);
+   --border-color: var(--label-color);
+   background: linear-gradient(var(--gradientDegree), var(--yellow) 0, var(--red) 100%);
+}
+
 @mixin fast-healing {
    color: var(--label-color);
    --border-color: var(--label-color);

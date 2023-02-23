@@ -1,6 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import { getSetting, localize } from '~/helpers/utility';
+   import { localize } from '~/helpers/utility';
    import ChatEffects from '~/chat-message/ChatEffects.svelte';
    import ReportConfirmResolveRegainButton from '~/chat-message/report/components/ReportConfirmResolveRegainButton.svelte';
    import ReportRemoveExpiredEffectsButton from '~/chat-message/report/components/ReportRemoveExpiredEffectsButton.svelte';
@@ -23,7 +23,7 @@
    />
 
    <!--Effects-->
-   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects}
+   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects || chatContext.initiativeEffects}
       <ChatEffects />
    {/if}
 
@@ -131,7 +131,7 @@
    {/if}
 
    <!--Remove Expired Effects Button-->
-   {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false && getSetting('autoRemoveExpiredEffects') === 'showButton'}
+   {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false}
       <div class="button">
          <ReportRemoveExpiredEffectsButton />
       </div>

@@ -1324,15 +1324,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   getExpiredEffects() {
-      return this.parent.items.filter((item) => item.type === 'effect' && item.typeComponent.isExpired());
-   }
-
    async removeExpiredEffects(confirmed) {
       if (this.parent.isOwner) {
          // Get the expired effects
-         const expiredEffects = this.getExpiredEffects();
-         if (expiredEffects.length > 0) {
+         const expiredEffects = this.effects?.expired;
+         if (expiredEffects && expiredEffects.length > 0) {
             // Check if the removeal was confirmed
             if (confirmed || !confirmDeletingItems()) {
                for (const effect of expiredEffects) {
@@ -1493,7 +1489,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound) {
-      if (this.effects?.initiative) {
+      if (getSetting('autoDecreaseEffectDuration') && this.effects?.initiative) {
          // Get effects to advance
          let effectsToAdvance = null;
          if (isNewRound) {
@@ -1509,17 +1505,71 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             });
          }
 
-         // Advance each effect
-         for (const effect of effectsToAdvance) {
-            if (effect.system.duration.remaining > 0) {
-               effect.system.duration.remaining -= 1;
-               await effect.update({
-                  system: {
-                     duration: {
-                        remaining: effect.system.duration.remaining
+         // If there are any effects to advance
+         if (effectsToAdvance.length > 0) {
+            const expiredEffects = [];
+
+            // Advance each effect
+            for (const effect of effectsToAdvance) {
+               if (effect.system.duration.remaining > 0) {
+                  effect.system.duration.remaining -= 1;
+                  await effect.update({
+                     system: {
+                        duration: {
+                           remaining: effect.system.duration.remaining
+                        }
                      }
+                  });
+
+                  if (effect.system.duration.remaining <= 0) {
+                     expiredEffects.push(effect);
                   }
-               });
+               }
+            }
+
+            // If there are any expired effects
+            if (expiredEffects.length > 0) {
+               const chatContext = {};
+
+               // Report effects if appropriate
+               const reportEffects = getSetting('reportEffects');
+               if (reportEffects) {
+                  chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
+               }
+
+               // Remove expired effects if appropriate
+               const autoRemoveEffects = getSetting('autoRemoveExpiredEffects');
+               switch (getSetting('autoRemoveExpiredEffects')) {
+                  case 'showButton': {
+                     // Display button for removing the effects
+                     chatContext.expiredEffectsRemoved = false;
+                     break;
+                  }
+                  case 'enabled': {
+                     // Delete each effect
+                     expiredEffects.forEach((effect) => effect.delete());
+
+                     // Update chat context if appropriate
+                     if (reportEffects) {
+                        chatContext.expiredEffectsRemoved = true;
+                     }
+                     break;
+                  }
+                  default: {
+                     break;
+                  }
+               }
+
+               // Report if appropriate
+               if (reportEffects || autoRemoveEffects === 'showButton') {
+                  // Prepare chat context
+                  chatContext.type = 'effectsExpiredReport';
+                  chatContext.name = this.parent.name;
+                  chatContext.img = this.parent.img;
+
+                  // Send the report to chat
+                  this.whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
+               }
             }
          }
       }
@@ -1714,6 +1764,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async calculateTurnEndEffects(chatContext) {
       // Decrease effect duration if appropriate
       if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnEnd) {
+         // Advance each turn end effect
+         const expiredEffects = [];
          for (const effect of this.effects.turnEnd) {
             if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
@@ -1724,33 +1776,43 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                      }
                   }
                });
+
+               // Add to expired effects if it expired
+               if (effect.system.duration.remaining <= 0) {
+                  expiredEffects.push(effect);
+               }
             }
          }
-      }
 
-      // Report effects if appropriate
-      if (getSetting('reportEffects')) {
-         // Add efects to chat context
-         if (this.effects?.expired) {
-            chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
-         }
-      }
+         // If there are any expired effects
+         if (expiredEffects.length > 0) {
 
-      // Remove expired effects if appropriate
-      const expiredEffects = this.effects.expired;
-      if (expiredEffects) {
-         switch (getSetting('autoRemoveExpiredEffects')) {
-            case 'showButton': {
-               chatContext.expiredEffectsRemoved = false;
-               break;
+            // Report effects if appropriate
+            const reportEffects = getSetting('reportEffects');
+            if (reportEffects) {
+               chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
             }
-            case 'enabled': {
-               chatContext.expiredEffectsRemoved = true;
-               expiredEffects.forEach((effect) => effect.delete());
-               break;
-            }
-            default: {
-               break;
+
+            // Remove expired effects if appropriate
+            switch (getSetting('autoRemoveExpiredEffects')) {
+               case 'showButton': {
+                  // Display button for removing the effects
+                  chatContext.expiredEffectsRemoved = false;
+                  break;
+               }
+               case 'enabled': {
+                  // Delete each effect
+                  expiredEffects.forEach((effect) => effect.delete());
+
+                  // Update chat context if appropriate
+                  if (reportEffects) {
+                     chatContext.expiredEffectsRemoved = true;
+                  }
+                  break;
+               }
+               default: {
+                  break;
+               }
             }
          }
       }
@@ -2156,6 +2218,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          case 'custom': {
             retVal.custom = effect.system.duration.custom;
             retVal.remaining = effect.system.duration.remaining;
+            break;
+         }
+         case 'initiative': {
+            retVal.remaining = effect.system.duration.remaining;
+            retVal.initiative = effect.system.duration.initiative;
             break;
          }
          case 'turnEnd':
