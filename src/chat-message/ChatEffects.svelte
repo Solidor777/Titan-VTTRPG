@@ -7,10 +7,10 @@
    import ChatEffectTagExpired from '~/chat-message/ChatEffectTagExpired.svelte';
    import ChatConditionTag from '~/chat-message/ChatConditionTag.svelte';
    import ChatEffectTagInitiative from '~/chat-message/ChatEffectTagInitiative.svelte';
+   import ChatEffectTagCustom from '~/chat-message/ChatEffectTagCustom.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
-   console.log($document.flags.titan.chatContext);
 </script>
 
 <div class="effects">
@@ -76,6 +76,21 @@
                remaining={effect.remaining}
                img={effect.img}
                initiative={effect.initiative}
+               description={effect.description}
+            />
+         </div>
+      {/each}
+   {/if}
+
+   <!--Custom Effects-->
+   {#if $document.flags.titan.chatContext.customEffects}
+      {#each $document.flags.titan.chatContext.customEffects as effect}
+         <div class="effect">
+            <ChatEffectTagCustom
+               label={effect.label}
+               remaining={effect.remaining}
+               img={effect.img}
+               custom={effect.custom}
                description={effect.description}
             />
          </div>

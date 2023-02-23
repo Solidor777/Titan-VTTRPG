@@ -1699,6 +1699,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report effects if appropriate
       if (getSetting('reportEffects')) {
          // Add efects to chat context
+         console.log(this.effects);
          if (this.effects) {
 
             // Permanent effects
@@ -1719,6 +1720,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Initiative order effects
             if (this.effects.initiative) {
                chatContext.initiativeEffects = this.effects.initiative.map(this.getEffectReportData);
+            }
+
+            // Custom order effects
+            if (this.effects.custom) {
+               chatContext.customEffects = this.effects.custom.map(this.getEffectReportData);
             }
 
             // Expired effects

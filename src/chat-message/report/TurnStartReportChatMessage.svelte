@@ -23,7 +23,7 @@
    />
 
    <!--Effects-->
-   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.expiredEffects || chatContext.initiativeEffects}
+   {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.initiativeEffects || chatContext.customEffects || chatContext.expiredEffects}
       <ChatEffects />
    {/if}
 

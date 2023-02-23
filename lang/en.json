@@ -144,7 +144,7 @@
    "LOCAL.effect.turnEnd.desc.label": "Effect duration progresses on <strong>Turn End</strong>.",
    "LOCAL.effect.turnStart.desc.label": "Effect duration progresses on <strong>Turn Start</strong>.",
    "LOCAL.effect.initiative.desc.label": "Effect duration progresses on a given <strong>Initiative</strong> in turn order.",
-   "LOCAL.effect.custom.desc.label": "Effect lasts for a <strong>Custom</strong> time.",
+   "LOCAL.effect.custom.desc.label": "Effect lasts for a <strong>Custom</strong> duration.",
    "LOCAL.fastHealing.label": "Fast Healing",
    "LOCAL.elite.label": "Elite",
    "LOCAL.encumbering.desc.label": "When wearing armor with the <strong>Encumbering trait</strong>, you have <strong>Disadvantage</strong> on checks to <strong>Swim</strong>, <strong>Fly</strong>, or <strong>Climb</strong>.",
