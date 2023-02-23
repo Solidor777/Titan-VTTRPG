@@ -48,9 +48,36 @@
          <div class="controls">
             <!--Duration-->
             {#if item.system.duration.type !== 'permanent'}
+               {#if item.system.duration.type === 'initiative'}
+                  <!--Initiative-->
+                  <div class="field margin-right">
+                     <div class="label">
+                        {localize('initiative')}
+                     </div>
+                     <div class="input">
+                        <IntegerInput
+                           min={0}
+                           bind:value={item.system.duration.initiative}
+                           on:change={() => {
+                              item.update({
+                                 system: {
+                                    duration: {
+                                       remaining:
+                                          item.system.duration.initiative,
+                                    },
+                                 },
+                              });
+                           }}
+                        />
+                     </div>
+                  </div>
+               {/if}
+
                <div class="field">
                   <div class="label">
-                     {localize('turns')}
+                     {item.system.duration.type === 'custom'
+                        ? item.system.duration.custom
+                        : localize('turns')}
                   </div>
                   <div class="input">
                      <IntegerInput
@@ -195,6 +222,10 @@
             .field {
                @include flex-row;
                @include flex-group-center;
+
+               &.margin-right {
+                  margin-right: 0.25rem;
+               }
 
                .label {
                   margin-right: 0.25rem;
