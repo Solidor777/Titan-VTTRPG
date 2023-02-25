@@ -4,7 +4,7 @@ import '~/styles/Mixins.scss';
 import '~/styles/Global.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { registerChatContextOptions } from '~/helpers/ChatContextOptions.js';
-import { getSetting, localize } from '~/helpers/Utility';
+import { getSetting, localize, isModifierActive } from '~/helpers/Utility';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerTooltipSettings from '~/system/TooltipManager';
 import registerInitiativeFormula from '~/system/Initiative';
@@ -175,7 +175,7 @@ Hooks.on("updateCombat", (combat, data, diff) => {
 async function onUpdateCombat(combat, data, diff) {
    // Ensure that this is the result of advancing in turn order
    const isNewCombat = combat.previous.turn === null;
-   if (combat.combatant && diff.direction === 1 || isNewCombat) {
+   if (!isModifierActive() && (combat.combatant && diff.direction === 1 || isNewCombat)) {
       // Get the change in initiative
       const currentCombatant = combat.combatant;
       const currentInitiative = currentCombatant.initiative;

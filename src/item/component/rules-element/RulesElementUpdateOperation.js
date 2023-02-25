@@ -1,8 +1,8 @@
 import { getFlatModifierTemplate } from '~/rules-element/FlatModifier.js';
 import { getMulBaseTemplate } from '~/rules-element/MulBase.js';
 import { getFastHealingTemplate } from '~/rules-element/FastHealing.js';
-import getTurnStartMessageTemplate from '~/rules-element/TurnStartMessage.js';
 import { getPersistentDamageTemplate } from '~/rules-element/PersistentDamage';
+import { getTurnMessageTemplate } from '~/rules-element/TurnMessage';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -15,8 +15,8 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getMulBaseTemplate(element.uuid, element.type);
          break;
       }
-      case 'turnStartMessage': {
-         document.system.rulesElement[elementIdx] = getTurnStartMessageTemplate(element.uuid, element.type);
+      case 'turnMessage': {
+         document.system.rulesElement[elementIdx] = getTurnMessageTemplate(element.uuid, element.type);
          break;
       }
       case 'fastHealing': {

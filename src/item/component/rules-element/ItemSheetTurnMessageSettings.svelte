@@ -1,10 +1,11 @@
 <script>
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
+   import { localize } from '~/helpers/Utility.js';
    import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged from './RulesElementUpdateOperation';
-   import DocumentTextArea from '~/documents/components/input/DocumentTextArea.svelte';
+   import DocumentBoundEditorInput from '~/documents/components/input/DocumentBoundEditorInput.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -12,13 +13,24 @@
    export let operationOptions = void 0;
    export let idx = void 0;
 
+   const selectorOptions = [
+      {
+         label: localize('turnStart'),
+         value: 'turnStart',
+      },
+      {
+         label: localize('turnEnd'),
+         value: 'turnEnd',
+      },
+   ];
+
    // Dynamic element
    $: element = $document.system.rulesElement[idx];
 
    // Setup tabs
 </script>
 
-{#if element && element.operation === 'turnStartMessage'}
+{#if element && element.operation === 'turnMessage'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -32,9 +44,17 @@
             />
          </div>
 
+         <!--Selector-->
+         <div class="field select">
+            <DocumentSelect
+               options={selectorOptions}
+               bind:value={element.selector}
+            />
+         </div>
+
          <!--Message text-->
-         <div class="text">
-            <DocumentTextArea bind:value={element.message} />
+         <div class="message">
+            <DocumentBoundEditorInput bind:value={element.message} />
          </div>
       </div>
 
@@ -60,13 +80,15 @@
       @include panel-1;
       width: 100%;
       height: 100%;
+      min-height: 15rem;
 
       .settings {
-         @include flex-column;
+         @include flex-row;
          @include flex-group-top-left;
-         flex-wrap: wrap;
          width: 100%;
+         height: 100%;
          margin-bottom: 0.5rem;
+         flex-wrap: wrap;
 
          .field {
             @include flex-row;
@@ -77,10 +99,11 @@
             }
          }
 
-         .text {
-            @include flex-row;
-            margin-left: 0.25rem;
+         .message {
+            margin-top: 0.25rem;
+            @include flex-column;
             width: 100%;
+            height: 100%;
          }
       }
 

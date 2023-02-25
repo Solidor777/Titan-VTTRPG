@@ -16,6 +16,10 @@
    .content-link {
       --color-text-dark-primary: #191813;
       color: var(--color-text-dark-primary);
+
+      i {
+         color: var(--color-text-dark-primary);
+      }
    }
 
    // Input styling

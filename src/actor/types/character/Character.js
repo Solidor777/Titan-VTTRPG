@@ -16,6 +16,7 @@ import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
 import { applyFastHealingElements } from '~/rules-element/FastHealing';
 import { applyPersistentDamageElements } from '~/rules-element/PersistentDamage';
+import { applyTurnMessageElements } from '~/rules-element/TurnMessage';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -38,6 +39,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    applyMulBaseElements = applyMulBaseElements.bind(this);
    applyFastHealingElements = applyFastHealingElements.bind(this);
    applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
+   applyTurnMessageElements = applyTurnMessageElements.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -290,6 +292,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const flatModifierElements = [];
       const fastHealingElements = [];
       const persistentDamageElements = [];
+      const turnMessageElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -308,6 +311,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                persistentDamageElements.push(element);
                break;
             }
+            case 'turnMessage': {
+               turnMessageElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -319,6 +326,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this.applyFlatModifierElements(flatModifierElements);
       this.applyFastHealingElements(fastHealingElements);
       this.applyPersistentDamageElements(persistentDamageElements);
+      this.applyTurnMessageElements(turnMessageElements);
 
       return;
    }
@@ -1187,7 +1195,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Send the report to chat
-               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
 
          }
@@ -1246,7 +1254,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   };
 
                   // Send the report to chat
-                  this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+                  this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
                }
             }
          }
@@ -1316,7 +1324,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext.resolveShortage = resolveSpent - initialResolve;
                }
 
-               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, shouldReportPlaySound);
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, shouldReportPlaySound);
             }
          }
       }
@@ -1408,7 +1416,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                };
 
                // Send the report to chat
-               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
          }
       }
@@ -1437,7 +1445,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                };
 
                // Send the report to chat
-               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
          }
       }
@@ -1480,7 +1488,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Send the report to chat
-               this.whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
          }
       }
@@ -1568,7 +1576,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext.img = this.parent.img;
 
                   // Send the report to chat
-                  this.whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
+                  this._whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
                }
             }
          }
@@ -1586,15 +1594,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          let shouldUpdateActor = false;
 
          // Calculate healing or damage
-         if (await this.calculateTurnHealingAndDamage(chatContext, 'turnStart') === true) {
+         if (await this._calculateTurnHealingAndDamage(chatContext, 'turnStart') === true) {
             shouldUpdateActor = true;
          }
 
          // Calculate turn start effects
-         await this.calculateTurnStartEffects(chatContext);
+         await this._calculateTurnStartEffects(chatContext);
 
          // Regain resolve
-         if (this.calculateResolveRegain(chatContext)) {
+         if (this._calculateResolveRegain(chatContext)) {
             shouldUpdateActor = true;
          }
 
@@ -1605,6 +1613,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             });
          }
 
+         // Get turn messages]
+         const message = this.turnMessage?.turnStart;
+         if (message) {
+            chatContext.message = message;
+         }
+
          // Send the end of turn report if appropriate
          if (Object.keys(chatContext).length > 0) {
 
@@ -1613,7 +1627,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             chatContext.img = actor.img;
             chatContext.name = actor.name;
 
-            this.whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
+            this._whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
          }
       }
 
@@ -1656,11 +1670,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Initialize variables
          const chatContext = {};
 
-         await this.calculateTurnEndEffects(chatContext);
-         if (await this.calculateTurnHealingAndDamage(chatContext, 'turnEnd') === true) {
+         await this._calculateTurnEndEffects(chatContext);
+         if (await this._calculateTurnHealingAndDamage(chatContext, 'turnEnd') === true) {
             actor.update({
                system: actor.system
             });
+         }
+
+         // Get turn messages]
+         const message = this.turnMessage?.turnEnd;
+         if (message) {
+            chatContext.message = message;
          }
 
          // End of turn report
@@ -1672,14 +1692,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             chatContext.img = actor.img;
 
             // Send the report to chat
-            this.whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
+            this._whisperUsers(chatContext, getOwners(this.parent), this.getTurnReportUserID(), true);
          }
       }
 
       return;
    }
 
-   async calculateTurnStartEffects(chatContext) {
+   async _calculateTurnStartEffects(chatContext) {
       // Decrease effect duration if appropriate
       if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnStart) {
          for (const effect of this.effects.turnStart) {
@@ -1766,7 +1786,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
    }
 
-   async calculateTurnEndEffects(chatContext) {
+   async _calculateTurnEndEffects(chatContext) {
       // Decrease effect duration if appropriate
       if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnEnd) {
          // Advance each turn end effect
@@ -1825,7 +1845,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async calculateTurnHealingAndDamage(chatContext, selector) {
+   async _calculateTurnHealingAndDamage(chatContext, selector) {
       let shouldUpdateActor = false;
 
       // Fast healing report
@@ -1926,7 +1946,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return shouldUpdateActor;
    }
 
-   async calculateResolveRegain(chatContext) {
+   async _calculateResolveRegain(chatContext) {
       let shouldUpdateActor = false;
 
       // Calculate resolve regain
@@ -1964,7 +1984,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return shouldUpdateActor;
    }
 
-   async whisperUsers(chatContext, users, userId, playSound = true) {
+   async _whisperUsers(chatContext, users, userId, playSound = true) {
       const whisperMessage = {
          user: userId,
          speaker: ChatMessage.getSpeaker({ actor: this.parent }),

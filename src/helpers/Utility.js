@@ -178,3 +178,7 @@ export function getBestPlayerOwner(document) {
    // Found no player owners
    return false;
 }
+
+export function isModifierActive() {
+   return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT);
+}

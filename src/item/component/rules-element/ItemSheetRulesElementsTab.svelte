@@ -7,7 +7,7 @@
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import ItemSheetFlatModifierSettings from '~/item/component/rules-element/ItemSheetFlatModifierSettings.svelte';
    import ItemSheetMulBaseSettings from '~/item/component/rules-element/ItemSheetMulBaseSettings.svelte';
-   import ItemSheetTurnStartMessageSettings from '~/item/component/rules-element/ItemSheetTurnStartMessageSettings.svelte';
+   import ItemSheetTurnMessageSettings from '~/item/component/rules-element/ItemSheetTurnMessageSettings.svelte';
    import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
    import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
 
@@ -25,8 +25,8 @@
          value: 'mulBase',
       },
       {
-         label: localize('turnStartMessage'),
-         value: 'turnStartMessage',
+         label: localize('turnMessage'),
+         value: 'turnMessage',
       },
       {
          label: localize('fastHealing'),
@@ -42,7 +42,7 @@
       const elementComponents = {
          flatModifier: ItemSheetFlatModifierSettings,
          mulBase: ItemSheetMulBaseSettings,
-         turnStartMessage: ItemSheetTurnStartMessageSettings,
+         turnMessage: ItemSheetTurnMessageSettings,
          fastHealing: ItemSheetFastHealingSettings,
          persistentDamage: ItemSheetPersistentDamageSettings,
       };

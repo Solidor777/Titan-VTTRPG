@@ -9,6 +9,7 @@
    import ReportHeader from '~/chat-message/report/components/ReportHeader.svelte';
    import ChatFastHealingTag from '~/chat-message/ChatFastHealingTag.svelte';
    import ChatPersistentDamageTag from '~/chat-message/ChatPersistentDamageTag.svelte';
+   import RichText from '../../helpers/svelte-components/RichText.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -21,6 +22,15 @@
       icon={'fas fa-hourglass-start'}
       label={localize('turnStart')}
    />
+
+   <!--Messages-->
+   {#if chatContext.message}
+      {#each Object.values(chatContext.message) as message}
+         <div class="message">
+            <RichText text={message} />
+         </div>
+      {/each}
+   {/if}
 
    <!--Effects-->
    {#if chatContext.permanentEffects || chatContext.turnEndEffects || chatContext.turnStartEffects || chatContext.initiativeEffects || chatContext.customEffects || chatContext.expiredEffects}
@@ -45,7 +55,7 @@
 
    <!--Stamina-->
    {#if chatContext.stamina}
-      <div class="message">
+      <div class="section">
          {`${localize('stamina')}: ${
             $document.flags.titan.chatContext.stamina.value
          } / ${$document.flags.titan.chatContext.stamina.max}`}
@@ -54,7 +64,7 @@
 
    <!--Wounds-->
    {#if chatContext.wounds}
-      <div class="message">
+      <div class="section">
          {`${localize('wounds')}: ${
             $document.flags.titan.chatContext.wounds.value
          } / ${$document.flags.titan.chatContext.wounds.max}`}
@@ -63,7 +73,7 @@
 
    <!--Resolve-->
    {#if chatContext.resolve}
-      <div class="message">
+      <div class="section">
          {`${localize('resolve')}: ${
             $document.flags.titan.chatContext.resolve.value
          } / ${$document.flags.titan.chatContext.resolve.max}`}
@@ -74,7 +84,7 @@
    {#if chatContext.resolveRegain}
       <!--If confirmed, show how much was was regained-->
       {#if $document.flags.titan.chatContext.resolveRegain.confirmed}
-         <div class="message">
+         <div class="section">
             <i class="fas fa-bolt" />
             <div>
                {localize('regained%xResolve').replace(
@@ -94,7 +104,7 @@
    {#if chatContext.healingApplied}
       <!--If confirmed, show how much was was regained-->
       {#if $document.flags.titan.chatContext.healingApplied.confirmed === true}
-         <div class="message">
+         <div class="section">
             <i class="fas fa-heart" />
             <div>
                {localize('healed%xDamage').replace(
@@ -114,7 +124,7 @@
    {#if chatContext.damageApplied}
       <!--If confirmed, show how much was was regained-->
       {#if $document.flags.titan.chatContext.damageApplied.confirmed === true}
-         <div class="message">
+         <div class="section">
             <i class="fas fa-burst" />
             <div>
                {localize('took%xDamage').replace(
@@ -152,7 +162,7 @@
          margin-top: 0.5rem;
       }
 
-      .message {
+      .section {
          @include flex-row;
          @include flex-group-center;
          margin-top: 0.5rem;
@@ -166,6 +176,14 @@
          .fas {
             margin-right: 0.25rem;
          }
+      }
+
+      .message {
+         @include panel-1;
+         @include border;
+         margin-top: 0.5rem;
+         padding: 0.25rem;
+         width: 100%;
       }
 
       .button {

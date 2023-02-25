@@ -453,6 +453,7 @@
    "LOCAL.token.label": "Token",
    "LOCAL.prototypeToken.label": "Prototype Token",
    "LOCAL.effectsExpired.label": "Effects Expired",
+   "LOCAL.turnMessage.label": "Turn Message",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."
