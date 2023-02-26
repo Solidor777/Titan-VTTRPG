@@ -4,7 +4,6 @@
 
    // Document reference
    const document = getContext('DocumentStore');
-   console.log($document.flags.titan.message);
 </script>
 
 <div class="messages">

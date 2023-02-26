@@ -3,11 +3,10 @@
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import AttributeCheckChatHeader from './AttributeCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
-   import CheckChatMesssages from '../../chat-message/CheckChatMesssages.svelte';
+   import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
-   console.log($document.flags.titan);
 </script>
 
 <div class="check-chat-message">

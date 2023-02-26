@@ -32,86 +32,90 @@
 
 {#if element && element.operation === 'turnMessage'}
    <div class="element" transition:slide|local>
-      <!--Element Operation-->
-      <div class="settings">
-         <div class="field select">
-            <DocumentSelect
-               options={operationOptions}
-               bind:value={element.operation}
-               on:change={() => {
-                  onRulesElementOperationChanged($document, idx);
+      <!--Main Header-->
+      <div class="header">
+         <!--Element Operation-->
+         <div class="settings">
+            <div class="field select">
+               <DocumentSelect
+                  options={operationOptions}
+                  bind:value={element.operation}
+                  on:change={() => {
+                     onRulesElementOperationChanged($document, idx);
+                  }}
+               />
+            </div>
+
+            <!--Selector-->
+            <div class="field select">
+               <DocumentSelect
+                  options={selectorOptions}
+                  bind:value={element.selector}
+               />
+            </div>
+         </div>
+
+         <!--Delete Element-->
+         <div class="delete-button">
+            <IconButton
+               icon={'fas fa-trash'}
+               on:click={() => {
+                  $document.typeComponent.removeRulesElement(idx);
                }}
             />
          </div>
-
-         <!--Selector-->
-         <div class="field select">
-            <DocumentSelect
-               options={selectorOptions}
-               bind:value={element.selector}
-            />
-         </div>
-
-         <!--Message text-->
-         <div class="message">
-            <DocumentBoundEditorInput bind:value={element.message} />
-         </div>
       </div>
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <IconButton
-            icon={'fas fa-trash'}
-            on:click={() => {
-               $document.typeComponent.removeRulesElement(idx);
-            }}
-         />
+      <!--Message text-->
+      <div class="message">
+         <DocumentBoundEditorInput bind:value={element.message} />
       </div>
    </div>
 {/if}
 
 <style lang="scss">
    @import '../../../Styles/Mixins.scss';
-
    .element {
-      @include flex-row;
-      @include flex-space-between;
+      @include flex-column;
+      @include flex-group-top-left;
       @include border;
       @include panel-1;
       width: 100%;
       height: 100%;
 
-      .settings {
+      .header {
          @include flex-row;
-         @include flex-group-top-left;
          width: 100%;
-         height: 100%;
-         margin-bottom: 0.5rem;
-         flex-wrap: wrap;
 
-         .field {
+         .settings {
             @include flex-row;
-            margin: 0.5rem 0.25rem 0 0.25rem;
+            @include flex-group-left;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
 
-            &.select {
-               @include flex-group-left;
+            .field {
+               @include flex-row;
+               margin: 0.5rem 0.25rem 0 0.25rem;
+
+               &.select {
+                  @include flex-group-left;
+               }
             }
          }
 
-         .message {
+         .delete-button {
             @include flex-column;
-            margin-top: 0.25rem;
-            width: 100%;
-            height: 100%;
-            min-height: 10rem;
+            @include flex-group-top;
+            margin: 0.25rem 0.25rem 0 0;
          }
       }
 
-      .delete-button {
+      .message {
          @include flex-column;
-         @include flex-group-top;
+         margin-top: 0.25rem;
+         width: 100%;
+         min-height: 10rem;
          height: 100%;
-         margin: 0.5rem 0.25rem 0 0;
       }
    }
 </style>

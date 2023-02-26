@@ -797,7 +797,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                if (message.length > 0) {
                   messageOptions.message = message;
                }
-               console.log(messageOptions);
 
                // Send the check to chat
                await attributeCheck.evaluateCheck();
@@ -840,12 +839,31 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Roll the resistance check
             const resistanceCheck = await this.getResistanceCheck(options);
             if (resistanceCheck && resistanceCheck.isValid) {
-               await resistanceCheck.evaluateCheck();
-               await resistanceCheck.sendToChat({
+
+               const messageOptions = {
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-               });
+               };
+
+               // Add messages if appropriate
+               // Attribute messages
+               const message = [];
+               const resistanceMessages = this.rollMessage?.resistance;
+               if (resistanceMessages) {
+                  const keyMessages = resistanceMessages[resistanceCheck.parameters.resistance];
+                  if (keyMessages) {
+                     message.push(...keyMessages);
+                  }
+               }
+
+               if (message.length > 0) {
+                  messageOptions.message = message;
+               }
+
+
+               await resistanceCheck.evaluateCheck();
+               await resistanceCheck.sendToChat(messageOptions);
             }
 
             return;

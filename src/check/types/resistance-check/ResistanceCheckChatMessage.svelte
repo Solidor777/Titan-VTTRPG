@@ -3,6 +3,7 @@
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import ResistanceCheckChatHeader from './ResistanceCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
+   import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -14,6 +15,13 @@
    <div class="section">
       <ResistanceCheckChatHeader {check} />
    </div>
+
+   <!--Chat Messages-->
+   {#if $document.flags.titan.message}
+      <div class="section">
+         <CheckChatMesssages />
+      </div>
+   {/if}
 
    <!--Dice Container-->
    <div class="section tags">
