@@ -754,20 +754,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Check if confirmed
          if (confirmed || !getCheckOptions()) {
             // Get the check
-            const attributeCheck = await this.getAttributeCheck(options);
-            if (attributeCheck && attributeCheck.isValid) {
-               const messageOptions = {
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-                  rollMode: game.settings.get('core', 'rollMode'),
-               };
+            const check = await this.getAttributeCheck(options);
+            if (check && check.isValid) {
 
                // Expend resolve if appropriate
                let resolveSpent = 0;
-               if (attributeCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
                   resolveSpent += 1;
                }
-               if (attributeCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
                   resolveSpent += 1;
                }
                if (resolveSpent > 0) {
@@ -775,32 +770,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Add messages if appropriate
-               // Attribute messages
-               const message = [];
-               const attributeMessages = this.rollMessage?.attribute;
-               if (attributeMessages) {
-                  const keyMessages = attributeMessages[attributeCheck.parameters.attribute];
-                  if (keyMessages) {
-                     message.push(...keyMessages);
-                  }
-               }
-
-               // Skill messages
-               const skillMessages = this.rollMessage?.skill;
-               if (skillMessages) {
-                  const keyMessages = skillMessages[attributeCheck.parameters.skill];
-                  if (keyMessages) {
-                     message.push(...keyMessages);
-                  }
-               }
-
-               if (message.length > 0) {
-                  messageOptions.message = message;
-               }
+               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
 
                // Send the check to chat
-               await attributeCheck.evaluateCheck();
-               await attributeCheck.sendToChat(messageOptions);
+               await check.evaluateCheck();
+               await check.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+                  message: message
+               });
             }
 
             return;
@@ -818,6 +797,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+
    // Get a resistance check at the actor
    async getResistanceCheck(options) {
 
@@ -825,10 +805,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.actorRollData = this.parent.getRollData();
 
       // Get the check
-      const resistanceCheck = new TitanResistanceCheck(options);
-
-      // Return the data
-      return resistanceCheck;
+      return new TitanResistanceCheck(options);
    }
 
    async rollResistanceCheck(options, confirmed) {
@@ -837,33 +814,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (confirmed || !getCheckOptions()) {
 
             // Roll the resistance check
-            const resistanceCheck = await this.getResistanceCheck(options);
-            if (resistanceCheck && resistanceCheck.isValid) {
+            const check = await this.getResistanceCheck(options);
+            if (check && check.isValid) {
+               // Add messages if appropriate
+               const message = this._getResistanceRollMessages(check.parameters.resistance);
 
-               const messageOptions = {
+               await check.evaluateCheck();
+               await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-               };
-
-               // Add messages if appropriate
-               // Attribute messages
-               const message = [];
-               const resistanceMessages = this.rollMessage?.resistance;
-               if (resistanceMessages) {
-                  const keyMessages = resistanceMessages[resistanceCheck.parameters.resistance];
-                  if (keyMessages) {
-                     message.push(...keyMessages);
-                  }
-               }
-
-               if (message.length > 0) {
-                  messageOptions.message = message;
-               }
-
-
-               await resistanceCheck.evaluateCheck();
-               await resistanceCheck.sendToChat(messageOptions);
+                  message: message
+               });
             }
 
             return;
@@ -911,8 +873,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Perform the attack
-      const attackCheck = new TitanAttackCheck(options);
-      return attackCheck;
+      return new TitanAttackCheck(options);
    }
 
    async rollAttackCheck(options, confirmed) {
@@ -920,25 +881,29 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Check if confirmed
          if (confirmed || !getCheckOptions()) {
             // Get the attack check
-            const attackCheck = await this.getAttackCheck(options);
-            if (attackCheck && attackCheck.isValid) {
+            const check = await this.getAttackCheck(options);
+            if (check && check.isValid) {
                // Expend resolve if appropriate
                let resolveSpent = 0;
-               if (attackCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
                   resolveSpent += 1;
                }
-               if (attackCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
                   resolveSpent += 1;
                }
                if (resolveSpent > 0) {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               await attackCheck.evaluateCheck();
-               await attackCheck.sendToChat({
+               // Add messages if appropriate
+               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+
+               await check.evaluateCheck();
+               await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
+                  message: message
                });
             }
 
@@ -1025,25 +990,29 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Check if confirmed
          if (confirmed || !getCheckOptions()) {
             // Get the check
-            const castingCheck = await this.getCastingCheck(options);
-            if (castingCheck && castingCheck.isValid) {
+            const check = await this.getCastingCheck(options);
+            if (check && check.isValid) {
                // Expend resolve if appropriate
                let resolveSpent = 0;
-               if (castingCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
                   resolveSpent += 1;
                }
-               if (castingCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
                   resolveSpent += 1;
                }
                if (resolveSpent > 0) {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               await castingCheck.evaluateCheck();
-               await castingCheck.sendToChat({
+               // Add messages if appropriate
+               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+
+               await check.evaluateCheck();
+               await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
+                  message: message
                });
             }
 
@@ -1102,28 +1071,32 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Check if confirmed
          if (confirmed || !getCheckOptions()) {
             // Otherwise, get a check
-            const itemCheck = await this.getItemCheck(options);
-            if (itemCheck && itemCheck.isValid) {
+            const check = await this.getItemCheck(options);
+            if (check && check.isValid) {
                // Expend resolve if appropriate
                let resolveSpent = 0;
-               if (itemCheck.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
                   resolveSpent += 1;
                }
-               if (itemCheck.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
                   resolveSpent += 1;
                }
-               if (itemCheck.parameters.resolveCost && getSetting('autoSpendResolveChecks')) {
-                  resolveSpent += itemCheck.parameters.resolveCost;
+               if (check.parameters.resolveCost && getSetting('autoSpendResolveChecks')) {
+                  resolveSpent += check.parameters.resolveCost;
                }
                if (resolveSpent > 0) {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               await itemCheck.evaluateCheck();
-               await itemCheck.sendToChat({
+               // Add messages if appropriate
+               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+
+               await check.evaluateCheck();
+               await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
+                  message: message
                });
             }
 
@@ -1165,6 +1138,46 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       return;
+   }
+
+   _getAttributeAndSkillRollMessages(attribute, skill) {
+      // Attribute messages
+      const message = [];
+      if (attribute) {
+         const attributeMessages = this.rollMessage?.attribute;
+         if (attributeMessages) {
+            const keyMessages = attributeMessages[attribute];
+            if (keyMessages) {
+               message.push(...keyMessages);
+            }
+         }
+      }
+
+      // Skill messages
+      if (skill) {
+         const skillMessages = this.rollMessage?.skill;
+         if (skillMessages) {
+            const keyMessages = skillMessages[skill];
+            if (keyMessages) {
+               message.push(...keyMessages);
+            }
+         }
+      }
+
+      return message.length > 0 ? message : false;
+   }
+
+   _getResistanceRollMessages(resistance) {
+      const message = [];
+      const resistanceMessages = this.rollMessage?.resistance;
+      if (resistanceMessages) {
+         const keyMessages = resistanceMessages[resistance];
+         if (keyMessages) {
+            message.push(...keyMessages);
+         }
+      }
+
+      return message.length > 0 ? message : false;
    }
 
    // Apply damage to the actor

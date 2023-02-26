@@ -58,31 +58,14 @@
             element.key = 'body';
             break;
          }
-         case 'skill': {
-            element.key = 'arcana';
-            break;
-         }
-         case 'mod': {
-            element.key = 'armor';
-            break;
-         }
-         case 'rating': {
-            element.key = 'awareness';
-            break;
-         }
          case 'resistance': {
             element.key = 'reflexes';
             break;
          }
-         case 'resource': {
-            element.key = 'resolve';
+         case 'skill': {
+            element.key = 'arcana';
             break;
          }
-         case 'speed': {
-            element.key = 'burrow';
-            break;
-         }
-
          default: {
             break;
          }
@@ -98,25 +81,12 @@
          case 'attribute': {
             return DocumentAttributeSelect;
          }
-         case 'skill': {
-            return DocumentSkillSelect;
-         }
-         case 'mod': {
-            return DocumentModSelect;
-         }
-         case 'rating': {
-            return DocumentRatingSelect;
-         }
          case 'resistance': {
             return DocumentResistanceSelect;
          }
-         case 'resource': {
-            return DocumentResourceSelect;
+         case 'skill': {
+            return DocumentSkillSelect;
          }
-         case 'speed': {
-            return DocumentSpeedSelect;
-         }
-
          default: {
             break;
          }
