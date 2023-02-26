@@ -18,8 +18,7 @@
    }
 
    function getDieClass(final) {
-      const success =
-         final >= $document.flags.titan.chatContext.parameters.difficulty;
+      const success = final >= $document.flags.titan.parameters.difficulty;
       const criticalSuccess = final >= 6;
       const criticalFailure = final === 1;
       if (criticalSuccess) {
@@ -36,27 +35,21 @@
    function applyExpertise() {
       // If expertise can be applied
       if (
-         $document.flags.titan.chatContext.results.expertiseRemaining > 0 &&
-         $document.flags.titan.chatContext.results.dice[idx].final < 6
+         $document.flags.titan.results.expertiseRemaining > 0 &&
+         $document.flags.titan.results.dice[idx].final < 6
       ) {
          // Add the expertise
-         $document.flags.titan.chatContext.results.dice[idx].final += 1;
-         if (
-            $document.flags.titan.chatContext.results.dice[idx].expertiseApplied
-         ) {
-            $document.flags.titan.chatContext.results.dice[
-               idx
-            ].expertiseApplied += 1;
+         $document.flags.titan.results.dice[idx].final += 1;
+         if ($document.flags.titan.results.dice[idx].expertiseApplied) {
+            $document.flags.titan.results.dice[idx].expertiseApplied += 1;
          } else {
-            $document.flags.titan.chatContext.results.dice[
-               idx
-            ].expertiseApplied = 1;
+            $document.flags.titan.results.dice[idx].expertiseApplied = 1;
          }
-         $document.flags.titan.chatContext.results.expertiseRemaining -= 1;
+         $document.flags.titan.results.expertiseRemaining -= 1;
 
          // Recalculate the results
-         $document.flags.titan.chatContext.results = recalculateCheckResults(
-            $document.flags.titan.chatContext
+         $document.flags.titan.results = recalculateCheckResults(
+            $document.flags.titan
          );
 
          // Update the document
@@ -64,7 +57,7 @@
             flags: {
                titan: {
                   chatContext: {
-                     results: $document.flags.titan.chatContext.results,
+                     results: $document.flags.titan.results,
                   },
                },
             },
@@ -73,16 +66,14 @@
    }
 
    $: label = getLabel(
-      $document.flags.titan.chatContext.results.dice[idx].base,
-      $document.flags.titan.chatContext.results.dice[idx].expertiseApplied
+      $document.flags.titan.results.dice[idx].base,
+      $document.flags.titan.results.dice[idx].expertiseApplied
    );
-   $: dieClass = getDieClass(
-      $document.flags.titan.chatContext.results.dice[idx].final
-   );
+   $: dieClass = getDieClass($document.flags.titan.results.dice[idx].final);
    $: disabled =
       !$document.constructor.getSpeakerActor($document.speaker)?.isOwner ||
-      $document.flags.titan.chatContext.results.expertiseRemaining === 0 ||
-      $document.flags.titan.chatContext.results.dice[idx].final === 6;
+      $document.flags.titan.results.expertiseRemaining === 0 ||
+      $document.flags.titan.results.dice[idx].final === 6;
 </script>
 
 <!-- svelte-ignore missing-declaration -->

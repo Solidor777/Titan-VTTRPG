@@ -7,15 +7,11 @@
 </script>
 
 <div class="label">
-   <div
-      class="content {$document.flags.titan.chatContext.parameters.attribute}"
-   >
+   <div class="content {$document.flags.titan.parameters.attribute}">
       <!--Type Label -->
-      {`${localize($document.flags.titan.chatContext.parameters.attribute)}${
-         $document.flags.titan.chatContext.parameters.skill
-            ? ` (${localize(
-                 $document.flags.titan.chatContext.parameters.skill
-              )})`
+      {`${localize($document.flags.titan.parameters.attribute)}${
+         $document.flags.titan.parameters.skill
+            ? ` (${localize($document.flags.titan.parameters.skill)})`
             : ''
       }`}
    </div>

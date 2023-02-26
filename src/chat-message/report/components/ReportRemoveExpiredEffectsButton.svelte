@@ -13,7 +13,7 @@
       )?.character;
       if (character) {
          character.removeExpiredEffects(true);
-         $document.flags.titan.chatContext.expiredEffectsRemoved = true;
+         $document.flags.titan.expiredEffectsRemoved = true;
          $document.update({
             flags: {
                titan: {

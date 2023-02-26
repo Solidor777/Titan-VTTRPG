@@ -7,15 +7,11 @@
 </script>
 
 <div class="label">
-   <div
-      class="content {$document.flags.titan.chatContext.parameters.attribute}"
-   >
+   <div class="content {$document.flags.titan.parameters.attribute}">
       <img
-         src={$document.flags.titan.chatContext.parameters.img}
+         src={$document.flags.titan.parameters.img}
          alt="item"
-         class={$document.flags.titan.chatContext.parameters.img.indexOf(
-            '.svg'
-         ) === -1
+         class={$document.flags.titan.parameters.img.indexOf('.svg') === -1
             ? ''
             : 'svg'}
       />
@@ -24,16 +20,14 @@
       <div class="labels">
          <!--Label-->
          <div class="label">
-            {`${$document.flags.titan.chatContext.parameters.itemName}`}
+            {`${$document.flags.titan.parameters.itemName}`}
          </div>
 
          <!--Type Label -->
          <div class="sub-label">
             {`${localize(
-               $document.flags.titan.chatContext.parameters.attribute
-            )} (${localize(
-               $document.flags.titan.chatContext.parameters.skill
-            )})`}
+               $document.flags.titan.parameters.attribute
+            )} (${localize($document.flags.titan.parameters.skill)})`}
          </div>
       </div>
    </div>

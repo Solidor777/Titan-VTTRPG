@@ -14,7 +14,7 @@
          if (character) {
             // Update the actor
             await character.applyDamage(
-               $document.flags.titan.chatContext.damageApplied.total,
+               $document.flags.titan.damageApplied.total,
                false,
                false,
                true
@@ -49,7 +49,7 @@
       <i class="fas fa-heart" />
       {localize('apply%xDamage').replace(
          '%x',
-         $document.flags.titan.chatContext.damageApplied.total
+         $document.flags.titan.damageApplied.total
       )}
    </EfxButton>
 </div>

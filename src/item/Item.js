@@ -138,9 +138,7 @@ export default class TitanItem extends Item {
                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                sound: CONFIG.sounds.notification,
                flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
+                  titan: chatContext
                },
                classes: ['titan']
             },

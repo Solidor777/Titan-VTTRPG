@@ -15,40 +15,40 @@
    <!--Type-->
    <div class="stat">
       <IconTag
-         icon={$document.flags.titan.chatContext.parameters.type === 'melee'
+         icon={$document.flags.titan.parameters.type === 'melee'
             ? 'fas fa-sword'
             : 'fas fa-bow-arrow'}
-         label={localize($document.flags.titan.chatContext.parameters.type)}
+         label={localize($document.flags.titan.parameters.type)}
       />
    </div>
 
    <!--Range-->
-   {#if $document.flags.titan.chatContext.parameters.attack.range !== 1}
+   {#if $document.flags.titan.parameters.attack.range !== 1}
       <div class="stat">
          <IconStatTag
             label={localize('range')}
-            value={$document.flags.titan.chatContext.parameters.attack.range}
+            value={$document.flags.titan.parameters.attack.range}
             icon={'fas fa-ruler'}
          />
       </div>
    {/if}
 
    <!--Multi-Attack-->
-   {#if $document.flags.titan.chatContext.parameters.multiAttack}
+   {#if $document.flags.titan.parameters.multiAttack}
       <div class="stat">
          <IconTag label={localize('multiAttack')} icon={'fas fa-swords'} />
       </div>
    {/if}
 
    <!--Item Traits-->
-   {#each $document.flags.titan.chatContext.parameters.itemTrait as trait}
+   {#each $document.flags.titan.parameters.itemTrait as trait}
       <div class="stat" use:tooltip={{ content: trait.description }}>
          <Tag label={trait.name} />
       </div>
    {/each}
 
    <!--Attack Traits-->
-   {#each $document.flags.titan.chatContext.parameters.attack.trait as trait}
+   {#each $document.flags.titan.parameters.attack.trait as trait}
       <div
          class="stat"
          use:tooltip={{ content: localize(`${trait.name}.desc`) }}

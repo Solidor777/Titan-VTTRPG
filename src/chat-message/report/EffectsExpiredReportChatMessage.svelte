@@ -17,7 +17,7 @@
    <ChatEffects />
 
    <!--Remove Expired Effects Button-->
-   {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false}
+   {#if $document.flags.titan.expiredEffectsRemoved === false}
       <div class="button">
          <ReportRemoveExpiredEffectsButton />
       </div>

@@ -4,7 +4,7 @@
    const document = getContext('DocumentStore');
 
    // Chat context reference
-   const chatContext = $document.flags.titan.chatContext;
+   const chatContext = $document.flags.titan;
 </script>
 
 <div class="traits">

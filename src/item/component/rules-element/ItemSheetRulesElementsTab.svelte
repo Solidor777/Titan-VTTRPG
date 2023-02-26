@@ -10,6 +10,7 @@
    import ItemSheetTurnMessageSettings from '~/item/component/rules-element/ItemSheetTurnMessageSettings.svelte';
    import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
    import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
+   import ItemSheetRollMessageSettings from '~/item/component/rules-element/ItemSheetRollMessageSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -25,16 +26,20 @@
          value: 'mulBase',
       },
       {
-         label: localize('turnMessage'),
-         value: 'turnMessage',
-      },
-      {
          label: localize('fastHealing'),
          value: 'fastHealing',
       },
       {
          label: localize('persistentDamage'),
          value: 'persistentDamage',
+      },
+      {
+         label: localize('turnMessage'),
+         value: 'turnMessage',
+      },
+      {
+         label: localize('rollMessage'),
+         value: 'rollMessage',
       },
    ];
 
@@ -45,6 +50,7 @@
          turnMessage: ItemSheetTurnMessageSettings,
          fastHealing: ItemSheetFastHealingSettings,
          persistentDamage: ItemSheetPersistentDamageSettings,
+         rollMessage: ItemSheetRollMessageSettings,
       };
 
       return elementComponents[operation];

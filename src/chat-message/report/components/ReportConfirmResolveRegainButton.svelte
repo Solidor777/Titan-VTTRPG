@@ -14,7 +14,7 @@
          if (character) {
             // Update the actor
             await character.regainResolve(
-               $document.flags.titan.chatContext.resolveRegain.total,
+               $document.flags.titan.resolveRegain.total,
                true
             );
 
@@ -44,7 +44,7 @@
       <i class="fas fa-bolt" />
       {localize('regain%xResolve').replace(
          '%x',
-         $document.flags.titan.chatContext.resolveRegain.total
+         $document.flags.titan.resolveRegain.total
       )}
    </EfxButton>
 </div>

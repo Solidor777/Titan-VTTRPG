@@ -11,39 +11,37 @@
    <!--Successes-->
    <div class="stat">
       <div class="border-right">
-         {`${localize('dc')} ${
-            $document.flags.titan.chatContext.parameters.difficulty
-         }:${$document.flags.titan.chatContext.parameters.complexity}`}
+         {`${localize('dc')} ${$document.flags.titan.parameters.difficulty}:${
+            $document.flags.titan.parameters.complexity
+         }`}
       </div>
       <div>
-         {`${$document.flags.titan.chatContext.results.successes} ${localize(
-            'successes'
-         )}`}
+         {`${$document.flags.titan.results.successes} ${localize('successes')}`}
       </div>
    </div>
 
    <!--Succeeded-->
-   {#if $document.flags.titan.chatContext.results.succeeded}
+   {#if $document.flags.titan.results.succeeded}
       <div class="result succeeded">
          {localize('succeeded')}
       </div>
 
       <!--Extra Successes-->
-      {#if $document.flags.titan.chatContext.results.extraSuccesses !== undefined}
-         {#if $document.flags.titan.chatContext.results.extraSuccessesRemaining !== undefined}
+      {#if $document.flags.titan.results.extraSuccesses !== undefined}
+         {#if $document.flags.titan.results.extraSuccessesRemaining !== undefined}
             <div class="stat">
-               {localize('extraSuccesses')}: {$document.flags.titan.chatContext
-                  .results.extraSuccessesRemaining}/{$document.flags.titan
-                  .chatContext.results.extraSuccesses}
-            </div>
-         {:else if $document.flags.titan.chatContext.results.extraSuccesses > 0}
-            <div class="stat">
-               {localize('extraSuccesses')}: {$document.flags.titan.chatContext
+               {localize('extraSuccesses')}: {$document.flags.titan.results
+                  .extraSuccessesRemaining}/{$document.flags.titan.chatContext
                   .results.extraSuccesses}
+            </div>
+         {:else if $document.flags.titan.results.extraSuccesses > 0}
+            <div class="stat">
+               {localize('extraSuccesses')}: {$document.flags.titan.results
+                  .extraSuccesses}
             </div>
          {/if}
       {/if}
-   {:else if $document.flags.titan.chatContext.parameters.complexity > 0}
+   {:else if $document.flags.titan.parameters.complexity > 0}
       <!--Failed-->
       <div class="result failed">
          {localize('failed')}
@@ -51,11 +49,11 @@
    {/if}
 
    <!--Expertise Remaining-->
-   {#if $document.flags.titan.chatContext.parameters.totalExpertise}
+   {#if $document.flags.titan.parameters.totalExpertise}
       <div class="stat">
          <i class="fas fa-graduation-cap" />
          {localize('expertiseRemaining')}:
-         {$document.flags.titan.chatContext.results.expertiseRemaining}
+         {$document.flags.titan.results.expertiseRemaining}
 
          <!--Reset Button-->
          {#if $document.constructor.getSpeakerActor($document.speaker)?.isOwner}
@@ -67,27 +65,27 @@
    {/if}
 
    <!--Damage-->
-   {#if $document.flags.titan.chatContext.results.succeeded}
-      {#if $document.flags.titan.chatContext.results.damage > 0}
+   {#if $document.flags.titan.results.succeeded}
+      {#if $document.flags.titan.results.damage > 0}
          <div class="stat">
             <i class="fas fa-burst" />
             {localize('damage')}:
-            {$document.flags.titan.chatContext.results.damage}
+            {$document.flags.titan.results.damage}
          </div>
       {/if}
 
       <!--Healing-->
-      {#if $document.flags.titan.chatContext.results.healing > 0}
+      {#if $document.flags.titan.results.healing > 0}
          <div class="stat">
             <i class="fas fa-heart" />
             {localize('healing')}:
-            {$document.flags.titan.chatContext.results.healing}
+            {$document.flags.titan.results.healing}
          </div>
       {/if}
    {/if}
 
    <!--Rerolled failures-->
-   {#if $document.flags.titan.chatContext.failuresReRolled}
+   {#if $document.flags.titan.failuresReRolled}
       <div class="stat">
          <i class="fas fa-dice" />
          {localize('failuresReRolled')}
@@ -95,7 +93,7 @@
    {/if}
 
    <!--Training Doubled-->
-   {#if $document.flags.titan.chatContext.parameters.doubleTraining && $document.flags.titan.chatContext.parameters.totalTrainingDice > 0}
+   {#if $document.flags.titan.parameters.doubleTraining && $document.flags.titan.parameters.totalTrainingDice > 0}
       <div class="stat">
          <i class="fas fa-dumbbell" />
          {localize('trainingDoubled')}
@@ -103,7 +101,7 @@
    {/if}
 
    <!--Expertise Doubled-->
-   {#if $document.flags.titan.chatContext.parameters.doubleExpertise && $document.flags.titan.chatContext.parameters.totalExpertise > 0}
+   {#if $document.flags.titan.parameters.doubleExpertise && $document.flags.titan.parameters.totalExpertise > 0}
       <div class="stat">
          <i class="fas fa-graduation-cap" />
          {localize('expertiseDoubled')}

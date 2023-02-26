@@ -13,7 +13,7 @@
 
    // Document reference
    const document = getContext('DocumentStore');
-   const chatContext = $document.flags.titan.chatContext;
+   const chatContext = $document.flags.titan;
 </script>
 
 <div class="report">
@@ -25,11 +25,13 @@
 
    <!--Messages-->
    {#if chatContext.message}
-      {#each Object.values(chatContext.message) as message}
-         <div class="message">
-            <RichText text={message} />
-         </div>
-      {/each}
+      <div class="messages">
+         {#each Object.values(chatContext.message) as message}
+            <div class="message">
+               <RichText text={message} />
+            </div>
+         {/each}
+      </div>
    {/if}
 
    <!--Effects-->
@@ -56,34 +58,34 @@
    <!--Stamina-->
    {#if chatContext.stamina}
       <div class="section">
-         {`${localize('stamina')}: ${
-            $document.flags.titan.chatContext.stamina.value
-         } / ${$document.flags.titan.chatContext.stamina.max}`}
+         {`${localize('stamina')}: ${$document.flags.titan.stamina.value} / ${
+            $document.flags.titan.stamina.max
+         }`}
       </div>
    {/if}
 
    <!--Wounds-->
    {#if chatContext.wounds}
       <div class="section">
-         {`${localize('wounds')}: ${
-            $document.flags.titan.chatContext.wounds.value
-         } / ${$document.flags.titan.chatContext.wounds.max}`}
+         {`${localize('wounds')}: ${$document.flags.titan.wounds.value} / ${
+            $document.flags.titan.wounds.max
+         }`}
       </div>
    {/if}
 
    <!--Resolve-->
    {#if chatContext.resolve}
       <div class="section">
-         {`${localize('resolve')}: ${
-            $document.flags.titan.chatContext.resolve.value
-         } / ${$document.flags.titan.chatContext.resolve.max}`}
+         {`${localize('resolve')}: ${$document.flags.titan.resolve.value} / ${
+            $document.flags.titan.resolve.max
+         }`}
       </div>
    {/if}
 
    <!--Resolve Regain-->
    {#if chatContext.resolveRegain}
       <!--If confirmed, show how much was was regained-->
-      {#if $document.flags.titan.chatContext.resolveRegain.confirmed}
+      {#if $document.flags.titan.resolveRegain.confirmed}
          <div class="section">
             <i class="fas fa-bolt" />
             <div>
@@ -103,7 +105,7 @@
    <!--Healing applied-->
    {#if chatContext.healingApplied}
       <!--If confirmed, show how much was was regained-->
-      {#if $document.flags.titan.chatContext.healingApplied.confirmed === true}
+      {#if $document.flags.titan.healingApplied.confirmed === true}
          <div class="section">
             <i class="fas fa-heart" />
             <div>
@@ -113,7 +115,7 @@
                )}
             </div>
          </div>
-      {:else if $document.flags.titan.chatContext.healingApplied.confirmed === false}
+      {:else if $document.flags.titan.healingApplied.confirmed === false}
          <div class="button">
             <ReportConfirmApplyHealingButton />
          </div>
@@ -123,7 +125,7 @@
    <!--Damage applied-->
    {#if chatContext.damageApplied}
       <!--If confirmed, show how much was was regained-->
-      {#if $document.flags.titan.chatContext.damageApplied.confirmed === true}
+      {#if $document.flags.titan.damageApplied.confirmed === true}
          <div class="section">
             <i class="fas fa-burst" />
             <div>
@@ -133,7 +135,7 @@
                )}
             </div>
          </div>
-      {:else if $document.flags.titan.chatContext.damageApplied.confirmed === false}
+      {:else if $document.flags.titan.damageApplied.confirmed === false}
          <div class="button">
             <ReportConfirmApplyDamageButton />
          </div>
@@ -141,7 +143,7 @@
    {/if}
 
    <!--Remove Expired Effects Button-->
-   {#if $document.flags.titan.chatContext.expiredEffectsRemoved === false}
+   {#if $document.flags.titan.expiredEffectsRemoved === false}
       <div class="button">
          <ReportRemoveExpiredEffectsButton />
       </div>
@@ -178,12 +180,17 @@
          }
       }
 
-      .message {
-         @include panel-1;
-         @include border;
-         margin-top: 0.5rem;
-         padding: 0.25rem;
+      .messages {
+         @include flex-column;
+         @include flex-group-top-left;
          width: 100%;
+
+         .message {
+            @include panel-1;
+            @include border;
+            margin-top: 0.5rem;
+            padding: 0.25rem;
+         }
       }
 
       .button {

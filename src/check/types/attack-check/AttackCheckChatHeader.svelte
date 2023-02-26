@@ -7,15 +7,11 @@
 </script>
 
 <div class="label">
-   <div
-      class="content {$document.flags.titan.chatContext.parameters.attribute}"
-   >
+   <div class="content {$document.flags.titan.parameters.attribute}">
       <img
-         src={$document.flags.titan.chatContext.parameters.img}
+         src={$document.flags.titan.parameters.img}
          alt="item"
-         class={$document.flags.titan.chatContext.parameters.img.indexOf(
-            '.svg'
-         ) === -1
+         class={$document.flags.titan.parameters.img.indexOf('.svg') === -1
             ? ''
             : 'svg'}
       />
@@ -24,33 +20,31 @@
       <div class="labels">
          <!--Label-->
          <div class="label">
-            {`${$document.flags.titan.chatContext.parameters.itemName}`}
+            {`${$document.flags.titan.parameters.itemName}`}
          </div>
 
          <!--Attack -->
          <div class="sub-label">
-            {$document.flags.titan.chatContext.parameters.attack.label}
+            {$document.flags.titan.parameters.attack.label}
          </div>
 
          <!--Type Label -->
          <div class="sub-label">
             {`${localize(
-               $document.flags.titan.chatContext.parameters.attribute
-            )} (${localize(
-               $document.flags.titan.chatContext.parameters.skill
-            )})`}
+               $document.flags.titan.parameters.attribute
+            )} (${localize($document.flags.titan.parameters.skill)})`}
          </div>
 
          <!--Target defense-->
-         {#if $document.flags.titan.chatContext.parameters.targetDefense !== undefined}
+         {#if $document.flags.titan.parameters.targetDefense !== undefined}
             {`${
-               $document.flags.titan.chatContext.parameters.type === 'melee'
+               $document.flags.titan.parameters.type === 'melee'
                   ? `${localize('melee')}`
                   : `${localize('accuracy')}`
-            } ${
-               $document.flags.titan.chatContext.parameters.attackerRating
-            } ${localize('versus')} ${localize('defense')} ${
-               $document.flags.titan.chatContext.parameters.targetDefense
+            } ${$document.flags.titan.parameters.attackerRating} ${localize(
+               'versus'
+            )} ${localize('defense')} ${
+               $document.flags.titan.parameters.targetDefense
             }`}
          {/if}
 
@@ -58,12 +52,11 @@
          <div class="sub-label">
             {`${localize('damage')}: 
             ${
-               $document.flags.titan.chatContext.parameters.attack.damage +
-               $document.flags.titan.chatContext.parameters.damageMod
+               $document.flags.titan.parameters.attack.damage +
+               $document.flags.titan.parameters.damageMod
             }
             ${
-               $document.flags.titan.chatContext.parameters.attack
-                  .plusExtraSuccessDamage
+               $document.flags.titan.parameters.attack.plusExtraSuccessDamage
                   ? ` + ${localize('extraSuccesses.short')}`
                   : ''
             }`}

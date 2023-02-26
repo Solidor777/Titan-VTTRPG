@@ -8,7 +8,7 @@
 
 <div class="aspects">
    <!--Each aspect-->
-   {#each $document.flags.titan.chatContext.results.scalingAspect as aspect, idx}
+   {#each $document.flags.titan.results.scalingAspect as aspect, idx}
       <!--Aspect-->
       <div class="aspect">
          <CheckChatScalingAspect {idx} />

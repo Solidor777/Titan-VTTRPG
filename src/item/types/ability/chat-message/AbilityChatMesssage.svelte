@@ -11,7 +11,7 @@
 
    // Chat context reference
    const document = getContext('DocumentStore');
-   const item = $document.flags.titan.chatContext;
+   const item = $document.flags.titan;
 </script>
 
 <div class="item-chat-message">

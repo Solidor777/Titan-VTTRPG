@@ -14,7 +14,7 @@
          if (character) {
             // Update the actor
             await character.applyHealing(
-               $document.flags.titan.chatContext.healingApplied.total,
+               $document.flags.titan.healingApplied.total,
                false,
                true
             );
@@ -45,7 +45,7 @@
       <i class="fas fa-heart" />
       {localize('heal%xDamage').replace(
          '%x',
-         $document.flags.titan.chatContext.healingApplied.total
+         $document.flags.titan.healingApplied.total
       )}
    </EfxButton>
 </div>

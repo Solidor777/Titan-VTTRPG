@@ -23,10 +23,9 @@
    </div>
 
    <!--Attack Notes-->
-   {#if $document.flags.titan.chatContext.parameters.attackNotes !== '' && $document.flags.titan.chatContext.parameters.attackNotes !== '<p></p>'}
+   {#if $document.flags.titan.parameters.attackNotes !== '' && $document.flags.titan.parameters.attackNotes !== '<p></p>'}
       <div class="section rich-text">
-         <RichText
-            text={$document.flags.titan.chatContext.parameters.attackNotes} />
+         <RichText text={$document.flags.titan.parameters.attackNotes} />
       </div>
    {/if}
 
@@ -40,13 +39,12 @@
       <CheckChatResults />
    </div>
 
-   {#if $document.flags.titan.chatContext.results.succeeded}
+   {#if $document.flags.titan.results.succeeded}
       <!--Damage Buttons-->
       <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
+      {#if $document.flags.titan.results.damage && game.user.isGM}
          <div class="section">
-            <ChatDamageButtons
-               damage={$document.flags.titan.chatContext.results.damage} />
+            <ChatDamageButtons damage={$document.flags.titan.results.damage} />
          </div>
       {/if}
    {/if}

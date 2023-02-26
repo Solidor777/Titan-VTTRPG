@@ -109,7 +109,7 @@ Hooks.once('setup', async () => {
 
 Hooks.on('renderChatMessage', (message, html) => {
    // Check if this is a valid titan chat message
-   const chatContext = message.getFlag('titan', 'chatContext');
+   const chatContext = message?.flags?.titan;
    if (TitanChatMessageTypes.has(chatContext?.type)) {
       // Add the titan class
       const content = html.find('.chat-message').prevObject;

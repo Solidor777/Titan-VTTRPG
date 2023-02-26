@@ -14,8 +14,8 @@
 </script>
 
 <div class="effects">
-   {#if $document.flags.titan.chatContext.conditions}
-      {#each $document.flags.titan.chatContext.conditions as effect}
+   {#if $document.flags.titan.conditions}
+      {#each $document.flags.titan.conditions as effect}
          <div class="effect">
             <ChatConditionTag
                label={effect.label}
@@ -27,8 +27,8 @@
    {/if}
 
    <!--Permanent Effects-->
-   {#if $document.flags.titan.chatContext.permanentEffects}
-      {#each $document.flags.titan.chatContext.permanentEffects as effect}
+   {#if $document.flags.titan.permanentEffects}
+      {#each $document.flags.titan.permanentEffects as effect}
          <div class="effect">
             <ChatEffectTagPermanent
                label={effect.label}
@@ -40,8 +40,8 @@
    {/if}
 
    <!--Turn Start Effects-->
-   {#if $document.flags.titan.chatContext.turnStartEffects}
-      {#each $document.flags.titan.chatContext.turnStartEffects as effect}
+   {#if $document.flags.titan.turnStartEffects}
+      {#each $document.flags.titan.turnStartEffects as effect}
          <div class="effect">
             <ChatEffectTagTurnStart
                label={effect.label}
@@ -54,8 +54,8 @@
    {/if}
 
    <!--Turn End Effects-->
-   {#if $document.flags.titan.chatContext.turnEndEffects}
-      {#each $document.flags.titan.chatContext.turnEndEffects as effect}
+   {#if $document.flags.titan.turnEndEffects}
+      {#each $document.flags.titan.turnEndEffects as effect}
          <div class="effect">
             <ChatEffectTagTurnEnd
                label={effect.label}
@@ -68,8 +68,8 @@
    {/if}
 
    <!--Initiative Effects-->
-   {#if $document.flags.titan.chatContext.initiativeEffects}
-      {#each $document.flags.titan.chatContext.initiativeEffects as effect}
+   {#if $document.flags.titan.initiativeEffects}
+      {#each $document.flags.titan.initiativeEffects as effect}
          <div class="effect">
             <ChatEffectTagInitiative
                label={effect.label}
@@ -83,8 +83,8 @@
    {/if}
 
    <!--Custom Effects-->
-   {#if $document.flags.titan.chatContext.customEffects}
-      {#each $document.flags.titan.chatContext.customEffects as effect}
+   {#if $document.flags.titan.customEffects}
+      {#each $document.flags.titan.customEffects as effect}
          <div class="effect">
             <ChatEffectTagCustom
                label={effect.label}
@@ -98,8 +98,8 @@
    {/if}
 
    <!--Expired Effects-->
-   {#if $document.flags.titan.chatContext.expiredEffects}
-      {#each $document.flags.titan.chatContext.expiredEffects as effect}
+   {#if $document.flags.titan.expiredEffects}
+      {#each $document.flags.titan.expiredEffects as effect}
          <div class="effect" out:slide|local>
             <ChatEffectTagExpired
                label={effect.label}

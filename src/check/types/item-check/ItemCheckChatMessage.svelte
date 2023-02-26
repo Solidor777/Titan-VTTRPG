@@ -29,53 +29,49 @@
    </div>
 
    <!--If succeeded-->
-   {#if $document.flags.titan.chatContext.results.succeeded}
+   {#if $document.flags.titan.results.succeeded}
       <!--Damage Buttons-->
       <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.chatContext.results.damage && game.user.isGM}
+      {#if $document.flags.titan.results.damage && game.user.isGM}
          <div class="section">
-            <ChatDamageButtons
-               damage={$document.flags.titan.chatContext.results.damage} />
+            <ChatDamageButtons damage={$document.flags.titan.results.damage} />
          </div>
       {/if}
 
       <!--Healing Button-->
       <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.chatContext.results.healing && game.user.isGM}
+      {#if $document.flags.titan.results.healing && game.user.isGM}
          <div class="section">
             <ChatHealingButton
-               healing={$document.flags.titan.chatContext.results.healing} />
+               healing={$document.flags.titan.results.healing}
+            />
          </div>
       {/if}
 
       <!--Opposed Check Buttons-->
-      {#if $document.flags.titan.chatContext.parameters.opposedCheck}
+      {#if $document.flags.titan.parameters.opposedCheck}
          <div class="section">
             <ChatAttributeCheckButton
-               attribute={$document.flags.titan.chatContext.parameters
-                  .opposedCheck.attribute}
-               skill={$document.flags.titan.chatContext.parameters.opposedCheck
-                  .skill}
-               difficulty={$document.flags.titan.chatContext.parameters
-                  .opposedCheck.difficulty}
-               complexity={$document.flags.titan.chatContext.results
-                  .extraSuccesses + 1} />
+               attribute={$document.flags.titan.parameters.opposedCheck
+                  .attribute}
+               skill={$document.flags.titan.parameters.opposedCheck.skill}
+               difficulty={$document.flags.titan.parameters.opposedCheck
+                  .difficulty}
+               complexity={$document.flags.titan.results.extraSuccesses + 1}
+            />
          </div>
       {/if}
 
       <!--Resistance Check Buttons-->
-      {#if $document.flags.titan.chatContext.results.reflexesCheck || $document.flags.titan.chatContext.results.resilienceCheck || $document.flags.titan.chatContext.results.willpowerCheck}
+      {#if $document.flags.titan.results.reflexesCheck || $document.flags.titan.results.resilienceCheck || $document.flags.titan.results.willpowerCheck}
          <div class="section tags">
             <ChatResistanceCheckButtons
-               reflexes={$document.flags.titan.chatContext.results
-                  .reflexesCheck}
-               resilience={$document.flags.titan.chatContext.results
-                  .resilienceCheck}
-               willpower={$document.flags.titan.chatContext.results
-                  .willpowerCheck}
+               reflexes={$document.flags.titan.results.reflexesCheck}
+               resilience={$document.flags.titan.results.resilienceCheck}
+               willpower={$document.flags.titan.results.willpowerCheck}
                difficulty={4}
-               complexity={$document.flags.titan.chatContext.results
-                  .extraSuccesses + 1} />
+               complexity={$document.flags.titan.results.extraSuccesses + 1}
+            />
          </div>
       {/if}
    {/if}

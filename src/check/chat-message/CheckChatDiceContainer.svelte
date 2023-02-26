@@ -7,7 +7,7 @@
 
 <div class="container">
    <!--For each dice-->
-   {#each $document.flags.titan.chatContext.results.dice as die, idx}
+   {#each $document.flags.titan.results.dice as die, idx}
       <!-- svelte-ignore missing-declaration -->
       <div class="dice">
          <CheckChatDie {idx} />

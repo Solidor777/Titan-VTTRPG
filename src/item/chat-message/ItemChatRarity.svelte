@@ -4,7 +4,7 @@
 
    // Chat context reference
    const document = getContext('DocumentStore');
-   const chatContext = $document.flags.titan.chatContext;
+   const chatContext = $document.flags.titan;
 </script>
 
 <div class="tag {chatContext.system.rarity}">

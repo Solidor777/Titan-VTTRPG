@@ -45,7 +45,6 @@ export function applyMulBaseElements(elements) {
                }
             }
          }
-
       }
    }
 

@@ -9,19 +9,18 @@
    // Chat context
    const document = getContext('DocumentStore');
 
-   $: aspect = $document.flags.titan.chatContext.results.scalingAspect[idx];
+   $: aspect = $document.flags.titan.results.scalingAspect[idx];
 
    function increaseAspect() {
       // Increase the aspect
       aspect.currentValue += Math.max(aspect.initialValue, 1);
 
       // Decrease the extra successes by the cost
-      $document.flags.titan.chatContext.results.extraSuccessesRemaining -=
-         aspect.cost;
+      $document.flags.titan.results.extraSuccessesRemaining -= aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         $document.flags.titan.chatContext.results.damage += Math.max(
+         $document.flags.titan.results.damage += Math.max(
             aspect.initialValue,
             1
          );
@@ -29,7 +28,7 @@
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         $document.flags.titan.chatContext.results.healing += Math.max(
+         $document.flags.titan.results.healing += Math.max(
             aspect.initialValue,
             1
          );
@@ -48,12 +47,11 @@
       aspect.currentValue -= Math.max(aspect.initialValue, 1);
 
       // Increase the extra successes by the cost
-      $document.flags.titan.chatContext.results.extraSuccessesRemaining +=
-         aspect.cost;
+      $document.flags.titan.results.extraSuccessesRemaining += aspect.cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         $document.flags.titan.chatContext.results.damage -= Math.max(
+         $document.flags.titan.results.damage -= Math.max(
             aspect.initialValue,
             1
          );
@@ -61,7 +59,7 @@
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         $document.flags.titan.chatContext.results.healing -= Math.max(
+         $document.flags.titan.results.healing -= Math.max(
             aspect.initialValue,
             1
          );
@@ -84,16 +82,16 @@
       aspect.currentValue = aspect.initialValue;
 
       // Reset the extra successes
-      $document.flags.titan.chatContext.results.extraSuccessesRemaining += cost;
+      $document.flags.titan.results.extraSuccessesRemaining += cost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         $document.flags.titan.chatContext.results.damage -= delta;
+         $document.flags.titan.results.damage -= delta;
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         $document.flags.titan.chatContext.results.healing -= delta;
+         $document.flags.titan.results.healing -= delta;
       }
 
       // Update the document
@@ -115,8 +113,8 @@
          {:else if aspect.label === localize('healing')}
             <i class="fas fa-heart" />
          {/if}
-         {aspect.label}: {$document.flags.titan.chatContext.results
-            .scalingAspect[idx].currentValue}
+         {aspect.label}: {$document.flags.titan.results.scalingAspect[idx]
+            .currentValue}
       </div>
       <div class="cost">
          {localize('cost')}: {`${aspect.cost} ${localize(
@@ -154,8 +152,8 @@
       <div class="control">
          <EfxButton
             on:click={increaseAspect}
-            disabled={$document.flags.titan.chatContext.results
-               .extraSuccessesRemaining < aspect.cost}
+            disabled={$document.flags.titan.results.extraSuccessesRemaining <
+               aspect.cost}
          >
             <div class="button-inner">
                <i class="fas fa-plus" />

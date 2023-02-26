@@ -6,7 +6,7 @@
 
    // Document reference
    const document = getContext('DocumentStore');
-   const check = $document.flags.titan.chatContext;
+   const check = $document.flags.titan;
 </script>
 
 <div class="check-chat-message">

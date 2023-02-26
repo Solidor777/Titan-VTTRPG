@@ -61,7 +61,7 @@
             turnEndReport: TurnEndReportChatMessage,
             effectsExpiredReport: EffectsExpiredReportChatMessage,
          };
-         return chatComponents[$document.flags.titan.chatContext.type];
+         return chatComponents[$document.flags.titan.type];
       }
       return PrivateRollChatMessage;
    }

@@ -3,6 +3,7 @@ import { getMulBaseTemplate } from '~/rules-element/MulBase.js';
 import { getFastHealingTemplate } from '~/rules-element/FastHealing.js';
 import { getPersistentDamageTemplate } from '~/rules-element/PersistentDamage';
 import { getTurnMessageTemplate } from '~/rules-element/TurnMessage';
+import { getRollMessageTemplate } from '../../../rules-element/RollMessage';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -15,16 +16,20 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getMulBaseTemplate(element.uuid, element.type);
          break;
       }
-      case 'turnMessage': {
-         document.system.rulesElement[elementIdx] = getTurnMessageTemplate(element.uuid, element.type);
-         break;
-      }
       case 'fastHealing': {
          document.system.rulesElement[elementIdx] = getFastHealingTemplate(element.uuid, element.type);
          break;
       }
       case 'persistentDamage': {
          document.system.rulesElement[elementIdx] = getPersistentDamageTemplate(element.uuid, element.type);
+         break;
+      }
+      case 'turnMessage': {
+         document.system.rulesElement[elementIdx] = getTurnMessageTemplate(element.uuid);
+         break;
+      }
+      case 'rollMessage': {
+         document.system.rulesElement[elementIdx] = getRollMessageTemplate(element.uuid);
          break;
       }
       default: {

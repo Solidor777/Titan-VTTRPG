@@ -17,6 +17,7 @@ import { applyMulBaseElements } from '~/rules-element/MulBase.js';
 import { applyFastHealingElements } from '~/rules-element/FastHealing';
 import { applyPersistentDamageElements } from '~/rules-element/PersistentDamage';
 import { applyTurnMessageElements } from '~/rules-element/TurnMessage';
+import { applyRollMessageElements } from '~/rules-element/RollMessage';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -40,6 +41,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    applyFastHealingElements = applyFastHealingElements.bind(this);
    applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
    applyTurnMessageElements = applyTurnMessageElements.bind(this);
+   applyRollMessageElements = applyRollMessageElements.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -245,7 +247,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Cache effects
-      this.effects = Object.keys(sortedEffects).length > 0 ? sortedEffects : false;
+      this.effect = Object.keys(sortedEffects).length > 0 ? sortedEffects : false;
 
       // Added conditions if appropriate
       const conditions = this.parent.temporaryEffects.filter((effect) => effect.flags.titan?.type === 'condition');
@@ -293,6 +295,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const fastHealingElements = [];
       const persistentDamageElements = [];
       const turnMessageElements = [];
+      const rollMessageElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -315,6 +318,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                turnMessageElements.push(element);
                break;
             }
+            case 'rollMessage': {
+               rollMessageElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -327,6 +334,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this.applyFastHealingElements(fastHealingElements);
       this.applyPersistentDamageElements(persistentDamageElements);
       this.applyTurnMessageElements(turnMessageElements);
+      this.applyRollMessageElements(rollMessageElements);
 
       return;
    }
@@ -748,6 +756,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Get the check
             const attributeCheck = await this.getAttributeCheck(options);
             if (attributeCheck && attributeCheck.isValid) {
+               const messageOptions = {
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               };
 
                // Expend resolve if appropriate
                let resolveSpent = 0;
@@ -761,14 +774,34 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
+               // Add messages if appropriate
+               // Attribute messages
+               const message = [];
+               const attributeMessages = this.rollMessage?.attribute;
+               if (attributeMessages) {
+                  const keyMessages = attributeMessages[attributeCheck.parameters.attribute];
+                  if (keyMessages) {
+                     message.push(...keyMessages);
+                  }
+               }
+
+               // Skill messages
+               const skillMessages = this.rollMessage?.skill;
+               if (skillMessages) {
+                  const keyMessages = skillMessages[attributeCheck.parameters.skill];
+                  if (keyMessages) {
+                     message.push(...keyMessages);
+                  }
+               }
+
+               if (message.length > 0) {
+                  messageOptions.message = message;
+               }
+               console.log(messageOptions);
 
                // Send the check to chat
                await attributeCheck.evaluateCheck();
-               await attributeCheck.sendToChat({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({ actor: this.parent }),
-                  rollMode: game.settings.get('core', 'rollMode'),
-               });
+               await attributeCheck.sendToChat(messageOptions);
             }
 
             return;
@@ -1335,7 +1368,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    async removeExpiredEffects(confirmed) {
       if (this.parent.isOwner) {
          // Get the expired effects
-         const expiredEffects = this.effects?.expired;
+         const expiredEffects = this.effect?.expired;
          if (expiredEffects && expiredEffects.length > 0) {
             // Check if the removeal was confirmed
             if (confirmed || !confirmDeletingItems()) {
@@ -1497,17 +1530,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound) {
-      if (getSetting('autoDecreaseEffectDuration') && this.effects?.initiative) {
+      if (getSetting('autoDecreaseEffectDuration') && this.effect?.initiative) {
          // Get effects to advance
          let effectsToAdvance = null;
          if (isNewRound) {
-            effectsToAdvance = this.effects.initiative.filter((effect) => {
+            effectsToAdvance = this.effect.initiative.filter((effect) => {
                const initiative = effect.system.duration.initiative;
                return (initiative >= currentInitiative || initiative < previousInitiative);
             });
          }
          else {
-            effectsToAdvance = this.effects.initiative.filter((effect) => {
+            effectsToAdvance = this.effect.initiative.filter((effect) => {
                const initiative = effect.system.duration.initiative;
                return (initiative >= currentInitiative && initiative < previousInitiative);
             });
@@ -1542,7 +1575,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Report effects if appropriate
                const reportEffects = getSetting('reportEffects');
                if (reportEffects) {
-                  chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
+                  chatContext.expiredEffects = this.effect.expired.map(this.getEffectReportData);
                }
 
                // Remove expired effects if appropriate
@@ -1701,8 +1734,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async _calculateTurnStartEffects(chatContext) {
       // Decrease effect duration if appropriate
-      if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnStart) {
-         for (const effect of this.effects.turnStart) {
+      if (getSetting('autoDecreaseEffectDuration') && this.effect?.turnStart) {
+         for (const effect of this.effect.turnStart) {
             if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
                await effect.update({
@@ -1719,36 +1752,36 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Report effects if appropriate
       if (getSetting('reportEffects')) {
          // Add efects to chat context
-         if (this.effects) {
+         if (this.effect) {
 
             // Permanent effects
-            if (this.effects.permanent) {
-               chatContext.permanentEffects = this.effects.permanent.map(this.getEffectReportData);
+            if (this.effect.permanent) {
+               chatContext.permanentEffects = this.effect.permanent.map(this.getEffectReportData);
             }
 
             // Turn start effects
-            if (this.effects.turnStart) {
-               chatContext.turnStartEffects = this.effects.turnStart.map(this.getEffectReportData);
+            if (this.effect.turnStart) {
+               chatContext.turnStartEffects = this.effect.turnStart.map(this.getEffectReportData);
             }
 
             // Turn end effects
-            if (this.effects.turnEnd) {
-               chatContext.turnEndEffects = this.effects.turnEnd.map(this.getEffectReportData);
+            if (this.effect.turnEnd) {
+               chatContext.turnEndEffects = this.effect.turnEnd.map(this.getEffectReportData);
             }
 
             // Initiative order effects
-            if (this.effects.initiative) {
-               chatContext.initiativeEffects = this.effects.initiative.map(this.getEffectReportData);
+            if (this.effect.initiative) {
+               chatContext.initiativeEffects = this.effect.initiative.map(this.getEffectReportData);
             }
 
             // Custom order effects
-            if (this.effects.custom) {
-               chatContext.customEffects = this.effects.custom.map(this.getEffectReportData);
+            if (this.effect.custom) {
+               chatContext.customEffects = this.effect.custom.map(this.getEffectReportData);
             }
 
             // Expired effects
-            if (this.effects.expired) {
-               chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
+            if (this.effect.expired) {
+               chatContext.expiredEffects = this.effect.expired.map(this.getEffectReportData);
             }
          }
 
@@ -1767,7 +1800,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Remove expired effects if appropriate
-      const expiredEffects = this.effects.expired;
+      const expiredEffects = this.effect.expired;
       if (expiredEffects) {
          switch (getSetting('autoRemoveExpiredEffects')) {
             case 'showButton': {
@@ -1788,10 +1821,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async _calculateTurnEndEffects(chatContext) {
       // Decrease effect duration if appropriate
-      if (getSetting('autoDecreaseEffectDuration') && this.effects?.turnEnd) {
+      if (getSetting('autoDecreaseEffectDuration') && this.effect?.turnEnd) {
          // Advance each turn end effect
          const expiredEffects = [];
-         for (const effect of this.effects.turnEnd) {
+         for (const effect of this.effect.turnEnd) {
             if (effect.system.duration.remaining > 0) {
                effect.system.duration.remaining -= 1;
                await effect.update({
@@ -1815,7 +1848,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Report effects if appropriate
             const reportEffects = getSetting('reportEffects');
             if (reportEffects) {
-               chatContext.expiredEffects = this.effects.expired.map(this.getEffectReportData);
+               chatContext.expiredEffects = this.effect.expired.map(this.getEffectReportData);
             }
 
             // Remove expired effects if appropriate
@@ -1991,9 +2024,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
          whisper: users,
          flags: {
-            titan: {
-               chatContext: chatContext
-            }
+            titan: chatContext
          }
       };
 

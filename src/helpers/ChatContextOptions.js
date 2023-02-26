@@ -4,7 +4,7 @@ import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResult
 async function reRollCheckFailures(li) {
    // Get the successes and failure count
    const message = game.messages.get(li.data("messageId"));
-   const chatContext = message.getFlag('titan', 'chatContext');
+   const chatContext = message?.flags?.titan;
    let failureCount = 0;
    let expertiseToRefund = 0;
    const successes = chatContext.results.dice.filter((die) => {
@@ -69,7 +69,7 @@ async function reRollCheckFailures(li) {
 async function doubleExpertise(li) {
    // If expertise is not already doubled
    const message = game.messages.get(li.data("messageId"));
-   const chatContext = message.getFlag('titan', 'chatContext');
+   const chatContext = message?.flags?.titan;
 
    // Re roll dice equal to the number of falures
    if (chatContext.parameters.doubleExpertise === false && chatContext.parameters.totalExpertise > 0) {
@@ -104,7 +104,7 @@ async function doubleExpertise(li) {
 async function doubleTraining(li) {
    // If expertise is not already doubled
    const message = game.messages.get(li.data("messageId"));
-   const chatContext = message.getFlag('titan', 'chatContext');
+   const chatContext = message?.flags?.titan;
 
    // Re roll dice equal to the number of falures
    if (chatContext.parameters.doubleTraining === false && chatContext.parameters.totalTrainingDice > 0) {
@@ -154,7 +154,7 @@ export function registerChatContextOptions(html, options) {
    let canUseCheckControls = (li) => {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-         const chatContext = message.getFlag('titan', 'chatContext');
+         const chatContext = message?.flags?.titan;
          return chatContext?.isCheck === true && chatContext.failuresReRolled === false;
       }
 
@@ -164,7 +164,7 @@ export function registerChatContextOptions(html, options) {
    let canDoubleExpertise = (li) => {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-         const chatContext = message.getFlag('titan', 'chatContext');
+         const chatContext = message?.flags?.titan;
          return chatContext?.isCheck === true &&
             chatContext.parameters.doubleExpertise === false &&
             chatContext.parameters.totalExpertise > 0;
@@ -176,7 +176,7 @@ export function registerChatContextOptions(html, options) {
    let canDoubleTraining = (li) => {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-         const chatContext = message.getFlag('titan', 'chatContext');
+         const chatContext = message?.flags?.titan;
          return chatContext?.isCheck === true &&
             chatContext.parameters.doubleTraining === false &&
             chatContext.parameters.totalTrainingDice > 0;

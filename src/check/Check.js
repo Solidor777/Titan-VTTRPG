@@ -172,6 +172,10 @@ export default class TitanCheck {
          failuresReRolled: false
       };
 
+      if (options.message) {
+         chatContext.message = options.message;
+      }
+
       const speaker = options?.speaker ?? null;
       const token = (speaker ? (speaker.token ? speaker.token : typeof (speaker.getActiveTokens) === 'function' ? speaker.getActiveTokens(false, true)[0] : null) : null);
 
@@ -186,9 +190,7 @@ export default class TitanCheck {
                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                sound: CONFIG.sounds.dice,
                flags: {
-                  titan: {
-                     chatContext: chatContext
-                  }
+                  titan: chatContext
                }
             },
             options?.rollMode ?

@@ -80,7 +80,6 @@
       @include panel-1;
       width: 100%;
       height: 100%;
-      min-height: 15rem;
 
       .settings {
          @include flex-row;
@@ -100,10 +99,11 @@
          }
 
          .message {
-            margin-top: 0.25rem;
             @include flex-column;
+            margin-top: 0.25rem;
             width: 100%;
             height: 100%;
+            min-height: 10rem;
          }
       }
 

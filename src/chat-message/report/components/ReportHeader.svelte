@@ -4,7 +4,7 @@
 
    // Document reference
    const document = getContext('DocumentStore');
-   const chatContext = $document.flags.titan.chatContext;
+   const chatContext = $document.flags.titan;
 
    export let icon = void 0;
    export let label = void 0;

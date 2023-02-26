@@ -5,7 +5,7 @@
 
    // Chat context reference
    const document = getContext('DocumentStore');
-   const chatContext = $document.flags.titan.chatContext;
+   const chatContext = $document.flags.titan;
 </script>
 
 <StatTag label={localize('tradition')} value={chatContext.system.tradition} />
