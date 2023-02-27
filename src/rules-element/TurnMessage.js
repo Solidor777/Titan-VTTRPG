@@ -19,7 +19,6 @@ export function applyTurnMessageElements(elements) {
       // For each selector
       for (const [selector, selectorElements] of Object.entries(selectors)) {
          const selectorMessages = [];
-         // Apply each mod
          for (const element of selectorElements) {
             if (!isHTMLBlank(element.message)) {
                selectorMessages.push(element.message);

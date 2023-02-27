@@ -19,11 +19,11 @@ import { applyPersistentDamageElements } from '~/rules-element/PersistentDamage'
 import { applyTurnMessageElements } from '~/rules-element/TurnMessage';
 import {
    applyRollMessageElements,
-   getAttributeAndSkillRollMessages,
-   getResistanceRollMessages,
-   getAttackTypeAndTraitRollMessages,
-   getItemTraitRollMessages,
-   getSpellTraditionRollMessages
+   getAttributeCheckMessages,
+   getResistanceCheckMessages,
+   getAttackCheckMessages,
+   getCastingCheckMessages,
+   getItemCheckMessages
 } from '~/rules-element/RollMessage';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
@@ -49,11 +49,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
    _applyTurnMessageElements = applyTurnMessageElements.bind(this);
    _applyRollMessageElements = applyRollMessageElements.bind(this);
-   _getAttributeAndSkillRollMessages = getAttributeAndSkillRollMessages.bind(this);
-   _getResistanceRollMessages = getResistanceRollMessages.bind(this);
-   _getAttackTypeAndTraitRollMessages = getAttackTypeAndTraitRollMessages.bind(this);
-   _getItemTraitRollMessages = getItemTraitRollMessages.bind(this);
-   _getSpellTraditionRollMessages = getSpellTraditionRollMessages.bind(this);
+   _getAttributeCheckMessages = getAttributeCheckMessages.bind(this);
+   _getResistanceCheckMessages = getResistanceCheckMessages.bind(this);
+   _getAttackCheckMessages = getAttackCheckMessages.bind(this);
+   _getCastingCheckMessages = getCastingCheckMessages.bind(this);
+   _getItemCheckMessages = getItemCheckMessages.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -781,16 +781,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               // Add messages if appropriate
-               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
-
                // Send the check to chat
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-                  message: message
+                  message: this._getAttributeCheckMessages(check)
                });
             }
 
@@ -828,15 +825,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Roll the resistance check
             const check = await this.getResistanceCheck(options);
             if (check && check.isValid) {
-               // Add messages if appropriate
-               const message = this._getResistanceRollMessages(check.parameters.resistance);
-
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-                  message: message
+                  message: this._getResistanceCheckMessages(check)
                });
             }
 
@@ -907,27 +901,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               // Add messages if appropriate
-               const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
-               const attackTypeAndTraitMessages = this._getAttackTypeAndTraitRollMessages(check.parameters.attack);
-               const itemTraitMessages = this._getItemTraitRollMessages(check.parameters.itemTrait);
-               const message = [];
-               if (attributeAndSkillMessages) {
-                  message.push(...attributeAndSkillMessages);
-               }
-               if (attackTypeAndTraitMessages) {
-                  message.push(...attackTypeAndTraitMessages);
-               }
-               if (itemTraitMessages) {
-                  message.push(...itemTraitMessages);
-               }
-
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-                  message: message
+                  message: this._getAttackCheckMessages(check)
                });
             }
 
@@ -1028,27 +1007,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               // Add messages if appropriate
-               const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
-               const itemTraitMessages = this._getItemTraitRollMessages(check.parameters.itemTrait);
-               const spellTraditionMessages = this._getSpellTraditionRollMessages(check.parameters.tradition);
-               const message = [];
-               if (attributeAndSkillMessages) {
-                  message.push(...attributeAndSkillMessages);
-               }
-               if (itemTraitMessages) {
-                  message.push(...itemTraitMessages);
-               }
-               if (spellTraditionMessages) {
-                  message.push(...spellTraditionMessages);
-               }
-
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-                  message: message
+                  message: this._getCastingCheckMessages(check)
                });
             }
 
@@ -1124,23 +1088,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   await this.spendResolve(resolveSpent, true, false);
                }
 
-               // Add messages if appropriate
-               const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
-               const itemTraitMessages = this._getItemTraitRollMessages(check.parameters.itemTrait);
-               const message = [];
-               if (attributeAndSkillMessages) {
-                  message.push(...attributeAndSkillMessages);
-               }
-               if (itemTraitMessages) {
-                  message.push(...itemTraitMessages);
-               }
-
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
                   speaker: ChatMessage.getSpeaker({ actor: this.parent }),
                   rollMode: game.settings.get('core', 'rollMode'),
-                  message: message
+                  message: this._getItemCheckMessages(check)
                });
             }
 

@@ -42,6 +42,10 @@
          value: 'customItemTrait',
       },
       {
+         label: localize('multiAttack'),
+         value: 'multiAttack',
+      },
+      {
          label: localize('resistance'),
          value: 'resistance',
       },
@@ -74,7 +78,8 @@
             break;
          }
          case 'customAttackTrait':
-         case 'customItemTrait': {
+         case 'customItemTrait':
+         case 'multiAttack': {
             element.key = '';
             break;
          }
@@ -159,12 +164,14 @@
             </div>
 
             <!--Key-->
-            <div class="field select">
-               <svelte:component
-                  this={getSelector()}
-                  bind:value={element.key}
-               />
-            </div>
+            {#if element.selector !== 'multiAttack'}
+               <div class="field select">
+                  <svelte:component
+                     this={getSelector()}
+                     bind:value={element.key}
+                  />
+               </div>
+            {/if}
          </div>
 
          <!--Delete Element-->
