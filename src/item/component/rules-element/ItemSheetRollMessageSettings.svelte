@@ -38,12 +38,20 @@
          value: 'customAttackTrait',
       },
       {
+         label: localize('customItemTrait'),
+         value: 'customItemTrait',
+      },
+      {
          label: localize('resistance'),
          value: 'resistance',
       },
       {
          label: localize('skill'),
          value: 'skill',
+      },
+      {
+         label: localize('spellTradition'),
+         value: 'spellTradition',
       },
    ];
 
@@ -65,7 +73,8 @@
             element.key = 'body';
             break;
          }
-         case 'customAttackTrait': {
+         case 'customAttackTrait':
+         case 'customItemTrait': {
             element.key = '';
             break;
          }
@@ -75,6 +84,10 @@
          }
          case 'skill': {
             element.key = 'arcana';
+            break;
+         }
+         case 'spellTradition': {
+            element.key = 'any';
             break;
          }
          default: {
@@ -101,11 +114,17 @@
          case 'customAttackTrait': {
             return DocumentTextInput;
          }
+         case 'customItemTrait': {
+            return DocumentTextInput;
+         }
          case 'resistance': {
             return DocumentResistanceSelect;
          }
          case 'skill': {
             return DocumentSkillSelect;
+         }
+         case 'spellTradition': {
+            return DocumentTextInput;
          }
          default: {
             break;
