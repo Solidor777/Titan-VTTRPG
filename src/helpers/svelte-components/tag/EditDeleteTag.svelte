@@ -1,7 +1,11 @@
 <script>
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import { localize } from '~/helpers/Utility.js';
    export let label = void 0;
    export let deleteFunction = void 0;
    export let editFunction = void 0;
+   export let deleteTooltip = localize('delete');
+   export let editTooltip = localize('edit');
 </script>
 
 <div class="tag">
@@ -11,6 +15,7 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
+      use:tooltip={{ content: editTooltip }}
       class="fas fa-pen-to-square"
       on:keypress={() => {
          editFunction();
@@ -22,6 +27,7 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
+      use:tooltip={{ content: deleteTooltip }}
       class="fas fa-trash"
       on:keypress={() => {
          deleteFunction();

@@ -456,6 +456,8 @@
    "LOCAL.customAttackTrait.label": "Custom Attack Trait",
    "LOCAL.loud.label": "Loud",
    "LOCAL.magical.label": "Magical",
+   "LOCAL.edit.label": "Edit",
+   "LOCAL.delete.label": "Delete",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."
