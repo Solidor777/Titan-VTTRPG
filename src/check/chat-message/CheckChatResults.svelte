@@ -31,8 +31,8 @@
          {#if $document.flags.titan.results.extraSuccessesRemaining !== undefined}
             <div class="stat">
                {localize('extraSuccesses')}: {$document.flags.titan.results
-                  .extraSuccessesRemaining}/{$document.flags.titan.chatContext
-                  .results.extraSuccesses}
+                  .extraSuccessesRemaining}/{$document.flags.titan.results
+                  .extraSuccesses}
             </div>
          {:else if $document.flags.titan.results.extraSuccesses > 0}
             <div class="stat">

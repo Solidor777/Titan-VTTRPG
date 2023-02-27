@@ -17,7 +17,14 @@ import { applyMulBaseElements } from '~/rules-element/MulBase.js';
 import { applyFastHealingElements } from '~/rules-element/FastHealing';
 import { applyPersistentDamageElements } from '~/rules-element/PersistentDamage';
 import { applyTurnMessageElements } from '~/rules-element/TurnMessage';
-import { applyRollMessageElements } from '~/rules-element/RollMessage';
+import {
+   applyRollMessageElements,
+   getAttributeAndSkillRollMessages,
+   getResistanceRollMessages,
+   getAttackTypeAndTraitRollMessages,
+   getItemTraitRollMessages,
+   getSpellTraditionRollMessages
+} from '~/rules-element/RollMessage';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -36,12 +43,17 @@ import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/C
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
    // Apply rules element bindings
-   applyFlatModifierElements = applyFlatModifierElements.bind(this);
-   applyMulBaseElements = applyMulBaseElements.bind(this);
-   applyFastHealingElements = applyFastHealingElements.bind(this);
-   applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
-   applyTurnMessageElements = applyTurnMessageElements.bind(this);
-   applyRollMessageElements = applyRollMessageElements.bind(this);
+   _applyFlatModifierElements = applyFlatModifierElements.bind(this);
+   _applyMulBaseElements = applyMulBaseElements.bind(this);
+   _applyFastHealingElements = applyFastHealingElements.bind(this);
+   _applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
+   _applyTurnMessageElements = applyTurnMessageElements.bind(this);
+   _applyRollMessageElements = applyRollMessageElements.bind(this);
+   _getAttributeAndSkillRollMessages = getAttributeAndSkillRollMessages.bind(this);
+   _getResistanceRollMessages = getResistanceRollMessages.bind(this);
+   _getAttackTypeAndTraitRollMessages = getAttackTypeAndTraitRollMessages.bind(this);
+   _getItemTraitRollMessages = getItemTraitRollMessages.bind(this);
+   _getSpellTraditionRollMessages = getSpellTraditionRollMessages.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -329,12 +341,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       });
 
       // Apply elements
-      this.applyMulBaseElements(mulBaseElements);
-      this.applyFlatModifierElements(flatModifierElements);
-      this.applyFastHealingElements(fastHealingElements);
-      this.applyPersistentDamageElements(persistentDamageElements);
-      this.applyTurnMessageElements(turnMessageElements);
-      this.applyRollMessageElements(rollMessageElements);
+      this._applyMulBaseElements(mulBaseElements);
+      this._applyFlatModifierElements(flatModifierElements);
+      this._applyFastHealingElements(fastHealingElements);
+      this._applyPersistentDamageElements(persistentDamageElements);
+      this._applyTurnMessageElements(turnMessageElements);
+      this._applyRollMessageElements(rollMessageElements);
 
       return;
    }
@@ -898,12 +910,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                // Add messages if appropriate
                const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
                const attackTypeAndTraitMessages = this._getAttackTypeAndTraitRollMessages(check.parameters.attack);
+               const itemTraitMessages = this._getItemTraitRollMessages(check.parameters.itemTrait);
                const message = [];
                if (attributeAndSkillMessages) {
                   message.push(...attributeAndSkillMessages);
                }
                if (attackTypeAndTraitMessages) {
                   message.push(...attackTypeAndTraitMessages);
+               }
+               if (itemTraitMessages) {
+                  message.push(...itemTraitMessages);
                }
 
                await check.evaluateCheck();
@@ -1013,7 +1029,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Add messages if appropriate
-               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+               const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+               const itemTraitMessages = this._getItemTraitRollMessages(check.parameters.itemTrait);
+               const spellTraditionMessages = this._getSpellTraditionRollMessages(check.parameters.tradition);
+               const message = [];
+               if (attributeAndSkillMessages) {
+                  message.push(...attributeAndSkillMessages);
+               }
+               if (itemTraitMessages) {
+                  message.push(...itemTraitMessages);
+               }
+               if (spellTraditionMessages) {
+                  message.push(...spellTraditionMessages);
+               }
 
                await check.evaluateCheck();
                await check.sendToChat({
@@ -1097,7 +1125,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Add messages if appropriate
-               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+               const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+               const itemTraitMessages = this._getItemTraitRollMessages(check.parameters.itemTrait);
+               const message = [];
+               if (attributeAndSkillMessages) {
+                  message.push(...attributeAndSkillMessages);
+               }
+               if (itemTraitMessages) {
+                  message.push(...itemTraitMessages);
+               }
 
                await check.evaluateCheck();
                await check.sendToChat({
@@ -1146,82 +1182,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       return;
-   }
-
-   _getAttributeAndSkillRollMessages(attribute, skill) {
-      // Attribute messages
-      const message = [];
-      if (attribute) {
-         const attributeMessages = this.rollMessage?.attribute;
-         if (attributeMessages) {
-            const keyMessages = attributeMessages[attribute];
-            if (keyMessages) {
-               message.push(...keyMessages);
-            }
-         }
-      }
-
-      // Skill messages
-      if (skill) {
-         const skillMessages = this.rollMessage?.skill;
-         if (skillMessages) {
-            const keyMessages = skillMessages[skill];
-            if (keyMessages) {
-               message.push(...keyMessages);
-            }
-         }
-      }
-
-      return message.length > 0 ? message : false;
-   }
-
-   _getResistanceRollMessages(resistance) {
-      const message = [];
-      const resistanceMessages = this.rollMessage?.resistance;
-      if (resistanceMessages) {
-         const keyMessages = resistanceMessages[resistance];
-         if (keyMessages) {
-            message.push(...keyMessages);
-         }
-      }
-
-      return message.length > 0 ? message : false;
-   }
-
-   _getAttackTypeAndTraitRollMessages(attack) {
-      // Type messages
-      const message = [];
-      const typeMessages = this.rollMessage?.attackType;
-      if (typeMessages) {
-         const keyMessages = typeMessages[attack.type];
-         if (keyMessages) {
-            message.push(...keyMessages);
-         }
-      }
-
-      // Trait messages
-      const traitMessages = this.rollMessage?.attackTrait;
-      if (traitMessages) {
-         attack.trait.forEach((trait) => {
-            const keyMessages = traitMessages[trait.name];
-            if (keyMessages) {
-               message.push(...keyMessages);
-            }
-         });
-      }
-
-      // Custom Trait messages
-      const customTraitMesssages = this.rollMessage?.customAttackTrait;
-      if (customTraitMesssages) {
-         attack.customTrait.forEach((trait) => {
-            const keyMessages = customTraitMesssages[trait.name.toLowerCase()];
-            if (keyMessages) {
-               message.push(...keyMessages);
-            }
-         });
-      }
-
-      return message.length > 0 ? message : false;
    }
 
    // Apply damage to the actor

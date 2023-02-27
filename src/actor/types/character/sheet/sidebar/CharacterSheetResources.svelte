@@ -10,7 +10,6 @@
 <!--Resources-->
 <div class="resources">
    <!--Stamina-->
-
    {#if $document.system.resource.stamina.maxBase > 0}
       <div class="resource stamina">
          <CharacterSheetResource

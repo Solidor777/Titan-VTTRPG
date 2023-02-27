@@ -32,23 +32,25 @@ export default class TitanCastingCheck extends TitanCheck {
       const itemRollData = options.itemRollData;
 
       const parameters = {
-         difficulty: options.difficulty ?? itemRollData.castingCheck.difficulty,
-         complexity: options.complexity ?? itemRollData.castingCheck.complexity,
-         diceMod: options.diceMod ?? 0,
-         trainingMod: options.trainingMod ?? 0,
-         expertiseMod: options.expertiseMod ?? 0,
-         doubleExpertise: options.doubleExpertise ?? false,
-         doubleTraining: options.doubleTraining ?? false,
-         maximizeSuccesses: options.maximizeSuccesses ?? false,
-         extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
-         extraFailureOnCritical: options.extraFailureOnCritical ?? false,
-         itemName: itemRollData.name,
          aspect: itemRollData.aspect,
+         complexity: options.complexity ?? itemRollData.castingCheck.complexity,
          customAspect: itemRollData.customAspect,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
+         description: itemRollData.description,
+         diceMod: options.diceMod ?? 0,
+         difficulty: options.difficulty ?? itemRollData.castingCheck.difficulty,
+         doubleExpertise: options.doubleExpertise ?? false,
+         doubleTraining: options.doubleTraining ?? false,
+         expertiseMod: options.expertiseMod ?? 0,
+         extraFailureOnCritical: options.extraFailureOnCritical ?? false,
+         extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          healingMod: options.healingMod ?? actorRollData.mod.healing.value,
          img: itemRollData.img,
-         description: itemRollData.description
+         itemName: itemRollData.name,
+         itemTrait: itemRollData.customTrait,
+         maximizeSuccesses: options.maximizeSuccesses ?? false,
+         tradition: itemRollData.tradition,
+         trainingMod: options.trainingMod ?? 0,
       };
 
       // Determine the skill training and expertise

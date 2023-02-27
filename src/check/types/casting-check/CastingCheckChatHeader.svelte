@@ -29,6 +29,13 @@
                $document.flags.titan.parameters.attribute
             )} (${localize($document.flags.titan.parameters.skill)})`}
          </div>
+
+         <!--Tradition -->
+         {#if $document.flags.titan.parameters.tradition !== '' && $document.flags.titan.parameters.tradition !== localize('any')}
+            <div class="sub-label">
+               {$document.flags.titan.parameters.tradition}
+            </div>
+         {/if}
       </div>
    </div>
 </div>

@@ -1,12 +1,14 @@
 <script>
    import { getContext } from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
-   import ItemCheckChatHeader from './ItemCheckChatHeader.svelte';
+   import ItemCheckChatHeader from '~/check/types/item-check/ItemCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
    import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
    import ChatHealingButton from '~/chat-message/ChatHealingButton.svelte';
    import ChatAttributeCheckButton from '~/chat-message/ChatAttributeCheckButton.svelte';
    import ChatResistanceCheckButtons from '~/chat-message/ChatResistanceCheckButtons.svelte';
+   import ItemCheckChatItemTraits from '~/check/types/item-check/ItemCheckChatItemTraits.svelte';
+   import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -17,6 +19,20 @@
    <div class="section">
       <ItemCheckChatHeader />
    </div>
+
+   <!--Chat Messages-->
+   {#if $document.flags.titan.message}
+      <div class="section">
+         <CheckChatMesssages />
+      </div>
+   {/if}
+
+   <!--Item Traits-->
+   {#if $document.flags.titan.parameters.itemTrait}
+      <div class="section tags">
+         <ItemCheckChatItemTraits />
+      </div>
+   {/if}
 
    <!--Dice Container-->
    <div class="section tags">

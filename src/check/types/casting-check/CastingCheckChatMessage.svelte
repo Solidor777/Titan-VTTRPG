@@ -8,6 +8,8 @@
    import ChatResistanceCheckButtons from '~/chat-message/ChatResistanceCheckButtons.svelte';
    import CheckChatScalingAspects from '~/check/chat-message/CheckChatScalingAspects.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
+   import ItemCheckChatItemTraits from '~/check/types/item-check/ItemCheckChatItemTraits.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -25,6 +27,20 @@
    <div class="section">
       <CastingCheckChatHeader />
    </div>
+
+   <!--Chat Messages-->
+   {#if $document.flags.titan.message}
+      <div class="section">
+         <CheckChatMesssages />
+      </div>
+   {/if}
+
+   <!--Item Traits-->
+   {#if $document.flags.titan.parameters.itemTrait}
+      <div class="section tags">
+         <ItemCheckChatItemTraits />
+      </div>
+   {/if}
 
    <!--Description-->
    {#if $document.flags.titan.results.succeeded && $document.flags.titan.parameters.description !== '' && $document.flags.titan.parameters.description !== '<p></p>'}

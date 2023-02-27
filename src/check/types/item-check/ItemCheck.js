@@ -51,23 +51,24 @@ export default class TitanItemCheck extends TitanCheck {
 
       // Initializ base parameters
       const parameters = {
-         difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : clamp(itemCheckData.difficulty, 2, 6),
+         checkLabel: itemCheckData.label,
          complexity: options.complexity ? Math.max(0, options.complexity) : Math.max(itemCheckData.complexity, 0),
          diceMod: options.diceMod ?? 0,
-         trainingMod: options.TrainingMod ?? 0,
-         expertiseMod: options.expertiseMod ?? 0,
+         difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : clamp(itemCheckData.difficulty, 2, 6),
          doubleExpertise: options.doubleExpertise ?? false,
          doubleTraining: options.doubleTraining ?? false,
-         maximizeSuccesses: options.maximizeSuccesses ?? false,
-         extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
+         expertiseMod: options.expertiseMod ?? 0,
          extraFailureOnCritical: options.extraFailureOnCritical ?? false,
+         extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
          img: itemRollData.img,
-         itemName: itemRollData.name,
-         resolveCost: options.resolveCost ?? itemCheckData.resolveCost,
          isDamage: options.isDamage ?? itemCheckData.isDamage,
          isHealing: options.isHealing ?? itemCheckData.isHealing,
+         itemName: itemRollData.name,
+         itemTrait: itemRollData.customTrait,
+         maximizeSuccesses: options.maximizeSuccesses ?? false,
          resistanceCheck: options.resistanceCheck ?? itemCheckData.resistanceCheck,
-         checkLabel: itemCheckData.label
+         resolveCost: options.resolveCost ?? itemCheckData.resolveCost,
+         trainingMod: options.TrainingMod ?? 0,
       };
       parameters.totalDice = parameters.diceMod;
 
