@@ -6,8 +6,8 @@
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import DeleteTag from '~/helpers/svelte-components/tag/DeleteTag.svelte';
    import DocumentAddCustomTraitDialog from '~/documents/DocumentAddCustomTraitDialog';
+   import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
    // Application statee reference
    const document = getContext('DocumentStore');
@@ -65,23 +65,19 @@
 
          <!--Custom Traits-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
-            <div
-               class="trait"
-               use:tooltip={{ content: trait.description }}
-               transition:slide|local
-            >
-               <DeleteTag
-                  deleteFunction={() => {
-                     const customTrait = $document.system.customTrait;
-                     customTrait.splice(idx, 1);
-
-                     $document.update({
-                        system: {
-                           customTrait: customTrait,
-                        },
-                     });
-                  }}
+            <div class="trait" transition:slide|local>
+               >
+               <EditDeleteTag
                   label={trait.name}
+                  editFunction={() => {
+                     $document.editCustomTrait(idx);
+                  }}
+                  deleteFunction={() => {
+                     $document.deleteCustomTrait(idx);
+                  }}
+                  labelTooltip={trait.description}
+                  editTooltip={localize('editTrait')}
+                  deleteTooltip={localize('deleteTrait')}
                />
             </div>
          {/each}

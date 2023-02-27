@@ -7,6 +7,8 @@ import TitanEquipment from '~/item/types/equipment/Equipment.js';
 import TitanShield from '~/item/types/shield/Shield.js';
 import TitanSpell from '~/item/types/spell/Spell.js';
 import TitanWeapon from '~/item/types/weapon/Weapon.js';
+import DocumentAddCustomTraitDialog from '~/documents/DocumentAddCustomTraitDialog';
+import DocumentEditCustomTraitDialog from '~/documents/DocumentEditCustomTraitDialog';
 
 export default class TitanItem extends Item {
    async _preCreate(data, options, user) {
@@ -212,5 +214,38 @@ export default class TitanItem extends Item {
          },
          uuid: uuidv4()
       };
+   }
+
+   // Opens the new custom trait dialog
+   addCustomTrait() {
+      if (this.isOwner) {
+         const dialog = new DocumentAddCustomTraitDialog(this);
+         dialog.render(true);
+      }
+      return;
+   }
+
+   // Opens the edit custom trait dialog
+   editCustomTrait(traitIdx) {
+      if (this.isOwner) {
+         const dialog = new DocumentEditCustomTraitDialog(this, traitIdx);
+         dialog.render(true);
+      }
+
+      return;
+   }
+
+   // Removes a custom trait from an attack
+   async deleteCustomTrait(traitIdx) {
+      if (this.isOwner) {
+         this.system.customTrait.splice(traitIdx, 1);
+         await this.update({
+            system: {
+               customTrait: this.system.customTrait
+            }
+         });
+      }
+
+      return;
    }
 }

@@ -14,8 +14,7 @@
    import DocumentCheckboxInput from '~/documents/components/input/DocumentCheckboxInput.svelte';
    import DocumentRangeTypeSelect from '~/documents/components/select/DocumentRangeTypeSelect.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
-   import DeleteTag from '~/helpers/svelte-components/tag/DeleteTag.svelte';
-   import EditDeleteTag from '../../../../helpers/svelte-components/tag/EditDeleteTag.svelte';
+   import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
    // Attack idx
    export let idx = void 0;
@@ -202,10 +201,7 @@
 
                      <!--Each custom trait-->
                      {#each attack.customTrait as trait, traitIdx (trait.uuid)}
-                        <div
-                           class="trait"
-                           use:tooltip={{ content: trait.description }}
-                        >
+                        <div class="trait">
                            <!--Bool Trait-->
                            <EditDeleteTag
                               label={trait.name}
@@ -221,6 +217,9 @@
                                     traitIdx
                                  );
                               }}
+                              labelTooltip={trait.description}
+                              editTooltip={localize('editTrait')}
+                              deleteTooltip={localize('deleteTrait')}
                            />
                         </div>
                      {/each}

@@ -4,12 +4,13 @@
    export let label = void 0;
    export let deleteFunction = void 0;
    export let editFunction = void 0;
-   export let deleteTooltip = localize('delete');
-   export let editTooltip = localize('edit');
+   export let deleteTooltip = void 0;
+   export let editTooltip = void 0;
+   export let labelTooltip = void 0;
 </script>
 
 <div class="tag">
-   <div>
+   <div use:tooltip={{ content: labelTooltip }}>
       {label}
    </div>
    <!-- svelte-ignore a11y-missing-attribute -->

@@ -10,7 +10,6 @@ export default class DocumentAddCustomTraitDialog extends TJSDialog {
                class: DocumentAddCustomTraitDialogShell,
                props: {
                   document: document,
-
                },
             },
             zIndex: null,
