@@ -1,5 +1,6 @@
 <script>
    import { localize } from '~/helpers/Utility.js';
+   import { ARMOR_TRAIT_DESCRIPTIONS } from '~/item/types/armor/ArmorTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
@@ -9,6 +10,7 @@
 
    // Item reference
    export let item = void 0;
+   const traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="stats">
@@ -36,7 +38,7 @@
    {#each item.system.trait as trait}
       <div
          class="stat"
-         use:tooltip={{ content: localize(`${trait.name}.desc`) }}
+         use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}
       >
          {#if trait.type === 'number'}
             <StatTag label={localize(trait.name)} value={trait.value} />

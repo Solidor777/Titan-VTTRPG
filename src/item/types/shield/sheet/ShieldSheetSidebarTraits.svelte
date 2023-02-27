@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import { localize } from '~/helpers/Utility.js';
+   import { SHIELD_TRAIT_DESCRIPTIONS } from '~/item/types/shield/ShieldTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
@@ -10,7 +11,7 @@
 
    // Application statee reference
    const document = getContext('DocumentStore');
-   const application = getContext('#external').application;
+   const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="traits">
@@ -54,7 +55,9 @@
             <div
                class="trait"
                transition:slide|local
-               use:tooltip={{ content: localize(`${trait.name}.desc`) }}
+               use:tooltip={{
+                  content: localize(traitDescriptions[trait.name]),
+               }}
             >
                <Tag label={localize(trait.name)} />
             </div>

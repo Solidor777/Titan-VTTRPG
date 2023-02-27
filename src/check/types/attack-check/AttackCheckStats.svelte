@@ -1,6 +1,7 @@
 <script>
    import { localize } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
@@ -9,6 +10,8 @@
 
    // Document reference
    const document = getContext('DocumentStore');
+
+   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="stats">
@@ -51,7 +54,7 @@
    {#each $document.flags.titan.parameters.attack.trait as trait}
       <div
          class="stat"
-         use:tooltip={{ content: localize(`${trait.name}.desc`) }}
+         use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}
       >
          {#if trait.type === 'number'}
             <StatTag label={localize(trait.name)} value={trait.value} />

@@ -1,4 +1,4 @@
-export default [
+export const ATTACK_TRAITS = [
    {
       name: 'blast',
       type: 'number',
@@ -25,12 +25,12 @@ export default [
       value: false,
    },
    {
-      name: 'loud.attack',
+      name: 'loud',
       type: 'boolean',
       value: false,
    },
    {
-      name: 'magical.attack',
+      name: 'magical',
       type: 'boolean',
       value: false,
    },
@@ -80,3 +80,22 @@ export default [
       value: false,
    },
 ];
+
+export const ATTACK_TRAIT_DESCRIPTIONS = {
+   blast: 'attack.blast.desc',
+   cleave: 'attack.cleave.desc',
+   close: 'attack.close.desc',
+   crushing: 'attack.crushing.desc',
+   flurry: 'attack.flurry.desc',
+   ineffective: 'attack.ineffective.desc',
+   loud: 'attack.loud.desc',
+   magical: 'attack.magical.desc',
+   penetrating: 'attack.penetrating.desc',
+   piercing: 'attack.piercing.desc',
+   reload: 'attack.reload.desc',
+   rend: 'attack.rend.desc',
+   restraining: 'attack.restraining.desc',
+   slashing: 'attack.slashing.desc',
+   splash: 'attack.splash.desc',
+   twoHanded: 'attack.twoHanded.desc',
+};

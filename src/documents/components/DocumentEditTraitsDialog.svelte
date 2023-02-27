@@ -1,8 +1,8 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
@@ -16,6 +16,9 @@
 
    // The options
    export let traitOptions = void 0;
+
+   // Descriptions of each trait
+   export let traitDescriptions = void 0;
 
    // Application reference
    const application = getContext('#external').application;
@@ -55,7 +58,7 @@
    <ol>
       {#each traitOptions as trait, idx}
          <!--Trait-->
-         <li use:tooltip={{ content: localize(`${trait.name}.desc`) }}>
+         <li use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}>
             <!--Label-->
             <div class="label">
                {localize(trait.name)}
@@ -122,7 +125,7 @@
 
             .label {
                @include flex-row;
-               @include flex-group-center;
+               @include flex-group-left;
                width: 100%;
                height: 100%;
             }

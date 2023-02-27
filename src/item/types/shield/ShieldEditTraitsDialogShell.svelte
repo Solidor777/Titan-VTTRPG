@@ -2,23 +2,23 @@
 
 <script>
    import DocumentEditTraitsDialog from '~/documents/components/DocumentEditTraitsDialog.svelte';
+   import {
+      SHIELD_TRAITS,
+      SHIELD_TRAIT_DESCRIPTIONS,
+   } from '~/item/types/shield/ShieldTraits.js';
 
    // The weapon item owning the attack
    export let document = void 0;
 
    // The trait options
-   let traitOptions = [
-      {
-         name: 'magical.armor',
-         type: 'boolean',
-         value: false,
-      },
-   ];
+   let traitOptions = foundry.utils.deepClone(SHIELD_TRAITS);
+   let traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="edit-traits-dialog">
    <DocumentEditTraitsDialog
-      bind:document
+      {traitDescriptions}
+      {document}
       bind:documentTraits={document.system.trait}
       bind:traitOptions
    />

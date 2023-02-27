@@ -2,16 +2,18 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import { localize } from '~/helpers/Utility.js';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import IconStatTag from '../../../../helpers/svelte-components/tag/IconStatTag.svelte';
+   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
+   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    // Initialize expanded state
    $document.system.attack.forEach((entry, idx) => {
@@ -108,7 +110,9 @@
                {#each attack.trait as trait (trait.name)}
                   <div
                      class="stat"
-                     use:tooltip={{ content: localize(`${trait.name}.desc`) }}
+                     use:tooltip={{
+                        content: localize(traitDescriptions[trait.name]),
+                     }}
                      transition:slide|local
                   >
                      {#if trait.type === 'number'}

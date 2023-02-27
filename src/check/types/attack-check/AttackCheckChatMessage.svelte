@@ -6,6 +6,7 @@
    import AttackCheckChatHeader from './AttackCheckChatHeader.svelte';
    import AttackCheckStats from './AttackCheckStats.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -21,6 +22,13 @@
    <div class="section tags">
       <AttackCheckStats />
    </div>
+
+   <!--Chat Messages-->
+   {#if $document.flags.titan.message}
+      <div class="section">
+         <CheckChatMesssages />
+      </div>
+   {/if}
 
    <!--Attack Notes-->
    {#if $document.flags.titan.parameters.attackNotes !== '' && $document.flags.titan.parameters.attackNotes !== '<p></p>'}

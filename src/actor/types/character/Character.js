@@ -896,7 +896,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                }
 
                // Add messages if appropriate
-               const message = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+               const attributeAndSkillMessages = this._getAttributeAndSkillRollMessages(check.parameters.attribute, check.parameters.skill);
+               const attackTypeAndTraitMessages = this._getAttackTypeAndTraitRollMessages(check.parameters.attack);
+               const message = [];
+               if (attributeAndSkillMessages) {
+                  message.push(...attributeAndSkillMessages);
+               }
+               if (attackTypeAndTraitMessages) {
+                  message.push(...attackTypeAndTraitMessages);
+               }
 
                await check.evaluateCheck();
                await check.sendToChat({
@@ -1175,6 +1183,42 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (keyMessages) {
             message.push(...keyMessages);
          }
+      }
+
+      return message.length > 0 ? message : false;
+   }
+
+   _getAttackTypeAndTraitRollMessages(attack) {
+      // Type messages
+      const message = [];
+      const typeMessages = this.rollMessage?.attackType;
+      if (typeMessages) {
+         const keyMessages = typeMessages[attack.type];
+         if (keyMessages) {
+            message.push(...keyMessages);
+         }
+      }
+
+      // Trait messages
+      const traitMessages = this.rollMessage?.attackTrait;
+      if (traitMessages) {
+         attack.trait.forEach((trait) => {
+            const keyMessages = traitMessages[trait];
+            if (keyMessages) {
+               message.push(...keyMessages);
+            }
+         });
+      }
+
+      // Custom Trait messages
+      const customTraitMesssages = this.rollMessage?.customAttackTrait;
+      if (customTraitMesssages) {
+         attack.customTrait.forEach((trait) => {
+            const keyMessages = customTraitMesssages[trait];
+            if (keyMessages) {
+               message.push(...keyMessages);
+            }
+         });
       }
 
       return message.length > 0 ? message : false;

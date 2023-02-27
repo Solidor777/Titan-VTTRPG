@@ -1,4 +1,3 @@
-import { isFirstOwner } from '~/helpers/Utility';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 import ShieldEditTraitsDialog from '~/item/types/shield/ShieldEditTraitsDialog';
@@ -14,7 +13,7 @@ export default class TitanShield extends TitanTypeComponent {
       if (this.parent.img === 'icons/svg/item-bag.svg') {
          return {
             img: 'icons/svg/shield.svg'
-         }
+         };
       }
 
       return false;

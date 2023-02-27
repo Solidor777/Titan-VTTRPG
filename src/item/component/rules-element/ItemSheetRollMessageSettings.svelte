@@ -6,13 +6,12 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentSkillSelect from '~/documents/components/select/DocumentSkillSelect.svelte';
    import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
-   import DocumentModSelect from '~/documents/components/select/DocumentModSelect.svelte';
-   import DocumentRatingSelect from '~/documents/components/select/DocumentRatingSelect.svelte';
    import DocumentResistanceSelect from '~/documents/components/select/DocumentResistanceSelect.svelte';
-   import DocumentResourceSelect from '~/documents/components/select/DocumentResourceSelect.svelte';
-   import DocumentSpeedSelect from '~/documents/components/select/DocumentSpeedSelect.svelte';
    import onRulesElementOperationChanged from './RulesElementUpdateOperation';
    import DocumentBoundEditorInput from '~/documents/components/input/DocumentBoundEditorInput.svelte';
+   import DocumentRangeTypeSelect from '~/documents/components/select/DocumentRangeTypeSelect.svelte';
+   import DocumentAttackTraitSelect from '~/documents/components/select/DocumentAttackTraitSelect.svelte';
+   import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -23,28 +22,28 @@
    // Selector options
    const selectorOptions = [
       {
+         label: localize('attackTrait'),
+         value: 'attackTrait',
+      },
+      {
+         label: localize('attackType'),
+         value: 'attackType',
+      },
+      {
          label: localize('attribute'),
          value: 'attribute',
       },
       {
-         label: localize('skill'),
-         value: 'skill',
-      },
-      {
-         label: localize('rating'),
-         value: 'rating',
+         label: localize('customAttackTrait'),
+         value: 'customAttackTrait',
       },
       {
          label: localize('resistance'),
          value: 'resistance',
       },
       {
-         label: localize('resource'),
-         value: 'resource',
-      },
-      {
-         label: localize('speed'),
-         value: 'speed',
+         label: localize('skill'),
+         value: 'skill',
       },
    ];
 
@@ -54,8 +53,20 @@
    // Updates the key when the selector changes
    function onSelectorChange() {
       switch (element.selector) {
+         case 'attackTrait': {
+            element.key = 'blast';
+            break;
+         }
+         case 'attackType': {
+            element.key = 'melee';
+            break;
+         }
          case 'attribute': {
             element.key = 'body';
+            break;
+         }
+         case 'customAttackTrait': {
+            element.key = '';
             break;
          }
          case 'resistance': {
@@ -78,8 +89,17 @@
 
    function getSelector() {
       switch (element.selector) {
+         case 'attackTrait': {
+            return DocumentAttackTraitSelect;
+         }
+         case 'attackType': {
+            return DocumentRangeTypeSelect;
+         }
          case 'attribute': {
             return DocumentAttributeSelect;
+         }
+         case 'customAttackTrait': {
+            return DocumentTextInput;
          }
          case 'resistance': {
             return DocumentResistanceSelect;

@@ -2,38 +2,23 @@
 
 <script>
    import DocumentEditTraitsDialog from '~/documents/components/DocumentEditTraitsDialog.svelte';
+   import {
+      ARMOR_TRAITS,
+      ARMOR_TRAIT_DESCRIPTIONS,
+   } from '~/item/types/armor/ArmorTraits.js';
 
    // The weapon item owning the attack
    export let document = void 0;
 
    // The trait options
-   let traitOptions = [
-      {
-         name: 'magical.armor',
-         type: 'boolean',
-         value: false,
-      },
-      {
-         name: 'loud.armor',
-         type: 'boolean',
-         value: false,
-      },
-      {
-         name: 'encumbering',
-         type: 'boolean',
-         value: false,
-      },
-      {
-         name: 'heavy.armor',
-         type: 'boolean',
-         value: false,
-      },
-   ];
+   let traitOptions = foundry.utils.deepClone(ARMOR_TRAITS);
+   let traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="edit-traits-dialog">
    <DocumentEditTraitsDialog
-      bind:document
+      {traitDescriptions}
+      {document}
       bind:documentTraits={document.system.trait}
       bind:traitOptions
    />

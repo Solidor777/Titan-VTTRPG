@@ -2,7 +2,10 @@
 
 <script>
    import DocumentEditTraitsDialog from '~/documents/components/DocumentEditTraitsDialog.svelte';
-   import WEAPON_TRAITS from '~/item/types/weapon/WeaponTraits.js';
+   import {
+      ATTACK_TRAITS,
+      ATTACK_TRAIT_DESCRIPTIONS,
+   } from '~/item/types/weapon/AttackTraits.js';
 
    // The weapon document owning the attack
    export let document = void 0;
@@ -11,11 +14,13 @@
    export let attackIdx = void 0;
 
    // Trait options
-   let traitOptions = foundry.utils.deepClone(WEAPON_TRAITS);
+   let traitOptions = foundry.utils.deepClone(ATTACK_TRAITS);
+   let traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="edit-traits-dialog">
    <DocumentEditTraitsDialog
+      {traitDescriptions}
       {document}
       bind:documentTraits={document.system.attack[attackIdx].trait}
       bind:traitOptions

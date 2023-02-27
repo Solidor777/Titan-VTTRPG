@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import { localize } from '~/helpers/Utility.js';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
@@ -21,6 +22,7 @@
    // Setup context variables
    const document = getContext('DocumentStore');
    const appState = getContext('ApplicationStateStore');
+   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    $: attack = $document.system.attack[idx];
    $: isExpanded = $appState.isExpanded.attacks[idx];
@@ -181,7 +183,7 @@
                         <div
                            class="trait"
                            use:tooltip={{
-                              content: localize(`${trait.name}.desc`),
+                              content: localize(traitDescriptions[trait.name]),
                            }}
                         >
                            {#if trait.type === 'number'}
