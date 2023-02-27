@@ -36,7 +36,7 @@ export function applyRollMessageElements(elements) {
             }
 
             if (keyMessages.length > 0) {
-               selectorMessages[key] = keyMessages;
+               selectorMessages[key.toLowerCase()] = keyMessages;
             }
          }
 

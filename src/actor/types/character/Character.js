@@ -1203,7 +1203,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const traitMessages = this.rollMessage?.attackTrait;
       if (traitMessages) {
          attack.trait.forEach((trait) => {
-            const keyMessages = traitMessages[trait];
+            const keyMessages = traitMessages[trait.name];
             if (keyMessages) {
                message.push(...keyMessages);
             }
@@ -1214,7 +1214,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const customTraitMesssages = this.rollMessage?.customAttackTrait;
       if (customTraitMesssages) {
          attack.customTrait.forEach((trait) => {
-            const keyMessages = customTraitMesssages[trait];
+            const keyMessages = customTraitMesssages[trait.name.toLowerCase()];
             if (keyMessages) {
                message.push(...keyMessages);
             }

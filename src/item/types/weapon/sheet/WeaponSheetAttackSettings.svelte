@@ -15,6 +15,7 @@
    import DocumentRangeTypeSelect from '~/documents/components/select/DocumentRangeTypeSelect.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import DeleteTag from '~/helpers/svelte-components/tag/DeleteTag.svelte';
+   import EditDeleteTag from '../../../../helpers/svelte-components/tag/EditDeleteTag.svelte';
 
    // Attack idx
    export let idx = void 0;
@@ -168,7 +169,7 @@
                   <div class="button">
                      <EfxButton
                         on:click={() => {
-                           $document.typeComponent.addCustomTrait(idx);
+                           $document.typeComponent.addCustomAttackTrait(idx);
                         }}
                      >
                         <i class="fas fa-circle-plus" />
@@ -200,21 +201,25 @@
                      {/each}
 
                      <!--Each custom trait-->
-                     {#each attack.customTrait as trait, idx (trait.uuid)}
+                     {#each attack.customTrait as trait, traitIdx (trait.uuid)}
                         <div
                            class="trait"
                            use:tooltip={{ content: trait.description }}
                         >
                            <!--Bool Trait-->
-                           <DeleteTag
+                           <EditDeleteTag
                               label={trait.name}
+                              editFunction={() => {
+                                 $document.typeComponent.editCustomAttackTrait(
+                                    idx,
+                                    traitIdx
+                                 );
+                              }}
                               deleteFunction={() => {
-                                 attack.customTrait.splice(idx, 1);
-                                 $document.update({
-                                    system: {
-                                       attack: $document.system.attack,
-                                    },
-                                 });
+                                 $document.typeComponent.deleteCustomAttackTrait(
+                                    idx,
+                                    traitIdx
+                                 );
                               }}
                            />
                         </div>

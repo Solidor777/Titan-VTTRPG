@@ -4,6 +4,7 @@ import { addRulesElement, removeRulesElement } from '~/item/component/rules-elem
 import TitanTypeComponent from '~/helpers/TypeComponent';
 import WeaponEditAttackTraitsDialog from '~/item/types/weapon/dialogs/WeaponEditAttackTraitsDialog';
 import WeaponAddCustomTraitDialog from '~/item/types/weapon/dialogs/WeaponAddCustomTraitDialog';
+import WeaponEditCustomTraitDialog from '~/item/types/weapon/dialogs/WeaponEditCustomTraitDialog';
 
 export default class TitanWeapon extends TitanTypeComponent {
 
@@ -101,12 +102,36 @@ export default class TitanWeapon extends TitanTypeComponent {
       return;
    }
 
-   // Opens the attack traits edit dialog
-   addCustomTrait(attackIdx) {
+   // Opens the new custom trait dialog
+   addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
          const dialog = new WeaponAddCustomTraitDialog(this.parent, attackIdx);
          dialog.render(true);
       }
+      return;
+   }
+
+   // Opens the edit custom trait dialog
+   editCustomAttackTrait(attackIdx, traitIdx) {
+      if (this.parent.isOwner) {
+         const dialog = new WeaponEditCustomTraitDialog(this.parent, attackIdx, traitIdx);
+         dialog.render(true);
+      }
+
+      return;
+   }
+
+   // Removes a custom trait from an attack
+   async deleteCustomAttackTrait(attackIdx, traitIdx) {
+      if (this.parent.isOwner) {
+         this.parent.system.attack[attackIdx].customTrait.splice(traitIdx, 1);
+         await this.parent.update({
+            system: {
+               attack: this.parent.system.attack
+            }
+         });
+      }
+
       return;
    }
 }

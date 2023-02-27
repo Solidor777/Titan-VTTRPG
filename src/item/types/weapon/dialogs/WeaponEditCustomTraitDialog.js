@@ -1,16 +1,17 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { getSetting } from '~/helpers/Utility';
-import WeaponAddCustomTraitDialogShell from '~/item/types/weapon/dialogs/WeaponAddCustomTraitDialogShell.svelte';
+import WeaponEditCustomTraitDialogShell from '~/item/types/weapon/dialogs/WeaponEditCustomTraitDialogShell.svelte';
 export default class WeaponAddCustomTraitDialog extends TJSDialog {
-   constructor(document, attackIdx) {
+   constructor(document, attackIdx, traitIdx) {
       super(
          {
             title: `${document.name}: ${document.system.attack[attackIdx].label}`,
             content: {
-               class: WeaponAddCustomTraitDialogShell,
+               class: WeaponEditCustomTraitDialogShell,
                props: {
                   attackIdx: attackIdx,
                   document: document,
+                  traitIdx: traitIdx,
                },
             },
             zIndex: null,
