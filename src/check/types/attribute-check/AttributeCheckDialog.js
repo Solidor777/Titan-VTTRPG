@@ -18,7 +18,7 @@ export default class AttributeCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 480,
+            height: 490,
             classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );

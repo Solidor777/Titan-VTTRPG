@@ -18,7 +18,7 @@ export default class ItemCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 510,
+            height: 520,
             classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );

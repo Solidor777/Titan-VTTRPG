@@ -25,6 +25,10 @@ import {
    getCastingCheckMessages,
    getItemCheckMessages
 } from '~/rules-element/RollMessage';
+import {
+   applyConditionalDiceModifierElements,
+   getAttackDiceMod
+} from '~/rules-element/ConditionalDiceModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -49,11 +53,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _applyPersistentDamageElements = applyPersistentDamageElements.bind(this);
    _applyTurnMessageElements = applyTurnMessageElements.bind(this);
    _applyRollMessageElements = applyRollMessageElements.bind(this);
+   _applyConditionalDiceModifierElements = applyConditionalDiceModifierElements.bind(this);
    _getAttributeCheckMessages = getAttributeCheckMessages.bind(this);
    _getResistanceCheckMessages = getResistanceCheckMessages.bind(this);
    _getAttackCheckMessages = getAttackCheckMessages.bind(this);
    _getCastingCheckMessages = getCastingCheckMessages.bind(this);
    _getItemCheckMessages = getItemCheckMessages.bind(this);
+   getAttackDiceMod = getAttackDiceMod.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -308,6 +314,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const persistentDamageElements = [];
       const turnMessageElements = [];
       const rollMessageElements = [];
+      const conditionalDiceModifierElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -334,6 +341,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                rollMessageElements.push(element);
                break;
             }
+            case 'conditionalDiceModifier': {
+               conditionalDiceModifierElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -347,6 +358,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._applyPersistentDamageElements(persistentDamageElements);
       this._applyTurnMessageElements(turnMessageElements);
       this._applyRollMessageElements(rollMessageElements);
+      this._applyConditionalDiceModifierElements(conditionalDiceModifierElements);
 
       return;
    }
@@ -932,30 +944,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             return;
          }
 
-         // Get the damage mod
-         options.damageMod = this.parent.system.mod.damage.value;
-
-         // Get the attacker melee and accuracy
-         options.attackerMelee = this.parent.system.rating.melee.value;
-         options.attackerAccuracy = this.parent.system.rating.accuracy.value;
-
-         // Get the target defense
-         let userTargets = Array.from(game.user.targets);
-         if (userTargets.length < 1 && game.user.isGM) {
-            userTargets = Array.from(canvas.tokens.controlled);
-         }
-         if (userTargets[0] && userTargets[0].document.parent._id !== this.parent._id) {
-            options.targetDefense = userTargets[0].document.actor.getRollData().rating.defense.value;
-         }
-
-         // Get the attack type
-         options.type = checkAttack.type;
-         options.weaponName = checkWeapon.name;
-         options.attackName = checkAttack.label;
-         options.multiAttack = options.multiAttack ?? checkWeapon.multiAttack;
-
          // Create the dialog
-         const dialog = new AttackCheckDialog(this.parent, options);
+         const dialog = new AttackCheckDialog(this.parent, checkWeapon, checkAttack, options);
          dialog.render(true);
       }
 

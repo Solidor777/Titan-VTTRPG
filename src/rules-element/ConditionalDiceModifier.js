@@ -75,7 +75,7 @@ function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, re
    return retVal;
 }
 
-export function getAttackBonusDie(attack, multiAttack) {
+export function getAttackDiceMod(attack, multiAttack) {
    let retVal = 0;
    const conditionalDiceModifiers = this.getConditionalDiceModifier;
    if (conditionalDiceModifiers) {

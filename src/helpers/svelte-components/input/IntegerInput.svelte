@@ -6,21 +6,30 @@
    export let min = false;
    export let max = false;
    export let disabled = false;
-   $: input = value;
+
+   let editingActive = false;
+   let input = value;
+
+   $: if (!editingActive) {
+      input = value;
+   }
 
    function validateInput() {
-      value = parseInt(input);
+      let newValue = parseInt(input);
       if (isNaN(value)) {
-         input = 0;
-         value = 0;
+         newValue = 0;
       }
       if (min !== false) {
-         value = Math.max(value, min);
+         newValue = Math.max(newValue, min);
       }
       if (max !== false) {
-         value = Math.min(value, max);
+         newValue = Math.min(newValue, max);
       }
+
+      value = newValue;
    }
+
+   function updateInput() {}
 
    function checkInput(event) {
       // Only accept valid inputs
@@ -30,12 +39,26 @@
          event.preventDefault();
       }
    }
+
+   function onFocus() {
+      editingActive = true;
+   }
+
+   function onBlur() {
+      editingActive = false;
+   }
 </script>
 
 <input
    type="number"
-   on:change={validateInput}
+   on:keyup={validateInput}
+   on:keyup
+   on:change={updateInput}
    on:change
+   on:focuse={onFocus}
+   on:focus
+   on:blur={onBlur}
+   on:blur
    bind:value={input}
    on:keypress={(event) => checkInput(event)}
    {disabled}

@@ -2,15 +2,17 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize, getSetting } from '~/helpers/Utility.js';
 import AttackCheckDialogShell from '~/check/types/attack-check/AttackCheckDialogShell.svelte';
 export default class AttackCheckDialog extends TJSDialog {
-   constructor(actor, options) {
+   constructor(actor, weapon, attack, options) {
       super(
          {
             title: `${localize('attackCheck')} (${actor.name})`,
             content: {
                class: AttackCheckDialogShell,
                props: {
-                  options: options,
                   actor: actor,
+                  weapon: weapon,
+                  attack: attack,
+                  options: options,
                },
             },
             zIndex: null,
@@ -18,7 +20,7 @@ export default class AttackCheckDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 580,
+            height: 590,
             classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );

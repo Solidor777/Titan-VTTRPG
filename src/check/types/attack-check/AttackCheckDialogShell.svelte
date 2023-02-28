@@ -18,29 +18,44 @@
    export let options = void 0;
 
    // Weapon
-   const weapon = actor.items.get(options.itemId);
+   export let weapon = void 0;
 
    // Attack
-   const attack = weapon.system.attack[options.attackIdx];
+   export let attack = void 0;
+
+   // Get the target defense
+   function getTargetDefense() {
+      let userTargets = Array.from(game.user.targets);
+      if (userTargets.length < 1 && game.user.isGM) {
+         userTargets = Array.from(canvas.tokens.controlled);
+      }
+
+      if (userTargets[0] && userTargets[0].document.parent._id !== actor._id) {
+         return userTargets[0].document.actor.getRollData().rating.defense
+            .value;
+      }
+
+      return 1;
+   }
 
    // Initialize check parameters
    const checkParameters = {
       attribute: options.attribute ?? attack.attribute,
       skill: options.skill ?? attack.skill,
-      type: options.type ?? 'melee',
-      targetDefense: options.targetDefense ?? 1,
+      type: options.type ?? attack.type,
+      targetDefense: options.targetDefense ?? getTargetDefense(),
       attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
       attackerAccuracy:
          options.attackerAccuracy ?? actor.system.rating.accuracy.value,
-      damageMod: options.damageMod ?? 0,
+      damageMod: options.damageMod ?? actor.system.mod.damage.value,
       trainingMod: options.trainingMod ?? 0,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
       doubleExpertise: options.doubleExpertise ?? false,
-      diceMod: options.diceMod ?? 0,
+      diceMod: options.diceMod ?? actor.character.getAttackDiceMod(),
       itemId: options.itemId,
       attackIdx: options.attackIdx,
-      multiAttack: options.multiAttack,
+      multiAttack: options.multiAttack ?? weapon.system.multiAttack,
    };
 
    // Rating options
@@ -71,6 +86,20 @@
       return;
    }
 
+   // Determine whether this attack has the flurry trait
+
+   function hasFlurryTrait() {
+      for (let idx = 0; idx < attack.trait.length; idx++) {
+         if (attackData.trait[idx].name === 'flurry') {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   let flurryTrait = hasFlurryTrait();
+
    // Calculates the total dice
    function getTotalDice(checkParameters, actor) {
       // Get the attribute dice
@@ -92,6 +121,13 @@
          retVal += trainingDice;
       }
 
+      // Halve dice if using multi attack
+      if (checkParameters.multiAttack) {
+         // Round the total dice up if this is a dual attack
+         // Otherwise, round down
+         retVal = flurryTrait ? Math.ceil(retVal / 2) : Math.floor(retVal / 2);
+      }
+
       return retVal;
    }
 
@@ -109,6 +145,11 @@
          if (checkParameters.doubleExpertise === true) {
             retVal *= 2;
          }
+      }
+
+      // Halve expertise if using multi attack
+      if (checkParameters.multiAttack) {
+         retVal = Math.floor(retVal / 2);
       }
 
       return retVal;
