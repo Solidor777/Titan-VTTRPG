@@ -10,6 +10,7 @@
    import Select from '~/helpers/svelte-components/select/Select.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
+   import { getCombatTargets } from '~/helpers/Utility';
 
    // The actor document making this check
    export let actor;
@@ -25,14 +26,10 @@
 
    // Get the target defense
    function getTargetDefense() {
-      let userTargets = Array.from(game.user.targets);
-      if (userTargets.length < 1 && game.user.isGM) {
-         userTargets = Array.from(canvas.tokens.controlled);
-      }
+      const userTargets = getCombatTargets();
 
-      if (userTargets[0] && userTargets[0].document.parent._id !== actor._id) {
-         return userTargets[0].document.actor.getRollData().rating.defense
-            .value;
+      if (userTargets[0] && userTargets[0]._id !== actor._id) {
+         return userTargets[0].getRollData().rating.defense.value;
       }
 
       return 1;
@@ -40,22 +37,21 @@
 
    // Initialize check parameters
    const checkParameters = {
-      attribute: options.attribute ?? attack.attribute,
-      skill: options.skill ?? attack.skill,
-      type: options.type ?? attack.type,
-      targetDefense: options.targetDefense ?? getTargetDefense(),
-      attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
+      attackIdx: options.attackIdx,
       attackerAccuracy:
          options.attackerAccuracy ?? actor.system.rating.accuracy.value,
-      damageMod: options.damageMod ?? actor.system.mod.damage.value,
-      trainingMod: options.trainingMod ?? 0,
+      attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
+      attribute: options.attribute ?? attack.attribute,
+      diceMod: options.diceMod ?? actor.character.getAttackDiceMod(),
+      doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
-      doubleExpertise: options.doubleExpertise ?? false,
-      diceMod: options.diceMod ?? actor.character.getAttackDiceMod(),
       itemId: options.itemId,
-      attackIdx: options.attackIdx,
       multiAttack: options.multiAttack ?? weapon.system.multiAttack,
+      skill: options.skill ?? attack.skill,
+      targetDefense: options.targetDefense ?? getTargetDefense(),
+      trainingMod: options.trainingMod ?? 0,
+      type: options.type ?? attack.type,
    };
 
    // Rating options
@@ -87,7 +83,6 @@
    }
 
    // Determine whether this attack has the flurry trait
-
    function hasFlurryTrait() {
       for (let idx = 0; idx < attack.trait.length; idx++) {
          if (attackData.trait[idx].name === 'flurry') {
@@ -162,7 +157,7 @@
 <div class="check-dialog">
    <!--Name-->
    <div class="row row-label">
-      {options.weaponName} ({options.attackName})
+      {weapon.name} ({attack.label})
    </div>
 
    <!--Attribute-->

@@ -16,10 +16,10 @@
 
    // Initialize check parameters
    const checkParameters = {
-      resistance: options.resistance ?? 'reflexes',
-      difficulty: options.difficulty ?? 4,
-      complexity: options.complexity ?? 0,
+      complexity: options.complexity ? Math.max(options.complexity, 0) : 0,
       diceMod: options.diceMod ?? 0,
+      difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : 4,
+      resistance: options.resistance ?? 'reflexes',
    };
 
    const application = getContext('#external').application;

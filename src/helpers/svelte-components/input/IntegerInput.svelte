@@ -29,8 +29,6 @@
       value = newValue;
    }
 
-   function updateInput() {}
-
    function checkInput(event) {
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {
@@ -53,9 +51,8 @@
    type="number"
    on:keyup={validateInput}
    on:keyup
-   on:change={updateInput}
    on:change
-   on:focuse={onFocus}
+   on:focus={onFocus}
    on:focus
    on:blur={onBlur}
    on:blur

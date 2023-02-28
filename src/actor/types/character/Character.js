@@ -1,7 +1,7 @@
 import {
    clamp,
    getSetting,
-   getCheckOptions,
+   shouldGetCheckOptions,
    confirmDeletingItems,
    documentSort,
    isHTMLBlank,
@@ -42,6 +42,7 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
+import { getCombatTargets } from '../../../helpers/Utility';
 
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
@@ -764,7 +765,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    // Get a skill check from the actor
-   async getAttributeCheck(options) {
+   async _getAttributeCheck(options) {
 
       // Get the actor check data
       options.actorRollData = this.parent.getRollData();
@@ -773,27 +774,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return new TitanAttributeCheck(options);
    }
 
+   _getAttributeCheckDialog(options) {
+      // Initialize default attribute for the skill if no attribute was specified
+      if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
+         options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+      }
+      const dialog = new AttributeCheckDialog(this.parent, options);
+      return dialog.render(true);
+   }
+
    async rollAttributeCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // Check if confirmed
-         if (confirmed || !getCheckOptions()) {
+         // If confirmed
+         if (confirmed || !shouldGetCheckOptions()) {
             // Get the check
-            const check = await this.getAttributeCheck(options);
+            const check = await this._getAttributeCheck(options);
             if (check && check.isValid) {
-
-               // Expend resolve if appropriate
-               let resolveSpent = 0;
-               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
-                  resolveSpent += 1;
-               }
-               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
-                  resolveSpent += 1;
-               }
-               if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true, false);
-               }
-
-               // Send the check to chat
+               await this._expendCheckResolve(check);
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
@@ -802,17 +799,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   message: this._getAttributeCheckMessages(check)
                });
             }
-
-            return;
          }
 
-         // Otherwise, create an options dialog
-         if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
-            options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+         // Otherwise open a check dialog
+         else {
+            this._getAttributeCheckDialog(options);
          }
-         const dialog = new AttributeCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
       }
 
       return;
@@ -820,7 +812,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
 
    // Get a resistance check at the actor
-   async getResistanceCheck(options) {
+   async _getResistanceCheck(options) {
 
       // Get the actor check data
       options.actorRollData = this.parent.getRollData();
@@ -831,11 +823,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    async rollResistanceCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // Check if confirmed
-         if (confirmed || !getCheckOptions()) {
+         // If confirmed
+         if (confirmed || !shouldGetCheckOptions()) {
 
-            // Roll the resistance check
-            const check = await this.getResistanceCheck(options);
+            // Get the check
+            const check = await this._getResistanceCheck(options);
             if (check && check.isValid) {
                await check.evaluateCheck();
                await check.sendToChat({
@@ -845,23 +837,23 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   message: this._getResistanceCheckMessages(check)
                });
             }
-
-            return;
          }
 
-         // Otherwise, create an options dialog
-         const dialog = new ResistanceCheckDialog(this.parent, options);
-         dialog.render(true);
+         else {
+            // Otherwise open a check dialog
+            const dialog = new ResistanceCheckDialog(this.parent, options);
+            dialog.render(true);
+         }
       }
 
       return;
    }
 
    // Get an attack check
-   async getAttackCheck(options) {
+   async _getAttackCheck(options) {
       // Get the weapon check data.
-      const checkWeapon = this.parent.items.get(options?.itemId);
-      if (!checkWeapon || checkWeapon.type !== 'weapon') {
+      const weapon = this.parent.items.get(options?.itemId);
+      if (!weapon || weapon.type !== 'weapon') {
          console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
          console.trace();
 
@@ -876,43 +868,52 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.actorRollData = actorRollData;
 
       // Add the weapon data to the check options
-      const itemRollData = checkWeapon.getRollData();
+      const itemRollData = weapon.getRollData();
       options.itemRollData = itemRollData;
 
       // Get the target check data
-      let userTargets = Array.from(game.user.targets);
-      if (userTargets.length < 1 && game.user.isGM) {
-         userTargets = Array.from(canvas.tokens.controlled);
-      }
-
-      if (userTargets[0] && userTargets[0].document.actor._id !== this.parent._id) {
-         const targetRollData = userTargets[0].document.actor.getRollData();
+      const userTargets = getCombatTargets();
+      if (userTargets[0] && userTargets[0]._id !== this.parent._id) {
+         const targetRollData = userTargets[0].getRollData();
          options.targetRollData = targetRollData;
       }
 
-      // Perform the attack
       return new TitanAttackCheck(options);
    }
 
+   _getAttackCheckDialog(options) {
+      // Get the weapon check data.
+      const weapon = this.parent.items.get(options?.itemId);
+      if (!weapon) {
+         console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
+         console.trace();
+
+         return;
+      }
+
+      // Get the attack data
+      const attack = weapon.system.attack[options.attackIdx];
+      if (!attack) {
+         console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
+         console.trace();
+
+         return;
+      }
+
+      // Create the dialog
+      const dialog = new AttackCheckDialog(this.parent, weapon, attack, options);
+      return dialog.render(true);
+   }
+
+
    async rollAttackCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // Check if confirmed
-         if (confirmed || !getCheckOptions()) {
-            // Get the attack check
-            const check = await this.getAttackCheck(options);
+         // If confirmed
+         if (confirmed || !shouldGetCheckOptions()) {
+            // Get the check
+            const check = await this._getAttackCheck(options);
             if (check && check.isValid) {
-               // Expend resolve if appropriate
-               let resolveSpent = 0;
-               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
-                  resolveSpent += 1;
-               }
-               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
-                  resolveSpent += 1;
-               }
-               if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true, false);
-               }
-
+               await this._expendCheckResolve(check);
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
@@ -921,41 +922,21 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   message: this._getAttackCheckMessages(check)
                });
             }
-
-            return;
          }
 
-         // Otherwise, create an options dialog
-         // Get the weapon check data.
-         const checkWeapon = this.parent.items.get(options?.itemId);
-         if (!checkWeapon) {
-            console.error('TITAN | Attack check failed. Invalid weapon ID provided to actor.');
-            console.trace();
-
-            return;
+         // Otherwise open a check dialog
+         else {
+            this._getAttackCheckDialog(options);
          }
-
-         // Get the attack data
-         const checkAttack = checkWeapon.system.attack[options.attackIdx];
-         if (!checkAttack) {
-            console.error('TITAN | Attack check failed. Invalid Attack Index provided to actor.');
-            console.trace();
-
-            return;
-         }
-
-         // Create the dialog
-         const dialog = new AttackCheckDialog(this.parent, checkWeapon, checkAttack, options);
-         dialog.render(true);
       }
 
       return;
    }
 
-   async getCastingCheck(options) {
+   async _getCastingCheck(options) {
       // Get the weapon check data.
-      const checkSpell = this.parent.items.get(options?.itemId);
-      if (!checkSpell || checkSpell.type !== 'spell') {
+      const spell = this.parent.items.get(options?.itemId);
+      if (!spell || spell.type !== 'spell') {
          console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
          console.trace();
 
@@ -970,7 +951,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.actorRollData = actorRollData;
 
       // Add the weapon data to the check options
-      const itemRollData = checkSpell.getRollData();
+      const itemRollData = spell.getRollData();
       options.itemRollData = itemRollData;
 
       // Get the check
@@ -978,25 +959,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return castingCheck;
    }
 
+   _getCastingCheckDialog(options) {
+      const spell = this.parent.items.get(options?.itemId);
+      if (!spell || spell.type !== 'spell') {
+         console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
+         console.trace();
+
+         return;
+      }
+
+      // Create the dialog
+      const dialog = new CastingCheckDialog(this.parent, spell, options);
+      dialog.render(true);
+   }
+
    async rollCastingCheck(options, confirmed = false) {
       if (this.parent.isOwner) {
          // Check if confirmed
-         if (confirmed || !getCheckOptions()) {
+         if (confirmed || !shouldGetCheckOptions()) {
             // Get the check
-            const check = await this.getCastingCheck(options);
+            const check = await this._getCastingCheck(options);
             if (check && check.isValid) {
-               // Expend resolve if appropriate
-               let resolveSpent = 0;
-               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
-                  resolveSpent += 1;
-               }
-               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
-                  resolveSpent += 1;
-               }
-               if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true, false);
-               }
-
+               await this._expendCheckResolve(check);
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
@@ -1005,48 +989,27 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   message: this._getCastingCheckMessages(check)
                });
             }
-
-            return;
          }
 
-         // Otherwise, create a confirmation dialog
-         const checkSpell = this.parent.items.get(options?.itemId);
-         if (!checkSpell || checkSpell.type !== 'spell') {
-            console.error('TITAN | Casting check failed. Invalid Spell ID provided to actor.');
-            console.trace();
-
-            return;
+         // Otherwise open a check dialog
+         else {
+            this._getCastingCheckDialog(options);
          }
-
-         // Get the spell data
-         options.difficulty = checkSpell.system.castingCheck.difficulty;
-         options.complexity = checkSpell.system.castingCheck.complexity;
-         options.attribute = checkSpell.system.castingCheck.attribute;
-         options.skill = checkSpell.system.castingCheck.skill;
-         options.spellName = checkSpell.name;
-
-         // Get the mods
-         options.damageMod = this.parent.system.mod.damage.value;
-         options.healingMod = this.parent.system.mod.healing.value;
-
-         // Create the dialog
-         const dialog = new CastingCheckDialog(this.parent, options);
-         dialog.render(true);
       }
 
       return;
    }
 
-   async getItemCheck(options) {
+   async _getItemCheck(options) {
       // Get the Item data.
-      const checkItem = this.parent.items.get(options?.itemId);
-      if (!checkItem) {
+      const item = this.parent.items.get(options?.itemId);
+      if (!item) {
          console.error('TITAN | Item Check failed before creation. Invalid Item ID provided to actor.');
          console.trace();
 
          return;
       }
-      options.itemRollData = checkItem.getRollData();
+      options.itemRollData = item.getRollData();
 
       // Add the actor check data to the check options
       options.actorRollData = this.parent.getRollData();
@@ -1056,28 +1019,48 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return itemCheck;
    }
 
+   _getItemCheckDialog(options) {
+      const item = this.parent.items.get(options?.itemId);
+      if (!item) {
+         console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
+         console.trace();
+
+         return;
+      }
+      const checkData = item.system.check[options.checkIdx];
+      if (!checkData) {
+         console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
+         console.trace();
+
+         return;
+      }
+
+      // Get the spell data
+      options.difficulty = checkData.difficulty;
+      options.complexity = checkData.complexity;
+      options.attribute = checkData.attribute;
+      options.skill = checkData.skill;
+      options.checkName = checkData.label;
+      options.itemName = item.name;
+
+      // Get the mods
+      options.damageMod = this.parent.system.mod.damage.value;
+      options.healingMod = this.parent.system.mod.healing.value;
+
+      // Create the dialog
+      const dialog = new ItemCheckDialog(this.parent, options);
+      dialog.render(true);
+      return;
+   }
+
    async rollItemCheck(options, confirmed) {
       if (this.parent.isOwner) {
-         // Check if confirmed
-         if (confirmed || !getCheckOptions()) {
-            // Otherwise, get a check
-            const check = await this.getItemCheck(options);
+         // If confirmed
+         if (confirmed || !shouldGetCheckOptions()) {
+            // Get the check
+            const check = await this._getItemCheck(options);
             if (check && check.isValid) {
-               // Expend resolve if appropriate
-               let resolveSpent = 0;
-               if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
-                  resolveSpent += 1;
-               }
-               if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
-                  resolveSpent += 1;
-               }
-               if (check.parameters.resolveCost && getSetting('autoSpendResolveChecks')) {
-                  resolveSpent += check.parameters.resolveCost;
-               }
-               if (resolveSpent > 0) {
-                  await this.spendResolve(resolveSpent, true, false);
-               }
-
+               await this._expendCheckResolve(check);
                await check.evaluateCheck();
                await check.sendToChat({
                   user: game.user.id,
@@ -1086,42 +1069,37 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   message: this._getItemCheckMessages(check)
                });
             }
-
-            return;
          }
 
-         // Otherwise, create a confirmation dialog
-         const checkItem = this.parent.items.get(options?.itemId);
-         if (!checkItem) {
-            console.error('TITAN | Item check failed. Invalid Item ID provided to actor.');
-            console.trace();
-
-            return;
+         // Otherwise open a check dialog
+         else {
+            this._getItemCheckDialog(options);
          }
-         const checkData = checkItem.system.check[options.checkIdx];
-         if (!checkData) {
-            console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
-            console.trace();
+      }
 
-            return;
-         }
+      return;
+   }
 
-         // Get the spell data
-         options.difficulty = checkData.difficulty;
-         options.complexity = checkData.complexity;
-         options.attribute = checkData.attribute;
-         options.skill = checkData.skill;
-         options.checkName = checkData.label;
-         options.itemName = checkItem.name;
+   async _expendCheckResolve(check) {
+      // Expend resolve if appropriate
+      // Doublr traing
+      let resolveSpent = 0;
+      if (check.parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+         resolveSpent += 1;
+      }
 
-         // Get the mods
-         options.damageMod = this.parent.system.mod.damage.value;
-         options.healingMod = this.parent.system.mod.healing.value;
+      // Double expertise
+      if (check.parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+         resolveSpent += 1;
+      }
 
-         // Create the dialog
-         const dialog = new ItemCheckDialog(this.parent, options);
-         dialog.render(true);
-         return;
+      // Resolve cost
+      if (check.parameters.resolveCost && getSetting('autoSpendResolveChecks')) {
+         resolveSpent += check.parameters.resolveCost;
+      }
+
+      if (resolveSpent > 0) {
+         return await this.spendResolve(resolveSpent, true, false);
       }
 
       return;

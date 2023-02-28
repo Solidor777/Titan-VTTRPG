@@ -22,11 +22,11 @@
    {min}
    {max}
    disabled={disabled || !$document.isOwner}
-   on:change
-   on:change={() => {
+   on:keyup={() => {
       $document.update({
          system: $document.system,
          flags: $document.flags,
       });
    }}
+   on:keyup
 />

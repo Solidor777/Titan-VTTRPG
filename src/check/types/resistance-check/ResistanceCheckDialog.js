@@ -9,8 +9,8 @@ export default class ResistanceCheckDialog extends TJSDialog {
             content: {
                class: ResistanceCheckDialogShell,
                props: {
-                  options: options,
                   actor: actor,
+                  options: options,
                },
             },
             zIndex: null,

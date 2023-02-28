@@ -6,7 +6,7 @@ export function localize(string) {
    return game.i18n.localize(`LOCAL.${string}.label`);
 }
 
-export function getCheckOptions() {
+export function shouldGetCheckOptions() {
    const retVal = game.settings.get('titan', 'getCheckOptions') === true;
    return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT) ? !retVal : retVal;
 }
@@ -35,7 +35,7 @@ export function getCombatTargets() {
    let userTargets = Array.from(game.user.targets);
 
    // If not targets, get controlled tokens
-   if (userTargets.length < 1) {
+   if (userTargets.length < 1 && game.user.isGM) {
       userTargets = Array.from(canvas.tokens.controlled);
    }
 

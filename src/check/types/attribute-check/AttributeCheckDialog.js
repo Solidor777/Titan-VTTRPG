@@ -9,8 +9,8 @@ export default class AttributeCheckDialog extends TJSDialog {
             content: {
                class: AttributeCheckDialogShell,
                props: {
-                  options: options,
                   actor: actor,
+                  options: options,
                },
             },
             zIndex: null,

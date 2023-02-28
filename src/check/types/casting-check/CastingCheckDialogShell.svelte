@@ -11,23 +11,30 @@
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
    // The actor document making this check
-   export let actor;
+   export let actor = void 0;
+
+   // The spell being cast
+   export let spell = void 0;
 
    // Initial check options
    export let options = void 0;
 
    // Initialize check parameters
    const checkParameters = {
-      attribute: options.attribute ?? 'body',
-      skill: options.skill ?? 'arcana',
-      difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : 4,
-      complexity: options.complexity ? Math.max(options.complexity, 0) : 0,
-      trainingMod: options.trainingMod ?? 0,
+      attribute: options.attribute ?? spell.system.castingCheck.attribute,
+      complexity: options.complexity
+         ? Math.max(options.complexity, 0)
+         : spell.system.castingCheck.complexity,
+      diceMod: options.diceMod ?? 0,
+      difficulty: options.difficulty
+         ? clamp(options.difficulty, 2, 6)
+         : spell.system.castingCheck.difficulty,
+      doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
-      doubleExpertise: options.doubleExpertise ?? false,
-      diceMod: options.diceMod ?? 0,
       itemId: options.itemId,
+      skill: options.skill ?? spell.system.castingCheck.skill,
+      trainingMod: options.trainingMod ?? 0,
    };
 
    const application = getContext('#external').application;
