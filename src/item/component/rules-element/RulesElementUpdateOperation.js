@@ -3,7 +3,8 @@ import { getMulBaseTemplate } from '~/rules-element/MulBase.js';
 import { getFastHealingTemplate } from '~/rules-element/FastHealing.js';
 import { getPersistentDamageTemplate } from '~/rules-element/PersistentDamage';
 import { getTurnMessageTemplate } from '~/rules-element/TurnMessage';
-import { getRollMessageTemplate } from '../../../rules-element/RollMessage';
+import { getRollMessageTemplate } from '~/rules-element/RollMessage';
+import { getConditionalDiceModifierTemplate } from '~/rules-element/ConditionalDiceModifier';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -30,6 +31,10 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
       case 'rollMessage': {
          document.system.rulesElement[elementIdx] = getRollMessageTemplate(element.uuid);
+         break;
+      }
+      case 'conditionalDiceModifier': {
+         document.system.rulesElement[elementIdx] = getConditionalDiceModifierTemplate(element.uuid);
          break;
       }
       default: {

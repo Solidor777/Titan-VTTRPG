@@ -104,6 +104,7 @@
    "LOCAL.common.label": "Common",
    "LOCAL.complexity.label": "Complexity",
    "LOCAL.condition.label": "Condition",
+   "LOCAL.conditionalDiceModifier.label": "Conditional Dice Modifier",
    "LOCAL.conditions.label": "Conditions",
    "LOCAL.confirm": "Confirm",
    "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item from this actor?",

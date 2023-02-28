@@ -11,6 +11,7 @@
    import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
    import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
    import ItemSheetRollMessageSettings from '~/item/component/rules-element/ItemSheetRollMessageSettings.svelte';
+   import ItemSheetConditionalDiceMessageSettings from '~/item/component/rules-element/ItemSheetConditionalDiceMessageSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -41,6 +42,10 @@
          label: localize('rollMessage'),
          value: 'rollMessage',
       },
+      {
+         label: localize('conditionalDiceModifier'),
+         value: 'conditionalDiceModifier',
+      },
    ];
 
    function selectComponent(operation) {
@@ -51,6 +56,7 @@
          fastHealing: ItemSheetFastHealingSettings,
          persistentDamage: ItemSheetPersistentDamageSettings,
          rollMessage: ItemSheetRollMessageSettings,
+         conditionalDiceModifier: ItemSheetConditionalDiceMessageSettings,
       };
 
       return elementComponents[operation];

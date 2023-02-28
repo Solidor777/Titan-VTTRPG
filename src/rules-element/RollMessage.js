@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { isHTMLBlank, sortObjectsIntoContainerByKey } from '~/helpers/Utility';
-import { camelize } from '../helpers/Utility';
+import { camelize } from '~/helpers/Utility';
 
 export function getRollMessageTemplate(uuid) {
    return {
@@ -224,7 +224,7 @@ export function getCastingCheckMessages(check) {
       }
 
       // Spell Tradition messages
-      const spellTraditionMessages = getRollMessages(rollMessages, 'spellTradition', check.parameters.tradition);
+      const spellTraditionMessages = getRollMessages(rollMessages, 'spellTradition', camelize(check.parameters.tradition));
       if (spellTraditionMessages) {
          message.push(...spellTraditionMessages);
       }

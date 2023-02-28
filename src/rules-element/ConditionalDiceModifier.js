@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
+import { camelize } from '~/helpers/Utility';
 
-export function getTurnMessageTemplate(uuid) {
+export function getConditionalDiceModifierTemplate(uuid) {
    return {
       operation: 'conditionalDiceModifier',
       selector: 'attackType',
@@ -41,48 +42,48 @@ export function applyConditionalDiceModifierElements(elements) {
          }
       }
 
-      this.conditionalDiceModifiers = conditionalDiceModifiers;
+      this.conditionalDiceModifier = conditionalDiceModifiers;
    }
-   this.conditionalDiceModifiers = false;
+   this.conditionalDiceModifier = false;
    return;
 }
 
-export function getAttackBonusDie(attack) {
+function getDiceMods(conditionalDiceModifiers, selector, key) {
+   const selectorMods = conditionalDiceModifiers[selector];
+   if (selectorMods) {
+      const keyMod = selectorMods[key];
+      if (keyMod) {
+         return keyMod;
+      }
+   }
+
+   return 0;
+}
+
+function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, reduceFunction) {
    let retVal = 0;
-
-   // Attack type
-   const attackTypeMods = this.conditionalDiceModifiers?.attackType;
-   if (attackTypeMods) {
-      const keyMod = attackType[attack.type];
-      if (keyMod) {
-         retVal += keyMod;
-      }
+   const selectorMods = conditionalDiceModifiers[selector];
+   if (selectorMods) {
+      keys.forEach((key) => {
+         const keyMod = selectorMods[reduceFunction(key)];
+         if (keyMod) {
+            retVal += keyMod;
+         }
+      });
    }
 
-   // Attack trait
-   const attackTraitMods = this.conditionalDiceModifiers?.attackCustomTrait;
-   if (attackTraitMods) {
-      const keyMod = attackTraitMods[attack.type];
-      if (keyMod) {
-         retVal += keyMod;
-      }
-   }
+   return retVal;
+}
 
-   // Attack custom trait
-   const attackCustomTraitMods = this.conditionalDiceModifiers?.attackCustomTrait;
-   if (attackCustomTraitMods) {
-      const keyMod = attackCustomTraitMods[attack.type];
-      if (keyMod) {
-         retVal += keyMod;
-      }
-   }
-
-   // Attack multi attack
-   const attackMultiAttackMods = this.conditionalDiceModifiers?.attackCustomTrait;
-   if (attackMultiAttackMods) {
-      const keyMod = attackMultiAttackMods[attack.type];
-      if (keyMod) {
-         retVal += keyMod;
+export function getAttackBonusDie(attack, multiAttack) {
+   let retVal = 0;
+   const conditionalDiceModifiers = this.getConditionalDiceModifier;
+   if (conditionalDiceModifiers) {
+      retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
+      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
+      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customAttackTrait', attack.customTrait, (trait) => camelize(trait.name));
+      if (multiAttack && conditionalDiceModifiers.multiAttack) {
+         retVal += conditionalDiceModifiers.multiAttack;
       }
    }
 
