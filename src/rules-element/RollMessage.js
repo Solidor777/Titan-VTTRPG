@@ -20,41 +20,59 @@ export function applyRollMessageElements(elements) {
 
       // For each selector
       for (const [selector, selectorElements] of Object.entries(selectors)) {
-         const selectorMessages = {};
 
-         // Sort elements by key
-         const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
-         let camelizeMessages = false;
-         switch (selector) {
-            case 'customAttackTrait':
-            case 'customItemTrait':
-            case 'spellTradition': {
-               camelizeMessages = true;
-               break;
-            }
-            default: {
-               break;
-            }
-         }
-
-         // For each key
-         for (const [key, keyElements] of Object.entries(keys)) {
-            const keyMessages = [];
-
+         // Handle special case for multi attack messages
+         if (selector === 'multiAttack') {
+            const selectorMessages = [];
             // Apply each message
-            for (const element of keyElements) {
+            for (const element of selectorElements) {
                if (!isHTMLBlank(element.message)) {
-                  keyMessages.push(element.message);
+                  selectorMessages.push(element.message);
                }
             }
 
-            if (keyMessages.length > 0) {
-               selectorMessages[camelizeMessages ? camelize(key) : key] = keyMessages;
+
+            if (selectorMessages.length > 0) {
+               messages[selector] = selectorMessages;
             }
          }
 
-         if (Object.keys(selectorMessages).length > 0) {
-            messages[selector] = selectorMessages;
+         else {
+            const selectorMessages = {};
+            // Sort elements by key
+            const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+            let camelizeMessages = false;
+            switch (selector) {
+               case 'customAttackTrait':
+               case 'customItemTrait':
+               case 'spellTradition': {
+                  camelizeMessages = true;
+                  break;
+               }
+               default: {
+                  break;
+               }
+            }
+
+            // For each key
+            for (const [key, keyElements] of Object.entries(keys)) {
+               const keyMessages = [];
+
+               // Apply each message
+               for (const element of keyElements) {
+                  if (!isHTMLBlank(element.message)) {
+                     keyMessages.push(element.message);
+                  }
+               }
+
+               if (keyMessages.length > 0) {
+                  selectorMessages[camelizeMessages ? camelize(key) : key] = keyMessages;
+               }
+            }
+
+            if (Object.keys(selectorMessages).length > 0) {
+               messages[selector] = selectorMessages;
+            }
          }
       }
 
@@ -68,8 +86,8 @@ export function applyRollMessageElements(elements) {
    return;
 }
 
-function getRollMessages(selector, key) {
-   const selectorMessages = this.rollMessage[selector];
+function getRollMessages(rollMessages, selector, key) {
+   const selectorMessages = rollMessages[selector];
    if (selectorMessages) {
       const keyMessages = selectorMessages[key];
       if (keyMessages) {
@@ -80,9 +98,9 @@ function getRollMessages(selector, key) {
    return false;
 }
 
-function getRollMessagesForReducedKeys(selector, keys, reduceFunction) {
+function getRollMessagesForReducedKeys(rollMessages, selector, keys, reduceFunction) {
    const messages = [];
-   const selectorMessages = this.rollMessage[selector];
+   const selectorMessages = rollMessages[selector];
    if (selectorMessages) {
       keys.forEach((key) => {
          const keyMessages = selectorMessages[reduceFunction(key)];
@@ -96,11 +114,12 @@ function getRollMessagesForReducedKeys(selector, keys, reduceFunction) {
 }
 
 export function getAttributeCheckMessages(check) {
-   if (this.rollMessage) {
+   const rollMessages = this.rollMessage;
+   if (rollMessages) {
       const message = [];
 
       // Attribute messages
-      const attributeRollMessages = getRollMessages('attribute', check.parameters.attribute);
+      const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
          message.push(...attributeRollMessages);
       }
@@ -108,7 +127,7 @@ export function getAttributeCheckMessages(check) {
       // Skill messages
       const skill = check.parameters.skill;
       if (skill && skill !== 'none') {
-         const skillRollMessages = getRollMessages('skill', skill);
+         const skillRollMessages = getRollMessages(rollMessages, 'skill', skill);
          if (skillRollMessages) {
             message.push(...skillRollMessages);
          }
@@ -121,54 +140,56 @@ export function getAttributeCheckMessages(check) {
 }
 
 export function getResistanceCheckMessages(check) {
-   if (this.rollMessage) {
-      return getRollMessages('resistence', check.parameters.resistance);
+   const rollMessages = this.rollMessage;
+   if (rollMessages) {
+      return getRollMessages(rollMessages, 'resistence', check.parameters.resistance);
    }
 
    return false;
 }
 
 export function getAttackCheckMessages(check) {
-   if (this.rollMessage) {
+   const rollMessages = this.rollMessage;
+   if (rollMessages) {
       const message = [];
 
       // Attribute messages
-      const attributeRollMessages = getRollMessages('attribute', check.parameters.attribute);
+      const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
          message.push(...attributeRollMessages);
       }
 
       // Skill messages
-      const skillRollMessages = getRollMessages('skill', check.parameters.skill);
+      const skillRollMessages = getRollMessages(rollMessages, 'skill', check.parameters.skill);
       if (skillRollMessages) {
          message.push(...skillRollMessages);
       }
 
       // Type messages
-      const typeMessages = getRollMessages('attackType', check.parameters.attack.type);
+      const typeMessages = getRollMessages(rollMessages, 'attackType', check.parameters.attack.type);
       if (typeMessages) {
          message.push(...typeMessages);
       }
 
       // Attack Trait messages
-      const attackTraitMessages = getRollMessagesForReducedKeys('attackTrait', check.parameters.attack.trait, (trait) => trait.name);
+      const attackTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'attackTrait', check.parameters.attack.trait, (trait) => trait.name);
       if (attackTraitMessages) {
          message.push(...attackTraitMessages);
       }
 
       // Attack Trait messages
-      const customAttackTraitMessages = getRollMessagesForReducedKeys('customAttackTrait', check.parameters.attack.customTrait, (trait) => camelize(trait.name));
+      const customAttackTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customAttackTrait', check.parameters.attack.customTrait, (trait) => camelize(trait.name));
       if (customAttackTraitMessages) {
          message.push(...customAttackTraitMessages);
       }
 
       // Multi Attack messages
-      if (check.parameters.multiAttack && this.rollMessage.multiAttack) {
-         message.push(...this.rollMessage.multiAttack);
+      if (check.parameters.multiAttack && rollMessages.multiAttack) {
+         message.push(...rollMessages.multiAttack);
       }
 
       // Custom Item Trait messages
-      const customItemTraitMessages = getRollMessagesForReducedKeys('customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
+      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
       if (customItemTraitMessages) {
          message.push(...customItemTraitMessages);
       }
@@ -180,29 +201,30 @@ export function getAttackCheckMessages(check) {
 }
 
 export function getCastingCheckMessages(check) {
-   if (this.rollMessage) {
+   const rollMessages = this.rollMessage;
+   if (rollMessages) {
       const message = [];
 
       // Attribute messages
-      const attributeRollMessages = getRollMessages('attribute', check.parameters.attribute);
+      const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
          message.push(...attributeRollMessages);
       }
 
       // Skill messages
-      const skillRollMessages = getRollMessages('skill', check.parameters.skill);
+      const skillRollMessages = getRollMessages(rollMessages, 'skill', check.parameters.skill);
       if (skillRollMessages) {
          message.push(...skillRollMessages);
       }
 
       // Custom Item Trait messages
-      const customItemTraitMessages = getRollMessagesForReducedKeys('customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
+      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
       if (customItemTraitMessages) {
          message.push(...customItemTraitMessages);
       }
 
       // Spell Tradition messages
-      const spellTraditionMessages = getRollMessages('spellTradition', check.parameters.tradition);
+      const spellTraditionMessages = getRollMessages(rollMessages, 'spellTradition', check.parameters.tradition);
       if (spellTraditionMessages) {
          message.push(...spellTraditionMessages);
       }
@@ -214,23 +236,24 @@ export function getCastingCheckMessages(check) {
 }
 
 export function getItemCheckMessages(check) {
-   if (this.rollMessage) {
+   const rollMessages = this.rollMessage;
+   if (rollMessages) {
       const message = [];
 
       // Attribute messages
-      const attributeRollMessages = getRollMessages('attribute', check.parameters.attribute);
+      const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
          message.push(...attributeRollMessages);
       }
 
       // Skill messages
-      const skillRollMessages = getRollMessages('skill', check.parameters.skill);
+      const skillRollMessages = getRollMessages(rollMessages, 'skill', check.parameters.skill);
       if (skillRollMessages) {
          message.push(...skillRollMessages);
       }
 
       // Custom Item Trait messages
-      const customItemTraitMessages = getRollMessagesForReducedKeys('customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
+      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
       if (customItemTraitMessages) {
          message.push(...customItemTraitMessages);
       }
