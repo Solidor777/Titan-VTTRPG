@@ -2,13 +2,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { isHTMLBlank, sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 import { camelize } from '~/helpers/Utility';
 
-export function getRollMessageTemplate(uuid) {
+export function getRollMessageTemplate(uuid, type) {
    return {
       operation: 'rollMessage',
       selector: 'attribute',
       key: 'body',
       message: '',
-      uuid: uuid ?? uuidv4()
+      uuid: uuid ?? uuidv4(),
+      type: type ?? ''
    };
 }
 

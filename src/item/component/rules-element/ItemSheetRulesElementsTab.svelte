@@ -12,6 +12,7 @@
    import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
    import ItemSheetRollMessageSettings from '~/item/component/rules-element/ItemSheetRollMessageSettings.svelte';
    import ItemSheetConditionalDiceModifierSettings from '~/item/component/rules-element/ItemSheetConditionalDiceModifierSettings.svelte';
+   import ItemSheetConditionaRatingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaRatingModifierSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -46,6 +47,10 @@
          label: localize('conditionalDiceModifier'),
          value: 'conditionalDiceModifier',
       },
+      {
+         label: localize('conditionalRatingModifier'),
+         value: 'conditionalRatingModifier',
+      },
    ];
 
    function selectComponent(operation) {
@@ -57,6 +62,7 @@
          persistentDamage: ItemSheetPersistentDamageSettings,
          rollMessage: ItemSheetRollMessageSettings,
          conditionalDiceModifier: ItemSheetConditionalDiceModifierSettings,
+         conditionalRatingModifier: ItemSheetConditionaRatingModifierSettings,
       };
 
       return elementComponents[operation];

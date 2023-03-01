@@ -105,6 +105,7 @@
    "LOCAL.complexity.label": "Complexity",
    "LOCAL.condition.label": "Condition",
    "LOCAL.conditionalDiceModifier.label": "Conditional Dice Modifier",
+   "LOCAL.conditionalRatingModifier.label": "Conditional Rating Modifier",
    "LOCAL.conditions.label": "Conditions",
    "LOCAL.confirm": "Confirm",
    "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item from this actor?",
@@ -461,6 +462,10 @@
    "LOCAL.xpAvailable.label": "XP Available",
    "LOCAL.xpCost.label": "XP Cost",
    "LOCAL.xpEarned.label": "XP Earned",
+   "LOCAL.armorTrait.label": "Armor Trait",
+   "LOCAL.customArmorTrait.label": "Custom Armor Trait",
+   "LOCAL.shieldTrait.label": "Shield Trait",
+   "LOCAL.customShieldTrait.label": "Custom Shield Trait",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."

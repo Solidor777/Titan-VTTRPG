@@ -2,11 +2,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 import { camelize } from '~/helpers/Utility';
 
-export function getConditionalDiceModifierTemplate(uuid, type) {
+export function getConditionalRatingModifierTemplate(uuid, type) {
    return {
-      operation: 'conditionalDiceModifier',
-      selector: 'attackType',
-      key: 'melee',
+      operation: 'conditionalRatingModifier',
+      rating: 'accuracy',
+      selector: 'customAttackTrait',
+      key: '',
       value: 1,
       uuid: uuid ?? uuidv4(),
       type: type ?? ''
@@ -15,57 +16,74 @@ export function getConditionalDiceModifierTemplate(uuid, type) {
 
 export function applyConditionalDiceModifierElements(elements) {
    if (elements.length > 0) {
-      const conditionalDiceModifiers = {};
-      // Sort elements by selector
-      const selectors = sortObjectsIntoContainerByKey(elements, 'selector');
-      // For each selector
-      for (const [selector, selectorElements] of Object.entries(selectors)) {
-         // Hand special case for multi attack
-         if (selector === 'multiAttack') {
-            conditionalDiceModifiers.multiAttack = 0;
-            for (const element of selectorElements) {
-               conditionalDiceModifiers.multiAttack += element.value;
-            }
-         }
+      const conditionalRatingModifiers = {};
+      // Sort elements by rating
+      const ratings = sortObjectsIntoContainerByKey(elements, 'rating');
 
-         else {
-            conditionalDiceModifiers[selector] = {};
-            const selectorMap = conditionalDiceModifiers[selector];
-            let camelizeKeys = false;
-            switch (selector) {
-               case 'customAttackTrait':
-               case 'customItemTrait':
-               case 'spellTradition': {
-                  camelizeKeys = true;
+      // For each rating
+      for (const [rating, ratingElements] of Object.entries(ratings)) {
+         {
+            // Initialize rating map
+            conditionalRatingModifiers[rating] = {};
+            const ratingMap = conditionalRatingModifiers[rating];
+
+            // Sort elements by selector
+            const selectors = sortObjectsIntoContainerByKey(ratingElements, 'selector');
+
+            // For each selector
+            for (const [selector, selectorElements] of Object.entries(selectors)) {
+
+               // Hand special case for multi attack
+               if (selector === 'multiAttack') {
+                  ratingMap.multiAttack = 0;
+                  for (const element of selectorElements) {
+                     ratingMap.multiAttack += element.value;
+                  }
                }
-            }
 
-            // Sort elements by key
-            const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+               else {
+                  // Initialize rating map
+                  ratingMap[selector] = {};
+                  const selectorMap = ratingMap[selector];
 
-            // For each key
-            for (const [key, keyElements] of Object.entries(keys)) {
-               const formattedKey = camelizeKeys ? camelize(key) : key;
+                  // Cache whether to camelize keys
+                  let camelizeKeys = false;
+                  switch (selector) {
+                     case 'customAttackTrait':
+                     case 'customItemTrait':
+                     case 'spellTradition': {
+                        camelizeKeys = true;
+                     }
+                  }
 
-               // Initialize key value
-               selectorMap[formattedKey] = 0; {
+                  // Sort elements by key
+                  const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
 
-                  // For each element
-                  for (const element of keyElements) {
+                  // For each key
+                  for (const [key, keyElements] of Object.entries(keys)) {
+                     const formattedKey = camelizeKeys ? camelize(key) : key;
 
-                     // Add to the key value
-                     selectorMap[formattedKey] += element.value;
+                     // Initialize key value
+                     selectorMap[formattedKey] = 0; {
+
+                        // For each element
+                        for (const element of keyElements) {
+
+                           // Add to the key value
+                           selectorMap[formattedKey] += element.value;
+                        }
+                     }
                   }
                }
             }
          }
-      }
 
-      this.conditionalDiceModifier = conditionalDiceModifiers;
-      return;
+         this.conditionalRatingModifier = conditionalRatingModifiers;
+         return;
+      }
    }
 
-   this.conditionalDiceModifier = false;
+   this.conditionalRatingModifier = false;
    return;
 }
 

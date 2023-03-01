@@ -5,6 +5,7 @@ import { getPersistentDamageTemplate } from '~/rules-element/PersistentDamage';
 import { getTurnMessageTemplate } from '~/rules-element/TurnMessage';
 import { getRollMessageTemplate } from '~/rules-element/RollMessage';
 import { getConditionalDiceModifierTemplate } from '~/rules-element/ConditionalDiceModifier';
+import { getConditionalRatingModifierTemplate } from '~/rules-element/ConditionalRatingModifier';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -35,6 +36,10 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
       case 'conditionalDiceModifier': {
          document.system.rulesElement[elementIdx] = getConditionalDiceModifierTemplate(element.uuid);
+         break;
+      }
+      case 'conditionalRatingModifier': {
+         document.system.rulesElement[elementIdx] = getConditionalRatingModifierTemplate(element.uuid);
          break;
       }
       default: {

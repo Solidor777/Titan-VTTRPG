@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { isHTMLBlank, sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
-export function getTurnMessageTemplate(uuid) {
+export function getTurnMessageTemplate(uuid, type) {
    return {
       operation: 'turnMessage',
       selector: 'turnStart',
       message: '',
       uuid: uuid ?? uuidv4(),
+      type: type ?? ''
    };
 }
 

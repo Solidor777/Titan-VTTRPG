@@ -9,6 +9,8 @@
    import DocumentAttackTraitSelect from '~/documents/components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentArmorTraitSelect from '~/documents/components/select/DocumentArmorTraitSelect.svelte';
+   import DocumentShieldTraitSelect from '~/documents/components/select/DocumentShieldTraitSelect.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -16,8 +18,42 @@
    export let operationOptions = void 0;
    export let idx = void 0;
 
-   // Selector options
-   const selectorOptions = [
+   // Rating optiions
+   const ratingOptions = [
+      {
+         label: localize('melee'),
+         value: 'melee',
+      },
+      {
+         label: localize('accuracy'),
+         value: 'accuracy',
+      },
+      {
+         label: localize('defense'),
+         value: 'defense',
+      },
+   ];
+
+   const defenseSelectorOptions = [
+      {
+         label: localize('armorTrait'),
+         value: 'armorTrait',
+      },
+      {
+         label: localize('shieldTrait'),
+         value: 'shieldTrait',
+      },
+      {
+         label: localize('customArmorTrait'),
+         value: 'customArmorTrait',
+      },
+      {
+         label: localize('customShieldTrait'),
+         value: 'customShieldTrait',
+      },
+   ];
+
+   const attackSelectorOptions = [
       {
          label: localize('attackTrait'),
          value: 'attackTrait',
@@ -31,41 +67,35 @@
          value: 'customAttackTrait',
       },
       {
-         label: localize('customItemTrait'),
-         value: 'customItemTrait',
-      },
-      {
          label: localize('multiAttack'),
          value: 'multiAttack',
       },
-      {
-         label: localize('spellTradition'),
-         value: 'spellTradition',
-      },
    ];
 
-   // Dynamic element
-   $: element = $document.system.rulesElement[idx];
+   // Element
+   export let element = void 0;
 
    // Updates the key when the selector changes
    function onSelectorChange() {
       switch (element.selector) {
+         case 'armorTrait':
+         case 'shieldTrait': {
+            element.key = 'magical';
+            break;
+         }
+         case 'customArmorTrait':
+         case 'customAttackTrait':
+         case 'customShieldTrait':
+         case 'multiAttack': {
+            element.key = '';
+            break;
+         }
          case 'attackTrait': {
             element.key = 'blast';
             break;
          }
          case 'attackType': {
             element.key = 'melee';
-            break;
-         }
-         case 'customAttackTrait':
-         case 'customItemTrait':
-         case 'multiAttack': {
-            element.key = '';
-            break;
-         }
-         case 'spellTradition': {
-            element.key = localize('any');
             break;
          }
          default: {
@@ -78,6 +108,22 @@
       });
    }
 
+   // Updates the selector when the rating changes
+   function onRatingChange() {
+      switch (element.rating) {
+         case 'defense': {
+            element.selector = 'armorTrait';
+            break;
+         }
+         default: {
+            element.selector = 'attackTrait';
+            break;
+         }
+      }
+
+      onSelectorChange();
+   }
+
    function getSelector() {
       switch (element.selector) {
          case 'attackTrait': {
@@ -86,13 +132,15 @@
          case 'attackType': {
             return DocumentRangeTypeSelect;
          }
-         case 'customAttackTrait': {
-            return DocumentTextInput;
+         case 'armorTrait': {
+            return DocumentArmorTraitSelect;
          }
-         case 'customItemTrait': {
-            return DocumentTextInput;
+         case 'shieldTrait': {
+            return DocumentShieldTraitSelect;
          }
-         case 'spellTradition': {
+         case 'customArmorTrait':
+         case 'customAttackTrait':
+         case 'customShieldTrait': {
             return DocumentTextInput;
          }
          default: {
@@ -102,7 +150,7 @@
    }
 </script>
 
-{#if element && element.operation === 'conditionalDiceModifier'}
+{#if element && element.operation === 'conditionalRatingModifier'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -116,10 +164,21 @@
             />
          </div>
 
+         <!--Rating-->
+         <div class="field select">
+            <DocumentSelect
+               options={ratingOptions}
+               bind:value={element.rating}
+               on:change={onRatingChange}
+            />
+         </div>
+
          <!--Selector-->
          <div class="field select">
             <DocumentSelect
-               options={selectorOptions}
+               options={element.rating === 'defense'
+                  ? defenseSelectorOptions
+                  : attackSelectorOptions}
                bind:value={element.selector}
                on:change={onSelectorChange}
             />
