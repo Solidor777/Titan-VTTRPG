@@ -970,7 +970,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Create the dialog
       const dialog = new CastingCheckDialog(this.parent, spell, options);
-      dialog.render(true);
+      return dialog.render(true);
    }
 
    async rollCastingCheck(options, confirmed = false) {
@@ -1027,30 +1027,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          return;
       }
-      const checkData = item.system.check[options.checkIdx];
-      if (!checkData) {
+      const check = item.system.check[options.checkIdx];
+      if (!check) {
          console.error(`TITAN | Item check failed. Invalid Check Idx provided to actor (${options.checkIdx}).`);
          console.trace();
 
          return;
       }
 
-      // Get the spell data
-      options.difficulty = checkData.difficulty;
-      options.complexity = checkData.complexity;
-      options.attribute = checkData.attribute;
-      options.skill = checkData.skill;
-      options.checkName = checkData.label;
-      options.itemName = item.name;
-
-      // Get the mods
-      options.damageMod = this.parent.system.mod.damage.value;
-      options.healingMod = this.parent.system.mod.healing.value;
-
       // Create the dialog
-      const dialog = new ItemCheckDialog(this.parent, options);
-      dialog.render(true);
-      return;
+      const dialog = new ItemCheckDialog(this.parent, item, check, options);
+      return dialog.render(true);
    }
 
    async rollItemCheck(options, confirmed) {

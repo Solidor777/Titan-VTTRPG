@@ -10,18 +10,28 @@
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   // The actor document making this check
-   export let actor;
-
    // Initial check options
    export let options = void 0;
 
+   // The actor document making this check
+   export let actor;
+
+   // Item data
+   export let item = void 0;
+
+   // Check data
+   export let check = void 0;
+
    // Initialize check parameters
    const checkParameters = {
-      attribute: options.attribute ?? 'body',
-      skill: options.skill ?? 'arcana',
-      difficulty: options.difficulty ? clamp(options.difficulty, 2, 6) : 4,
-      complexity: options.complexity ? Math.max(options.complexity, 0) : 0,
+      attribute: options.attribute ?? check.attribute,
+      skill: options.skill ?? check.skill,
+      difficulty: options.difficulty
+         ? clamp(options.difficulty, 2, 6)
+         : check.difficulty,
+      complexity: options.complexity
+         ? Math.max(options.complexity, 0)
+         : check.complexity,
       trainingMod: options.trainingMod ?? 0,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
@@ -94,7 +104,7 @@
 <div class="check-dialog">
    <!--Name-->
    <div class="row row-label">
-      {options.itemName} ({options.checkName})
+      {item.name} ({check.label})
    </div>
 
    <!--Attribute-->
