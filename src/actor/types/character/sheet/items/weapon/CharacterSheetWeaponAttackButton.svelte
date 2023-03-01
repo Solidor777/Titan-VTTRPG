@@ -4,6 +4,9 @@
    // Reference to the docuement
    const document = getContext('DocumentStore');
 
+   // Weapon
+   export let diceMod = 0;
+
    // Check
    export let attack = void 0;
 </script>
@@ -16,7 +19,8 @@
          <div class="pool">
             <i class="fas fa-dice-d6" />
             {$document.system.attribute[attack.attribute].value +
-               $document.system.skill[attack.skill].training.value}
+               $document.system.skill[attack.skill].training.value +
+               diceMod}
          </div>
 
          <!--Expertise-->

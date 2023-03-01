@@ -58,7 +58,12 @@
          <IconStatTag
             label={localize('dice')}
             value={$document.system.attribute[attack.attribute].value +
-               $document.system.skill[attack.skill].training.value}
+               $document.system.skill[attack.skill].training.value +
+               $document.typeComponent.getAttackDiceMod(
+                  item,
+                  attack,
+                  item.system.multiAttack
+               )}
             icon={'fas fa-dice-d6'}
          />
       </div>

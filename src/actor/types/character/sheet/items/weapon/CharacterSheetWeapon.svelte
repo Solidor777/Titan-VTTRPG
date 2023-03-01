@@ -26,7 +26,6 @@
 
    // Setup context references
    const document = getContext('DocumentStore');
-   const application = getContext('#external').application;
 
    // Item reference
    $: item = $document.items.get(id);
@@ -60,6 +59,11 @@
                {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
                      attack={item.system.attack[0]}
+                     diceMod={$document.typeComponent.getAttackDiceMod(
+                        item,
+                        item.system.attack[0],
+                        item.system.multiAttack
+                     )}
                      on:click={() =>
                         $document.typeComponent.rollAttackCheck(
                            { itemId: item._id, attackIdx: 0 },

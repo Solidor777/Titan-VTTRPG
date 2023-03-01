@@ -45,8 +45,8 @@
       diceMod:
          options.diceMod ??
          actor.character.getAttackDiceMod(
-            attack,
             weapon,
+            attack,
             options.multiAttack ?? weapon.system.multiAttack
          ),
       doubleExpertise: options.doubleExpertise ?? false,

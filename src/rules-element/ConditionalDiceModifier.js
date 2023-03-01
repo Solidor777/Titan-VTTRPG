@@ -97,7 +97,7 @@ function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, re
    return retVal;
 }
 
-export function getAttackDiceMod(attack, item, multiAttack) {
+export function getAttackDiceMod(item, attack, multiAttack) {
    let retVal = 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {

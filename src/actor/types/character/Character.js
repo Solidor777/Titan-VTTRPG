@@ -872,7 +872,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Initialize check options
       options.attack = attack;
       options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
-      options.diceMod = options.diceMod ?? this.getAttackDiceMod(attack, weapon, options.multiAttack ?? weapon.system.multiAttack);
+      options.diceMod = options.diceMod ?? this.getAttackDiceMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();
