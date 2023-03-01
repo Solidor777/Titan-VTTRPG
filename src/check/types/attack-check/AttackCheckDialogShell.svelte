@@ -44,7 +44,7 @@
       attribute: options.attribute ?? attack.attribute,
       diceMod:
          options.diceMod ??
-         actor.character.getAttackDiceMod(
+         actor.character.getAttackCheckDiceMod(
             weapon,
             attack,
             options.multiAttack ?? weapon.system.multiAttack

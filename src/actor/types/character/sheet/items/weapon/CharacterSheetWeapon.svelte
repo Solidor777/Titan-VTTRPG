@@ -59,7 +59,7 @@
                {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
                      attack={item.system.attack[0]}
-                     diceMod={$document.typeComponent.getAttackDiceMod(
+                     diceMod={$document.typeComponent.getAttackCheckDiceMod(
                         item,
                         item.system.attack[0],
                         item.system.multiAttack

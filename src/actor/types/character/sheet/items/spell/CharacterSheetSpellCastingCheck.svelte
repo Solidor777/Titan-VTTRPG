@@ -30,7 +30,8 @@
          value={$document.system.attribute[item.system.castingCheck.attribute]
             .value +
             $document.system.skill[item.system.castingCheck.skill].training
-               .value}
+               .value +
+            $document.typeComponent.getCastingCheckDiceMod(item)}
          icon={'fas fa-dice-d6'}
       />
    </div>

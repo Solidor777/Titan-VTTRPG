@@ -29,7 +29,7 @@
       complexity: options.complexity
          ? Math.max(options.complexity, 0)
          : check.complexity,
-      diceMod: options.diceMod ?? 0,
+      diceMod: options.diceMod ?? actor.typeComponent.getItemCheckDiceMod(item),
       difficulty: options.difficulty
          ? clamp(options.difficulty, 2, 6)
          : check.difficulty,

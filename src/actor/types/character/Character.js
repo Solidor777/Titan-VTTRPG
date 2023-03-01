@@ -28,8 +28,9 @@ import {
 } from '~/rules-element/RollMessage';
 import {
    applyConditionalDiceModifierElements,
-   getAttackDiceMod,
-   getCastingDiceMod
+   getAttackCheckDiceMod,
+   getCastingCheckDiceMod,
+   getItemCheckDiceMod
 } from '~/rules-element/ConditionalDiceModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
@@ -61,8 +62,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _getAttackCheckMessages = getAttackCheckMessages.bind(this);
    _getCastingCheckMessages = getCastingCheckMessages.bind(this);
    _getItemCheckMessages = getItemCheckMessages.bind(this);
-   getAttackDiceMod = getAttackDiceMod.bind(this);
-   getCastingDiceMod = getCastingDiceMod.bind(this);
+   getAttackCheckDiceMod = getAttackCheckDiceMod.bind(this);
+   getCastingCheckDiceMod = getCastingCheckDiceMod.bind(this);
+   getItemCheckDiceMod = getItemCheckDiceMod.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -874,7 +876,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Initialize check options
       options.attack = attack;
       options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
-      options.diceMod = options.diceMod ?? this.getAttackDiceMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
+      options.diceMod = options.diceMod ?? this.getAttackCheckDiceMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();
@@ -958,7 +960,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Initialize check options
       options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
-      options.diceMod = options.diceMod ?? this.getCastingDiceMod(spell);
+      options.diceMod = options.diceMod ?? this.getCastingCheckDiceMod(spell);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();
@@ -1024,6 +1026,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          return;
       }
       options.itemRollData = item.getRollData();
+      options.diceMod = this.getItemCheckDiceMod(item);
 
       // Add the actor check data to the check options
       options.actorRollData = this.parent.getRollData();

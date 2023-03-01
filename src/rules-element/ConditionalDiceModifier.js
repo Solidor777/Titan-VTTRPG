@@ -97,7 +97,7 @@ function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, re
    return retVal;
 }
 
-export function getAttackDiceMod(item, attack, multiAttack) {
+export function getAttackCheckDiceMod(item, attack, multiAttack) {
    let retVal = 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
@@ -113,11 +113,21 @@ export function getAttackDiceMod(item, attack, multiAttack) {
    return retVal;
 }
 
-export function getCastingDiceMod(item) {
+export function getCastingCheckDiceMod(item) {
    let retVal = 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'spellTradition', camelize(item.system.tradition));
+      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
+   }
+
+   return retVal;
+}
+
+export function getItemCheckDiceMod(item) {
+   let retVal = 0;
+   const conditionalDiceModifiers = this.conditionalDiceModifier;
+   if (conditionalDiceModifiers) {
       retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
    }
 
