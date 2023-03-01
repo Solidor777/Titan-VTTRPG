@@ -25,7 +25,7 @@
    ];
 
    // Dynamic element
-   $: element = $document.system.rulesElement[idx];
+   export let element = void 0;
 
    // Setup tabs
 </script>

@@ -25,20 +25,20 @@
    // Initialize check parameters
    const checkParameters = {
       attribute: options.attribute ?? check.attribute,
-      skill: options.skill ?? check.skill,
-      difficulty: options.difficulty
-         ? clamp(options.difficulty, 2, 6)
-         : check.difficulty,
+      checkIdx: options.checkIdx,
       complexity: options.complexity
          ? Math.max(options.complexity, 0)
          : check.complexity,
-      trainingMod: options.trainingMod ?? 0,
+      diceMod: options.diceMod ?? 0,
+      difficulty: options.difficulty
+         ? clamp(options.difficulty, 2, 6)
+         : check.difficulty,
+      doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
-      doubleExpertise: options.doubleExpertise ?? false,
-      diceMod: options.diceMod ?? 0,
       itemId: options.itemId,
-      checkIdx: options.checkIdx,
+      skill: options.skill ?? check.skill,
+      trainingMod: options.trainingMod ?? 0,
    };
 
    const application = getContext('#external').application;

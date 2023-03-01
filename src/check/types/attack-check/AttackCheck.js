@@ -37,7 +37,7 @@ export default class TitanAttackCheck extends TitanCheck {
       const actorRollData = options.actorRollData;
       const itemRollData = options.itemRollData;
       const targetRollData = options.targetRollData;
-      const attackData = itemRollData.attack[options.attackIdx];
+      const attackData = options.attack;
 
       // Initialize base parameters
       const parameters = {

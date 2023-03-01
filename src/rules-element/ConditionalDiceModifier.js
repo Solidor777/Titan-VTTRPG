@@ -17,33 +17,55 @@ export function applyConditionalDiceModifierElements(elements) {
       const conditionalDiceModifiers = {};
       // Sort elements by selector
       const selectors = sortObjectsIntoContainerByKey(elements, 'selector');
-
       // For each selector
       for (const [selector, selectorElements] of Object.entries(selectors)) {
-         conditionalDiceModifiers[selector] = {};
-         const selectorMap = conditionalDiceModifiers[selector];
+         // Hand special case for multi attack
+         if (selector === 'multiAttack') {
+            conditionalDiceModifiers.multiAttack = 0;
+            for (const element of selectorElements) {
+               conditionalDiceModifiers.multiAttack += element.value;
+            }
+         }
 
-         // Sort elements by key
-         const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+         else {
+            conditionalDiceModifiers[selector] = {};
+            const selectorMap = conditionalDiceModifiers[selector];
+            let camelizeKeys = false;
+            switch (selector) {
+               case 'customAttackTrait':
+               case 'customItemTrait':
+               case 'spellTradition': {
+                  camelizeKeys = true;
+               }
+            }
 
-         // For each key
-         for (const [key, keyElements] of Object.entries(keys)) {
+            // Sort elements by key
+            const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
 
-            // Initialize key value
-            selectorMap[key] = 0; {
+            // For each key
+            for (const [key, keyElements] of Object.entries(keys)) {
+               const formattedKey = camelizeKeys ? camelize(key) : key;
 
-               // For each element
-               for (const element of keyElements) {
+               // Initialize key value
+               selectorMap[formattedKey] = 0; {
 
-                  // Add to the key value
-                  selectorMap[key] += element.value;
+                  // For each element
+                  for (const element of keyElements) {
+
+                     // Add to the key value
+                     selectorMap[formattedKey] += element.value;
+                  }
                }
             }
          }
+
+
       }
 
       this.conditionalDiceModifier = conditionalDiceModifiers;
+      return;
    }
+
    this.conditionalDiceModifier = false;
    return;
 }
@@ -75,17 +97,19 @@ function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, re
    return retVal;
 }
 
-export function getAttackDiceMod(attack, multiAttack) {
+export function getAttackDiceMod(attack, item, multiAttack) {
    let retVal = 0;
-   const conditionalDiceModifiers = this.getConditionalDiceModifier;
+   const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
       retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
       retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customAttackTrait', attack.customTrait, (trait) => camelize(trait.name));
+      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
       if (multiAttack && conditionalDiceModifiers.multiAttack) {
          retVal += conditionalDiceModifiers.multiAttack;
       }
    }
+
 
    return retVal;
 }

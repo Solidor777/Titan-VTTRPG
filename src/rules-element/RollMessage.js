@@ -41,12 +41,12 @@ export function applyRollMessageElements(elements) {
             const selectorMessages = {};
             // Sort elements by key
             const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
-            let camelizeMessages = false;
+            let camelizeKeys = false;
             switch (selector) {
                case 'customAttackTrait':
                case 'customItemTrait':
                case 'spellTradition': {
-                  camelizeMessages = true;
+                  camelizeKeys = true;
                   break;
                }
                default: {
@@ -66,7 +66,7 @@ export function applyRollMessageElements(elements) {
                }
 
                if (keyMessages.length > 0) {
-                  selectorMessages[camelizeMessages ? camelize(key) : key] = keyMessages;
+                  selectorMessages[camelizeKeys ? camelize(key) : key] = keyMessages;
                }
             }
 

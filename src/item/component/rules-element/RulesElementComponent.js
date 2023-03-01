@@ -36,7 +36,9 @@ export async function removeRulesElement(idx) {
       // Remove the element
       this.parent.system.rulesElement.splice(idx, 1);
       await this.parent.update({
-         system: this.parent.system
+         system: {
+            rulesElement: this.parent.system.rulesElement
+         }
       });
    }
 

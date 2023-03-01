@@ -860,8 +860,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          return;
       }
 
+      // Get the attack check data.
+      const attack = weapon.system.attack[options.attackIdx];
+      if (!attack) {
+         console.error('TITAN | Attack check failed. Invalid attack ID provided to actor.');
+         console.trace();
+
+         return;
+      }
+
       // Initialize check options
+      options.attack = attack;
       options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
+      options.diceMod = options.diceMod ?? this.getAttackDiceMod(attack, weapon, options.multiAttack ?? weapon.system.multiAttack);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();

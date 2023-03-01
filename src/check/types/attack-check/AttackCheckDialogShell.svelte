@@ -42,7 +42,13 @@
          options.attackerAccuracy ?? actor.system.rating.accuracy.value,
       attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
       attribute: options.attribute ?? attack.attribute,
-      diceMod: options.diceMod ?? actor.character.getAttackDiceMod(),
+      diceMod:
+         options.diceMod ??
+         actor.character.getAttackDiceMod(
+            attack,
+            weapon,
+            options.multiAttack ?? weapon.system.multiAttack
+         ),
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
@@ -85,7 +91,7 @@
    // Determine whether this attack has the flurry trait
    function hasFlurryTrait() {
       for (let idx = 0; idx < attack.trait.length; idx++) {
-         if (attackData.trait[idx].name === 'flurry') {
+         if (attack.trait[idx].name === 'flurry') {
             return true;
          }
       }

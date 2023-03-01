@@ -11,7 +11,7 @@
    import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
    import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
    import ItemSheetRollMessageSettings from '~/item/component/rules-element/ItemSheetRollMessageSettings.svelte';
-   import ItemSheetConditionalDiceMessageSettings from '~/item/component/rules-element/ItemSheetConditionalDiceMessageSettings.svelte';
+   import ItemSheetConditionalDiceModifierSettings from '~/item/component/rules-element/ItemSheetConditionalDiceModifierSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -56,7 +56,7 @@
          fastHealing: ItemSheetFastHealingSettings,
          persistentDamage: ItemSheetPersistentDamageSettings,
          rollMessage: ItemSheetRollMessageSettings,
-         conditionalDiceModifier: ItemSheetConditionalDiceMessageSettings,
+         conditionalDiceModifier: ItemSheetConditionalDiceModifierSettings,
       };
 
       return elementComponents[operation];
@@ -84,6 +84,7 @@
                         $document.system.rulesElement[idx].operation
                      )}
                      {idx}
+                     {element}
                      {operationOptions}
                   />
                </li>
