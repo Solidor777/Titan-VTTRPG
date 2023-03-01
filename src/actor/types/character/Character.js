@@ -1,16 +1,17 @@
 import {
    clamp,
-   getSetting,
-   shouldGetCheckOptions,
    confirmDeletingItems,
    documentSort,
-   isHTMLBlank,
-   getOwners,
-   getSumOfValuesInObject,
    getBestPlayerOwner,
+   getCombatTargets,
+   getOwners,
+   getSetting,
+   getSumOfValuesInObject,
    isFirstOwner,
+   isHTMLBlank,
+   localize,
+   shouldGetCheckOptions,
    sortObjectsIntoContainerByFunction,
-   localize
 } from '~/helpers/Utility.js';
 import { applyFlatModifierElements } from '~/rules-element/FlatModifier.js';
 import { applyMulBaseElements } from '~/rules-element/MulBase.js';
@@ -27,7 +28,8 @@ import {
 } from '~/rules-element/RollMessage';
 import {
    applyConditionalDiceModifierElements,
-   getAttackDiceMod
+   getAttackDiceMod,
+   getCastingDiceMod
 } from '~/rules-element/ConditionalDiceModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
@@ -42,7 +44,6 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
-import { getCombatTargets } from '../../../helpers/Utility';
 
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
@@ -61,6 +62,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _getCastingCheckMessages = getCastingCheckMessages.bind(this);
    _getItemCheckMessages = getItemCheckMessages.bind(this);
    getAttackDiceMod = getAttackDiceMod.bind(this);
+   getCastingDiceMod = getCastingDiceMod.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;
@@ -956,6 +958,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Initialize check options
       options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
+      options.diceMod = options.diceMod ?? this.getCastingDiceMod(spell);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();

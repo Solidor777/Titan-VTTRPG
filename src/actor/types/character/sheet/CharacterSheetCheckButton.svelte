@@ -11,6 +11,8 @@
       difficulty: 4,
       complexity: 0,
    };
+
+   export let diceMod = 0;
 </script>
 
 <div class="item-check-button {check.attribute}">
@@ -27,7 +29,8 @@
             {$document.system.attribute[check.attribute].value +
                (check.skill
                   ? $document.system.skill[check.skill].training.value
-                  : 0)}
+                  : 0) +
+               diceMod}
          </div>
 
          <!--Expertise-->
