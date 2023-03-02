@@ -66,7 +66,6 @@
          <!--Custom Traits-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
             <div class="trait" transition:slide|local>
-               >
                <EditDeleteTag
                   label={trait.name}
                   editFunction={() => {

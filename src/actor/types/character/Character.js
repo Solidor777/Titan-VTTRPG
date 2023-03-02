@@ -32,6 +32,7 @@ import {
    getCastingCheckDiceMod,
    getItemCheckDiceMod
 } from '~/rules-element/ConditionalDiceModifier';
+import { applyConditionalRatingModifierElements } from '~/rules-element/ConditionalRatingModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -57,6 +58,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _applyTurnMessageElements = applyTurnMessageElements.bind(this);
    _applyRollMessageElements = applyRollMessageElements.bind(this);
    _applyConditionalDiceModifierElements = applyConditionalDiceModifierElements.bind(this);
+   _applyConditionRatingModifierElements = applyConditionalRatingModifierElements.bind(this);
    _getAttributeCheckMessages = getAttributeCheckMessages.bind(this);
    _getResistanceCheckMessages = getResistanceCheckMessages.bind(this);
    _getAttackCheckMessages = getAttackCheckMessages.bind(this);
@@ -320,6 +322,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const turnMessageElements = [];
       const rollMessageElements = [];
       const conditionalDiceModifierElements = [];
+      const conditionalRatingModifierElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -350,6 +353,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                conditionalDiceModifierElements.push(element);
                break;
             }
+            case 'conditionalRatingModifier': {
+               conditionalRatingModifierElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -364,6 +371,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._applyTurnMessageElements(turnMessageElements);
       this._applyRollMessageElements(rollMessageElements);
       this._applyConditionalDiceModifierElements(conditionalDiceModifierElements);
+      this._applyConditionRatingModifierElements(conditionalRatingModifierElements);
 
       return;
    }
@@ -2060,6 +2068,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   getArmor() {
+      return this.parent.items.get(this.parent.system.equipped.armor);
+   }
+
    async equipArmor(armorId) {
       if (this.parent.isOwner) {
          // Ensure the armor is valid
@@ -2097,6 +2109,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       return;
+   }
+
+   getShield() {
+      return this.parent.items.get(this.parent.system.equipped.shield);
    }
 
    async equipShield(shieldId) {

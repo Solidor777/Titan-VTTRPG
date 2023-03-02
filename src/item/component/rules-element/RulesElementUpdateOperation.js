@@ -27,19 +27,19 @@ export default async function onRulesElementOperationChanged(document, elementId
          break;
       }
       case 'turnMessage': {
-         document.system.rulesElement[elementIdx] = getTurnMessageTemplate(element.uuid);
+         document.system.rulesElement[elementIdx] = getTurnMessageTemplate(element.uuid, element.type);
          break;
       }
       case 'rollMessage': {
-         document.system.rulesElement[elementIdx] = getRollMessageTemplate(element.uuid);
+         document.system.rulesElement[elementIdx] = getRollMessageTemplate(element.uuid, element.type);
          break;
       }
       case 'conditionalDiceModifier': {
-         document.system.rulesElement[elementIdx] = getConditionalDiceModifierTemplate(element.uuid);
+         document.system.rulesElement[elementIdx] = getConditionalDiceModifierTemplate(element.uuid, element.type);
          break;
       }
       case 'conditionalRatingModifier': {
-         document.system.rulesElement[elementIdx] = getConditionalRatingModifierTemplate(element.uuid);
+         document.system.rulesElement[elementIdx] = getConditionalRatingModifierTemplate(element.uuid, element.type);
          break;
       }
       default: {

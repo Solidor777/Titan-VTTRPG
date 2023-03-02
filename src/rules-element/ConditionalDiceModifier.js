@@ -81,7 +81,7 @@ function getDiceMods(conditionalDiceModifiers, selector, key) {
    return 0;
 }
 
-function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, reduceFunction) {
+function getDiceModsForReducedKeys(conditionalDiceModifiers, selector, keys, reduceFunction) {
    let retVal = 0;
    const selectorMods = conditionalDiceModifiers[selector];
    if (selectorMods) {
@@ -101,9 +101,9 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customAttackTrait', attack.customTrait, (trait) => camelize(trait.name));
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customAttackTrait', attack.customTrait, (trait) => camelize(trait.name));
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
       if (multiAttack && conditionalDiceModifiers.multiAttack) {
          retVal += conditionalDiceModifiers.multiAttack;
       }
@@ -117,7 +117,7 @@ export function getCastingCheckDiceMod(item) {
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'spellTradition', camelize(item.system.tradition));
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
    }
 
    return retVal;
@@ -127,7 +127,7 @@ export function getItemCheckDiceMod(item) {
    let retVal = 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
    }
 
    return retVal;

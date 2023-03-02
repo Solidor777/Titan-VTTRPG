@@ -10,11 +10,11 @@ export function getConditionalRatingModifierTemplate(uuid, type) {
       key: '',
       value: 1,
       uuid: uuid ?? uuidv4(),
-      type: type ?? ''
+      type: type ?? 'effect'
    };
 }
 
-export function applyConditionalDiceModifierElements(elements) {
+export function applyConditionalRatingModifierElements(elements) {
    if (elements.length > 0) {
       const conditionalRatingModifiers = {};
       // Sort elements by rating
@@ -50,8 +50,8 @@ export function applyConditionalDiceModifierElements(elements) {
                   let camelizeKeys = false;
                   switch (selector) {
                      case 'customAttackTrait':
-                     case 'customItemTrait':
-                     case 'spellTradition': {
+                     case 'customArmorTrait':
+                     case 'customShieldTrait': {
                         camelizeKeys = true;
                      }
                   }
@@ -64,31 +64,45 @@ export function applyConditionalDiceModifierElements(elements) {
                      const formattedKey = camelizeKeys ? camelize(key) : key;
 
                      // Initialize key value
-                     selectorMap[formattedKey] = 0; {
+                     selectorMap[formattedKey] = {}; {
+                        const keyMap = selectorMap[formattedKey];
 
-                        // For each element
-                        for (const element of keyElements) {
+                        // Sort elements by type
+                        const types = sortObjectsIntoContainerByKey(keyElements, 'type');
 
-                           // Add to the key value
-                           selectorMap[formattedKey] += element.value;
+                        // For each type
+                        for (const [type, typeElements] of Object.entries(types)) {
+                           keyMap[type] = 0;
+
+                           // For each element
+                           for (const element of typeElements) {
+
+                              // Add to the key value
+                              keyMap[type] += element.value;
+                           }
                         }
+
                      }
                   }
                }
             }
          }
-
-         this.conditionalRatingModifier = conditionalRatingModifiers;
-         return;
       }
+
+      if (conditionalRatingModifiers.defense) {
+         applyDefenseRatingModifier(this, conditionalRatingModifiers.defense);
+      }
+
+      this.conditionalRatingModifier = conditionalRatingModifiers;
+      return;
    }
 
    this.conditionalRatingModifier = false;
    return;
 }
 
-function getDiceMods(conditionalDiceModifiers, selector, key) {
-   const selectorMods = conditionalDiceModifiers[selector];
+function getRatingMods(conditionalRatingModifiers, selector, key) {
+   const selectorMods = conditionalRatingModifiers[selector];
    if (selectorMods) {
       const keyMod = selectorMods[key];
       if (keyMod) {
@@ -99,14 +113,14 @@ function getDiceMods(conditionalDiceModifiers, selector, key) {
    return 0;
 }
 
-function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, reduceFunction) {
-   let retVal = 0;
+function getRatingModsForReducedKeys(conditionalDiceModifiers, selector, keys, reduceFunction) {
+   let retVal = [];
    const selectorMods = conditionalDiceModifiers[selector];
    if (selectorMods) {
       keys.forEach((key) => {
          const keyMod = selectorMods[reduceFunction(key)];
          if (keyMod) {
-            retVal += keyMod;
+            retVal.push(keyMod);
          }
       });
    }
@@ -114,39 +128,35 @@ function getDicedModsForReducedKeys(conditionalDiceModifiers, selector, keys, re
    return retVal;
 }
 
-export function getAttackCheckDiceMod(item, attack, multiAttack) {
-   let retVal = 0;
-   const conditionalDiceModifiers = this.conditionalDiceModifier;
-   if (conditionalDiceModifiers) {
-      retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customAttackTrait', attack.customTrait, (trait) => camelize(trait.name));
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
-      if (multiAttack && conditionalDiceModifiers.multiAttack) {
-         retVal += conditionalDiceModifiers.multiAttack;
+function applyDefenseRatingModifier(character, conditionalDefenseModifiers) {
+   // Apply armor bonuses
+   const armor = character.getArmor();
+   if (armor) {
+
+      // Armor traits
+      const armorTraits = armor.system.trait;
+      if (armorTraits.length > 0) {
+         const armorTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'armorTrait', armorTraits, (trait) => trait.name);
+         if (armorTraitMods.length > 0) {
+            for (const armorTraitMod of armorTraitMods) {
+               for (const [type, value] of Object.entries(armorTraitMod)) {
+                  character.parent.system.rating.defense.mod[type] += value;
+               }
+            }
+         }
+      }
+
+      // Custom armor traits
+      const customArmorTraits = armor.system.customTrait;
+      if (customArmorTraits.length > 0) {
+         const customArmorTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customArmorTrait', customArmorTraits, (trait) => camelize(trait.name));
+         if (customArmorTraitMods.length > 0) {
+            for (const customArmorTraitMod of customArmorTraitMods) {
+               for (const [type, value] of Object.entries(customArmorTraitMod)) {
+                  character.parent.system.rating.defense.mod[type] += value;
+               }
+            }
+         }
       }
    }
-
-   return retVal;
-}
-
-export function getCastingCheckDiceMod(item) {
-   let retVal = 0;
-   const conditionalDiceModifiers = this.conditionalDiceModifier;
-   if (conditionalDiceModifiers) {
-      retVal += getDiceMods(conditionalDiceModifiers, 'spellTradition', camelize(item.system.tradition));
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
-   }
-
-   return retVal;
-}
-
-export function getItemCheckDiceMod(item) {
-   let retVal = 0;
-   const conditionalDiceModifiers = this.conditionalDiceModifier;
-   if (conditionalDiceModifiers) {
-      retVal += getDicedModsForReducedKeys(conditionalDiceModifiers, 'customItemTrait', item.system.customTrait, (trait) => camelize(trait.name));
-   }
-
-   return retVal;
 }
