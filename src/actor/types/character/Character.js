@@ -894,12 +894,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Add the weapon data to the check options
       const itemRollData = weapon.getRollData();
       options.itemRollData = itemRollData;
+      options.multiAttack = options.multiAttack ?? itemRollData.multiAttack;
 
       // Get the target check data
       const userTargets = getCombatTargets();
       if (userTargets[0] && userTargets[0]._id !== this.parent._id) {
          const targetRollData = userTargets[0].getRollData();
          options.targetRollData = targetRollData;
+         options.attackerMelee = options.attackerMelee ?? actorRollData.rating.melee.value + this.getAttackRatingModifier('melee', weapon, attack, options.multiAttack);
+         options.attackerAccuracy = options.attackAccuracyMelee ?? actorRollData.rating.accuracy.value + this.getAttackRatingModifier('accuracy', weapon, attack, options.multiAttack);
       }
 
       return new TitanAttackCheck(options);
