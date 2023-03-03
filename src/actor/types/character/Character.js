@@ -32,7 +32,7 @@ import {
    getCastingCheckDiceMod,
    getItemCheckDiceMod
 } from '~/rules-element/ConditionalDiceModifier';
-import { applyConditionalRatingModifierElements } from '~/rules-element/ConditionalRatingModifier';
+import { applyConditionalRatingModifierElements, getAttackRatingModifier } from '~/rules-element/ConditionalRatingModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
 import AttackCheckDialog from '~/check/types/attack-check/AttackCheckDialog.js';
@@ -67,6 +67,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getAttackCheckDiceMod = getAttackCheckDiceMod.bind(this);
    getCastingCheckDiceMod = getCastingCheckDiceMod.bind(this);
    getItemCheckDiceMod = getItemCheckDiceMod.bind(this);
+   getAttackRatingModifier = getAttackRatingModifier.bind(this);
 
    _getSpentXP() {
       const systemData = this.parent.system;

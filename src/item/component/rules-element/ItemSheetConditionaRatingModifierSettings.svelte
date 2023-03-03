@@ -63,8 +63,8 @@
          value: 'attackType',
       },
       {
-         label: localize('customAttackTrait'),
-         value: 'customAttackTrait',
+         label: localize('customTrait'),
+         value: 'customTrait',
       },
       {
          label: localize('multiAttack'),
@@ -84,7 +84,7 @@
             break;
          }
          case 'customArmorTrait':
-         case 'customAttackTrait':
+         case 'customTrait':
          case 'customShieldTrait':
          case 'multiAttack': {
             element.key = '';

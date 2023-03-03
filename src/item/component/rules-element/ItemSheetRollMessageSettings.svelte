@@ -34,12 +34,8 @@
          value: 'attribute',
       },
       {
-         label: localize('customAttackTrait'),
-         value: 'customAttackTrait',
-      },
-      {
-         label: localize('customItemTrait'),
-         value: 'customItemTrait',
+         label: localize('customTrait'),
+         value: 'customTrait',
       },
       {
          label: localize('multiAttack'),
@@ -77,8 +73,7 @@
             element.key = 'body';
             break;
          }
-         case 'customAttackTrait':
-         case 'customItemTrait':
+         case 'customTrait':
          case 'multiAttack': {
             element.key = '';
             break;
@@ -116,10 +111,7 @@
          case 'attribute': {
             return DocumentAttributeSelect;
          }
-         case 'customAttackTrait': {
-            return DocumentTextInput;
-         }
-         case 'customItemTrait': {
+         case 'customTrait': {
             return DocumentTextInput;
          }
          case 'resistance': {

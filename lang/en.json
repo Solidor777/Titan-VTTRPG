@@ -117,8 +117,6 @@
    "LOCAL.custom.label": "Custom",
    "LOCAL.customAspect.label": "Custom Aspect",
    "LOCAL.customAspects.label": "Custom Aspects",
-   "LOCAL.customAttackTrait.label": "Custom Attack Trait",
-   "LOCAL.customItemTrait.label": "Custom Item Trait",
    "LOCAL.damage.desc.label": "Bonuses and penalties to damage dealt.",
    "LOCAL.damage.label": "Damage",
    "LOCAL.damageTaken.label": "Damage Taken",
@@ -466,6 +464,7 @@
    "LOCAL.customArmorTrait.label": "Custom Armor Trait",
    "LOCAL.shieldTrait.label": "Shield Trait",
    "LOCAL.customShieldTrait.label": "Custom Shield Trait",
+   "LOCAL.customTrait.label": "Custom Trait",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."

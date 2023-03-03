@@ -27,12 +27,8 @@
          value: 'attackType',
       },
       {
-         label: localize('customAttackTrait'),
-         value: 'customAttackTrait',
-      },
-      {
-         label: localize('customItemTrait'),
-         value: 'customItemTrait',
+         label: localize('customTrait'),
+         value: 'customTrait',
       },
       {
          label: localize('multiAttack'),
@@ -58,8 +54,7 @@
             element.key = 'melee';
             break;
          }
-         case 'customAttackTrait':
-         case 'customItemTrait':
+         case 'customTrait':
          case 'multiAttack': {
             element.key = '';
             break;
@@ -86,10 +81,7 @@
          case 'attackType': {
             return DocumentRangeTypeSelect;
          }
-         case 'customAttackTrait': {
-            return DocumentTextInput;
-         }
-         case 'customItemTrait': {
+         case 'customTrait': {
             return DocumentTextInput;
          }
          case 'spellTradition': {

@@ -44,8 +44,7 @@ export function applyRollMessageElements(elements) {
             const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
             let camelizeKeys = false;
             switch (selector) {
-               case 'customAttackTrait':
-               case 'customItemTrait':
+               case 'customTrait':
                case 'spellTradition': {
                   camelizeKeys = true;
                   break;
@@ -178,21 +177,27 @@ export function getAttackCheckMessages(check) {
          message.push(...attackTraitMessages);
       }
 
-      // Attack Trait messages
-      const customAttackTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customAttackTrait', check.parameters.attack.customTrait, (trait) => camelize(trait.name));
+      // Custom Attack Trait messages
+      const customTraitMessages = [];
+      const customAttackTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.attack.customTrait, (trait) => camelize(trait.name));
       if (customAttackTraitMessages) {
-         message.push(...customAttackTraitMessages);
+         customTraitMessages.push(...customAttackTraitMessages);
       }
+
+      // Custom Item Trait messages
+      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
+      if (customItemTraitMessages) {
+         customTraitMessages.push(...customItemTraitMessages);
+      }
+
+      // Make sure the custom messages are unique
+      message.push(...customTraitMessages.filter((entry, index) => {
+         return customTraitMessages.indexOf(entry) === index;
+      }));
 
       // Multi Attack messages
       if (check.parameters.multiAttack && rollMessages.multiAttack) {
          message.push(...rollMessages.multiAttack);
-      }
-
-      // Custom Item Trait messages
-      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
-      if (customItemTraitMessages) {
-         message.push(...customItemTraitMessages);
       }
 
       return message.length > 0 ? message : false;
@@ -218,10 +223,10 @@ export function getCastingCheckMessages(check) {
          message.push(...skillRollMessages);
       }
 
-      // Custom Item Trait messages
-      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
-      if (customItemTraitMessages) {
-         message.push(...customItemTraitMessages);
+      // Custom Trait messages
+      const customTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
+      if (customTraitMessages) {
+         message.push(...customTraitMessages);
       }
 
       // Spell Tradition messages
@@ -254,9 +259,9 @@ export function getItemCheckMessages(check) {
       }
 
       // Custom Item Trait messages
-      const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customItemTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
-      if (customItemTraitMessages) {
-         message.push(...customItemTraitMessages);
+      const customTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
+      if (customTraitMessages) {
+         message.push(...customTraitMessages);
       }
 
       return message.length > 0 ? message : false;

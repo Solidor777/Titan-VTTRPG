@@ -36,32 +36,41 @@
    }
 
    // Initialize check parameters
+   const multiAttack = options.multiAttack ?? weapon.system.multiAttack;
    const checkParameters = {
       attackIdx: options.attackIdx,
       attackerAccuracy:
-         options.attackerAccuracy ?? actor.system.rating.accuracy.value,
-      attackerMelee: options.attackerMelee ?? actor.system.rating.melee.value,
+         options.attackerAccuracy ??
+         actor.system.rating.accuracy.value +
+            actor.typeComponent.getAttackRatingModifier(
+               'accuracy',
+               weapon,
+               attack,
+               multiAttack
+            ),
+      attackerMelee:
+         options.attackerMelee ??
+         actor.system.rating.melee.value +
+            actor.typeComponent.getAttackRatingModifier(
+               'melee',
+               weapon,
+               attack,
+               multiAttack
+            ),
       attribute: options.attribute ?? attack.attribute,
       diceMod:
          options.diceMod ??
-         actor.character.getAttackCheckDiceMod(
-            weapon,
-            attack,
-            options.multiAttack ?? weapon.system.multiAttack
-         ),
+         actor.character.getAttackCheckDiceMod(weapon, attack, multiAttack),
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,
       itemId: options.itemId,
-      multiAttack: options.multiAttack ?? weapon.system.multiAttack,
+      multiAttack: multiAttack,
       skill: options.skill ?? attack.skill,
       targetDefense: options.targetDefense ?? getTargetDefense(),
       trainingMod: options.trainingMod ?? 0,
       type: options.type ?? attack.type,
    };
-
-   // Rating options
-   const ratingOptions = [1, 2, 3, 4, 5, 6];
 
    // Type Options
    const typeOptions = [
@@ -204,10 +213,7 @@
             {localize('attackerMelee')}
          </div>
          <div class="input">
-            <IntegerSelect
-               options={ratingOptions}
-               bind:value={checkParameters.attackerMelee}
-            />
+            <IntegerInput bind:value={checkParameters.attackerMelee} />
          </div>
       {:else}
          <!--Accuracy-->
@@ -215,10 +221,7 @@
             {localize('attackerAccuracy')}
          </div>
          <div class="input">
-            <IntegerSelect
-               options={ratingOptions}
-               bind:value={checkParameters.attackerAccuracy}
-            />
+            <IntegerInput bind:value={checkParameters.attackerAccuracy} />
          </div>
       {/if}
    </div>
@@ -229,10 +232,7 @@
          {localize('targetDefense')}
       </div>
       <div class="input">
-         <IntegerSelect
-            options={ratingOptions}
-            bind:value={checkParameters.targetDefense}
-         />
+         <IntegerInput bind:value={checkParameters.targetDefense} />
       </div>
    </div>
 
