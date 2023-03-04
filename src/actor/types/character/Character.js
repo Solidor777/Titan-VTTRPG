@@ -265,9 +265,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   _getActiveEffectItems() {
+      return this.parent.items.filter((effect) => effect.type === 'effect' && (effect.system.active || effect.system.duration.type !== 'permanent'));
+   }
+
    _sortEffects() {
       // Sort effects by duration type
-      const effectItems = this.parent.items.filter((effect) => effect.type === 'effect').sort((a, b) => documentSort(a, b));
+      const effectItems = this._getActiveEffectItems().sort((a, b) => documentSort(a, b));
       const sortedEffects = sortObjectsIntoContainerByFunction(effectItems, (effect) => {
          return effect.typeComponent?.isExpired() ? 'expired' : effect.system.duration.type;
       });
@@ -284,32 +288,39 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
    _applyRulesElements() {
       // Get all the rules elements
-      let rulesElements = [];
+      const rulesElements = [];
       this.parent.items.forEach((item) => {
          if (item.system.rulesElement && item.system.rulesElement.length > 0) {
             // Equipment, armor, shields, and weapons only apply elements if they are equipped
             switch (item.type) {
                case 'armor': {
                   if (this.parent.system.equipped.armor === item._id) {
-                     rulesElements = [...rulesElements, ...item.system.rulesElement];
+                     rulesElements.push(...item.system.rulesElement);
                   }
                   break;
                }
                case 'shield': {
                   if (this.parent.system.equipped.shield === item._id) {
-                     rulesElements = [...rulesElements, ...item.system.rulesElement];
+                     rulesElements.push(...item.system.rulesElement);
                   }
                   break;
                }
                case 'weapon':
                case 'equipment': {
                   if (item.system.equipped) {
-                     rulesElements = [...rulesElements, ...item.system.rulesElement];
+                     rulesElements.push(...item.system.rulesElement);
                   }
                   break;
                }
+               case 'effect': {
+                  if (item.system.active || item.system.duration.type !== 'permanent') {
+                     rulesElements.push(...item.system.rulesElement);
+                  }
+
+                  break;
+               }
                default: {
-                  rulesElements = [...rulesElements, ...item.system.rulesElement];
+                  rulesElements.push(...item.system.rulesElement);
                }
             }
          }
@@ -650,13 +661,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Cleanup orphaned active effects
          for (const effect of this.parent.effects) {
-            if (effect.flags.titan?.type === 'effect' && !this.parent.items.get(effect.origin)) {
-               await effect.delete();
+            if (effect.flags.titan?.type === 'effect') {
+               const effectItem = this.parent.items.get(effect.origin);
+               if (!effectItem || !effectItem.typeComponent.isActive()) {
+                  await effect.delete();
+               }
             }
          }
 
          // For each effect item
-         for (const effectItem of this.parent.items.filter((item) => item.type === 'effect')) {
+         for (const effectItem of this._getActiveEffectItems()) {
             const effects = this.parent.effects.filter((effect) => effect.origin === effectItem._id);
 
             // Update effects if appropriate

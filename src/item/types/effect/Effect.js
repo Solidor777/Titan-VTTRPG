@@ -20,4 +20,8 @@ export default class TitanEffect extends TitanTypeComponent {
    isExpired() {
       return this.parent.system.duration.type !== 'permanent' && this.parent.system.duration.remaining <= 0;
    }
+
+   isActive() {
+      return this.parent.system.active || this.parent.system.duration.type !== 'permanent';
+   }
 }
