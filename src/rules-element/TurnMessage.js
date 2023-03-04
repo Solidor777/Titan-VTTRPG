@@ -21,7 +21,7 @@ export function applyTurnMessageElements(elements) {
       for (const [selector, selectorElements] of Object.entries(selectors)) {
          const selectorMessages = [];
          for (const element of selectorElements) {
-            if (!isHTMLBlank(element.message)) {
+            if (!isHTMLBlank(element.message) && selectorMessages.indexOf(element.message) < 0) {
                selectorMessages.push(element.message);
             }
          }

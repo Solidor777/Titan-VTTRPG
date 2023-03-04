@@ -1,7 +1,7 @@
-import { localize, getSetting, getActor } from '~/helpers/Utility.js';
+import { localize, getActor } from '~/helpers/Utility.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 
-async function reRollCheckFailures(li) {
+async function reRollCheckFailures(li, spendResolve) {
    // Get the successes and failure count
    const message = game.messages.get(li.data("messageId"));
    const chatContext = message?.flags?.titan;
@@ -52,7 +52,7 @@ async function reRollCheckFailures(li) {
       });
 
       // Spend resolve if appropriate
-      if (getSetting('autoSpendResolveReRollFailures')) {
+      if (spendResolve) {
          const actor = getActor(message.speaker.actor, message.speaker.token);
          if (actor) {
             const character = actor.character;
@@ -66,7 +66,7 @@ async function reRollCheckFailures(li) {
    return;
 }
 
-async function doubleExpertise(li) {
+async function doubleExpertise(li, spendResolve) {
    // If expertise is not already doubled
    const message = game.messages.get(li.data("messageId"));
    const chatContext = message?.flags?.titan;
@@ -87,7 +87,7 @@ async function doubleExpertise(li) {
       });
 
       // Spend resolve if appropriate
-      if (getSetting('autoSpendResolveDoubleExpertise')) {
+      if (spendResolve) {
          const actor = getActor(message.speaker.actor, message.speaker.token);
          if (actor) {
             const character = actor.character;
@@ -101,7 +101,7 @@ async function doubleExpertise(li) {
    return;
 }
 
-async function doubleTraining(li) {
+async function doubleTraining(li, spendResolve) {
    // If expertise is not already doubled
    const message = game.messages.get(li.data("messageId"));
    const chatContext = message?.flags?.titan;
@@ -135,7 +135,7 @@ async function doubleTraining(li) {
       });
 
       // Spend resolve if appropriate
-      if (getSetting('autoSpendResolveDoubleTraining')) {
+      if (spendResolve) {
          const actor = getActor(message.speaker.actor, message.speaker.token);
          if (actor) {
             const character = actor.character;
@@ -185,25 +185,71 @@ export function registerChatContextOptions(html, options) {
       return false;
    };
 
+   const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
+   const autoSpendResolveDoubleExpertise = getSetting('autoSpendResolveDoubleExpertise');
+   const autoSpendResolveDoubleTraining = getSetting('autoSpendResolveDoubleTraining');
 
-   options.push(
+   // Re-roll Failures (Spend Resolve)
+   const reRollFailureOptions = [
       {
+         name: localize("reRollFailuresSpendResolve"),
+         icon: '<i class="fas fa-dice"></i>',
+         condition: canUseCheckControls,
+         callback: (li) => reRollCheckFailures(li, true)
+      },
+   ];
+
+   // Re-roll Failures
+   if (game.user.isGM || !autoSpendResolveReRollFailures) {
+      reRollFailureOptions.unshift({
          name: localize("reRollFailures"),
          icon: '<i class="fas fa-dice"></i>',
          condition: canUseCheckControls,
-         callback: (li) => reRollCheckFailures(li)
-      },
+         callback: (li) => reRollCheckFailures(li, false)
+      });
+   }
+
+   // Double Expertise (Spend Resolve)
+   const doubleExpertiseOptions = [
       {
+         name: localize("doubleExpertiseSpendResolve"),
+         icon: '<i class="fas fa-graduation-cap"></i>',
+         condition: canDoubleExpertise,
+         callback: (li) => doubleExpertise(li, true)
+      },
+   ];
+
+   // Double Expertise
+   if (game.user.isGM || !autoSpendResolveDoubleExpertise) {
+      doubleExpertiseOptions.unshift({
          name: localize("doubleExpertise"),
          icon: '<i class="fas fa-graduation-cap"></i>',
          condition: canDoubleExpertise,
-         callback: (li) => doubleExpertise(li)
-      },
+         callback: (li) => doubleExpertise(li, false)
+      });
+   }
+
+   // Double Training (Spend Resolve)
+   const doubleTrainingOptions = [
       {
+         name: localize("doubleTrainingSpendResolve"),
+         icon: '<i class="fas fa-dumbbell"></i>',
+         condition: canDoubleTraining,
+         callback: (li) => doubleTraining(li, true)
+      },
+   ];
+
+   // Double Training
+   if (game.user.isGM || !autoSpendResolveDoubleTraining) {
+      doubleTrainingOptions.push({
          name: localize("doubleTraining"),
          icon: '<i class="fas fa-dumbbell"></i>',
          condition: canDoubleTraining,
-         callback: (li) => doubleTraining(li)
-      },
-   );
+         callback: (li) => doubleTraining(li, false)
+      });
+   }
+
+   options.push(...reRollFailureOptions);
+   options.push(...doubleExpertiseOptions);
+   options.push(...doubleTrainingOptions);
 }

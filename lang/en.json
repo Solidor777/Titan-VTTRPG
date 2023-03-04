@@ -465,6 +465,9 @@
    "LOCAL.shieldTrait.label": "Shield Trait",
    "LOCAL.customShieldTrait.label": "Custom Shield Trait",
    "LOCAL.customTrait.label": "Custom Trait",
+   "LOCAL.reRollFailuresSpendResolve.label": "Re-roll Failures (Spend 1 Resolve)",
+   "LOCAL.doubleExpertiseSpendResolve.label": "Double Expertise (Spend 1 Resolve)",
+   "LOCAL.doubleTrainingSpendResolve.label": "Double Training (Spend 1 Resolve)",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."
@@ -534,8 +537,8 @@
       "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Double Expertise on a check."
    },
    "SETTINGS.autoSpendResolveReRollFailures": {
-      "label": "Auto-Spend Resolve when Re-Rolling Failures",
-      "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Re-Roll failures on a check."
+      "label": "Auto-Spend Resolve when Re-rolling Failures",
+      "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Re-roll failures on a check."
    },
    "SETTINGS.autoSpendResolveChecks": {
       "label": "Auto-Spend Resolve when using Checks",

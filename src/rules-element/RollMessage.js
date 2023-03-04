@@ -60,7 +60,7 @@ export function applyRollMessageElements(elements) {
 
                // Apply each message
                for (const element of keyElements) {
-                  if (!isHTMLBlank(element.message)) {
+                  if (!isHTMLBlank(element.message) && keyMessages.indexOf(element.message) < 0) {
                      keyMessages.push(element.message);
                   }
                }

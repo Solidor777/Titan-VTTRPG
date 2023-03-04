@@ -42,6 +42,10 @@ export function getCombatTargets() {
    return userTargets.map((target) => target.actor);
 }
 
+export function getControlledTokens() {
+   return Array.from(canvas.tokens.controlled);
+}
+
 export function isGM() {
    return game.user.isGM;
 }
