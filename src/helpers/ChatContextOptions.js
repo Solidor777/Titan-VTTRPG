@@ -1,4 +1,4 @@
-import { localize, getActor } from '~/helpers/Utility.js';
+import { localize, getActor, getSetting } from '~/helpers/Utility.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 
 async function reRollCheckFailures(li, spendResolve) {

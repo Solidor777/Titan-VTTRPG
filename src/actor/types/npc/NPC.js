@@ -2,6 +2,12 @@ import { getSetting } from '~/helpers/Utility';
 import TitanCharacterComponent from '~/actor/types/character/Character';
 
 export default class TitanNPCComponent extends TitanCharacterComponent {
+   setInitialData(initialData) {
+      super.setInitialData(initialData);
+      prototypeToken.disposition = CONST.TOKEN_DISPOSITIONS.HOSTILE;
+      return;
+   }
+
    // Prepare NPC type specific data
    prepareDerivedData() {
       super.prepareDerivedData();

@@ -1,4 +1,5 @@
 import { localize, confirmDeletingItems } from '~/helpers/Utility';
+import { v4 as uuidv4 } from 'uuid';
 import TitanPlayerComponent from '~/actor/types/player/Player.js';
 import TitanNPCComponent from '~/actor/types/npc/NPC.js';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
@@ -6,23 +7,30 @@ export default class TitanActor extends Actor {
 
    async _preCreate(data, options, user) {
       await super._preCreate(data, options, user);
-      const initData = {
-         'prototypeToken.bar1': { attribute: 'resource.stamina' },
-         'prototypeToken.bar2': { attribute: 'resource.wounds' },
-         'prototypeToken.displayName': CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
-         'prototypeToken.displayBars': CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
-      };
 
-      if (data.type === 'player') {
-         initData['prototypeToken.vision'] = true;
-         initData['prototypeToken.actorLink'] = true;
-         initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.FRIENDLY;
-      }
-      else if (data.type === 'npc') {
-         initData['prototypeToken.disposition'] = CONST.TOKEN_DISPOSITIONS.HOSTILE;
-      }
+      // Initialize type component
+      this._initializeTypeComponent();
 
-      this.updateSource(initData);
+      // Initialize creation data
+      const uuid = this.flags?.titan?.uuid;
+      if (!uuid) {
+
+         // UUID
+         const initialData = {
+            flags: {
+               titan: {
+                  uuid: uuidv4()
+               }
+            }
+         };
+
+         // Type specific data
+         if (this.typeComponent) {
+            this.typeComponent.setInitialData(initialData);
+         }
+
+         this.updateSource(initialData);
+      }
    }
 
    // Prepare calculated data

@@ -14,13 +14,28 @@ export default class TitanItem extends Item {
    async _preCreate(data, options, user) {
       await super._preCreate(data, options, user);
 
-      // Perform initializations
+      // Initialize type component
       this._initializeTypeComponent();
-      if (this.typeComponent) {
-         const initialData = this.typeComponent.getInitialData();
-         if (initialData) {
-            this.updateSource(initialData);
+
+      // Initialize creation data
+      const uuid = this.flags?.titan?.uuid;
+      if (!uuid) {
+
+         // UUID
+         const initialData = {
+            flags: {
+               titan: {
+                  uuid: uuidv4()
+               }
+            }
+         };
+
+         // Type specific data
+         if (this.typeComponent) {
+            this.typeComponent.setInitialData(initialData);
          }
+
+         this.updateSource(initialData);
       }
    }
 

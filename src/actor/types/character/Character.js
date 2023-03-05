@@ -69,6 +69,19 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getItemCheckDiceMod = getItemCheckDiceMod.bind(this);
    getAttackRatingModifier = getAttackRatingModifier.bind(this);
 
+   setInitialData(initialData) {
+      // Prototype token
+      if (!initialData.prototypeToken) {
+         initialData.prototypeToken = {};
+      }
+      initialData.prototypeToken.bar1 = { attribute: 'resource.stamina' };
+      initialData.prototypeToken.bar2 = { attribute: 'resource.resolve' };
+      initialData.prototypeToken.displayName = CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER;
+      initialData.prototypeToken.displayBars = CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER;
+
+      return;
+   }
+
    _getSpentXP() {
       const systemData = this.parent.system;
       // Calculate the amount of XP spent

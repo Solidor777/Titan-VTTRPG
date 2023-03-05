@@ -7,15 +7,9 @@ export default class TitanArmor extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-   getInitialData() {
-      // Image
-      if (this.parent.img === 'icons/svg/item-bag.svg') {
-         return {
-            img: 'icons/svg/statue.svg'
-         }
-      }
-
-      return false;
+   setInitialData(initialData) {
+      initialData.img = 'icons/svg/statue.svg';
+      return;
    }
 
    editArmorTraits() {

@@ -12,29 +12,19 @@ export default class TitanWeapon extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-   getInitialData() {
-      let shouldReturnData = false;
-      const initialData = {};
-
+   setInitialData(initialData) {
       // Image
-      if (this.parent.img === 'icons/svg/item-bag.svg') {
-         shouldReturnData = true;
-         initialData.img = 'icons/svg/sword.svg';
+      initialData.img = 'icons/svg/sword.svg';
+
+      // System
+      if (!initialData.system) {
+         initialData.system = {};
       }
 
       // Attack
-      if (this.parent.system.attack.length <= 0) {
-         shouldReturnData = true;
-         initialData.system = {
-            attack: [getAttackTemplate()]
-         };
-      }
+      initialData.attack = [getAttackTemplate()];
 
-      if (shouldReturnData) {
-         return initialData;
-      }
-
-      return false;
+      return;
    }
 
 

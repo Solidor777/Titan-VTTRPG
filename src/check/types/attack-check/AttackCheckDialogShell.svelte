@@ -6,7 +6,6 @@
    import AttributeSelect from '~/helpers/svelte-components/select/AttributeSelect.svelte';
    import SkillSelect from '~/helpers/svelte-components/select/SkillSelect.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
-   import IntegerSelect from '~/helpers/svelte-components/select/IntegerSelect.svelte';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';

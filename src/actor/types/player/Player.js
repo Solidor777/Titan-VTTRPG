@@ -1,6 +1,17 @@
 import TitanCharacterComponent from '~/actor/types/character/Character.js';
 
 export default class TitanPlayerComponent extends TitanCharacterComponent {
+
+   setInitialData(initialData) {
+      super.setInitialData(initialData);
+      const prototypeToken = initialData.prototypeToken;
+      prototypeToken.vision = true;
+      prototypeToken.actorLink = true;
+      prototypeToken.disposition = CONST.TOKEN_DISPOSITIONS.FRIENDLY;
+
+      return;
+   }
+
    // Prepare Player type specific data
    prepareDerivedData() {
       super.prepareDerivedData();

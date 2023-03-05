@@ -6,14 +6,8 @@ export default class TitanAbility extends TitanTypeComponent {
    addRulesElement = addRulesElement.bind(this);
    removeRulesElement = removeRulesElement.bind(this);
 
-   getInitialData() {
-      // Image
-      if (this.parent.img === 'icons/svg/item-bag.svg') {
-         return {
-            img: 'icons/svg/ice-aura.svg'
-         };
-      }
-
-      return false;
+   setInitialData(initialData) {
+      initialData.img = 'icons/svg/ice-aura.svg';
+      return;
    }
 }

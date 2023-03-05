@@ -468,6 +468,7 @@
    "LOCAL.reRollFailuresSpendResolve.label": "Re-roll Failures (Spend 1 Resolve)",
    "LOCAL.doubleExpertiseSpendResolve.label": "Double Expertise (Spend 1 Resolve)",
    "LOCAL.doubleTrainingSpendResolve.label": "Double Training (Spend 1 Resolve)",
+   "LOCAL.createMacro.label": "Create Macro",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."

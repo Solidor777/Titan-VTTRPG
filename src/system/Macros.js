@@ -1,3 +1,5 @@
+import ItemMacroDialog from '../item/dialog/ItemMacroDialog';
+
 export class TitanMacros {
    rollAttackCheck(itemName, attackIdx) {
       // For each controller token
@@ -107,7 +109,7 @@ export function createItemMacro(data, slot) {
 
          // Otherwise, if the item has checks, create an item check macro
          if (item.system.check.length > 0) {
-            createItemCheckMacro(item, slot);
+            // createItemCheckMacro(item, slot);
             return false;
          }
          break;
@@ -120,7 +122,9 @@ export function createItemMacro(data, slot) {
       default: {
          // If the item has checks, create an item check macro
          if (item.system.check.length > 0) {
-            createItemCheckMacro(item, slot);
+            const dialog = new ItemMacroDialog(item, slot);
+            dialog.render(true);
+            // createItemCheckMacro(item, slot);
             return false;
          }
          break;

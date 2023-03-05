@@ -5,28 +5,19 @@ import SpellAspects from '~/item/types/spell/SpellAspects';
 
 
 export default class TitanSpell extends TitanTypeComponent {
-   getInitialData() {
-      let shouldReturnData = false;
-      const initialData = {};
-
+   setInitialData(initialData) {
       // Image
-      if (this.parent.img === 'icons/svg/item-bag.svg') {
-         shouldReturnData = true;
-         initialData.img = 'icons/svg/explosion.svg';
+      initialData.img = 'icons/svg/explosion.svg';
+
+      // System
+      if (!initialData.system) {
+         initialData.system = {};
       }
 
       // Tradition
-      if (this.parent.system.tradition === '') {
-         initialData.system = {
-            tradition: localize('any')
-         };
-      }
+      initialData.system.tradition = localize('any');
 
-      if (shouldReturnData) {
-         return initialData;
-      }
-
-      return false;
+      return;
    }
 
    addStandardAspect(aspect) {

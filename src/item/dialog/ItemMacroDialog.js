@@ -1,0 +1,26 @@
+import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { localize, getSetting } from '~/helpers/Utility.js';
+import ItemMacroDialogShell from '~/item/dialog/ItemMacroDialogShell.svelte';
+export default class ItemMacroDialog extends TJSDialog {
+   constructor(item, slot) {
+      super(
+         {
+            title: `${localize('createMacro')} (${item.name})`,
+            content: {
+               class: ItemMacroDialogShell,
+               props: {
+                  item: item,
+                  slot: slot
+               },
+            },
+            zIndex: null,
+            id: `dialog-${item.name}`,
+         },
+         {
+            width: 350,
+            height: 590,
+            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
+         },
+      );
+   }
+}
