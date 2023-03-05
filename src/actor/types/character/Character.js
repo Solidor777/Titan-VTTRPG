@@ -676,7 +676,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Update effects if appropriate
             if (effects.length > 0) {
 
-               // Delete duplicate ffects
+               // Delete duplicate effects
                for (let idx = 1; idx < effects.length; idx++) {
                   await effects[idx].delete();
                }
@@ -2086,6 +2086,52 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
+   async toggleActive(itemId) {
+      if (this.parent.isOwner) {
+         const item = this.parent.items.get(itemId);
+         if (item && item.system.active !== undefined) {
+            const newActive = !item.system.active;
+            item.system.active = newActive;
+            return await item.update({
+               system: {
+                  active: newActive
+               }
+            });
+         }
+      }
+   }
+
+   async decrementEffectDuration(itemId) {
+      if (this.parent.isOwner) {
+         const item = this.parent.items.get(itemId);
+         if (item && item.system.duration?.remaining) {
+            item.system.duration.remaining -= 1;
+            return await item.update({
+               system: {
+                  duration: {
+                     remaining: item.system.duration.remaining
+                  }
+               }
+            });
+         }
+      }
+   }
+
+   async incrementEffectDuration(itemId) {
+      if (this.parent.isOwner) {
+         const item = this.parent.items.get(itemId);
+         if (item && item.system.duration?.remaining !== undefined) {
+            item.system.duration.remaining += 1;
+            return await item.update({
+               system: {
+                  duration: {
+                     remaining: item.system.duration.remaining
+                  }
+               }
+            });
+         }
+      }
+   }
    getArmor() {
       return this.parent.items.get(this.parent.system.equipped.armor);
    }

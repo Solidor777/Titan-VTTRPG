@@ -9,11 +9,12 @@
    import CharacterSheetItemEditButton from '~/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton from '~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
-   import CharacterSheetCheckButton from '~/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
    import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
+   import CharacterSheetItemToggleActiveButton from '~/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
+   import MinIconButton from '~/helpers/svelte-components/button/MinIconButton.svelte';
 
    // Reference to the weapon id
    export let id = void 0;
@@ -79,6 +80,19 @@
                         ? item.system.duration.custom
                         : localize('turns')}
                   </div>
+
+                  <!--Decrease duration-->
+                  <div class="decrement">
+                     <MinIconButton
+                        icon={'fas fa-minus'}
+                        on:click={() =>
+                           $document.typeComponent.decrementEffectDuration(
+                              item._id
+                           )}
+                     />
+                  </div>
+
+                  <!--Duration input-->
                   <div class="input">
                      <IntegerInput
                         min={0}
@@ -94,20 +108,21 @@
                         }}
                      />
                   </div>
+
+                  <!--Increase duration-->
+                  <div class="increment">
+                     <MinIconButton
+                        icon={'fas fa-plus'}
+                        on:click={() =>
+                           $document.typeComponent.incrementEffectDuration(
+                              item._id
+                           )}
+                     />
+                  </div>
                </div>
-            {:else if item.system.check.length > 0}
-               <!--Check-->
-               <div>
-                  <CharacterSheetCheckButton
-                     check={item.system.check[0]}
-                     diceMod={$document.typeComponent.getItemCheckDiceMod(item)}
-                     on:click={() =>
-                        $document.typeComponent.rollItemCheck(
-                           { itemId: item._id, checkIdx: 0 },
-                           false
-                        )}
-                  />
-               </div>
+            {:else}
+               <!--Toggle Active Button-->
+               <CharacterSheetItemToggleActiveButton {item} />
             {/if}
 
             <!--Send to Chat button-->
@@ -234,6 +249,14 @@
 
                .input {
                   width: 2rem;
+               }
+
+               .increment {
+                  margin-left: 0.125rem;
+               }
+
+               .decrement {
+                  margin-right: 0.125rem;
                }
             }
          }

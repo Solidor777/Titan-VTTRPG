@@ -5,14 +5,13 @@
 
    // Item reference
    export let item = void 0;
-   export let equipped = void 0;
 
    // Reference to the application
    const document = getContext('DocumentStore');
 </script>
 
 <ToggleButton
-   active={equipped}
-   label={localize('equipped')}
-   on:click={() => $document.typeComponent.toggleEquipped(item._id)}
+   active={item.system.active}
+   label={localize('active')}
+   on:click={() => $document.typeComponent.toggleActive(item._id)}
 />
