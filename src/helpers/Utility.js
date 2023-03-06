@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export function clamp(value, min, max) {
    return Math.min(Math.max(value, min), max);
 }
@@ -193,5 +195,15 @@ export function camelize(string) {
          return '';
       } // or if (/\s+/.test(match)) for white spaces
       return index === 0 ? match.toLowerCase() : match.toUpperCase();
+   });
+}
+
+export async function regenerateUUID(document) {
+   await document.update({
+      flags: {
+         titan: {
+            uuid: uuidv4()
+         }
+      }
    });
 }

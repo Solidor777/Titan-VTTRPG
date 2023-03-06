@@ -1,167 +1,30 @@
 import { localize, getActor, getSetting } from '~/helpers/Utility.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 
-async function reRollCheckFailures(li, spendResolve) {
-   // Get the successes and failure count
-   const message = game.messages.get(li.data("messageId"));
-   const chatContext = message?.flags?.titan;
-   let failureCount = 0;
-   let expertiseToRefund = 0;
-   const successes = chatContext.results.dice.filter((die) => {
-      if (die.base >= chatContext.parameters.difficulty) {
-         return true;
-      }
-      else {
-         failureCount += 1;
-         if (die.expertiseApplied) {
-            expertiseToRefund += die.expertiseApplied;
-         }
-         return false;
-      }
-   });
-
-   // If there are any failures
-   if (failureCount > 0) {
-      // Re roll dice equal to the number of falures
-      const roll = new Roll(`${failureCount}d6`);
-      await roll.evaluate({ async: true });
-      const reRolledDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
-      const newDice = successes.concat(reRolledDice.map((die) => {
-         return {
-            expertiseApplied: 0,
-            base: die,
-            final: die
-         };
-      }));
-      chatContext.results.dice = newDice;
-      chatContext.results.expertiseRemaining += expertiseToRefund;
-
-      // Recalculate the check
-      const newResults = recalculateCheckResults(chatContext);
-
-      // Update the message
-      await message.update({
-         flags: {
-            titan: {
-               chatContext: {
-                  results: newResults,
-                  failuresReRolled: true
-               },
-            },
-         },
-      });
-
-      // Spend resolve if appropriate
-      if (spendResolve) {
-         const actor = getActor(message.speaker.actor, message.speaker.token);
-         if (actor) {
-            const character = actor.character;
-            if (character) {
-               character.spendResolve(1, true, true);
-            }
-         }
-      }
-   }
-
-   return;
-}
-
-async function doubleExpertise(li, spendResolve) {
-   // If expertise is not already doubled
-   const message = game.messages.get(li.data("messageId"));
-   const chatContext = message?.flags?.titan;
-
-   // Re roll dice equal to the number of falures
-   if (chatContext.parameters.doubleExpertise === false && chatContext.parameters.totalExpertise > 0) {
-      chatContext.parameters.doubleExpertise = true;
-      chatContext.results.expertiseRemaining += chatContext.parameters.totalExpertise;
-      chatContext.parameters.totalExpertise *= 2;
-
-      // Update the message
-      await message.update({
-         flags: {
-            titan: {
-               chatContext: chatContext
-            },
-         },
-      });
-
-      // Spend resolve if appropriate
-      if (spendResolve) {
-         const actor = getActor(message.speaker.actor, message.speaker.token);
-         if (actor) {
-            const character = actor.character;
-            if (character) {
-               character.spendResolve(1, true, true);
-            }
-         }
-      }
-   }
-
-   return;
-}
-
-async function doubleTraining(li, spendResolve) {
-   // If expertise is not already doubled
-   const message = game.messages.get(li.data("messageId"));
-   const chatContext = message?.flags?.titan;
-
-   // Re roll dice equal to the number of falures
-   if (chatContext.parameters.doubleTraining === false && chatContext.parameters.totalTrainingDice > 0) {
-      chatContext.parameters.doubleTraining = true;
-
-      // Roll the new dice
-      const roll = new Roll(`${chatContext.parameters.totalTrainingDice}d6`);
-      await roll.evaluate({ async: true });
-      const newDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
-      const newDiceResults = chatContext.results.dice.concat(newDice.map((die) => {
-         return {
-            expertiseApplied: 0,
-            base: die,
-            final: die
-         };
-      }));
-
-      // Update the message
-      chatContext.results.totalDice += chatContext.parameters.totalTrainingDice;
-      chatContext.parameters.totalTrainingDice *= 2;
-      chatContext.results.dice = newDiceResults;
-      await message.update({
-         flags: {
-            titan: {
-               chatContext: chatContext
-            },
-         },
-      });
-
-      // Spend resolve if appropriate
-      if (spendResolve) {
-         const actor = getActor(message.speaker.actor, message.speaker.token);
-         if (actor) {
-            const character = actor.character;
-            if (character) {
-               character.spendResolve(1, true, true);
-            }
-         }
-      }
-   }
-
-   return;
-}
-
 export function registerChatContextOptions(html, options) {
+
    // Check if this message should have check controls
-   let canUseCheckControls = (li) => {
+   function canReRollFailures(li) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message?.flags?.titan;
-         return chatContext?.isCheck === true && chatContext.failuresReRolled === false;
+         if (chatContext?.isCheck === true && chatContext.failuresReRolled === false) {
+            let retVal = false;
+            for (const die of chatContext.results.dice) {
+               if (die.base < chatContext.parameters.difficulty) {
+                  retVal = true;
+                  break;
+               }
+            }
+
+            return retVal;
+         }
       }
 
       return false;
-   };
+   }
 
-   let canDoubleExpertise = (li) => {
+   function canDoubleExpertise(li) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message?.flags?.titan;
@@ -171,9 +34,9 @@ export function registerChatContextOptions(html, options) {
       }
 
       return false;
-   };
+   }
 
-   let canDoubleTraining = (li) => {
+   function canDoubleTraining(li) {
       const message = game.messages.get(li.data("messageId"));
       if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
          const chatContext = message?.flags?.titan;
@@ -183,7 +46,7 @@ export function registerChatContextOptions(html, options) {
       }
 
       return false;
-   };
+   }
 
    const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
    const autoSpendResolveDoubleExpertise = getSetting('autoSpendResolveDoubleExpertise');
@@ -194,7 +57,7 @@ export function registerChatContextOptions(html, options) {
       {
          name: localize("reRollFailuresSpendResolve"),
          icon: '<i class="fas fa-dice"></i>',
-         condition: canUseCheckControls,
+         condition: canReRollFailures,
          callback: (li) => reRollCheckFailures(li, true)
       },
    ];
@@ -204,7 +67,7 @@ export function registerChatContextOptions(html, options) {
       reRollFailureOptions.unshift({
          name: localize("reRollFailures"),
          icon: '<i class="fas fa-dice"></i>',
-         condition: canUseCheckControls,
+         condition: canReRollFailures,
          callback: (li) => reRollCheckFailures(li, false)
       });
    }
@@ -252,4 +115,146 @@ export function registerChatContextOptions(html, options) {
    options.push(...reRollFailureOptions);
    options.push(...doubleExpertiseOptions);
    options.push(...doubleTrainingOptions);
+}
+
+async function reRollCheckFailures(li, spendResolve) {
+   // Get the successes and failure count
+   const message = game.messages.get(li.data("messageId"));
+   const chatContext = message?.flags?.titan;
+   let failureCount = 0;
+   let expertiseToRefund = 0;
+   const successes = chatContext.results.dice.filter((die) => {
+      if (die.base >= chatContext.parameters.difficulty) {
+         return true;
+      }
+      else {
+         failureCount += 1;
+         if (die.expertiseApplied) {
+            expertiseToRefund += die.expertiseApplied;
+         }
+         return false;
+      }
+   });
+
+   // If there are any failures
+   if (failureCount > 0) {
+      // Re roll dice equal to the number of falures
+      const roll = new Roll(`${failureCount}d6`);
+      await roll.evaluate({ async: true });
+      const reRolledDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
+      const newDice = successes.concat(reRolledDice.map((die) => {
+         return {
+            expertiseApplied: 0,
+            base: die,
+            final: die
+         };
+      }));
+      chatContext.results.dice = newDice;
+      chatContext.results.expertiseRemaining += expertiseToRefund;
+
+      // Recalculate the check
+      const newResults = recalculateCheckResults(chatContext);
+
+      // Update the message
+      await message.update({
+         flags: {
+            titan: {
+               results: newResults,
+               failuresReRolled: true
+            },
+         },
+      });
+
+      // Spend resolve if appropriate
+      if (spendResolve) {
+         const actor = getActor(message.speaker.actor, message.speaker.token);
+         if (actor) {
+            const character = actor.character;
+            if (character) {
+               character.spendResolve(1, true, true);
+            }
+         }
+      }
+   }
+
+   return;
+}
+
+async function doubleExpertise(li, spendResolve) {
+   // If expertise is not already doubled
+   const message = game.messages.get(li.data("messageId"));
+   const chatContext = message?.flags?.titan;
+
+   // Re roll dice equal to the number of falures
+   if (chatContext.parameters.doubleExpertise === false && chatContext.parameters.totalExpertise > 0) {
+      chatContext.parameters.doubleExpertise = true;
+      chatContext.results.expertiseRemaining += chatContext.parameters.totalExpertise;
+      chatContext.parameters.totalExpertise *= 2;
+
+      // Update the message
+      await message.update({
+         flags: {
+            titan: chatContext
+         },
+      });
+
+      // Spend resolve if appropriate
+      if (spendResolve) {
+         const actor = getActor(message.speaker.actor, message.speaker.token);
+         if (actor) {
+            const character = actor.character;
+            if (character) {
+               character.spendResolve(1, true, true);
+            }
+         }
+      }
+   }
+
+   return;
+}
+
+async function doubleTraining(li, spendResolve) {
+   // If expertise is not already doubled
+   const message = game.messages.get(li.data("messageId"));
+   const chatContext = message?.flags?.titan;
+
+   // Re roll dice equal to the number of falures
+   if (chatContext.parameters.doubleTraining === false && chatContext.parameters.totalTrainingDice > 0) {
+      chatContext.parameters.doubleTraining = true;
+
+      // Roll the new dice
+      const roll = new Roll(`${chatContext.parameters.totalTrainingDice}d6`);
+      await roll.evaluate({ async: true });
+      const newDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
+      const newDiceResults = chatContext.results.dice.concat(newDice.map((die) => {
+         return {
+            expertiseApplied: 0,
+            base: die,
+            final: die
+         };
+      }));
+
+      // Update the message
+      chatContext.results.totalDice += chatContext.parameters.totalTrainingDice;
+      chatContext.parameters.totalTrainingDice *= 2;
+      chatContext.results.dice = newDiceResults;
+      await message.update({
+         flags: {
+            titan: chatContext
+         },
+      });
+
+      // Spend resolve if appropriate
+      if (spendResolve) {
+         const actor = getActor(message.speaker.actor, message.speaker.token);
+         if (actor) {
+            const character = actor.character;
+            if (character) {
+               character.spendResolve(1, true, true);
+            }
+         }
+      }
+   }
+
+   return;
 }

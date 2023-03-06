@@ -8,8 +8,8 @@ import { getSetting, localize } from '~/helpers/Utility';
 import { TitanMacros, onHotbarDrop } from '~/system/Macros';
 import { onUpdateCombat } from '~/system/Combat';
 import registerSystemSettings from '~/system/SystemSettings.js';
-import registerTooltipSettings from '~/system/TooltipManager';
 import registerInitiativeFormula from '~/system/Initiative';
+import registerItemContextOptions from '~/helpers/ItemContextOptions';
 import TitanConditions from '~/helpers/Conditions.js';
 import TitanChatMessageTypes from '~/system/ChatMessageTypes.js';
 import ChatMessageShell from '~/chat-message/ChatMessageShell.svelte';
@@ -32,7 +32,6 @@ Hooks.once('init', async () => {
 
    // Register system settings
    registerSystemSettings();
-   registerTooltipSettings();
    registerInitiativeFormula();
 
    // Register Document Classes
@@ -182,6 +181,8 @@ Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
 });
 
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
+
+Hooks.on('getItemDirectoryEntryContext', registerItemContextOptions);
 
 Hooks.on("updateCombat", (combat, data, diff) => {
    onUpdateCombat(combat, data, diff);

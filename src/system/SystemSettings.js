@@ -324,4 +324,14 @@ export default function registerSystemSettings() {
       },
       restricted: true,
    });
+
+   game.settings.register('titan', 'confirmRegenerateUUID', {
+      config: true,
+      scope: 'client',
+      name: 'SETTINGS.confirmRegenerateUUID.label',
+      hint: 'SETTINGS.confirmRegenerateUUID.hint',
+      type: Boolean,
+      default: true,
+      restricted: true
+   });
 }

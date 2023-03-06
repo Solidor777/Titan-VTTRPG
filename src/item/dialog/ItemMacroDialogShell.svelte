@@ -1,6 +1,7 @@
 <script>
    import { localize } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import ImagePicker from '~/helpers/svelte-components/ImagePicker.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
@@ -254,7 +255,7 @@
    {/if}
 
    <!--ID Method-->
-   <div class="row">
+   <div class="row" use:tooltip={{ content: localize(`idMethod.desc`) }}>
       <!--Label-->
       <div class="label">
          {localize('idMethod')}

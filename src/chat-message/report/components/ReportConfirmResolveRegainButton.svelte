@@ -22,13 +22,11 @@
             $document.update({
                flags: {
                   titan: {
-                     chatContext: {
-                        resolveRegain: {
-                           confirmed: true,
-                        },
-                        resolve: {
-                           value: actor.system.resource.resolve.value,
-                        },
+                     resolveRegain: {
+                        confirmed: true,
+                     },
+                     resolve: {
+                        value: actor.system.resource.resolve.value,
                      },
                   },
                },

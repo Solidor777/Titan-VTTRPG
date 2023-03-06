@@ -23,13 +23,11 @@
             await $document.update({
                flags: {
                   titan: {
-                     chatContext: {
-                        healingApplied: {
-                           confirmed: true,
-                        },
-                        stamina: {
-                           value: actor.system.resource.stamina.value,
-                        },
+                     healingApplied: {
+                        confirmed: true,
+                     },
+                     stamina: {
+                        value: actor.system.resource.stamina.value,
                      },
                   },
                },

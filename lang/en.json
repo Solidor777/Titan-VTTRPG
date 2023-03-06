@@ -475,6 +475,10 @@
    "LOCAL.itemUuid.label": "Item Unique ID",
    "LOCAL.itemName.label": "Item Name",
    "LOCAL.itemId.label": "Item ID",
+   "LOCAL.confirmRegenerateUUID.label": "Are you sure you want to regenerate this documents's Unique ID? This will break any macros that were created for this document using the Unique ID Method.",
+   "LOCAL.regenerateUUID.label": "Regenerate Unique ID",
+   "LOCAL.regenerate.label": "Regenerate",
+   "LOCAL.idMethod.desc.label": "<p>This is the method by which the macro will attempt to identify the item.</p><p><strong>Unique ID</strong> - The item will be identified by its unique ID that is generated on item creation. Compatible across actors, but may mis-identify items that were duplicated from others without regenerating their Unique ID.</p><p><strong>Item Name</strong> - The item will be identified by the name of the item. Compatible across actors, but may mis-identify items that use the same name.</p><p><strong>Item ID</strong> - The item will be identified by the ID of the item given to it by Foundry. Not compatible across actors, but will never mis-identify an item.</p>",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."
@@ -605,5 +609,9 @@
    "SETTINGS.resolveBaseRegain": {
       "label": "Base Resolve Regain",
       "hint": "When Auto-Regain Resolve is not disabled, this is the base value by which a combatant's Resolve will increase by at the start of their turn."
+   },
+   "SETTINGS.confirmRegenerateUUID": {
+      "label": "Confirm Regenerating Unique ID",
+      "hint": "A document's Unique ID is generated on creation, and used to identify the document for macros. This ID persists if the document is duplicated. It can be regenerated from the context menu. When this setting is true, regeneration will require an additional confirmation dialog."
    }
 }

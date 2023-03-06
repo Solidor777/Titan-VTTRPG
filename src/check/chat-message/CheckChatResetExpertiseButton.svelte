@@ -19,9 +19,7 @@
       await $document.update({
          flags: {
             titan: {
-               chatContext: {
-                  results: newResults,
-               },
+               results: newResults,
             },
          },
       });

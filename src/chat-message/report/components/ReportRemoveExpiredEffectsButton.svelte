@@ -17,10 +17,8 @@
          $document.update({
             flags: {
                titan: {
-                  chatContext: {
-                     expiredEffectsRemoved: true,
-                     expiredEffects: false,
-                  },
+                  expiredEffectsRemoved: true,
+                  expiredEffects: false,
                },
             },
          });

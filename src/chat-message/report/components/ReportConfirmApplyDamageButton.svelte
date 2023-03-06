@@ -24,16 +24,14 @@
             await $document.update({
                flags: {
                   titan: {
-                     chatContext: {
-                        damageApplied: {
-                           confirmed: true,
-                        },
-                        stamina: {
-                           value: actor.system.resource.stamina.value,
-                        },
-                        wounds: {
-                           value: actor.system.resource.wounds.value,
-                        },
+                     damageApplied: {
+                        confirmed: true,
+                     },
+                     stamina: {
+                        value: actor.system.resource.stamina.value,
+                     },
+                     wounds: {
+                        value: actor.system.resource.wounds.value,
                      },
                   },
                },

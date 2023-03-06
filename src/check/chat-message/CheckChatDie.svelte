@@ -56,9 +56,7 @@
          $document.update({
             flags: {
                titan: {
-                  chatContext: {
-                     results: $document.flags.titan.results,
-                  },
+                  results: $document.flags.titan.results,
                },
             },
          });
