@@ -18,7 +18,7 @@ export default class ItemMacroDialog extends TJSDialog {
          },
          {
             width: 350,
-            height: 590,
+            height: 280,
             classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );

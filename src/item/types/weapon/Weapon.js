@@ -22,7 +22,7 @@ export default class TitanWeapon extends TitanTypeComponent {
       }
 
       // Attack
-      initialData.attack = [getAttackTemplate()];
+      initialData.system.attack = [getAttackTemplate()];
 
       return;
    }

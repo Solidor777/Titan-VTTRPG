@@ -6,10 +6,9 @@
    // Path to the image
    export let path;
    export let alt;
-   let img;
 
-   // Get the sheett
-   const { application } = getContext('#external');
+   // Get the aplication
+   const application = getContext('#external').application;
 
    // Get the contained document
    const document = getContext('DocumentStore');
@@ -35,13 +34,7 @@
    }
 </script>
 
-<img
-   bind:this={img}
-   {alt}
-   {src}
-   on:keypress={(event) => onEditImage()}
-   on:click={(event) => onEditImage(event)}
-/>
+<img {alt} {src} on:keypress={onEditImage} on:click={onEditImage} />
 
 <style>
    img {

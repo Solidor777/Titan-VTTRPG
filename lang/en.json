@@ -469,6 +469,11 @@
    "LOCAL.doubleExpertiseSpendResolve.label": "Double Expertise (Spend 1 Resolve)",
    "LOCAL.doubleTrainingSpendResolve.label": "Double Training (Spend 1 Resolve)",
    "LOCAL.createMacro.label": "Create Macro",
+   "LOCAL.macroType.label": "Macro Type",
+   "LOCAL.idMethod.label": "ID Method",
+   "LOCAL.itemUuid.label": "Item Unique ID",
+   "LOCAL.itemName.label": "Item Name",
+   "LOCAL.itemId.label": "Item ID",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."

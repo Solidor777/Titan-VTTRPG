@@ -275,6 +275,10 @@
             @include flex-row;
             width: 100%;
             margin-top: 0.5rem;
+
+            &:not(:first-child) {
+               margin-left: 0.25rem;
+            }
          }
       }
 

@@ -5,7 +5,7 @@ import '~/styles/Global.scss';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import { registerChatContextOptions } from '~/helpers/ChatContextOptions.js';
 import { getSetting, localize } from '~/helpers/Utility';
-import { TitanMacros, createItemMacro } from '~/system/Macros';
+import { TitanMacros, onHotbarDrop } from '~/system/Macros';
 import { onUpdateCombat } from '~/system/Combat';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerTooltipSettings from '~/system/TooltipManager';
@@ -116,7 +116,7 @@ Hooks.once('setup', async () => {
 
 Hooks.once('ready', () => {
    Hooks.on('hotbarDrop', (bar, data, slot) => {
-      return createItemMacro(data, slot);
+      return onHotbarDrop(data, slot);
    });
 
    return;

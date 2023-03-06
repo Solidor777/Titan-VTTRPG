@@ -1,7 +1,7 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import { localize, getCombatTargets } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
    import AttributeSelect from '~/helpers/svelte-components/select/AttributeSelect.svelte';
    import SkillSelect from '~/helpers/svelte-components/select/SkillSelect.svelte';
@@ -9,7 +9,6 @@
    import Select from '~/helpers/svelte-components/select/Select.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
-   import { getCombatTargets } from '~/helpers/Utility';
 
    // The actor document making this check
    export let actor;
@@ -374,6 +373,10 @@
             @include flex-row;
             width: 100%;
             margin-top: 0.5rem;
+
+            &:not(:first-child) {
+               margin-left: 0.25rem;
+            }
          }
       }
 
