@@ -2099,7 +2099,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async toggleActive(itemId) {
+   async toggleEffectActive(itemId) {
       if (this.parent.isOwner) {
          const item = this.parent.items.get(itemId);
          if (item && item.system.active !== undefined) {

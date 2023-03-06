@@ -12,15 +12,20 @@
    // Slot on the hotbar that the macro will be assign to
    export let slot = void 0;
 
+   // UUID of the item that was dropped
+   export let uuid = void 0;
+
+   console.log(uuid);
+
    // Application reference
    const application = getContext('#external').application;
 
    // Macro type
-   let macroType = 'openItemSheet';
+   let macroType = 'toggleDocumentSheet';
    const macroTypeOptions = [
       {
-         value: 'openItemSheet',
-         label: localize('openItemSheet'),
+         value: 'toggleDocumentSheet',
+         label: localize('toggleItemSheet'),
       },
    ];
 
@@ -85,10 +90,10 @@
          if (item.system.duration.type === 'permanent') {
             // Add toggle active to the macro type options
             macroTypeOptions.push({
-               value: 'toggleActive',
-               label: localize('toggleActive'),
+               value: 'toggleEffectActive',
+               label: localize('toggleEffectActive'),
             });
-            macroType = 'toggleActive';
+            macroType = 'toggleEffectActive';
             break;
          }
       }
@@ -121,22 +126,68 @@
    let name = item.name;
 
    async function onCreateMacro() {
+      let macro;
       switch (macroType) {
          case 'attackCheck': {
-            console.log(game);
-            const macro = await game.titan.macros.getAttackCheckMacro(
+            macro = await game.titan.macros.getAttackCheckMacro(
                item,
                name,
                img,
                idMethod,
                attackIdx
             );
-            game.user.assignHotbarMacro(macro, slot);
+            break;
          }
+
+         case 'castingCheck': {
+            macro = await game.titan.macros.getCastingCheckMacro(
+               item,
+               name,
+               img,
+               idMethod
+            );
+            break;
+         }
+
+         case 'itemCheck': {
+            macro = await game.titan.macros.getItemCheckMacro(
+               item,
+               name,
+               img,
+               idMethod,
+               itemCheckIdx
+            );
+            break;
+         }
+
+         case 'toggleEffectActive': {
+            macro = await game.titan.macros.getToggleEffectActiveMacro(
+               item,
+               name,
+               img,
+               idMethod
+            );
+            break;
+         }
+
+         case 'toggleDocumentSheet': {
+            macro = await game.titan.macros.getToggleDocumentSheetMacro(
+               name,
+               img,
+               uuid
+            );
+            break;
+         }
+
          default: {
             break;
          }
       }
+
+      if (macro) {
+         game.user.assignHotbarMacro(macro, slot);
+      }
+
       application.close();
       return;
    }
