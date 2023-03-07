@@ -8,6 +8,19 @@ export function localize(string) {
    return game.i18n.localize(`LOCAL.${string}.label`);
 }
 
+export function format(string, data) {
+   return game.i18n.format(`LOCAL.${string}.label`, data);
+}
+
+export function camelize(string) {
+   return string.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, index) => {
+      if (+match === 0) {
+         return '';
+      } // or if (/\s+/.test(match)) for white spaces
+      return index === 0 ? match.toLowerCase() : match.toUpperCase();
+   });
+}
+
 export function shouldGetCheckOptions() {
    const retVal = game.settings.get('titan', 'getCheckOptions') === true;
    return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT) ? !retVal : retVal;
@@ -189,15 +202,6 @@ export function isModifierActive() {
    return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT);
 }
 
-export function camelize(string) {
-   return string.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, (match, index) => {
-      if (+match === 0) {
-         return '';
-      } // or if (/\s+/.test(match)) for white spaces
-      return index === 0 ? match.toLowerCase() : match.toUpperCase();
-   });
-}
-
 export async function regenerateUUID(document) {
    await document.update({
       flags: {
@@ -206,6 +210,10 @@ export async function regenerateUUID(document) {
          }
       }
    });
+
+   ui.notifications.info(
+      localize('regeneratedUUIDForDocument%x').replace('%x', document.name)
+   );
 }
 
 export function isCheck(chatMessageType) {

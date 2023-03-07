@@ -23,6 +23,9 @@
             },
          });
       }
+      ui.notifications.info(
+         localize('editedUUIDForDocument%x').replace('%x', document.name)
+      );
       application.close();
       return;
    }
