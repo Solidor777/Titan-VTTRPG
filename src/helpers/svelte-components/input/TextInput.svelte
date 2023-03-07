@@ -1,5 +1,3 @@
-<svelte:options accessors={true} />
-
 <script>
    // The value of the input
    export let value;

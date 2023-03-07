@@ -14,7 +14,7 @@
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import CharacterSheetItemToggleActiveButton from '~/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
-   import MinIconButton from '~/helpers/svelte-components/button/MinIconButton.svelte';
+   import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
 
    // Reference to the weapon id
    export let id = void 0;
@@ -81,20 +81,9 @@
                         : localize('turns')}
                   </div>
 
-                  <!--Decrease duration-->
-                  <div class="decrement">
-                     <MinIconButton
-                        icon={'fas fa-minus'}
-                        on:click={() =>
-                           $document.typeComponent.decrementEffectDuration(
-                              item._id
-                           )}
-                     />
-                  </div>
-
                   <!--Duration input-->
                   <div class="input">
-                     <IntegerInput
+                     <IntegerIncrementInput
                         min={0}
                         bind:value={item.system.duration.remaining}
                         on:change={() => {
@@ -106,17 +95,6 @@
                               },
                            });
                         }}
-                     />
-                  </div>
-
-                  <!--Increase duration-->
-                  <div class="increment">
-                     <MinIconButton
-                        icon={'fas fa-plus'}
-                        on:click={() =>
-                           $document.typeComponent.incrementEffectDuration(
-                              item._id
-                           )}
                      />
                   </div>
                </div>
@@ -248,15 +226,7 @@
                }
 
                .input {
-                  width: 2rem;
-               }
-
-               .increment {
-                  margin-left: 0.125rem;
-               }
-
-               .decrement {
-                  margin-right: 0.125rem;
+                  --input-width: 2rem;
                }
             }
          }

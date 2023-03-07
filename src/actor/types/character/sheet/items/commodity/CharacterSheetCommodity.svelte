@@ -12,8 +12,9 @@
    import CharacterSheetItemDeleteButton from '~/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
+   import StatTag from '../../../../../../helpers/svelte-components/tag/StatTag.svelte';
 
    // Reference to the armor id
    export let id = void 0;
@@ -48,21 +49,16 @@
          <div class="controls">
             <!--Quantity-->
             <div class="field">
-               <div class="label">
-                  {localize('quantity')}
-               </div>
-               <div class="input">
-                  <IntegerInput
-                     bind:value={item.system.quantity}
-                     on:change={() => {
-                        item.update({
-                           system: {
-                              quantity: item.system.quantity,
-                           },
-                        });
-                     }}
-                  />
-               </div>
+               <IntegerIncrementInput
+                  bind:value={item.system.quantity}
+                  on:change={() => {
+                     item.update({
+                        system: {
+                           quantity: item.system.quantity,
+                        },
+                     });
+                  }}
+               />
             </div>
 
             <!--Send to Chat button-->
@@ -107,6 +103,13 @@
 
             <!--Footer-->
             <div class="section tags small-text">
+               <div class="tag">
+                  <StatTag
+                     label={localize('quantity')}
+                     value={item.system.quantity}
+                  />
+               </div>
+
                <!--Rarity-->
                <div class="tag">
                   <RarityTag rarity={item.system.rarity} />
@@ -172,13 +175,7 @@
                @include flex-row;
                @include flex-group-center;
 
-               .label {
-                  margin-right: 0.25rem;
-               }
-
-               .input {
-                  width: 2.5rem;
-               }
+               --input-width: 5rem;
             }
          }
       }

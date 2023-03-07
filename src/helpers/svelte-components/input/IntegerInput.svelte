@@ -1,6 +1,6 @@
-<svelte:options accessors={true} />
-
 <script>
+   import { createEventDispatcher } from 'svelte';
+
    // The value of the input
    export let value = void 0;
    export let min = false;
@@ -10,13 +10,15 @@
    let editingActive = false;
    let input = value;
 
+   const dispatch = createEventDispatcher();
+
    $: if (!editingActive) {
       input = value;
    }
 
    function validateInput() {
       let newValue = parseInt(input);
-      if (isNaN(value)) {
+      if (isNaN(newValue)) {
          newValue = 0;
       }
       if (min !== false) {
@@ -27,6 +29,7 @@
       }
 
       value = newValue;
+      dispatch('change');
    }
 
    function checkInput(event) {
@@ -45,13 +48,19 @@
    function onBlur() {
       editingActive = false;
    }
+
+   function onChange() {
+      if (isNaN(input)) {
+         input = value;
+      }
+   }
 </script>
 
 <input
    type="number"
    on:keyup={validateInput}
    on:keyup
-   on:change
+   on:change={onChange}
    on:focus={onFocus}
    on:focus
    on:blur={onBlur}
