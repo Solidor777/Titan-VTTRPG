@@ -14,7 +14,7 @@ export default class DocumenEditCustomTraitDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${document.name}`,
+            id: `edit-custom-trait-dialog-${document._id}`,
          },
          {
             width: 300,

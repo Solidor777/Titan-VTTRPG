@@ -15,7 +15,7 @@ export default class CastingCheckDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${actor.name}`,
+            id: `casting-check-dialog-${actor._id}`,
          },
          {
             width: 350,

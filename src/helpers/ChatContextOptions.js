@@ -1,53 +1,8 @@
 import { localize, getActor, getSetting } from '~/helpers/Utility.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
+import { isCheck } from './Utility';
 
 export function registerChatContextOptions(html, options) {
-
-   // Check if this message should have check controls
-   function canReRollFailures(li) {
-      const message = game.messages.get(li.data("messageId"));
-      if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-         const chatContext = message?.flags?.titan;
-         if (chatContext?.isCheck === true && chatContext.failuresReRolled === false) {
-            let retVal = false;
-            for (const die of chatContext.results.dice) {
-               if (die.base < chatContext.parameters.difficulty) {
-                  retVal = true;
-                  break;
-               }
-            }
-
-            return retVal;
-         }
-      }
-
-      return false;
-   }
-
-   function canDoubleExpertise(li) {
-      const message = game.messages.get(li.data("messageId"));
-      if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-         const chatContext = message?.flags?.titan;
-         return chatContext?.isCheck === true &&
-            chatContext.parameters.doubleExpertise === false &&
-            chatContext.parameters.totalExpertise > 0;
-      }
-
-      return false;
-   }
-
-   function canDoubleTraining(li) {
-      const message = game.messages.get(li.data("messageId"));
-      if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-         const chatContext = message?.flags?.titan;
-         return chatContext?.isCheck === true &&
-            chatContext.parameters.doubleTraining === false &&
-            chatContext.parameters.totalTrainingDice > 0;
-      }
-
-      return false;
-   }
-
    const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
    const autoSpendResolveDoubleExpertise = getSetting('autoSpendResolveDoubleExpertise');
    const autoSpendResolveDoubleTraining = getSetting('autoSpendResolveDoubleTraining');
@@ -115,6 +70,74 @@ export function registerChatContextOptions(html, options) {
    options.push(...reRollFailureOptions);
    options.push(...doubleExpertiseOptions);
    options.push(...doubleTrainingOptions);
+}
+
+function getChatContext(li) {
+   // Get the message from the list item
+   const message = game.messages.get(li.data("messageId"));
+
+   // Check if this user owns the speaker
+   if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
+
+      // Check if the message is a titan message
+      const chatContext = message?.flags?.titan;
+      if (chatContext) {
+         return chatContext;
+      }
+   }
+
+   return false;
+}
+
+function canReRollFailures(li) {
+   // Get chat contextt
+   const chatContext = getChatContext(li);
+   if (chatContext) {
+      // If this is a check that has not re-rolled failures
+      if (isCheck(chatContext.type) && (chatContext.failuresReRolled === false || game.user.isGM)) {
+
+         // Check if the check has any failures
+         let retVal = false;
+         for (const die of chatContext.results.dice) {
+            if (die.base < chatContext.parameters.difficulty) {
+               retVal = true;
+               break;
+            }
+         }
+
+         return retVal;
+      }
+   }
+
+   return false;
+}
+
+function canDoubleExpertise(li) {
+   // Get chat context
+   const chatContext = getChatContext(li);
+   if (chatContext) {
+
+      // Check if this is a check with expertise that has not yet been doubled
+      return isCheck(chatContext.type) &&
+         chatContext.parameters.totalExpertise > 0 &&
+         (chatContext.parameters.doubleExpertise === false || game.user.isGM);
+   }
+
+   return false;
+}
+
+function canDoubleTraining(li) {
+   // Get chat context
+   const chatContext = getChatContext(li);
+   if (chatContext) {
+
+      // Check if this is a check with training that has not yet been doubled
+      return isCheck(chatContext.type) &&
+         chatContext.parameters.totalTrainingDice > 0 &&
+         (chatContext.parameters.doubleTraining === false || game.user.isGM);
+   }
+
+   return false;
 }
 
 async function reRollCheckFailures(li, spendResolve) {

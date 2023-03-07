@@ -7,7 +7,7 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
 
-   // Item to create the macro for
+   // Item to edit
    export let item = void 0;
 
    // Slot on the hotbar that the macro will be assign to
@@ -15,8 +15,6 @@
 
    // UUID of the item that was dropped
    export let uuid = void 0;
-
-   console.log(uuid);
 
    // Application reference
    const application = getContext('#external').application;
@@ -193,7 +191,7 @@
       return;
    }
 
-   async function onCancel() {
+   function onCancel() {
       application.close();
       return;
    }

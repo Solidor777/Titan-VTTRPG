@@ -1,4 +1,4 @@
-import ItemMacroDialog from '~/item/dialog/ItemMacroDialog';
+import CreateItemMacroDialog from '~/item/dialog/CreateItemMacroDialog';
 
 export class TitanMacros {
    rollAttackCheck(id, idMethod, attackIdx) {
@@ -336,7 +336,7 @@ export function onHotbarDrop(data, slot) {
 
    // Create a dialog if this item has any associated checks
    if (macroItem.system.check.length > 0) {
-      const dialog = new ItemMacroDialog(macroItem, slot, data.uuid);
+      const dialog = new CreateItemMacroDialog(macroItem, slot, data.uuid);
       dialog.render(true);
 
       return false;
@@ -345,7 +345,7 @@ export function onHotbarDrop(data, slot) {
    switch (macroItem.type) {
       case 'weapon': {
          if (macroItem.system.attack.length > 0) {
-            const dialog = new ItemMacroDialog(macroItem, slot, data.uuid);
+            const dialog = new CreateItemMacroDialog(macroItem, slot, data.uuid);
             dialog.render(true);
 
             return false;
@@ -356,7 +356,7 @@ export function onHotbarDrop(data, slot) {
 
       case 'spell':
       case 'effect': {
-         const dialog = new ItemMacroDialog(macroItem, slot, data.uuid);
+         const dialog = new CreateItemMacroDialog(macroItem, slot, data.uuid);
          dialog.render(true);
 
          return false;

@@ -1,13 +1,13 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { localize, getSetting } from '~/helpers/Utility.js';
-import ItemMacroDialogShell from '~/item/dialog/ItemMacroDialogShell.svelte';
-export default class ItemMacroDialog extends TJSDialog {
+import CreateItemMacroDialogShell from '~/item/dialog/CreateItemMacroDialogShell.svelte';
+export default class CreateItemMacroDialog extends TJSDialog {
    constructor(item, slot, uuid) {
       super(
          {
             title: `${localize('createMacro')} (${item.name})`,
             content: {
-               class: ItemMacroDialogShell,
+               class: CreateItemMacroDialogShell,
                props: {
                   item: item,
                   slot: slot,
@@ -15,7 +15,7 @@ export default class ItemMacroDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${item.name}`,
+            id: `create-macro-dialog-${item._id}`,
          },
          {
             width: 370,

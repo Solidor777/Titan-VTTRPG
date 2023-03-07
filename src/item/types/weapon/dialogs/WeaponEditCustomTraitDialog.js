@@ -15,7 +15,7 @@ export default class WeaponEditCustomTraitDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${document.name}`,
+            id: `edit-custom-traits-dialog-${document._id}`,
          },
          {
             width: 300,

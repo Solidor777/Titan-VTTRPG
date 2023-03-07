@@ -168,7 +168,6 @@ export default class TitanCheck {
          parameters: this.parameters,
          results: this.results,
          type: this._getCheckType(),
-         isCheck: true,
          failuresReRolled: false
       };
 

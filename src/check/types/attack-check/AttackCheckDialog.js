@@ -16,7 +16,7 @@ export default class AttackCheckDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${actor.name}`,
+            id: `attack-check-dialog-${actor._id}`,
          },
          {
             width: 350,

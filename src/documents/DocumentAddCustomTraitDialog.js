@@ -13,7 +13,7 @@ export default class DocumentAddCustomTraitDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${document.name}`,
+            id: `add-custom-trait-dialog-${document._id}`,
          },
          {
             width: 300,

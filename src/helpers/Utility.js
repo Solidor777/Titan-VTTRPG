@@ -207,3 +207,18 @@ export async function regenerateUUID(document) {
       }
    });
 }
+
+export function isCheck(chatMessageType) {
+   switch (chatMessageType) {
+      case 'attackCheck':
+      case 'attributeCheck':
+      case 'resistanceCheck':
+      case 'castingCheck':
+      case 'itemCheck': {
+         return true;
+      }
+      default: {
+         return false;
+      }
+   }
+}

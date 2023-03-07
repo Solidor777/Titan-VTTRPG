@@ -14,7 +14,7 @@ export default class AttributeCheckDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${actor.name}`,
+            id: `attribute-check-dialog-${actor._id}`,
          },
          {
             width: 350,

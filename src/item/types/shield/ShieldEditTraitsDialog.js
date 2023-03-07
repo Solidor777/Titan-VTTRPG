@@ -13,7 +13,7 @@ export default class ShieldEditTraitsDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `dialog-${document.name}`,
+            id: `edit-shield-traits-dialog-${document._id}`,
          },
          {
             width: 320,

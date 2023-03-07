@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 import WeaponEditAttackTraitsDialog from '~/item/types/weapon/dialogs/WeaponEditAttackTraitsDialog';
-import WeaponAddCustomTraitDialog from '~/item/types/weapon/dialogs/WeaponAddCustomTraitDialog';
+import WeaponAddCustomAttackTraitDialog from '~/item/types/weapon/dialogs/WeaponAddCustomAttackTraitDialog';
 import WeaponEditCustomTraitDialog from '~/item/types/weapon/dialogs/WeaponEditCustomTraitDialog';
 
 export default class TitanWeapon extends TitanTypeComponent {
@@ -95,7 +95,7 @@ export default class TitanWeapon extends TitanTypeComponent {
    // Opens the new custom trait dialog
    addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
-         const dialog = new WeaponAddCustomTraitDialog(this.parent, attackIdx);
+         const dialog = new WeaponAddCustomAttackTraitDialog(this.parent, attackIdx);
          dialog.render(true);
       }
       return;
