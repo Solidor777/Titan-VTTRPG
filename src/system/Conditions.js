@@ -1,4 +1,6 @@
-export default [
+import { localize } from '~/helpers/Utility';
+
+const TITAN_CONDITIONS = Object.freeze([
    {
       id: 'blinded',
       label: 'LOCAL.blinded.label',
@@ -54,4 +56,28 @@ export default [
       label: 'LOCAL.unconscious.label',
       icon: 'icons/svg/unconscious.svg'
    },
-];
+]);
+
+export default function setupConditions() {
+   // Sort conditions
+   const conditions = TITAN_CONDITIONS.sort((a, b) => {
+      const textA = game.i18n.localize(a.label);
+      const textB = game.i18n.localize(b.label);
+      return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+   });
+
+   // For each condition
+   for (const condition of conditions) {
+      // Set the description
+      const description = localize(`${condition.id}.desc`);
+      condition.flags = {
+         titan: {
+            description: description,
+            type: 'condition'
+         },
+         'visual-active-effects.data.content': description
+      };
+   }
+
+   CONFIG.statusEffects = conditions;
+}

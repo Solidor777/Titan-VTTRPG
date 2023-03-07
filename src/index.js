@@ -2,17 +2,6 @@ import '~/styles/Fonts.scss';
 import '~/styles/Variables.scss';
 import '~/styles/Mixins.scss';
 import '~/styles/Global.scss';
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
-import { registerChatContextOptions } from '~/helpers/ChatContextOptions.js';
-import { getSetting, localize } from '~/helpers/Utility';
-import { TitanMacros, onHotbarDrop } from '~/system/Macros';
-import { onUpdateCombat } from '~/system/Combat';
-import registerSystemSettings from '~/system/SystemSettings.js';
-import registerInitiativeFormula from '~/system/Initiative';
-import registerItemContextOptions from '~/helpers/ItemContextOptions';
-import TitanConditions from '~/helpers/Conditions.js';
-import TitanChatMessageTypes from '~/system/ChatMessageTypes.js';
-import ChatMessageShell from '~/chat-message/ChatMessageShell.svelte';
 import TitanActor from '~/actor/Actor.js';
 import TitanItem from '~/item/Item.js';
 import TitanPlayerSheet from '~/actor/types/player/PlayerSheet.js';
@@ -25,7 +14,19 @@ import TitanEquipmentSheet from '~/item/types/equipment/sheet/EquipmentSheet.js'
 import TitanShieldSheet from '~/item/types/shield/sheet/ShieldSheet';
 import TitanSpellSheet from '~/item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from '~/item/types/weapon/sheet/WeaponSheet.js';
-import TitanTokenDocument from '~/documents/TokenDocument';
+import TitanTokenDocument from '~/documents/TokenDocument.js';
+import TitanMacros from '~/system/Macros';
+import registerSystemSettings from '~/system/SystemSettings.js';
+import registerInitiativeFormula from '~/system/Initiative.js';
+import registerChatContextOptions from '~/system/ChatContextOptions.js';
+import registerItemContextOptions from '~/system/ItemContextOptions.js';
+import registerActorContextOptions from '~/system/ActorContextOptions.js';
+import setupConditions from '~/system/Conditions';
+import onUpdateCombat from '~/system/Combat';
+import onRenderJournalSheet from '~/system/Journal.js';
+import onHotbarDrop from '~/system/Hotbar';
+import { onRenderChatMessage, onPreDeleteChatMessage } from '~/system/ChatMessage';
+
 
 Hooks.once('init', async () => {
    console.log('TITAN | Starting Titan VTTRPG System');
@@ -89,29 +90,7 @@ Hooks.once('init', async () => {
    return;
 });
 
-Hooks.once('setup', async () => {
-   // Set up Conditions
-   const conditions = TitanConditions.sort((a, b) => {
-      const textA = game.i18n.localize(a.label);
-      const textB = game.i18n.localize(b.label);
-      return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-   });
-   for (const condition of conditions) {
-      const description = localize(`${condition.id}.desc`);
-      condition.flags = {
-         titan: {
-            description: description,
-            type: 'condition'
-         },
-         'visual-active-effects.data.content': description
-      };
-   }
-
-   CONFIG.statusEffects = conditions;
-
-
-   return;
-});
+Hooks.once('setup', setupConditions);
 
 Hooks.once('ready', () => {
    Hooks.on('hotbarDrop', (bar, data, slot) => {
@@ -121,69 +100,18 @@ Hooks.once('ready', () => {
    return;
 });
 
-Hooks.on('renderChatMessage', (message, html) => {
-   // Check if this is a valid titan chat message
-   const chatContext = message?.flags?.titan;
-   if (TitanChatMessageTypes.has(chatContext?.type)) {
-      // Add the titan class
-      const content = html.find('.chat-message').prevObject;
-      content.addClass('titan');
+Hooks.on('renderChatMessage', onRenderChatMessage);
 
-      // Adder the owner class
-      if (message.isOwner) {
-         content.addClass('owner');
-      }
+Hooks.on('preDeleteChatMessage', onPreDeleteChatMessage);
 
-      // Add the dark mode class
-      if (getSetting('darkModeChatMessages') !== 'disabled') {
-         content.addClass('titan-dark-mode');
-      }
+Hooks.on('renderJournalSheet', onRenderJournalSheet);
 
-      // Add the svelte component
-      const documentStore = new TJSDocument(message);
-      message._svelteComponent = new ChatMessageShell({
-         target: html[0],
-         props: {
-            documentStore: documentStore,
-         }
-      });
-   }
-   else if (getSetting('darkModeChatMessages') === 'all') {
-      // Add the titan class
-      const content = html.find('.chat-message').prevObject;
-      content.addClass('titan-dark-mode');
-   }
-
-});
-
-
-Hooks.on('preDeleteChatMessage', (message) => {
-   // Check if this is a valid titan chat message
-   const flagData = message.getFlag('titan', 'data');
-   if (typeof flagData === 'object' && typeof message?._svelteComponent?.$destroy === 'function') {
-      // If so, delete the svelte component
-      message._svelteComponent.$destroy();
-   }
-});
-
-Hooks.on('renderJournalSheet', (journalSheet, html) => {
-   if (getSetting('darkModeJournals')) {
-      const journal = html.find('journal-entry').prevObject;
-      journal.addClass('titan-dark-mode');
-   }
-});
-
-Hooks.on('renderJournalTextPageSheet', (journalSheet, html) => {
-   if (getSetting('darkModeJournals')) {
-      const journal = html.find('journal-entry').prevObject;
-      journal.addClass('titan-dark-mode');
-   }
-});
+Hooks.on('renderJournalTextPageSheet', onRenderJournalSheet);
 
 Hooks.on("getChatLogEntryContext", registerChatContextOptions);
 
 Hooks.on('getItemDirectoryEntryContext', registerItemContextOptions);
 
-Hooks.on("updateCombat", (combat, data, diff) => {
-   onUpdateCombat(combat, data, diff);
-});
+Hooks.on('getActorDirectoryEntryContext', registerActorContextOptions);
+
+Hooks.on("updateCombat", onUpdateCombat);

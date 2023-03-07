@@ -203,17 +203,19 @@ export function isModifierActive() {
 }
 
 export async function regenerateUUID(document) {
-   await document.update({
-      flags: {
-         titan: {
-            uuid: uuidv4()
+   if (document) {
+      await document.update({
+         flags: {
+            titan: {
+               uuid: uuidv4()
+            }
          }
-      }
-   });
+      });
 
-   ui.notifications.info(
-      localize('regeneratedUUIDForDocument%x').replace('%x', document.name)
-   );
+      ui.notifications.info(
+         localize('regeneratedUUIDForDocument%x').replace('%x', document.name)
+      );
+   }
 }
 
 export function isCheck(chatMessageType) {

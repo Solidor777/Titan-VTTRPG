@@ -1,8 +1,7 @@
-import { localize, getActor, getSetting } from '~/helpers/Utility.js';
+import { localize, getActor, getSetting, isCheck } from '~/helpers/Utility.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
-import { isCheck } from './Utility';
 
-export function registerChatContextOptions(html, options) {
+export default function registerChatContextOptions(html, options) {
    const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
    const autoSpendResolveDoubleExpertise = getSetting('autoSpendResolveDoubleExpertise');
    const autoSpendResolveDoubleTraining = getSetting('autoSpendResolveDoubleTraining');

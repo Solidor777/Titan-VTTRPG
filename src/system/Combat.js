@@ -1,6 +1,6 @@
 import { isModifierActive } from '~/helpers/Utility';
 
-export async function onUpdateCombat(combat, data, diff) {
+export default async function onUpdateCombat(combat, data, diff) {
    // Ensure that this is the result of advancing in turn order
    const isNewCombat = combat.previous.turn === null;
    if (!isModifierActive() && (combat.combatant && diff.direction === 1 || isNewCombat)) {
