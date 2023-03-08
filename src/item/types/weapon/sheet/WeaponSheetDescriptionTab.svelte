@@ -11,14 +11,14 @@
    // Tabs
    const tabs = [
       {
-         label: localize('attackNotes'),
-         id: 'attackNotes',
-         component: WeaponSheetAttackNotesTab,
-      },
-      {
          label: localize('itemDescription'),
          id: 'itemDescription',
          component: WeaponSheetItemDescriptionTab,
+      },
+      {
+         label: localize('attackNotes'),
+         id: 'attackNotes',
+         component: WeaponSheetAttackNotesTab,
       },
    ];
 </script>
