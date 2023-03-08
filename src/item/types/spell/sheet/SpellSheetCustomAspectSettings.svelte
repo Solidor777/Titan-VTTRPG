@@ -228,7 +228,7 @@
                   }
 
                   &.number {
-                     width: 2rem;
+                     width: 3.5rem;
                   }
                }
             }

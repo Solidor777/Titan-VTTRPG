@@ -304,7 +304,7 @@
                   @include font-size-normal;
 
                   &.number {
-                     width: 2rem;
+                     width: 3.5rem;
                   }
                }
             }
