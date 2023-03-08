@@ -5,7 +5,6 @@ import EditUUIDDialog from '~/documents/dialogs/EditUUIDDialog';
 export default function registerActorContextOptions(html, options) {
    // Only present these options for the gm
    if (game.user.isGM) {
-
       // Regenerate UUID
       options.push({
          name: localize('regenerateUUID'),
@@ -24,17 +23,17 @@ export default function registerActorContextOptions(html, options) {
    }
 }
 
-function getItem(li) {
-   const itemId = li.data('document-id');
-   return game.items.get(itemId);
+function getActor(li) {
+   const actorID = li.data('document-id');
+   return game.actors.get(actorID);
 }
 
 function canEditUUID(li) {
-   return getItem(li) ? true : false;
+   return getActor(li) ? true : false;
 }
 
 async function regenerateUUID(li) {
-   const item = getItem(li);
+   const item = getActor(li);
    if (item) {
       if (getSetting('confirmRegenerateUUID')) {
          const dialog = new ConfirmRegenerateUUIDDialog(item);
@@ -50,7 +49,7 @@ async function regenerateUUID(li) {
 }
 
 async function editUUID(li) {
-   const item = getItem(li);
+   const item = getActor(li);
    if (item) {
       const dialog = new EditUUIDDialog(item);
       dialog.render(true);

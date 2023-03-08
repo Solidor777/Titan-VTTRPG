@@ -1,6 +1,6 @@
 import { localize } from '~/helpers/Utility';
 
-const TITAN_CONDITIONS = Object.freeze([
+const TITAN_CONDITIONS = [
    {
       id: 'blinded',
       label: 'LOCAL.blinded.label',
@@ -56,7 +56,7 @@ const TITAN_CONDITIONS = Object.freeze([
       label: 'LOCAL.unconscious.label',
       icon: 'icons/svg/unconscious.svg'
    },
-]);
+];
 
 export default function setupConditions() {
    // Sort conditions
