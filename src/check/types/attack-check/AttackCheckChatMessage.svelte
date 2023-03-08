@@ -52,7 +52,10 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.results.damage && game.user.isGM}
          <div class="section">
-            <ChatDamageButtons damage={$document.flags.titan.results.damage} />
+            <ChatDamageButtons
+               damage={$document.flags.titan.results.damage}
+               damageTraits={$document.flags.titan.parameters.attack.trait}
+            />
          </div>
       {/if}
    {/if}

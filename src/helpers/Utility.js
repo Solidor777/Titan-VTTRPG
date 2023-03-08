@@ -65,14 +65,14 @@ export function isGM() {
    return game.user.isGM;
 }
 
-export function applyDamageToTargets(damage, ignoreArmor, report = true, updateActor = true) {
+export function applyDamageToTargets(damage, ignoreArmor, report = true, updateActor = true, damageTraits = false) {
    // Get targets
    const targets = getCombatTargets();
 
    // Apply healing to each target
    targets.forEach((target) => {
       if (target && target.system.resource?.stamina) {
-         target.typeComponent.applyDamage(damage, ignoreArmor, report, updateActor);
+         target.typeComponent.applyDamage(damage, ignoreArmor, report, updateActor, damageTraits);
       }
    });
 }

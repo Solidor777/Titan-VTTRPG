@@ -18,7 +18,7 @@
       <IconStatTag
          icon={'fas fa-helmet-battle'}
          label={localize('armor')}
-         value={item.system.armor}
+         value={`${item.system.armor.value} / ${item.system.armor.max}`}
       />
    </div>
 

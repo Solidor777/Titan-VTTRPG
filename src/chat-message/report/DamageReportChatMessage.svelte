@@ -1,8 +1,11 @@
 <script>
    import { getContext } from 'svelte';
    import { localize } from '~/helpers/utility';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import ChatResource from '~/chat-message/ChatResource.svelte';
    import ReportHeader from '~/chat-message/report/components/ReportHeader.svelte';
+   import RichText from '../../helpers/svelte-components/RichText.svelte';
+   import Tag from '../../helpers/svelte-components/tag/Tag.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -27,6 +30,15 @@
    {:else if chatContext.ignoredArmor}
       <!--Ignored Armor-->
       <div class="message">{localize('armorIgnored')}</div>
+   {/if}
+
+   {#if chatContext.penetrating}
+      <div
+         class="message"
+         use:tooltip={{ content: localize('attack.penetrating.desc') }}
+      >
+         <Tag label={localize('penetrating')} />
+      </div>
    {/if}
 
    <!--Wounds Suffered-->

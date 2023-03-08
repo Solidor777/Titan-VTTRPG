@@ -498,7 +498,10 @@
             "base",
             "object"
          ],
-         "armor": 1,
+         "armor": {
+            "max": 1,
+            "value": 1
+         },
          "trait": [],
          "rulesElement": []
       },

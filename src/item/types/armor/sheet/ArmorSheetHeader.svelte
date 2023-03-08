@@ -70,7 +70,18 @@
             <!--Input-->
             <div class="input number">
                <DocumentIntegerInput
-                  bind:value={$document.system.armor}
+                  bind:value={$document.system.armor.value}
+                  min={0}
+                  max={$document.system.armor.max}
+               />
+            </div>
+
+            <div class="divider">/</div>
+
+            <!--Input-->
+            <div class="input number">
+               <DocumentIntegerInput
+                  bind:value={$document.system.armor.max}
                   min={0}
                />
             </div>
@@ -145,6 +156,11 @@
                   &.large-number {
                      --input-width: 5rem;
                   }
+               }
+
+               .divider {
+                  margin-left: 0.25rem;
+                  margin-right: 0.25rem;
                }
             }
          }

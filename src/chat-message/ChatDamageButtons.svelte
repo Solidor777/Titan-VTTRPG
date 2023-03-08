@@ -9,13 +9,17 @@
 
    // Document reference
    export let damage = void 0;
+   export let damageTraits = void 0;
+   console.log(damageTraits);
 </script>
 
 <div class="damage-buttons">
    <!--Apply damage button-->
    <div class="button" use:tooltip={{ content: localize('applyDamage') }}>
       <EfxButton
-         on:click={() => applyDamageToTargets(damage, false, true, true)}
+         on:click={() => {
+            applyDamageToTargets(damage, false, true, true, damageTraits);
+         }}
          ><i class="fas fa-burst" />
       </EfxButton>
    </div>
@@ -25,7 +29,9 @@
       class="button"
       use:tooltip={{ content: localize('applyDamageIgnoreArmor') }}
    >
-      <EfxButton on:click={() => applyDamageToTargets(damage, true, true, true)}
+      <EfxButton
+         on:click={() =>
+            applyDamageToTargets(damage, true, true, true, damageTraits)}
          ><i class="fas fa-shield-slash" />
       </EfxButton>
    </div>
@@ -33,7 +39,14 @@
    <!--Apply half damage button-->
    <div class="button" use:tooltip={{ content: localize('applyHalfDamage') }}>
       <EfxButton
-         on:click={() => applyDamageToTargets(damage, false, true, true)}
+         on:click={() =>
+            applyDamageToTargets(
+               Math.floor(damage / 2),
+               false,
+               true,
+               true,
+               damageTraits
+            )}
       >
          <i class="fas fa-heart-half-stroke" />
       </EfxButton>

@@ -577,7 +577,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          const armor = systemData.mod.armor;
          const equippedArmor = this.parent.items.get(equippedArmorId);
          if (equippedArmor) {
-            armor.mod.equipment += equippedArmor.system.armor;
+            armor.mod.equipment += equippedArmor.system.armor.value;
             const armorTraits = equippedArmor.system.trait;
 
             // Add encumbrance
@@ -1149,10 +1149,24 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    // Apply damage to the actor
-   async applyDamage(damage = 1, ignoreArmor = false, shouldReport = true, updateActor = true) {
+   async applyDamage(damage = 1, ignoreArmor = false, shouldReport = true, updateActor = true, damageTraits = false) {
       if (this.parent.isOwner) {
+
+         // Calculate how much damage is resisted
+         let damageResistance = ignoreArmor ? 0 : this.parent.system.mod.armor.value;
+         let penetrating = false;
+         if (damageResistance > 0 && damageTraits) {
+            for (const trait of damageTraits) {
+               if (trait.name === 'penetrating') {
+                  penetrating = true;
+                  damageResistance -= 1;
+                  break;
+               }
+            }
+         }
+
          // Calculate the damage amount
-         const damageTaken = ignoreArmor ? damage : Math.max(damage - this.parent.system.mod.armor.value, 0);
+         const damageTaken = damageResistance < damage ? damage - damageResistance : 0;
          const stamina = this.parent.system.resource.stamina;
          const wounds = this.parent.system.resource.wounds;
 
@@ -1226,10 +1240,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext.woundsSuffered = woundsSuffered;
                }
 
+               // Penetrating message
+               if (penetrating) {
+                  chatContext.penetrating = true;
+               }
+
                // Send the report to chat
                this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
-
          }
 
          return {
@@ -1237,8 +1255,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             woundsSuffered: woundsSuffered
          };
       }
-
-      return;
    }
 
    async applyHealing(healing = 1, shouldReport = true, updateActor = true) {
