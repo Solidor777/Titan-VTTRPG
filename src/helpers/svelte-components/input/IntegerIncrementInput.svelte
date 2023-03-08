@@ -71,10 +71,13 @@
 </script>
 
 <div class="input">
-   <div class="increment">
-      <MinIconButton icon={'fas fa-plus'} on:click={incrementInput} />
+   <div class="decrement">
+      <MinIconButton
+         icon={'fas fa-minus'}
+         on:click={decrementInput}
+         {disabled}
+      />
    </div>
-
    <input
       type="number"
       on:keyup={validateInput}
@@ -88,8 +91,12 @@
       on:keypress={(event) => checkInput(event)}
       {disabled}
    />
-   <div class="decrement">
-      <MinIconButton icon={'fas fa-minus'} on:click={decrementInput} />
+   <div class="increment">
+      <MinIconButton
+         icon={'fas fa-plus'}
+         on:click={incrementInput}
+         {disabled}
+      />
    </div>
 </div>
 
@@ -109,10 +116,10 @@
       }
 
       .increment {
-         margin-right: 0.125rem;
+         margin-left: 0.125rem;
       }
       .decrement {
-         margin-left: 0.125rem;
+         margin-right: 0.125rem;
       }
    }
 </style>

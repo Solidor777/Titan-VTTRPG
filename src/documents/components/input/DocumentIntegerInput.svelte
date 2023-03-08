@@ -1,5 +1,3 @@
-<svelte:options accessors={true} />
-
 <script>
    import { getContext } from 'svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
@@ -22,7 +20,7 @@
    {min}
    {max}
    disabled={disabled || !$document.isOwner}
-   on:keyup={() => {
+   on:change={() => {
       $document.update({
          system: $document.system,
          flags: $document.flags,

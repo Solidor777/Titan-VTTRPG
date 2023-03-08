@@ -5,6 +5,7 @@
    import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
    import DocumentRaritySelect from '~/documents/components/select/DocumentRaritySelect.svelte';
+   import DocumentIntegerIncrementInput from '~/documents/components/input/DocumentIntegerIncrementInput.svelte';
 
    // Get Context variables
    const document = getContext('DocumentStore');
@@ -66,7 +67,7 @@
 
             <!--Input-->
             <div class="input large-number">
-               <DocumentIntegerInput
+               <DocumentIntegerIncrementInput
                   bind:value={$document.system.quantity}
                   min={0}
                />

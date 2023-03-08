@@ -1,5 +1,3 @@
-<svelte:options accessors={true} />
-
 <script>
    import { getContext } from 'svelte';
    import TextArea from '~/helpers/svelte-components/input/TextArea.svelte';

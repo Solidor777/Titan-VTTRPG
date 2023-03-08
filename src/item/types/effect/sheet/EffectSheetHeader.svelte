@@ -6,7 +6,8 @@
    import DocumentName from '~/documents/components/input/DocumentNameInput.svelte';
    import DocumentSelect from '~/documents/components/select/DocumentSelect.svelte';
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
-   import DocumentTextInput from '../../../../documents/components/input/DocumentTextInput.svelte';
+   import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
+   import DocumentIntegerIncrementInput from '~/documents/components/input/DocumentIntegerIncrementInput.svelte';
 
    // Get Context variables
    const document = getContext('DocumentStore');
@@ -103,7 +104,7 @@
 
                <!--Input-->
                <div class="input number">
-                  <DocumentIntegerInput
+                  <DocumentIntegerIncrementInput
                      min={0}
                      bind:value={$document.system.duration.remaining}
                   />

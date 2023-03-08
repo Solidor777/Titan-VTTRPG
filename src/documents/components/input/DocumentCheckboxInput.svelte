@@ -1,5 +1,3 @@
-<svelte:options accessors={true} />
-
 <script>
    import { getContext } from 'svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
