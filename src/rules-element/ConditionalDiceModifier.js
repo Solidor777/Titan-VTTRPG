@@ -96,7 +96,7 @@ function getDiceModsForReducedKeys(conditionalDiceModifiers, selector, keys, red
 }
 
 export function getAttackCheckDiceMod(item, attack, multiAttack) {
-   let retVal = 0;
+   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
@@ -112,7 +112,7 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
 }
 
 export function getCastingCheckDiceMod(item) {
-   let retVal = 0;
+   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'spellTradition', camelize(item.system.tradition));
@@ -123,7 +123,7 @@ export function getCastingCheckDiceMod(item) {
 }
 
 export function getItemCheckDiceMod(item) {
-   let retVal = 0;
+   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
    const conditionalDiceModifiers = this.conditionalDiceModifier;
    if (conditionalDiceModifiers) {
       retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', item.system.customTrait, (trait) => camelize(trait.name));

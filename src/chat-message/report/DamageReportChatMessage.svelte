@@ -17,7 +17,7 @@
       icon={'fas fa-burst'}
       label={localize('took%xDamage').replace('%x', chatContext.damageTaken)}
    />
-
+   <!--Ignored Armor-->
    <!--Damage resisted-->
    {#if chatContext.damageResisted}
       <div class="message">
@@ -26,18 +26,8 @@
             chatContext.damageResisted
          )}
       </div>
-   {:else if chatContext.ignoredArmor}
-      <!--Ignored Armor-->
+   {:else if chatContext.ignoreArmor}
       <div class="message">{localize('armorIgnored')}</div>
-   {/if}
-
-   {#if chatContext.penetrating}
-      <div
-         class="message"
-         use:tooltip={{ content: localize('attack.penetrating.desc') }}
-      >
-         <Tag label={localize('penetrating')} />
-      </div>
    {/if}
 
    <!--Wounds Suffered-->
@@ -69,6 +59,30 @@
          max={chatContext.wounds.max}
       />
    </div>
+
+   {#if chatContext.penetrating || chatContext.ineffective}
+      <div class="tags message">
+         <!--Ineffective-->
+         {#if chatContext.ineffective}
+            <div
+               class="tag"
+               use:tooltip={{ content: localize('attack.ineffective.desc') }}
+            >
+               <Tag label={localize('ineffective')} />
+            </div>
+         {/if}
+
+         <!--Penetrating-->
+         {#if chatContext.penetrating}
+            <div
+               class="tag"
+               use:tooltip={{ content: localize('attack.penetrating.desc') }}
+            >
+               <Tag label={localize('penetrating')} />
+            </div>
+         {/if}
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -84,12 +98,19 @@
       .message {
          @include flex-row;
          @include flex-group-center;
-         margin-top: 0.5rem;
          flex-wrap: wrap;
          padding-bottom: 0.5rem;
 
+         &:not(.tags) {
+            margin-top: 0.5rem;
+         }
+
          &:not(:last-child) {
             @include border-bottom;
+         }
+
+         .tag {
+            @include tag-margin;
          }
       }
    }

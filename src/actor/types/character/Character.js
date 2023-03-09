@@ -810,6 +810,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the actor check data
       options.actorRollData = this.parent.getRollData();
 
+      // Add dice penalty if the actor is contaminated
+      if (this.parent.system.condition.contaminated) {
+         options.diceMod = options.diceMod ?? -1;
+      }
+
       // Otherwise, do a skill check
       return new TitanAttributeCheck(options);
    }
@@ -819,6 +824,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
          options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
       }
+
+      // Add dice penalty if the actor is contaminated
+      if (this.parent.system.condition.contaminated) {
+         options.diceMod = options.diceMod ?? -1;
+      }
+
       const dialog = new AttributeCheckDialog(this.parent, options);
       return dialog.render(true);
    }
@@ -850,12 +861,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-
    // Get a resistance check at the actor
    async _getResistanceCheck(options) {
 
       // Get the actor check data
       options.actorRollData = this.parent.getRollData();
+
+      // Add dice penalty if the actor is contaminated
+      if (this.parent.system.condition.contaminated) {
+         options.diceMod = options.diceMod ?? -1;
+      }
 
       // Get the check
       return new TitanResistanceCheck(options);
@@ -881,6 +896,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          else {
             // Otherwise open a check dialog
+            // Add dice penalty if the actor is contaminated
+            if (this.parent.system.condition.contaminated) {
+               options.diceMod = options.diceMod ?? -1;
+            }
             const dialog = new ResistanceCheckDialog(this.parent, options);
             dialog.render(true);
          }
@@ -1154,8 +1173,15 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Calculate how much damage is resisted
          let damageResistance = options?.ignoreArmor ? 0 : this.parent.system.mod.armor.value;
-         if (damageResistance > 0 && options?.penetrating) {
-            damageResistance -= 1;
+         if (damageResistance > 0 && options) {
+            if (options.ineffective) {
+               damageResistance *= 2;
+               console.log(damageResistance);
+            }
+
+            if (options.penetrating) {
+               damageResistance -= 1;
+            }
          }
 
          // Calculate the damage amount
@@ -1223,7 +1249,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             if (options) {
                // Ignore Armor
                if (options.ignoreArmor) {
-                  chatContext.ignoredArmor = true;
+                  chatContext.ignoreArmor = true;
                }
 
                else {
