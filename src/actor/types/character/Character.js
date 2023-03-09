@@ -1142,27 +1142,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       if (resolveSpent > 0) {
-         return await this.spendResolve(resolveSpent, true, false);
+         return await this.spendResolve(resolveSpent, { playSound: false });
       }
 
       return;
    }
 
    // Apply damage to the actor
-   async applyDamage(damage = 1, ignoreArmor = false, shouldReport = true, updateActor = true, damageTraits = false) {
-      if (this.parent.isOwner) {
+   async applyDamage(damage = 1, options) {
+      if (damage > 0 && this.parent.isOwner) {
 
          // Calculate how much damage is resisted
-         let damageResistance = ignoreArmor ? 0 : this.parent.system.mod.armor.value;
-         let penetrating = false;
-         if (damageResistance > 0 && damageTraits) {
-            for (const trait of damageTraits) {
-               if (trait.name === 'penetrating') {
-                  penetrating = true;
-                  damageResistance -= 1;
-                  break;
-               }
-            }
+         let damageResistance = options?.ignoreArmor ? 0 : this.parent.system.mod.armor.value;
+         if (damageResistance > 0 && options?.penetrating) {
+            damageResistance -= 1;
          }
 
          // Calculate the damage amount
@@ -1187,7 +1180,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Update the actor
          stamina.value = Math.max(stamina.value - damageTaken, 0);
          wounds.value += woundsSuffered;
-         if (updateActor) {
+         if (options?.updateActor !== false) {
             await this.parent.update({
                system: {
                   resource: {
@@ -1204,61 +1197,62 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
 
          // Report
-         if (shouldReport) {
-            const shouldReportSettings = getSetting('reportTakingDamage');
-            if (shouldReportSettings) {
-
-               // Create the chat context
-               const chatContext = {
-                  type: 'damageReport',
-                  img: this.parent.img,
-                  name: this.parent.name,
-                  damageTaken: damageTaken,
-                  stamina: {
-                     value: stamina.value,
-                     max: stamina.max
-                  },
-                  wounds: {
-                     value: wounds.value,
-                     max: wounds.max
-                  }
-               };
-
-               // Damage resisted
-               const damageResisted = damage - damageTaken;
-               if (damageResisted > 0) {
-                  chatContext.damageResisted = damageResisted;
+         if (options?.report !== true && getSetting('reportTakingDamage')) {
+            // Create the chat context
+            const chatContext = {
+               type: 'damageReport',
+               img: this.parent.img,
+               name: this.parent.name,
+               damageTaken: damageTaken,
+               stamina: {
+                  value: stamina.value,
+                  max: stamina.max
+               },
+               wounds: {
+                  value: wounds.value,
+                  max: wounds.max
                }
+            };
 
+
+            // Damage resisted
+            if (damageResistance > 0) {
+               chatContext.damageResisted = damage - damageTaken;
+            }
+
+            if (options) {
                // Ignore Armor
-               else if (ignoreArmor) {
+               if (options.ignoreArmor) {
                   chatContext.ignoredArmor = true;
                }
 
-               // Wounds soffered
-               if (woundsSuffered > 0) {
-                  chatContext.woundsSuffered = woundsSuffered;
-               }
+               else {
 
-               // Penetrating message
-               if (penetrating) {
-                  chatContext.penetrating = true;
-               }
+                  // Penetrating
+                  if (options.penetrating) {
+                     chatContext.penetrating = true;
+                  }
 
-               // Send the report to chat
-               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+                  // Ineffective
+                  if (options.ineffective) {
+                     chatContext.ineffective = true;
+                  }
+               }
             }
-         }
 
-         return {
-            damageTaken: damageTaken,
-            woundsSuffered: woundsSuffered
-         };
+            // Wounds soffered
+            if (woundsSuffered > 0) {
+               chatContext.woundsSuffered = woundsSuffered;
+            }
+
+            // Send the report to chat
+            this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+         }
       }
    }
 
-   async applyHealing(healing = 1, shouldReport = true, updateActor = true) {
-      if (this.parent.isOwner) {
+   async applyHealing(healing = 1, options) {
+      if (healing > 0 && this.parent.isOwner) {
          // Check if the actor's stamina is less than max
          let damageHealed = 0;
          const stamina = this.parent.system.resource.stamina;
@@ -1268,7 +1262,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             stamina.value += damageHealed;
 
             // Update the actor
-            if (updateActor) {
+            if (options?.updateActor !== false) {
                await this.parent.update({
                   system: {
                      resource: {
@@ -1281,30 +1275,28 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
 
             // Report
-            if (shouldReport) {
-               const shouldReportSettings = getSetting('reportHealingDamage');
-               if (shouldReportSettings) {
-                  // Create chat context
-                  const wounds = this.parent.system.resource.wounds;
-                  const chatContext = {
-                     type: 'healingReport',
-                     img: this.parent.img,
-                     name: this.parent.name,
-                     damageHealed: damageHealed,
-                     stamina: {
-                        value: stamina.value,
-                        max: stamina.max
-                     },
-                     wounds: {
-                        value: wounds.value,
-                        max: wounds.max
-                     }
-                  };
+            if (options?.report !== false && getSetting('reportHealingDamage')) {
+               // Create chat context
+               const wounds = this.parent.system.resource.wounds;
+               const chatContext = {
+                  type: 'healingReport',
+                  img: this.parent.img,
+                  name: this.parent.name,
+                  damageHealed: damageHealed,
+                  stamina: {
+                     value: stamina.value,
+                     max: stamina.max
+                  },
+                  wounds: {
+                     value: wounds.value,
+                     max: wounds.max
+                  }
+               };
 
-                  // Send the report to chat
-                  this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
-               }
+               // Send the report to chat
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
             }
+
          }
 
          return damageHealed;
@@ -1314,7 +1306,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    async regainResolve(resolveRegained = 1, updateActor = true) {
-      if (this.parent.isOwner) {
+      if (resolveRegained > 0 && this.parent.isOwner) {
          // Update resolve
          const resolve = this.parent.system.resource.resolve;
          resolve.value = Math.min(resolve.max, resolve.value + resolveRegained);
@@ -1334,8 +1326,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       return;
    }
 
-   async spendResolve(resolveSpent = 1, shouldReport = true, shouldReportPlaySound = true) {
-      if (this.parent.isOwner) {
+   async spendResolve(resolveSpent = 1, options) {
+      if (resolveSpent > 0 && this.parent.isOwner) {
          // Check if the actor's resolve is less than max
          const resolve = this.parent.system.resource.resolve;
          const initialResolve = resolve.value;
@@ -1354,7 +1346,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
 
          // Report
-         if (shouldReport === true) {
+         if (options?.report !== false) {
             const shouldReportSettings = getSetting('reportSpendingResolve');
             if (shouldReportSettings) {
                // Create chat context
@@ -1372,7 +1364,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   chatContext.resolveShortage = resolveSpent - initialResolve;
                }
 
-               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, shouldReportPlaySound);
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, options?.playSound ?? true);
             }
          }
       }
@@ -1951,7 +1943,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Update the actor if appropriate
             const confirmed = autoApplyFastHealing === 'enabled';
             if (confirmed) {
-               await this.applyHealing(turnStaminaMod, false, false);
+               await this.applyHealing(turnStaminaMod, { updateActor: false, report: false });
                shouldUpdateActor = true;
             }
 
@@ -1973,7 +1965,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             // Update the actor if appropriate
             const confirmed = autoApplyPersistentDamage === 'enabled';
             if (confirmed) {
-               await this.applyDamage(-turnStaminaMod, false, false);
+               await this.applyDamage(-turnStaminaMod, { updateActor: false, ignoreArmor: true, report: false });
                shouldUpdateActor = true;
             }
 

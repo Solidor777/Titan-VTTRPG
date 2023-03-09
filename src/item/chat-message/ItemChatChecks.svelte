@@ -62,8 +62,7 @@
                   ) {
                      await actor.character.spendResolve(
                         itemCheck.parameters.resolveCost,
-                        true,
-                        false
+                        { playSound: false }
                      );
                   }
                   await itemCheck.evaluateCheck();
@@ -90,7 +89,7 @@
             // If the target is valid
             const character = controlledTokens[tokenIdx]?.actor?.character;
             if (character) {
-               character.spendResolve(resolveToSpend, true, true);
+               character.spendResolve(resolveToSpend);
             }
          }
       }

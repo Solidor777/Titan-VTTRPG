@@ -12,7 +12,7 @@
 
 <!--Apply healing button-->
 <div class="healing-button" use:tooltip={{ content: localize('applyHealing') }}>
-   <EfxButton on:click={() => applyHealingToTargets(healing, true, true)}>
+   <EfxButton on:click={() => applyHealingToTargets(healing)}>
       <i class="fas fa-heart" />
       {localize('heal%xDamage').replace('%x', healing)}
    </EfxButton>

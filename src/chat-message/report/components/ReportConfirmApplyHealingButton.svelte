@@ -15,8 +15,7 @@
             // Update the actor
             await character.applyHealing(
                $document.flags.titan.healingApplied.total,
-               false,
-               true
+               { report: false }
             );
 
             // Update the chat document

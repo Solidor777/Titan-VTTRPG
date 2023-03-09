@@ -32,11 +32,7 @@
    }
 
    async function spendResolve() {
-      return await $document.typeComponent.spendResolve(
-         check.resolveCost,
-         true,
-         true
-      );
+      return await $document.typeComponent.spendResolve(check.resolveCost);
    }
 </script>
 
@@ -62,7 +58,7 @@
                <div class="resolve-cost-button">
                   <SpendResolveButton
                      cost={check.resolveCost}
-                     on:click={() => spendResolve()}
+                     on:click={spendResolve}
                   />
                </div>
             {/if}

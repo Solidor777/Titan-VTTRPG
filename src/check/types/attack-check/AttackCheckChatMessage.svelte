@@ -54,7 +54,11 @@
          <div class="section">
             <ChatDamageButtons
                damage={$document.flags.titan.results.damage}
-               damageTraits={$document.flags.titan.parameters.attack.trait}
+               ineffective={$document.flags.titan.parameters.ineffective ??
+                  false}
+               penetrating={$document.flags.titan.parameters.penetrating ??
+                  false}
+               magical={$document.flags.titan.parameters.magical ?? false}
             />
          </div>
       {/if}

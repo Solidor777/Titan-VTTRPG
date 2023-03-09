@@ -7,10 +7,10 @@
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
 
-   // Document reference
    export let damage = void 0;
-   export let damageTraits = void 0;
-   console.log(damageTraits);
+   export let ineffective = false;
+   export let penetrating = false;
+   export let magical = false;
 </script>
 
 <div class="damage-buttons">
@@ -18,7 +18,11 @@
    <div class="button" use:tooltip={{ content: localize('applyDamage') }}>
       <EfxButton
          on:click={() => {
-            applyDamageToTargets(damage, false, true, true, damageTraits);
+            applyDamageToTargets(damage, {
+               ineffective: ineffective,
+               penetrating: penetrating,
+               magical: magical,
+            });
          }}
          ><i class="fas fa-burst" />
       </EfxButton>
@@ -31,7 +35,12 @@
    >
       <EfxButton
          on:click={() =>
-            applyDamageToTargets(damage, true, true, true, damageTraits)}
+            applyDamageToTargets(damage, {
+               ignoreArmor: true,
+               ineffective: ineffective,
+               penetrating: penetrating,
+               magical: magical,
+            })}
          ><i class="fas fa-shield-slash" />
       </EfxButton>
    </div>
@@ -40,13 +49,11 @@
    <div class="button" use:tooltip={{ content: localize('applyHalfDamage') }}>
       <EfxButton
          on:click={() =>
-            applyDamageToTargets(
-               Math.floor(damage / 2),
-               false,
-               true,
-               true,
-               damageTraits
-            )}
+            applyDamageToTargets(Math.floor(damage / 2), {
+               ineffective: ineffective,
+               penetrating: penetrating,
+               magical: magical,
+            })}
       >
          <i class="fas fa-heart-half-stroke" />
       </EfxButton>
@@ -54,7 +61,7 @@
 
    <!--Apply healing button-->
    <div class="button" use:tooltip={{ content: localize('applyHealing') }}>
-      <EfxButton on:click={() => applyHealingToTargets(damage, true, true)}>
+      <EfxButton on:click={() => applyHealingToTargets(damage)}>
          <i class="fas fa-heart" />
       </EfxButton>
    </div>

@@ -193,7 +193,7 @@ async function reRollCheckFailures(li, spendResolve) {
          if (actor) {
             const character = actor.character;
             if (character) {
-               character.spendResolve(1, true, true);
+               character.spendResolve(1);
             }
          }
       }
@@ -226,7 +226,7 @@ async function doubleExpertise(li, spendResolve) {
          if (actor) {
             const character = actor.character;
             if (character) {
-               character.spendResolve(1, true, true);
+               character.spendResolve(1);
             }
          }
       }
@@ -272,7 +272,7 @@ async function doubleTraining(li, spendResolve) {
          if (actor) {
             const character = actor.character;
             if (character) {
-               character.spendResolve(1, true, true);
+               character.spendResolve(1);
             }
          }
       }

@@ -128,20 +128,54 @@ export default class TitanAttackCheck extends TitanCheck {
       }
       parameters.totalExpertise = totalExpertise;
 
+      // Calculate attack traits that can effect successes and damage
+      // Determine whether the attack has the multi attack trait
+      for (let idx = 0; idx < attackData.trait.length; idx++) {
+         switch (attackData.trait[idx].name) {
+            case 'flurry': {
+               parameters.flurry = true;
+               break;
+            }
+            case 'rend': {
+               parameters.rend = true;
+               break;
+            }
+            case 'magical': {
+               parameters.magical = true;
+               break;
+            }
+            case 'ineffective': {
+               parameters.ineffective = true;
+               break;
+            }
+            case 'penetrating': {
+               parameters.penetrating = true;
+               break;
+            }
+            default: {
+               break;
+            }
+         }
+         if (attackData.trait[idx].name === 'flurry') {
+            parameters.flurry = true;
+            break;
+         }
+      }
+
       // Adjust the dice and expertise if this is a multi-attack
       if (parameters.multiAttack) {
 
          // Determine whether the attack has the multi attack trait
          for (let idx = 0; idx < attackData.trait.length; idx++) {
             if (attackData.trait[idx].name === 'flurry') {
-               parameters.flurryTrait = true;
+               parameters.flurry = true;
                break;
             }
          }
 
          // Round the total dice up if this is a dual attack
          // Otherwise, round down
-         parameters.totalDice = parameters.flurryTrait ?
+         parameters.totalDice = parameters.flurry ?
             Math.ceil(parameters.totalDice / 2) :
             Math.floor(parameters.totalDice / 2);
 

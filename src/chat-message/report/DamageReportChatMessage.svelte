@@ -4,8 +4,7 @@
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import ChatResource from '~/chat-message/ChatResource.svelte';
    import ReportHeader from '~/chat-message/report/components/ReportHeader.svelte';
-   import RichText from '../../helpers/svelte-components/RichText.svelte';
-   import Tag from '../../helpers/svelte-components/tag/Tag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');

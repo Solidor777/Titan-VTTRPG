@@ -15,9 +15,7 @@
             // Update the actor
             await character.applyDamage(
                $document.flags.titan.damageApplied.total,
-               false,
-               false,
-               true
+               { ignoreArmor: true, report: false }
             );
 
             // Update the chat document
