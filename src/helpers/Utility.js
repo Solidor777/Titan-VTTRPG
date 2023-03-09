@@ -71,8 +71,8 @@ export function applyDamageToTargets(damage, options) {
 
    // Apply healing to each target
    targets.forEach((target) => {
-      if (target && target.system.resource?.stamina) {
-         target.typeComponent.applyDamage(damage, options);
+      if (target && target.character) {
+         target.character.applyDamage(damage, options);
       }
    });
 }
@@ -83,8 +83,32 @@ export function applyHealingToTargets(healing = 1, options) {
 
    // Apply healing to each target
    targets.forEach((target) => {
-      if (target && target.system.resource?.stamina) {
-         target.typeComponent.applyHealing(healing, options);
+      if (target && target.character) {
+         target.character.applyHealing(healing, options);
+      }
+   });
+}
+
+export function applyRendToTargets(rend, options) {
+   // Get targets
+   const targets = getCombatTargets();
+
+   // Apply healing to each target
+   targets.forEach((target) => {
+      if (target && target.character) {
+         target.character.applyRend(rend, options);
+      }
+   });
+}
+
+export function applyRepairsToTargets(repairs, options) {
+   // Get targets
+   const targets = getCombatTargets();
+
+   // Apply healing to each target
+   targets.forEach((target) => {
+      if (target && target.character) {
+         target.character.applyRepairs(repairs, options);
       }
    });
 }

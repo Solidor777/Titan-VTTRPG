@@ -6,6 +6,8 @@ export default function calculateCheckResults(inResults, parameters) {
    const extraSuccessOnCritical = parameters.extraSuccessOnCritical;
    const extraFailureOnCritical = parameters.extraFailureOnCritical;
    const difficulty = parameters.difficulty;
+   results.criticalSuccesses = 0;
+   results.criticalFailures = 0;
    results.successes = 0;
    results.extraSuccesses = 0;
    results.succeeded = false;
@@ -30,6 +32,7 @@ export default function calculateCheckResults(inResults, parameters) {
 
       // If this dice was a critical failure
       else if (results.dice[i].final === 1) {
+         results.criticalFailures += 1;
          results.dice[i].criticalFailure = true;
          if (extraFailureOnCritical) {
             results.successes -= 1;

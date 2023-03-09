@@ -25,7 +25,9 @@ const CHAT_MESSAGE_TYPES = Object.freeze(new Set([
    'removeCombatEffectsReport',
    'shortRestReport',
    'longRestReport',
-   'effectsExpiredReport'
+   'effectsExpiredReport',
+   'rendReport',
+   'repairReport'
 ]));
 
 export function onRenderChatMessage(message, html) {

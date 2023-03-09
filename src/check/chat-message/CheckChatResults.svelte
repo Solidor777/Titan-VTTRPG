@@ -64,8 +64,8 @@
       </div>
    {/if}
 
-   <!--Damage-->
    {#if $document.flags.titan.results.succeeded}
+      <!--Damage-->
       {#if $document.flags.titan.results.damage > 0}
          <div class="stat">
             <i class="fas fa-burst" />
@@ -80,6 +80,15 @@
             <i class="fas fa-heart" />
             {localize('healing')}:
             {$document.flags.titan.results.healing}
+         </div>
+      {/if}
+
+      <!--Rend-->
+      {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
+         <div class="stat">
+            <i class="fas fa-hammer-crash" />
+            {localize('rend')}:
+            {$document.flags.titan.results.criticalSuccesses}
          </div>
       {/if}
    {/if}

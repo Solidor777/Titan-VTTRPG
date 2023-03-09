@@ -7,17 +7,27 @@
 
    export let icon = void 0;
    export let label = void 0;
+   export let img1;
+   export let img2;
+   export let name1;
+   export let name2;
 </script>
 
 <div class="header">
-   <!--Img-->
-   <img src={chatContext.img} alt="img" />
+   <!--Images-->
+   <div class="images">
+      <img src={img1} alt="img1" />
+      <img src={img2} alt="img2" />
+   </div>
 
    <!--Header-->
    <div class="label">
-      <!--Sub Header-->
+      <!--Sub Headers-->
       <div class="name">
-         {chatContext.name}
+         {name1}
+      </div>
+      <div class="name">
+         {name2}
       </div>
 
       <!--Main Header-->
@@ -44,6 +54,10 @@
          @include border;
          width: 5rem;
          margin-bottom: 0.5rem;
+
+         &:not(:first-child) {
+            margin-left: 0.25rem;
+         }
       }
 
       .label {
@@ -72,6 +86,10 @@
             @include flex-group-center;
             width: 100%;
             flex-wrap: wrap;
+
+            &:not(:first-child) {
+               margin-top: 0.25rem;
+            }
          }
       }
    }

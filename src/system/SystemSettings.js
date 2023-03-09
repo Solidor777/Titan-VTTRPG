@@ -225,6 +225,26 @@ export default function registerSystemSettings() {
       default: true,
    });
 
+   game.settings.register('titan', 'reportRendingArmor', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.reportRendingArmor.label',
+      hint: 'SETTINGS.reportRendingArmor.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+   });
+
+   game.settings.register('titan', 'reportRepairingArmor', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.reportRepairingArmor.label',
+      hint: 'SETTINGS.reportRepairingArmor.hint',
+      type: Boolean,
+      restricted: true,
+      default: true,
+   });
+
    game.settings.register('titan', 'reportSpendingResolve', {
       config: true,
       scope: 'world',

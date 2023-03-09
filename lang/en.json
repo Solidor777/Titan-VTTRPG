@@ -254,6 +254,7 @@
    "LOCAL.longRest.label": "Long Rest",
    "LOCAL.lore.desc.label": "<strong>Lore</strong> measures your overall breadth of knowledge in topics you are familiar with.",
    "LOCAL.lore.label": "Lore",
+   "LOCAL.lost%xArmor.label": "Lost %x Armor",
    "LOCAL.loud.label": "Loud",
    "LOCAL.m10.label": "10m",
    "LOCAL.m10Radius.label": "10m (radius)",
@@ -352,6 +353,10 @@
    "LOCAL.removeEffects.label": "Remove Effects",
    "LOCAL.removeExpiredEffects.label": "Remove Expired Efects",
    "LOCAL.rend.label": "Rend",
+   "LOCAL.rendArmor.label": "Rend Armor",
+   "LOCAL.repair.label": "Repair",
+   "LOCAL.repairArmor.label": "Repair Armor",
+   "LOCAL.repaired%xArmor.label": "Repaired %x Armor",
    "LOCAL.resilience.baseValue.label": "Base Resilience = Body + (Soul / 2), rounded up.",
    "LOCAL.resilience.desc.label": "<strong>Resilience</strong> is your your ability to resist pain and illnesses.",
    "LOCAL.resilience.label": "Resilience",
@@ -360,6 +365,7 @@
    "LOCAL.resistanceCheck.label": "Resistance Check",
    "LOCAL.resistances.label": "Resistances",
    "LOCAL.resisted%xDamage.label": "Resisted %x Damage",
+   "LOCAL.resisted%xRend.label": "Resisted %x Rend",
    "LOCAL.resistedBy.label": "Resisted by",
    "LOCAL.resolve.label": "Resolve",
    "LOCAL.resolve.max.label": "Max Resolve = Soul",
@@ -577,6 +583,14 @@
    "SETTINGS.reportHealingDamage": {
       "label": "Report Healing Damage",
       "hint": "Notify when an actor heals damage."
+   },
+   "SETTINGS.reportRendingArmor": {
+      "label": "Report Rending Armor",
+      "hint": "Notify when an actor's armor is reduced by a rend attack."
+   },
+   "SETTINGS.reportRepairingArmor": {
+      "label": "Report Repairing Armor",
+      "hint": "Notify when an actor's armor is repaired."
    },
    "SETTINGS.reportSpendingResolve": {
       "label": "Report Spending Resolve",

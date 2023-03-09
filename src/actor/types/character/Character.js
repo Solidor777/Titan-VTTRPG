@@ -1176,7 +1176,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          if (damageResistance > 0 && options) {
             if (options.ineffective) {
                damageResistance *= 2;
-               console.log(damageResistance);
             }
 
             if (options.penetrating) {
@@ -1329,6 +1328,106 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       return;
+   }
+
+   async applyRend(rend, options) {
+      if (rend > 0 && this.parent.isOwner) {
+         // Get the armor
+         const armor = this.getArmor();
+         if (armor) {
+
+            // Check if the armor is magical
+            let magicalArmor = false;
+            for (let idx = 0; idx < armor.system.trait.length; idx++) {
+               if (armor.system.trait[idx].name === 'magical') {
+                  magicalArmor = true;
+                  break;
+               }
+            }
+
+            // Apply the rend if the rend is magical or the armor is non magical
+            let rendResisted = true;
+            const armorValue = armor.system.armor.value;
+            if (!magicalArmor || options?.magical) {
+               rendResisted = false;
+               armor.system.armor.value = Math.max(armor.system.armor.value - rend, 0);
+               await armor.update({
+                  system: {
+                     armor: {
+                        value: armor.system.armor.value
+                     }
+                  }
+               });
+            }
+
+            // Report
+            if (options?.report !== false && getSetting('reportRendingArmor')) {
+               // Create chat context
+               const chatContext = {
+                  type: 'rendReport',
+                  actorImg: this.parent.img,
+                  actorName: this.parent.name,
+                  itemImg: armor.img,
+                  itemName: armor.name,
+                  armor: {
+                     value: armor.system.armor.value,
+                     max: armor.system.armor.max
+                  },
+                  rend: rend
+               };
+
+               if (rendResisted) {
+                  chatContext.rendResisted = true;
+               }
+               else {
+                  chatContext.armorLost = armorValue - armor.system.armor.value;
+               }
+
+               // Send the report to chat
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+            }
+         }
+      }
+   }
+
+   async applyRepairs(repairs, options) {
+      if (repairs > 0 && this.parent.isOwner) {
+         // Get the armor
+         const armor = this.getArmor();
+         if (armor && armor.system.armor.value < armor.system.armor.max) {
+
+            // Apply the repairs if the rend is magical or the armor is non magical
+            const armorValue = armor.system.armor.value;
+            armor.system.armor.value = Math.min(armor.system.armor.value + repairs, armor.system.armor.max);
+            await armor.update({
+               system: {
+                  armor: {
+                     value: armor.system.armor.value
+                  }
+               }
+            });
+
+            // Report
+            if (options?.report !== false && getSetting('reportRepairingArmor')) {
+               // Create chat context
+               const chatContext = {
+                  type: 'repairReport',
+                  actorImg: this.parent.img,
+                  actorName: this.parent.name,
+                  itemImg: armor.img,
+                  itemName: armor.name,
+                  armor: {
+                     value: armor.system.armor.value,
+                     max: armor.system.armor.max
+                  },
+                  armorRepaired: armor.system.armor.value - armorValue
+               };
+
+               // Send the report to chat
+               this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
+            }
+         }
+      }
    }
 
    async regainResolve(resolveRegained = 1, updateActor = true) {
@@ -2179,8 +2278,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          }
       }
    }
+
    getArmor() {
-      return this.parent.items.get(this.parent.system.equipped.armor);
+      const armor = this.parent.system.equipped.armor;
+      if (armor !== null && armor !== '') {
+         return this.parent.items.get(armor);
+      }
+      return false;
    }
 
    async equipArmor(armorId) {
@@ -2223,7 +2327,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    }
 
    getShield() {
-      return this.parent.items.get(this.parent.system.equipped.shield);
+      const shield = this.parent.system.equipped.shield;
+      if (shield !== null && shield !== '') {
+         return this.parent.items.get(shield);
+      }
+      return false;
    }
 
    async equipShield(shieldId) {

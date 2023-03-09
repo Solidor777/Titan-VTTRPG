@@ -7,6 +7,7 @@
    import AttackCheckChatStats from './AttackCheckChatStats.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
+   import ChatRendButtons from '../../../chat-message/ChatRendButtons.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -58,6 +59,16 @@
                   false}
                penetrating={$document.flags.titan.parameters.penetrating ??
                   false}
+               magical={$document.flags.titan.parameters.magical ?? false}
+            />
+         </div>
+      {/if}
+
+      <!--Rend Buttons-->
+      {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
+         <div class="section">
+            <ChatRendButtons
+               rend={$document.flags.titan.results.criticalSuccesses}
                magical={$document.flags.titan.parameters.magical ?? false}
             />
          </div>

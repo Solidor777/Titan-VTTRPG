@@ -10,7 +10,6 @@
    export let damage = void 0;
    export let ineffective = false;
    export let penetrating = false;
-   export let magical = false;
 </script>
 
 <div class="damage-buttons">
@@ -21,7 +20,6 @@
             applyDamageToTargets(damage, {
                ineffective: ineffective,
                penetrating: penetrating,
-               magical: magical,
             });
          }}
          ><i class="fas fa-burst" />
@@ -39,7 +37,6 @@
                ignoreArmor: true,
                ineffective: ineffective,
                penetrating: penetrating,
-               magical: magical,
             })}
          ><i class="fas fa-shield-slash" />
       </EfxButton>
@@ -52,7 +49,6 @@
             applyDamageToTargets(Math.floor(damage / 2), {
                ineffective: ineffective,
                penetrating: penetrating,
-               magical: magical,
             })}
       >
          <i class="fas fa-heart-half-stroke" />
