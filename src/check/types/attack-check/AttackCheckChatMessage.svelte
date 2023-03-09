@@ -2,12 +2,12 @@
    import { getContext } from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
-   import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
    import AttackCheckChatHeader from './AttackCheckChatHeader.svelte';
    import AttackCheckChatStats from './AttackCheckChatStats.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
-   import ChatRendButtons from '../../../chat-message/ChatRendButtons.svelte';
+   import ChatRendButtons from '~/chat-message/ChatRendButtons.svelte';
+   import AttackCheckChatDamageButtons from '~/check/types/attack-check/AttackCheckChatDamageButtons.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -53,19 +53,21 @@
       <!-- svelte-ignore missing-declaration -->
       {#if $document.flags.titan.results.damage && game.user.isGM}
          <div class="section">
-            <ChatDamageButtons
+            <AttackCheckChatDamageButtons
                damage={$document.flags.titan.results.damage}
                ineffective={$document.flags.titan.parameters.ineffective ??
                   false}
                penetrating={$document.flags.titan.parameters.penetrating ??
                   false}
-               magical={$document.flags.titan.parameters.magical ?? false}
+               cleave={$document.flags.titan.parameters.rend
+                  ? $document.flags.titan.results.criticalSuccesses
+                  : 0}
             />
          </div>
       {/if}
 
-      <!--Rend Buttons-->
-      {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
+      <!--Critical Success Effects-->
+      {#if $document.flags.titan.results.criticalSuccesses && $document.flags.titan.parameters.rend}
          <div class="section">
             <ChatRendButtons
                rend={$document.flags.titan.results.criticalSuccesses}

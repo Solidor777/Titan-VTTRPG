@@ -136,6 +136,10 @@ export default class TitanAttackCheck extends TitanCheck {
                parameters.flurry = true;
                break;
             }
+            case 'cleave': {
+               parameters.cleave = true;
+               break;
+            }
             case 'rend': {
                parameters.rend = true;
                break;

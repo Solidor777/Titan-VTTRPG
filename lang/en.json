@@ -47,7 +47,7 @@
    "LOCAL.athletics.desc.label": "<strong>Athletics</strong> is your ability to perform acts of of physical prowess.",
    "LOCAL.athletics.label": "Athletics",
    "LOCAL.attack.blast.desc.label": "<strong>Blast</strong> attacks automatically damage all creatures within the distance of the <strong>Blast</strong> Radius.",
-   "LOCAL.attack.cleave.desc.label": "Each roll of 6 on an attack with the <strong>Cleave</strong> trait deals 1 damage to all enemies adjacent to the attacker.",
+   "LOCAL.attack.cleave.desc.label": "Each roll of 6 on an attack with the <strong>Cleave</strong> trait deals 1 damage to all other enemies adjacent to the attacker.",
    "LOCAL.attack.close.desc.label": "Ranged attacks with the <strong>Close</strong> trait do not suffer a penalty to <strong>Accuracy</strong> when attacking an adjacent enemy.",
    "LOCAL.attack.crushing.desc.label": "A <strong>Crushing</strong> attack is heavy and solid, and deals bludgeoning blows to enemies.",
    "LOCAL.attack.flurry.desc.label": "Attacks with the <strong>Flurry</strong> trait round up their when splitting their dice pool in half for multiple attacks.",

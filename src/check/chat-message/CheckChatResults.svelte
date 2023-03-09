@@ -1,6 +1,7 @@
 <script>
    import { localize } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import CheckChatResetExpertiseButton from './CheckChatResetExpertiseButton.svelte';
 
    // Document reference
@@ -85,9 +86,24 @@
 
       <!--Rend-->
       {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
-         <div class="stat">
+         <div
+            class="stat"
+            use:tooltip={{ content: localize('attack.rend.desc') }}
+         >
             <i class="fas fa-hammer-crash" />
             {localize('rend')}:
+            {$document.flags.titan.results.criticalSuccesses}
+         </div>
+      {/if}
+
+      <!--Rend-->
+      {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
+         <div
+            class="stat"
+            use:tooltip={{ content: localize('attack.cleave.desc') }}
+         >
+            <i class="fas fa-scythe" />
+            {localize('cleave')}:
             {$document.flags.titan.results.criticalSuccesses}
          </div>
       {/if}
