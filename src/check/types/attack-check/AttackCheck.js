@@ -190,6 +190,40 @@ export default class TitanAttackCheck extends TitanCheck {
       return parameters;
    }
 
+   _applyExpertise(dice) {
+      const retVal = super._applyExpertise(dice);
+
+      // If we could benefit from critical successes
+      if (retVal.expertiseRemaining > 0 && this.parameters.difficulty < 6 && (this.parameters.cleave || this.parameters.rend)) {
+         for (let increment = 1; increment < 6; increment++) {
+            // Abort early if we run out of expertise
+            if (increment > retVal.expertiseRemaining) {
+               break;
+            }
+
+            // Apply expertise to dice that are == the increment from being a critical success
+            for (let i = 0; i < dice.length; i++) {
+               if (
+                  retVal.dice[i].final < 6 &&
+                  6 - retVal.dice[i].final === increment
+               ) {
+                  retVal.expertiseRemaining -= increment;
+                  retVal.dice[i].final = 6;
+                  retVal.dice[i].expertiseApplied += increment;
+
+                  // Abort early if we run out of expertise
+                  if (increment > retVal.expertiseRemaining) {
+                     break;
+                  }
+               }
+            }
+         }
+
+      }
+
+      return retVal;
+   }
+
    _calculateResults(inResults, parameters) {
       return calculateAttackCheckResults(inResults, parameters);
    }
