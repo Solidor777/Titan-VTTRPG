@@ -4,7 +4,7 @@
    export let disabled = false;
 </script>
 
-<input bind:value on:change {disabled} />
+<input bind:value on:change on:keyup {disabled} />
 
 <style lang="scss">
    @import '../../../styles/Mixins.scss';

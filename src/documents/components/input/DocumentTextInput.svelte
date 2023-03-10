@@ -9,17 +9,22 @@
 
    // Document reference
    const document = getContext('DocumentStore');
-</script>
 
-<TextInput
-   bind:value
-   disabled={disabled || !$document.isOwner}
-   on:change
-   on:change={async () => {
+   function updateDocument() {
       $document.update({
          system: $document.system,
          flags: $document.flags,
          name: $document.name,
       });
-   }}
+   }
+</script>
+
+<TextInput
+   bind:value
+   disabled={disabled || !$document.isOwner}
+   on:keyup
+   on:keyup={updateDocument}
+   on:change
+   on:change={updateDocument}
+   on:keyup
 />

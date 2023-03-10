@@ -17,7 +17,7 @@
 <IntegerIncrementInput
    {min}
    {max}
-   {disabled}
+   disabled={disabled || !$document.isOwner}
    {increment}
    {modifierIncrement}
    bind:value
