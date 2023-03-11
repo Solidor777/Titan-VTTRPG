@@ -101,8 +101,15 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
    if (conditionalDiceModifiers) {
       retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
       retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', attack.customTrait, (trait) => camelize(trait.name));
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', item.system.customTrait, (trait) => camelize(trait.name));
+      const customTraits = attack.customTrait;
+      for (const trait of item.system.customTrait) {
+         if (!customTraits.find((match) => {
+            return match.name === trait.name;
+         })) {
+            customTraits.push(trait);
+         }
+      }
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => camelize(trait.name));
       if (multiAttack && conditionalDiceModifiers.multiAttack) {
          retVal += conditionalDiceModifiers.multiAttack;
       }

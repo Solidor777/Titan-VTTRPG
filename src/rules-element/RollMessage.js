@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { isHTMLBlank, sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 import { camelize } from '~/helpers/Utility';
+import { appendUnique } from '../helpers/Utility';
 
 export function getRollMessageTemplate(uuid, type) {
    return {
@@ -121,7 +122,7 @@ export function getAttributeCheckMessages(check) {
       // Attribute messages
       const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
-         message.push(...attributeRollMessages);
+         appendUnique(message, attributeRollMessages);
       }
 
       // Skill messages
@@ -129,7 +130,7 @@ export function getAttributeCheckMessages(check) {
       if (skill && skill !== 'none') {
          const skillRollMessages = getRollMessages(rollMessages, 'skill', skill);
          if (skillRollMessages) {
-            message.push(...skillRollMessages);
+            appendUnique(message, attributeRollMessages);
          }
       }
 
@@ -156,48 +157,42 @@ export function getAttackCheckMessages(check) {
       // Attribute messages
       const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
-         message.push(...attributeRollMessages);
+         appendUnique(message, attributeRollMessages);
       }
 
       // Skill messages
       const skillRollMessages = getRollMessages(rollMessages, 'skill', check.parameters.skill);
       if (skillRollMessages) {
-         message.push(...skillRollMessages);
+         appendUnique(message, skillRollMessages);
       }
 
       // Type messages
       const typeMessages = getRollMessages(rollMessages, 'attackType', check.parameters.attack.type);
       if (typeMessages) {
-         message.push(...typeMessages);
+         appendUnique(message, typeMessages);
       }
 
       // Attack Trait messages
       const attackTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'attackTrait', check.parameters.attack.trait, (trait) => trait.name);
       if (attackTraitMessages) {
-         message.push(...attackTraitMessages);
+         appendUnique(message, attackTraitMessages);
       }
 
       // Custom Attack Trait messages
-      const customTraitMessages = [];
       const customAttackTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.attack.customTrait, (trait) => camelize(trait.name));
       if (customAttackTraitMessages) {
-         customTraitMessages.push(...customAttackTraitMessages);
+         appendUnique(message, customAttackTraitMessages);
       }
 
       // Custom Item Trait messages
       const customItemTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
       if (customItemTraitMessages) {
-         customTraitMessages.push(...customItemTraitMessages);
+         appendUnique(message, customItemTraitMessages);
       }
-
-      // Make sure the custom messages are unique
-      message.push(...customTraitMessages.filter((entry, index) => {
-         return customTraitMessages.indexOf(entry) === index;
-      }));
 
       // Multi Attack messages
       if (check.parameters.multiAttack && rollMessages.multiAttack) {
-         message.push(...rollMessages.multiAttack);
+         appendUnique(message, rollMessages.multiAttack);
       }
 
       return message.length > 0 ? message : false;
@@ -214,25 +209,25 @@ export function getCastingCheckMessages(check) {
       // Attribute messages
       const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
-         message.push(...attributeRollMessages);
+         appendUnique(message, attributeRollMessages);
       }
 
       // Skill messages
       const skillRollMessages = getRollMessages(rollMessages, 'skill', check.parameters.skill);
       if (skillRollMessages) {
-         message.push(...skillRollMessages);
+         appendUnique(message, skillRollMessages);
       }
 
       // Custom Trait messages
       const customTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
       if (customTraitMessages) {
-         message.push(...customTraitMessages);
+         appendUnique(message, customTraitMessages);
       }
 
       // Spell Tradition messages
       const spellTraditionMessages = getRollMessages(rollMessages, 'spellTradition', camelize(check.parameters.tradition));
       if (spellTraditionMessages) {
-         message.push(...spellTraditionMessages);
+         appendUnique(message, spellTraditionMessages);
       }
 
       return message.length > 0 ? message : false;
@@ -249,19 +244,19 @@ export function getItemCheckMessages(check) {
       // Attribute messages
       const attributeRollMessages = getRollMessages(rollMessages, 'attribute', check.parameters.attribute);
       if (attributeRollMessages) {
-         message.push(...attributeRollMessages);
+         appendUnique(message, attributeRollMessages);
       }
 
       // Skill messages
       const skillRollMessages = getRollMessages(rollMessages, 'skill', check.parameters.skill);
       if (skillRollMessages) {
-         message.push(...skillRollMessages);
+         appendUnique(message, skillRollMessages);
       }
 
       // Custom Item Trait messages
       const customTraitMessages = getRollMessagesForReducedKeys(rollMessages, 'customTrait', check.parameters.itemTrait, (trait) => camelize(trait.name));
       if (customTraitMessages) {
-         message.push(...customTraitMessages);
+         appendUnique(message, customTraitMessages);
       }
 
       return message.length > 0 ? message : false;

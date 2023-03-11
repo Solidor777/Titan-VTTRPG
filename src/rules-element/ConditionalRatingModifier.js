@@ -6,7 +6,7 @@ export function getConditionalRatingModifierTemplate(uuid, type) {
    return {
       operation: 'conditionalRatingModifier',
       rating: 'accuracy',
-      selector: 'customTrait',
+      selector: 'customWeaponTrait',
       key: '',
       value: 1,
       uuid: uuid ?? uuidv4(),
@@ -55,7 +55,7 @@ export function applyConditionalRatingModifierElements(elements) {
                   // Cache whether to camelize keys
                   let camelizeKeys = false;
                   switch (selector) {
-                     case 'customAttackTrait':
+                     case 'customWeaponTrait':
                      case 'customArmorTrait':
                      case 'customShieldTrait': {
                         camelizeKeys = true;
@@ -154,9 +154,15 @@ function applyDefenseRatingModifier(character, conditionalDefenseModifiers) {
       }
 
       // Custom Armor traits
-      const customArmorTraits = armor.system.customTrait;
+      const customArmorTraits = [];
+      armor.system.customTrait.forEach((trait) => {
+         const formattedName = camelize(trait.name);
+         if (customArmorTraits.indexOf(formattedName) < 0) {
+            customArmorTraits.push(formattedName);
+         }
+      });
       if (customArmorTraits.length > 0) {
-         const customArmorTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customArmorTrait', customArmorTraits, (trait) => trait.name);
+         const customArmorTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customArmorTrait', customArmorTraits, (trait) => (trait));
          if (customArmorTraitMods) {
             for (const [type, value] of Object.entries(customArmorTraitMods)) {
                character.parent.system.rating.defense.mod[type] += value;
@@ -181,9 +187,15 @@ function applyDefenseRatingModifier(character, conditionalDefenseModifiers) {
       }
 
       // Custom Shield traits
-      const customShieldTraits = shield.system.customTrait;
+      const customShieldTraits = [];
+      shield.system.customTrait.forEach((trait) => {
+         const formattedName = camelize(trait.name);
+         if (customShieldTraits.indexOf(formattedName) < 0) {
+            customShieldTraits.push(formattedName);
+         }
+      });
       if (customShieldTraits.length > 0) {
-         const customShieldTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customShieldTrait', customShieldTraits, (trait) => camelize(trait.name));
+         const customShieldTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customShieldTrait', customShieldTraits, (trait) => (trait));
          if (customShieldTraitMods) {
             for (const [type, value] of Object.entries(customShieldTraitMods)) {
                character.parent.system.rating.defense.mod[type] += value;
@@ -198,8 +210,9 @@ export function getAttackRatingModifier(rating, weapon, attack, multiAttack) {
    const conditionalRatingModifiers = this.conditionalRatingModifier[rating];
    if (conditionalRatingModifiers) {
       // Attack traits
-      if (attack.trait.length > 0) {
-         const attackTraitMods = getRatingModsForReducedKeys(conditionalRatingModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
+      const attackTraits = attack.trait;
+      if (attackTraits.length > 0) {
+         const attackTraitMods = getRatingModsForReducedKeys(conditionalRatingModifiers, 'attackTrait', attackTraits, (trait) => trait.name);
          if (attackTraitMods) {
             for (const value of Object.values(attackTraitMods)) {
                retVal += value;
@@ -207,9 +220,23 @@ export function getAttackRatingModifier(rating, weapon, attack, multiAttack) {
          }
       }
 
-      // Custom attack traits
-      if (attack.trait.length > 0) {
-         const attackTraitMods = getRatingModsForReducedKeys(conditionalRatingModifiers, 'customTrait', attack.trait, (trait) => trait.name);
+      // Custom traits
+      const customTraits = [];
+      attack.customTrait.forEach((trait) => {
+         const formattedName = camelize(trait.name);
+         if (customTraits.indexOf(formattedName) < 0) {
+            customTraits.push(formattedName);
+         }
+      });
+      weapon.system.customTrait.forEach((trait) => {
+         const formattedName = camelize(trait.name);
+         if (customTraits.indexOf(formattedName) < 0) {
+            customTraits.push(formattedName);
+         }
+      });
+
+      if (customTraits.length > 0) {
+         const attackTraitMods = getRatingModsForReducedKeys(conditionalRatingModifiers, 'customWeaponTrait', customTraits, (trait) => (trait));
          if (attackTraitMods) {
             for (const value of Object.values(attackTraitMods)) {
                retVal += value;

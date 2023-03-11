@@ -63,12 +63,13 @@
             <!--Value-->
             <div class="value">
                {#if check.skill !== 'none'}
-                  {localize(check.attribute)}
-                  {localize(check.skill)}
-                  {check.difficulty}:{check.complexity}
+                  {`${localize(check.attribute)} (${localize(check.skill)}) ${
+                     check.difficulty
+                  }:${check.complexity}`}
                {:else}
-                  {localize(check.attribute)}
-                  {check.difficulty}:{check.complexity}
+                  {`${localize(check.attribute)} ${check.difficulty}:${
+                     check.complexity
+                  }`}
                {/if}
             </div>
          </div>

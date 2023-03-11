@@ -1,5 +1,5 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import { localize, appendUniqueWithFilter } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
    import { ATTACK_TRAIT_DESCRIPTIONS } from '~/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
@@ -10,6 +10,21 @@
 
    // Document reference
    const document = getContext('DocumentStore');
+   let customTraits = [];
+
+   function traitFilter(value, match) {
+      return (
+         value.name === match.name && value.description === match.description
+      );
+   }
+
+   $: {
+      customTraits = [];
+      const itemTraits = $document.flags.titan.parameters.itemTrait;
+      const attackTraits = $document.flags.titan.parameters.attack.customTrait;
+      appendUniqueWithFilter(customTraits, itemTraits, traitFilter);
+      appendUniqueWithFilter(customTraits, attackTraits, traitFilter);
+   }
 
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
@@ -43,8 +58,8 @@
       </div>
    {/if}
 
-   <!--Item Traits-->
-   {#each $document.flags.titan.parameters.itemTrait as trait}
+   <!--Custom Traits-->
+   {#each customTraits as trait}
       <div class="stat" use:tooltip={{ content: trait.description }}>
          <Tag label={trait.name} />
       </div>

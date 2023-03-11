@@ -18,42 +18,7 @@
    export let operationOptions = void 0;
    export let idx = void 0;
 
-   // Rating optiions
-   const ratingOptions = [
-      {
-         label: localize('melee'),
-         value: 'melee',
-      },
-      {
-         label: localize('accuracy'),
-         value: 'accuracy',
-      },
-      {
-         label: localize('defense'),
-         value: 'defense',
-      },
-   ];
-
-   const defenseSelectorOptions = [
-      {
-         label: localize('armorTrait'),
-         value: 'armorTrait',
-      },
-      {
-         label: localize('shieldTrait'),
-         value: 'shieldTrait',
-      },
-      {
-         label: localize('customArmorTrait'),
-         value: 'customArmorTrait',
-      },
-      {
-         label: localize('customShieldTrait'),
-         value: 'customShieldTrait',
-      },
-   ];
-
-   const attackSelectorOptions = [
+   const selectorOptions = [
       {
          label: localize('attackTrait'),
          value: 'attackTrait',
@@ -63,12 +28,16 @@
          value: 'attackType',
       },
       {
-         label: localize('customWeaponTrait'),
-         value: 'customWeaponTrait',
+         label: localize('customTrait'),
+         value: 'customTrait',
       },
       {
          label: localize('multiAttack'),
          value: 'multiAttack',
+      },
+      {
+         label: localize('spellTradition'),
+         value: 'spellTradition',
       },
    ];
 
@@ -84,9 +53,10 @@
             break;
          }
          case 'customArmorTrait':
-         case 'customWeaponTrait':
+         case 'customTrait':
          case 'customShieldTrait':
-         case 'multiAttack': {
+         case 'multiAttack':
+         case 'spellTradition': {
             element.key = '';
             break;
          }
@@ -108,22 +78,6 @@
       });
    }
 
-   // Updates the selector when the rating changes
-   function onRatingChange() {
-      switch (element.rating) {
-         case 'defense': {
-            element.selector = 'armorTrait';
-            break;
-         }
-         default: {
-            element.selector = 'attackTrait';
-            break;
-         }
-      }
-
-      onSelectorChange();
-   }
-
    function getSelector() {
       switch (element.selector) {
          case 'attackTrait': {
@@ -139,8 +93,9 @@
             return DocumentShieldTraitSelect;
          }
          case 'customArmorTrait':
-         case 'customWeaponTrait':
-         case 'customShieldTrait': {
+         case 'customTrait':
+         case 'customShieldTrait':
+         case 'spellTradition': {
             return DocumentTextInput;
          }
          default: {
@@ -150,7 +105,7 @@
    }
 </script>
 
-{#if element && element.operation === 'conditionalRatingModifier'}
+{#if element && element.operation === 'conditionalDamageModifier'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -164,21 +119,10 @@
             />
          </div>
 
-         <!--Rating-->
-         <div class="field select">
-            <DocumentSelect
-               options={ratingOptions}
-               bind:value={element.rating}
-               on:change={onRatingChange}
-            />
-         </div>
-
          <!--Selector-->
          <div class="field select">
             <DocumentSelect
-               options={element.rating === 'defense'
-                  ? defenseSelectorOptions
-                  : attackSelectorOptions}
+               options={selectorOptions}
                bind:value={element.selector}
                on:change={onSelectorChange}
             />
