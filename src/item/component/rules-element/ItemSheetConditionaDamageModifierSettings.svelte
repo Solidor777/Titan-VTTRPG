@@ -28,8 +28,8 @@
          value: 'attackType',
       },
       {
-         label: localize('customTrait'),
-         value: 'customTrait',
+         label: localize('customArmorTrait'),
+         value: 'customArmorTrait',
       },
       {
          label: localize('multiAttack'),
@@ -53,7 +53,7 @@
             break;
          }
          case 'customArmorTrait':
-         case 'customTrait':
+         case 'customWeaponTrait':
          case 'customShieldTrait':
          case 'multiAttack':
          case 'spellTradition': {
@@ -93,7 +93,7 @@
             return DocumentShieldTraitSelect;
          }
          case 'customArmorTrait':
-         case 'customTrait':
+         case 'customWeaponTrait':
          case 'customShieldTrait':
          case 'spellTradition': {
             return DocumentTextInput;

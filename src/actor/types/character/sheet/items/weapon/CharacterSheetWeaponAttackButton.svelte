@@ -9,6 +9,33 @@
 
    // Check
    export let attack = void 0;
+
+   export let multiAttack = void 0;
+
+   let dicePool = 0;
+
+   $: {
+      // Get base dice
+      dicePool =
+         $document.system.attribute[attack.attribute].value +
+         $document.system.skill[attack.skill].training.value +
+         diceMod;
+
+      // Cut the dice in half if multi attacking
+      if (multiAttack) {
+         // Round up or down, depending on the flurry trait
+         let flurry = false;
+         for (const trait of attack.trait) {
+            if (trait.name === flurry) {
+               flurry = true;
+            }
+         }
+
+         dicePool = flurry
+            ? Math.ceil(dicePool * 0.5)
+            : Math.floor(dicePool * 0.5);
+      }
+   }
 </script>
 
 <div class="button {attack.attribute}">
@@ -18,9 +45,7 @@
          <!--Pool-->
          <div class="pool">
             <i class="fas fa-dice-d6" />
-            {$document.system.attribute[attack.attribute].value +
-               $document.system.skill[attack.skill].training.value +
-               diceMod}
+            {dicePool}
          </div>
 
          <!--Expertise-->

@@ -5,8 +5,9 @@ import { camelize } from '~/helpers/Utility';
 export function getConditionalDiceModifierTemplate(uuid, type) {
    return {
       operation: 'conditionalDiceModifier',
-      selector: 'attackType',
-      key: 'melee',
+      checkType: 'attack',
+      selector: 'attackTrait',
+      key: 'blast',
       value: 1,
       uuid: uuid ?? uuidv4(),
       type: type ?? ''
@@ -16,44 +17,56 @@ export function getConditionalDiceModifierTemplate(uuid, type) {
 export function applyConditionalDiceModifierElements(elements) {
    if (elements.length > 0) {
       const conditionalDiceModifiers = {};
-      // Sort elements by selector
-      const selectors = sortObjectsIntoContainerByKey(elements, 'selector');
-      // For each selector
-      for (const [selector, selectorElements] of Object.entries(selectors)) {
-         // Hand special case for multi attack
-         if (selector === 'multiAttack') {
-            conditionalDiceModifiers.multiAttack = 0;
-            for (const element of selectorElements) {
-               conditionalDiceModifiers.multiAttack += element.value;
-            }
-         }
+      // Sort elects by check type
+      const checkTypes = sortObjectsIntoContainerByKey(elements, 'checkType');
 
-         else {
-            conditionalDiceModifiers[selector] = {};
-            const selectorMap = conditionalDiceModifiers[selector];
-            let camelizeKeys = false;
-            switch (selector) {
-               case 'customTrait':
-               case 'spellTradition': {
-                  camelizeKeys = true;
+      // For each check type
+      for (const [checkType, checkTypeElements] of Object.entries(checkTypes)) {
+         conditionalDiceModifiers[checkType] = {};
+         const checkTypeMap = conditionalDiceModifiers[checkType];
+
+         // Sort elements by selector
+         const selectors = sortObjectsIntoContainerByKey(checkTypeElements, 'selector');
+
+         // For each selector
+         for (const [selector, selectorElements] of Object.entries(selectors)) {
+
+            // Hand special case for multi attack
+            if (selector === 'multiAttack') {
+               checkTypeMap.multiAttack = 0;
+               for (const element of selectorElements) {
+                  checkTypeMap.multiAttack += element.value;
                }
             }
 
-            // Sort elements by key
-            const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+            // Normal flow
+            else {
+               checkTypeMap[selector] = {};
+               const selectorMap = checkTypeMap[selector];
+               let camelizeKeys = false;
+               switch (selector) {
+                  case 'customTrait':
+                  case 'spellTradition': {
+                     camelizeKeys = true;
+                  }
+               }
 
-            // For each key
-            for (const [key, keyElements] of Object.entries(keys)) {
-               const formattedKey = camelizeKeys ? camelize(key) : key;
+               // Sort elements by key
+               const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
 
-               // Initialize key value
-               selectorMap[formattedKey] = 0; {
+               // For each key
+               for (const [key, keyElements] of Object.entries(keys)) {
+                  const formattedKey = camelizeKeys ? camelize(key) : key;
 
-                  // For each element
-                  for (const element of keyElements) {
+                  // Initialize key value
+                  selectorMap[formattedKey] = 0; {
 
-                     // Add to the key value
-                     selectorMap[formattedKey] += element.value;
+                     // For each element
+                     for (const element of keyElements) {
+
+                        // Add to the key value
+                        selectorMap[formattedKey] += element.value;
+                     }
                   }
                }
             }
@@ -96,20 +109,44 @@ function getDiceModsForReducedKeys(conditionalDiceModifiers, selector, keys, red
 }
 
 export function getAttackCheckDiceMod(item, attack, multiAttack) {
+   // Normal mod is 0. Contaminated mod is -1.
    let retVal = this.parent.system.condition.contaminated ? -1 : 0;
-   const conditionalDiceModifiers = this.conditionalDiceModifier;
+
+   // If conditional dice modifiers exist
+   const conditionalDiceModifiers = this.conditionalDiceModifier?.attack;
    if (conditionalDiceModifiers) {
+
+      // Get mods for the attack type
       retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
+
+      // Get mods for the attack traits
       retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
-      const customTraits = attack.customTrait;
-      for (const trait of item.system.customTrait) {
+
+      // Get mods for custom traits
+      const customTraits = [];
+
+      // Ensure attack traits are unique
+      for (const trait of (attack.customTrait)) {
+         const formattedName = camelize(trait.name);
          if (!customTraits.find((match) => {
-            return match.name === trait.name;
+            return camelize(match.name) === formattedName;
          })) {
-            customTraits.push(trait);
+            customTraits.push(formattedName);
          }
       }
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => camelize(trait.name));
+
+      // Ensure item traits are unique
+      for (const trait of item.system.customTrait) {
+         const formattedName = camelize(trait.name);
+         if (!customTraits.find((match) => {
+            return camelize(match) === formattedName;
+         })) {
+            customTraits.push(formattedName);
+         }
+      }
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => (trait));
+
+      // Get multi attack mods
       if (multiAttack && conditionalDiceModifiers.multiAttack) {
          retVal += conditionalDiceModifiers.multiAttack;
       }
@@ -119,21 +156,55 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
 }
 
 export function getCastingCheckDiceMod(item) {
+   // Normal mod is 0. Contaminated mod is -1.
    let retVal = this.parent.system.condition.contaminated ? -1 : 0;
-   const conditionalDiceModifiers = this.conditionalDiceModifier;
+
+   // If conditional dice modifiers exist
+   const conditionalDiceModifiers = this.conditionalDiceModifier?.casting;
    if (conditionalDiceModifiers) {
+
+      // Get mods for the spell tradition
       retVal += getDiceMods(conditionalDiceModifiers, 'spellTradition', camelize(item.system.tradition));
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', item.system.customTrait, (trait) => camelize(trait.name));
+
+      // Get mods for custom traits
+      const customTraits = [];
+
+      // Ensure item traits are unique
+      for (const trait of item.system.customTrait) {
+         const formattedName = camelize(trait.name);
+         if (!customTraits.find((match) => {
+            return camelize(match.name) === formattedName;
+         })) {
+            customTraits.push(formattedName);
+         }
+      }
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => (trait));
    }
 
    return retVal;
 }
 
 export function getItemCheckDiceMod(item) {
+   // Normal mod is 0. Contaminated mod is -1.
    let retVal = this.parent.system.condition.contaminated ? -1 : 0;
-   const conditionalDiceModifiers = this.conditionalDiceModifier;
+
+   // If conditional dice modifiers exist
+   const conditionalDiceModifiers = this.conditionalDiceModifier?.item;
    if (conditionalDiceModifiers) {
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', item.system.customTrait, (trait) => camelize(trait.name));
+
+      // Get mods for custom traits
+      const customTraits = [];
+
+      // Ensure item traits are unique
+      for (const trait of item.system.customTrait) {
+         const formattedName = camelize(trait.name);
+         if (!customTraits.find((match) => {
+            return camelize(match.name) === formattedName;
+         })) {
+            customTraits.push(formattedName);
+         }
+      }
+      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => (trait));
    }
 
    return retVal;

@@ -6,7 +6,7 @@ export function getConditionalRatingModifierTemplate(uuid, type) {
    return {
       operation: 'conditionalRatingModifier',
       rating: 'accuracy',
-      selector: 'customWeaponTrait',
+      selector: 'attackTrait',
       key: '',
       value: 1,
       uuid: uuid ?? uuidv4(),
@@ -108,6 +108,7 @@ export function applyConditionalRatingModifierElements(elements) {
 }
 
 function getRatingMods(conditionalRatingModifiers, selector, key) {
+   // Get mods for a particular rating
    const selectorMods = conditionalRatingModifiers[selector];
    if (selectorMods) {
       const keyMod = selectorMods[key];
@@ -155,12 +156,16 @@ function applyDefenseRatingModifier(character, conditionalDefenseModifiers) {
 
       // Custom Armor traits
       const customArmorTraits = [];
+
+      // Ensure traits are unique
       armor.system.customTrait.forEach((trait) => {
          const formattedName = camelize(trait.name);
          if (customArmorTraits.indexOf(formattedName) < 0) {
             customArmorTraits.push(formattedName);
          }
       });
+
+      // Get mods
       if (customArmorTraits.length > 0) {
          const customArmorTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customArmorTrait', customArmorTraits, (trait) => (trait));
          if (customArmorTraitMods) {
@@ -188,12 +193,16 @@ function applyDefenseRatingModifier(character, conditionalDefenseModifiers) {
 
       // Custom Shield traits
       const customShieldTraits = [];
+
+      // Ensure custom traits are unique
       shield.system.customTrait.forEach((trait) => {
          const formattedName = camelize(trait.name);
          if (customShieldTraits.indexOf(formattedName) < 0) {
             customShieldTraits.push(formattedName);
          }
       });
+
+      // Get mods
       if (customShieldTraits.length > 0) {
          const customShieldTraitMods = getRatingModsForReducedKeys(conditionalDefenseModifiers, 'customShieldTrait', customShieldTraits, (trait) => (trait));
          if (customShieldTraitMods) {
@@ -222,12 +231,16 @@ export function getAttackRatingModifier(rating, weapon, attack, multiAttack) {
 
       // Custom traits
       const customTraits = [];
+
+      // Ensure attack traits are unique
       attack.customTrait.forEach((trait) => {
          const formattedName = camelize(trait.name);
          if (customTraits.indexOf(formattedName) < 0) {
             customTraits.push(formattedName);
          }
       });
+
+      // Ensure weapon traits are unique
       weapon.system.customTrait.forEach((trait) => {
          const formattedName = camelize(trait.name);
          if (customTraits.indexOf(formattedName) < 0) {
@@ -235,6 +248,7 @@ export function getAttackRatingModifier(rating, weapon, attack, multiAttack) {
          }
       });
 
+      // Get mods
       if (customTraits.length > 0) {
          const attackTraitMods = getRatingModsForReducedKeys(conditionalRatingModifiers, 'customWeaponTrait', customTraits, (trait) => (trait));
          if (attackTraitMods) {

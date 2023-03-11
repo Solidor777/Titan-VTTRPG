@@ -14,9 +14,9 @@
    import CharacterSheetItemEquipButton from '~/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
    import CharacterSheetItemImage from '~/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetItemChecks from '~/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import CharacterSheetWeaponMultiAttackButton from './CharacterSheetWeaponMultiAttackButton.svelte';
-   import CharacterSheetWeaponAttacks from './CharacterSheetWeaponAttacks.svelte';
-   import CharacterSheetWeaponAttackButton from './CharacterSheetWeaponAttackButton.svelte';
+   import CharacterSheetWeaponMultiAttackButton from '~/actor/types/character/sheet/items/weapon/CharacterSheetWeaponMultiAttackButton.svelte';
+   import CharacterSheetWeaponAttacks from '~/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
+   import CharacterSheetWeaponAttackButton from '~/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttackButton.svelte';
 
    // Weapon id
    export let id = void 0;
@@ -64,6 +64,7 @@
                         item.system.attack[0],
                         item.system.multiAttack
                      )}
+                     multiAttack={item.system.multiAttack}
                      on:click={() =>
                         $document.typeComponent.rollAttackCheck(
                            { itemId: item._id, attackIdx: 0 },

@@ -45,7 +45,7 @@ export function applyConditionalDamageModifierElements(elements) {
             // Cache whether to camelize keys
             let camelizeKeys = false;
             switch (selector) {
-               case 'customTrait':
+               case 'customWeaponTrait':
                case 'customArmorTrait':
                case 'customShieldTrait': {
                   camelizeKeys = true;
@@ -120,13 +120,14 @@ function getDamageModsForReducedKeys(conditionalDiceModifiers, selector, keys, r
    return Object.keys(retVal).length > 0 ? retVal : false;
 }
 
-export function getAttackDamageModifier(attack, multiAttack) {
+export function getAttackDamageModifier(weapon, attack, multiAttack) {
    let retVal = 0;
    const conditionalDamageModifiers = this.conditionalDamageModifier;
    if (conditionalDamageModifiers) {
       // Attack traits
-      if (attack.trait.length > 0) {
-         const attackTraitMods = getDamageModsForReducedKeys(conditionalDamageModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
+      const attackTraits = attack.trait;
+      if (attackTraits.length > 0) {
+         const attackTraitMods = getDamageModsForReducedKeys(conditionalDamageModifiers, 'attackTrait', attackTraits, (trait) => trait.name);
          if (attackTraitMods) {
             for (const value of Object.values(attackTraitMods)) {
                retVal += value;
@@ -134,9 +135,28 @@ export function getAttackDamageModifier(attack, multiAttack) {
          }
       }
 
-      // Custom attack traits
-      if (attack.trait.length > 0) {
-         const attackTraitMods = getDamageModsForReducedKeys(conditionalDamageModifiers, 'customTrait', attack.trait, (trait) => trait.name);
+      // Custom traits
+      const customTraits = [];
+
+      // Ensure attack traits are unique
+      attack.customTrait.forEach((trait) => {
+         const formattedName = camelize(trait.name);
+         if (customTraits.indexOf(formattedName) < 0) {
+            customTraits.push(formattedName);
+         }
+      });
+
+      // Ensure weapon traits are unique
+      weapon.system.customTrait.forEach((trait) => {
+         const formattedName = camelize(trait.name);
+         if (customTraits.indexOf(formattedName) < 0) {
+            customTraits.push(formattedName);
+         }
+      });
+
+      // Get mods
+      if (customTraits.length > 0) {
+         const attackTraitMods = getDamageModsForReducedKeys(conditionalDamageModifiers, 'customWeaponTrait', customTraits, (trait) => (trait));
          if (attackTraitMods) {
             for (const value of Object.values(attackTraitMods)) {
                retVal += value;

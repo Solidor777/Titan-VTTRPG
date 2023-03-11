@@ -16,8 +16,27 @@
    export let operationOptions = void 0;
    export let idx = void 0;
 
-   // Selector options
-   const selectorOptions = [
+   // Dynamic element
+   $: element = $document.system.rulesElement[idx];
+
+   // Check type options
+   const checkTypeOptions = [
+      {
+         label: localize('attackCheck'),
+         value: 'attack',
+      },
+      {
+         label: localize('castingCheck'),
+         value: 'casting',
+      },
+      {
+         label: localize('itemCheck'),
+         value: 'item',
+      },
+   ];
+
+   // Attack check options
+   const attackCheckSelectorOptions = [
       {
          label: localize('attackTrait'),
          value: 'attackTrait',
@@ -34,14 +53,48 @@
          label: localize('multiAttack'),
          value: 'multiAttack',
       },
+   ];
+
+   // Casting check selector options
+   const castingCheckSelectorOptions = [
+      {
+         label: localize('customTrait'),
+         value: 'customTrait',
+      },
       {
          label: localize('spellTradition'),
          value: 'spellTradition',
       },
    ];
 
-   // Dynamic element
-   $: element = $document.system.rulesElement[idx];
+   // Item check selector options
+   const itemCheckSelectorOptions = [
+      {
+         label: localize('customTrait'),
+         value: 'customTrait',
+      },
+   ];
+
+   let selectorOptions = [];
+   switch ($document.system.rulesElement[idx]?.checkType) {
+      case 'attack': {
+         selectorOptions = attackCheckSelectorOptions;
+         break;
+      }
+
+      case 'casting': {
+         selectorOptions = castingCheckSelectorOptions;
+         break;
+      }
+
+      case 'item': {
+         selectorOptions = itemCheckSelectorOptions;
+         break;
+      }
+      default: {
+         break;
+      }
+   }
 
    // Updates the key when the selector changes
    function onSelectorChange() {
@@ -71,6 +124,34 @@
       $document.update({
          system: $document.system,
       });
+   }
+
+   function onCheckTypeChange() {
+      if (element) {
+         switch (element.checkType) {
+            case 'attack': {
+               selectorOptions = attackCheckSelectorOptions;
+               element.selector = 'attackTrait';
+               break;
+            }
+            case 'casting': {
+               selectorOptions = castingCheckSelectorOptions;
+               element.selector = 'customTrait';
+               break;
+            }
+
+            case 'item': {
+               selectorOptions = itemCheckSelectorOptions;
+               element.selector = 'customTrait';
+               break;
+            }
+            default: {
+               break;
+            }
+         }
+      }
+
+      onSelectorChange();
    }
 
    function getSelector() {
@@ -105,6 +186,15 @@
                on:change={() => {
                   onRulesElementOperationChanged($document, idx);
                }}
+            />
+         </div>
+
+         <!--Type-->
+         <div class="field select">
+            <DocumentSelect
+               options={checkTypeOptions}
+               bind:value={element.checkType}
+               on:change={onCheckTypeChange}
             />
          </div>
 

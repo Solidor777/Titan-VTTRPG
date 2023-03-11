@@ -22,7 +22,35 @@
    // Attack reference
    $: attack = item.system.attack[attackIdx];
 
-   let traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
+   let dicePool = 0;
+   $: {
+      // Get base dice
+      dicePool =
+         $document.system.attribute[attack.attribute].value +
+         $document.system.skill[attack.skill].training.value +
+         $document.typeComponent.getAttackCheckDiceMod(
+            item,
+            attack,
+            item.system.multiAttack
+         );
+
+      // Cut the dice in half if multi attacking
+      if (item.system.multiAttack) {
+         // Round up or down, depending on the flurry trait
+         let flurry = false;
+         for (const trait of attack.trait) {
+            if (trait.name === flurry) {
+               flurry = true;
+            }
+         }
+
+         dicePool = flurry
+            ? Math.ceil(dicePool * 0.5)
+            : Math.floor(dicePool * 0.5);
+      }
+   }
+
+   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="attack">
@@ -57,13 +85,7 @@
       <div class="stat">
          <IconStatTag
             label={localize('dice')}
-            value={$document.system.attribute[attack.attribute].value +
-               $document.system.skill[attack.skill].training.value +
-               $document.typeComponent.getAttackCheckDiceMod(
-                  item,
-                  attack,
-                  item.system.multiAttack
-               )}
+            value={dicePool}
             icon={'fas fa-dice-d6'}
          />
       </div>

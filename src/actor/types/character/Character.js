@@ -194,17 +194,17 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Reflexes = (Mind + (Body / 2) rounded up)
       systemData.resistance.reflexes.baseValue =
          systemData.attribute.mind.baseValue +
-         Math.ceil(systemData.attribute.body.baseValue / 2);
+         Math.floor(systemData.attribute.body.baseValue * 0.5);
 
       // Resilience = (Body + (Soul/2) rounded up)
       systemData.resistance.resilience.baseValue =
          systemData.attribute.body.baseValue +
-         Math.ceil(systemData.attribute.soul.baseValue / 2);
+         Math.floor(systemData.attribute.soul.baseValue * 0.5);
 
       // Willpower = (Soul + (Mind/2))
       systemData.resistance.willpower.baseValue =
          systemData.attribute.soul.baseValue +
-         Math.ceil(systemData.attribute.mind.baseValue / 2);
+         Math.floor(systemData.attribute.mind.baseValue * 0.5);
    }
 
    _calculateBaseResources() {
