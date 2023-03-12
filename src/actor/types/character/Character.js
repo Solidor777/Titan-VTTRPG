@@ -1099,8 +1099,18 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          return;
       }
+
+      // Get the check
+      const check = item.system.check[options.checkIdx];
+      if (!check) {
+         console.error('TITAN | Item Check failed before creation. Invalid Check IDX provided to actor.');
+         console.trace();
+
+         return;
+      }
+
       options.itemRollData = item.getRollData();
-      options.diceMod = this.getItemCheckDiceMod(item);
+      options.diceMod = this.getItemCheckDiceMod(item, check);
 
       // Add the actor check data to the check options
       options.actorRollData = this.parent.getRollData();

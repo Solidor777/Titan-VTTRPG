@@ -112,43 +112,80 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
    // Normal mod is 0. Contaminated mod is -1.
    let retVal = this.parent.system.condition.contaminated ? -1 : 0;
 
-   // If conditional dice modifiers exist
-   const conditionalDiceModifiers = this.conditionalDiceModifier?.attack;
-   if (conditionalDiceModifiers) {
+   const diceMods = this.conditionalDiceModifier;
+   if (diceMods) {
+      // Any check dice mods
+      const anyCheckDiceMods = diceMods.any;
+      if (anyCheckDiceMods) {
 
-      // Get mods for the attack type
-      retVal += getDiceMods(conditionalDiceModifiers, 'attackType', attack.type);
+         // Custom Traits
+         const customTraits = [];
 
-      // Get mods for the attack traits
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
-
-      // Get mods for custom traits
-      const customTraits = [];
-
-      // Ensure attack traits are unique
-      for (const trait of (attack.customTrait)) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match.name) === formattedName;
-         })) {
-            customTraits.push(formattedName);
+         // Ensure attack traits are unique
+         for (const trait of (attack.customTrait)) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
          }
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+         retVal += getDiceModsForReducedKeys(anyCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
       }
 
-      // Ensure item traits are unique
-      for (const trait of item.system.customTrait) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match) === formattedName;
-         })) {
-            customTraits.push(formattedName);
-         }
-      }
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => (trait));
+      // Attack check dice mods
+      const attackCheckDiceMods = diceMods.attack;
+      if (attackCheckDiceMods) {
+         // Attribute
+         retVal += getDiceMods(attackCheckDiceMods, 'attribute', attack.attribute);
 
-      // Get multi attack mods
-      if (multiAttack && conditionalDiceModifiers.multiAttack) {
-         retVal += conditionalDiceModifiers.multiAttack;
+         // Skill
+         retVal += getDiceMods(attackCheckDiceMods, 'skill', attack.skill);
+
+         // Attack Type
+         retVal += getDiceMods(attackCheckDiceMods, 'attackType', attack.type);
+
+         // Attack Traits
+         retVal += getDiceModsForReducedKeys(attackCheckDiceMods, 'attackTrait', attack.trait, (trait) => trait.name);
+
+         // Custom Traits
+         const customTraits = [];
+
+         // Ensure attack traits are unique
+         for (const trait of (attack.customTrait)) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+         retVal += getDiceModsForReducedKeys(attackCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get multi attack mods
+         if (multiAttack && attackCheckDiceMods.multiAttack) {
+            retVal += attackCheckDiceMods.multiAttack;
+         }
       }
    }
 
@@ -160,51 +197,112 @@ export function getCastingCheckDiceMod(item) {
    let retVal = this.parent.system.condition.contaminated ? -1 : 0;
 
    // If conditional dice modifiers exist
-   const conditionalDiceModifiers = this.conditionalDiceModifier?.casting;
-   if (conditionalDiceModifiers) {
+   const diceMods = this.conditionalDiceModifier;
+   if (diceMods) {
 
-      // Get mods for the spell tradition
-      retVal += getDiceMods(conditionalDiceModifiers, 'spellTradition', camelize(item.system.tradition));
+      // Any check dice mods
+      const anyCheckDiceMods = diceMods.any;
+      if (anyCheckDiceMods) {
 
-      // Get mods for custom traits
-      const customTraits = [];
+         // Custom traits
+         const customTraits = [];
 
-      // Ensure item traits are unique
-      for (const trait of item.system.customTrait) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match.name) === formattedName;
-         })) {
-            customTraits.push(formattedName);
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
          }
+
+         retVal += getDiceModsForReducedKeys(anyCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
       }
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => (trait));
+
+      // Casting check dice mods
+      const castingCheckDiceMods = diceMods.casting;
+      if (castingCheckDiceMods) {
+
+         // Attribute
+         retVal += getDiceMods(castingCheckDiceMods, 'attribute', item.system.castingCheck.attribute);
+
+         // Skill
+         retVal += getDiceMods(castingCheckDiceMods, 'skill', item.system.castingCheck.skill);
+
+         // Spell tradition
+         retVal += getDiceMods(castingCheckDiceMods, 'spellTradition', camelize(item.system.tradition));
+
+         // Custom traits
+         const customTraits = [];
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+
+         retVal += getDiceModsForReducedKeys(castingCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+      }
    }
 
    return retVal;
 }
 
-export function getItemCheckDiceMod(item) {
+export function getItemCheckDiceMod(item, check) {
    // Normal mod is 0. Contaminated mod is -1.
    let retVal = this.parent.system.condition.contaminated ? -1 : 0;
+   const diceMods = this.conditionalDiceModifier;
+   if (diceMods) {
 
-   // If conditional dice modifiers exist
-   const conditionalDiceModifiers = this.conditionalDiceModifier?.item;
-   if (conditionalDiceModifiers) {
+      // Any check dice mods
+      const anyCheckDiceMods = diceMods.any;
+      if (anyCheckDiceMods) {
 
-      // Get mods for custom traits
-      const customTraits = [];
+         // Custom traits
+         const customTraits = [];
 
-      // Ensure item traits are unique
-      for (const trait of item.system.customTrait) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match.name) === formattedName;
-         })) {
-            customTraits.push(formattedName);
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
          }
+
+         retVal += getDiceModsForReducedKeys(anyCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
       }
-      retVal += getDiceModsForReducedKeys(conditionalDiceModifiers, 'customTrait', customTraits, (trait) => (trait));
+
+      // Item check dice mods
+      const itemCheckDiceMods = diceMods.item;
+      if (itemCheckDiceMods) {
+
+         // Attribute
+         retVal += getDiceMods(itemCheckDiceMods, 'attribute', check.attribute);
+
+         // Skill
+         retVal += getDiceMods(itemCheckDiceMods, 'skill', check.skill);
+
+         // Custom traits
+         const customTraits = [];
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+         retVal += getDiceModsForReducedKeys(itemCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+      }
    }
 
    return retVal;

@@ -51,7 +51,10 @@
                <div>
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
-                     diceMod={$document.typeComponent.getItemCheckDiceMod(item)}
+                     diceMod={$document.typeComponent.getItemCheckDiceMod(
+                        item,
+                        item.system.check[0]
+                     )}
                      on:click={() =>
                         $document.typeComponent.rollItemCheck(
                            { itemId: item._id, checkIdx: 0 },

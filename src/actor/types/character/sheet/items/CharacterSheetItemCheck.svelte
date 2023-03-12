@@ -85,7 +85,7 @@
                label={localize('dice')}
                value={$document.system.attribute[check.attribute].value +
                   $document.system.skill[check.skill].training.value +
-                  $document.typeComponent.getItemCheckDiceMod(item)}
+                  $document.typeComponent.getItemCheckDiceMod(item, check)}
                icon={'fas fa-dice-d6'}
             />
          </div>
