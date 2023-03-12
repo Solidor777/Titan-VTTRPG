@@ -9,16 +9,32 @@
    import DocumentAttackTraitSelect from '~/documents/components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/documents/components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
-   import DocumentArmorTraitSelect from '~/documents/components/select/DocumentArmorTraitSelect.svelte';
-   import DocumentShieldTraitSelect from '~/documents/components/select/DocumentShieldTraitSelect.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
 
    export let operationOptions = void 0;
    export let idx = void 0;
+   export let element = void 0;
 
-   const selectorOptions = [
+   // Check type options
+   const checkTypeOptions = [
+      {
+         label: localize('attackCheck'),
+         value: 'attack',
+      },
+      {
+         label: localize('castingCheck'),
+         value: 'casting',
+      },
+      {
+         label: localize('itemCheck'),
+         value: 'item',
+      },
+   ];
+
+   // Attack check options
+   const attackCheckSelectorOptions = [
       {
          label: localize('attackTrait'),
          value: 'attackTrait',
@@ -28,12 +44,20 @@
          value: 'attackType',
       },
       {
-         label: localize('customArmorTrait'),
-         value: 'customArmorTrait',
+         label: localize('customTrait'),
+         value: 'customTrait',
       },
       {
          label: localize('multiAttack'),
          value: 'multiAttack',
+      },
+   ];
+
+   // Casting check options
+   const castingCheckSelectorOptions = [
+      {
+         label: localize('customTrait'),
+         value: 'customTrait',
       },
       {
          label: localize('spellTradition'),
@@ -41,31 +65,53 @@
       },
    ];
 
-   // Element
-   export let element = void 0;
+   // Item check options
+   const itemCheckSelectorOptions = [
+      {
+         label: localize('customTrait'),
+         value: 'customTrait',
+      },
+   ];
+
+   let selectorOptions = [];
+   switch (element?.checkType) {
+      case 'attack': {
+         selectorOptions = attackCheckSelectorOptions;
+         break;
+      }
+
+      case 'casting': {
+         selectorOptions = castingCheckSelectorOptions;
+         break;
+      }
+
+      case 'item': {
+         selectorOptions = itemCheckSelectorOptions;
+         break;
+      }
+      default: {
+         break;
+      }
+   }
 
    // Updates the key when the selector changes
    function onSelectorChange() {
       switch (element.selector) {
-         case 'armorTrait':
-         case 'shieldTrait': {
-            element.key = 'magical';
-            break;
-         }
-         case 'customArmorTrait':
-         case 'customWeaponTrait':
-         case 'customShieldTrait':
-         case 'multiAttack':
-         case 'spellTradition': {
-            element.key = '';
-            break;
-         }
          case 'attackTrait': {
             element.key = 'blast';
             break;
          }
          case 'attackType': {
             element.key = 'melee';
+            break;
+         }
+         case 'customTrait':
+         case 'multiAttack': {
+            element.key = '';
+            break;
+         }
+         case 'spellTradition': {
+            element.key = localize('any');
             break;
          }
          default: {
@@ -78,6 +124,34 @@
       });
    }
 
+   function onCheckTypeChange() {
+      if (element) {
+         switch (element.checkType) {
+            case 'attack': {
+               selectorOptions = attackCheckSelectorOptions;
+               element.selector = 'attackTrait';
+               break;
+            }
+            case 'casting': {
+               selectorOptions = castingCheckSelectorOptions;
+               element.selector = 'customTrait';
+               break;
+            }
+
+            case 'item': {
+               selectorOptions = itemCheckSelectorOptions;
+               element.selector = 'customTrait';
+               break;
+            }
+            default: {
+               break;
+            }
+         }
+      }
+
+      onSelectorChange();
+   }
+
    function getSelector() {
       switch (element.selector) {
          case 'attackTrait': {
@@ -86,15 +160,9 @@
          case 'attackType': {
             return DocumentRangeTypeSelect;
          }
-         case 'armorTrait': {
-            return DocumentArmorTraitSelect;
+         case 'customTrait': {
+            return DocumentTextInput;
          }
-         case 'shieldTrait': {
-            return DocumentShieldTraitSelect;
-         }
-         case 'customArmorTrait':
-         case 'customWeaponTrait':
-         case 'customShieldTrait':
          case 'spellTradition': {
             return DocumentTextInput;
          }
@@ -116,6 +184,15 @@
                on:change={() => {
                   onRulesElementOperationChanged($document, idx);
                }}
+            />
+         </div>
+
+         <!--Type-->
+         <div class="field select">
+            <DocumentSelect
+               options={checkTypeOptions}
+               bind:value={element.checkType}
+               on:change={onCheckTypeChange}
             />
          </div>
 

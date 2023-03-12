@@ -18,45 +18,138 @@
 
    export let operationOptions = void 0;
    export let idx = void 0;
+   export let element = void 0;
 
-   // Selector options
-   const selectorOptions = [
+   // Check type options
+   const checkTypeOptions = [
       {
-         label: localize('attackTrait'),
-         value: 'attackTrait',
+         label: localize('anyCheck'),
+         value: 'any',
       },
       {
-         label: localize('attackType'),
-         value: 'attackType',
-      },
-      {
-         label: localize('attribute'),
+         label: localize('attributeCheck'),
          value: 'attribute',
       },
       {
-         label: localize('customTrait'),
-         value: 'customTrait',
+         label: localize('attackCheck'),
+         value: 'attack',
       },
       {
-         label: localize('multiAttack'),
-         value: 'multiAttack',
+         label: localize('castingCheck'),
+         value: 'casting',
       },
       {
-         label: localize('resistance'),
+         label: localize('itemCheck'),
+         value: 'item',
+      },
+      {
+         label: localize('resistanceCheck'),
          value: 'resistance',
-      },
-      {
-         label: localize('skill'),
-         value: 'skill',
-      },
-      {
-         label: localize('spellTradition'),
-         value: 'spellTradition',
       },
    ];
 
-   // Dynamic element
-   export let element = void 0;
+   // Selector options by check type
+   const selectorOptions = {
+      any: [
+         {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('customTrait'),
+            value: 'customTrait',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+      ],
+      attribute: [
+         {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+      ],
+      attack: [
+         {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('attackTrait'),
+            value: 'attackTrait',
+         },
+         {
+            label: localize('attackType'),
+            value: 'attackType',
+         },
+         {
+            label: localize('customTrait'),
+            value: 'customTrait',
+         },
+         {
+            label: localize('multiAttack'),
+            value: 'multiAttack',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+      ],
+      casting: [
+         {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('customTrait'),
+            value: 'customTrait',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+         {
+            label: localize('spellTradition'),
+            value: 'spellTradition',
+         },
+      ],
+      item: [
+         {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('customTrait'),
+            value: 'customTrait',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+      ],
+   };
+
+   // Update selector when check type changes
+   function onCheckTypeChange() {
+      switch (element.checkType) {
+         case 'resistance': {
+            element.selector = '';
+            element.key = 'reflexes';
+            break;
+         }
+         default: {
+            element.selector = 'attribute';
+            break;
+         }
+      }
+
+      onSelectorChange();
+   }
 
    // Updates the key when the selector changes
    function onSelectorChange() {
@@ -76,10 +169,6 @@
          case 'customTrait':
          case 'multiAttack': {
             element.key = '';
-            break;
-         }
-         case 'resistance': {
-            element.key = 'reflexes';
             break;
          }
          case 'skill': {
@@ -114,9 +203,6 @@
          case 'customTrait': {
             return DocumentTextInput;
          }
-         case 'resistance': {
-            return DocumentResistanceSelect;
-         }
          case 'skill': {
             return DocumentSkillSelect;
          }
@@ -146,23 +232,40 @@
                />
             </div>
 
-            <!--Selector-->
+            <!--Type-->
             <div class="field select">
                <DocumentSelect
-                  options={selectorOptions}
-                  bind:value={element.selector}
-                  on:change={onSelectorChange}
+                  options={checkTypeOptions}
+                  bind:value={element.checkType}
+                  on:change={onCheckTypeChange}
                />
             </div>
 
-            <!--Key-->
-            {#if element.selector !== 'multiAttack'}
+            {#if element.checkType !== 'resistance'}
+               <!--Selector-->
                <div class="field select">
-                  <svelte:component
-                     this={getSelector()}
-                     bind:value={element.key}
+                  <DocumentSelect
+                     options={selectorOptions[element.checkType]}
+                     bind:value={element.selector}
+                     on:change={onSelectorChange}
                   />
                </div>
+            {/if}
+
+            <!--Key-->
+            {#if element.selector !== 'multiAttack'}
+               {#if element.checkType !== 'resistance'}
+                  <div class="field select">
+                     <svelte:component
+                        this={getSelector()}
+                        bind:value={element.key}
+                     />
+                  </div>
+               {:else}
+                  <div class="field select">
+                     <DocumentResistanceSelect bind:value={element.key} />
+                  </div>
+               {/if}
             {/if}
          </div>
 

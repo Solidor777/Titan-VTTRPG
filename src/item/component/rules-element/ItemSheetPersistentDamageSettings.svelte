@@ -12,6 +12,7 @@
 
    export let operationOptions = void 0;
    export let idx = void 0;
+   export let element = void 0;
 
    const selectorOptions = [
       {
@@ -23,10 +24,6 @@
          value: 'turnEnd',
       },
    ];
-
-   export let element = void 0;
-
-   // Setup tabs
 </script>
 
 {#if element && element.operation === 'persistentDamage'}

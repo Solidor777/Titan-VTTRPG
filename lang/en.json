@@ -491,6 +491,7 @@
    "LOCAL.xpAvailable.label": "XP Available",
    "LOCAL.xpCost.label": "XP Cost",
    "LOCAL.xpEarned.label": "XP Earned",
+   "LOCAL.anyCheck.label": "Any Check",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."

@@ -15,9 +15,7 @@
 
    export let operationOptions = void 0;
    export let idx = void 0;
-
-   // Dynamic element
-   $: element = $document.system.rulesElement[idx];
+   export let element = void 0;
 
    // Check type options
    const checkTypeOptions = [
@@ -76,7 +74,7 @@
    ];
 
    let selectorOptions = [];
-   switch ($document.system.rulesElement[idx]?.checkType) {
+   switch (element?.checkType) {
       case 'attack': {
          selectorOptions = attackCheckSelectorOptions;
          break;

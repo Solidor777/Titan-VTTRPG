@@ -46,6 +46,12 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
+import {
+   applyConditionalDamageModifierElements,
+   getAttackCheckDamageMod,
+   getCastingCheckDamageMod,
+   getItemCheckDamageMod
+} from '~/rules-element/ConditionalDamageModifier';
 
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
@@ -59,6 +65,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _applyRollMessageElements = applyRollMessageElements.bind(this);
    _applyConditionalDiceModifierElements = applyConditionalDiceModifierElements.bind(this);
    _applyConditionRatingModifierElements = applyConditionalRatingModifierElements.bind(this);
+   _applyConditionalDamageModifierElements = applyConditionalDamageModifierElements.bind(this);
    _getAttributeCheckMessages = getAttributeCheckMessages.bind(this);
    _getResistanceCheckMessages = getResistanceCheckMessages.bind(this);
    _getAttackCheckMessages = getAttackCheckMessages.bind(this);
@@ -68,6 +75,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getCastingCheckDiceMod = getCastingCheckDiceMod.bind(this);
    getItemCheckDiceMod = getItemCheckDiceMod.bind(this);
    getAttackRatingModifier = getAttackRatingModifier.bind(this);
+   getAttackCheckDamageMod = getAttackCheckDamageMod.bind(this);
+   getCastingCheckDamageMod = getCastingCheckDamageMod.bind(this);
+   getItemCheckDamageMod = getItemCheckDamageMod.bind(this);
 
    setInitialData(initialData) {
       // Prototype token
@@ -348,6 +358,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const rollMessageElements = [];
       const conditionalDiceModifierElements = [];
       const conditionalRatingModifierElements = [];
+      const conditionalDamageModifierElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -382,6 +393,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                conditionalRatingModifierElements.push(element);
                break;
             }
+            case 'conditionalDamageModifier': {
+               conditionalDamageModifierElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -397,6 +412,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._applyRollMessageElements(rollMessageElements);
       this._applyConditionalDiceModifierElements(conditionalDiceModifierElements);
       this._applyConditionRatingModifierElements(conditionalRatingModifierElements);
+      this._applyConditionalDamageModifierElements(conditionalDamageModifierElements);
 
       return;
    }

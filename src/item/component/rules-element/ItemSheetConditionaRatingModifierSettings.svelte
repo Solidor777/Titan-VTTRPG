@@ -17,6 +17,7 @@
 
    export let operationOptions = void 0;
    export let idx = void 0;
+   export let element = void 0;
 
    // Rating optiions
    const ratingOptions = [
@@ -71,9 +72,6 @@
          value: 'multiAttack',
       },
    ];
-
-   // Element
-   export let element = void 0;
 
    // Updates the key when the selector changes
    function onSelectorChange() {
