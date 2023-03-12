@@ -14,6 +14,7 @@
    import ItemSheetConditionalDiceModifierSettings from '~/item/component/rules-element/ItemSheetConditionalDiceModifierSettings.svelte';
    import ItemSheetConditionaRatingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaRatingModifierSettings.svelte';
    import ItemSheetConditionaDamageModifierSettings from '~/item/component/rules-element/ItemSheetConditionaDamageModifierSettings.svelte';
+   import ItemSheetConditionaHealingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaHealingModifierSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -56,6 +57,10 @@
          label: localize('conditionalDamageModifier'),
          value: 'conditionalDamageModifier',
       },
+      {
+         label: localize('conditionalHealingModifier'),
+         value: 'conditionalHealingModifier',
+      },
    ];
 
    function selectComponent(operation) {
@@ -69,6 +74,7 @@
          conditionalDiceModifier: ItemSheetConditionalDiceModifierSettings,
          conditionalRatingModifier: ItemSheetConditionaRatingModifierSettings,
          conditionalDamageModifier: ItemSheetConditionaDamageModifierSettings,
+         conditionalHealingModifier: ItemSheetConditionaHealingModifierSettings,
       };
 
       return elementComponents[operation];

@@ -52,6 +52,11 @@ import {
    getCastingCheckDamageMod,
    getItemCheckDamageMod
 } from '~/rules-element/ConditionalDamageModifier';
+import {
+   applyConditionalHealingModifierElements,
+   getCastingCheckHealingMod,
+   getItemCheckHealingMod
+} from '~/rules-element/ConditionalHealingModifier';
 
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
@@ -66,6 +71,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _applyConditionalDiceModifierElements = applyConditionalDiceModifierElements.bind(this);
    _applyConditionRatingModifierElements = applyConditionalRatingModifierElements.bind(this);
    _applyConditionalDamageModifierElements = applyConditionalDamageModifierElements.bind(this);
+   _applyConditionaHealingModifierElements = applyConditionalHealingModifierElements.bind(this);
    _getAttributeCheckMessages = getAttributeCheckMessages.bind(this);
    _getResistanceCheckMessages = getResistanceCheckMessages.bind(this);
    _getAttackCheckMessages = getAttackCheckMessages.bind(this);
@@ -78,6 +84,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getAttackCheckDamageMod = getAttackCheckDamageMod.bind(this);
    getCastingCheckDamageMod = getCastingCheckDamageMod.bind(this);
    getItemCheckDamageMod = getItemCheckDamageMod.bind(this);
+   getCastingCheckHealingMod = getCastingCheckHealingMod.bind(this);
+   getItemCheckHealingMod = getItemCheckHealingMod.bind(this);
 
    setInitialData(initialData) {
       // Prototype token
@@ -359,6 +367,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const conditionalDiceModifierElements = [];
       const conditionalRatingModifierElements = [];
       const conditionalDamageModifierElements = [];
+      const conditionalHealingModifierElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
             case 'mulbase': {
@@ -397,6 +406,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                conditionalDamageModifierElements.push(element);
                break;
             }
+            case 'conditionalHealingModifier': {
+               conditionalHealingModifierElements.push(element);
+               break;
+            }
             default: {
                break;
             }
@@ -413,6 +426,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._applyConditionalDiceModifierElements(conditionalDiceModifierElements);
       this._applyConditionRatingModifierElements(conditionalRatingModifierElements);
       this._applyConditionalDamageModifierElements(conditionalDamageModifierElements);
+      this._applyConditionaHealingModifierElements(conditionalHealingModifierElements);
 
       return;
    }
@@ -1034,6 +1048,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Initialize check options
       options.damageMod = options.damageMod ?? this.getCastingCheckDamageMod(spell);
+      options.healingMod = options.healingMod ?? this.getCastingCheckHealingMod(spell);
       options.diceMod = options.diceMod ?? this.getCastingCheckDiceMod(spell);
 
       // Add the actor check data to the check options
@@ -1112,7 +1127,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.itemRollData = item.getRollData();
       options.diceMod = options.diceMod ?? this.getItemCheckDiceMod(item, check);
       options.damageMod = options.damageMod ?? this.getItemCheckDamageMod(item, check);
-      console.log(options.damageMod);
+      options.healingMod = options.healingMod ?? this.getItemCheckHealingMod(item, check);
 
       // Add the actor check data to the check options
       options.actorRollData = this.parent.getRollData();

@@ -7,6 +7,7 @@ import { getRollMessageTemplate } from '~/rules-element/RollMessage';
 import { getConditionalDiceModifierTemplate } from '~/rules-element/ConditionalDiceModifier';
 import { getConditionalRatingModifierTemplate } from '~/rules-element/ConditionalRatingModifier';
 import { getConditionalDamageModifierTemplate } from '~/rules-element/ConditionalDamageModifier';
+import { getConditionalHealingModifierTemplate } from '~/rules-element/ConditionalHealingModifier';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -45,6 +46,10 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
       case 'conditionalDamageModifier': {
          document.system.rulesElement[elementIdx] = getConditionalDamageModifierTemplate(element.uuid, element.type);
+         break;
+      }
+      case 'conditionalHealingModifier': {
+         document.system.rulesElement[elementIdx] = getConditionalHealingModifierTemplate(element.uuid, element.type);
          break;
       }
       default: {

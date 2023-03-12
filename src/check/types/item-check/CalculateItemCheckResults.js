@@ -22,7 +22,7 @@ export default function calculateItemCheckResults(inResults, parameters) {
 
          // Set healing
          if (parameters.isHealing) {
-            results.healing = stat;
+            results.healing = stat + parameters.healingMod;
          }
       }
 
