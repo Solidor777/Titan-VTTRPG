@@ -109,46 +109,82 @@ function getDamageModsForReducedKeys(conditionalDamageModifiers, selector, keys,
 }
 
 export function getAttackCheckDamageMod(item, attack, multiAttack) {
-   // Normal mod is 0. Contaminated mod is -1.
-   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
+   let retVal = 0;
 
-   // If conditional damage modifiers exist
-   const conditionalDamageModifiers = this.conditionalDamageModifier?.attack;
-   if (conditionalDamageModifiers) {
+   const damageMods = this.conditionalDamageModifier;
+   if (damageMods) {
+      // Any check damage mods
+      const anyCheckDamageMods = damageMods.any;
+      if (anyCheckDamageMods) {
 
-      // Get mods for the attack type
-      retVal += getDamageMods(conditionalDamageModifiers, 'attackType', attack.type);
+         // Custom Traits
+         const customTraits = [];
 
-      // Get mods for the attack traits
-      retVal += getDamageModsForReducedKeys(conditionalDamageModifiers, 'attackTrait', attack.trait, (trait) => trait.name);
-
-      // Get mods for custom traits
-      const customTraits = [];
-
-      // Ensure attack traits are unique
-      for (const trait of (attack.customTrait)) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match.name) === formattedName;
-         })) {
-            customTraits.push(formattedName);
+         // Ensure attack traits are unique
+         for (const trait of (attack.customTrait)) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
          }
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+         retVal += getDamageModsForReducedKeys(anyCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
       }
 
-      // Ensure item traits are unique
-      for (const trait of item.system.customTrait) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match) === formattedName;
-         })) {
-            customTraits.push(formattedName);
-         }
-      }
-      retVal += getDamageModsForReducedKeys(conditionalDamageModifiers, 'customTrait', customTraits, (trait) => (trait));
+      // Attack check damage mods
+      const attackCheckDamageMods = damageMods.attack;
+      if (attackCheckDamageMods) {
+         // Attribute
+         retVal += getDamageMods(attackCheckDamageMods, 'attribute', attack.attribute);
 
-      // Get multi attack mods
-      if (multiAttack && conditionalDamageModifiers.multiAttack) {
-         retVal += conditionalDamageModifiers.multiAttack;
+         // Skill
+         retVal += getDamageMods(attackCheckDamageMods, 'skill', attack.skill);
+
+         // Attack Type
+         retVal += getDamageMods(attackCheckDamageMods, 'attackType', attack.type);
+
+         // Attack Traits
+         retVal += getDamageModsForReducedKeys(attackCheckDamageMods, 'attackTrait', attack.trait, (trait) => trait.name);
+
+         // Custom Traits
+         const customTraits = [];
+
+         // Ensure attack traits are unique
+         for (const trait of (attack.customTrait)) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+         retVal += getDamageModsForReducedKeys(attackCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get multi attack mods
+         if (multiAttack && attackCheckDamageMods.multiAttack) {
+            retVal += attackCheckDamageMods.multiAttack;
+         }
       }
    }
 
@@ -156,55 +192,118 @@ export function getAttackCheckDamageMod(item, attack, multiAttack) {
 }
 
 export function getCastingCheckDamageMod(item) {
-   // Normal mod is 0. Contaminated mod is -1.
-   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
+   let retVal = 0;
 
    // If conditional damage modifiers exist
-   const conditionalDamageModifiers = this.conditionalDamageModifier?.casting;
-   if (conditionalDamageModifiers) {
+   const damageMods = this.conditionalDamageModifier;
+   if (damageMods) {
 
-      // Get mods for the spell tradition
-      retVal += getDamageMods(conditionalDamageModifiers, 'spellTradition', camelize(item.system.tradition));
+      // Any check damage mods
+      const anyCheckDamageMods = damageMods.any;
+      if (anyCheckDamageMods) {
 
-      // Get mods for custom traits
-      const customTraits = [];
+         // Custom traits
+         const customTraits = [];
 
-      // Ensure item traits are unique
-      for (const trait of item.system.customTrait) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match.name) === formattedName;
-         })) {
-            customTraits.push(formattedName);
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
          }
+
+         retVal += getDamageModsForReducedKeys(anyCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
       }
-      retVal += getDamageModsForReducedKeys(conditionalDamageModifiers, 'customTrait', customTraits, (trait) => (trait));
+
+      // Casting check damage mods
+      const castingCheckDamageMods = damageMods.casting;
+      if (castingCheckDamageMods) {
+
+         // Attribute
+         retVal += getDamageMods(castingCheckDamageMods, 'attribute', item.system.castingCheck.attribute);
+
+         // Skill
+         retVal += getDamageMods(castingCheckDamageMods, 'skill', item.system.castingCheck.skill);
+
+         // Spell tradition
+         retVal += getDamageMods(castingCheckDamageMods, 'spellTradition', camelize(item.system.tradition));
+
+         // Custom traits
+         const customTraits = [];
+
+         // Ensure item traits are unique
+         for (const trait of item.system.customTrait) {
+            const formattedName = camelize(trait.name);
+            if (!customTraits.find((match) => {
+               return camelize(match.name) === formattedName;
+            })) {
+               customTraits.push(formattedName);
+            }
+         }
+
+         retVal += getDamageModsForReducedKeys(castingCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+      }
    }
 
    return retVal;
 }
 
-export function getItemCheckDamageMod(item) {
-   // Normal mod is 0. Contaminated mod is -1.
-   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
+export function getItemCheckDamageMod(item, check) {
+   let retVal = 0;
 
-   // If conditional damage modifiers exist
-   const conditionalDamageModifiers = this.conditionalDamageModifier?.item;
-   if (conditionalDamageModifiers) {
+   // Check if the check has damage
+   if (check.isDamage) {
+      const damageMods = this.conditionalDamageModifier;
+      if (damageMods) {
 
-      // Get mods for custom traits
-      const customTraits = [];
+         // Any check damage mods
+         const anyCheckDamageMods = damageMods.any;
+         if (anyCheckDamageMods) {
 
-      // Ensure item traits are unique
-      for (const trait of item.system.customTrait) {
-         const formattedName = camelize(trait.name);
-         if (!customTraits.find((match) => {
-            return camelize(match.name) === formattedName;
-         })) {
-            customTraits.push(formattedName);
+            // Custom traits
+            const customTraits = [];
+
+            // Ensure item traits are unique
+            for (const trait of item.system.customTrait) {
+               const formattedName = camelize(trait.name);
+               if (!customTraits.find((match) => {
+                  return camelize(match.name) === formattedName;
+               })) {
+                  customTraits.push(formattedName);
+               }
+            }
+
+            retVal += getDamageModsForReducedKeys(anyCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         }
+
+         // Item check damage mods
+         const itemCheckDamageMods = damageMods.item;
+         if (itemCheckDamageMods) {
+
+            // Attribute
+            retVal += getDamageMods(itemCheckDamageMods, 'attribute', check.attribute);
+
+            // Skill
+            retVal += getDamageMods(itemCheckDamageMods, 'skill', check.skill);
+
+            // Custom traits
+            const customTraits = [];
+
+            // Ensure item traits are unique
+            for (const trait of item.system.customTrait) {
+               const formattedName = camelize(trait.name);
+               if (!customTraits.find((match) => {
+                  return camelize(match.name) === formattedName;
+               })) {
+                  customTraits.push(formattedName);
+               }
+            }
+            retVal += getDamageModsForReducedKeys(itemCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
          }
       }
-      retVal += getDamageModsForReducedKeys(conditionalDamageModifiers, 'customTrait', customTraits, (trait) => (trait));
    }
 
    return retVal;

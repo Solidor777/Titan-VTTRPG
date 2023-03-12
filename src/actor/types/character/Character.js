@@ -946,7 +946,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // Initialize check options
       options.attack = attack;
-      options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
+      options.damageMod = options.damageMod ?? this.getAttackCheckDamageMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
       options.diceMod = options.diceMod ?? this.getAttackCheckDiceMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
 
       // Add the actor check data to the check options
@@ -1033,7 +1033,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Initialize check options
-      options.damageMod = options.damageMod ?? this.parent.system.mod.damage.value;
+      options.damageMod = options.damageMod ?? this.getCastingCheckDamageMod(spell);
       options.diceMod = options.diceMod ?? this.getCastingCheckDiceMod(spell);
 
       // Add the actor check data to the check options
@@ -1110,7 +1110,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       options.itemRollData = item.getRollData();
-      options.diceMod = this.getItemCheckDiceMod(item, check);
+      options.diceMod = options.diceMod ?? this.getItemCheckDiceMod(item, check);
+      options.damageMod = options.damageMod ?? this.getItemCheckDamageMod(item, check);
+      console.log(options.damageMod);
 
       // Add the actor check data to the check options
       options.actorRollData = this.parent.getRollData();
