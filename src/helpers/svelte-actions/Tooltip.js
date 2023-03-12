@@ -6,31 +6,31 @@ const delay = [1000, 250];
 const duration = [400, 250];
 
 export default function tooltip(node, params) {
-   let tippy = params?.content ? initializeTippy(node, params) : false;
+   let tippyTooltip = params?.content ? initializeTippy(node, params) : false;
 
    return {
       update: (newParams) => {
          if (newParams?.content) {
 
-            if (tippy) {
+            if (tippyTooltip) {
                const content = newParams.content;
-               tippy.setProps({ content, allowHTML, duration, delay });
+               tippyTooltip.setProps({ content, allowHTML, duration, delay });
             }
 
             else {
-               tippy = initializeTippy(node, params);
+               tippyTooltip = initializeTippy(node, params);
             }
          }
 
-         else if (tippy) {
-            tippy.destroy();
-            tippy = false;
+         else if (tippyTooltip) {
+            tippyTooltip.destroy();
+            tippyTooltip = false;
          }
       },
 
       destroy: () => {
-         if (tippy) {
-            tippy.destroy();
+         if (tippyTooltip) {
+            tippyTooltip.destroy();
          }
       }
    };

@@ -1,4 +1,4 @@
 export default function preventDefault(event) {
-  event.preventDefault();
-  return;
+   event.preventDefault();
+   return;
 }

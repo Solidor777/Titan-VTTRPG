@@ -95,7 +95,14 @@
          <IconStatTag
             icon={'fas fa-burst'}
             label={localize('damage')}
-            value={`${attack.damage}${
+            value={`${
+               attack.damage +
+               $document.typeComponent.getAttackCheckDamageMod(
+                  item,
+                  attack,
+                  item.system.multiAttack
+               )
+            }${
                attack.plusExtraSuccessDamage
                   ? ` + ${localize('extraSuccesses.short')}`
                   : ''
