@@ -378,6 +378,12 @@
                      "static": 0
                   }
                },
+               "climb": {
+                  "baseValue": 0,
+                  "mod": {
+                     "static": 0
+                  }
+               },
                "swim": {
                   "baseValue": 0,
                   "mod": {

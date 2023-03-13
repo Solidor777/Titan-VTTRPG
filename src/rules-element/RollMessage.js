@@ -24,86 +24,65 @@ export function applyRollMessageElements(elements) {
       for (const [checkType, checkTypeElements] of Object.entries(checkTypes)) {
          const checkTypeMessages = {};
 
-         // Special case handling for resistance checks
-         if (checkType === 'resistance') {
-            const keys = sortObjectsIntoContainerByKey(checkTypeElements, 'key');
 
-            // For each key
-            for (const [key, keyElements] of Object.entries(keys)) {
-               const keyMessages = [];
+         // Sort elements by selector
+         const selectors = sortObjectsIntoContainerByKey(checkTypeElements, 'selector');
 
+         // For each selector
+         for (const [selector, selectorElements] of Object.entries(selectors)) {
+
+            // Handle special case for any and multi attack messages
+            if (selector === 'multiAttack' || selector === 'any') {
+               const selectorMessages = [];
                // Apply each message
-               for (const element of keyElements) {
-                  if (!isHTMLBlank(element.message) && keyMessages.indexOf(element.message) < 0) {
-                     keyMessages.push(element.message);
+               for (const element of selectorElements) {
+                  if (!isHTMLBlank(element.message)) {
+                     selectorMessages.push(element.message);
                   }
                }
 
-               if (keyMessages.length > 0) {
-                  checkTypeMessages[key] = keyMessages;
+               if (selectorMessages.length > 0) {
+                  checkTypeMessages[selector] = selectorMessages;
                }
             }
-         }
 
-         else {
-            // Sort elements by selector
-            const selectors = sortObjectsIntoContainerByKey(checkTypeElements, 'selector');
+            else {
+               const selectorMessages = {};
+               // Sort elements by key
+               const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+               let camelizeKeys = false;
+               switch (selector) {
+                  case 'customTrait':
+                  case 'spellTradition': {
+                     camelizeKeys = true;
+                     break;
+                  }
+                  default: {
+                     break;
+                  }
+               }
 
-            // For each selector
-            for (const [selector, selectorElements] of Object.entries(selectors)) {
+               // For each key
+               for (const [key, keyElements] of Object.entries(keys)) {
+                  const keyMessages = [];
 
-               // Handle special case for multi attack messages
-               if (selector === 'multiAttack') {
-                  const selectorMessages = [];
                   // Apply each message
-                  for (const element of selectorElements) {
-                     if (!isHTMLBlank(element.message)) {
-                        selectorMessages.push(element.message);
+                  for (const element of keyElements) {
+                     if (!isHTMLBlank(element.message) && keyMessages.indexOf(element.message) < 0) {
+                        keyMessages.push(element.message);
                      }
                   }
 
-                  if (selectorMessages.length > 0) {
-                     checkTypeMessages[selector] = selectorMessages;
+                  if (keyMessages.length > 0) {
+                     selectorMessages[camelizeKeys ? camelize(key) : key] = keyMessages;
                   }
                }
 
-               else {
-                  const selectorMessages = {};
-                  // Sort elements by key
-                  const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
-                  let camelizeKeys = false;
-                  switch (selector) {
-                     case 'customTrait':
-                     case 'spellTradition': {
-                        camelizeKeys = true;
-                        break;
-                     }
-                     default: {
-                        break;
-                     }
-                  }
-
-                  // For each key
-                  for (const [key, keyElements] of Object.entries(keys)) {
-                     const keyMessages = [];
-
-                     // Apply each message
-                     for (const element of keyElements) {
-                        if (!isHTMLBlank(element.message) && keyMessages.indexOf(element.message) < 0) {
-                           keyMessages.push(element.message);
-                        }
-                     }
-
-                     if (keyMessages.length > 0) {
-                        selectorMessages[camelizeKeys ? camelize(key) : key] = keyMessages;
-                     }
-                  }
-
-                  if (Object.keys(selectorMessages).length > 0) {
-                     checkTypeMessages[selector] = selectorMessages;
-                  }
+               if (Object.keys(selectorMessages).length > 0) {
+                  checkTypeMessages[selector] = selectorMessages;
                }
             }
+
 
          }
 
@@ -128,6 +107,10 @@ export function getAttributeCheckMessages(check) {
 
    const anyMessages = this.rollMessage?.any;
    if (anyMessages) {
+
+      // Any messages
+      getAnyMessages(anyMessages, check, messages);
+
       // Attribute
       getAttributeMessages(anyMessages, check, messages);
 
@@ -140,6 +123,10 @@ export function getAttributeCheckMessages(check) {
 
    const attributeMessages = this.rollMessage?.attribute;
    if (attributeMessages) {
+
+      // Any messages
+      getAnyMessages(attributeMessages, check, messages);
+
       // Attribute
       getAttributeMessages(attributeMessages, check, messages);
 
@@ -154,15 +141,28 @@ export function getAttributeCheckMessages(check) {
 }
 
 export function getResistanceCheckMessages(check) {
-   const rollMessages = this.rollMessage?.resistance;
-   if (rollMessages) {
-      const resistance = check.parameters.resistance;
-      if (rollMessages[resistance]) {
-         return rollMessages[resistance];
-      }
+   const messages = [];
+
+   // Any messages
+   const anyMessages = this.rollMessage?.any;
+   if (anyMessages) {
+
+      // Any messages
+      getAnyMessages(anyMessages, check, messages);
    }
 
-   return false;
+   // Resistance messages
+   const resistanceMessages = this.rollMessage?.resistance;
+   if (resistanceMessages) {
+
+      // Any messages
+      getAnyMessages(resistanceMessages, check, messages);
+
+      // Resistance messages
+      getResistanceMessages(resistanceMessages, check, messages);
+   }
+
+   return messages.length > 0 ? messages : false;
 }
 
 export function getAttackCheckMessages(check) {
@@ -171,6 +171,9 @@ export function getAttackCheckMessages(check) {
    // Get any type messages
    const anyMessages = this.rollMessage?.any;
    if (anyMessages) {
+
+      // Any messages
+      getAnyMessages(anyMessages, check, messages);
 
       // Attribute
       getAttributeMessages(anyMessages, check, messages);
@@ -188,6 +191,9 @@ export function getAttackCheckMessages(check) {
    // Get attack type messages
    const attackMessages = this.rollMessage?.attack;
    if (attackMessages) {
+
+      // Any messages
+      getAnyMessages(attackMessages, check, messages);
 
       // Attribute
       getAttributeMessages(attackMessages, check, messages);
@@ -221,6 +227,9 @@ export function getCastingCheckMessages(check) {
    const anyMessages = this.rollMessage?.any;
    if (anyMessages) {
 
+      // Any messages
+      getAnyMessages(anyMessages, check, messages);
+
       // Attribute
       getAttributeMessages(anyMessages, check, messages);
 
@@ -234,6 +243,9 @@ export function getCastingCheckMessages(check) {
    // Get casting check messages
    const castingMessages = this.rollMessage?.casting;
    if (castingMessages) {
+
+      // Any messages
+      getAnyMessages(castingMessages, check, messages);
 
       // Attribute
       getAttributeMessages(castingMessages, check, messages);
@@ -258,6 +270,9 @@ export function getItemCheckMessages(check) {
    const anyMessages = this.rollMessage?.any;
    if (anyMessages) {
 
+      // Any messages
+      getAnyMessages(anyMessages, check, messages);
+
       // Attribute
       getAttributeMessages(anyMessages, check, messages);
 
@@ -271,6 +286,9 @@ export function getItemCheckMessages(check) {
    // Get casting check messages
    const itemMessages = this.rollMessage?.item;
    if (itemMessages) {
+
+      // Any messages
+      getAnyMessages(itemMessages, check, messages);
 
       // Attribute
       getAttributeMessages(itemMessages, check, messages);
@@ -326,6 +344,13 @@ function getSkillMessages(categoryMessages, check, messages) {
    }
 }
 
+function getResistanceMessages(categoryMessages, check, messages) {
+   const resistanceRollMessages = getRollMessages(categoryMessages, 'resistance', check.parameters.resistance);
+   if (resistanceRollMessages) {
+      appendUnique(messages, resistanceRollMessages);
+   }
+}
+
 function getAttackTypeMessages(categoryMessages, check, messages) {
    const attackTypeMessages = getRollMessages(categoryMessages, 'attackType', check.parameters.attack.type);
    if (attackTypeMessages) {
@@ -364,5 +389,11 @@ function getSpellTraditionMessages(categoryMessages, check, messages) {
    const spellTraditionMessages = getRollMessages(categoryMessages, 'spellTradition', camelize(check.parameters.tradition));
    if (spellTraditionMessages) {
       messages.push(...spellTraditionMessages);
+   }
+}
+
+function getAnyMessages(categoryMessages, check, messages) {
+   if (categoryMessages.any) {
+      appendUnique(messages, categoryMessages.any);
    }
 }

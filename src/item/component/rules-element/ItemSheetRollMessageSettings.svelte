@@ -52,6 +52,10 @@
    const selectorOptions = {
       any: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -66,6 +70,10 @@
       ],
       attribute: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -75,6 +83,10 @@
          },
       ],
       attack: [
+         {
+            label: localize('any'),
+            value: 'any',
+         },
          {
             label: localize('attribute'),
             value: 'attribute',
@@ -102,6 +114,10 @@
       ],
       casting: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -120,6 +136,10 @@
       ],
       item: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -132,21 +152,21 @@
             value: 'skill',
          },
       ],
+      resistance: [
+         {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
+            label: localize('resistance'),
+            value: 'resistance',
+         },
+      ],
    };
 
    // Update selector when check type changes
    function onCheckTypeChange() {
-      switch (element.checkType) {
-         case 'resistance': {
-            element.selector = '';
-            element.key = 'reflexes';
-            break;
-         }
-         default: {
-            element.selector = 'attribute';
-            break;
-         }
-      }
+      element.selector = 'any';
 
       onSelectorChange();
    }
@@ -154,6 +174,12 @@
    // Updates the key when the selector changes
    function onSelectorChange() {
       switch (element.selector) {
+         case 'any':
+         case 'customTrait':
+         case 'multiAttack': {
+            element.key = '';
+            break;
+         }
          case 'attackTrait': {
             element.key = 'blast';
             break;
@@ -166,9 +192,8 @@
             element.key = 'body';
             break;
          }
-         case 'customTrait':
-         case 'multiAttack': {
-            element.key = '';
+         case 'resistance': {
+            element.key = 'reflexes';
             break;
          }
          case 'skill': {
@@ -206,6 +231,9 @@
          case 'skill': {
             return DocumentSkillSelect;
          }
+         case 'resistance': {
+            return DocumentResistanceSelect;
+         }
          case 'spellTradition': {
             return DocumentTextInput;
          }
@@ -241,31 +269,23 @@
                />
             </div>
 
-            {#if element.checkType !== 'resistance'}
-               <!--Selector-->
-               <div class="field select">
-                  <DocumentSelect
-                     options={selectorOptions[element.checkType]}
-                     bind:value={element.selector}
-                     on:change={onSelectorChange}
-                  />
-               </div>
-            {/if}
+            <!--Selector-->
+            <div class="field select">
+               <DocumentSelect
+                  options={selectorOptions[element.checkType]}
+                  bind:value={element.selector}
+                  on:change={onSelectorChange}
+               />
+            </div>
 
             <!--Key-->
-            {#if element.selector !== 'multiAttack'}
-               {#if element.checkType !== 'resistance'}
-                  <div class="field select">
-                     <svelte:component
-                        this={getSelector()}
-                        bind:value={element.key}
-                     />
-                  </div>
-               {:else}
-                  <div class="field select">
-                     <DocumentResistanceSelect bind:value={element.key} />
-                  </div>
-               {/if}
+            {#if element.selector !== 'multiAttack' && element.selector !== 'any'}
+               <div class="field select">
+                  <svelte:component
+                     this={getSelector()}
+                     bind:value={element.key}
+                  />
+               </div>
             {/if}
          </div>
 
