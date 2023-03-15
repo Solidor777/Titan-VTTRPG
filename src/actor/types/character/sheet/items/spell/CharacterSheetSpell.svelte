@@ -53,6 +53,9 @@
                <CharacterSheetCheckButton
                   check={item.system.castingCheck}
                   diceMod={$document.typeComponent.getCastingCheckDiceMod(item)}
+                  expertiseMod={$document.typeComponent.getCastingCheckExpertiseMod(
+                     item
+                  )}
                   on:click={() =>
                      $document.typeComponent.rollCastingCheck(
                         { itemId: id },

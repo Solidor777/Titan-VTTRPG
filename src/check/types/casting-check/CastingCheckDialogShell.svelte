@@ -32,7 +32,9 @@
          : spell.system.castingCheck.difficulty,
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
-      expertiseMod: options.expertiseMod ?? 0,
+      expertiseMod:
+         options.expertiseMod ??
+         actor.typeComponent.getCastingCheckExpertiseMod(spell),
       itemId: options.itemId,
       skill: options.skill ?? spell.system.castingCheck.skill,
       trainingMod: options.trainingMod ?? 0,

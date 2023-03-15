@@ -8,6 +8,7 @@ import { getConditionalDiceModifierTemplate } from '~/rules-element/ConditionalD
 import { getConditionalRatingModifierTemplate } from '~/rules-element/ConditionalRatingModifier';
 import { getConditionalDamageModifierTemplate } from '~/rules-element/ConditionalDamageModifier';
 import { getConditionalHealingModifierTemplate } from '~/rules-element/ConditionalHealingModifier';
+import { getConditionalExpertiseModifierTemplate } from '~/rules-element/ConditionalExpertiseModifier';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -38,6 +39,10 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
       case 'conditionalDiceModifier': {
          document.system.rulesElement[elementIdx] = getConditionalDiceModifierTemplate(element.uuid, element.type);
+         break;
+      }
+      case 'conditionalExpertiseModifier': {
+         document.system.rulesElement[elementIdx] = getConditionalExpertiseModifierTemplate(element.uuid, element.type);
          break;
       }
       case 'conditionalRatingModifier': {

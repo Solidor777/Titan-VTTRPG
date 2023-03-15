@@ -15,6 +15,7 @@
    import ItemSheetConditionaRatingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaRatingModifierSettings.svelte';
    import ItemSheetConditionaDamageModifierSettings from '~/item/component/rules-element/ItemSheetConditionaDamageModifierSettings.svelte';
    import ItemSheetConditionaHealingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaHealingModifierSettings.svelte';
+   import ItemSheetConditionalExpertiseModifierSettings from '~/item/component/rules-element/ItemSheetConditionalExpertiseModifierSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -50,6 +51,10 @@
          value: 'conditionalDiceModifier',
       },
       {
+         label: localize('conditionalExpertiseModifier'),
+         value: 'conditionalExpertiseModifier',
+      },
+      {
          label: localize('conditionalRatingModifier'),
          value: 'conditionalRatingModifier',
       },
@@ -72,6 +77,8 @@
          persistentDamage: ItemSheetPersistentDamageSettings,
          rollMessage: ItemSheetRollMessageSettings,
          conditionalDiceModifier: ItemSheetConditionalDiceModifierSettings,
+         conditionalExpertiseModifier:
+            ItemSheetConditionalExpertiseModifierSettings,
          conditionalRatingModifier: ItemSheetConditionaRatingModifierSettings,
          conditionalDamageModifier: ItemSheetConditionaDamageModifierSettings,
          conditionalHealingModifier: ItemSheetConditionaHealingModifierSettings,

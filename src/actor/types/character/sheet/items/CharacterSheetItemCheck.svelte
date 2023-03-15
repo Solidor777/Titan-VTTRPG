@@ -7,7 +7,6 @@
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
 
    // Reference to the docuement
@@ -33,6 +32,23 @@
 
    async function spendResolve() {
       return await $document.typeComponent.spendResolve(check.resolveCost);
+   }
+
+   // Calculate dice pool
+   let dicePool = 0;
+   $: {
+      dicePool =
+         $document.system.attribute[check.attribute].value +
+         $document.system.skill[check.skill].training.value +
+         $document.typeComponent.getItemCheckDiceMod(item, check);
+   }
+
+   // Calculate expertise
+   let expertise = 0;
+   $: {
+      expertise =
+         $document.system.skill[check.skill].expertise.value +
+         $document.typeComponent.getItemCheckExpertiseMod(item, check);
    }
 </script>
 
@@ -83,9 +99,7 @@
          <div class="stat">
             <IconStatTag
                label={localize('dice')}
-               value={$document.system.attribute[check.attribute].value +
-                  $document.system.skill[check.skill].training.value +
-                  $document.typeComponent.getItemCheckDiceMod(item, check)}
+               value={dicePool}
                icon={'fas fa-dice-d6'}
             />
          </div>
@@ -102,11 +116,11 @@
          {/if}
 
          <!--Expertise-->
-         {#if $document.system.skill[check.skill].expertise.value !== 0}
+         {#if expertise !== 0}
             <div class="stat">
                <IconStatTag
                   label={localize('expertise')}
-                  value={$document.system.skill[check.skill].expertise.value}
+                  value={expertise}
                   icon={'fas fa-graduation-cap'}
                />
             </div>

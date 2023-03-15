@@ -32,6 +32,24 @@ import {
    getCastingCheckDiceMod,
    getItemCheckDiceMod
 } from '~/rules-element/ConditionalDiceModifier';
+import {
+   applyConditionalExpertiseModifierElements,
+   getAttackCheckExpertiseMod,
+   getCastingCheckExpertiseMod,
+   getItemCheckExpertiseMod
+} from '~/rules-element/ConditionalExpertiseModifier';
+import {
+   applyConditionalDamageModifierElements,
+   getAttackCheckDamageMod,
+   getCastingCheckDamageMod,
+   getItemCheckDamageMod
+} from '~/rules-element/ConditionalDamageModifier';
+import {
+   applyConditionalHealingModifierElements,
+   getCastingCheckHealingMod,
+   getItemCheckHealingMod
+} from '~/rules-element/ConditionalHealingModifier';
+
 import { applyConditionalRatingModifierElements, getAttackRatingModifier } from '~/rules-element/ConditionalRatingModifier';
 import ResistanceCheckDialog from '~/check/types/resistance-check/ResistanceCheckDialog.js';
 import AttributeCheckDialog from '~/check/types/attribute-check/AttributeCheckDialog.js';
@@ -46,18 +64,6 @@ import TitanTypeComponent from '~/helpers/TypeComponent.js';
 import ItemCheckDialog from '~/check/types/item-check/ItemCheckDialog';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
 import ConfirmRemoveExpiredEffectsDialog from '~/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog';
-import {
-   applyConditionalDamageModifierElements,
-   getAttackCheckDamageMod,
-   getCastingCheckDamageMod,
-   getItemCheckDamageMod
-} from '~/rules-element/ConditionalDamageModifier';
-import {
-   applyConditionalHealingModifierElements,
-   getCastingCheckHealingMod,
-   getItemCheckHealingMod
-} from '~/rules-element/ConditionalHealingModifier';
-
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
 
@@ -69,6 +75,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    _applyTurnMessageElements = applyTurnMessageElements.bind(this);
    _applyRollMessageElements = applyRollMessageElements.bind(this);
    _applyConditionalDiceModifierElements = applyConditionalDiceModifierElements.bind(this);
+   _applyConditionalExpertiseModifierElements = applyConditionalExpertiseModifierElements.bind(this);
    _applyConditionRatingModifierElements = applyConditionalRatingModifierElements.bind(this);
    _applyConditionalDamageModifierElements = applyConditionalDamageModifierElements.bind(this);
    _applyConditionaHealingModifierElements = applyConditionalHealingModifierElements.bind(this);
@@ -80,6 +87,9 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getAttackCheckDiceMod = getAttackCheckDiceMod.bind(this);
    getCastingCheckDiceMod = getCastingCheckDiceMod.bind(this);
    getItemCheckDiceMod = getItemCheckDiceMod.bind(this);
+   getAttackCheckExpertiseMod = getAttackCheckExpertiseMod.bind(this);
+   getCastingCheckExpertiseMod = getCastingCheckExpertiseMod.bind(this);
+   getItemCheckExpertiseMod = getItemCheckExpertiseMod.bind(this);
    getAttackRatingModifier = getAttackRatingModifier.bind(this);
    getAttackCheckDamageMod = getAttackCheckDamageMod.bind(this);
    getCastingCheckDamageMod = getCastingCheckDamageMod.bind(this);
@@ -365,6 +375,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const turnMessageElements = [];
       const rollMessageElements = [];
       const conditionalDiceModifierElements = [];
+      const conditionalExpertiseModifierElements = [];
       const conditionalRatingModifierElements = [];
       const conditionalDamageModifierElements = [];
       const conditionalHealingModifierElements = [];
@@ -398,6 +409,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                conditionalDiceModifierElements.push(element);
                break;
             }
+            case 'conditionalExpertiseModifier': {
+               conditionalExpertiseModifierElements.push(element);
+               break;
+            }
             case 'conditionalRatingModifier': {
                conditionalRatingModifierElements.push(element);
                break;
@@ -424,6 +439,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       this._applyTurnMessageElements(turnMessageElements);
       this._applyRollMessageElements(rollMessageElements);
       this._applyConditionalDiceModifierElements(conditionalDiceModifierElements);
+      this._applyConditionalExpertiseModifierElements(conditionalExpertiseModifierElements);
       this._applyConditionRatingModifierElements(conditionalRatingModifierElements);
       this._applyConditionalDamageModifierElements(conditionalDamageModifierElements);
       this._applyConditionaHealingModifierElements(conditionalHealingModifierElements);
@@ -962,6 +978,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.attack = attack;
       options.damageMod = options.damageMod ?? this.getAttackCheckDamageMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
       options.diceMod = options.diceMod ?? this.getAttackCheckDiceMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
+      options.expertiseMod = options.expertiseMod ?? this.getAttackCheckExpertiseMod(weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();
@@ -1050,6 +1067,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       options.damageMod = options.damageMod ?? this.getCastingCheckDamageMod(spell);
       options.healingMod = options.healingMod ?? this.getCastingCheckHealingMod(spell);
       options.diceMod = options.diceMod ?? this.getCastingCheckDiceMod(spell);
+      options.expertiseMod = options.expertiseMod ?? this.getCastingCheckExpertiseMod(spell);
 
       // Add the actor check data to the check options
       const actorRollData = this.parent.getRollData();
@@ -1126,6 +1144,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       options.itemRollData = item.getRollData();
       options.diceMod = options.diceMod ?? this.getItemCheckDiceMod(item, check);
+      options.expertiseMod = options.expertiseMod ?? this.getItemCheckExpertiseMod(item, check);
       options.damageMod = options.damageMod ?? this.getItemCheckDamageMod(item, check);
       options.healingMod = options.healingMod ?? this.getItemCheckHealingMod(item, check);
 

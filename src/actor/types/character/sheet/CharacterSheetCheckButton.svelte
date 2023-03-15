@@ -13,6 +13,7 @@
    };
 
    export let diceMod = 0;
+   export let expertiseMod = 0;
 </script>
 
 <div class="item-check-button {check.attribute}">
@@ -34,10 +35,11 @@
          </div>
 
          <!--Expertise-->
-         {#if check.skill && $document.system.skill[check.skill].expertise.value > 0}
+         {#if check.skill && $document.system.skill[check.skill].expertise.value + expertiseMod > 0}
             <div class="stat">
                <i class="fas fa-graduation-cap" />
-               {$document.system.skill[check.skill].expertise.value}
+               {$document.system.skill[check.skill].expertise.value +
+                  expertiseMod}
             </div>
          {/if}
 

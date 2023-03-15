@@ -4,25 +4,25 @@
    // Reference to the docuement
    const document = getContext('DocumentStore');
 
-   // Weapon
-   export let diceMod = 0;
-
    // Check
+   export let item = void 0;
    export let attack = void 0;
 
-   export let multiAttack = void 0;
-
+   // Calculate dice pool
    let dicePool = 0;
-
    $: {
       // Get base dice
       dicePool =
          $document.system.attribute[attack.attribute].value +
          $document.system.skill[attack.skill].training.value +
-         diceMod;
+         $document.typeComponent.getAttackCheckDiceMod(
+            item,
+            attack,
+            item.system.multiAttack
+         );
 
       // Cut the dice in half if multi attacking
-      if (multiAttack) {
+      if (item.system.multiAtta) {
          // Round up or down, depending on the flurry trait
          let flurry = false;
          for (const trait of attack.trait) {
@@ -34,6 +34,24 @@
          dicePool = flurry
             ? Math.ceil(dicePool * 0.5)
             : Math.floor(dicePool * 0.5);
+      }
+   }
+
+   // Calculate expertise
+   let expertise = 0;
+   $: {
+      // Get base expertise
+      expertise =
+         $document.system.skill[attack.skill].expertise.value +
+         $document.typeComponent.getAttackCheckExpertiseMod(
+            item,
+            attack,
+            item.system.multiAttack
+         );
+
+      // Cut the expertise in half if multi attacking
+      if (item.system.multiAttack) {
+         expertise = Math.floor(expertise * 0.5);
       }
    }
 </script>
@@ -49,10 +67,10 @@
          </div>
 
          <!--Expertise-->
-         {#if $document.system.skill[attack.skill].expertise.value !== 0}
+         {#if expertise !== 0}
             <div class="expertise">
                <i class="fa fa-graduation-cap" />
-               {$document.system.skill[attack.skill].expertise.value}
+               {expertise}
             </div>
          {/if}
       </div>

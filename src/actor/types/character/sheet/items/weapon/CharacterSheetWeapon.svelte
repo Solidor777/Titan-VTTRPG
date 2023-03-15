@@ -59,12 +59,7 @@
                {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
                      attack={item.system.attack[0]}
-                     diceMod={$document.typeComponent.getAttackCheckDiceMod(
-                        item,
-                        item.system.attack[0],
-                        item.system.multiAttack
-                     )}
-                     multiAttack={item.system.multiAttack}
+                     {item}
                      on:click={() =>
                         $document.typeComponent.rollAttackCheck(
                            { itemId: item._id, attackIdx: 0 },

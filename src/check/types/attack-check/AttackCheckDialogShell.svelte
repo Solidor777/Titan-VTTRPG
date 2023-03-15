@@ -61,7 +61,13 @@
          actor.character.getAttackCheckDiceMod(weapon, attack, multiAttack),
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
-      expertiseMod: options.expertiseMod ?? 0,
+      expertiseMod:
+         options.expertiseMod ??
+         actor.character.getAttackCheckExpertiseMod(
+            weapon,
+            attack,
+            multiAttack
+         ),
       itemId: options.itemId,
       multiAttack: multiAttack,
       skill: options.skill ?? attack.skill,

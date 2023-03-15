@@ -9,6 +9,23 @@
 
    // Context references
    const document = getContext('DocumentStore');
+
+   // Calculate dice pool
+   let dicePool = 0;
+   $: {
+      dicePool =
+         $document.system.attribute[item.system.castingCheck.attribute].value +
+         $document.system.skill[item.system.castingCheck.skill].training.value +
+         $document.typeComponent.getCastingCheckDiceMod(item);
+   }
+
+   // Calculate expertise
+   let expertise = 0;
+   $: {
+      expertise =
+         $document.system.skill[item.system.castingCheck.skill].expertise
+            .value + $document.typeComponent.getCastingCheckExpertiseMod(item);
+   }
 </script>
 
 <div class="check">
@@ -27,11 +44,7 @@
    <div class="tag">
       <IconStatTag
          label={localize('dice')}
-         value={$document.system.attribute[item.system.castingCheck.attribute]
-            .value +
-            $document.system.skill[item.system.castingCheck.skill].training
-               .value +
-            $document.typeComponent.getCastingCheckDiceMod(item)}
+         value={dicePool}
          icon={'fas fa-dice-d6'}
       />
    </div>
@@ -49,12 +62,11 @@
    {/if}
 
    <!--Expertise-->
-   {#if $document.system.skill[item.system.castingCheck.skill].expertise.value !== 0}
+   {#if expertise !== 0}
       <div class="tag">
          <IconStatTag
             label={localize('expertise')}
-            value={$document.system.skill[item.system.castingCheck.skill]
-               .expertise.value}
+            value={expertise}
             icon={'fas fa-graduation-cap'}
          />
       </div>

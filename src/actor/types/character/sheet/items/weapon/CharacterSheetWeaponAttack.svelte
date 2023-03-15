@@ -22,6 +22,7 @@
    // Attack reference
    $: attack = item.system.attack[attackIdx];
 
+   // Calculate dice pool
    let dicePool = 0;
    $: {
       // Get base dice
@@ -35,7 +36,7 @@
          );
 
       // Cut the dice in half if multi attacking
-      if (item.system.multiAttack) {
+      if (item.system.multiAtta) {
          // Round up or down, depending on the flurry trait
          let flurry = false;
          for (const trait of attack.trait) {
@@ -47,6 +48,24 @@
          dicePool = flurry
             ? Math.ceil(dicePool * 0.5)
             : Math.floor(dicePool * 0.5);
+      }
+   }
+
+   // Calculate expertise
+   let expertise = 0;
+   $: {
+      // Get base expertise
+      expertise =
+         $document.system.skill[attack.skill].expertise.value +
+         $document.typeComponent.getAttackCheckExpertiseMod(
+            item,
+            attack,
+            item.system.multiAttack
+         );
+
+      // Cut the expertise in half if multi attacking
+      if (item.system.multiAttack) {
+         expertise = Math.floor(expertise * 0.5);
       }
    }
 
@@ -122,11 +141,11 @@
       {/if}
 
       <!--Expertise-->
-      {#if $document.system.skill[attack.skill].expertise.value !== 0}
+      {#if expertise !== 0}
          <div class="stat">
             <IconStatTag
                label={localize('expertise')}
-               value={$document.system.skill[attack.skill].expertise.value}
+               value={expertise}
                icon={'fas fa-graduation-cap'}
             />
          </div>
