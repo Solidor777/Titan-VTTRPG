@@ -7,7 +7,7 @@
   "author": "Solidor",
   "dependencies": {
     "@typhonjs-fvtt/runtime": "^0.0.22",
-    "@typhonjs-fvtt/svelte-standard": "^0.0.20",
+    "@typhonjs-fvtt/svelte-standard": "^0.0.21",
     "dracula-ui": "^1.0.6",
     "svelte": "^3.55.0",
     "tippy.js": "^6.3.7",
