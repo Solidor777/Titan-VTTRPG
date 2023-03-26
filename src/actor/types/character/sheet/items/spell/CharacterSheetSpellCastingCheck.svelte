@@ -16,7 +16,7 @@
       dicePool =
          $document.system.attribute[item.system.castingCheck.attribute].value +
          $document.system.skill[item.system.castingCheck.skill].training.value +
-         $document.typeComponent.getCastingCheckDiceMod(item);
+         $document.typeComponent.getCastingCheckMod('dice', item);
    }
 
    // Calculate expertise
@@ -24,7 +24,8 @@
    $: {
       expertise =
          $document.system.skill[item.system.castingCheck.skill].expertise
-            .value + $document.typeComponent.getCastingCheckExpertiseMod(item);
+            .value +
+         $document.typeComponent.getCastingCheckMod('expertise', item);
    }
 </script>
 

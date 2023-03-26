@@ -58,12 +58,13 @@
       attribute: options.attribute ?? attack.attribute,
       diceMod:
          options.diceMod ??
-         actor.character.getAttackCheckDiceMod(weapon, attack, multiAttack),
+         actor.character.getAttackCheckMod('dice', weapon, attack, multiAttack),
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod:
          options.expertiseMod ??
-         actor.character.getAttackCheckExpertiseMod(
+         actor.character.getAttackCheckMod(
+            'expertise',
             weapon,
             attack,
             multiAttack

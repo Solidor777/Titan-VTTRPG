@@ -51,11 +51,13 @@
                <div>
                   <CharacterSheetCheckButton
                      check={item.system.check[0]}
-                     diceMod={$document.typeComponent.getItemCheckDiceMod(
+                     diceMod={$document.typeComponent.getItemCheckMod(
+                        'dice',
                         item,
                         item.system.check[0]
                      )}
-                     expertiseMod={$document.typeComponent.getItemCheckExpertiseMod(
+                     expertiseMod={$document.typeComponent.getItemCheckMod(
+                        'expertise',
                         item,
                         item.system.check[0]
                      )}

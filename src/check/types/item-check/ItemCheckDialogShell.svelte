@@ -31,7 +31,7 @@
          : check.complexity,
       diceMod:
          options.diceMod ??
-         actor.typeComponent.getItemCheckDiceMod(item, check),
+         actor.typeComponent.getItemCheckMod('dice', item, check),
       difficulty: options.difficulty
          ? clamp(options.difficulty, 2, 6)
          : check.difficulty,

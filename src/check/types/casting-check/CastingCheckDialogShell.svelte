@@ -26,7 +26,8 @@
          ? Math.max(options.complexity, 0)
          : spell.system.castingCheck.complexity,
       diceMod:
-         options.diceMod ?? actor.typeComponent.getCastingCheckDiceMod(spell),
+         options.diceMod ??
+         actor.typeComponent.getCastingCheckMod('dice', spell),
       difficulty: options.difficulty
          ? clamp(options.difficulty, 2, 6)
          : spell.system.castingCheck.difficulty,
@@ -34,7 +35,7 @@
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod:
          options.expertiseMod ??
-         actor.typeComponent.getCastingCheckExpertiseMod(spell),
+         actor.typeComponent.getCastingCheckMod('expertise', spell),
       itemId: options.itemId,
       skill: options.skill ?? spell.system.castingCheck.skill,
       trainingMod: options.trainingMod ?? 0,

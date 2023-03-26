@@ -52,8 +52,12 @@
             <div>
                <CharacterSheetCheckButton
                   check={item.system.castingCheck}
-                  diceMod={$document.typeComponent.getCastingCheckDiceMod(item)}
-                  expertiseMod={$document.typeComponent.getCastingCheckExpertiseMod(
+                  diceMod={$document.typeComponent.getCastingCheckMod(
+                     'dice',
+                     item
+                  )}
+                  expertiseMod={$document.typeComponent.getCastingCheckMod(
+                     'expertise',
                      item
                   )}
                   on:click={() =>

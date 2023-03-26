@@ -40,7 +40,7 @@
       dicePool =
          $document.system.attribute[check.attribute].value +
          $document.system.skill[check.skill].training.value +
-         $document.typeComponent.getItemCheckDiceMod(item, check);
+         $document.typeComponent.getItemCheckMod('dice', item, check);
    }
 
    // Calculate expertise
@@ -48,7 +48,7 @@
    $: {
       expertise =
          $document.system.skill[check.skill].expertise.value +
-         $document.typeComponent.getItemCheckExpertiseMod(item, check);
+         $document.typeComponent.getItemCheckMod('expertise', item, check);
    }
 </script>
 

@@ -29,7 +29,8 @@
       dicePool =
          $document.system.attribute[attack.attribute].value +
          $document.system.skill[attack.skill].training.value +
-         $document.typeComponent.getAttackCheckDiceMod(
+         $document.typeComponent.getAttackCheckMod(
+            'expertise',
             item,
             attack,
             item.system.multiAttack
@@ -57,7 +58,8 @@
       // Get base expertise
       expertise =
          $document.system.skill[attack.skill].expertise.value +
-         $document.typeComponent.getAttackCheckExpertiseMod(
+         $document.typeComponent.getAttackCheckMod(
+            'expertise',
             item,
             attack,
             item.system.multiAttack
@@ -116,7 +118,8 @@
             label={localize('damage')}
             value={`${
                attack.damage +
-               $document.typeComponent.getAttackCheckDamageMod(
+               $document.typeComponent.getAttackCheckMod(
+                  'damage',
                   item,
                   attack,
                   item.system.multiAttack

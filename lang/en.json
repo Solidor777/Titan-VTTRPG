@@ -110,6 +110,7 @@
    "LOCAL.conditionalDiceModifier.label": "Conditional Dice Modifier",
    "LOCAL.conditionalHealingModifier.label": "Conditional Healing Mod",
    "LOCAL.conditionalRatingModifier.label": "Conditional Rating Modifier",
+   "LOCAL.conditionalCheckModifier.label": "Conditional Check Modifier",
    "LOCAL.conditions.label": "Conditions",
    "LOCAL.confirm": "Confirm",
    "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item from this actor?",

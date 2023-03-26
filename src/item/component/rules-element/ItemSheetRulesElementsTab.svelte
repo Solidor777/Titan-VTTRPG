@@ -11,11 +11,8 @@
    import ItemSheetFastHealingSettings from '~/item/component/rules-element/ItemSheetFastHealingSettings.svelte';
    import ItemSheetPersistentDamageSettings from '~/item/component/rules-element/ItemSheetPersistentDamageSettings.svelte';
    import ItemSheetRollMessageSettings from '~/item/component/rules-element/ItemSheetRollMessageSettings.svelte';
-   import ItemSheetConditionalDiceModifierSettings from '~/item/component/rules-element/ItemSheetConditionalDiceModifierSettings.svelte';
    import ItemSheetConditionaRatingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaRatingModifierSettings.svelte';
-   import ItemSheetConditionaDamageModifierSettings from '~/item/component/rules-element/ItemSheetConditionaDamageModifierSettings.svelte';
-   import ItemSheetConditionaHealingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaHealingModifierSettings.svelte';
-   import ItemSheetConditionalExpertiseModifierSettings from '~/item/component/rules-element/ItemSheetConditionalExpertiseModifierSettings.svelte';
+   import ItemSheetConditionaCheckModifierSettings from '~/item/component/rules-element/ItemSheetConditionaCheckModifierSettings.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -47,24 +44,12 @@
          value: 'rollMessage',
       },
       {
-         label: localize('conditionalDiceModifier'),
-         value: 'conditionalDiceModifier',
-      },
-      {
-         label: localize('conditionalExpertiseModifier'),
-         value: 'conditionalExpertiseModifier',
-      },
-      {
          label: localize('conditionalRatingModifier'),
          value: 'conditionalRatingModifier',
       },
       {
-         label: localize('conditionalDamageModifier'),
-         value: 'conditionalDamageModifier',
-      },
-      {
-         label: localize('conditionalHealingModifier'),
-         value: 'conditionalHealingModifier',
+         label: localize('conditionalCheckModifier'),
+         value: 'conditionalCheckModifier',
       },
    ];
 
@@ -76,12 +61,8 @@
          fastHealing: ItemSheetFastHealingSettings,
          persistentDamage: ItemSheetPersistentDamageSettings,
          rollMessage: ItemSheetRollMessageSettings,
-         conditionalDiceModifier: ItemSheetConditionalDiceModifierSettings,
-         conditionalExpertiseModifier:
-            ItemSheetConditionalExpertiseModifierSettings,
          conditionalRatingModifier: ItemSheetConditionaRatingModifierSettings,
-         conditionalDamageModifier: ItemSheetConditionaDamageModifierSettings,
-         conditionalHealingModifier: ItemSheetConditionaHealingModifierSettings,
+         conditionalCheckModifier: ItemSheetConditionaCheckModifierSettings,
       };
 
       return elementComponents[operation];

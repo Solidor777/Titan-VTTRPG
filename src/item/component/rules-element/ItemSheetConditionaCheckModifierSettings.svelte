@@ -19,8 +19,48 @@
    export let idx = void 0;
    export let element = void 0;
 
+   // Modifier type options
+   const modifierTypeOptions = [
+      {
+         label: localize('damage'),
+         value: 'damage',
+      },
+      {
+         label: localize('dice'),
+         value: 'dice',
+      },
+      {
+         label: localize('expertise'),
+         value: 'expertise',
+      },
+      {
+         label: localize('healing'),
+         value: 'healing',
+      },
+   ];
+
    // Check type options
    const checkTypeOptions = [
+      {
+         label: localize('anyCheck'),
+         value: 'any',
+      },
+      {
+         label: localize('attackCheck'),
+         value: 'attack',
+      },
+      {
+         label: localize('castingCheck'),
+         value: 'casting',
+      },
+      {
+         label: localize('itemCheck'),
+         value: 'item',
+      },
+   ];
+
+   // Special case for healing because attacks cannot heal
+   const healingCheckTypeOptions = [
       {
          label: localize('anyCheck'),
          value: 'any',
@@ -39,11 +79,49 @@
    const selectorOptions = {
       any: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('customTrait'),
             value: 'customTrait',
          },
       ],
+      attack: [
+         {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('attackTrait'),
+            value: 'attackTrait',
+         },
+         {
+            label: localize('attackType'),
+            value: 'attackType',
+         },
+         {
+            label: localize('customTrait'),
+            value: 'customTrait',
+         },
+         {
+            label: localize('multiAttack'),
+            value: 'multiAttack',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+      ],
       casting: [
+         {
+            label: localize('any'),
+            value: 'any',
+         },
          {
             label: localize('attribute'),
             value: 'attribute',
@@ -63,6 +141,10 @@
       ],
       item: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -77,22 +159,36 @@
       ],
    };
 
-   // Update the selector when the check type changes
-   function onCheckTypeChange() {
-      if (element) {
-         switch (element.checkType) {
-            case 'any': {
-               element.selector = 'customTrait';
-               break;
-            }
-            default: {
-               element.selector = 'attribute';
-               break;
-            }
+   // Update the check type if necessary when modifier type changes
+   function onModifierTypeChanged() {
+      if (
+         element?.modifierType === 'healing' &&
+         element.checkType === 'attack'
+      ) {
+         element.checkType = 'any';
+         if (onCheckTypeChange() !== true) {
+            $document.update({
+               system: $document.system,
+            });
          }
       }
+   }
 
-      onSelectorChange();
+   // Update the selector when the check type changes
+   // Returns whether an update was triggered
+   function onCheckTypeChange() {
+      if (
+         element &&
+         element.selector !== 'customTrait' &&
+         !(element.checkType !== 'any' && element.selector === 'skill')
+      ) {
+         element.selector = 'any';
+         onSelectorChange();
+
+         return true;
+      }
+
+      return false;
    }
 
    // Updates the key when the selector changes
@@ -102,7 +198,16 @@
             element.key = 'body';
             break;
          }
-         case 'customTrait': {
+         case 'attackTrait': {
+            element.key = 'blast';
+            break;
+         }
+         case 'attackType': {
+            element.key = 'melee';
+            break;
+         }
+         case 'customTrait':
+         case 'multiAttack': {
             element.key = '';
             break;
          }
@@ -129,6 +234,12 @@
          case 'attribute': {
             return DocumentAttributeSelect;
          }
+         case 'attackTrait': {
+            return DocumentAttackTraitSelect;
+         }
+         case 'attackType': {
+            return DocumentRangeTypeSelect;
+         }
          case 'customTrait': {
             return DocumentTextInput;
          }
@@ -145,7 +256,7 @@
    }
 </script>
 
-{#if element && element.operation === 'conditionalHealingModifier'}
+{#if element && element.operation === 'conditionalCheckModifier'}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
@@ -159,10 +270,21 @@
             />
          </div>
 
-         <!--Type-->
+         <!--Modifier Type-->
          <div class="field select">
             <DocumentSelect
-               options={checkTypeOptions}
+               options={modifierTypeOptions}
+               bind:value={element.modifierType}
+               on:change={onModifierTypeChanged}
+            />
+         </div>
+
+         <!--Check Type-->
+         <div class="field select">
+            <DocumentSelect
+               options={element.modifierType === 'healing'
+                  ? healingCheckTypeOptions
+                  : checkTypeOptions}
                bind:value={element.checkType}
                on:change={onCheckTypeChange}
             />
@@ -178,9 +300,14 @@
          </div>
 
          <!--Key-->
-         <div class="field select">
-            <svelte:component this={getSelector()} bind:value={element.key} />
-         </div>
+         {#if element.selector !== 'any'}
+            <div class="field select">
+               <svelte:component
+                  this={getSelector()}
+                  bind:value={element.key}
+               />
+            </div>
+         {/if}
 
          <!--Value-->
          <div class="field number">

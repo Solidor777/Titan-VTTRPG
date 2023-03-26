@@ -4,11 +4,8 @@ import { getFastHealingTemplate } from '~/rules-element/FastHealing.js';
 import { getPersistentDamageTemplate } from '~/rules-element/PersistentDamage';
 import { getTurnMessageTemplate } from '~/rules-element/TurnMessage';
 import { getRollMessageTemplate } from '~/rules-element/RollMessage';
-import { getConditionalDiceModifierTemplate } from '~/rules-element/ConditionalDiceModifier';
 import { getConditionalRatingModifierTemplate } from '~/rules-element/ConditionalRatingModifier';
-import { getConditionalDamageModifierTemplate } from '~/rules-element/ConditionalDamageModifier';
-import { getConditionalHealingModifierTemplate } from '~/rules-element/ConditionalHealingModifier';
-import { getConditionalExpertiseModifierTemplate } from '~/rules-element/ConditionalExpertiseModifier';
+import { getConditionalCheckModifierTemplate } from '~/rules-element/ConditionalCheckModifier';
 
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
@@ -37,24 +34,12 @@ export default async function onRulesElementOperationChanged(document, elementId
          document.system.rulesElement[elementIdx] = getRollMessageTemplate(element.uuid, element.type);
          break;
       }
-      case 'conditionalDiceModifier': {
-         document.system.rulesElement[elementIdx] = getConditionalDiceModifierTemplate(element.uuid, element.type);
-         break;
-      }
-      case 'conditionalExpertiseModifier': {
-         document.system.rulesElement[elementIdx] = getConditionalExpertiseModifierTemplate(element.uuid, element.type);
-         break;
-      }
       case 'conditionalRatingModifier': {
          document.system.rulesElement[elementIdx] = getConditionalRatingModifierTemplate(element.uuid, element.type);
          break;
       }
-      case 'conditionalDamageModifier': {
-         document.system.rulesElement[elementIdx] = getConditionalDamageModifierTemplate(element.uuid, element.type);
-         break;
-      }
-      case 'conditionalHealingModifier': {
-         document.system.rulesElement[elementIdx] = getConditionalHealingModifierTemplate(element.uuid, element.type);
+      case 'conditionalCheckModifier': {
+         document.system.rulesElement[elementIdx] = getConditionalCheckModifierTemplate(element.uuid, element.type);
          break;
       }
       default: {

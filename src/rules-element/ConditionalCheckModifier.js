@@ -2,9 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 import { camelize } from '~/helpers/Utility';
 
-export function getConditionalDamageModifierTemplate(uuid, type) {
+export function getConditionalCheckModifierTemplate(uuid, type) {
    return {
-      operation: 'conditionalDamageModifier',
+      operation: 'conditionalCheckModifier',
+      modifierType: 'damage',
       checkType: 'any',
       selector: 'any',
       key: '',
@@ -14,80 +15,90 @@ export function getConditionalDamageModifierTemplate(uuid, type) {
    };
 }
 
-export function applyConditionalDamageModifierElements(elements) {
+export function applyConditionalCheckModifierElements(elements) {
    if (elements.length > 0) {
-      const conditionalDamageModifiers = {};
-      // Sort elects by check type
-      const checkTypes = sortObjectsIntoContainerByKey(elements, 'checkType');
+      const conditionalCheckModifiers = {};
 
-      // For each check type
-      for (const [checkType, checkTypeElements] of Object.entries(checkTypes)) {
-         conditionalDamageModifiers[checkType] = {};
-         const checkTypeMap = conditionalDamageModifiers[checkType];
+      // Sort elements by modifier type
+      const modifierTypes = sortObjectsIntoContainerByKey(elements, 'modifierType');
 
-         // Sort elements by selector
-         const selectors = sortObjectsIntoContainerByKey(checkTypeElements, 'selector');
+      // For each modifier type
+      for (const [modifierType, modifierTypeElements] of Object.entries(modifierTypes)) {
+         const modifierTypeMap = {};
+         conditionalCheckModifiers[modifierType] = modifierTypeMap;
 
-         // For each selector
-         for (const [selector, selectorElements] of Object.entries(selectors)) {
-            switch (selector) {
-               // Special case handling for any and multi-attack
-               case 'any':
-               case 'multiAttack': {
-                  checkTypeMap[selector] = 0;
-                  for (const element of selectorElements) {
-                     checkTypeMap[selector] += element.value;
-                  }
-                  break;
-               }
+         // Sort elements by check type
+         const checkTypes = sortObjectsIntoContainerByKey(modifierTypeElements, 'checkType');
 
-               // Normal flow
-               default: {
-                  checkTypeMap[selector] = {};
-                  const selectorMap = checkTypeMap[selector];
-                  let camelizeKeys = false;
-                  switch (selector) {
-                     case 'customTrait':
-                     case 'spellTradition': {
-                        camelizeKeys = true;
+         // For each check type
+         for (const [checkType, checkTypeElements] of Object.entries(checkTypes)) {
+            const checkTypeMap = {};
+            modifierTypeMap[checkType] = checkTypeMap;
+
+            // Sort elements by selector
+            const selectors = sortObjectsIntoContainerByKey(checkTypeElements, 'selector');
+
+            // For each selector
+            for (const [selector, selectorElements] of Object.entries(selectors)) {
+               switch (selector) {
+                  // Special case handling for any and multi-attack
+                  case 'any':
+                  case 'multiAttack': {
+                     checkTypeMap[selector] = 0;
+                     for (const element of selectorElements) {
+                        checkTypeMap[selector] += element.value;
                      }
+                     break;
                   }
 
-                  // Sort elements by key
-                  const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
-
-                  // For each key
-                  for (const [key, keyElements] of Object.entries(keys)) {
-                     const formattedKey = camelizeKeys ? camelize(key) : key;
-
-                     // Initialize key value
-                     selectorMap[formattedKey] = 0; {
-
-                        // For each element
-                        for (const element of keyElements) {
-
-                           // Add to the key value
-                           selectorMap[formattedKey] += element.value;
+                  // Normal flow
+                  default: {
+                     checkTypeMap[selector] = {};
+                     const selectorMap = checkTypeMap[selector];
+                     let camelizeKeys = false;
+                     switch (selector) {
+                        case 'customTrait':
+                        case 'spellTradition': {
+                           camelizeKeys = true;
                         }
                      }
-                  }
 
-                  break;
+                     // Sort elements by key
+                     const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+
+                     // For each key
+                     for (const [key, keyElements] of Object.entries(keys)) {
+                        const formattedKey = camelizeKeys ? camelize(key) : key;
+
+                        // Initialize key value
+                        selectorMap[formattedKey] = 0; {
+
+                           // For each element
+                           for (const element of keyElements) {
+
+                              // Add to the key value
+                              selectorMap[formattedKey] += element.value;
+                           }
+                        }
+                     }
+
+                     break;
+                  }
                }
             }
          }
       }
 
-      this.conditionalDamageModifier = conditionalDamageModifiers;
+      this.conditionalCheckModifier = conditionalCheckModifiers;
       return;
    }
 
-   this.conditionalDamageModifier = false;
+   this.conditionalCheckModifier = false;
    return;
 }
 
-function getDamageMods(conditionalDamageModifiers, selector, key) {
-   const selectorMods = conditionalDamageModifiers[selector];
+function getCheckMods(conditionalCheckModifiers, selector, key) {
+   const selectorMods = conditionalCheckModifiers[selector];
    if (selectorMods) {
       const keyMod = selectorMods[key];
       if (keyMod) {
@@ -98,9 +109,9 @@ function getDamageMods(conditionalDamageModifiers, selector, key) {
    return 0;
 }
 
-function getDamageModsForReducedKeys(conditionalDamageModifiers, selector, keys, reduceFunction) {
+function getCheckModsForReducedKeys(conditionalCheckModifiers, selector, keys, reduceFunction) {
    let retVal = 0;
-   const selectorMods = conditionalDamageModifiers[selector];
+   const selectorMods = conditionalCheckModifiers[selector];
    if (selectorMods) {
       keys.forEach((key) => {
          const keyMod = selectorMods[reduceFunction(key)];
@@ -113,15 +124,17 @@ function getDamageModsForReducedKeys(conditionalDamageModifiers, selector, keys,
    return retVal;
 }
 
-export function getAttackCheckDamageMod(item, attack, multiAttack) {
-   // Normal mod is 0. Contaminated mod is -1.
-   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
+export function getAttackCheckMod(modifierType, item, attack, multiAttack) {
+   // Contaminated creatures have -1 to all dice rolls
+   let retVal = modifierType === 'dice' && this.parent.system.condition.contaminated ? -1 : 0;
 
-   const damageMods = this.conditionalDamageModifier;
-   if (damageMods) {
-      // Any check damage mods
-      const anyCheckDamageMods = damageMods.any;
-      if (anyCheckDamageMods) {
+   // Check for conditional modifiers
+   if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
+      const checkMods = this.conditionalCheckModifier[modifierType];
+
+      // Any check mods
+      const anyCheckMods = checkMods.any;
+      if (anyCheckMods) {
 
          // Custom Traits
          const customTraits = [];
@@ -145,28 +158,28 @@ export function getAttackCheckDamageMod(item, attack, multiAttack) {
                customTraits.push(formattedName);
             }
          }
-         retVal += getDamageModsForReducedKeys(anyCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         retVal += getCheckModsForReducedKeys(anyCheckMods, 'customTrait', customTraits, (trait) => (trait));
 
          // Get any mods
-         if (anyCheckDamageMods.any) {
-            retVal += anyCheckDamageMods.any;
+         if (anyCheckMods.any) {
+            retVal += anyCheckMods.any;
          }
       }
 
-      // Attack check damage mods
-      const attackCheckDamageMods = damageMods.attack;
-      if (attackCheckDamageMods) {
+      // Attack check mods
+      const attackCheckMods = checkMods.attack;
+      if (attackCheckMods) {
          // Attribute
-         retVal += getDamageMods(attackCheckDamageMods, 'attribute', attack.attribute);
+         retVal += getCheckMods(attackCheckMods, 'attribute', attack.attribute);
 
          // Skill
-         retVal += getDamageMods(attackCheckDamageMods, 'skill', attack.skill);
+         retVal += getCheckMods(attackCheckMods, 'skill', attack.skill);
 
          // Attack Type
-         retVal += getDamageMods(attackCheckDamageMods, 'attackType', attack.type);
+         retVal += getCheckMods(attackCheckMods, 'attackType', attack.type);
 
          // Attack Traits
-         retVal += getDamageModsForReducedKeys(attackCheckDamageMods, 'attackTrait', attack.trait, (trait) => trait.name);
+         retVal += getCheckModsForReducedKeys(attackCheckMods, 'attackTrait', attack.trait, (trait) => trait.name);
 
          // Custom Traits
          const customTraits = [];
@@ -190,16 +203,16 @@ export function getAttackCheckDamageMod(item, attack, multiAttack) {
                customTraits.push(formattedName);
             }
          }
-         retVal += getDamageModsForReducedKeys(attackCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         retVal += getCheckModsForReducedKeys(attackCheckMods, 'customTrait', customTraits, (trait) => (trait));
 
          // Get multi attack mods
-         if (multiAttack && attackCheckDamageMods.multiAttack) {
-            retVal += attackCheckDamageMods.multiAttack;
+         if (multiAttack && attackCheckMods.multiAttack) {
+            retVal += attackCheckMods.multiAttack;
          }
 
          // Get any mods
-         if (attackCheckDamageMods.any) {
-            retVal += attackCheckDamageMods.any;
+         if (attackCheckMods.any) {
+            retVal += attackCheckMods.any;
          }
       }
    }
@@ -207,17 +220,17 @@ export function getAttackCheckDamageMod(item, attack, multiAttack) {
    return retVal;
 }
 
-export function getCastingCheckDamageMod(item) {
-   // Normal mod is 0. Contaminated mod is -1.
-   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
+export function getCastingCheckMod(modifierType, item) {
+   // Contaminated creatures have -1 to all dice rolls
+   let retVal = modifierType === 'dice' && this.parent.system.condition.contaminated ? -1 : 0;
 
-   // If conditional damage modifiers exist
-   const damageMods = this.conditionalDamageModifier;
-   if (damageMods) {
+   // Check for conditional modifiers
+   if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
+      const checkMods = this.conditionalCheckModifier[modifierType];
 
-      // Any check damage mods
-      const anyCheckDamageMods = damageMods.any;
-      if (anyCheckDamageMods) {
+      // Any check mods
+      const anyCheckMods = checkMods.any;
+      if (anyCheckMods) {
 
          // Custom traits
          const customTraits = [];
@@ -232,26 +245,26 @@ export function getCastingCheckDamageMod(item) {
             }
          }
 
-         retVal += getDamageModsForReducedKeys(anyCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         retVal += getCheckModsForReducedKeys(anyCheckMods, 'customTrait', customTraits, (trait) => (trait));
 
          // Get any mods
-         if (anyCheckDamageMods.any) {
-            retVal += anyCheckDamageMods.any;
+         if (anyCheckMods.any) {
+            retVal += anyCheckMods.any;
          }
       }
 
-      // Casting check damage mods
-      const castingCheckDamageMods = damageMods.casting;
-      if (castingCheckDamageMods) {
+      // Casting check mods
+      const castingCheckMods = checkMods.casting;
+      if (castingCheckMods) {
 
          // Attribute
-         retVal += getDamageMods(castingCheckDamageMods, 'attribute', item.system.castingCheck.attribute);
+         retVal += getCheckMods(castingCheckMods, 'attribute', item.system.castingCheck.attribute);
 
          // Skill
-         retVal += getDamageMods(castingCheckDamageMods, 'skill', item.system.castingCheck.skill);
+         retVal += getCheckMods(castingCheckMods, 'skill', item.system.castingCheck.skill);
 
          // Spell tradition
-         retVal += getDamageMods(castingCheckDamageMods, 'spellTradition', camelize(item.system.tradition));
+         retVal += getCheckMods(castingCheckMods, 'spellTradition', camelize(item.system.tradition));
 
          // Custom traits
          const customTraits = [];
@@ -266,11 +279,11 @@ export function getCastingCheckDamageMod(item) {
             }
          }
 
-         retVal += getDamageModsForReducedKeys(castingCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         retVal += getCheckModsForReducedKeys(castingCheckMods, 'customTrait', customTraits, (trait) => (trait));
 
          // Get any mods
-         if (castingCheckDamageMods.any) {
-            retVal += castingCheckDamageMods.any;
+         if (castingCheckMods.any) {
+            retVal += castingCheckMods.any;
          }
       }
    }
@@ -278,15 +291,17 @@ export function getCastingCheckDamageMod(item) {
    return retVal;
 }
 
-export function getItemCheckDamageMod(item, check) {
-   // Normal mod is 0. Contaminated mod is -1.
-   let retVal = this.parent.system.condition.contaminated ? -1 : 0;
-   const damageMods = this.conditionalDamageModifier;
-   if (damageMods) {
+export function getItemCheckMod(modifierType, item, check) {
+   // Contaminated creatures have -1 to all dice rolls
+   let retVal = modifierType === 'dice' && this.parent.system.condition.contaminated ? -1 : 0;
 
-      // Any check damage mods
-      const anyCheckDamageMods = damageMods.any;
-      if (anyCheckDamageMods) {
+   // Check for conditional modifiers
+   if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
+      const checkMods = this.conditionalCheckModifier[modifierType];
+
+      // Any check mods
+      const anyCheckMods = checkMods.any;
+      if (anyCheckMods) {
 
          // Custom traits
          const customTraits = [];
@@ -301,23 +316,23 @@ export function getItemCheckDamageMod(item, check) {
             }
          }
 
-         retVal += getDamageModsForReducedKeys(anyCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         retVal += getCheckModsForReducedKeys(anyCheckMods, 'customTrait', customTraits, (trait) => (trait));
 
          // Get any mods
-         if (anyCheckDamageMods.any) {
-            retVal += anyCheckDamageMods.any;
+         if (anyCheckMods.any) {
+            retVal += anyCheckMods.any;
          }
       }
 
-      // Item check damage mods
-      const itemCheckDamageMods = damageMods.item;
-      if (itemCheckDamageMods) {
+      // Item check mods
+      const itemCheckMods = checkMods.item;
+      if (itemCheckMods) {
 
          // Attribute
-         retVal += getDamageMods(itemCheckDamageMods, 'attribute', check.attribute);
+         retVal += getCheckMods(itemCheckMods, 'attribute', check.attribute);
 
          // Skill
-         retVal += getDamageMods(itemCheckDamageMods, 'skill', check.skill);
+         retVal += getCheckMods(itemCheckMods, 'skill', check.skill);
 
          // Custom traits
          const customTraits = [];
@@ -332,11 +347,11 @@ export function getItemCheckDamageMod(item, check) {
             }
          }
 
-         retVal += getDamageModsForReducedKeys(itemCheckDamageMods, 'customTrait', customTraits, (trait) => (trait));
+         retVal += getCheckModsForReducedKeys(itemCheckMods, 'customTrait', customTraits, (trait) => (trait));
 
          // Get any mods
-         if (itemCheckDamageMods.any) {
-            retVal += itemCheckDamageMods.any;
+         if (itemCheckMods.any) {
+            retVal += itemCheckMods.any;
          }
       }
    }
