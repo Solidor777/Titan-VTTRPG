@@ -13,6 +13,7 @@
    import ItemSheetRollMessageSettings from '~/item/component/rules-element/ItemSheetRollMessageSettings.svelte';
    import ItemSheetConditionaRatingModifierSettings from '~/item/component/rules-element/ItemSheetConditionaRatingModifierSettings.svelte';
    import ItemSheetConditionaCheckModifierSettings from '~/item/component/rules-element/ItemSheetConditionaCheckModifierSettings.svelte';
+   import ItemSheetInvalidRulesElement from '~/item/component/rules-element/ItemSheetInvalidRulesElement.svelte';
 
    // Setup context variables
    const document = getContext('DocumentStore');
@@ -54,18 +55,43 @@
    ];
 
    function selectComponent(operation) {
-      const elementComponents = {
-         flatModifier: ItemSheetFlatModifierSettings,
-         mulBase: ItemSheetMulBaseSettings,
-         turnMessage: ItemSheetTurnMessageSettings,
-         fastHealing: ItemSheetFastHealingSettings,
-         persistentDamage: ItemSheetPersistentDamageSettings,
-         rollMessage: ItemSheetRollMessageSettings,
-         conditionalRatingModifier: ItemSheetConditionaRatingModifierSettings,
-         conditionalCheckModifier: ItemSheetConditionaCheckModifierSettings,
-      };
+      switch (operation) {
+         case 'flatModifier': {
+            return ItemSheetFlatModifierSettings;
+         }
 
-      return elementComponents[operation];
+         case 'mulBase': {
+            return ItemSheetMulBaseSettings;
+         }
+
+         case 'turnMessage': {
+            return ItemSheetTurnMessageSettings;
+         }
+
+         case 'fastHealing': {
+            return ItemSheetFastHealingSettings;
+         }
+
+         case 'persistentDamage': {
+            return ItemSheetPersistentDamageSettings;
+         }
+
+         case 'rollMessage': {
+            return ItemSheetRollMessageSettings;
+         }
+
+         case 'conditionalRatingModifier': {
+            return ItemSheetConditionaRatingModifierSettings;
+         }
+
+         case 'conditionalCheckModifier': {
+            return ItemSheetConditionaCheckModifierSettings;
+         }
+
+         default: {
+            return ItemSheetInvalidRulesElement;
+         }
+      }
    }
 </script>
 
