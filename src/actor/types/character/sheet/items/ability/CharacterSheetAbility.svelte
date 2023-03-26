@@ -55,6 +55,10 @@
                         item,
                         item.system.check[0]
                      )}
+                     expertiseMod={$document.typeComponent.getItemCheckExpertiseMod(
+                        item,
+                        item.system.check[0]
+                     )}
                      on:click={() =>
                         $document.typeComponent.rollItemCheck(
                            { itemId: item._id, checkIdx: 0 },

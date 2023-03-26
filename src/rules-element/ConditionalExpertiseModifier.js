@@ -5,9 +5,9 @@ import { camelize } from '~/helpers/Utility';
 export function getConditionalExpertiseModifierTemplate(uuid, type) {
    return {
       operation: 'conditionalExpertiseModifier',
-      checkType: 'attack',
-      selector: 'attackTrait',
-      key: 'blast',
+      checkType: 'any',
+      selector: 'any',
+      key: '',
       value: 1,
       uuid: uuid ?? uuidv4(),
       type: type ?? ''
@@ -30,44 +30,49 @@ export function applyConditionalExpertiseModifierElements(elements) {
 
          // For each selector
          for (const [selector, selectorElements] of Object.entries(selectors)) {
-
-            // Hand special case for multi attack
-            if (selector === 'multiAttack') {
-               checkTypeMap.multiAttack = 0;
-               for (const element of selectorElements) {
-                  checkTypeMap.multiAttack += element.value;
-               }
-            }
-
-            // Normal flow
-            else {
-               checkTypeMap[selector] = {};
-               const selectorMap = checkTypeMap[selector];
-               let camelizeKeys = false;
-               switch (selector) {
-                  case 'customTrait':
-                  case 'spellTradition': {
-                     camelizeKeys = true;
+            switch (selector) {
+               // Special case handling for any and multi-attack
+               case 'any':
+               case 'multiAttack': {
+                  checkTypeMap[selector] = 0;
+                  for (const element of selectorElements) {
+                     checkTypeMap[selector] += element.value;
                   }
+                  break;
                }
 
-               // Sort elements by key
-               const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
-
-               // For each key
-               for (const [key, keyElements] of Object.entries(keys)) {
-                  const formattedKey = camelizeKeys ? camelize(key) : key;
-
-                  // Initialize key value
-                  selectorMap[formattedKey] = 0; {
-
-                     // For each element
-                     for (const element of keyElements) {
-
-                        // Add to the key value
-                        selectorMap[formattedKey] += element.value;
+               // Normal flow
+               default: {
+                  checkTypeMap[selector] = {};
+                  const selectorMap = checkTypeMap[selector];
+                  let camelizeKeys = false;
+                  switch (selector) {
+                     case 'customTrait':
+                     case 'spellTradition': {
+                        camelizeKeys = true;
                      }
                   }
+
+                  // Sort elements by key
+                  const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+
+                  // For each key
+                  for (const [key, keyElements] of Object.entries(keys)) {
+                     const formattedKey = camelizeKeys ? camelize(key) : key;
+
+                     // Initialize key value
+                     selectorMap[formattedKey] = 0; {
+
+                        // For each element
+                        for (const element of keyElements) {
+
+                           // Add to the key value
+                           selectorMap[formattedKey] += element.value;
+                        }
+                     }
+                  }
+
+                  break;
                }
             }
          }
@@ -141,6 +146,11 @@ export function getAttackCheckExpertiseMod(item, attack, multiAttack) {
             }
          }
          retVal += getExpertiseModsForReducedKeys(anyCheckExpertiseMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (anyCheckExpertiseMods.any) {
+            retVal += anyCheckExpertiseMods.any;
+         }
       }
 
       // Attack check expertise mods
@@ -186,6 +196,11 @@ export function getAttackCheckExpertiseMod(item, attack, multiAttack) {
          if (multiAttack && attackCheckExpertiseMods.multiAttack) {
             retVal += attackCheckExpertiseMods.multiAttack;
          }
+
+         // Get any mods
+         if (attackCheckExpertiseMods.any) {
+            retVal += attackCheckExpertiseMods.any;
+         }
       }
    }
 
@@ -218,6 +233,11 @@ export function getCastingCheckExpertiseMod(item) {
          }
 
          retVal += getExpertiseModsForReducedKeys(anyCheckExpertiseMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (anyCheckExpertiseMods.any) {
+            retVal += anyCheckExpertiseMods.any;
+         }
       }
 
       // Casting check expertise mods
@@ -247,6 +267,11 @@ export function getCastingCheckExpertiseMod(item) {
          }
 
          retVal += getExpertiseModsForReducedKeys(castingCheckExpertiseMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (castingCheckExpertiseMods.any) {
+            retVal += castingCheckExpertiseMods.any;
+         }
       }
    }
 
@@ -277,6 +302,11 @@ export function getItemCheckExpertiseMod(item, check) {
          }
 
          retVal += getExpertiseModsForReducedKeys(anyCheckExpertiseMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (anyCheckExpertiseMods.any) {
+            retVal += anyCheckExpertiseMods.any;
+         }
       }
 
       // Item check expertise mods
@@ -301,7 +331,13 @@ export function getItemCheckExpertiseMod(item, check) {
                customTraits.push(formattedName);
             }
          }
+
          retVal += getExpertiseModsForReducedKeys(itemCheckExpertiseMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (itemCheckExpertiseMods.any) {
+            retVal += itemCheckExpertiseMods.any;
+         }
       }
    }
 

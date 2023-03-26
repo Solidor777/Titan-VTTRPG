@@ -43,11 +43,19 @@
    const selectorOptions = {
       any: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('customTrait'),
             value: 'customTrait',
          },
       ],
       attack: [
+         {
+            label: localize('any'),
+            value: 'any',
+         },
          {
             label: localize('attribute'),
             value: 'attribute',
@@ -75,6 +83,10 @@
       ],
       casting: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -93,6 +105,10 @@
       ],
       item: [
          {
+            label: localize('any'),
+            value: 'any',
+         },
+         {
             label: localize('attribute'),
             value: 'attribute',
          },
@@ -110,16 +126,7 @@
    // Update the selector when the check type changes
    function onCheckTypeChange() {
       if (element) {
-         switch (element.checkType) {
-            case 'any': {
-               element.selector = 'customTrait';
-               break;
-            }
-            default: {
-               element.selector = 'attribute';
-               break;
-            }
-         }
+         element.selector = 'any';
       }
 
       onSelectorChange();
@@ -223,9 +230,14 @@
          </div>
 
          <!--Key-->
-         <div class="field select">
-            <svelte:component this={getSelector()} bind:value={element.key} />
-         </div>
+         {#if element.selector !== 'any'}
+            <div class="field select">
+               <svelte:component
+                  this={getSelector()}
+                  bind:value={element.key}
+               />
+            </div>
+         {/if}
 
          <!--Value-->
          <div class="field number">

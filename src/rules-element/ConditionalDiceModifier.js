@@ -5,9 +5,9 @@ import { camelize } from '~/helpers/Utility';
 export function getConditionalDiceModifierTemplate(uuid, type) {
    return {
       operation: 'conditionalDiceModifier',
-      checkType: 'attack',
-      selector: 'attackTrait',
-      key: 'blast',
+      checkType: 'any',
+      selector: 'any',
+      key: '',
       value: 1,
       uuid: uuid ?? uuidv4(),
       type: type ?? ''
@@ -30,44 +30,49 @@ export function applyConditionalDiceModifierElements(elements) {
 
          // For each selector
          for (const [selector, selectorElements] of Object.entries(selectors)) {
-
-            // Hand special case for multi attack
-            if (selector === 'multiAttack') {
-               checkTypeMap.multiAttack = 0;
-               for (const element of selectorElements) {
-                  checkTypeMap.multiAttack += element.value;
-               }
-            }
-
-            // Normal flow
-            else {
-               checkTypeMap[selector] = {};
-               const selectorMap = checkTypeMap[selector];
-               let camelizeKeys = false;
-               switch (selector) {
-                  case 'customTrait':
-                  case 'spellTradition': {
-                     camelizeKeys = true;
+            switch (selector) {
+               // Special case handling for any and multi-attack
+               case 'any':
+               case 'multiAttack': {
+                  checkTypeMap[selector] = 0;
+                  for (const element of selectorElements) {
+                     checkTypeMap[selector] += element.value;
                   }
+                  break;
                }
 
-               // Sort elements by key
-               const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
-
-               // For each key
-               for (const [key, keyElements] of Object.entries(keys)) {
-                  const formattedKey = camelizeKeys ? camelize(key) : key;
-
-                  // Initialize key value
-                  selectorMap[formattedKey] = 0; {
-
-                     // For each element
-                     for (const element of keyElements) {
-
-                        // Add to the key value
-                        selectorMap[formattedKey] += element.value;
+               // Normal flow
+               default: {
+                  checkTypeMap[selector] = {};
+                  const selectorMap = checkTypeMap[selector];
+                  let camelizeKeys = false;
+                  switch (selector) {
+                     case 'customTrait':
+                     case 'spellTradition': {
+                        camelizeKeys = true;
                      }
                   }
+
+                  // Sort elements by key
+                  const keys = sortObjectsIntoContainerByKey(selectorElements, 'key');
+
+                  // For each key
+                  for (const [key, keyElements] of Object.entries(keys)) {
+                     const formattedKey = camelizeKeys ? camelize(key) : key;
+
+                     // Initialize key value
+                     selectorMap[formattedKey] = 0; {
+
+                        // For each element
+                        for (const element of keyElements) {
+
+                           // Add to the key value
+                           selectorMap[formattedKey] += element.value;
+                        }
+                     }
+                  }
+
+                  break;
                }
             }
          }
@@ -141,6 +146,11 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
             }
          }
          retVal += getDiceModsForReducedKeys(anyCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (anyCheckDiceMods.any) {
+            retVal += anyCheckDiceMods.any;
+         }
       }
 
       // Attack check dice mods
@@ -186,6 +196,11 @@ export function getAttackCheckDiceMod(item, attack, multiAttack) {
          if (multiAttack && attackCheckDiceMods.multiAttack) {
             retVal += attackCheckDiceMods.multiAttack;
          }
+
+         // Get any mods
+         if (attackCheckDiceMods.any) {
+            retVal += attackCheckDiceMods.any;
+         }
       }
    }
 
@@ -218,6 +233,11 @@ export function getCastingCheckDiceMod(item) {
          }
 
          retVal += getDiceModsForReducedKeys(anyCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (anyCheckDiceMods.any) {
+            retVal += anyCheckDiceMods.any;
+         }
       }
 
       // Casting check dice mods
@@ -247,6 +267,11 @@ export function getCastingCheckDiceMod(item) {
          }
 
          retVal += getDiceModsForReducedKeys(castingCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (castingCheckDiceMods.any) {
+            retVal += castingCheckDiceMods.any;
+         }
       }
    }
 
@@ -277,6 +302,11 @@ export function getItemCheckDiceMod(item, check) {
          }
 
          retVal += getDiceModsForReducedKeys(anyCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (anyCheckDiceMods.any) {
+            retVal += anyCheckDiceMods.any;
+         }
       }
 
       // Item check dice mods
@@ -301,7 +331,13 @@ export function getItemCheckDiceMod(item, check) {
                customTraits.push(formattedName);
             }
          }
+
          retVal += getDiceModsForReducedKeys(itemCheckDiceMods, 'customTrait', customTraits, (trait) => (trait));
+
+         // Get any mods
+         if (itemCheckDiceMods.any) {
+            retVal += itemCheckDiceMods.any;
+         }
       }
    }
 
