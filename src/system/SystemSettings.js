@@ -105,44 +105,40 @@ export default function registerSystemSettings() {
 
    game.settings.register('titan', 'autoSpendResolveDoubleTraining', {
       config: true,
-      scope: 'world',
+      scope: 'client',
       name: 'SETTINGS.autoSpendResolveDoubleTraining.label',
       hint: 'SETTINGS.autoSpendResolveDoubleTraining.hint',
       type: Boolean,
-      restricted: true,
       default: true,
       requiresReload: true,
    });
 
    game.settings.register('titan', 'autoSpendResolveDoubleExpertise', {
       config: true,
-      scope: 'world',
+      scope: 'client',
       name: 'SETTINGS.autoSpendResolveDoubleExpertise.label',
       hint: 'SETTINGS.autoSpendResolveDoubleExpertise.hint',
       type: Boolean,
-      restricted: true,
       default: true,
       requiresReload: true,
    });
 
    game.settings.register('titan', 'autoSpendResolveReRollFailures', {
       config: true,
-      scope: 'world',
+      scope: 'client',
       name: 'SETTINGS.autoSpendResolveReRollFailures.label',
       hint: 'SETTINGS.autoSpendResolveReRollFailures.hint',
       type: Boolean,
-      restricted: true,
       default: true,
       requiresReload: true,
    });
 
    game.settings.register('titan', 'autoSpendResolveChecks', {
       config: true,
-      scope: 'world',
+      scope: 'client',
       name: 'SETTINGS.autoSpendResolveChecks.label',
       hint: 'SETTINGS.autoSpendResolveChecks.hint',
       type: Boolean,
-      restricted: true,
       default: true,
       requiresReload: true,
    });

@@ -17,6 +17,10 @@
          value: 'burrow',
       },
       {
+         label: localize('climb'),
+         value: 'climb',
+      },
+      {
          label: localize('fly'),
          value: 'fly',
       },
