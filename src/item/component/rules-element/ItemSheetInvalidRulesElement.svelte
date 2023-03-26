@@ -47,7 +47,7 @@
          @include flex-group-left;
          flex-wrap: wrap;
          width: 100%;
-         margin-bottom: 0.5rem;
+         margin: 0 0.25rem 0 0.25rem;
       }
 
       .delete-button {
