@@ -76,6 +76,20 @@
       return retVal;
    }
 
+   let diceMod = 0;
+   $: diceMod = $document.typeComponent.getAttributeCheckMod(
+      'dice',
+      $document.system.skill[key].defaultAttribute,
+      key
+   );
+
+   let expertiseMod = 0;
+   $: expertiseMod = $document.typeComponent.getAttributeCheckMod(
+      'expertise',
+      $document.system.skill[key].defaultAttribute,
+      key
+   );
+
    $: trainingTotalValueTooltip = getTotalValueTooltip(
       $document.system.skill[key].training.baseValue,
       $document.system.skill[key].training.mod.equipment,
@@ -91,22 +105,14 @@
       $document.system.skill[key].expertise.mod.effect,
       $document.system.skill[key].expertise.mod.ability,
       $document.system.skill[key].expertise.mod.static,
-      $document.typeComponent.getAttributeCheckMod(
-         'expertise',
-         $document.system.skill[key].defaultAttribute,
-         key
-      )
+      expertiseMod
    );
 
    $: totalDiceTooltip = getTotalDiceTooltip(
       $document.system.attribute[$document.system.skill[key].defaultAttribute]
          .value,
       $document.system.skill[key].training.value,
-      $document.typeComponent.getAttributeCheckMod(
-         'dice',
-         $document.system.skill[key].defaultAttribute,
-         key
-      )
+      diceMod
    );
 </script>
 
@@ -164,11 +170,7 @@
                $document.system.attribute[
                   $document.system.skill[key].defaultAttribute
                ].value +
-               $document.typeComponent.getAttributeCheckMod(
-                  'dice',
-                  $document.system.skill[key].defaultAttribute,
-                  key
-               )}
+               diceMod}
          </div>
       </div>
    </div>
@@ -260,14 +262,11 @@
          >
             <ModTag
                currentValue={$document.system.skill[key].expertise.value +
-                  $document.typeComponent.getAttributeCheckMod(
-                     'expertise',
-                     $document.system.skill[key].defaultAttribute,
-                     key
-                  )}
+                  expertiseMod}
                baseValue={$document.system.skill[key].expertise.baseValue +
                   $document.system.skill[key].expertise.mod.ability +
-                  $document.system.skill[key].expertise.mod.equipment}
+                  $document.system.skill[key].expertise.mod.equipment +
+                  expertiseMod}
             />
          </div>
       </div>
