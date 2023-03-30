@@ -823,8 +823,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       }
 
       // Initialize check mods
-      options.diceMod = options.diceMod ?? this.getAttributeCheckMod('dice', options.attribute);
-      options.expertiseMod = options.expertiseMod ?? this.getAttributeCheckMod('expertise', options.attribute);
+      options.diceMod = options.diceMod ?? this.getAttributeCheckMod('dice', options.attribute, options.skill);
+      options.expertiseMod = options.expertiseMod ?? this.getAttributeCheckMod('expertise', options.attribute, options.skill);
 
       return new TitanAttributeCheck(options);
    }

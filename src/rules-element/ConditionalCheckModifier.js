@@ -368,7 +368,7 @@ export function getItemCheckMod(modifierType, item, check) {
    return retVal;
 }
 
-export function getAttributeCheckMod(modifierType, attribute) {
+export function getAttributeCheckMod(modifierType, attribute, skill) {
    // Contaminated creatures have -1 to all dice rolls
    let retVal = 0;
 
@@ -382,6 +382,7 @@ export function getAttributeCheckMod(modifierType, attribute) {
 
          // Attribute
          retVal += getCheckMods(anyCheckMods, 'attribute', attribute);
+         retVal += getCheckMods(anyCheckMods, 'skill', skill);
 
          // Get any mods
          if (anyCheckMods.any) {

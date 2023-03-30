@@ -1,59 +1,76 @@
 <script>
-   import { getContext } from "svelte";
-   import { localize } from "~/helpers/Utility.js";
-   import tooltip from "~/helpers/svelte-actions/Tooltip.js";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import DocumentIntegerInput from "~/documents/components/input/DocumentIntegerInput.svelte";
-   import DocumentAttributeSelect from "~/documents/components/select/DocumentAttributeSelect.svelte";
-   import ModTag from "~/helpers/svelte-components/tag/ModTag.svelte";
+   import { getContext } from 'svelte';
+   import { localize } from '~/helpers/Utility.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import DocumentIntegerInput from '~/documents/components/input/DocumentIntegerInput.svelte';
+   import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
+   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
    // Key for the skill
    export let key;
 
    // Setup context variables
-   const document = getContext("DocumentStore");
+   const document = getContext('DocumentStore');
 
    // Calculate the tooltip for the total value of training or expertise
-   function getTotalValueTooltip(baseValue, equipment, effect, ability, staticMod) {
+   function getTotalValueTooltip(
+      baseValue,
+      equipment,
+      effect,
+      ability,
+      staticMod,
+      mod
+   ) {
       // Base label
-      let retVal = `<p>${localize("base")}: ${baseValue}</p>`;
+      let retVal = `<p>${localize('base')}: ${baseValue}</p>`;
 
       // Equipment
       if (equipment !== 0) {
-         retVal += `<p>${localize("equipment")}: ${equipment}</p>`;
+         retVal += `<p>${localize('equipment')}: ${equipment}</p>`;
       }
 
       // Abilities
       if (ability !== 0) {
-         retVal += `<p>${localize("abilities")}: ${ability}</p>`;
+         retVal += `<p>${localize('abilities')}: ${ability}</p>`;
       }
 
       // Effects
       if (effect !== 0) {
-         retVal += `<p>${localize("effects")}: ${effect}</p>`;
+         retVal += `<p>${localize('effects')}: ${effect}</p>`;
       }
 
       // Static mod
       if (staticMod !== 0) {
-         retVal += `<p>${localize("mod")}: ${staticMod}</p>`;
+         retVal += `<p>${localize('mod')}: ${staticMod}</p>`;
+      }
+
+      // Mod
+      if (mod !== 0) {
+         retVal += `<p>${localize('mod')}: ${mod}</p>`;
       }
 
       return retVal;
    }
 
    // Calculate the tooltip for the total value of training or expertise
-   function getTotalDiceTooltip(attribute, training) {
+   function getTotalDiceTooltip(attribute, training, mod) {
       // Base label
-      let retVal = `<p>${localize("skill.totalDice")}</p>`;
+      let retVal = `<p>${localize('skill.totalDice')}</p>`;
 
       // Training
       if (attribute !== 0) {
-         retVal += `<p>${localize("attribute")}: ${attribute}</p>`;
+         retVal += `<p>${localize('attribute')}: ${attribute}</p>`;
       }
 
       // Attribute
       if (training !== 0) {
-         retVal += `<p>${localize("training")}: ${training}</p>`;
+         retVal += `<p>${localize('training')}: ${training}</p>`;
+      }
+
+      // Mod
+      if (mod !== 0) {
+         retVal += `<p>${localize('mod')}: ${mod}</p>`;
       }
 
       return retVal;
@@ -64,7 +81,8 @@
       $document.system.skill[key].training.mod.equipment,
       $document.system.skill[key].training.mod.effect,
       $document.system.skill[key].training.mod.ability,
-      $document.system.skill[key].training.mod.static
+      $document.system.skill[key].training.mod.static,
+      0
    );
 
    $: expertiseTotalValueTooltip = getTotalValueTooltip(
@@ -72,12 +90,23 @@
       $document.system.skill[key].expertise.mod.equipment,
       $document.system.skill[key].expertise.mod.effect,
       $document.system.skill[key].expertise.mod.ability,
-      $document.system.skill[key].expertise.mod.static
+      $document.system.skill[key].expertise.mod.static,
+      $document.typeComponent.getAttributeCheckMod(
+         'expertise',
+         $document.system.skill[key].defaultAttribute,
+         key
+      )
    );
 
    $: totalDiceTooltip = getTotalDiceTooltip(
-      $document.system.attribute[$document.system.skill[key].defaultAttribute].value,
-      $document.system.skill[key].training.value
+      $document.system.attribute[$document.system.skill[key].defaultAttribute]
+         .value,
+      $document.system.skill[key].training.value,
+      $document.typeComponent.getAttributeCheckMod(
+         'dice',
+         $document.system.skill[key].defaultAttribute,
+         key
+      )
    );
 </script>
 
@@ -85,7 +114,13 @@
    <div class="column">
       <!--Roll Button-->
       <div class="button" use:tooltip={{ content: localize(`${key}.desc`) }}>
-         <EfxButton on:click={() => $document.typeComponent.rollAttributeCheck({ skill: key }, false)}>
+         <EfxButton
+            on:click={() =>
+               $document.typeComponent.rollAttributeCheck(
+                  { skill: key },
+                  false
+               )}
+         >
             <div class="button-content">
                <!--Icon-->
                <i class="fas fa-dice" />
@@ -101,13 +136,18 @@
       <!--Default Attribute-->
       <div class="attribute">
          <!--Label-->
-         <div class="label" use:tooltip={{ content: localize("defaultAttribute.desc") }}>
-            {localize("attribute")}
+         <div
+            class="label"
+            use:tooltip={{ content: localize('defaultAttribute.desc') }}
+         >
+            {localize('attribute')}
          </div>
 
          <!--Select-->
          <div class="select">
-            <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute} />
+            <DocumentAttributeSelect
+               bind:value={$document.system.skill[key].defaultAttribute}
+            />
          </div>
       </div>
    </div>
@@ -116,12 +156,19 @@
    <div class="column">
       <div class="tag" use:tooltip={{ content: totalDiceTooltip }}>
          <!--Label-->
-         <div class="label"><i class="fas fa-dice-d6" />{localize("dice")}</div>
+         <div class="label"><i class="fas fa-dice-d6" />{localize('dice')}</div>
 
          <!--Total Value-->
          <div class="value">
             {$document.system.skill[key].training.value +
-               $document.system.attribute[$document.system.skill[key].defaultAttribute].value}
+               $document.system.attribute[
+                  $document.system.skill[key].defaultAttribute
+               ].value +
+               $document.typeComponent.getAttributeCheckMod(
+                  'dice',
+                  $document.system.skill[key].defaultAttribute,
+                  key
+               )}
          </div>
       </div>
    </div>
@@ -131,30 +178,40 @@
       <!--Training row-->
       <div class="row">
          <!--Label-->
-         <div class="label" use:tooltip={{ content: localize("training.desc") }}>
+         <div
+            class="label"
+            use:tooltip={{ content: localize('training.desc') }}
+         >
             <!--Icon-->
             <i class="fas fa-graduation-cap" />
 
             <!--Inner Label-->
             <div class="inner-label">
-               {localize("training")}
+               {localize('training')}
             </div>
          </div>
 
          <!--Base Value-->
          <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue} />
+            <DocumentIntegerInput
+               bind:value={$document.system.skill[key].training.baseValue}
+            />
          </div>
 
          <!--Static Mod-->
          <div class="symbol">+</div>
          <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.skill[key].training.mod.static} />
+            <DocumentIntegerInput
+               bind:value={$document.system.skill[key].training.mod.static}
+            />
          </div>
 
          <!--Total Value-->
          <div class="symbol">=</div>
-         <div class="value" use:tooltip={{ content: trainingTotalValueTooltip }}>
+         <div
+            class="value"
+            use:tooltip={{ content: trainingTotalValueTooltip }}
+         >
             <ModTag
                currentValue={$document.system.skill[key].training.value}
                baseValue={$document.system.skill[key].training.baseValue +
@@ -167,32 +224,47 @@
       <!--Expertise row-->
       <div class="row">
          <!--Label-->
-         <div class="label" use:tooltip={{ content: localize("expertise.desc") }}>
+         <div
+            class="label"
+            use:tooltip={{ content: localize('expertise.desc') }}
+         >
             <!--Icon-->
             <i class="fas fa-dumbbell" />
 
             <!--Inner Label-->
             <div class="inner-label">
-               {localize("expertise")}
+               {localize('expertise')}
             </div>
          </div>
 
          <!--Base Value-->
          <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.baseValue} />
+            <DocumentIntegerInput
+               bind:value={$document.system.skill[key].expertise.baseValue}
+            />
          </div>
 
          <!--Static Mod-->
          <div class="symbol">+</div>
          <div class="input">
-            <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.mod.static} />
+            <DocumentIntegerInput
+               bind:value={$document.system.skill[key].expertise.mod.static}
+            />
          </div>
 
          <!--Total Value-->
          <div class="symbol">=</div>
-         <div class="value" use:tooltip={{ content: expertiseTotalValueTooltip }}>
+         <div
+            class="value"
+            use:tooltip={{ content: expertiseTotalValueTooltip }}
+         >
             <ModTag
-               currentValue={$document.system.skill[key].expertise.value}
+               currentValue={$document.system.skill[key].expertise.value +
+                  $document.typeComponent.getAttributeCheckMod(
+                     'expertise',
+                     $document.system.skill[key].defaultAttribute,
+                     key
+                  )}
                baseValue={$document.system.skill[key].expertise.baseValue +
                   $document.system.skill[key].expertise.mod.ability +
                   $document.system.skill[key].expertise.mod.equipment}
@@ -203,7 +275,7 @@
 </div>
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .skill {
       @include flex-row;
