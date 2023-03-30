@@ -42,6 +42,7 @@ export default class TitanAttackCheck extends TitanCheck {
       // Initialize base parameters
       const parameters = {
          attack: attackData,
+         attribute: options.attribute,
          attackNotes: itemRollData.attackNotes,
          complexity: 1,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
@@ -56,28 +57,17 @@ export default class TitanAttackCheck extends TitanCheck {
          itemTrait: itemRollData.customTrait,
          maximizeSuccesses: options?.maximizeSuccesses ?? false,
          multiAttack: options.multiAttack ?? itemRollData.multiAttack,
+         skill: options.skill,
          trainingMod: options.trainingMod ?? 0,
          type: options.type ?? attackData.type,
       };
 
       // Determine the skill training and expertise
-      if (!options.skill || options.skill === 'none') {
-         parameters.skill = attackData.skill;
-      }
-      else {
-         parameters.skill = options.skill;
-      }
       const skillData = actorRollData.skill[parameters.skill];
       parameters.skillTrainingDice = skillData.training.value;
       parameters.skillExpertise = skillData.expertise.value;
 
       // Determine the attribute dice
-      if (!options.attribute && options.attribute !== 'default') {
-         parameters.attribute = attackData.attribute;
-      }
-      else {
-         parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
-      }
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
 
       // Determine the target defense

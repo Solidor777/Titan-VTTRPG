@@ -54,12 +54,7 @@ export default class TitanAttributeCheck extends TitanCheck {
       }
 
       // Determine the attribute die
-      if (options.attribute && options.attribute !== 'default') {
-         parameters.attribute = options.attribute;
-      }
-      else {
-         parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
-      }
+      parameters.attribute = options.attribute;
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
       parameters.totalDice += parameters.attributeDice;
 

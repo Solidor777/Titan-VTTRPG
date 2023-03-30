@@ -51,6 +51,7 @@ export default class TitanItemCheck extends TitanCheck {
 
       // Initializ base parameters
       const parameters = {
+         attribute: options.attribute,
          checkLabel: itemCheckData.label,
          complexity: options.complexity ? Math.max(0, options.complexity) : Math.max(itemCheckData.complexity, 0),
          diceMod: options.diceMod ?? 0,
@@ -73,9 +74,8 @@ export default class TitanItemCheck extends TitanCheck {
       parameters.totalDice = parameters.diceMod;
 
       // Determine the skill training and expertise
-      const skill = options.skill ?? itemCheckData.skill;
-      if (skill && skill !== 'none') {
-         parameters.skill = skill;
+      if (options.skill !== 'none') {
+         parameters.skill = options.skill;
 
          const skillData = actorRollData.skill[parameters.skill];
          parameters.skillTrainingDice = skillData.training.value;
@@ -98,13 +98,6 @@ export default class TitanItemCheck extends TitanCheck {
       }
 
       // Determine the attribute die
-      const attribute = options.attribute ?? itemCheckData.attribute;
-      if (attribute && attribute !== 'default') {
-         parameters.attribute = attribute;
-      }
-      else {
-         parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
-      }
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
       parameters.totalDice += parameters.attributeDice;
 

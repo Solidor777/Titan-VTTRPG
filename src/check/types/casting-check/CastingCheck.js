@@ -33,6 +33,7 @@ export default class TitanCastingCheck extends TitanCheck {
 
       const parameters = {
          aspect: itemRollData.aspect,
+         attribute: options.attribute,
          complexity: options.complexity ?? itemRollData.castingCheck.complexity,
          customAspect: itemRollData.customAspect,
          damageMod: options.damageMod ?? actorRollData.mod.damage.value,
@@ -49,28 +50,17 @@ export default class TitanCastingCheck extends TitanCheck {
          itemName: itemRollData.name,
          itemTrait: itemRollData.customTrait,
          maximizeSuccesses: options.maximizeSuccesses ?? false,
+         skill: options.skill,
          tradition: itemRollData.tradition,
          trainingMod: options.trainingMod ?? 0,
       };
 
       // Determine the skill training and expertise
-      if (!options.skill || options.skill === 'none') {
-         parameters.skill = itemRollData.castingCheck.skill;
-      }
-      else {
-         parameters.skill = options.skill;
-      }
       const skillData = actorRollData.skill[parameters.skill];
       parameters.skillTrainingDice = skillData.training.value;
       parameters.skillExpertise = skillData.expertise.value;
 
       // Determine the attribute die
-      if (!options.attribute || options.attribute === 'default') {
-         parameters.attribute = itemRollData.castingCheck.attribute;
-      }
-      else {
-         parameters.attribute = options.attribute;
-      }
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
 
 

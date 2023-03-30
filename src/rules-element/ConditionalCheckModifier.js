@@ -126,7 +126,7 @@ function getCheckModsForReducedKeys(conditionalCheckModifiers, selector, keys, r
 
 export function getAttackCheckMod(modifierType, item, attack, multiAttack) {
    // Contaminated creatures have -1 to all dice rolls
-   let retVal = modifierType === 'dice' && this.parent.system.condition.contaminated ? -1 : 0;
+   let retVal = 0;
 
    // Check for conditional modifiers
    if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
@@ -135,6 +135,9 @@ export function getAttackCheckMod(modifierType, item, attack, multiAttack) {
       // Any check mods
       const anyCheckMods = checkMods.any;
       if (anyCheckMods) {
+
+         // Attribute
+         retVal += getCheckMods(anyCheckMods, 'attribute', attack.attribute);
 
          // Custom Traits
          const customTraits = [];
@@ -222,7 +225,7 @@ export function getAttackCheckMod(modifierType, item, attack, multiAttack) {
 
 export function getCastingCheckMod(modifierType, item) {
    // Contaminated creatures have -1 to all dice rolls
-   let retVal = modifierType === 'dice' && this.parent.system.condition.contaminated ? -1 : 0;
+   let retVal = 0;
 
    // Check for conditional modifiers
    if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
@@ -231,6 +234,9 @@ export function getCastingCheckMod(modifierType, item) {
       // Any check mods
       const anyCheckMods = checkMods.any;
       if (anyCheckMods) {
+
+         // Attribute
+         retVal += getCheckMods(anyCheckMods, 'attribute', item.system.castingCheck.attribute);
 
          // Custom traits
          const customTraits = [];
@@ -293,7 +299,7 @@ export function getCastingCheckMod(modifierType, item) {
 
 export function getItemCheckMod(modifierType, item, check) {
    // Contaminated creatures have -1 to all dice rolls
-   let retVal = modifierType === 'dice' && this.parent.system.condition.contaminated ? -1 : 0;
+   let retVal = 0;
 
    // Check for conditional modifiers
    if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
@@ -302,6 +308,9 @@ export function getItemCheckMod(modifierType, item, check) {
       // Any check mods
       const anyCheckMods = checkMods.any;
       if (anyCheckMods) {
+
+         // Attribute
+         retVal += getCheckMods(anyCheckMods, 'attribute', check.attribute);
 
          // Custom traits
          const customTraits = [];
@@ -352,6 +361,31 @@ export function getItemCheckMod(modifierType, item, check) {
          // Get any mods
          if (itemCheckMods.any) {
             retVal += itemCheckMods.any;
+         }
+      }
+   }
+
+   return retVal;
+}
+
+export function getAttributeCheckMod(modifierType, attribute) {
+   // Contaminated creatures have -1 to all dice rolls
+   let retVal = 0;
+
+   // Check for conditional modifiers
+   if (this.conditionalCheckModifier && this.conditionalCheckModifier[modifierType] && this.conditionalCheckModifier[modifierType]) {
+      const checkMods = this.conditionalCheckModifier[modifierType];
+
+      // Any check mods
+      const anyCheckMods = checkMods.any;
+      if (anyCheckMods) {
+
+         // Attribute
+         retVal += getCheckMods(anyCheckMods, 'attribute', attribute);
+
+         // Get any mods
+         if (anyCheckMods.any) {
+            retVal += anyCheckMods.any;
          }
       }
    }

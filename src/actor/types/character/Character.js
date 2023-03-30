@@ -44,7 +44,8 @@ import {
    applyConditionalCheckModifierElements,
    getAttackCheckMod,
    getCastingCheckMod,
-   getItemCheckMod
+   getItemCheckMod,
+   getAttributeCheckMod
 } from '~/rules-element/ConditionalCheckModifier';
 
 export default class TitanCharacterComponent extends TitanTypeComponent {
@@ -67,6 +68,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
    getAttackCheckMod = getAttackCheckMod.bind(this);
    getCastingCheckMod = getCastingCheckMod.bind(this);
    getItemCheckMod = getItemCheckMod.bind(this);
+   getAttributeCheckMod = getAttributeCheckMod.bind(this);
 
    setInitialData(initialData) {
       // Prototype token
@@ -426,8 +428,8 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   systemData.condition.contaminated = true;
 
                   // Decrease all Skills and Resistances by 1
-                  for (const skill of Object.values(systemData.skill)) {
-                     skill.training.mod.effect -= 1;
+                  for (const attribute of Object.values(systemData.attribute)) {
+                     attribute.mod.effect -= 1;
                   }
                   for (const resistance of Object.values(systemData.resistance)) {
                      resistance.mod.effect -= 1;
@@ -809,12 +811,21 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the actor check data
       options.actorRollData = this.parent.getRollData();
 
-      // Add dice penalty if the actor is contaminated
-      if (this.parent.system.condition.contaminated) {
-         options.diceMod = options.diceMod ?? -1;
+      // Ensure the attribute is set
+      if ((!options.attribute || options.attribute === 'default')) {
+         if (options.skill && options.skill !== 'none') {
+            options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+         }
+         else {
+            console.error('TITAN | Attribute check failed. No attribute or skill provided');
+            return;
+         }
       }
 
-      // Otherwise, do a skill check
+      // Initialize check mods
+      options.diceMod = options.diceMod ?? this.getAttributeCheckMod('dice', options.attribute);
+      options.expertiseMod = options.expertiseMod ?? this.getAttributeCheckMod('expertise', options.attribute);
+
       return new TitanAttributeCheck(options);
    }
 
@@ -822,11 +833,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Initialize default attribute for the skill if no attribute was specified
       if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
          options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
-      }
-
-      // Add dice penalty if the actor is contaminated
-      if (this.parent.system.condition.contaminated) {
-         options.diceMod = options.diceMod ?? -1;
       }
 
       const dialog = new AttributeCheckDialog(this.parent, options);
@@ -866,11 +872,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Get the actor check data
       options.actorRollData = this.parent.getRollData();
 
-      // Add dice penalty if the actor is contaminated
-      if (this.parent.system.condition.contaminated) {
-         options.diceMod = options.diceMod ?? -1;
-      }
-
       // Get the check
       return new TitanResistanceCheck(options);
    }
@@ -895,10 +896,6 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          else {
             // Otherwise open a check dialog
-            // Add dice penalty if the actor is contaminated
-            if (this.parent.system.condition.contaminated) {
-               options.diceMod = options.diceMod ?? -1;
-            }
             const dialog = new ResistanceCheckDialog(this.parent, options);
             dialog.render(true);
          }
@@ -927,8 +924,20 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          return;
       }
 
-      // Initialize check options
+      // Set the attack
       options.attack = attack;
+
+      // Set the attribute
+      if (!options.attribute || options.attribute === 'default') {
+         options.attribute = attack.attribute;
+      }
+
+      // Set the skill
+      if (!options.skill || options.skill === 'default') {
+         options.skill = attack.skill;
+      }
+
+      // Initialize check mods
       options.damageMod = options.damageMod ?? this.getAttackCheckMod('damage', weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
       options.diceMod = options.diceMod ?? this.getAttackCheckMod('dice', weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
       options.expertiseMod = options.expertiseMod ?? this.getAttackCheckMod('expertise', weapon, attack, options.multiAttack ?? weapon.system.multiAttack);
@@ -973,6 +982,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          return;
       }
 
+      // Set the attribute
+      if ((options.skill && options.skill !== 'none') && (!options.attribute || options.attribute === 'default')) {
+         options.attribute = this.parent.system.skill[options.skill].defaultAttribute;
+      }
+
       // Create the dialog
       const dialog = new AttackCheckDialog(this.parent, weapon, attack, options);
       return dialog.render(true);
@@ -1014,6 +1028,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          console.trace();
 
          return;
+      }
+
+      // Set the attribute
+      if (!options.attribute || options.attribute === 'default') {
+         options.attribute = spell.system.castingCheck.attribute;
+      }
+
+      // Set the skill
+      if (!options.skill || options.skill === 'default') {
+         options.skill = spell.system.castingCheck.skill;
       }
 
       // Initialize check options
@@ -1093,6 +1117,16 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          console.trace();
 
          return;
+      }
+
+      // Set the attribute
+      if (!options.attribute || options.attribute === 'default') {
+         options.attribute = check.attribute;
+      }
+
+      // Set the skill
+      if (!options.skill || options.skill === 'default') {
+         options.skill = check.skill;
       }
 
       options.itemRollData = item.getRollData();

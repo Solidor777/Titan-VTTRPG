@@ -113,7 +113,7 @@
    "LOCAL.confirmDeleteItem.label": "Are you sure you want to delete this item from this actor?",
    "LOCAL.confirmRegenerateUUID.label": "Are you sure you want to regenerate this documents's Unique ID? This will break any macros that were created for this document using the Unique ID Method.",
    "LOCAL.confirmRemoveExpiredEffects.label": "Are you sure you want to remove all expired effects from this actor?",
-   "LOCAL.contaminated.desc.label": "A <strong>Contaminated</strong> creature rolls 1 less die for all Checks.",
+   "LOCAL.contaminated.desc.label": "A <strong>Contaminated</strong> creature has a -1 penalty to all <strong>Attributes</strong> and <strong>Resistances</strong>.",
    "LOCAL.contaminated.label": "Contaminated",
    "LOCAL.cost.label": "Cost",
    "LOCAL.createMacro.label": "Create Macro",

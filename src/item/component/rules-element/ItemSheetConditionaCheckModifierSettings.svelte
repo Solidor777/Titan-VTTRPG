@@ -83,6 +83,14 @@
             value: 'any',
          },
          {
+            label: localize('attribute'),
+            value: 'attribute',
+         },
+         {
+            label: localize('skill'),
+            value: 'skill',
+         },
+         {
             label: localize('customTrait'),
             value: 'customTrait',
          },
@@ -180,6 +188,7 @@
       if (
          element &&
          element.selector !== 'customTrait' &&
+         element.selector !== 'attribute' &&
          !(element.checkType !== 'any' && element.selector === 'skill')
       ) {
          element.selector = 'any';

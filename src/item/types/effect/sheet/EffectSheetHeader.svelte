@@ -70,11 +70,6 @@
          {#if $document.system.duration.type === 'custom'}
             <!--Custom-->
             <div class="stat text">
-               <!-- Label-->
-               <div class="label">
-                  {localize('custom')}
-               </div>
-
                <!--Input-->
                <div class="input text">
                   <DocumentTextInput
