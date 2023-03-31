@@ -524,7 +524,7 @@
          ],
          "rulesElement": [],
          "duration": {
-            "type": "turnEnd",
+            "type": "turnStart",
             "remaining": 1,
             "initiative": 1,
             "custom": ""
