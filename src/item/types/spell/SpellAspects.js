@@ -32,10 +32,10 @@ export default Object.freeze({
          ],
          initialValueCosts: {
             self: 0,
-            touch: 1,
-            10: 2,
-            30: 3,
-            50: 4
+            touch: 0,
+            10: 1,
+            30: 2,
+            50: 3
          }
       }
    },

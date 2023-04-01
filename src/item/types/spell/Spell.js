@@ -94,7 +94,7 @@ export default class TitanSpell extends TitanTypeComponent {
       let suggestedDifficulty = totalAspectCost;
       let suggestedComplexity = 1;
       if (suggestedDifficulty > 6) {
-         suggestedComplexity = totalAspectCost - 6;
+         suggestedComplexity = totalAspectCost - 5;
          suggestedDifficulty = 6;
       }
       else {
