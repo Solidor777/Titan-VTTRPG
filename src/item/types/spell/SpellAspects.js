@@ -6,8 +6,8 @@ export default Object.freeze({
          cost: 0,
          enabled: true
       },
+      sortOrder: 0,
       settings: {
-         sortOrder: 0,
          initialValueOptions: [
             {
                value: 'self',
@@ -46,8 +46,8 @@ export default Object.freeze({
          cost: 3,
          enabled: true
       },
+      sortOrder: 1,
       settings: {
-         sortOrder: 1,
          initialValueOptions: [
             {
                value: 5,
@@ -59,10 +59,19 @@ export default Object.freeze({
             },
          ],
          initialValueCosts: {
-            5: 2,
+            5: 3,
             10: 5,
          }
       }
+   },
+   extraTargets: {
+      template: {
+         label: 'extraTargets',
+         scaling: true,
+         initialValue: 1,
+         cost: 1,
+      },
+      sortOrder: 2,
    },
    duration: {
       template: {
@@ -73,8 +82,8 @@ export default Object.freeze({
          cost: 1,
          enabled: true
       },
+      sortOrder: 3,
       settings: {
-         sortOrder: 2,
          unitOptions: [
             {
                value: 'rounds',
@@ -102,8 +111,8 @@ export default Object.freeze({
          option: [],
          enabled: true
       },
+      sortOrder: 4,
       settings: {
-         sortOrder: 3,
          optionCost: 1,
          option: ['ignoreArmor']
       }
@@ -117,9 +126,7 @@ export default Object.freeze({
          isHealing: true,
          enabled: true
       },
-      settings: {
-         sortOrder: 4,
-      }
+      sortOrder: 5
    },
    decreaseMod: {
       template: {
@@ -131,8 +138,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false,
       },
+      sortOrder: 6,
       settings: {
-         sortOrder: 5,
          requireOption: true,
          option: [
             'armor',
@@ -151,8 +158,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 7,
       settings: {
-         sortOrder: 6,
          requireOption: true,
          option: [
             'armor',
@@ -172,8 +179,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 8,
       settings: {
-         sortOrder: 7,
          requireOption: true,
          option: [
             'awareness',
@@ -194,8 +201,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false,
       },
+      sortOrder: 9,
       settings: {
-         sortOrder: 8,
          requireOption: true,
          option: [
             'awareness',
@@ -217,8 +224,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 10,
       settings: {
-         sortOrder: 9,
          requireOption: true,
          option: [
             'reflexes',
@@ -237,8 +244,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 11,
       settings: {
-         sortOrder: 10,
          requireOption: true,
          option: [
             'reflexes',
@@ -258,8 +265,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 12,
       settings: {
-         sortOrder: 11,
          requireOption: true,
          option: [
             'body',
@@ -278,8 +285,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 13,
       settings: {
-         sortOrder: 12,
          requireOption: true,
          option: [
             'body',
@@ -299,8 +306,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 14,
       settings: {
-         sortOrder: 13,
          requireOption: true,
          option: [
             'arcana',
@@ -334,8 +341,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 15,
       settings: {
-         sortOrder: 14,
          requireOption: true,
          option: [
             'arcana',
@@ -370,8 +377,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 16,
       settings: {
-         sortOrder: 15,
          requireOption: true,
          option: [
             'stride',
@@ -391,8 +398,8 @@ export default Object.freeze({
          scaling: true,
          enabled: false
       },
+      sortOrder: 17,
       settings: {
-         sortOrder: 16,
          requireOption: true,
          option: [
             'stride',
@@ -411,8 +418,8 @@ export default Object.freeze({
          resistanceCheck: 'none',
          enabled: false
       },
+      sortOrder: 18,
       settings: {
-         sortOrder: 17,
          requireOption: true,
          option: [
             'blinded',
@@ -446,8 +453,8 @@ export default Object.freeze({
          option: [],
          enabled: false
       },
+      sortOrder: 19,
       settings: {
-         sortOrder: 18,
          requireOption: true,
          allOptionsCost: 5,
          option: [

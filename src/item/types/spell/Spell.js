@@ -24,7 +24,7 @@ export default class TitanSpell extends TitanTypeComponent {
       if (this.parent.isOwner) {
          let aspects = this.parent.system.aspect;
          aspects.push(aspect);
-         aspects = aspects.sort((a, b) => SpellAspects[a.label].settings.sortOrder - SpellAspects[b.label].settings.sortOrder);
+         aspects = aspects.sort((a, b) => SpellAspects[a.label].sortOrder - SpellAspects[b.label].sortOrder);
 
          this.parent.update({
             system: {
@@ -38,63 +38,80 @@ export default class TitanSpell extends TitanTypeComponent {
 
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
-      let totalAspectCost = 1;
+      let totalSpellCost = 1;
 
-      aspects.forEach((aspect) => {
+      const aspectsToRemove = new Set();
+      for (let idx = 0; idx < aspects.length; idx++) {
          // Determine whether the aspect is enabled
-         const settings = SpellAspects[aspect.label].settings;
-         const template = SpellAspects[aspect.label].template;
-         if (settings?.requireOption && aspect.option.length === 0) {
-            aspect.enabled = false;
-            aspect.cost = 0;
+         const aspect = aspects[idx];
+         const aspectSettings = SpellAspects[aspect.label];
+         if (aspectSettings) {
+            const settings = aspectSettings.settings;
+            const template = aspectSettings.template;
+            if (settings?.requireOption && aspect.option.length === 0) {
+               aspect.enabled = false;
+               aspect.cost = 0;
+            }
+            else {
+               aspect.enabled = true;
+
+               // Calculate the cost
+               let cost = template.cost;
+
+               // Initia value cost
+               if (settings?.initialValueCosts) {
+                  cost = settings.initialValueCosts[aspect.initialValue];
+               }
+
+               // Unit Cost
+               if (settings?.unitCosts) {
+                  cost = settings.unitCosts[aspect.unit];
+               }
+
+               // Add option cost
+               if (settings?.optionCost) {
+                  cost += settings.optionCost * aspect.option.length;
+               }
+               else if (settings?.optionCosts) {
+                  aspect.option.forEach((option) => {
+                     cost += settings.optionCosts[option];
+                  });
+               }
+
+               // Halve the cost if the aspect has a resistance check
+               if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
+                  cost = Math.ceil(cost / 2);
+               }
+
+               aspect.cost = cost;
+               totalSpellCost += cost;
+            }
          }
+
          else {
-            aspect.enabled = true;
-
-            // Calculate the cost
-            let cost = template.cost;
-
-            // Initia value cost
-            if (settings?.initialValueCosts) {
-               cost = settings.initialValueCosts[aspect.initialValue];
-            }
-
-            // Unit Cost
-            if (settings?.unitCosts) {
-               cost = settings.unitCosts[aspect.unit];
-            }
-
-            // Add option cost
-            if (settings?.optionCost) {
-               cost += settings.optionCost * aspect.option.length;
-            }
-            else if (settings?.optionCosts) {
-               aspect.option.forEach((option) => {
-                  cost += settings.optionCosts[option];
-               });
-            }
-
-            // Halve the cost if the aspect has a resistance check
-            if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
-               cost = Math.ceil(cost / 2);
-            }
-
-            aspect.cost = cost;
-            totalAspectCost += cost;
+            aspectsToRemove.add(idx);
          }
-      });
+      }
+
+      // Remove deprecated aspects if appropriate
+      if (aspectsToRemove.size > 0) {
+         const filteredAspects = aspects.filter((aspect, idx) => {
+            return !aspectsToRemove.contains(idx);
+         });
+         this.parent.system.aspect = filteredAspects;
+      }
 
       // Calculate total cost
       this.parent.system.customAspect.forEach((aspect) => {
-         totalAspectCost += aspect.cost;
+         totalSpellCost += aspect.cost;
       });
-      this.totalAspectCost = totalAspectCost;
+      this.totalSpellCost = totalSpellCost;
 
       // Calculate suggested complexity and difficulty
-      let suggestedDifficulty = totalAspectCost;
+      let suggestedDifficulty = totalSpellCost;
       let suggestedComplexity = 1;
       if (suggestedDifficulty > 6) {
-         suggestedComplexity = totalAspectCost - 5;
+         suggestedComplexity = totalSpellCost - 5;
          suggestedDifficulty = 6;
       }
       else {
