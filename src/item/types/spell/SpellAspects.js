@@ -461,17 +461,7 @@ export default Object.freeze({
             'stunned',
             'unconscious'
          ],
-         optionCosts: {
-            blinded: 2,
-            contaminated: 4,
-            deafened: 1,
-            frightened: 3,
-            incapacitated: 6,
-            prone: 2,
-            restrained: 5,
-            stunned: 4,
-            unconscious: 7
-         },
+         optionCost: 2,
       }
    },
 });
