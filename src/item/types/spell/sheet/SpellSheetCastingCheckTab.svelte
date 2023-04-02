@@ -110,12 +110,12 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize('totalSpellCost')}:
+               {localize('totaAspectCost')}:
             </div>
 
             <!--Value-->
             <div class="value">
-               {$document.spell.totalSpellCost}
+               {$document.spell.totaAspectCost}
             </div>
          </div>
       </div>

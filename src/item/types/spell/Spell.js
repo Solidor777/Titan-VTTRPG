@@ -38,7 +38,7 @@ export default class TitanSpell extends TitanTypeComponent {
 
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
-      let totalSpellCost = 1;
+      let totaAspectCost = 1;
 
       const aspectsToRemove = new Set();
       for (let idx = 0; idx < aspects.length; idx++) {
@@ -84,7 +84,7 @@ export default class TitanSpell extends TitanTypeComponent {
                }
 
                aspect.cost = cost;
-               totalSpellCost += cost;
+               totaAspectCost += cost;
             }
          }
 
@@ -103,15 +103,15 @@ export default class TitanSpell extends TitanTypeComponent {
 
       // Calculate total cost
       this.parent.system.customAspect.forEach((aspect) => {
-         totalSpellCost += aspect.cost;
+         totaAspectCost += aspect.cost;
       });
-      this.totalSpellCost = totalSpellCost;
+      this.totaAspectCost = totaAspectCost;
 
       // Calculate suggested complexity and difficulty
-      let suggestedDifficulty = totalSpellCost;
+      let suggestedDifficulty = totaAspectCost;
       let suggestedComplexity = 1;
       if (suggestedDifficulty > 6) {
-         suggestedComplexity = totalSpellCost - 5;
+         suggestedComplexity = totaAspectCost - 5;
          suggestedDifficulty = 6;
       }
       else {
