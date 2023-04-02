@@ -38,7 +38,7 @@ export default class TitanSpell extends TitanTypeComponent {
 
    prepareDerivedData() {
       const aspects = this.parent.system.aspect;
-      let totaAspectCost = 1;
+      let totaAspectCost = 0;
 
       const aspectsToRemove = new Set();
       for (let idx = 0; idx < aspects.length; idx++) {
