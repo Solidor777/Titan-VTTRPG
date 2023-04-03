@@ -30,7 +30,9 @@
 
       <!--Initial Value-->
       <div class="initial-value">
-         {aspect.initialValue}
+         {#if aspect.initialValue}
+            {aspect.initialValue}
+         {/if}
          {#if aspect.scaling}
             {#if aspect.cost > 1}
                {`+ (${aspect.cost} / ${localize('extraSuccesses.short')})`}

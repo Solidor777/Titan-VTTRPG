@@ -96,7 +96,7 @@ export default class TitanSpell extends TitanTypeComponent {
       // Remove deprecated aspects if appropriate
       if (aspectsToRemove.size > 0) {
          const filteredAspects = aspects.filter((aspect, idx) => {
-            return !aspectsToRemove.contains(idx);
+            return !aspectsToRemove.has(idx);
          });
          this.parent.system.aspect = filteredAspects;
       }
