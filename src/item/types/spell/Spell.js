@@ -48,7 +48,7 @@ export default class TitanSpell extends TitanTypeComponent {
          if (aspectSettings) {
             const settings = aspectSettings.settings;
             const template = aspectSettings.template;
-            if (settings?.requireOption && aspect.option.length === 0) {
+            if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
                aspect.enabled = false;
                aspect.cost = 0;
             }
@@ -58,25 +58,34 @@ export default class TitanSpell extends TitanTypeComponent {
                // Calculate the cost
                let cost = template.cost;
 
-               // Initia value cost
-               if (settings?.initialValueCosts) {
-                  cost = settings.initialValueCosts[aspect.initialValue];
+               if (settings) {
+                  // Initia value cost
+                  if (settings.initialValueCosts) {
+                     cost = settings.initialValueCosts[aspect.initialValue];
+                  }
+
+                  // Unit Cost
+                  if (settings.unitCosts) {
+                     cost = settings.unitCosts[aspect.unit];
+                  }
+
+                  // Add option cost
+                  // All options
+                  if (aspect.allOptions && settings.allOptionsCost) {
+                     cost += settings.allOptionsCost;
+                  }
+
+                  // Individual option cost
+                  else if (settings.optionCost) {
+                     cost += settings.optionCost * aspect.option.length;
+                  }
+                  else if (settings.optionCosts) {
+                     aspect.option.forEach((option) => {
+                        cost += settings.optionCosts[option];
+                     });
+                  }
                }
 
-               // Unit Cost
-               if (settings?.unitCosts) {
-                  cost = settings.unitCosts[aspect.unit];
-               }
-
-               // Add option cost
-               if (settings?.optionCost) {
-                  cost += settings.optionCost * aspect.option.length;
-               }
-               else if (settings?.optionCosts) {
-                  aspect.option.forEach((option) => {
-                     cost += settings.optionCosts[option];
-                  });
-               }
 
                // Halve the cost if the aspect has a resistance check
                if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
