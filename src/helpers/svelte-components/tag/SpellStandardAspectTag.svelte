@@ -22,7 +22,7 @@
          <i class={labelIcons[aspect.label]} />
       {/if}
 
-      {localize(aspect.units ?? aspect.label)}
+      {localize(aspect.unit ?? aspect.label)}
    </div>
 
    <!--Initial value-->

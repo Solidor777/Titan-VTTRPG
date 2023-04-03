@@ -14,7 +14,7 @@ export default function calculateCastingCheckResults(inResults, parameters) {
       results.scalingAspect = [];
       results.aspect = foundry.utils.deepClone(parameters.aspect);
       results.aspect.forEach((aspect) => {
-         aspect.label = localize(aspect.units ?? aspect.label);
+         aspect.label = localize(aspect.unit ?? aspect.label);
       });
       results.aspect = results.aspect.concat(foundry.utils.deepClone(parameters.customAspect));
 
