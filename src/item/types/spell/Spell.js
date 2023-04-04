@@ -89,7 +89,7 @@ export default class TitanSpell extends TitanTypeComponent {
 
                // Halve the cost if the aspect has a resistance check
                if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
-                  cost = Math.ceil(cost / 2);
+                  cost = Math.max(Math.floor(cost / 2), 1);
                }
 
                aspect.cost = cost;
