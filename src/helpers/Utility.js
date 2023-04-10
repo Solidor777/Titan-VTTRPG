@@ -47,18 +47,18 @@ export function isHTMLBlank(html) {
 
 export function getCombatTargets() {
    // Get the targets
-   let userTargets = Array.from(game.user.targets);
+   let userTargets = Array.from(game.user.targets).filter((target) => target.actor);
 
    // If not targets, get controlled tokens
    if (userTargets.length < 1 && game.user.isGM) {
-      userTargets = Array.from(canvas.tokens.controlled);
+      userTargets = Array.from(canvas.tokens.controlled).filter((target) => target.actor);
    }
 
    return userTargets.map((target) => target.actor);
 }
 
 export function getControlledTokens() {
-   return Array.from(canvas.tokens.controlled);
+   return Array.from(canvas.tokens.controlled).filter((token) => token.actor);
 }
 
 export function isGM() {
