@@ -7,7 +7,7 @@ export function getConditionalRatingModifierTemplate(uuid, type) {
       operation: 'conditionalRatingModifier',
       rating: 'accuracy',
       selector: 'attackTrait',
-      key: '',
+      key: 'blast',
       value: 1,
       uuid: uuid ?? uuidv4(),
       type: type ?? 'effect'

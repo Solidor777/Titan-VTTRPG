@@ -71,8 +71,8 @@ export const ATTACK_TRAITS = [
    },
    {
       name: 'splash',
-      type: 'number',
-      value: 0,
+      type: 'boolean',
+      value: false,
    },
    {
       name: 'twoHanded',

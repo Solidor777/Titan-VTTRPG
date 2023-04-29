@@ -53,7 +53,7 @@
                   {aspect.initialValue}
                {/if}
                {#if aspect.cost > 1}
-                  {`+ (${aspect.cost} / ${localize('extraSuccesses.short')})`}
+                  {`+ (${localize('extraSuccesses.short')} / ${aspect.cost})`}
                {:else}
                   {`+ ${localize('extraSuccesses.short')}`}
                {/if}

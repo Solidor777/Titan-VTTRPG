@@ -40,7 +40,7 @@
    }
 </script>
 
-<div class="add-custom-trait-dialog">
+<div class="custom-trait-dialog">
    <!--Name-->
    <div class="name">
       <!--Label-->
@@ -96,28 +96,23 @@
 <style lang="scss">
    @import '../../../../Styles/Mixins.scss';
 
-   .add-custom-trait-dialog {
-      @include flex-column;
-      @include flex-group-top;
+   .custom-trait-dialog {
       @include font-size-normal;
+      @include flex-column;
       width: 100%;
-      height: 100%;
+      height: 15.5rem;
 
       .name {
          @include flex-row;
          @include flex-group-left;
-         width: 100%;
 
          .label {
             @include flex-row;
-            @include flex-group-left;
-            height: 100%;
             font-weight: bold;
          }
 
          .input {
             @include flex-row;
-            @include flex-group-left;
             height: 100%;
             width: 100%;
             margin-left: 0.25rem;
@@ -154,7 +149,6 @@
 
          .button {
             @include flex-row;
-            @include flex-group-center;
             width: 100%;
             --button-border-radius: 10px;
             &:not(:first-child) {
