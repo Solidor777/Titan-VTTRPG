@@ -26,6 +26,27 @@
 
    $: attack = $document.system.attack[idx];
    $: isExpanded = $appState.isExpanded.attacks[idx];
+   async function updateAttackSkill() {
+      if (attack) {
+         if (attack.type === 'melee') {
+            if (attack.skill === 'rangedWeapons') {
+               attack.skill = 'meleeWeapons';
+               $document.update({
+                  system: {
+                     attack: $document.system.attack,
+                  },
+               });
+            }
+         } else if (attack.skill === 'meleeWeapons') {
+            attack.skill = 'rangedWeapons';
+            $document.update({
+               system: {
+                  attack: $document.system.attack,
+               },
+            });
+         }
+      }
+   }
 </script>
 
 {#if attack}
@@ -81,7 +102,10 @@
 
                   <!--Input-->
                   <div class="input">
-                     <DocumentRangeTypeSelect bind:value={attack.type} />
+                     <DocumentRangeTypeSelect
+                        bind:value={attack.type}
+                        on:change={updateAttackSkill}
+                     />
                   </div>
                </div>
 
