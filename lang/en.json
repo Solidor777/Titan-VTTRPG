@@ -210,7 +210,7 @@
    "LOCAL.fly.desc.label": "<strong>Fly</strong> is the ability to move by soaring through the atmosphere",
    "LOCAL.fly.label": "Fly",
    "LOCAL.fly.value.label": "Total Fly Speed",
-   "LOCAL.frightened.desc.label": "While a <strong>Frightened</strong> creature can detect the source of their fear, they roll one less dice for all Checks.",
+   "LOCAL.frightened.desc.label": "A <strong>Frightened</strong> creature cannot willingly move closer to the source of their fear. While they can detect the source of their fear, they roll one less dice for all Checks.",
    "LOCAL.frightened.label": "Frightened",
    "LOCAL.grip.label": "Grip",
    "LOCAL.heal%xDamage.label": "Heal %x Damage",

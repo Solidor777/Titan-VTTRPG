@@ -1,40 +1,40 @@
 <svelte:options accessors={true} />
 
 <script>
-   import { localize } from "~/helpers/Utility.js";
-   import { getContext } from "svelte";
-   import EfxButton from "~/helpers/svelte-components/button/EfxButton.svelte";
-   import Select from "~/helpers/svelte-components/select/Select.svelte";
+   import { localize } from '~/helpers/Utility.js';
+   import { getContext } from 'svelte';
+   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    // Character Sheet
    export let actor = void 0;
 
-   const application = getContext("external").application;
+   const application = getContext('#external').application;
 
    const options = [
       {
-         value: "armor",
-         label: localize("armor"),
+         value: 'armor',
+         label: localize('armor'),
       },
       {
-         value: "commodity",
-         label: localize("commodity"),
+         value: 'commodity',
+         label: localize('commodity'),
       },
       {
-         value: "equipment",
-         label: localize("equipment"),
+         value: 'equipment',
+         label: localize('equipment'),
       },
       {
-         value: "shield",
-         label: localize("shield"),
+         value: 'shield',
+         label: localize('shield'),
       },
       {
-         value: "weapon",
-         label: localize("weapon"),
+         value: 'weapon',
+         label: localize('weapon'),
       },
    ];
 
-   let value = "armor";
+   let value = 'armor';
 </script>
 
 <div class="add-item-dialog">
@@ -56,7 +56,7 @@
             application.close();
          }}
       >
-         {localize("addNewItem")}
+         {localize('addNewItem')}
       </EfxButton>
    </div>
 
@@ -65,13 +65,13 @@
          on:click={() => {
             application.close();
          }}
-         >{localize("cancel")}
+         >{localize('cancel')}
       </EfxButton>
    </div>
 </div>
 
 <style lang="scss">
-   @import "../../../../../../Styles/Mixins.scss";
+   @import '../../../../../../Styles/Mixins.scss';
 
    .add-item-dialog {
       @include flex-column;
