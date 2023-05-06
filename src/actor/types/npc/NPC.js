@@ -4,7 +4,7 @@ import TitanCharacterComponent from '~/actor/types/character/Character';
 export default class TitanNPCComponent extends TitanCharacterComponent {
    setInitialData(initialData) {
       super.setInitialData(initialData);
-      prototypeToken.disposition = CONST.TOKEN_DISPOSITIONS.HOSTILE;
+      initialData.prototypeToken.disposition = CONST.TOKEN_DISPOSITIONS.HOSTILE;
       return;
    }
 
