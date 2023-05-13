@@ -19,7 +19,7 @@ export default class WeaponEditAttackTraitsDialog extends TJSDialog {
          },
          {
             width: 320,
-            height: 470,
+            height: 520,
             classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
          },
       );

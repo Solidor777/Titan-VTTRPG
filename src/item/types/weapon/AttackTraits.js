@@ -50,6 +50,11 @@ export const ATTACK_TRAITS = [
       value: false,
    },
    {
+      name: 'push',
+      type: 'boolean',
+      value: false,
+   },
+   {
       name: 'reload',
       type: 'boolean',
       value: false,
@@ -79,6 +84,11 @@ export const ATTACK_TRAITS = [
       type: 'boolean',
       value: false,
    },
+   {
+      name: 'vicious',
+      type: 'boolean',
+      value: false,
+   },
 ];
 
 export const ATTACK_TRAIT_DESCRIPTIONS = {
@@ -92,10 +102,12 @@ export const ATTACK_TRAIT_DESCRIPTIONS = {
    magical: 'attack.magical.desc',
    penetrating: 'attack.penetrating.desc',
    piercing: 'attack.piercing.desc',
+   push: 'attack.push.desc',
    reload: 'attack.reload.desc',
    rend: 'attack.rend.desc',
    restraining: 'attack.restraining.desc',
    slashing: 'attack.slashing.desc',
    splash: 'attack.splash.desc',
    twoHanded: 'attack.twoHanded.desc',
+   vicious: 'attack.vicious.desc',
 };

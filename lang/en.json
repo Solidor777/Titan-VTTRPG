@@ -56,6 +56,7 @@
    "LOCAL.attack.label": "Attack",
    "LOCAL.attack.loud.desc.label": "An attack with the <strong>Loud</strong> trait alerts everyone within hearing of your presence when it is used.",
    "LOCAL.attack.magical.desc.label": "<strong>Magical</strong> attacks are effective against magical defenses.",
+   "LOCAL.attack.push.desc.label": "If you hit and deal damage on an attack with the <strong>Push</strong> trait, you may move the target 1 space away from you, provided it is no more than 1 Size larger than you.",
    "LOCAL.attack.penetrating.desc.label": "<strong>Penetrating</strong> attacks ignore 1 point of <strong>Armor</strong>.",
    "LOCAL.attack.piercing.desc.label": "<strong>Piercing</strong> attacks use a sharp point or tip to stab and skewer enemies.",
    "LOCAL.attack.reload.desc.label": "Attacks with the <strong>Reload</strong> trait require an Action to be reloaded before they can be used again.",
@@ -64,6 +65,7 @@
    "LOCAL.attack.slashing.desc.label": "A <strong>Slashing</strong> attack is sharp and typically bladed, and is used to cut enemies open.",
    "LOCAL.attack.splash.desc.label": "Attacks with the <strong>Splash</strong> trait deal half-damage to adjacent creatures.",
    "LOCAL.attack.twoHanded.desc.label": "A <strong>Two-Handed</strong> attack requires at least two hands to use.",
+   "LOCAL.attack.vicious.desc.label": "When a <strong>Vicious</strong> attack inflicts <strong>Wounds</strong>, the number of <strong>Wounds</strong> inflicted increases by 1.",
    "LOCAL.attackCheck.label": "Attack Check",
    "LOCAL.attackNotes.label": "Attack Notes",
    "LOCAL.attackTrait.label": "Attack Trait",
@@ -322,6 +324,7 @@
    "LOCAL.persistentDamage.desc.label": "While affected by <strong>Persistent Damage</strong>, a combatant will take the designated amount of damage every turn.",
    "LOCAL.persistentDamage.label": "Persistent Damage",
    "LOCAL.piercing.label": "Piercing",
+   "LOCAL.push.label": "Push",
    "LOCAL.prone.desc.label": "<p>A <strong>Prone</strong> creature has their speed reduced by half, rounded up.</p><p>The creature's <strong>Melee</strong> and <strong>Accuracy</strong> are decreased by 1 step.</p><p>A creature attacking a <strong>Prone</strong> within Range 1 increases their <strong>Melee</strong> or <strong>Accuracy</strong> by 1.</p><p>A creature attack a <strong>Prone</strong> target at a distance greater than Range 1 decreases their <strong>Accuracy</strong> by 1 per 10 distance, rounded down.</p><p>Standing up from <strong>Prone</strong> requires an Action or a Move.</p>",
    "LOCAL.prone.label": "Prone",
    "LOCAL.prototypeToken.label": "Prototype Token",
@@ -494,6 +497,7 @@
    "LOCAL.xpAvailable.label": "XP Available",
    "LOCAL.xpCost.label": "XP Cost",
    "LOCAL.xpEarned.label": "XP Earned",
+   "LOCAL.vicious.label": "Vicious",
    "SETTINGS.getCheckOptions": {
       "label": "Ask for Check Options by default.",
       "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."
