@@ -84,8 +84,12 @@ export default class TitanSpell extends TitanTypeComponent {
                         cost += settings.optionCosts[option];
                      });
                   }
-               }
 
+                  // Scaling aspect cost
+                  if (settings.scalingCost) {
+                     aspect.scalingLost = settings.scalingCost;
+                  }
+               }
 
                // Halve the cost if the aspect has a resistance check
                if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {

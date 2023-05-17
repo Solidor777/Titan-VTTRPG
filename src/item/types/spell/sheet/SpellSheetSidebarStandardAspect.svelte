@@ -52,7 +52,15 @@
                {#if aspect.initialValue}
                   {aspect.initialValue}
                {/if}
-               {#if aspect.cost > 1}
+               {#if aspect.scalingCost}
+                  {#if aspect.scalingCost > 1}
+                     {`+ (${localize('extraSuccesses.short')} / ${
+                        aspect.scalingCost
+                     })`}
+                  {:else}
+                     {`+ ${localize('extraSuccesses.short')}`}
+                  {/if}
+               {:else if aspect.cost > 1}
                   {`+ (${localize('extraSuccesses.short')} / ${aspect.cost})`}
                {:else}
                   {`+ ${localize('extraSuccesses.short')}`}

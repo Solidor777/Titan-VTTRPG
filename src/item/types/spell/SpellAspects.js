@@ -68,7 +68,7 @@ export default Object.freeze({
       template: {
          label: 'extraTargets',
          scaling: true,
-         initialValue: 1,
+         initialValue: 0,
          cost: 1,
       },
       sortOrder: 2,
@@ -109,7 +109,8 @@ export default Object.freeze({
          resistanceCheck: 'none',
          isDamage: true,
          option: [],
-         enabled: true
+         enabled: true,
+         scalingCost: 1,
       },
       sortOrder: 4,
       settings: {

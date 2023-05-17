@@ -10,13 +10,14 @@
    const document = getContext('DocumentStore');
 
    $: aspect = $document.flags.titan.results.scalingAspect[idx];
+   $: aspectCost = aspect.scalingCost ?? aspect.cost ?? 0;
 
    function increaseAspect() {
       // Increase the aspect
       aspect.currentValue += Math.max(aspect.initialValue, 1);
 
       // Decrease the extra successes by the cost
-      $document.flags.titan.results.extraSuccessesRemaining -= aspect.cost;
+      $document.flags.titan.results.extraSuccessesRemaining -= aspectCost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
@@ -47,7 +48,7 @@
       aspect.currentValue -= Math.max(aspect.initialValue, 1);
 
       // Increase the extra successes by the cost
-      $document.flags.titan.results.extraSuccessesRemaining += aspect.cost;
+      $document.flags.titan.results.extraSuccessesRemaining += aspectCost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
@@ -76,7 +77,7 @@
    function resetAspect() {
       // Get the aspect delta
       const delta = aspect.currentValue - aspect.initialValue;
-      const cost = delta * aspect.cost;
+      const cost = delta * aspectCost;
 
       // Reset the aspect to its original value
       aspect.currentValue = aspect.initialValue;
@@ -117,7 +118,7 @@
             .currentValue}
       </div>
       <div class="cost">
-         {localize('cost')}: {`${aspect.cost} ${localize(
+         {localize('cost')}: {`${aspectCost} ${localize(
             'extraSuccesses.short'
          )}`}
       </div>
@@ -153,7 +154,7 @@
          <EfxButton
             on:click={increaseAspect}
             disabled={$document.flags.titan.results.extraSuccessesRemaining <
-               aspect.cost}
+               aspectCost}
          >
             <div class="button-inner">
                <i class="fas fa-plus" />

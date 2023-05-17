@@ -340,7 +340,7 @@
    "LOCAL.reRollFailures.label": "Re-roll Failures",
    "LOCAL.reRollFailuresSpendResolve.label": "Re-roll Failures (Spend 1 Resolve)",
    "LOCAL.reaction.label": "Reaction",
-   "LOCAL.reflexes.baseValue.label": "Base Reflexes = Mind + (Body / 2). rounded down.",
+   "LOCAL.reflexes.baseValue.label": "Base Reflexes = Mind + (Body / 2), rounded down.",
    "LOCAL.reflexes.desc.label": "<strong>Reflexes</strong> is your ability to duck, dodge, and avoid sudden danger.",
    "LOCAL.reflexes.label": "Reflexes",
    "LOCAL.reflexes.value.label": "Total Reflexes",
