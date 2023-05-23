@@ -34,7 +34,7 @@
             {/if}
          {:else}
             <!--Non scaling value-->
-            {localize(aspect.initialValue)}
+            {aspect.initialValue}
          {/if}
       </div>
    {/if}

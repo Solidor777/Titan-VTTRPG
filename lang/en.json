@@ -60,7 +60,7 @@
    "LOCAL.attack.penetrating.desc.label": "<strong>Penetrating</strong> attacks ignore 1 point of <strong>Armor</strong>.",
    "LOCAL.attack.piercing.desc.label": "<strong>Piercing</strong> attacks use a sharp point or tip to stab and skewer enemies.",
    "LOCAL.attack.reload.desc.label": "Attacks with the <strong>Reload</strong> trait require an Action to be reloaded before they can be used again.",
-   "LOCAL.attack.rend.desc.label": "Each roll of 6 with a <strong>Rend</strong> attack destroys 1 point of <strong>Armor</strong> after the damage is applied. <strong>Magical</strong> armor can only be damaged by <strong>Magical</strong> weapons.</p>",
+   "LOCAL.attack.rend.desc.label": "Each roll of 6 with a <strong>Rend</strong> attack destroys 1 point of <strong>Armor</strong> after the damage is applied.<p><strong>Magical</strong> armor can only be damaged by <strong>Magical</strong> weapons.</p>",
    "LOCAL.attack.restraining.desc.label": "When a <strong>Restraining</strong> attack deals to a creature up to 1 Size larger than the attacker, that creature is Restrained until it uses an Action to free itself.",
    "LOCAL.attack.slashing.desc.label": "A <strong>Slashing</strong> attack is sharp and typically bladed, and is used to cut enemies open.",
    "LOCAL.attack.splash.desc.label": "Attacks with the <strong>Splash</strong> trait deal half-damage to adjacent creatures.",

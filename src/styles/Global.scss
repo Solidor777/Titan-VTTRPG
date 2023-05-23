@@ -190,6 +190,8 @@
          display: none;
       }
    }
+
+   font-family: 'Open Sans';
 }
 
 #chat-log .titan-dark-mode.emote.message .message-content {
@@ -220,4 +222,20 @@
 .token-link-warning {
    text-shadow: 0 0 4px brown;
    color: brown;
+}
+
+.message-content {
+   font-family: 'Open Sans';
+}
+
+.editor {
+   font-family: 'Open Sans';
+}
+
+.journal-page-header {
+   font-family: 'Open Sans';
+}
+
+.journal-page-content {
+   font-family: 'Open Sans';
 }
