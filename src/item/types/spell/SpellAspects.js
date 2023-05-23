@@ -80,7 +80,8 @@ export default Object.freeze({
          initialValue: 1,
          unit: 'rounds',
          cost: 1,
-         enabled: true
+         enabled: true,
+         scalingCost: 1,
       },
       sortOrder: 3,
       settings: {
