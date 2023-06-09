@@ -351,7 +351,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       const conditionalCheckModifierElements = [];
       rulesElements.forEach((element) => {
          switch (element.operation) {
-            case 'mulbase': {
+            case 'mulBase': {
                mulBaseElements.push(element);
                break;
             }
