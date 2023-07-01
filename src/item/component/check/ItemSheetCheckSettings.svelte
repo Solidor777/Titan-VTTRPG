@@ -10,6 +10,7 @@
    import DocumentSkillSelect from '~/documents/components/select/DocumentSkillSelect.svelte';
    import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
    import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
+   import DocumentCheckDifficultySelect from '../../../documents/components/select/DocumentCheckDifficultySelect.svelte';
 
    // Check idx
    export let idx = void 0;
@@ -103,7 +104,9 @@
 
                   <!--Value-->
                   <div class="input">
-                     <CheckDifficultySelect bind:value={check.difficulty} />
+                     <DocumentCheckDifficultySelect
+                        bind:value={check.difficulty}
+                     />
                   </div>
                </div>
 
