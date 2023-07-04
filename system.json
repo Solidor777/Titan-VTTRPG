@@ -11,9 +11,9 @@
   ],
   "version": "1.0.0",
   "compatibility": {
-    "minimum": "10.288",
-    "verified": "10.291",
-    "maximum": "10"
+    "minimum": "11.304",
+    "verified": "11.304",
+    "maximum": "11"
   },
   "esmodules": [
     "index.js"
