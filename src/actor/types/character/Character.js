@@ -719,7 +719,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
                // Update the label
                const label = isPermanent || remaining > 0 ? effectItem.name : `${effectItem.name} (${localize('expired')})`;
-               if (effect.label !== label) {
+               if (effect.name !== label) {
                   shouldUpdateEffect = true;
                   updateData.label = label;
                }
