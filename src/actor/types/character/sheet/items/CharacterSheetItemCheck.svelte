@@ -39,7 +39,9 @@
    $: {
       dicePool =
          $document.system.attribute[check.attribute].value +
-         $document.system.skill[check.skill].training.value +
+         (check.skill && check.skill !== 'none'
+            ? $document.system.skill[check.skill].training.value
+            : 0) +
          $document.typeComponent.getItemCheckMod('dice', item, check);
    }
 
@@ -47,7 +49,9 @@
    let expertise = 0;
    $: {
       expertise =
-         $document.system.skill[check.skill].expertise.value +
+         (check.skill && check.skill !== 'none'
+            ? $document.system.skill[check.skill].expertise.value
+            : 0) +
          $document.typeComponent.getItemCheckMod('expertise', item, check);
    }
 </script>
@@ -105,7 +109,7 @@
          </div>
 
          <!--Training-->
-         {#if $document.system.skill[check.skill].training.value !== 0}
+         {#if check.skill && check.skill !== 'none' && $document.system.skill[check.skill].training.value !== 0}
             <div class="stat">
                <IconStatTag
                   label={localize('training')}

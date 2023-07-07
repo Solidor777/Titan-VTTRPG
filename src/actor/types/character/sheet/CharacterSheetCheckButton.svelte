@@ -28,14 +28,14 @@
          <div class="stat">
             <i class="fas fa-dice-d6" />
             {$document.system.attribute[check.attribute].value +
-               (check.skill
+               (check.skill && check.skill !== 'none'
                   ? $document.system.skill[check.skill].training.value
                   : 0) +
                diceMod}
          </div>
 
          <!--Expertise-->
-         {#if check.skill && $document.system.skill[check.skill].expertise.value + expertiseMod > 0}
+         {#if check.skill && check.skill !== 'none' && $document.system.skill[check.skill].expertise.value + expertiseMod > 0}
             <div class="stat">
                <i class="fas fa-graduation-cap" />
                {$document.system.skill[check.skill].expertise.value +
