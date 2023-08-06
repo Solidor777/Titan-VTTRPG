@@ -22,7 +22,7 @@
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "eslint": "^8",
     "svelte-preprocess": "^5.0.4",
-    "vite": "^4"
+    "vite": "^4.4.8"
   },
   "browserslist": [
     ">5%",
