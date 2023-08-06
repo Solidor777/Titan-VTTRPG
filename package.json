@@ -5,11 +5,15 @@
   "private": true,
   "type": "module",
   "author": "Solidor",
+  "imports": {
+    "#runtime/*": "@typhonjs-fvtt/runtime/*",
+    "#standard/*": "@typhonjs-fvtt/svelte-standard/*"
+  },
   "dependencies": {
-    "@typhonjs-fvtt/runtime": "^0.0.23",
-    "@typhonjs-fvtt/svelte-standard": "^0.0.23",
-    "dracula-ui": "^1.0.6",
+    "@typhonjs-fvtt/runtime": "^0.1.1",
+    "@typhonjs-fvtt/svelte-standard": "^0.1.0",
     "svelte": "^4.1.2",
+    "dracula-ui": "^1.0.6",
     "tippy.js": "^6.3.7",
     "uuid": "^9.0.0"
   },
@@ -18,7 +22,7 @@
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "eslint": "^8",
     "svelte-preprocess": "^5.0.4",
-    "vite": "^4"
+    "vite": "^4.4.0"
   },
   "browserslist": [
     ">5%",
