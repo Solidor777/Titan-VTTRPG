@@ -1,6 +1,6 @@
 {
   "name": "titan",
-  "description": "Provides a bare-bones Foundry module template repo to get set up with using the TyphonJS Runtime Library and Svelte with ES Modules.",
+  "description": "Provides a bare-bones Foundry System for TITAN.",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -10,6 +10,7 @@
     "#standard/*": "@typhonjs-fvtt/svelte-standard/*"
   },
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.1.0",
     "@typhonjs-fvtt/runtime": "^0.1.1",
     "@typhonjs-fvtt/svelte-standard": "^0.1.0",
     "dracula-ui": "^1.0.6",
