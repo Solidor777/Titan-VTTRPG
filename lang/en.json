@@ -87,7 +87,7 @@
    "LOCAL.blindCheck.label": "Made a Blind Check",
    "LOCAL.blinded.desc.label": "<p>A <strong>Blinded</strong> creature cannot see.</p><p>A <strong>Blinded</strong> creature automatically fails any <strong>Awareness</strong> and <strong>Perception</strong> checks that rely on sight.</p><p>A <strong>Blinded</strong> creature's <strong>Melee</strong>, <strong>Accuracy</strong>, and <strong>Defense</strong> decrease by 1.</p>",
    "LOCAL.blinded.label": "Blinded",
-   "LOCAL.body.desc.label": "<strong>Body</strong> is your overall strength, speed, and physical fitness.",
+   "LOCAL.body.desc.label": "<p><strong>Body</strong> is your overall strength, speed, and coordination. Characters with a high <strong>Body</strong> tend to do well in a physical fight and excel at manual labor.</p><p>Your <strong>Body</strong> affects your Melee (your effectiveness in close combat) and your <strong>Defense</strong> (your ability to avoid damage).</p>",
    "LOCAL.body.label": "Body",
    "LOCAL.body.value.label": "Total Body",
    "LOCAL.bonusPenaltyDice.label": "Bonus / Penalty Dice",

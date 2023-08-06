@@ -6,13 +6,13 @@ import DocumentShell from '~/documents/DocumentShell.svelte';
 export default class SvelteDocumentSheet extends SvelteApplication {
 
    // Document store that monitors updates to any assigned document.
-   #documentStore = new TJSDocument(void 0, { delete: this.close.bind(this) });
+   documentStore = new TJSDocument(void 0, { delete: this.close.bind(this) });
 
    // Application store that monitors updates to any assigned document.
-   #applicationStateStore = new writable({});
+   applicationStateStore = new writable({});
 
    // Holds the document unsubscription function.
-   #storeUnsubscribe;
+   storeUnsubscribe;
 
    constructor(document, options = {}) {
       super(foundry.utils.mergeObject(
@@ -26,18 +26,18 @@ export default class SvelteDocumentSheet extends SvelteApplication {
 
       // Define document store property
       Object.defineProperty(this.reactive, 'document', {
-         get: () => this.#documentStore.get(),
+         get: () => this.documentStore.get(),
          set: (document) => {
-            this.#documentStore.set(document);
+            this.documentStore.set(document);
          },
       });
       this.reactive.document = document;
 
       // Define state store property
       Object.defineProperty(this.reactive, 'state', {
-         get: () => this.#applicationStateStore,
+         get: () => this.applicationStateStore,
          set: (state) => {
-            this.#applicationStateStore = state;
+            this.applicationStateStore = state;
          },
       });
    }
@@ -55,8 +55,8 @@ export default class SvelteDocumentSheet extends SvelteApplication {
             target: document.body,
             props: function () {
                return {
-                  documentStore: this.#documentStore,
-                  applicationStateStore: this.#applicationStateStore
+                  documentStore: this.documentStore,
+                  applicationStateStore: this.applicationStateStore
                };
             },
          },
@@ -263,9 +263,9 @@ export default class SvelteDocumentSheet extends SvelteApplication {
    async close(options = {}) {
       await super.close(options);
 
-      if (this.#storeUnsubscribe) {
-         this.#storeUnsubscribe();
-         this.#storeUnsubscribe = void 0;
+      if (this.storeUnsubscribe) {
+         this.storeUnsubscribe();
+         this.storeUnsubscribe = void 0;
       }
    }
 
@@ -276,7 +276,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
     *
     * @param {object}                     options -
     */
-   async #handleDocumentUpdate(doc, options) {
+   async handleDocumentUpdate(doc, options) {
       const { action } = options;
       if ((action === void 0 || action === 'update' || action === 'subscribe') && doc) {
          this.reactive.title = doc?.isToken ? `[Token] ${doc?.name}` : doc?.name ?? 'No Document Assigned';
@@ -284,8 +284,8 @@ export default class SvelteDocumentSheet extends SvelteApplication {
    }
 
    render(force = false, options = {}) {
-      if (!this.#storeUnsubscribe) {
-         this.#storeUnsubscribe = this.#documentStore.subscribe(this.#handleDocumentUpdate.bind(this));
+      if (!this.storeUnsubscribe) {
+         this.storeUnsubscribe = this.documentStore.subscribe(this.handleDocumentUpdate.bind(this));
       }
 
       super.render(force, options);
