@@ -10,8 +10,8 @@
     "#standard/*": "@typhonjs-fvtt/svelte-standard/*"
   },
   "dependencies": {
-    "@typhonjs-fvtt/runtime": "^0.0.23",
-    "@typhonjs-fvtt/svelte-standard": "^0.0.23",
+    "@typhonjs-fvtt/runtime": "^0.1.1",
+    "@typhonjs-fvtt/svelte-standard": "^0.1.0",
     "dracula-ui": "^1.0.6",
     "svelte": "^4.1.2",
     "tippy.js": "^6.3.7",
