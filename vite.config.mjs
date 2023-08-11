@@ -15,8 +15,7 @@ import * as path from 'path';
 const s_PACKAGE_ID = 'systems/titan';
 
 // A short additional string to add to Svelte CSS hash values to make yours unique. This reduces the amount of
-// duplicated framework CSS overlap between many TRL packages enabled on Foundry VTT at the same time. 'ese' is chosen
-// by shortening 'essential-svelte-esm'.
+// duplicated framework CSS overlap between many TRL packages enabled on Foundry VTT at the same time.
 const s_SVELTE_HASH_ID = 'tvtt';
 
 const s_COMPRESS = false;  // Set to true to compress the module bundle.
