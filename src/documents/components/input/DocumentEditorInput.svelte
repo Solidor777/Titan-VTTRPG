@@ -1,7 +1,6 @@
 <script>
-   import { TJSProseMirror } from '/component';
+   import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
    import { getContext } from 'svelte';
-   //import TestProseMirror from '~/documents/components/input/TestProseMirrorEdit.svelte';
 
    const document = getContext('DocumentStore');
    export let fieldName = void 0;
