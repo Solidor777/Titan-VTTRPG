@@ -16,6 +16,8 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
+      role="button"
+      tabindex="0"
       use:tooltip={{ content: editTooltip }}
       class="fas fa-pen-to-square"
       on:keypress={() => {
@@ -28,6 +30,8 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
+      role="button"
+      tabindex="0"
       use:tooltip={{ content: deleteTooltip }}
       class="fas fa-trash"
       on:keypress={() => {

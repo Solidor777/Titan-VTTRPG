@@ -34,6 +34,7 @@
    }
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <img {alt} {src} on:keypress={onEditImage} on:click={onEditImage} />
 
 <style>
