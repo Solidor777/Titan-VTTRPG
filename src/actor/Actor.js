@@ -1,5 +1,5 @@
 import { localize, confirmDeletingItems } from '~/helpers/Utility';
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import TitanPlayerComponent from '~/actor/types/player/Player.js';
 import TitanNPCComponent from '~/actor/types/npc/NPC.js';
 import ConfirmDeleteItemDialog from '~/actor/dialogs/ConfirmDeleteItemDialog';
@@ -19,7 +19,7 @@ export default class TitanActor extends Actor {
          const initialData = {
             flags: {
                titan: {
-                  uuid: uuidv4()
+                  uuid: Hashing.uuidv4()
                }
             }
          };

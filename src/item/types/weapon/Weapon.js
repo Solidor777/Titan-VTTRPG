@@ -1,5 +1,5 @@
 import { localize } from '~/helpers/Utility.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import { addRulesElement, removeRulesElement } from '~/item/component/rules-element/RulesElementComponent';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 import WeaponEditAttackTraitsDialog from '~/item/types/weapon/dialogs/WeaponEditAttackTraitsDialog';
@@ -137,6 +137,6 @@ function getAttackTemplate() {
       plusExtraSuccessDamage: true,
       trait: [],
       customTrait: [],
-      uuid: uuidv4()
+      uuid: Hashing.uuidv4()
    };
 }

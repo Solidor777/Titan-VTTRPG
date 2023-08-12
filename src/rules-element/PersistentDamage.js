@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
 export function getPersistentDamageTemplate(uuid, type) {
@@ -6,7 +6,7 @@ export function getPersistentDamageTemplate(uuid, type) {
       operation: 'persistentDamage',
       selector: 'turnStart',
       value: 1,
-      uuid: uuid ?? uuidv4(),
+      uuid: uuid ?? Hashing.uuidv4(),
       type: type ?? ''
    };
 }

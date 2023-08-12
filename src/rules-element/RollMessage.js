@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import { isHTMLBlank, sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 import { camelize } from '~/helpers/Utility';
 import { appendUnique } from '../helpers/Utility';
@@ -10,7 +10,7 @@ export function getRollMessageTemplate(uuid, type) {
       selector: 'attribute',
       key: 'body',
       message: '',
-      uuid: uuid ?? uuidv4(),
+      uuid: uuid ?? Hashing.uuidv4(),
       type: type ?? ''
    };
 }

@@ -1,6 +1,5 @@
 <script>
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
-   import { localize } from '~/helpers/Utility.js';
    export let label = void 0;
    export let deleteFunction = void 0;
    export let editFunction = void 0;

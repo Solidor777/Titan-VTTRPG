@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 
 export function clamp(value, min, max) {
    return Math.min(Math.max(value, min), max);
@@ -231,7 +231,7 @@ export async function regenerateUUID(document) {
       await document.update({
          flags: {
             titan: {
-               uuid: uuidv4()
+               uuid: Hashing.uuidv4()
             }
          }
       });

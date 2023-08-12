@@ -1,6 +1,6 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { getSetting } from '~/helpers/Utility.js';
-import { v4 as uuidv4 } from "uuid";
+import { Hashing } from '#runtime/util';
 import ConfirmationDialogShell from './ConfirmationDialogShell.svelte';
 export default class ConfirmationDialog extends TJSDialog {
    constructor(title, headers, message, confirmLabel, width = 250, height = 210, confirmationCallback, confirmationContext) {
@@ -16,7 +16,7 @@ export default class ConfirmationDialog extends TJSDialog {
                },
             },
             zIndex: null,
-            id: `confirmaton-dialog-${uuidv4()}`,
+            id: `confirmaton-dialog-${Hashing.uuidv4()}`,
          },
          {
             width: width,

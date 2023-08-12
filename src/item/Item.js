@@ -1,5 +1,5 @@
 import { localize } from '~/helpers/Utility.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import TitanAbility from '~/item/types/ability/Ability.js';
 import TitanArmor from '~/item/types/armor/Armor.js';
 import TitanEffect from '~/item/types/effect/Effect.js';
@@ -25,7 +25,7 @@ export default class TitanItem extends Item {
          const initialData = {
             flags: {
                titan: {
-                  uuid: uuidv4()
+                  uuid: Hashing.uuidv4()
                }
             }
          };
@@ -227,7 +227,7 @@ export default class TitanItem extends Item {
             attribute: 'body',
             skill: 'athletics'
          },
-         uuid: uuidv4()
+         uuid: Hashing.uuidv4()
       };
    }
 

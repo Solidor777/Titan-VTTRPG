@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 import { camelize } from '~/helpers/Utility';
 
@@ -9,7 +9,7 @@ export function getConditionalRatingModifierTemplate(uuid, type) {
       selector: 'attackTrait',
       key: 'blast',
       value: 1,
-      uuid: uuid ?? uuidv4(),
+      uuid: uuid ?? Hashing.uuidv4(),
       type: type ?? 'effect'
    };
 }

@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import { sortObjectsIntoContainerByKey } from '~/helpers/Utility';
 
 export function getFastHealingTemplate(uuid, type) {
@@ -6,7 +6,7 @@ export function getFastHealingTemplate(uuid, type) {
       operation: 'fastHealing',
       selector: 'turnStart',
       value: 1,
-      uuid: uuid ?? uuidv4(),
+      uuid: uuid ?? Hashing.uuidv4(),
       type: type ?? ''
    };
 }

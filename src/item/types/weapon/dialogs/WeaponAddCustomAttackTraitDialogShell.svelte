@@ -3,7 +3,7 @@
 <script>
    import { localize } from '~/helpers/Utility.js';
    import { getContext } from 'svelte';
-   import { v4 as uuidv4 } from 'uuid';
+   import { Hashing } from '@typhonjs-fvtt/runtime/util';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import TextArea from '~/helpers/svelte-components/input/TextArea.svelte';
    import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
@@ -20,7 +20,7 @@
    const newTrait = {
       name: localize('newTrait'),
       description: '',
-      uuid: uuidv4(),
+      uuid: Hashing.uuidv4(),
    };
 
    function addTrait() {

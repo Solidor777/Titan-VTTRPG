@@ -1,5 +1,5 @@
 import { localize } from '~/helpers/Utility.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Hashing } from '@typhonjs-fvtt/runtime/util';
 import TitanTypeComponent from '~/helpers/TypeComponent';
 import SpellAspects from '~/item/types/spell/SpellAspects';
 
@@ -186,6 +186,6 @@ function getCustomAspectTemplate() {
       resistanceCheck: 'none',
       isDamage: false,
       isHealing: false,
-      uuid: uuidv4()
+      uuid: Hashing.uuidv4()
    };
 }
