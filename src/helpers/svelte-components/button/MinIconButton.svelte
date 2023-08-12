@@ -1,6 +1,6 @@
 <script>
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
-   import { ripple } from '@typhonjs-fvtt/svelte-standard/action';
+   import { ripple } from '@typhonjs-fvtt/runtime/svelte/action/animate';
 
    export let icon = void 0;
    export let efx = ripple();
