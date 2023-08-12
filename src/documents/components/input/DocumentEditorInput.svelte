@@ -1,5 +1,5 @@
 <script>
-   import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
+   import { TJSProseMirror } from '/component';
    import { getContext } from 'svelte';
    //import TestProseMirror from '~/documents/components/input/TestProseMirrorEdit.svelte';
 

@@ -1,4 +1,4 @@
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import { getSetting } from '~/helpers/Utility';
 import ChatMessageShell from '~/chat-message/ChatMessageShell.svelte';
 

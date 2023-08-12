@@ -1,5 +1,5 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import { writable } from 'svelte/store';
 import { localize, getSetting } from '~/helpers/Utility.js';
 import DocumentShell from '~/documents/DocumentShell.svelte';
