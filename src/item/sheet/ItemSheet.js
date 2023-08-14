@@ -14,7 +14,24 @@ export default class TitanItemSheet extends SvelteDocumentSheet {
          onclick: () => this.reactive.document.sendToChat(),
       });
 
+      if (this.item.pack) {
+         buttons.unshift({
+            class: 'import',
+            icon: 'fas fa-download',
+            label: localize('import'),
+            onclick: (event) => this._onImport(event)
+         });
+      }
+
       return buttons;
+   }
+
+   _onImport(event) {
+      if (event) {
+         event.preventDefault();
+      }
+      return this.item.collection
+         .importFromCompendium(this.item.compendium, this.item.id);
    }
 
    addCheck() {

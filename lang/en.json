@@ -225,6 +225,7 @@
    "LOCAL.idMethod.desc.label": "<p>This is the method by which the macro will attempt to identify the item.</p><p><strong>Unique ID</strong> - The item will be identified by its unique ID that is generated on item creation. Compatible across actors, but may mis-identify items that were duplicated from others without regenerating their Unique ID.</p><p><strong>Item Name</strong> - The item will be identified by the name of the item. Compatible across actors, but may mis-identify items that use the same name.</p><p><strong>Item ID</strong> - The item will be identified by the ID of the item given to it by Foundry. Not compatible across actors, but will never mis-identify an item.</p>",
    "LOCAL.idMethod.label": "ID Method",
    "LOCAL.ignoreArmor.label": "Ignore Armor",
+   "LOCAL.import.label": "Import",
    "LOCAL.incapacitated.desc.label": "<p>An <strong>Incapacitated</strong> creature can't Move, take Actions, or spend Resolve.</p><p><strong>Incapacitated</strong> creatures cannot defend themselves. The Difficulty to hit an <strong>Incapacitated</strong> creature is always 2, and they automated fail <strong>Reflex</strong> checks.</p>",
    "LOCAL.incapacitated.label": "Incapacitated",
    "LOCAL.increase.label": "Increase",

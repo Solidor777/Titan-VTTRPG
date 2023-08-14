@@ -78,9 +78,26 @@ export default class TitanActorSheet extends SvelteDocumentSheet {
                }
             }
          }
+
+         if (this.actor.pack) {
+            buttons.unshift({
+               class: 'import',
+               icon: 'fas fa-download',
+               label: localize('import'),
+               onclick: (event) => this._onImport(event)
+            });
+         }
       }
 
       return buttons;
+   }
+
+   _onImport(event) {
+      if (event) {
+         event.preventDefault();
+      }
+      return this.actor.collection
+         .importFromCompendium(this.actor.compendium, this.actor.id);
    }
 }
 
