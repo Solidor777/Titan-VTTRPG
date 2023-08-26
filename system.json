@@ -11,8 +11,8 @@
   ],
   "version": "1.0.0",
   "compatibility": {
-    "minimum": "11.304",
-    "verified": "11.305",
+    "minimum": "11.308",
+    "verified": "11.308",
     "maximum": "11"
   },
   "esmodules": [
