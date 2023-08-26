@@ -69,24 +69,6 @@
       </div>
    {/if}
 
-   <!--Stamina-->
-   {#if chatContext.stamina}
-      <div class="section">
-         {`${localize('stamina')}: ${$document.flags.titan.stamina.value} / ${
-            $document.flags.titan.stamina.max
-         }`}
-      </div>
-   {/if}
-
-   <!--Wounds-->
-   {#if chatContext.wounds}
-      <div class="section">
-         {`${localize('wounds')}: ${$document.flags.titan.wounds.value} / ${
-            $document.flags.titan.wounds.max
-         }`}
-      </div>
-   {/if}
-
    <!--Healing applied-->
    {#if chatContext.healingApplied}
       <!--If confirmed, show how much was was regained-->

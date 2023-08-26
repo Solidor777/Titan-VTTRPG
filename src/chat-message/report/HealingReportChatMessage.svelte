@@ -26,15 +26,17 @@
       />
    </div>
 
-   <!--Wounds-->
-   <div class="message">
-      <ChatResource
-         icon={'fas fa-face-head-bandage'}
-         label={localize('wounds')}
-         value={chatContext.wounds.value}
-         max={chatContext.wounds.max}
-      />
-   </div>
+   {#if chatContext.wounds}
+      <!--Wounds-->
+      <div class="message">
+         <ChatResource
+            icon={'fas fa-face-head-bandage'}
+            label={localize('wounds')}
+            value={chatContext.wounds.value}
+            max={chatContext.wounds.max}
+         />
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">

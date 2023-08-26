@@ -1253,7 +1253,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
          // Update the actor
          stamina.value = Math.max(stamina.value - damageTaken, 0);
-         wounds.value += woundsSuffered;
+         wounds.value = Math.min(wounds.value + woundsSuffered, wounds.max);
          if (options?.updateActor !== false) {
             await this.parent.update({
                system: {
@@ -1282,11 +1282,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   value: stamina.value,
                   max: stamina.max
                },
-               wounds: {
+            };
+
+            if (wounds.max > 0) {
+               chatContext.wounds = {
                   value: wounds.value,
                   max: wounds.max
-               }
-            };
+               };
+            }
 
 
             // Damage resisted
@@ -1361,11 +1364,14 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                      value: stamina.value,
                      max: stamina.max
                   },
-                  wounds: {
+               };
+
+               if (wounds.max > 0) {
+                  chatContext.wounds = {
                      value: wounds.value,
                      max: wounds.max
-                  }
-               };
+                  };
+               }
 
                // Send the report to chat
                this._whisperUsers(chatContext, getOwners(this.parent), game.user.id, true);
@@ -2131,10 +2137,12 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // If stamina would be damaged
          else {
             const wounds = this.parent.system.resource.wounds;
-            chatContext.wounds = {
-               max: wounds.max,
-               value: wounds.value
-            };
+            if (wounds.max > 0) {
+               chatContext.wounds = {
+                  max: wounds.max,
+                  value: wounds.value
+               };
+            }
 
             // Update the actor if appropriate
             const confirmed = autoApplyPersistentDamage === 'enabled';

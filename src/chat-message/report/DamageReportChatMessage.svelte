@@ -5,6 +5,7 @@
    import ChatResource from '~/chat-message/ChatResource.svelte';
    import ReportHeader from '~/chat-message/report/components/ReportHeader.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import ChatOverkillDamageButton from '../ChatOverkillDamageButton.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -51,14 +52,16 @@
    </div>
 
    <!--Wounds-->
-   <div class="message">
-      <ChatResource
-         icon={'fas fa-face-head-bandage'}
-         label={localize('wounds')}
-         value={chatContext.wounds.value}
-         max={chatContext.wounds.max}
-      />
-   </div>
+   {#if chatContext.wounds}
+      <div class="message">
+         <ChatResource
+            icon={'fas fa-face-head-bandage'}
+            label={localize('wounds')}
+            value={chatContext.wounds.value}
+            max={chatContext.wounds.max}
+         />
+      </div>
+   {/if}
 
    {#if chatContext.penetrating || chatContext.ineffective}
       <div class="tags message">
@@ -81,6 +84,13 @@
                <Tag label={localize('penetrating')} />
             </div>
          {/if}
+      </div>
+   {/if}
+
+   <!--Overkill Damage-->
+   {#if chatContext.overkillDamage}
+      <div class="message">
+         <ChatOverkillDamageButton damage={chatContext.overkillDamage} />
       </div>
    {/if}
 </div>

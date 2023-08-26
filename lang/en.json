@@ -1,4 +1,5 @@
 {
+   "LOCAL.%xOverkillDamage.label": "%x Overkill Damage",
    "LOCAL.abilities.label": "Abilities",
    "LOCAL.accuracy.baseValue.label": "Base Accuracy = (Mind + Training in Ranged Weapons) / 2, rounded up.",
    "LOCAL.accuracy.desc.label": "<p><strong>Accuracy</strong> measures your effectiveness with ranged attacks, and affects the <strong>Difficulty</strong> of ranged attacks you make.</p> <p>Your <strong>Accuracy</strong> is equal to <strong>1/2</strong> your <strong>Mind</strong> <strong>+</strong> <strong>Training</strong> in <strong>Ranged Weapons</strong>.</p>",
@@ -33,6 +34,7 @@
    "LOCAL.applyEdits.label": "Apply Edits",
    "LOCAL.applyHalfDamage.label": "Apply Damage (Halved)",
    "LOCAL.applyHealing.label": "Apply Healing",
+   "LOCAL.applyOverkillDamage.label": "Apply Overkill Damage",
    "LOCAL.arcana.desc.label": "<strong>Arcana</strong> measures how much you know about arcane magic and creatures.",
    "LOCAL.arcana.label": "Arcana",
    "LOCAL.armor.base.label": "Equipped Armor",
@@ -623,6 +625,10 @@
    "SETTINGS.staminaBaseMultiplier": {
       "label": "Base Stamina Multiplier",
       "hint": "Base Stamina as a multiple of an character's Body + Mind + Soul."
+   },
+   "SETTINGS.staminaMinionMultiplier": {
+      "label": "Minion Stamina Multiplier",
+      "hint": "Additional multiplier applied to the Base Stamina of Minions."
    },
    "SETTINGS.resolveBaseMultiplier": {
       "label": "Base Resolve Multiplier",

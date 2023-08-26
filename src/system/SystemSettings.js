@@ -291,6 +291,16 @@ export default function registerSystemSettings() {
       default: 2,
    });
 
+   game.settings.register('titan', 'staminaMinionMultiplier', {
+      config: true,
+      scope: 'world',
+      name: 'SETTINGS.staminaMinionMultiplier.label',
+      hint: 'SETTINGS.staminaMinionMultiplier.hint',
+      type: Number,
+      restricted: true,
+      default: 0.5,
+   });
+
    game.settings.register('titan', 'resolveBaseMultiplier', {
       config: true,
       scope: 'world',
