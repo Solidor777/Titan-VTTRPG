@@ -69,7 +69,7 @@
       <!--Label-->
       <span
          class="label"
-         use:tooltip={{ content: localize(`${key}.valueDesc`) }}
+         use:tooltip={{ content: localize(`${key}.desc`) }}
          >{localize(key)}</span
       >
 
@@ -96,7 +96,7 @@
       <!--The Meter-->
       <div
          class="meter {key}"
-         use:tooltip={{ content: localize(`${key}.valueDesc`) }}
+         use:tooltip={{ content: localize(`${key}.desc`) }}
       >
          <Meter
             current={$document.system.resource[key].value}

@@ -15,7 +15,7 @@
    <!--Take a long Rest Button-->
    <div
       class="button long-rest"
-      use:tooltip={{ content: localize('longRest') }}
+      use:tooltip={{ content: localize('longRest.desc') }}
    >
       <IconButton
          icon={'fas fa-bed'}
@@ -28,7 +28,7 @@
    <!--Take a Short rest Button-->
    <div
       class="button short-rest"
-      use:tooltip={{ content: localize('shortRest') }}
+      use:tooltip={{ content: localize('shortRest.desc') }}
    >
       <IconButton
          icon={'fas fa-face-exhaling'}
