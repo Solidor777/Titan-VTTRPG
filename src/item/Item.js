@@ -143,7 +143,7 @@ export default class TitanItem extends Item {
       }
 
       const speaker = options?.speaker ?? null;
-      const token = (speaker ? (speaker.token ? speaker.token : speaker.getActiveTokens(false, true)[0]) : null);
+      const token = (speaker ? (speaker.token ? speaker.token : game.actors.get(speaker.actor)) : null);
 
       // Create and post the message
       return await ChatMessage.create(
