@@ -146,7 +146,7 @@ export function getAttackCheckMod(modifierType, item, attack, multiAttack) {
          for (const trait of (attack.customTrait)) {
             const formattedName = camelize(trait.name);
             if (!customTraits.find((match) => {
-               return camelize(match.name) === formattedName;
+               return camelize(match) === formattedName;
             })) {
                customTraits.push(formattedName);
             }
@@ -191,7 +191,7 @@ export function getAttackCheckMod(modifierType, item, attack, multiAttack) {
          for (const trait of (attack.customTrait)) {
             const formattedName = camelize(trait.name);
             if (!customTraits.find((match) => {
-               return camelize(match.name) === formattedName;
+               return camelize(match) === formattedName;
             })) {
                customTraits.push(formattedName);
             }
@@ -245,7 +245,7 @@ export function getCastingCheckMod(modifierType, item) {
          for (const trait of item.system.customTrait) {
             const formattedName = camelize(trait.name);
             if (!customTraits.find((match) => {
-               return camelize(match.name) === formattedName;
+               return camelize(match) === formattedName;
             })) {
                customTraits.push(formattedName);
             }
@@ -279,7 +279,7 @@ export function getCastingCheckMod(modifierType, item) {
          for (const trait of item.system.customTrait) {
             const formattedName = camelize(trait.name);
             if (!customTraits.find((match) => {
-               return camelize(match.name) === formattedName;
+               return camelize(match) === formattedName;
             })) {
                customTraits.push(formattedName);
             }
@@ -319,7 +319,7 @@ export function getItemCheckMod(modifierType, item, check) {
          for (const trait of item.system.customTrait) {
             const formattedName = camelize(trait.name);
             if (!customTraits.find((match) => {
-               return camelize(match.name) === formattedName;
+               return camelize(match) === formattedName;
             })) {
                customTraits.push(formattedName);
             }
@@ -350,7 +350,7 @@ export function getItemCheckMod(modifierType, item, check) {
          for (const trait of item.system.customTrait) {
             const formattedName = camelize(trait.name);
             if (!customTraits.find((match) => {
-               return camelize(match.name) === formattedName;
+               return camelize(match) === formattedName;
             })) {
                customTraits.push(formattedName);
             }

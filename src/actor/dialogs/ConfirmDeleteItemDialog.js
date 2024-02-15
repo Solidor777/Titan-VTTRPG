@@ -7,8 +7,8 @@ export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
          [actor.name, item.name],
          localize('confirmDeleteItem'),
          localize('deleteItem'),
-         250,
-         210
+         512,
+         512
       );
 
       this.actor = actor;
