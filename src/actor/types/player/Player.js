@@ -5,7 +5,9 @@ export default class TitanPlayerComponent extends TitanCharacterComponent {
    setInitialData(initialData) {
       super.setInitialData(initialData);
       const prototypeToken = initialData.prototypeToken;
-      prototypeToken.sight.enabled = true;
+      prototypeToken.sight = {
+         enabled: true
+      };
       prototypeToken.actorLink = true;
       prototypeToken.disposition = CONST.TOKEN_DISPOSITIONS.FRIENDLY;
 
