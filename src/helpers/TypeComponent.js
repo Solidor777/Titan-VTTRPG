@@ -15,7 +15,7 @@ export default class TitanTypeComponent {
       return chatContext;
    }
 
-   setInitialData(initialData) {
+   setInitialData() {
       return;
    }
 
