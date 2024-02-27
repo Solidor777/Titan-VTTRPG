@@ -1775,8 +1775,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                      break;
                   }
                   case 'enabled': {
-                     // Delete each effect
-                     expiredEffects.forEach((effect) => effect.delete());
+                     // Delete each expired effect
+                     for (const effect of expiredEffects) {
+                        await effect.delete();
+                     }
 
                      // Update chat context if appropriate
                      if (reportEffects) {
@@ -1997,7 +1999,11 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
             }
             case 'enabled': {
                chatContext.expiredEffectsRemoved = true;
-               expiredEffects.forEach((effect) => effect.delete());
+
+               // Delete each expired effect
+               for (const effect of expiredEffects) {
+                  await effect.delete();
+               }
                break;
             }
             default: {
@@ -2047,8 +2053,10 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   break;
                }
                case 'enabled': {
-                  // Delete each effect
-                  expiredEffects.forEach((effect) => effect.delete());
+                  // Delete each expired effect
+                  for (const effect of expiredEffects) {
+                     await effect.delete();
+                  }
 
                   // Update chat context if appropriate
                   if (reportEffects) {
