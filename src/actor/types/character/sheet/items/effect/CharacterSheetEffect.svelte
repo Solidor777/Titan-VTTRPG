@@ -63,7 +63,7 @@
                               item.update({
                                  system: {
                                     duration: {
-                                       remaining:
+                                       initiative:
                                           item.system.duration.initiative,
                                     },
                                  },

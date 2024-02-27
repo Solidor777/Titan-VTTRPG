@@ -1557,6 +1557,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
          // Get the expired effects
          const expiredEffects = this.effect?.expired;
          if (expiredEffects && expiredEffects.length > 0) {
+
             // Check if the removeal was confirmed
             if (confirmed || !confirmDeletingItems()) {
                for (const effect of expiredEffects) {
