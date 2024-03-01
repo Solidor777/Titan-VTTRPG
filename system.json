@@ -36,6 +36,6 @@
   "manifest": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/system.json",
   "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/titan.zip",
   "gridDistance": 1,
-  "gridUnits": "m",
+  "gridUnits": "sp",
   "license": "LICENSE.txt"
 }

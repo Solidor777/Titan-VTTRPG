@@ -699,7 +699,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       // Cleanup orphaned active effects
       for (const effect of this.parent.effects) {
          if (effect.flags.titan?.type === 'effect') {
-            const effectItem = this.parent.items.get(effect.origin);
+            const effectItem = this.parent.items.get(effect.flags.titan.origin);
             if (!effectItem || !effectItem.typeComponent.isActive()) {
                await effect.delete();
             }
@@ -708,7 +708,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
 
       // For each effect item
       for (const effectItem of this._getActiveEffectItems()) {
-         const effects = this.parent.effects.filter((effect) => effect.origin === effectItem._id);
+         const effects = this.parent.effects.filter((effect) => effect.flags.titan?.origin === effectItem._id);
 
          // Update effects if appropriate
          if (effects.length > 0) {
@@ -772,12 +772,13 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                   duration: {
                      turns: effectItem.system.duration.turns
                   },
+                  statuses: [
+                     `${effectItem._id}`
+                  ],
                   flags: {
-                     core: {
-                        statusId: effectItem._id,
-                     },
                      titan: {
-                        type: 'effect'
+                        type: 'effect',
+                        origin: effectItem._id,
                      },
                      'visual-active-effects.data.content': TextEditor.enrichHTML(effectItem.system.description, { async: false, secrets: true })
                   },

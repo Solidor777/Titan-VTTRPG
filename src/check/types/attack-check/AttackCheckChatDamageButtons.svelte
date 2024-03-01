@@ -34,11 +34,12 @@
          use:tooltip={{ content: localize('applyCleaveDamage') }}
       >
          <EfxButton
-            on:click={(() => applyDamageToTargets(cleave),
-            {
-               ineffective: ineffective,
-               penetrating: penetrating,
-            })}
+            on:click={() => {
+               applyDamageToTargets(cleave, {
+                  ineffective: ineffective,
+                  penetrating: penetrating,
+               });
+            }}
          >
             <i class="fas fa-scythe" />
          </EfxButton>
@@ -51,12 +52,13 @@
       use:tooltip={{ content: localize('applyDamageIgnoreArmor') }}
    >
       <EfxButton
-         on:click={() =>
+         on:click={() => {
             applyDamageToTargets(damage, {
-               ignoreArmor: true,
                ineffective: ineffective,
                penetrating: penetrating,
-            })}
+               ignoreArmor: true,
+            });
+         }}
          ><i class="fas fa-shield-slash" />
       </EfxButton>
    </div>
@@ -64,11 +66,12 @@
    <!--Apply half damage button-->
    <div class="button" use:tooltip={{ content: localize('applyHalfDamage') }}>
       <EfxButton
-         on:click={() =>
-            applyDamageToTargets(Math.floor(damage / 2), {
+         on:click={() => {
+            applyDamageToTargets(Math.max(Math.floor(damage / 2), 1), {
                ineffective: ineffective,
                penetrating: penetrating,
-            })}
+            });
+         }}
       >
          <i class="fas fa-heart-half-stroke" />
       </EfxButton>

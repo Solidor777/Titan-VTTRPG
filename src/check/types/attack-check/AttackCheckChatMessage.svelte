@@ -59,7 +59,7 @@
                   false}
                penetrating={$document.flags.titan.parameters.penetrating ??
                   false}
-               cleave={$document.flags.titan.parameters.rend
+               cleave={$document.flags.titan.parameters.cleave
                   ? $document.flags.titan.results.criticalSuccesses
                   : 0}
             />

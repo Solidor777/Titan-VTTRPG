@@ -29,6 +29,7 @@
    "LOCAL.any.label": "Any",
    "LOCAL.anyCheck.label": "Any Check",
    "LOCAL.apply%xDamage.label": "Apply %x Damage",
+   "LOCAL.applyCleaveDamage.label": "Apply Cleave Damage",
    "LOCAL.applyDamage.label": "Apply Damage",
    "LOCAL.applyDamageIgnoreArmor.label": "Apply Damage (Ignore Armor)",
    "LOCAL.applyEdits.label": "Apply Edits",
