@@ -330,7 +330,7 @@
    "LOCAL.persistentDamage.label": "Persistent Damage",
    "LOCAL.piercing.label": "Piercing",
    "LOCAL.push.label": "Push",
-   "LOCAL.prone.desc.label": "<p>A <strong>Prone</strong> creature has their speed reduced by half, rounded up.</p><p>The creature's <strong>Melee</strong> and <strong>Accuracy</strong> are decreased by 1 step.</p><p>A creature attacking a <strong>Prone</strong> within Range 1 increases their <strong>Melee</strong> or <strong>Accuracy</strong> by 1.</p><p>A creature attack a <strong>Prone</strong> target at a distance greater than Range 1 decreases their <strong>Accuracy</strong> by 1 per 10 distance, rounded down.</p><p>Standing up from <strong>Prone</strong> requires an Action or a Move.</p>",
+   "LOCAL.prone.desc.label": "<p>A <strong>Prone</strong> creature has their speed reduced by half, rounded up.</p><p>The creature's <strong>Melee</strong> and <strong>Accuracy</strong> are decreased by 1 step.</p><p>A creature attacking a <strong>Prone</strong> within Range 1 increases their <strong>Melee</strong> or <strong>Accuracy</strong> by 1.</p><p>A creature attack a <strong>Prone</strong> target at a distance greater than Range 1 decreases their <strong>Accuracy</strong> by <strong>1</strong> per <strong>10 spaces</strong>, rounded down.</p><p>Standing up from <strong>Prone</strong> requires an Action or a Move.</p>",
    "LOCAL.prone.label": "Prone",
    "LOCAL.prototypeToken.label": "Prototype Token",
    "LOCAL.quantity.label": "Quantity",
