@@ -1,4 +1,5 @@
 import TitanCheck from '~/check/Check.js';
+import calculateAttributeCheckResults from '~/check/types/attribute-check/CalculateAttributeCheckResults';
 
 export default class TitanAttributeCheck extends TitanCheck {
    _ensureValidConstruction(options) {
@@ -29,6 +30,11 @@ export default class TitanAttributeCheck extends TitanCheck {
       parameters.trainingMod = options.trainingMod ?? 0;
       parameters.doubleTraining = options.doubleTraining ?? false;
 
+      // Damage to resist
+      if (options.damageToResist && options.damageToResist > 0) {
+         parameters.damageToResist = options.damageToResist;
+      }
+
       // Determine the skill training and expertise
       if (options.skill && options.skill !== 'none') {
          parameters.skill = options.skill;
@@ -58,7 +64,14 @@ export default class TitanAttributeCheck extends TitanCheck {
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
       parameters.totalDice += parameters.attributeDice;
 
+      // Initialize damage to reduce
+      parameters.damageToReduce = options.damageToReduce ?? 0;
+
       return parameters;
+   }
+
+   _calculateResults(inResults, parameters) {
+      return calculateAttributeCheckResults(inResults, parameters);
    }
 
    _getCheckType() {

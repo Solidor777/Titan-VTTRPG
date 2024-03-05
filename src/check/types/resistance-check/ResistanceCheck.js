@@ -1,4 +1,5 @@
 import TitanCheck from '~/check/Check.js';
+import calculateResistanceCheckResults from '~/check/types/resistance-check/CalculateResistanceCheckResults';
 
 export default class TitanResistanceCheck extends TitanCheck {
    _ensureValidConstruction(inData) {
@@ -17,19 +18,26 @@ export default class TitanResistanceCheck extends TitanCheck {
       return true;
    }
 
-   _initializeParameters(inData) {
-      const parameters = super._initializeParameters(inData);
+   _initializeParameters(options) {
+      const parameters = super._initializeParameters(options);
 
       // Initialize resistance parameters
-      parameters.resistance = inData.resistance ?? 'reflexes';
+      parameters.resistance = options.resistance ?? 'reflexes';
 
       // Get the resistance value
-      parameters.resistanceDice = inData.actorRollData.resistance[parameters.resistance].value;
+      parameters.resistanceDice = options.actorRollData.resistance[parameters.resistance].value;
 
       // Add the training dice to the total dice
       parameters.totalDice += parameters.resistanceDice;
 
+      // Initialize damage to reduce
+      parameters.damageToReduce = options.damageToReduce ?? 0;
+
       return parameters;
+   }
+
+   _calculateResults(inResults, parameters) {
+      return calculateResistanceCheckResults(inResults, parameters);
    }
 
    _getCheckType() {

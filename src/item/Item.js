@@ -227,6 +227,7 @@ export default class TitanItem extends Item {
             attribute: 'body',
             skill: 'athletics'
          },
+         damageReducedBy: 'none',
          uuid: Hashing.uuidv4()
       };
    }

@@ -74,6 +74,11 @@
                difficulty={$document.flags.titan.parameters.opposedCheck
                   .difficulty}
                complexity={$document.flags.titan.results.extraSuccesses + 1}
+               damageToReduce={$document.flags.titan.parameters.isDamage &&
+               $document.flags.titan.parameters.damageReducedBy ===
+                  'opposedCheck'
+                  ? $document.flags.titan.results.damage
+                  : 0}
             />
          </div>
       {/if}
@@ -87,6 +92,11 @@
                willpower={$document.flags.titan.results.willpowerCheck}
                difficulty={4}
                complexity={$document.flags.titan.results.extraSuccesses + 1}
+               damageToReduce={$document.flags.titan.parameters.isDamage &&
+               $document.flags.titan.parameters.damageReducedBy ===
+                  'resistanceCheck'
+                  ? $document.flags.titan.results.damage
+                  : 0}
             />
          </div>
       {/if}

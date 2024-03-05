@@ -133,6 +133,7 @@
    "LOCAL.damage.desc.label": "<p>Bonuses and penalties to damage dealt.</p><p>Determined by what gear, effects, and abilities you possess.</p>",
    "LOCAL.damage.label": "Damage",
    "LOCAL.damageTaken.label": "Damage Taken",
+   "LOCAL.damageReducedBy.label": "Damage Reduced By",
    "LOCAL.dc.label": "DC",
    "LOCAL.dead.desc.label": "A <strong>Dead</strong> creature can take no actions of any kind.",
    "LOCAL.dead.label": "Dead",

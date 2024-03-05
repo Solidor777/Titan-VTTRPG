@@ -4,6 +4,7 @@
    import ResistanceCheckChatHeader from './ResistanceCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
    import CheckChatMesssages from '~/check/chat-message/CheckChatMesssages.svelte';
+   import ChatDamageButtons from '~/chat-message/ChatDamageButtons.svelte';
 
    // Document reference
    const document = getContext('DocumentStore');
@@ -32,6 +33,16 @@
    <div class="section">
       <CheckChatResults />
    </div>
+
+   <!--Damage Buttons-->
+   <!-- svelte-ignore missing-declaration -->
+   {#if $document.flags.titan.results.damageTaken && game.user.isGM}
+      <div class="section">
+         <ChatDamageButtons
+            damage={$document.flags.titan.results.damageTaken}
+         />
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">

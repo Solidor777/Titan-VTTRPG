@@ -70,6 +70,7 @@ export default class TitanItemCheck extends TitanCheck {
          resistanceCheck: options.resistanceCheck ?? itemCheckData.resistanceCheck,
          resolveCost: options.resolveCost ?? itemCheckData.resolveCost,
          trainingMod: options.TrainingMod ?? 0,
+         damageReducedBy: itemCheckData.damageReducedBy ?? 'none'
       };
       parameters.totalDice = parameters.diceMod;
 
@@ -101,21 +102,6 @@ export default class TitanItemCheck extends TitanCheck {
       parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
       parameters.totalDice += parameters.attributeDice;
 
-      // Get damage and healing specific parameters
-      if (parameters.isDamage || parameters.isHealing) {
-         parameters.initialValue = options.initialValue ?? itemCheckData.initialValue;
-         parameters.scaling = options.scaling ?? true;
-
-         // Damage specific parameters
-         if (parameters.isDamage) {
-            parameters.damageMod = options.damageMod ?? actorRollData.mod.damage.value;
-         }
-
-         // Healing specific parameters
-         if (parameters.isHealing) {
-            parameters.healingMod = options.healingMod ?? actorRollData.mod.healing.value;
-         }
-      }
 
       // Opposed check parameters
       // If no options override
@@ -139,6 +125,23 @@ export default class TitanItemCheck extends TitanCheck {
             skill: opposedCheck.skill ?? itemCheck.skill,
             difficulty: opposedCheck.difficulty ? clamp(opposedCheck.difficulty, 2, 6) : clamp(itemCheck.difficulty, 2, 6),
          };
+      }
+
+
+      // Get damage and healing specific parameters
+      if (parameters.isDamage || parameters.isHealing) {
+         parameters.initialValue = options.initialValue ?? itemCheckData.initialValue;
+         parameters.scaling = options.scaling ?? true;
+
+         // Damage specific parameters
+         if (parameters.isDamage) {
+            parameters.damageMod = options.damageMod ?? actorRollData.mod.damage.value;
+         }
+
+         // Healing specific parameters
+         if (parameters.isHealing) {
+            parameters.healingMod = options.healingMod ?? actorRollData.mod.healing.value;
+         }
       }
 
       return parameters;

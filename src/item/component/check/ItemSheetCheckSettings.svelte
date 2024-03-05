@@ -10,6 +10,7 @@
    import DocumentSkillSelect from '~/documents/components/select/DocumentSkillSelect.svelte';
    import DocumentAttributeSelect from '~/documents/components/select/DocumentAttributeSelect.svelte';
    import DocumentCheckDifficultySelect from '~/documents/components/select/DocumentCheckDifficultySelect.svelte';
+   import DocumentDamageReducedBySelect from '~/documents/components/select/DocumentDamageReducedBySelect.svelte';
 
    // Check idx
    export let idx = void 0;
@@ -228,6 +229,25 @@
                      </div>
                   </div>
                </div>
+
+               {#if check.isDamage}
+                  <!--Damage reduced by-->
+                  <div class="row" transition:slide|local>
+                     <div class="field">
+                        <!--Label-->
+                        <div class="label">
+                           {localize('damageReducedBy')}
+                        </div>
+
+                        <!--Value-->
+                        <div class="input">
+                           <DocumentDamageReducedBySelect
+                              bind:value={check.damageReducedBy}
+                           />
+                        </div>
+                     </div>
+                  </div>
+               {/if}
             {/if}
 
             <div class="row">

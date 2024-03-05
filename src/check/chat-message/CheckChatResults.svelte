@@ -96,7 +96,7 @@
          </div>
       {/if}
 
-      <!--Rend-->
+      <!--Cleave-->
       {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
@@ -107,6 +107,15 @@
             {$document.flags.titan.results.criticalSuccesses}
          </div>
       {/if}
+   {/if}
+
+   <!--Damage Taken-->
+   {#if $document.flags.titan.results.damageTaken}
+      <div class="stat">
+         <i class="fas fa-burst" />
+         {localize('damageTaken')}:
+         {$document.flags.titan.results.damageTaken}
+      </div>
    {/if}
 
    <!--Rerolled failures-->

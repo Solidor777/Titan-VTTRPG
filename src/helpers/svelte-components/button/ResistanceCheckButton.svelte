@@ -6,7 +6,7 @@
    export let resistance = 'reflexes';
    export let difficulty = 4;
    export let complexity = 1;
-
+   export let damageToReduce = 0;
    export let disabled = false;
 
    async function rollResistanceCheck() {
@@ -28,6 +28,7 @@
                resistance: resistance,
                difficulty: difficulty,
                complexity: complexity,
+               damageToReduce: damageToReduce,
             });
          }
       }

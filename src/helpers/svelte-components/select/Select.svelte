@@ -17,6 +17,9 @@
 
    select {
       @include input;
+      option {
+         @include flex-group-left;
+      }
 
       &:disabled {
          @include input-disabled;

@@ -6,6 +6,7 @@
    export let skill = 'arcana';
    export let difficulty = 4;
    export let complexity = 1;
+   export let damageToReduce = 0;
 
    async function rollOpposedCheck() {
       const targets = getCombatTargets();
@@ -15,7 +16,8 @@
             skill: skill,
             difficulty: difficulty,
             complexity: complexity,
-         })
+            damageToReduce: damageToReduce,
+         }),
       );
 
       return;

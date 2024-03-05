@@ -6,6 +6,7 @@
    export let willpower = false;
    export let difficulty = 4;
    export let complexity = 1;
+   export let damageToReduce = 0;
 </script>
 
 <div class="buttons">
@@ -15,7 +16,9 @@
          <ResistanceCheckButton
             resistance={'reflexes'}
             {difficulty}
-            {complexity} />
+            {complexity}
+            {damageToReduce}
+         />
       </div>
    {/if}
 
@@ -25,7 +28,9 @@
          <ResistanceCheckButton
             resistance={'resilience'}
             {difficulty}
-            {complexity} />
+            {complexity}
+            {damageToReduce}
+         />
       </div>
    {/if}
 
@@ -35,7 +40,9 @@
          <ResistanceCheckButton
             resistance={'willpower'}
             {difficulty}
-            {complexity} />
+            {complexity}
+            {damageToReduce}
+         />
       </div>
    {/if}
 </div>
