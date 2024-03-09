@@ -407,7 +407,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       if (this.conditions) {
          // Check each effect to see if it is a status effect
          this.conditions.forEach((condition) => {
-            switch (condition.flags.core.statusId) {
+            switch (condition.name) {
                // Blinded
                case 'blinded': {
                   const systemData = this.parent.system;
