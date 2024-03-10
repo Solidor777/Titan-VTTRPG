@@ -40,7 +40,7 @@
          documentTraits = traitOptions.filter(
             (trait) =>
                (trait.type === 'boolean' && trait.value === true) ||
-               (trait.type === 'number' && trait.value > 0)
+               (trait.type === 'number' && trait.value > 0),
          );
 
          // Update the document
@@ -53,7 +53,7 @@
    }
 </script>
 
-<div class="attack-trait-dialog">
+<div class="document-edit-traits-dialog">
    <!--Traits list-->
    <ol>
       {#each traitOptions as trait, idx}
@@ -99,7 +99,7 @@
 
 <style lang="scss">
    @import '../../styles/Mixins.scss';
-   .attack-trait-dialog {
+   .document-edit-traits-dialog {
       ol {
          list-style: none;
          column-count: var(--trait-column-count);
