@@ -5,18 +5,19 @@ import {
    postcssConfig,
    terserConfig
 } from '@typhonjs-fvtt/runtime/rollup';
-import * as path from 'path';
+import path from 'path';
 
 // ATTENTION!
 // Please modify the below variables: s_PACKAGE_ID and s_SVELTE_HASH_ID appropriately.
 
 // For convenience, you just need to modify the package ID below as it is used to fill in default proxy settings for
 // the dev server.
-const s_PACKAGE_ID = 'systems/titan';
+const s_PACKAGE_ID = 'systems/titan-rebuild';
 
 // A short additional string to add to Svelte CSS hash values to make yours unique. This reduces the amount of
-// duplicated framework CSS overlap between many TRL packages enabled on Foundry VTT at the same time.
-const s_SVELTE_HASH_ID = 'tvtt';
+// duplicated framework CSS overlap between many TRL packages enabled on Foundry VTT at the same time. 'ese' is chosen
+// by shortening 'essential-svelte-esm'.
+const s_SVELTE_HASH_ID = 'ese';
 
 const s_COMPRESS = false;  // Set to true to compress the module bundle.
 const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).
@@ -38,7 +39,7 @@ export default () => {
       resolve: {
          conditions: ['import', 'browser'],
          alias: {
-            '~': path.resolve(__dirname, 'src'),
+            '~/': `${path.resolve(__dirname, 'src')}/`,
          }
       },
 
@@ -52,7 +53,7 @@ export default () => {
       },
 
       define: {
-         'process.env': {}
+         'process.env.NODE_ENV': '"production"'
       },
 
       // About server options:
