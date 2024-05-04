@@ -500,7 +500,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
                         speedValue += mod;
                      }
 
-                     // Set the effect speed so that the total speed is 0 
+                     // Set the effect speed so that the total speed is 0
                      if (speedValue > 0) {
                         speed.mod.effect -= speedValue;
                      }
@@ -1901,8 +1901,7 @@ export default class TitanCharacterComponent extends TitanTypeComponent {
       else if (actor.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
          actor.sheet.render(true);
       }
-
-      return;
+      
    }
 
    async onTurnEnd() {

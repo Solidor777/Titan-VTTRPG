@@ -32,6 +32,7 @@ export default class SvelteDocumentSheet extends SvelteApplication {
          },
       });
       this.reactive.document = document;
+      this.object = document;
 
       // Define state store property
       Object.defineProperty(this.reactive, 'state', {

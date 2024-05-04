@@ -14,7 +14,6 @@ import TitanEquipmentSheet from '~/item/types/equipment/sheet/EquipmentSheet.js'
 import TitanShieldSheet from '~/item/types/shield/sheet/ShieldSheet';
 import TitanSpellSheet from '~/item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from '~/item/types/weapon/sheet/WeaponSheet.js';
-import TitanTokenDocument from '~/documents/TokenDocument.js';
 import TitanMacros from '~/system/Macros';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerInitiativeFormula from '~/system/Initiative.js';
@@ -38,7 +37,6 @@ Hooks.once('init', async () => {
    // Register Document Classes
    CONFIG.Actor.documentClass = TitanActor;
    CONFIG.Item.documentClass = TitanItem;
-   CONFIG.Token.documentClass = TitanTokenDocument;
    CONFIG.time.roundTime = 6;
 
    // Initialize titan specific game settings
