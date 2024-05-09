@@ -408,7 +408,7 @@
 
 @mixin effect-permanent {
    --border-color: var(--label-color);
-   
+
    color: var(--label-color);
    background: linear-gradient(var(--gradient-degree), var(--cyan) 0, var(--green) 100%);
 }
