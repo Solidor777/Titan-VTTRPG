@@ -1,5 +1,5 @@
 {
-   "name": "titan-rebuild",
+   "name": "titan",
    "version": "1.0.0",
    "description": "Provides a bare-bones Foundry System for TITAN.",
    "license": "MIT",

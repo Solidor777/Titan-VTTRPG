@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename); // get the name of the directory
 
 // For convenience, you just need to modify the package ID below as it is used to fill in default proxy settings for
 // the dev server.
-const s_PACKAGE_ID = 'systems/titan-rebuild';
+const s_PACKAGE_ID = 'systems/titan';
 
 const s_COMPRESS = false;  // Set to true to compress the module bundle.
 const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).

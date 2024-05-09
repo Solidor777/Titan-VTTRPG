@@ -36,4 +36,4 @@ export default class SocketManager {
    }
 }
 
-const SOCKET_NAME = 'system.titan-rebuild';
+const SOCKET_NAME = 'system.titan';
