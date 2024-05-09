@@ -1,26 +1,25 @@
 <script>
-   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
+
    export let enabled = void 0;
    export let label = void 0;
    export let disabled = false;
 </script>
 
 <div class="toggle enabled-{enabled === true}">
-   <EfxButton on:click {disabled}>
+   <Button on:click {disabled}>
       <div class="label">
          {label}
       </div>
-   </EfxButton>
+   </Button>
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .toggle {
       --button-font-size: var(--font-size-small);
-      --button-padding: 0.25rem;
+      --button-padding: var(--padding-standard);
       --button-line-height: normal;
-      --button-border-radius: 10px;
+      --button-border-radius: var(--button-chat-message-border-radius);
 
       &.enabled-true {
          --button-background: var(--active-background);

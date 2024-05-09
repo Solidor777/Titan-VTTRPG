@@ -1,9 +1,11 @@
 <script>
    import { getContext } from 'svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import recalculateCheckResults from './RecalculateCheckResults';
+   import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
+   import { RESET_ICON } from '~/system/Icons.js';
 
-   const document = getContext('DocumentStore');
+   const document = getContext('document');
+
    async function resetExpertise() {
       // Remove the expertise from the dice
       $document.flags.titan.results.dice.forEach((dice) => {
@@ -27,7 +29,7 @@
 </script>
 
 <IconButton
-   icon="fas fa-arrow-rotate-left"
+   icon="{RESET_ICON}"
    on:click={() => {
       resetExpertise();
    }}

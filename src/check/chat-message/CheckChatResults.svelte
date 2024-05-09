@@ -1,11 +1,20 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
-   import CheckChatResetExpertiseButton from './CheckChatResetExpertiseButton.svelte';
+   import CheckChatResetExpertiseButton from '~/check/chat-message/CheckChatResetExpertiseButton.svelte';
+   import {
+      CLEAVE_ICON,
+      DAMAGE_ICON,
+      DICE_ICON,
+      EXPERTISE_ICON,
+      HEALING_ICON,
+      REND_ICON,
+      TRAINING_ICON,
+   } from '~/system/Icons.js';
 
    // Document reference
-   const document = getContext('DocumentStore');
+   const document = getContext('document');
 </script>
 
 <div class="results">
@@ -32,13 +41,13 @@
          {#if $document.flags.titan.results.extraSuccessesRemaining !== undefined}
             <div class="stat">
                {localize('extraSuccesses')}: {$document.flags.titan.results
-                  .extraSuccessesRemaining}/{$document.flags.titan.results
-                  .extraSuccesses}
+               .extraSuccessesRemaining}/{$document.flags.titan.results
+               .extraSuccesses}
             </div>
          {:else if $document.flags.titan.results.extraSuccesses > 0}
             <div class="stat">
                {localize('extraSuccesses')}: {$document.flags.titan.results
-                  .extraSuccesses}
+               .extraSuccesses}
             </div>
          {/if}
       {/if}
@@ -52,14 +61,14 @@
    <!--Expertise Remaining-->
    {#if $document.flags.titan.parameters.totalExpertise}
       <div class="stat">
-         <i class="fas fa-graduation-cap" />
+         <i class={EXPERTISE_ICON}/>
          {localize('expertiseRemaining')}:
          {$document.flags.titan.results.expertiseRemaining}
 
          <!--Reset Button-->
          {#if $document.constructor.getSpeakerActor($document.speaker)?.isOwner}
             <div class="button">
-               <CheckChatResetExpertiseButton />
+               <CheckChatResetExpertiseButton/>
             </div>
          {/if}
       </div>
@@ -67,9 +76,9 @@
 
    {#if $document.flags.titan.results.succeeded}
       <!--Damage-->
-      {#if $document.flags.titan.results.damage > 0}
+      {#if $document.flags.titan.results.damage}
          <div class="stat">
-            <i class="fas fa-burst" />
+            <i class={DAMAGE_ICON}/>
             {localize('damage')}:
             {$document.flags.titan.results.damage}
          </div>
@@ -78,7 +87,7 @@
       <!--Healing-->
       {#if $document.flags.titan.results.healing > 0}
          <div class="stat">
-            <i class="fas fa-heart" />
+            <i class="{HEALING_ICON}"/>
             {localize('healing')}:
             {$document.flags.titan.results.healing}
          </div>
@@ -90,7 +99,7 @@
             class="stat"
             use:tooltip={{ content: localize('attack.rend.desc') }}
          >
-            <i class="fas fa-hammer-crash" />
+            <i class={REND_ICON}/>
             {localize('rend')}:
             {$document.flags.titan.results.criticalSuccesses}
          </div>
@@ -102,7 +111,7 @@
             class="stat"
             use:tooltip={{ content: localize('attack.cleave.desc') }}
          >
-            <i class="fas fa-scythe" />
+            <i class={CLEAVE_ICON}/>
             {localize('cleave')}:
             {$document.flags.titan.results.criticalSuccesses}
          </div>
@@ -112,7 +121,7 @@
    <!--Damage Taken-->
    {#if $document.flags.titan.results.damageTaken}
       <div class="stat">
-         <i class="fas fa-burst" />
+         <i class={DAMAGE_ICON}/>
          {localize('damageTaken')}:
          {$document.flags.titan.results.damageTaken}
       </div>
@@ -121,7 +130,7 @@
    <!--Rerolled failures-->
    {#if $document.flags.titan.failuresReRolled}
       <div class="stat">
-         <i class="fas fa-dice" />
+         <i class={DICE_ICON}/>
          {localize('failuresReRolled')}
       </div>
    {/if}
@@ -129,7 +138,7 @@
    <!--Training Doubled-->
    {#if $document.flags.titan.parameters.doubleTraining && $document.flags.titan.parameters.totalTrainingDice > 0}
       <div class="stat">
-         <i class="fas fa-dumbbell" />
+         <i class={TRAINING_ICON}/>
          {localize('trainingDoubled')}
       </div>
    {/if}
@@ -137,15 +146,13 @@
    <!--Expertise Doubled-->
    {#if $document.flags.titan.parameters.doubleExpertise && $document.flags.titan.parameters.totalExpertise > 0}
       <div class="stat">
-         <i class="fas fa-graduation-cap" />
+         <i class={EXPERTISE_ICON}/>
          {localize('expertiseDoubled')}
       </div>
    {/if}
 </div>
 
 <style lang="scss">
-   @import '../../styles/Mixins.scss';
-
    .results {
       @include border;
       @include flex-column;
@@ -154,7 +161,7 @@
       @include font-size-normal;
       font-weight: bold;
       width: 100%;
-      padding: 0.5rem;
+      padding: var(--padding-large);
 
       .result {
          @include flex-row;
@@ -162,6 +169,7 @@
          @include font-size-large;
          width: 100%;
          font-weight: bold;
+
          &.succeeded {
             color: var(--succeeded-color);
          }
@@ -174,24 +182,25 @@
       .stat {
          @include flex-row;
          @include flex-group-center;
+
          &:not(:first-child) {
-            margin-top: 0.25rem;
+            margin-top: var(--padding-standard);
          }
 
          i {
-            margin-right: 0.25rem;
+            margin-right: var(--padding-standard);
          }
 
          .button {
-            margin-left: 0.25rem;
-            --icon-button-radius: 1.5rem;
-            --icon-button-font-size: 0.9rem;
+            margin-left: var(--padding-standard);
+            --icon-button-radius: 24px;
+            --icon-button-font-size: 14px;
          }
 
          .border-right {
             @include border-right;
-            margin-right: 0.5rem;
-            padding-right: 0.5rem;
+            margin-right: var(--padding-large);
+            padding-right: var(--padding-large);
          }
       }
    }

@@ -1,7 +1,8 @@
 <script>
    import { createEventDispatcher } from 'svelte';
-   import { isModifierActive } from '~/helpers/utility.js';
-   import MinIconButton from '~/helpers/svelte-components/button/MinIconButton.svelte';
+   import isModifierActive from '~/helpers/utility-functions/IsModifierActive.js';
+   import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
+   import { DECREMENT_ICON, INCREMENT_ICON } from '~/system/icons.js';
 
    // The value of the input
    export let value = void 0;
@@ -40,7 +41,8 @@
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {
          event.preventDefault();
-      } else if (/[\.,]/.test(event.key)) {
+      }
+      else if (/[\.,]/.test(event.key)) {
          event.preventDefault();
       }
    }
@@ -72,8 +74,8 @@
 
 <div class="input">
    <div class="decrement">
-      <MinIconButton
-         icon={'fas fa-minus'}
+      <MiniIconButton
+         icon={DECREMENT_ICON}
          on:click={decrementInput}
          {disabled}
       />
@@ -92,8 +94,8 @@
       {disabled}
    />
    <div class="increment">
-      <MinIconButton
-         icon={'fas fa-plus'}
+      <MiniIconButton
+         icon={INCREMENT_ICON}
          on:click={incrementInput}
          {disabled}
       />
@@ -101,8 +103,6 @@
 </div>
 
 <style lang="scss">
-   @import '../../../styles/Mixins.scss';
-
    .input {
       @include flex-row;
       @include flex-group-center;
@@ -116,10 +116,11 @@
       }
 
       .increment {
-         margin-left: 0.125rem;
+         margin-left: 2px;
       }
+
       .decrement {
-         margin-right: 0.125rem;
+         margin-right: 2px;
       }
    }
 </style>

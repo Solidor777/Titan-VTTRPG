@@ -1,5 +1,6 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
+
    export let type = void 0;
    export let remaining = void 0;
 </script>
@@ -19,14 +20,12 @@
 </div>
 
 <style lang="scss">
-   @import '../../../styles/mixins.scss';
-
    .stat {
       @include flex-row;
       @include flex-group-center;
       @include border;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
 
       .label {
          font-weight: bold;
@@ -34,8 +33,8 @@
 
       .value {
          @include border-left;
-         padding-left: 0.25rem;
-         margin-left: 0.25rem;
+         padding-left: var(--padding-standard);
+         margin-left: var(--padding-standard);
       }
    }
 </style>

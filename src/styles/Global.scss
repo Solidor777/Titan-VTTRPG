@@ -1,20 +1,31 @@
+:root {
+   .app {
+      background-color: rgba(15 15 15 / 0.80)
+   }
+}
+
+.document-sheet * {
+   will-change: transform;
+}
+
 .titan-dark-mode {
    // Panel styling
    --panel-1-background: #373949;
    --panel-2-background: #424557;
    --panel-3-background: #2e303c;
-   --panel-1-color: rgba(255, 255, 255, 0.83);
-   --panel-2-color: rgba(255, 255, 255, 0.83);
-   --panel-3-color: rgba(255, 255, 255, 0.83);
-   --color-text-dark-primary: rgba(255, 255, 255, 0.83);
-   --color-text-dark-secondary: rgba(255, 255, 255, 0.83);
-   --color-text-dark-header: rgba(255, 255, 255, 0.83);
-   --color-text-dark-inactive: rgba(255, 255, 255, 0.83);
-   --color-border-highlight: rgba(255, 255, 255, 0.83);
-   --static-value-background: rgb(70, 70, 70);
+   --panel-1-color: rgba(255 255 255 / 0.83);
+   --panel-2-color: rgba(255 255 255 / 0.83);
+   --panel-3-color: rgba(255 255 255 / 0.83);
+   --color-text-dark-primary: rgba(255 255 255 / 0.83);
+   --color-text-dark-secondary: rgba(255 255 255 / 0.83);
+   --color-text-dark-header: rgba(255 255 255 / 0.83);
+   --color-text-dark-inactive: rgba(255 255 255 / 0.83);
+   --color-border-highlight: rgba(255 255 255 / 0.83);
+   --static-value-background: rgb(70 70 70);
 
    .content-link {
       --color-text-dark-primary: #191813;
+
       color: var(--color-text-dark-primary);
 
       i {
@@ -25,18 +36,18 @@
    // Input styling
    --input-color: #1d1e26;
    --input-background: #c5bcf8;
-   --border-color: rgba(255, 255, 255, 0.83);
+   --border-color: rgba(255 255 255 / 0.83);
 
    // Button styling
    --button-border-color: #15171b;
    --button-background: #f2b58c;
    --button-border-style: solid;
-   --button-background-disabled: rgb(208, 208, 208);
-   --button-background-highlight: rgb(255, 233, 174);
+   --button-background-disabled: #D0D0D0;
+   --button-background-highlight: #FFE9AE;
    --button-color: #15171b;
    --icon-button-border-color: black;
    --icon-button-background: #f2b58c;
-   --icon-button-highlight: rgb(255, 233, 174);
+   --icon-button-highlight: #FFE9AE;
    --icon-button-color: #15171b;
 
    select {
@@ -64,8 +75,8 @@
    --label-color: #1d1e26;
 
    // Meter styling
-   --meter-background: rgb(30, 30, 30);
-   --font-color: rgba(255, 255, 255, 0.83);
+   --meter-background: #1E1E1E;
+   --font-color: rgba(255 255 255 / 0.83);
 
    .window-content {
       background: #262836;
@@ -73,10 +84,12 @@
 
       .content-link {
          --color-text-dark-primary: #191813;
+
          color: var(--color-text-dark-primary);
 
          i {
             --color-text-dark-primary: #191813;
+
             color: var(--color-text-dark-primary);
          }
       }
@@ -101,16 +114,21 @@
    .prosemirror {
       .editor-menu {
          --color-text-dark-primary: #191813;
+
          button:not(.pm-dropdown) {
             &:not(.active) {
-               color: rgba(255, 255, 255, 0.83);
+               color: rgba(255 255 255 / 0.83);
             }
+
             &.active {
                --color-text-dark-primary: #191813;
+
                color: var(--color-text-dark-primary);
             }
+
             &:hover {
                --color-text-dark-primary: #191813;
+
                color: var(--color-text-dark-primary);
             }
          }
@@ -118,11 +136,11 @@
 
       &.editing-source {
          textarea {
-            color: rgba(255, 255, 255, 0.83);
+            color: rgba(255 255 255 / 0.83);
          }
       }
 
-      --color-hover-bg: rgb(255, 233, 174);
+      --color-hover-bg: #FFE9AE;
    }
 
    h1,
@@ -198,7 +216,7 @@
    font-family: 'Open Sans';
 }
 
-#chat-log .titan-dark-mode.emote.message .message-content {
+#chat-log .titan-dark-mode.emote.section .message-content {
    text-align: center;
    color: var(--panel-1-color);
    font-style: italic;

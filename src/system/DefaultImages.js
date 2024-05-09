@@ -1,0 +1,9 @@
+export const ABILITY_IMAGE = 'icons/svg/ice-aura.svg';
+export const ARMOR_IMAGE = 'icons/svg/statue.svg';
+export const COMMODITY_IMAGE = 'icons/svg/item-bag.svg';
+export const EFFECT_IMAGE = 'icons/svg/daze.svg';
+export const EQUIPMENT_IMAGE = 'icons/svg/combat.svg';
+export const ITEM_IMAGE = 'icons/svg/item-bag.svg';
+export const SHIELD_IMAGE = 'icons/svg/shield.svg';
+export const SPELL_IMAGE = 'icons/svg/explosion.svg';
+export const WEAPON_IMAGE = 'icons/svg/sword.svg';

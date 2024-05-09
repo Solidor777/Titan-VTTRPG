@@ -1,6 +1,7 @@
 <script>
-   import SpellCustomAspectTag from './SpellCustomAspectTag.svelte';
-   import SpellStandardAspectTag from './SpellStandardAspectTag.svelte';
+   import SpellCustomAspectTag from '~/helpers/svelte-components/tag/SpellCustomAspectTag.svelte';
+   import SpellStandardAspectTag from '~/helpers/svelte-components/tag/SpellStandardAspectTag.svelte';
+   import sort from '~/helpers/utility-functions/Sort.js';
 
    // Aspects list
    export let standardAspects = void 0;
@@ -15,7 +16,8 @@
 
       if (aspect.allOptions) {
          size += 1;
-      } else if (aspect.option) {
+      }
+      else if (aspect.option) {
          size += aspect.option.length;
       }
 
@@ -38,17 +40,9 @@
                size: getAspectSize(aspect),
                standardAspect: false,
             };
-         })
+         }),
       )
-      .sort((a, b) => {
-         if (a.size > b.size) {
-            return 1;
-         }
-         if (a.size < b.size) {
-            return -1;
-         }
-         return 0;
-      });
+      .sort((a, b) => sort(a.sort, b.sort));
 </script>
 
 <div class="aspects">
@@ -61,15 +55,13 @@
          </div>
       {:else if aspectSizeMap?.standardAspect === false}
          <div class="aspect">
-            <SpellCustomAspectTag aspect={customAspects[aspectSizeMap.idx]} />
+            <SpellCustomAspectTag aspect={customAspects[aspectSizeMap.idx]}/>
          </div>
       {/if}
    {/each}
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .aspects {
       @include flex-row;
       @include flex-group-center;

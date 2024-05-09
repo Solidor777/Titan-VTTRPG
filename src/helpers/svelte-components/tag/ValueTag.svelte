@@ -1,10 +1,12 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import { CURRENCY_ICON } from '~/system/Icons.js';
+
    export let value = void 0;
 </script>
 
 <div class="stat">
-   <i class="fas fa-coins" />
+   <i class="{CURRENCY_ICON}"/>
    <div class="label">
       {localize('value')}
    </div>
@@ -14,20 +16,18 @@
 </div>
 
 <style lang="scss">
-   @import '../../../styles/mixins.scss';
-
    .stat {
       @include flex-row;
       @include flex-group-center;
       @include border;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
 
       .label {
          @include border-right;
          font-weight: bold;
-         padding-right: 0.25rem;
-         margin: 0 0.25rem;
+         padding-right: var(--padding-standard);
+         margin: 0 var(--padding-standard);
       }
    }
 </style>

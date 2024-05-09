@@ -1,0 +1,29 @@
+{
+   "extends": "stylelint-config-standard-scss",
+   "rules": {
+      "font-family-name-quotes": "always-unless-keyword",
+      "font-weight-notation": "named-where-possible",
+      "function-url-no-scheme-relative": true,
+      "function-url-quotes": "always",
+      "value-keyword-case": "lower",
+      "unit-disallowed-list": [],
+      "no-descending-specificity": null,
+      "no-duplicate-selectors": true,
+      "font-family-no-missing-generic-family-keyword": null,
+      "alpha-value-notation": "number",
+      "property-no-unknown": [
+         true,
+         {
+            "ignoreProperties": [
+               "/^lost-/"
+            ]
+         }
+      ]
+   },
+   "ignoreFiles": [
+      "node_modules/*",
+      "src/assets/**",
+      "build/**",
+      "src/lib/styles/normalise.css"
+   ]
+}

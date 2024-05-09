@@ -1,5 +1,6 @@
 <script>
-   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import { SPEND_RESOLVE_ICON } from '~/system/Icons.js';
 
    // Check reference
    export let check = void 0;
@@ -8,23 +9,21 @@
 </script>
 
 <div class="item-check-button {check.attribute}">
-   <EfxButton on:click {disabled}>
+   <Button on:click {disabled}>
       <div class="button-inner">
-         <i class="fa fa-dice" />
+         <i class="fa fa-dice"/>
          <div>
             {check.label}
          </div>
-         <i class="divider fas fa-bolt" />
+         <i class="divider ${SPEND_RESOLVE_ICON}"/>
          <div>
             {check.resolveCost}
          </div>
       </div>
-   </EfxButton>
+   </Button>
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .item-check-button {
       @include flex-row;
 
@@ -46,17 +45,17 @@
          @include font-size-normal;
          height: 100%;
          line-height: normal;
-         padding: 0.25rem;
+         padding: var(--padding-standard);
 
          i {
-            margin-right: 0.25rem;
+            margin-right: var(--padding-standard);
          }
 
          .divider {
             @include border-left;
             border-color: var(--button-border-color);
-            margin-left: 0.25rem;
-            padding-left: 0.25rem;
+            margin-left: var(--padding-standard);
+            padding-left: var(--padding-standard);
          }
       }
    }

@@ -1,0 +1,82 @@
+<script>
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import { getContext } from 'svelte';
+
+   // Document reference
+   const document = getContext('document');
+</script>
+
+<div class="label">
+   <div class="content {$document.flags.titan.parameters.attribute}">
+      <img
+         src={$document.flags.titan.parameters.img}
+         alt="item"
+         class={$document.flags.titan.parameters.img.indexOf('.svg') === -1
+            ? ''
+            : 'svg'}
+      />
+
+      <!--Labels-->
+      <div class="labels">
+         <!--Label-->
+         <div class="label">
+            {`${$document.flags.titan.parameters.itemName}`}
+         </div>
+
+         <!--Type Label -->
+         <div class="sub-label">
+            {`${localize(
+               $document.flags.titan.parameters.attribute,
+            )} (${localize($document.flags.titan.parameters.skill)})`}
+         </div>
+
+         <!--Tradition -->
+         {#if $document.flags.titan.parameters.tradition !== '' && $document.flags.titan.parameters.tradition !== localize('any')}
+            <div class="sub-label">
+               {$document.flags.titan.parameters.tradition}
+            </div>
+         {/if}
+      </div>
+   </div>
+</div>
+
+<style lang="scss">
+   .label {
+      @include flex-row;
+      @include flex-group-left;
+
+      width: 100%;
+
+      .content {
+         @include flex-row;
+         @include flex-group-left;
+         @include attribute-colors;
+         @include border;
+         @include label;
+
+         padding: var(--padding-large);
+         font-weight: bold;
+
+         img {
+            width: 32px;
+            border: none;
+            margin-right: var(--padding-standard);
+         }
+
+         .labels {
+            @include flex-column;
+            @include flex-group-top-left;
+
+            .label {
+               @include flex-row;
+               @include font-size-large;
+            }
+
+            .sub-label {
+               @include flex-row;
+               @include font-size-small;
+            }
+         }
+      }
+   }
+</style>

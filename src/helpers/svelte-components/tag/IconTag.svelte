@@ -4,25 +4,23 @@
 </script>
 
 <div class="stat">
-   <i class={icon} />
+   <i class={icon}/>
    <div class="label">
       {label}
    </div>
 </div>
 
 <style lang="scss">
-   @import '../../../styles/mixins.scss';
-
    .stat {
       @include flex-row;
       @include flex-group-center;
       @include border;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
 
       .label {
          font-weight: bold;
-         margin-left: 0.25rem;
+         margin-left: var(--padding-standard);
       }
    }
 </style>

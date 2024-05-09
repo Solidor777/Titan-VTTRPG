@@ -1,29 +1,28 @@
 <script>
-   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
    export let label = void 0;
    export let active = void 0;
 </script>
 
-<EfxButton on:click>
+<Button on:click>
    <div class="button-inner">
       <div class="label">
          {label}
       </div>
-      <i class={active ? 'fas fa-square-check' : 'fas fa-square'} />
+      <i class={active ? CHECKED_ICON: UNCHECKED_ICON}/>
    </div>
-</EfxButton>
+</Button>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .button-inner {
       @include flex-row;
       @include flex-group-center;
       height: 100%;
 
       :not(:first-child) {
-         margin-left: 0.25rem;
+         margin-left: var(--padding-standard);
       }
    }
 </style>

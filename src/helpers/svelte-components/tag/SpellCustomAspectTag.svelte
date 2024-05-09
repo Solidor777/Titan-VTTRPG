@@ -1,5 +1,6 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
 
    // Spell aspect
    export let aspect = void 0;
@@ -10,10 +11,10 @@
    <div class="stat label">
       <!--Icon-->
       {#if aspect.isDamage}
-         <i class="fas fa-burst" />
+         <i class="{DAMAGE_ICON}"/>
       {/if}
       {#if aspect.isHealing}
-         <i class="fas fa-heart" />
+         <i class="{HEALING_ICON}"/>
       {/if}
 
       {aspect.label}
@@ -49,15 +50,13 @@
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .aspect {
       @include flex-row;
       @include flex-group-center;
       @include resistance-colors;
       @include border;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
       flex-wrap: wrap;
 
       .stat {
@@ -70,12 +69,12 @@
 
          &:not(:first-child) {
             @include border-left;
-            margin-left: 0.25rem;
-            padding-left: 0.25rem;
+            margin-left: var(--padding-standard);
+            padding-left: var(--padding-standard);
          }
 
          i {
-            margin-right: 0.25rem;
+            margin-right: var(--padding-standard);
          }
       }
    }

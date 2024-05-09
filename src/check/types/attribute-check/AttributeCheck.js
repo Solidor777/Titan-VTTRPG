@@ -1,77 +1,25 @@
 import TitanCheck from '~/check/Check.js';
-import calculateAttributeCheckResults from '~/check/types/attribute-check/CalculateAttributeCheckResults';
+import calculateAttributeCheckResults from '~/check/types/attribute-check/AttributeCheckResults.js';
 
-export default class TitanAttributeCheck extends TitanCheck {
-   _ensureValidConstruction(options) {
-      // Check if actor roll data was provided
-      if (!options?.actorRollData) {
-         console.error('TITAN | Attribute Check failed during construction. No provided Actor Roll Data.');
-         console.trace();
-
-         return false;
-      }
-
-      // Ensure a valid attribute / skill combination
-      if ((!options.skill || options.skill === 'none') && (!options.attribute || options.attribute === 'default')) {
-         console.error('TITAN | Attribute Check failed during construction. Neither skill nor attribute were provided.');
-         console.trace();
-
-         return false;
-      }
-
-      return true;
-   }
-
-   _initializeParameters(options) {
-      const parameters = super._initializeParameters(options);
-      const actorRollData = options.actorRollData;
-
-      // Initialize base parameters
-      parameters.trainingMod = options.trainingMod ?? 0;
-      parameters.doubleTraining = options.doubleTraining ?? false;
-
-      // Damage to resist
-      if (options.damageToResist && options.damageToResist > 0) {
-         parameters.damageToResist = options.damageToResist;
-      }
-
-      // Determine the skill training and expertise
-      if (options.skill && options.skill !== 'none') {
-         parameters.skill = options.skill;
-         const skillData = actorRollData.skill[parameters.skill];
-         parameters.skillTrainingDice = skillData.training.value;
-         parameters.skillExpertise = skillData.expertise.value;
-
-         // Calculate the total training dice
-         let totalTrainingDice = parameters.skillTrainingDice + parameters.trainingMod;
-         if (parameters.doubleTraining) {
-            totalTrainingDice *= 2;
-         }
-         parameters.totalTrainingDice = totalTrainingDice;
-         parameters.totalDice += totalTrainingDice;
-
-         // Calculcate the total expertise
-         let totalExpertise = parameters.skillExpertise + parameters.expertiseMod;
-         if (parameters.doubleExpertise) {
-            totalExpertise *= 2;
-         }
-         parameters.totalExpertise = totalExpertise;
-
-      }
-
-      // Determine the attribute die
-      parameters.attribute = options.attribute;
-      parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
-      parameters.totalDice += parameters.attributeDice;
-
-      // Initialize damage to reduce
-      parameters.damageToReduce = options.damageToReduce ?? 0;
-
-      return parameters;
-   }
-
-   _calculateResults(inResults, parameters) {
-      return calculateAttributeCheckResults(inResults, parameters);
+/**
+ * Class for creating and calculating the result of an Attribute Check.
+ * @augments TitanCheck
+ * @param   {AttributeCheckParameters} parameters  Parameters for the Check.
+ */
+export default class AttributeCheck extends TitanCheck {
+   /**
+    * Calculates the results of an Attribute Check, based on the inputted parameters,
+    * the dice rolled on the check,and the expertise that was applied.
+    * This calls an external helper function specific to the check type,
+    * so that re-calculation can be easily performed by external sources.
+    * See {@link calculateAttributeCheckResults}.
+    * @param   {CheckDiceResults}         diceResults The sorted dice rolled for the check, after Expertise is applied.
+    * @param   {AttributeCheckParameters} parameters  The parameters of the check.
+    * @returns {AttributeCheckResults}                The final results of the check.
+    * @protected
+    */
+   _calculateResults(diceResults, parameters) {
+      return calculateAttributeCheckResults(diceResults, parameters);
    }
 
    _getCheckType() {

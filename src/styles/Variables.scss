@@ -1,149 +1,156 @@
 :root {
-  // Fonts
-  --font-primary: 'Lato';
-  --font-mono: 'Lato';
-  --font-awesome: 'Lato';
-  --font-family: 'Lato';
-  --font-size: 1rem;
-  --font-color: black;
-  --font-body: 'Open Sans';
+   // Fonts
+   --font-primary: 'Lato';
+   --font-mono: 'Lato';
+   --font-awesome: 'Lato';
+   --font-family: 'Lato';
+   --font-size: 16px;
+   --font-color: black;
+   --font-body: 'Open Sans';
 
-  // Border styling
-  --border-style: solid;
-  --border-radius: 10px;
-  --border-width: 0.1rem;
-  --border-color: black;
+   // Font sizes
+   --font-size-normal: 16px;
+   --font-size-small: 14px;
+   --font-size-large: 20px;
+   --font-size-extra-large: 24px;
 
-  // Input styling
-  --input-border-style: solid;
-  --input-border-radius: 0px;
-  --input-border-width: 0.1rem;
-  --input-color: black;
-  --input-height: 1.5rem;
-  --input-width: 100%;
-  --input-background: white;
-  --input-padding: 0 0.25rem;
+   // Border styling
+   --border-style: solid;
+   --border-radius: 4px;
+   --border-width: 2px;
+   --border-color: black;
 
-  // Button Styling
-  --button-border-style: solid;
-  --button-border-radius: 25px;
-  --button-border-width: 0.1rem;
-  --button-border-color: black;
-  --button-padding: 0.1rem 0.5rem;
-  --button-background: rgba(255, 255, 240, 0.8);
-  --button-background-disabled: rgb(208, 208, 208);
-  --button-background-highlight: rgb(255, 233, 174);
-  --button-font-size: 1rem;
-  --button-font-weight: bold;
-  --button-color: black;
-  --button-line-height: 1.75rem;
-  --button-color-disabled: black;
-  --button-color-highlight: black;
+   // Padding
+   --padding-standard: 4px;
+   --padding-large: 10px;
 
-  // Icon Button Styling
-  --icon-button-border-style: solid;
-  --icon-button-border-radius: 50%;
-  --icon-button-border-width: 0.1rem;
-  --icon-button-border-color: black;
-  --icon-button-padding: 0.1rem;
-  --icon-button-background: rgba(255, 255, 240, 0.8);
-  --icon-button-highlight: rgb(255, 233, 174);
-  --icon-button-radius: 2rem;
-  --icon-button-font-size: 1rem;
-  --icon-button-color: black;
+   // Input styling
+   --input-border-style: solid;
+   --input-border-radius: 0px;
+   --input-border-width: 2px;
+   --input-color: black;
+   --input-height: 24px;
+   --input-width: 100%;
+   --input-background: white;
+   --input-padding: 0 4px;
 
-  // Tool tip delay
-  --tooltip-delay-normal: 0.6s;
-  --tooltip-delay-input: 0.9s;
+   // Button Styling
+   --button-border-style: solid;
+   --button-border-radius: 16px;
+   --button-border-width: 2px;
+   --button-border-color: black;
+   --button-padding: 2px 10px;
+   --button-background: rgba(255 255 240 / 0.8);
+   --button-background-disabled: #D0D0D0;
+   --button-background-highlight: #FFE9AE;
+   --button-font-size: 16px;
+   --button-font-weight: bold;
+   --button-color: black;
+   --button-line-height: 28px;
+   --button-color-disabled: black;
+   --button-color-highlight: black;
+   --button-chat-message-border-radius: 10px;
 
-  // Resource colors
-  --stamina-color: #008442;
-  --wounds-color: #980000;
-  --resolve-color: #0096c8;
+   // Icon Button Styling
+   --icon-button-border-style: solid;
+   --icon-button-border-radius: 50%;
+   --icon-button-border-width: 2px;
+   --icon-button-border-color: black;
+   --icon-button-padding: 2px;
+   --icon-button-background: rgba(255 255 240 / 0.8);
+   --icon-button-highlight: #FFE9AE;
+   --icon-button-radius: 32px;
+   --icon-button-font-size: 16px;
+   --icon-button-color: black;
 
-  // Resistance colors
-  --reflexes-color: #eff49a;
-  --resilience-color: #f2c88c;
-  --willpower-color: #f28cbf;
+   // Tool tip delay
+   --tooltip-delay-normal: 0.6s;
+   --tooltip-delay-input: 0.9s;
 
-  // Attribute colors
-  --body-color: #f29d8c;
-  --mind-color: #95f28c;
-  --soul-color: #b5f2e8;
+   // Resource colors
+   --stamina-color: #008442;
+   --wounds-color: #980000;
+   --resolve-color: #0096c8;
 
-  // Dice result colors
-  --critical-success-color: lightskyblue;
-  --success-color: lightgreen;
-  --failure-color: gold;
-  --critical-failure-color: lightsalmon;
+   // Resistance colors
+   --reflexes-color: #eff49a;
+   --resilience-color: #f2c88c;
+   --willpower-color: #f28cbf;
 
-  // Check results colors
-  --succeeded-color: darkblue;
-  --failed-color: darkred;
+   // Attribute colors
+   --body-color: #f29d8c;
+   --mind-color: #95f28c;
+   --soul-color: #b5f2e8;
 
-  // Theme Colors
-  --color-primary: #80cbc4;
-  --color-primary-light: #b2fef7;
-  --color-primary-dark: #4f9a94;
-  --color-secondary: #9fa8da;
-  --color-secondary-light: #d1d9ff;
-  --color-secondary-dark: #6f79a8;
-  --color-background: #bab9ae;
-  --color-foreground: #e4e3d7;
-  --color: white;
-  --highlight-background: rgb(255, 233, 174);
-  --static-value-background: rgb(208, 208, 208);
-  --active-background: #fcdbbf;
+   // Dice result colors
+   --critical-success-color: lightskyblue;
+   --success-color: lightgreen;
+   --failure-color: gold;
+   --critical-failure-color: lightsalmon;
 
-  // Panel Styles
-  --panel-1-background: #8c8c8c5e;
-  --panel-1-color: black;
-  --panel-2-background: #c7c7c75e;
-  --panel-2-color: black;
-  --panel-3-background: #eee9e683;
-  --panel-3-color: black;
+   // Check results colors
+   --succeeded-color: darkblue;
+   --failed-color: darkred;
 
-  // Label styles
-  --label-background: whitesmoke;
-  --label-color: black;
+   // Theme Colors
+   --color-primary: #80cbc4;
+   --color-primary-light: #b2fef7;
+   --color-primary-dark: #4f9a94;
+   --color-secondary: #9fa8da;
+   --color-secondary-light: #d1d9ff;
+   --color-secondary-dark: #6f79a8;
+   --color-background: #bab9ae;
+   --color-foreground: #e4e3d7;
+   --color: white;
+   --highlight-background: #FFE9AE;
+   --static-value-background: #D0D0D0;
+   --active-background: #fcdbbf;
 
-  // Rarity colors
-  --uncommon-color: #d0ffbb;
-  --rare-color: #ffdeac;
-  --unique-color: #ffcfee;
+   // Panel Styles
+   --panel-1-background: #8c8c8c5e;
+   --panel-1-color: black;
+   --panel-2-background: #c7c7c75e;
+   --panel-2-color: black;
+   --panel-3-background: #eee9e683;
+   --panel-3-color: black;
 
-  // Opacity
-  --disabled-opacity: 1;
+   // Label styles
+   --label-background: whitesmoke;
+   --label-color: black;
 
-  // Editor
-  --editor-background: whitesmoke;
-  --editor-border: none;
-  --editor-border-radius: 0;
+   // Rarity colors
+   --uncommon-color: #d0ffbb;
+   --rare-color: #ffdeac;
+   --unique-color: #ffcfee;
 
-  // Font sizes
-  --font-size-normal: 1rem;
-  --font-size-small: 0.9rem;
-  --font-size-large: 1.2rem;
-  --font-size-extra-large: 1.5rem;
+   // Opacity
+   --disabled-opacity: 1;
 
-  // Mod values
-  --lesser-color: #8b0000;
-  --lesser-background: #ffd1d1;
-  --greater-color: #023020;
-  --greater-background: #c5ffeb;
+   // Editor
+   --editor-background: whitesmoke;
+   --editor-border: none;
+   --editor-border-radius: 0;
 
-  // Meter values
-  --meter-shadow-1: rgba(255, 255, 255, 0.3);
-  --meter-shadow-2: rgba(0, 0, 0, 0.4);
-  --meter-background: whitesmoke;
+   // Mod values
+   --lesser-color: #8b0000;
+   --lesser-background: #ffd1d1;
+   --greater-color: #023020;
+   --greater-background: #c5ffeb;
 
-  // Effect colors
-  --gradientDegree: 135deg;
-  --purple: #9580ff;
-  --cyan: #80ffea;
-  --pink: #ff80bf;
-  --green: #8aff80;
-  --yellow: #ffff80;
-  --red: #ff9580;
-  --orange: #ffca80;
+   // Meter values
+   --meter-shadow-1: rgba(255 255 255 / 0.3);
+   --meter-shadow-2: rgba(0 0 0 / 0.4);
+   --meter-background: whitesmoke;
+
+   // Effect colors
+   --gradient-degree: 135deg;
+   --purple: #9580ff;
+   --blue: #809cff;
+   --cyan: #80ffea;
+   --pink: #ff80bf;
+   --green: #8aff80;
+   --yellow: #ffff80;
+   --maroon: #ff8282;
+   --red: #ff9580;
+   --orange: #ffca80;
 }

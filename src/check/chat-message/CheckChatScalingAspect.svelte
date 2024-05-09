@@ -1,13 +1,14 @@
 <script>
    import { getContext } from 'svelte';
-   import { localize } from '~/helpers/Utility.js';
-   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import { DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON } from '~/system/Icons.js';
 
    // Aspect
    export let idx = void 0;
 
    // Chat context
-   const document = getContext('DocumentStore');
+   const document = getContext('document');
 
    $: aspect = $document.flags.titan.results.scalingAspect[idx];
    $: aspectCost = aspect.scalingCost ?? aspect.cost ?? 0;
@@ -23,7 +24,7 @@
       if (aspect.isDamage) {
          $document.flags.titan.results.damage += Math.max(
             aspect.initialValue,
-            1
+            1,
          );
       }
 
@@ -31,7 +32,7 @@
       if (aspect.isHealing) {
          $document.flags.titan.results.healing += Math.max(
             aspect.initialValue,
-            1
+            1,
          );
       }
 
@@ -54,7 +55,7 @@
       if (aspect.isDamage) {
          $document.flags.titan.results.damage -= Math.max(
             aspect.initialValue,
-            1
+            1,
          );
       }
 
@@ -62,7 +63,7 @@
       if (aspect.isHealing) {
          $document.flags.titan.results.healing -= Math.max(
             aspect.initialValue,
-            1
+            1,
          );
       }
 
@@ -110,67 +111,66 @@
    <div class="label">
       <div class="label-inner">
          {#if aspect.label === localize('damage')}
-            <i class="fas fa-burst" />
+            <i class="{DAMAGE_ICON}"/>
          {:else if aspect.label === localize('healing')}
-            <i class="fas fa-heart" />
+            <i class="{HEALING_ICON}"/>
          {/if}
          {aspect.label}: {$document.flags.titan.results.scalingAspect[idx]
-            .currentValue}
+         .currentValue}
       </div>
       <div class="cost">
          {localize('cost')}: {`${aspectCost} ${localize(
-            'extraSuccesses.short'
-         )}`}
+         'extraSuccesses.short',
+      )}`}
       </div>
    </div>
 
    <div class="controls">
       <!--Reset Button-->
       <div class="control">
-         <EfxButton
+         <Button
             on:click={resetAspect}
             disabled={aspect.currentValue <= aspect.initialValue}
          >
             <div class="button-inner">
-               <i class="fas fa-arrow-rotate-left" />
+               <i class="{RESET_ICON}"/>
             </div>
-         </EfxButton>
+         </Button>
       </div>
 
       <!--Decrease Button-->
       <div class="control">
-         <EfxButton
+         <Button
             on:click={decreaseAspect}
             disabled={aspect.currentValue <= aspect.initialValue}
          >
             <div class="button-inner">
-               <i class="fas fa-minus" />
+               <i class="{DECREMENT_ICON}"/>
             </div>
-         </EfxButton>
+         </Button>
       </div>
 
       <!--Increase Button-->
       <div class="control">
-         <EfxButton
+         <Button
             on:click={increaseAspect}
             disabled={$document.flags.titan.results.extraSuccessesRemaining <
                aspectCost}
          >
             <div class="button-inner">
-               <i class="fas fa-plus" />
+               <i class="{INCREMENT_ICON}"/>
             </div>
-         </EfxButton>
+         </Button>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   @import '../../styles/mixins.scss';
    .aspect {
       @include flex-row;
       @include flex-space-between;
       width: 100%;
-      min-height: 2rem;
+      min-height: 32px;
       height: 100%;
       @include font-size-small;
 
@@ -181,16 +181,16 @@
          width: 100%;
          flex-wrap: wrap;
          font-weight: bold;
-         margin-right: 0.5rem;
+         margin-right: var(--padding-large);
 
          .label-inner {
             @include flex-row;
             @include flex-group-center;
             height: 100%;
-            margin-bottom: 0.25rem;
+            margin-bottom: var(--padding-standard);
 
             i {
-               margin-right: 0.25rem;
+               margin-right: var(--padding-standard);
             }
          }
       }
@@ -200,13 +200,13 @@
          @include flex-group-right;
          flex-wrap: nowrap;
          height: 100%;
-         --button-border-radius: 10px;
+         --button-border-radius: var(--button-chat-message-border-radius);
 
          .control {
-            height: 2rem;
+            height: 32px;
 
             &:not(:first-child) {
-               margin-left: 0.25rem;
+               margin-left: var(--padding-standard);
             }
 
             .button-inner {

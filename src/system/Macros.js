@@ -6,19 +6,14 @@ export default class TitanMacros {
 
          // Get the actor
          const actor = token.actor;
-         if (actor) {
+         if (actor && actor.system.isCharacter) {
 
-            // Get the character
-            const character = actor.character;
-            if (character) {
+            // Get the item
+            const item = this.getMacroItemFromID(actor, id, idMethod);
+            if (item && item.type === 'weapon' && item.system.attack.length > attackIdx) {
 
-               // Get the item
-               const item = this.getMacroItemFromID(actor, id, idMethod);
-               if (item && item.type === 'weapon' && item.system.attack.length > attackIdx) {
-
-                  // Roll the check
-                  character.rollAttackCheck({ itemId: item._id, attackIdx: attackIdx });
-               }
+               // Roll the check
+               actor.system.requestAttackCheck({ itemId: item._id, attackIdx: attackIdx });
             }
          }
       });
@@ -31,19 +26,14 @@ export default class TitanMacros {
 
          // Get the actor
          const actor = token.actor;
-         if (actor) {
+         if (actor && actor.system.isCharacter) {
 
-            // Get the character
-            const character = actor.character;
-            if (character) {
+            // Get the item
+            const item = this.getMacroItemFromID(actor, id, idMethod);
+            if (item && item.type === 'spell') {
 
-               // Get the item
-               const item = this.getMacroItemFromID(actor, id, idMethod);
-               if (item && item.type === 'spell') {
-
-                  // Roll the check
-                  character.rollCastingCheck({ itemId: item._id });
-               }
+               // Roll the check
+               actor.system.requestCastingCheck({ itemId: item._id });
             }
          }
       });
@@ -56,19 +46,14 @@ export default class TitanMacros {
 
          // Get the actor
          const actor = token.actor;
-         if (actor) {
+         if (actor && actor.system.isCharacter) {
 
-            // Get the character
-            const character = actor.character;
-            if (character) {
+            // Get the item
+            const item = this.getMacroItemFromID(actor, id, idMethod);
+            if (item && item.system.check.length > 0) {
 
-               // Get the item
-               const item = this.getMacroItemFromID(actor, id, idMethod);
-               if (item && item.system.check.length > 0) {
-
-                  // Roll the check
-                  character.rollItemCheck({ itemId: item._id, checkIdx: checkIdx });
-               }
+               // Roll the check
+               actor.system.requestItemCheck({ itemId: item._id, checkIdx: checkIdx });
             }
          }
       });
@@ -81,19 +66,14 @@ export default class TitanMacros {
 
          // Get the actor
          const actor = token.actor;
-         if (actor) {
+         if (actor && actor.system.isCharacter) {
 
-            // Get the character
-            const character = actor.character;
-            if (character) {
+            // Get the item
+            const item = this.getMacroItemFromID(actor, id, idMethod);
+            if (item && item.type === 'effect' && item.system.duration.type === 'permanent') {
 
-               // Get the item
-               const item = this.getMacroItemFromID(actor, id, idMethod);
-               if (item && item.type === 'effect' && item.system.duration.type === 'permanent') {
-
-                  // Toggle active
-                  character.toggleEffectActive(item._id);
-               }
+               // Toggle active
+               actor.system.toggleEffectActive(item._id);
             }
          }
       });
@@ -107,7 +87,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Get the command
-         const command = `game.titan.macros.rollAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
+         const command = `game.titan.macros.requestAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
 
          // Check if this macro already exists
          let retVal = await game.macros.find((macro) => macro.name === name && macro.command === command && macro.author.isSelf);
@@ -121,9 +101,9 @@ export default class TitanMacros {
                command: command,
                flags: {
                   titan: {
-                     macroType: 'attackCheck'
-                  }
-               }
+                     macroType: 'attackCheck',
+                  },
+               },
             });
          }
 
@@ -153,9 +133,9 @@ export default class TitanMacros {
                command: command,
                flags: {
                   titan: {
-                     macroType: 'castingCheck'
-                  }
-               }
+                     macroType: 'castingCheck',
+                  },
+               },
             });
          }
 
@@ -185,9 +165,9 @@ export default class TitanMacros {
                command: command,
                flags: {
                   titan: {
-                     macroType: 'itemCheck'
-                  }
-               }
+                     macroType: 'itemCheck',
+                  },
+               },
             });
          }
 
@@ -217,9 +197,9 @@ export default class TitanMacros {
                command: command,
                flags: {
                   titan: {
-                     macroType: 'toggleEffectActive'
-                  }
-               }
+                     macroType: 'toggleEffectActive',
+                  },
+               },
             });
          }
 
@@ -243,9 +223,9 @@ export default class TitanMacros {
             command: command,
             flags: {
                titan: {
-                  macroType: 'toggleDocumentSheet'
-               }
-            }
+                  macroType: 'toggleDocumentSheet',
+               },
+            },
          });
       }
 

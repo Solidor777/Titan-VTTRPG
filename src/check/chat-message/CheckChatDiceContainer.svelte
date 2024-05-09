@@ -1,23 +1,20 @@
 <script>
    import { getContext } from 'svelte';
-   import CheckChatDie from './CheckChatDie.svelte';
+   import CheckChatDie from '~/check/chat-message/CheckChatDie.svelte';
 
-   const document = getContext('DocumentStore');
+   const document = getContext('document');
 </script>
 
 <div class="container">
    <!--For each dice-->
    {#each $document.flags.titan.results.dice as die, idx}
-      <!-- svelte-ignore missing-declaration -->
       <div class="dice">
-         <CheckChatDie {idx} />
+         <CheckChatDie {idx}/>
       </div>
    {/each}
 </div>
 
 <style lang="scss">
-   @import '../../styles/Mixins.scss';
-
    .container {
       @include flex-row;
       @include flex-group-center;

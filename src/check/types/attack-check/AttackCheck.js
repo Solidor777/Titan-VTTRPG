@@ -1,198 +1,40 @@
-import { clamp } from '~/helpers/Utility';
 import TitanCheck from '~/check/Check.js';
-import calculateAttackCheckResults from '~/check/types/attack-check/CalculateAttackCheckResults';
+import calculateAttackCheckResults from '~/check/types/attack-check/AttackCheckResults.js';
 
-export default class TitanAttackCheck extends TitanCheck {
-   _ensureValidConstruction(options) {
-      // Check if actor roll data was provided
-      if (!options?.actorRollData) {
-         console.error('TITAN | Attack Check failed during construction. No provided Actor Roll Data.');
-         console.trace();
+/**
+ * Class for creating and calculating the result of an Attack Check.
+ * @augments TitanCheck
+ * @param   {AttackCheckParameters} parameters  Parameters for the Check.
+ */
+export default class AttackCheck extends TitanCheck {
+   /**
+    * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
+    * Makes a call to the parent function, but has some additional functionality for spending expertise to
+    * maximize the benefits of attack traits.
+    * @param   {number[]}           sortedDice  Results of the dice roll, sorted from largest to smallest.
+    * @returns {CheckDiceResults}               The dice results after Expertise is applied,
+    *                                           along with the expertise remaining.
+    * @protected
+    */
 
-         return false;
-      }
+   _applyExpertise(sortedDice) {
+      const retVal = super._applyExpertise(sortedDice);
 
-      // Check if the weapon is valid
-      const itemRollData = options.itemRollData;
-      if (!itemRollData) {
-         console.error(`TITAN | Attack Check failed during construction. No provided Item Roll Data.`);
-         console.trace();
+      // If we have expertise remaining, and this attack would benefit from critical successes
+      if (retVal.expertiseRemaining > 0 &&
+         this.parameters.difficulty < 6 &&
+         (this.parameters.cleave || this.parameters.rend)) {
 
-         return false;
-      }
-
-      // Check if the attack is valid
-      if (!itemRollData.attack[options.attackIdx]) {
-         console.error(`TITAN | Attack Check failed during construction. Invalid Attack IDX (${options.attackIdx}).`);
-         console.trace();
-
-         return false;
-      }
-
-      return true;
-   }
-
-   _initializeParameters(options) {
-      // Cache values for easy reference
-      const actorRollData = options.actorRollData;
-      const itemRollData = options.itemRollData;
-      const targetRollData = options.targetRollData;
-      const attackData = options.attack;
-
-      // Initialize base parameters
-      const parameters = {
-         attack: attackData,
-         attribute: options.attribute,
-         attackNotes: itemRollData.attackNotes,
-         complexity: 1,
-         damageMod: options.damageMod ?? actorRollData.mod.damage.value,
-         diceMod: options?.diceMod ?? 0,
-         doubleExpertise: options?.doubleExpertise ?? false,
-         doubleTraining: options.doubleTraining ?? 0,
-         expertiseMod: options.expertiseMod ?? 0,
-         extraFailureOnCritical: options?.extraFailureOnCritical ?? false,
-         extraSuccessOnCritical: options?.extraSuccessOnCritical ?? false,
-         img: itemRollData.img,
-         itemName: itemRollData.name,
-         itemTrait: itemRollData.customTrait,
-         maximizeSuccesses: options?.maximizeSuccesses ?? false,
-         multiAttack: options.multiAttack ?? itemRollData.multiAttack,
-         skill: options.skill,
-         trainingMod: options.trainingMod ?? 0,
-         type: options.type ?? attackData.type,
-      };
-
-      // Determine the skill training and expertise
-      const skillData = actorRollData.skill[parameters.skill];
-      parameters.skillTrainingDice = skillData.training.value;
-      parameters.skillExpertise = skillData.expertise.value;
-
-      // Determine the attribute dice
-      parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
-
-      // Determine the target defense
-      if (isNaN(options.targetDefense)) {
-         if (targetRollData) {
-            parameters.targetDefense = targetRollData.rating.defense.value;
-         }
-      }
-      else {
-         parameters.targetDefense = options.targetDefense;
-      }
-
-      // Calculate the difficulty if difficulty was not provided
-      if (!options.difficulty) {
-         // If the target is valid
-         if (!isNaN(parameters.targetDefense)) {
-            // Calculate the attacker rating
-            parameters.attackerRating =
-               parameters.type === 'melee' ?
-                  (isNaN(options.attackerMelee) ? actorRollData.rating.melee.value : options.attackerMelee) :
-                  (isNaN(options.attackerAccuracy) ? actorRollData.rating.accuracy.value : options.attackerAccuracy);
-
-            // Difficulty = 4 + defense rating - attacker rating
-            parameters.difficulty = clamp(parameters.targetDefense - parameters.attackerRating + 4, 2, 6);
-         }
-         else {
-            parameters.difficulty = 4;
-         }
-      }
-      else {
-         parameters.difficulty = clamp(options.difficulty, 2, 6);
-      }
-
-      // Calculate the total training dice
-      let totalTrainingDice = parameters.skillTrainingDice + parameters.trainingMod;
-      if (parameters.doubleTraining) {
-         totalTrainingDice *= 2;
-      }
-      parameters.totalTrainingDice = totalTrainingDice;
-
-      // Add the training dice to the total dice
-      parameters.totalDice = parameters.diceMod + parameters.attributeDice + totalTrainingDice;
-
-      // Calculcate the total expertise
-      let totalExpertise = parameters.skillExpertise + parameters.expertiseMod;
-      if (parameters.doubleExpertise) {
-         totalExpertise *= 2;
-      }
-      parameters.totalExpertise = totalExpertise;
-
-      // Calculate attack traits that can effect successes and damage
-      // Determine whether the attack has the multi attack trait
-      for (let idx = 0; idx < attackData.trait.length; idx++) {
-         switch (attackData.trait[idx].name) {
-            case 'flurry': {
-               parameters.flurry = true;
-               break;
-            }
-            case 'cleave': {
-               parameters.cleave = true;
-               break;
-            }
-            case 'rend': {
-               parameters.rend = true;
-               break;
-            }
-            case 'magical': {
-               parameters.magical = true;
-               break;
-            }
-            case 'ineffective': {
-               parameters.ineffective = true;
-               break;
-            }
-            case 'penetrating': {
-               parameters.penetrating = true;
-               break;
-            }
-            default: {
-               break;
-            }
-         }
-         if (attackData.trait[idx].name === 'flurry') {
-            parameters.flurry = true;
-            break;
-         }
-      }
-
-      // Adjust the dice and expertise if this is a multi-attack
-      if (parameters.multiAttack) {
-
-         // Determine whether the attack has the multi attack trait
-         for (let idx = 0; idx < attackData.trait.length; idx++) {
-            if (attackData.trait[idx].name === 'flurry') {
-               parameters.flurry = true;
-               break;
-            }
-         }
-
-         // Round the total dice up if this is a dual attack
-         // Otherwise, round down
-         parameters.totalDice = parameters.flurry ?
-            Math.ceil(parameters.totalDice / 2) :
-            Math.floor(parameters.totalDice / 2);
-
-         // Round the expertise down
-         parameters.totalExpertise = Math.floor(parameters.totalExpertise / 2);
-      }
-
-      return parameters;
-   }
-
-   _applyExpertise(dice) {
-      const retVal = super._applyExpertise(dice);
-
-      // If we could benefit from critical successes
-      if (retVal.expertiseRemaining > 0 && this.parameters.difficulty < 6 && (this.parameters.cleave || this.parameters.rend)) {
+         // Increase as many dice to 6 as possible
          for (let increment = 1; increment < 6; increment++) {
+
             // Abort early if we run out of expertise
             if (increment > retVal.expertiseRemaining) {
                break;
             }
 
-            // Apply expertise to dice that are == the increment from being a critical success
-            for (let i = 0; i < dice.length; i++) {
+            // Apply expertise to dice that are === the increment from being a critical success
+            for (let i = 0; i < sortedDice.length; i++) {
                if (
                   retVal.dice[i].final < 6 &&
                   6 - retVal.dice[i].final === increment
@@ -208,14 +50,24 @@ export default class TitanAttackCheck extends TitanCheck {
                }
             }
          }
-
       }
 
       return retVal;
    }
 
-   _calculateResults(inResults, parameters) {
-      return calculateAttackCheckResults(inResults, parameters);
+   /**
+    * Calculates the results of an Attack Check, based on the inputted parameters,
+    * the dice rolled on the check,and the expertise that was applied.
+    * This calls an external helper function specific to the check type,
+    * so that re-calculation can be easily performed by external sources.
+    * See {@link calculateAttackCheckResults}.
+    * @param   {CheckDiceResults}      diceResults The sorted dice rolled for the check, after Expertise is applied.
+    * @param   {AttackCheckParameters} parameters  The parameters of the check.
+    * @returns {AttackCheckResults}                The final results of the check.
+    * @protected
+    */
+   _calculateResults(diceResults, parameters) {
+      return calculateAttackCheckResults(diceResults, parameters);
    }
 
    _getCheckType() {

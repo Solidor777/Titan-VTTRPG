@@ -1,5 +1,5 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
 
    export let rarity = void 0;
 </script>
@@ -9,15 +9,13 @@
 </div>
 
 <style lang="scss">
-   @import '../../../styles/mixins.scss';
-
    .tag {
       @include flex-row;
       @include flex-group-center;
       @include border;
       @include label;
       @include rarity-colors;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
       font-weight: bold;
    }
 </style>

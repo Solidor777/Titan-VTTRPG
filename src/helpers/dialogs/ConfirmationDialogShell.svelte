@@ -1,19 +1,32 @@
-<svelte:options accessors={true} />
+<svelte:options accessors={true}/>
 
 <script>
-   import { localize } from '~/helpers/Utility.js';
-   import { getContext } from 'svelte';
-   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   // Character Sheet
+   /** @type string[] Header lines. */
    export let headers = void 0;
+
+   /** @type string Message explaining the dialog. */
    export let message = void 0;
+
+   /** @type string Label for the confirmation button. */
    export let confirmLabel = void 0;
 
-   const application = getContext('#external').application;
+   /** @type ConfirmationDialog Application reference. */
+   const application = getApplication();
+
+   /**
+    * Called when confirmation button clicked. /*
+    */
+   function onConfirmed() {
+      application.confirmationCallback();
+      application.close();
+   }
 </script>
 
-<div class="add-item-dialog">
+<div class="confirmation-dialog">
    <!--Headers-->
    {#each headers as header}
       <div class="header">
@@ -22,42 +35,35 @@
    {/each}
 
    <!--Message-->
-   <div class="message">
+   <div class="section">
       {message}
    </div>
 
    <!--Confirm Button-->
    <div class="button">
-      <EfxButton
-         on:click={() => {
-            application.confirmed();
-            if (typeof application.confirmationCallback === 'function') {
-               application.confirmationCallback();
-            }
-            application.close();
-         }}
+      <Button
+         on:click={onConfirmed}
       >
          {confirmLabel}
-      </EfxButton>
+      </Button>
    </div>
 
    <!--Cancel button-->
    <div class="button">
-      <EfxButton
+      <Button
          on:click={() => {
             application.close();
          }}
-         >{localize('cancel')}
-      </EfxButton>
+      >{localize('cancel')}
+      </Button>
    </div>
 </div>
 
 <style lang="scss">
-   @import '../../Styles/Mixins.scss';
-
-   .add-item-dialog {
+   .confirmation-dialog {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .header {
@@ -70,19 +76,22 @@
          flex-wrap: wrap;
       }
 
-      .message {
+      .section {
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
-         padding: 0.25rem;
+
+         padding: var(--padding-standard);
       }
 
       .button {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
-         margin-top: 0.25rem;
-         --button-border-radius: 10px;
+         margin-top: var(--padding-standard);
+
+         --button-border-radius: var(--button-chat-message-border-radius);
       }
    }
 </style>

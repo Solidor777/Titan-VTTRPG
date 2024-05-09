@@ -10,9 +10,11 @@
    function updateMeterWidth() {
       if (meterWidth < targetMeterWidth) {
          meterWidth = Math.min(meterWidth + meterScaleSpeed, targetMeterWidth);
-      } else if (meterWidth > targetMeterWidth) {
+      }
+      else if (meterWidth > targetMeterWidth) {
          meterWidth = Math.max(meterWidth - meterScaleSpeed, targetMeterWidth);
-      } else {
+      }
+      else {
          clearInterval(meterUpdate);
          meterUpdate = false;
       }
@@ -27,15 +29,15 @@
 </script>
 
 <div class="meter">
-   <span style={`width: ${meterWidth}%`} />
+   <span style={`width: ${meterWidth}%`}/>
 </div>
 
 <style lang="scss">
    .meter {
-      margin-left: 0.25rem;
-      margin-right: 0.25rem;
+      margin-left: var(--padding-standard);
+      margin-right: var(--padding-standard);
       display: flex;
-      height: 1.5rem;
+      height: 24px;
       width: 100%;
       background: var(--meter-background);
       border-radius: 25px;
@@ -48,8 +50,9 @@
          border-radius: 20px;
          background: var(--meter-color);
          box-shadow: inset 0 2px 9px var(--meter-shadow-1),
-            inset 0 -2px 6px var(--meter-shadow-2);
-         overflow: hidden;
+         inset 0 -2px 6px var(--meter-shadow-2);
+
+         // overflow: hidden;
       }
    }
 </style>

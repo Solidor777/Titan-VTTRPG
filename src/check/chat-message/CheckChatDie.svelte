@@ -1,18 +1,18 @@
 <script>
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
-   import { ripple } from '@typhonjs-fvtt/runtime/svelte/action/animate';
    import { getContext } from 'svelte';
-   import recalculateCheckResults from './RecalculateCheckResults';
+   import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 
    export let idx = void 0;
 
    // Document reference
-   const document = getContext('DocumentStore');
+   const document = getContext('document');
 
    function getLabel(base, expertiseApplied) {
       if (expertiseApplied > 0) {
          return `${base} + ${expertiseApplied}`;
-      } else {
+      }
+      else {
          return `${base}`;
       }
    }
@@ -23,11 +23,14 @@
       const criticalFailure = final === 1;
       if (criticalSuccess) {
          return 'critical-success';
-      } else if (success) {
+      }
+      else if (success) {
          return 'success';
-      } else if (criticalFailure) {
+      }
+      else if (criticalFailure) {
          return 'critical-failure';
-      } else {
+      }
+      else {
          return 'failure';
       }
    }
@@ -42,14 +45,15 @@
          $document.flags.titan.results.dice[idx].final += 1;
          if ($document.flags.titan.results.dice[idx].expertiseApplied) {
             $document.flags.titan.results.dice[idx].expertiseApplied += 1;
-         } else {
+         }
+         else {
             $document.flags.titan.results.dice[idx].expertiseApplied = 1;
          }
          $document.flags.titan.results.expertiseRemaining -= 1;
 
          // Recalculate the results
          $document.flags.titan.results = recalculateCheckResults(
-            $document.flags.titan
+            $document.flags.titan,
          );
 
          // Update the document
@@ -65,7 +69,7 @@
 
    $: label = getLabel(
       $document.flags.titan.results.dice[idx].base,
-      $document.flags.titan.results.dice[idx].expertiseApplied
+      $document.flags.titan.results.dice[idx].expertiseApplied,
    );
    $: dieClass = getDieClass($document.flags.titan.results.dice[idx].final);
    $: disabled =
@@ -74,11 +78,9 @@
       $document.flags.titan.results.dice[idx].final === 6;
 </script>
 
-<!-- svelte-ignore missing-declaration -->
 <button
    class={dieClass}
    on:mousedown={preventDefault}
-   use:ripple()
    {disabled}
    on:click={() => {
       applyExpertise();
@@ -88,36 +90,21 @@
 </button>
 
 <style lang="scss">
-   @import '../../styles/Mixins.scss';
-
    button {
       @include border;
       @include flex-row;
       @include flex-group-center;
       @include font-size-large;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
       font-weight: bold;
-      height: 2.5rem;
-      min-width: 2.5rem;
+      height: 40px;
+      min-width: 40px;
       flex-basis: content;
-      position: relative;
-      overflow: hidden;
-      clip-path: var(--tjs-icon-button-clip-path, none);
-      transform-style: preserve-3d;
       color: var(--button-color);
 
       &:disabled {
          cursor: default;
-      }
-
-      &:hover {
-         &:not(:disabled) {
-            clip-path: var(
-               --tjs-icon-button-clip-path-hover,
-               var(--tjs-icon-button-clip-path, none)
-            );
-         }
       }
 
       &.critical-success {

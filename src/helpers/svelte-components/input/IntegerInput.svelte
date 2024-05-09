@@ -28,15 +28,18 @@
          newValue = Math.min(newValue, max);
       }
 
-      value = newValue;
-      dispatch('change');
+      if (value !== newValue) {
+         value = newValue;
+         dispatch('change');
+      }
    }
 
    function checkInput(event) {
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {
          event.preventDefault();
-      } else if (/[\.,]/.test(event.key)) {
+      }
+      else if (/[\.,]/.test(event.key)) {
          event.preventDefault();
       }
    }
@@ -71,8 +74,6 @@
 />
 
 <style lang="scss">
-   @import '../../../styles/Mixins.scss';
-
    input {
       @include input;
 

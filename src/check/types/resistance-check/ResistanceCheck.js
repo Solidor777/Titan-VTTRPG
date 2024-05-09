@@ -1,43 +1,25 @@
 import TitanCheck from '~/check/Check.js';
-import calculateResistanceCheckResults from '~/check/types/resistance-check/CalculateResistanceCheckResults';
+import calculateResistanceCheckResults from '~/check/types/resistance-check/ResistanceCheckResults.js';
 
-export default class TitanResistanceCheck extends TitanCheck {
-   _ensureValidConstruction(inData) {
-      if (!super._ensureValidConstruction(inData)) {
-         return false;
-      }
-
-      // Check if actor check data is valid
-      if (!inData?.actorRollData) {
-         console.error('TITAN | Resistance Check failed during construction. No provided Actor Check Data.');
-         console.trace();
-
-         return false;
-      }
-
-      return true;
-   }
-
-   _initializeParameters(options) {
-      const parameters = super._initializeParameters(options);
-
-      // Initialize resistance parameters
-      parameters.resistance = options.resistance ?? 'reflexes';
-
-      // Get the resistance value
-      parameters.resistanceDice = options.actorRollData.resistance[parameters.resistance].value;
-
-      // Add the training dice to the total dice
-      parameters.totalDice += parameters.resistanceDice;
-
-      // Initialize damage to reduce
-      parameters.damageToReduce = options.damageToReduce ?? 0;
-
-      return parameters;
-   }
-
-   _calculateResults(inResults, parameters) {
-      return calculateResistanceCheckResults(inResults, parameters);
+/**
+ * Class for creating and calculating the result of a Resistance Check.
+ * @augments TitanCheck
+ * @param   {ResistanceCheckParameters} parameters  Parameters for the Check.
+ */
+export default class ResistanceCheck extends TitanCheck {
+   /**
+    * Calculates the results of a Resistance Check, based on the inputted parameters,
+    * the dice rolled on the check,and the expertise that was applied.
+    * This calls an external helper function specific to the check type,
+    * so that re-calculation can be easily performed by external sources.
+    * See {@link calculateResistanceCheckResults}.
+    * @param   {CheckDiceResults}            diceResults The sorted dice rolled for the check, after Expertise is applied.
+    * @param   {ResistanceCheckParameters}   parameters  The parameters of the check.
+    * @returns {ResistanceCheckResults}                  The final results of the check.
+    * @protected
+    */
+   _calculateResults(diceResults, parameters) {
+      return calculateResistanceCheckResults(diceResults, parameters);
    }
 
    _getCheckType() {

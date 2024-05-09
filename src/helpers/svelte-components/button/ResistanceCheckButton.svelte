@@ -1,6 +1,6 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
-   import EfxButton from '~/helpers/svelte-components/button/EfxButton.svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    // Resistance to roll
    export let resistance = 'reflexes';
@@ -9,7 +9,7 @@
    export let damageToReduce = 0;
    export let disabled = false;
 
-   async function rollResistanceCheck() {
+   async function requestResistanceCheck() {
       // Get the targets
       let userTargets = game.user.isGM
          ? Array.from(game.user.targets)
@@ -23,49 +23,47 @@
          // If the target is valid
          const target = userTargets[idx]?.actor;
          if (target && target.system.resistance) {
-            // Roll a resistance check
-            await target.typeComponent.rollResistanceCheck({
-               resistance: resistance,
-               difficulty: difficulty,
-               complexity: complexity,
-               damageToReduce: damageToReduce,
-            });
+            // Roll a Resistance Check
+            await target.system.requestResistanceCheck(
+               {
+                  resistance: resistance,
+                  difficulty: difficulty,
+                  complexity: complexity,
+                  damageToReduce: damageToReduce,
+               },
+            );
          }
       }
-
-      return;
    }
 </script>
 
 <div class="button {resistance}">
-   <EfxButton
+   <Button
       on:click={() => {
-         rollResistanceCheck();
+         requestResistanceCheck();
       }}
       {disabled}
    >
       {`${localize(resistance)} ${difficulty}:${complexity}`}
-   </EfxButton>
+   </Button>
 </div>
 
 <style lang="scss">
-   @import '../../../styles/Mixins.scss';
+  .button {
+    @include flex-row;
+    width: 100%;
+    @include font-size-normal;
 
-   .button {
-      @include flex-row;
-      width: 100%;
-      @include font-size-normal;
+    &.reflexes {
+      --button-background: var(--reflexes-color);
+    }
 
-      &.reflexes {
-         --button-background: var(--reflexes-color);
-      }
+    &.resilience {
+      --button-background: var(--resilience-color);
+    }
 
-      &.resilience {
-         --button-background: var(--resilience-color);
-      }
-
-      &.willpower {
-         --button-background: var(--willpower-color);
-      }
-   }
+    &.willpower {
+      --button-background: var(--willpower-color);
+    }
+  }
 </style>

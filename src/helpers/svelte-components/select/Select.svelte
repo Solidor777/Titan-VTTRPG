@@ -13,10 +13,9 @@
 </select>
 
 <style lang="scss">
-   @import '../../../styles/Mixins.scss';
-
    select {
       @include input;
+
       option {
          @include flex-group-left;
       }

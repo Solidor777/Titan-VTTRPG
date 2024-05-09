@@ -1,16 +1,3 @@
-@mixin background-normal {
-   background: url(../ui/parchment.jpg) repeat;
-   background-image: url(../ui/parchment.jpg);
-   background-position-x: initial;
-   background-position-y: initial;
-   background-size: initial;
-   background-repeat: repeat;
-   background-attachment: initial;
-   background-origin: initial;
-   background-clip: initial;
-   background: initial;
-}
-
 @mixin input {
    border-style: var(--input-border-style);
    border-radius: var(--input-border-radius);
@@ -88,6 +75,14 @@
    border-color: var(--button-border-color);
 }
 
+@mixin padding-standard {
+   padding: var(--padding-standard);
+}
+
+@mixin padding-large {
+   padding: var(--padding-large);
+}
+
 @mixin button {
    box-sizing: border-box;
    display: flex;
@@ -138,6 +133,8 @@
    font-weight: var(--button-font-weight);
    padding: var(--button-padding);
    color: var(--button-color);
+   width: var(--button-width);
+   height: var(--button-height);
    line-height: var(--button-line-height);
    margin: 0;
 
@@ -173,6 +170,23 @@
    width: var(--icon-button-radius);
    height: var(--icon-button-radius);
    color: var(--icon-button-color);
+   margin: 0;
+
+   &:disabled {
+      cursor: default;
+      background: var(--button-background-disabled);
+   }
+
+   &:hover {
+      &:not(:disabled) {
+         cursor: pointer;
+         background: radial-gradient(var(--button-background-highlight), var(--button-background));
+      }
+   }
+
+   i {
+      margin-right: 0;
+   }
 }
 
 @mixin flex-row {
@@ -306,25 +320,43 @@
 @mixin panel-1 {
    background: var(--panel-1-background);
    color: var(--panel-1-color);
+
    --border-color: var(--panel-1-color);
 }
 
 @mixin panel-2 {
    background: var(--panel-2-background);
    color: var(--panel-2-color);
+
    --border-color: var(--panel-2-color);
 }
 
 @mixin panel-3 {
    background: var(--panel-3-background);
    color: var(--panel-3-color);
+
    --border-color: var(--panel-3-color);
 }
 
 @mixin label {
    background: var(--label-background);
    color: var(--label-color);
+
    --border-color: var(--label-color);
+}
+
+@mixin tag {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   border-style: var(--border-style);
+   border-radius: var(--border-radius);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
+   font-weight: bold;
+   padding: var(--padding-standard);
 }
 
 @mixin editor {
@@ -334,11 +366,11 @@
 }
 
 @mixin tag-margin {
-   margin: 0.5rem 0.25rem 0 0.25rem;
+   margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
 }
 
 @mixin tag-margin-small {
-   margin: 0.25rem 0.125rem 0 0.125rem;
+   margin: 2px 0;
 }
 
 @mixin font-size-normal {
@@ -375,49 +407,67 @@
 }
 
 @mixin effect-permanent {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--cyan) 0, var(--green) 100%);
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--cyan) 0, var(--green) 100%);
 }
 
 @mixin effect-turn-start {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--purple) 0, var(--cyan) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--purple) 0, var(--cyan) 100%);
 }
 
 @mixin effect-turn-end {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--pink) 0, var(--purple) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--pink) 0, var(--purple) 100%);
 }
 
 @mixin effect-expired {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--yellow) 0, var(--red) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--yellow) 0, var(--red) 100%);
 }
 
 @mixin effect-initiative {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--red) 0, var(--purple) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--red), var(--purple) 100%);
 }
 
 @mixin effect-custom {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--yellow) 0, var(--red) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--purple), var(--yellow) 100%);
 }
 
 @mixin fast-healing {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--green) 0, var(--yellow) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--green), var(--yellow) 100%);
 }
 
 @mixin persistent-damage {
-   color: var(--label-color);
    --border-color: var(--label-color);
-   background: linear-gradient(var(--gradientDegree), var(--red) 0, var(--orange) 100%);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--maroon), var(--orange) 100%);
+}
+
+@mixin resolve-regain {
+   --border-color: var(--label-color);
+
+   color: var(--label-color);
+   background: linear-gradient(var(--gradient-degree), var(--blue), var(--cyan) 100%);
+}
+
+@mixin z-index-app {
+   z-index: var(--z-index-app);
 }

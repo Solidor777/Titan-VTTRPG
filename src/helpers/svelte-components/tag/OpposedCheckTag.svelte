@@ -1,5 +1,5 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
 
    export let opposedCheck = void 0;
 </script>
@@ -15,7 +15,7 @@
    <div class="label">
       {#if opposedCheck.skill && opposedCheck.skill !== 'none'}
          {`${localize(opposedCheck.attribute)} (${localize(
-            `${opposedCheck.skill}`
+            `${opposedCheck.skill}`,
          )})`}
       {:else}
          {localize(opposedCheck.attribute)}
@@ -24,15 +24,13 @@
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .check-label {
       @include flex-row;
       @include flex-group-center;
       @include attribute-colors;
       @include border;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
 
       .label {
          @include flex-row;
@@ -40,8 +38,8 @@
 
          &:not(:first-child) {
             @include border-left;
-            margin-left: 0.25rem;
-            padding-left: 0.25rem;
+            margin-left: var(--padding-standard);
+            padding-left: var(--padding-standard);
          }
 
          &.main {

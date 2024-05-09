@@ -1,5 +1,5 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
    // Filter Items
@@ -9,12 +9,12 @@
 <!--Filter-->
 <div class="filter">
    <div class="label">{localize('filter')}</div>
-   <div class="input"><TextInput bind:value={filter} /></div>
+   <div class="input">
+      <TextInput bind:value={filter}/>
+   </div>
 </div>
 
 <style lang="scss">
-   @import '../../Styles/Mixins.scss';
-
    .filter {
       @include flex-row;
       @include flex-group-center;
@@ -22,11 +22,11 @@
       @include panel-1;
       @include font-size-normal;
       width: 100%;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
 
       .label {
          font-weight: bold;
-         margin-right: 0.25rem;
+         margin-right: var(--padding-standard);
       }
    }
 </style>

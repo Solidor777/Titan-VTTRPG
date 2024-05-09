@@ -1,13 +1,21 @@
 <script>
-   import { localize } from '~/helpers/Utility.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import {
+      DAMAGE_ICON,
+      DECREASE_SPEED_ICON,
+      HEALING_ICON,
+      INCREASE_SPEED_ICON,
+      RADIUS_ICON,
+      RANGE_ICON,
+   } from '~/system/Icons.js';
 
    const labelIcons = {
-      damage: 'fas fa-burst',
-      healing: 'fas fa-heart',
-      range: 'fas fa-ruler',
-      radius: 'fas fa-bullseye',
-      decreaseSpeed: 'fas fa-person-running',
-      increaseSpeed: 'fas fa-person-running',
+      damage: DAMAGE_ICON,
+      healing: HEALING_ICON,
+      range: RANGE_ICON,
+      radius: RADIUS_ICON,
+      decreaseSpeed: INCREASE_SPEED_ICON,
+      increaseSpeed: DECREASE_SPEED_ICON,
    };
 
    // Spell aspect
@@ -19,7 +27,7 @@
    <div class="stat label">
       <!--Icon-->
       {#if labelIcons[aspect.label]}
-         <i class={labelIcons[aspect.label]} />
+         <i class={labelIcons[aspect.label]}/>
       {/if}
 
       {localize(aspect.unit ?? aspect.label)}
@@ -74,15 +82,13 @@
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .aspect {
       @include flex-row;
       @include flex-group-center;
       @include resistance-colors;
       @include border;
       @include label;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
       flex-wrap: wrap;
 
       .stat {
@@ -95,12 +101,12 @@
 
          &:not(:first-child) {
             @include border-left;
-            margin-left: 0.25rem;
-            padding-left: 0.25rem;
+            margin-left: var(--padding-standard);
+            padding-left: var(--padding-standard);
          }
 
          i {
-            margin-right: 0.25rem;
+            margin-right: var(--padding-standard);
          }
       }
    }

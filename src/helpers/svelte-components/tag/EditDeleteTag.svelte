@@ -1,5 +1,7 @@
 <script>
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import { DELETE_ICON, EDIT_ICON } from '~/system/Icons.js';
+
    export let label = void 0;
    export let deleteFunction = void 0;
    export let editFunction = void 0;
@@ -18,7 +20,7 @@
       role="button"
       tabindex="0"
       use:tooltip={{ content: editTooltip }}
-      class="fas fa-pen-to-square"
+      class="{EDIT_ICON}"
       on:keypress={() => {
          editFunction();
       }}
@@ -32,7 +34,7 @@
       role="button"
       tabindex="0"
       use:tooltip={{ content: deleteTooltip }}
-      class="fas fa-trash"
+      class="{DELETE_ICON}"
       on:keypress={() => {
          deleteFunction();
       }}
@@ -43,20 +45,18 @@
 </div>
 
 <style lang="scss">
-   @import '../../../styles/mixins.scss';
-
    .tag {
       @include flex-row;
       @include flex-group-center;
       @include border;
       @include label;
       font-weight: bold;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
 
       a {
          @include border-left;
-         margin-left: 0.25rem;
-         padding-left: 0.25rem;
+         margin-left: var(--padding-standard);
+         padding-left: var(--padding-standard);
       }
    }
 </style>

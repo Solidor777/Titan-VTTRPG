@@ -8,15 +8,13 @@
    class="tag {baseValue == currentValue
       ? ''
       : currentValue > baseValue
-      ? 'greater'
-      : 'lesser'}"
+        ? 'greater'
+        : 'lesser'}"
 >
    {currentValue}
 </div>
 
 <style lang="scss">
-   @import '../../../Styles/Mixins.scss';
-
    .tag {
       @include flex-row;
       @include flex-group-center;

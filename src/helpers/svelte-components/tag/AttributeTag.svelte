@@ -8,8 +8,6 @@
 </div>
 
 <style lang="scss">
-   @import '../../../styles/mixins.scss';
-
    .tag {
       @include label;
       @include flex-row;
@@ -18,6 +16,6 @@
       @include attribute-colors;
       flex-wrap: wrap;
       font-weight: bold;
-      padding: 0.25rem;
+      padding: var(--padding-standard);
    }
 </style>

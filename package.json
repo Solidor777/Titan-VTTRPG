@@ -11,17 +11,28 @@
       "#standard/*": "@typhonjs-fvtt/svelte-standard/*"
    },
    "dependencies": {
+      "@sveltejs/vite-plugin-svelte": "^3.1.0",
       "@typhonjs-fvtt/runtime": "0.1.2",
       "@typhonjs-fvtt/svelte-standard": "0.1.0",
-      "svelte": "^4.2.0",
+      "short-unique-id": "^5.0.3",
       "tippy.js": "^6.3.7"
    },
    "devDependencies": {
       "@typhonjs-config/eslint-config": "^0.6.0",
       "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
-      "eslint": "^8",
+      "esdoc": "^1.1.0",
+      "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+      "esdoc-standard-plugin": "^1.0.0",
+      "eslint": "^9.1.1",
+      "eslint-plugin-svelte": "^2.38.0",
+      "postcss-html": "^1.6.0",
+      "postcss-scss": "^4.0.9",
+      "stylelint": "^16.4.0",
+      "stylelint-config-standard": "^36.0.0",
+      "stylelint-config-standard-scss": "^13.1.0",
+      "svelte": "^4.2.15",
       "svelte-preprocess": "^5",
-      "vite": "^4.4.0"
+      "vite": "^5.2.10"
    },
    "browserslist": [
       ">5%",
@@ -30,6 +41,7 @@
    "scripts": {
       "build": "vite build",
       "dev": "vite",
-      "eslint": "eslint ."
+      "eslint": "eslint .",
+      "stylelint": "stylelint \"**/*.scss\""
    }
 }
