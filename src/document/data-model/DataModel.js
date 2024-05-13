@@ -6,6 +6,13 @@ import createNumberField from '~/helpers/utility-functions/CreateNumberField.js'
  * @augments {TypeDataModel}
  */
 export default class TitanDataModel extends foundry.abstract.TypeDataModel {
+   /**
+    * Map of the object's components, sorted by Name and Component Class.
+    * @type {object}
+    * @private
+    */
+   #components;
+
    constructor(data, options) {
       super(data, options);
 
@@ -37,6 +44,14 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     */
    static get _prototypeComponents() {
       return {};
+   }
+
+   /**
+    * Getter for the map of the data model's components.
+    * @returns {object}    The map of the data model's component.
+    */
+   get components() {
+      return this.#components;
    }
 
    static defineSchema() {
@@ -84,21 +99,6 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Map of the object's components, sorted by Name and Component Class.
-    * @type {object}
-    * @private
-    */
-   #components;
-
-   /**
-    * Getter for the map of the data model's components.
-    * @returns {object}    The map of the data model's component.
-    */
-   get components() {
-      return this.#components;
-   }
-
-   /**
     * Perform preliminary operations before a data model of this type is created.
     * Pre-creation operations only occur for the client which requested the operation.
     * Modifications to the pending document before it is persisted should be performed with this.parent.updateSource().
@@ -141,5 +141,13 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
             component.prepareDerivedData();
          }
       }
+   }
+
+   /**
+    * Gets the type specific Roll Data for this document.
+    * @returns {object} Type specific Roll Data for this document.
+    */
+   getRollData() {
+      return this.parent.getRollData()
    }
 }

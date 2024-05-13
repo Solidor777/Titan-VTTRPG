@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import sort from '~/helpers/utility-functions/Sort.js';
 
    // Component class for the item
@@ -81,24 +81,24 @@
       <!--Each Item-->
       {#each items as item (item._id)}
          <li
-            class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
-            data-item-id={item._id}
-            draggable={true}
-            on:dragstart={(event) => {
+                 class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
+                 data-item-id={item._id}
+                 draggable={true}
+                 on:dragstart={(event) => {
                onDragStart(event, item._id, 'item');
             }}
-            on:dragenter={() => {
+                 on:dragenter={() => {
                onDragEnter(item._id, 'item');
             }}
-            on:dragend={() => {
+                 on:dragend={() => {
                onDragEnd();
             }}
-            transition:slide|local
+                 transition:slide|local
          >
             <svelte:component
-               this={itemComponent}
-               id={item._id}
-               bind:isExpanded={isExpandedMap[item._id]}
+                    this={itemComponent}
+                    itemId={item._id}
+                    bind:isExpanded={isExpandedMap[item._id]}
             />
          </li>
       {/each}
@@ -106,25 +106,25 @@
 {/if}
 
 <style lang="scss">
-   ol {
-      @include flex-column;
-      @include flex-group-top;
-      @include list;
+  ol {
+    @include flex-column;
+    @include flex-group-top;
+    @include list;
+    width: 100%;
+    list-style: none;
+
+    li {
+      @include flex-row;
+      @include flex-space-between;
       width: 100%;
-      list-style: none;
 
-      li {
-         @include flex-row;
-         @include flex-space-between;
-         width: 100%;
-
-         &.drag-hovered {
-            background: var(--highlight-background);
-         }
-
-         &:not(:first-child) {
-            margin-top: var(--padding-large);
-         }
+      &.drag-hovered {
+        background: var(--highlight-background);
       }
-   }
+
+      &:not(:first-child) {
+        margin-top: var(--padding-large);
+      }
+    }
+  }
 </style>

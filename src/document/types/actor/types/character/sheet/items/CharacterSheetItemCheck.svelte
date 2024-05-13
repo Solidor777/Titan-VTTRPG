@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import getSetting from '~/helpers/utility-functions/GetSetting.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
@@ -9,7 +9,7 @@
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
    import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
-   import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON } from '~/system/Icons.js';
+   import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 
    // Reference to the docuement
    const document = getContext('document');
@@ -22,12 +22,12 @@
 
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
-   // Reference to the weapon id
+   /** @type {string} The ID of the item. */
    $: check = item.system.check[checkIdx];
 
    function rollItemCheck() {
       return $document.system.requestItemCheck(
-         { itemId: item._id, checkIdx: checkIdx },
+         {itemId: item._id, checkIdx: checkIdx},
       );
    }
 

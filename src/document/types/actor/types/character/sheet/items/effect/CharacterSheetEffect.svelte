@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
@@ -23,10 +23,10 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
 
-   // Reference to the weapon id
+   /** @type {string} The ID of the item. */
    export let id = void 0;
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
    // Setup context references

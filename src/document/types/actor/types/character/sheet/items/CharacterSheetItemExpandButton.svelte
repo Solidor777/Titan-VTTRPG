@@ -1,8 +1,8 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
+   import {COLLAPSED_ICON, EXPANDED_ICON} from '~/system/Icons.js';
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
    // Item

@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits';
+   import {getContext} from 'svelte';
+   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
@@ -22,7 +22,7 @@
    // Context references
    const document = getContext('document');
 
-   // Reference to the weapon id
+   /** @type {string} The ID of the item. */
    export let item = void 0;
 
    // Reference to the attack idx
@@ -111,9 +111,9 @@
       <!--Dice-->
       <div class="stat">
          <IconStatTag
+            icon={DICE_ICON}
             label={localize('dice')}
             value={dicePool}
-            icon={DICE_ICON}
          />
       </div>
 

@@ -2,7 +2,7 @@
    import CharacterSheetWeaponAttack
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte';
 
-   // Reference to the weapon id
+   /** @type {string} The ID of the item. */
    export let item = void 0;
 </script>
 
@@ -31,7 +31,7 @@
          &:not(:first-child) {
             @include border-top;
             padding-top: var(--padding-large);
-            
+
             margin-top: 8px;
          }
       }

@@ -55,6 +55,33 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /* === Construction === */
 
+   /**
+    * Gets the cached rulesElements on the parent actor,
+    * sorted by their type.
+    * @returns {object}     The parent actor's Rules Elements cache
+    */
+   get rulesElementsCache() {
+      return this.parent.rulesElementsCache;
+   }
+
+   /**
+    * Gets the parent document's Action Queue object.
+    * @returns {ActionQueue}     The parent actor's Action Queue.
+    */
+   get actionQueue() {
+      return this.parent.actionQueue;
+   }
+
+   /* === Setters and getters === */
+
+   /**
+    * Identifies this data model as a Character.
+    * @returns {boolean}   True
+    */
+   get isCharacter() {
+      return true;
+   }
+
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -183,12 +210,10 @@ export default class CharacterDataModel extends ActorDataModel {
       return {
          displayName: data.prototypeToken?.displayName ?? CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
          displayBars: data.prototypeToken?.displayBars ?? CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
-         bar1: data.prototypeToken?.bar1 ?? { attribute: 'resource.stamina' },
-         bar2: data.prototypeToken?.bar2 ?? { attribute: 'resource.resolve' },
+         bar1: data.prototypeToken?.bar1 ?? {attribute: 'resource.stamina'},
+         bar2: data.prototypeToken?.bar2 ?? {attribute: 'resource.resolve'},
       };
    }
-
-   /* === Setters and getters === */
 
    /**
     * Gets all the standard conditions affecting this Character.
@@ -222,31 +247,6 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       return false;
-   }
-
-   /**
-    * Gets the cached rulesElements on the parent actor,
-    * sorted by their type.
-    * @returns {object}     The parent actor's Rules Elements cache
-    */
-   get rulesElementsCache() {
-      return this.parent.rulesElementsCache;
-   }
-
-   /**
-    * Gets the parent document's Action Queue object.
-    * @returns {ActionQueue}     The parent actor's Action Queue.
-    */
-   get actionQueue() {
-      return this.parent.actionQueue;
-   }
-
-   /**
-    * Identifies this data model as a Character.
-    * @returns {boolean}   True
-    */
-   get isCharacter() {
-      return true;
    }
 
    /* === Data Preparation === */
@@ -572,8 +572,7 @@ export default class CharacterDataModel extends ActorDataModel {
             }
          }
          this.rulesElementsCache.mulBase = mulBase;
-      }
-      else {
+      } else {
          this.rulesElementsCache.mulBase = false;
       }
    }
@@ -624,8 +623,7 @@ export default class CharacterDataModel extends ActorDataModel {
          }
 
          this.rulesElementsCache.flatModifier = flatModifier;
-      }
-      else {
+      } else {
          this.rulesElementsCache.flatModifier = false;
       }
    }
@@ -661,8 +659,7 @@ export default class CharacterDataModel extends ActorDataModel {
          }
 
          this.rulesElementsCache.fastHealing = fastHealing;
-      }
-      else {
+      } else {
          this.rulesElementsCache.fastHealing = false;
       }
    }
@@ -696,8 +693,7 @@ export default class CharacterDataModel extends ActorDataModel {
          }
 
          this.rulesElementsCache.persistentDamage = persistentDamage;
-      }
-      else {
+      } else {
          this.rulesElementsCache.persistentDamage = false;
       }
    }
@@ -775,9 +771,7 @@ export default class CharacterDataModel extends ActorDataModel {
                   if (selectorMessages.length > 0) {
                      checkTypeMessages[selector] = selectorMessages;
                   }
-               }
-
-               else {
+               } else {
                   const selectorMessages = {};
 
                   // Sort elements by key
@@ -876,9 +870,7 @@ export default class CharacterDataModel extends ActorDataModel {
                            ratingMap.multiAttack[type] += element.value;
                         }
                      }
-                  }
-
-                  else {
+                  } else {
                      // Initialize rating map
                      ratingMap[selector] = {};
                      const selectorMap = ratingMap[selector];
@@ -2133,8 +2125,7 @@ export default class CharacterDataModel extends ActorDataModel {
          const targets = getCombatTargets();
          if (targets.length > 0) {
             checkOptions.targetDefense = targets[0].getRollData().rating.defense.value;
-         }
-         else {
+         } else {
             checkOptions.targetDefense = checkOptions.type === 'melee' ?
                checkOptions.attackerMelee :
                checkOptions.attackerAccuracy;
@@ -2989,6 +2980,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
       // Cache the item and roll data
       const itemRollData = this.parent.items.get(checkOptions.itemId).getRollData();
+      console.log(itemRollData);
       const checkData = itemRollData.check[checkOptions.checkIdx];
 
       // If no attribute is set.
@@ -3678,7 +3670,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
       // Spend resolve is any resolve was used
       if (resolveSpent > 0) {
-         return this.spendResolve(resolveSpent, { playSound: false });
+         return this.spendResolve(resolveSpent, {playSound: false});
       }
    }
 
@@ -3831,8 +3823,8 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {number?}  wounds.value         The character's current Wounds, if any.
     * @property {number?}  woundsSuffered       The number of Wounds suffered, if any.
     * @property {object?}  stamina             The character's Stamina.
-    * @property {number}   stamina.max          The character's maximum Stamina.
-    * @property {number}   stamina.value        The character's current Stamina.
+    * @property {integer}   stamina.max          The character's maximum Stamina.
+    * @property {integer}   stamina.value        The character's current Stamina.
     * @property {object?}  tags                 Tags applied to the damage.
     * @property {boolean?} tags.ineffective     Whether the Attack had the Ineffective trait.
     * @property {boolean?} tags.penetrating     Whether the Attack had the Penetrating trait.
@@ -3985,10 +3977,10 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string}   type              The Chat Message type (healingReport).
     * @property {string}   actorImg          The character's image.
     * @property {string}   actorName         The character's name.
-    * @property {number}   staminaRestored   The amount of Stamina healed.
+    * @property {integer}   staminaRestored   The amount of Stamina healed.
     * @property {object}   stamina           The character's Stamina.
-    * @property {number}   stamina.value     The character's current Stamina.
-    * @property {number}   stamina.max       The character's maximum Stamina.
+    * @property {integer}   stamina.value     The character's current Stamina.
+    * @property {integer}   stamina.max       The character's maximum Stamina.
     * @property {object?}  wounds            The character's Wounds, if any.
     * @property {number?}  wounds.value      The character's current Wounds, if any.
     * @property {number?}  wounds.max        The character's maximum Wounds, if any.
@@ -4124,7 +4116,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string}   type              The Chat Message type (spendResolveReport).
     * @property {string}   actorImg          The character's image.
     * @property {string}   actorName         The character's name.
-    * @property {number}   resolveSpent      The amount of Resolve spent.
+    * @property {integer}   resolveSpent      The amount of Resolve spent.
     * @property {number?}  resolveShortage   How much the character overspent their Resolve.
     */
 
@@ -4328,7 +4320,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string}   actorName      The character's name.
     * @property {string}   armorImg       The armor's image.
     * @property {string}   armorName      The armor's name.
-    * @property {number}   armorRepaired  The amount of Armor repaired.
+    * @property {integer}   armorRepaired  The amount of Armor repaired.
     */
 
    /**
@@ -4555,8 +4547,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Updates the status of this character in response to Initiative advancing
-    * @param {number}   currentInitiative    The initiative of the current combat turn.
-    * @param {number}   previousInitiative   The initiative of the previous combat turn.
+    * @param {float}    currentInitiative    The initiative of the current combat turn.
+    * @param {float}    previousInitiative   The initiative of the previous combat turn.
     * @param {boolean}  isNewRound           Whether the current combat turn is the start of a new round.
     * @returns {Promise<void>}
     */
@@ -4580,8 +4572,7 @@ export default class CharacterDataModel extends ActorDataModel {
                      const initiative = effect.system.duration.initiative;
                      return (initiative > previousInitiative || initiative <= currentInitiative);
                   });
-               }
-               else {
+               } else {
                   // If this turn is the start of a new round,
                   // advance effects with an initiative lesser or equal to the current turn's initiative,
                   // or greater than the previous turn's initiative
@@ -4686,8 +4677,7 @@ export default class CharacterDataModel extends ActorDataModel {
                break;
             }
          }
-      }
-      else if (this.parent.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
+      } else if (this.parent.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
          // If the current user is a player and an owner,
          // open the sheet if auto open sheets is enabled for players.
          this.parent.sheet.render(true);
@@ -4939,7 +4929,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string}   label       The name of the Effect item.
     * @property {string}   img         The image used by the Effect item.
     * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {number}   remaining   The remaining turns for the Effect item.
+    * @property {integer}   remaining   The remaining turns for the Effect item.
     */
 
    /**
@@ -4970,8 +4960,8 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string}   label       The name of the Effect item.
     * @property {string}   img         The image used by the Effect item.
     * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {number}   remaining   The remaining turns for the Effect item.
-    * @property {number}   initiative  The initiative count on which the Effect duration is reduced.
+    * @property {integer}  remaining   The remaining turns for the Effect item.
+    * @property {float}    initiative  The initiative count on which the Effect duration is reduced.
     */
 
    /**
@@ -5003,7 +4993,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string}   label       The name of the Effect item.
     * @property {string}   img         The image used by the Effect item.
     * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {number}   remaining   The remaining turns for the Effect item.
+    * @property {integer}   remaining   The remaining turns for the Effect item.
     * @property {string}   custom      Custom duration of the Effect item.
     */
 
@@ -5113,14 +5103,14 @@ export default class CharacterDataModel extends ActorDataModel {
 
             // Apply healing if appropriate
             if (turnStaminaMod > 0 && this.resource.stamina.value < this.resource.stamina.max) {
-               await this.applyHealing(turnStaminaMod, { updateActor: false, report: false });
+               await this.applyHealing(turnStaminaMod, {updateActor: false, report: false});
                shouldUpdateActor = true;
             }
 
             // Otherwise, apply damage if appropriate
             else if (turnStaminaMod < 0) {
                await this.applyDamage(-turnStaminaMod,
-                  { updateActor: false, ignoreArmor: true, report: false });
+                  {updateActor: false, ignoreArmor: true, report: false});
                shouldUpdateActor = true;
             }
 

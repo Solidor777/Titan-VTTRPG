@@ -1,11 +1,11 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
+   import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 
-   // Reference to the weapon id
+   /** @type {string} The ID of the item. */
    export let item = void 0;
 
    // Context references
@@ -45,9 +45,9 @@
    <!--Dice-->
    <div class="tag">
       <IconStatTag
+         icon={DICE_ICON}
          label={localize('dice')}
          value={dicePool}
-         icon={DICE_ICON}
       />
    </div>
 
@@ -80,7 +80,7 @@
       @include flex-row;
       @include flex-space-evenly;
       @include font-size-small;
-      
+
       flex-wrap: wrap;
 
       .tag {

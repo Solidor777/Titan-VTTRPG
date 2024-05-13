@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
@@ -26,7 +26,7 @@
    import CharacterSheetWeaponAttacks
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
    import CharacterSheetWeaponAttackButton
-      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttackButton.svelte';
+      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponCondensedAttackCheckButton.svelte';
 
    // Weapon id
    export let id = void 0;
@@ -63,14 +63,14 @@
                {#if !item.system.equipped}
                   <!--Toggle Equipped button-->
                   <CharacterSheetItemEquipButton
-                     {item}
-                     equipped={item.system.equipped}
+                          {item}
+                          equipped={item.system.equipped}
                   />
                {:else if item.system.attack[0]}
                   <CharacterSheetWeaponAttackButton
-                     attack={item.system.attack[0]}
-                     {item}
-                     on:click={() =>
+                          attack={item.system.attack[0]}
+                          {item}
+                          on:click={() =>
                         $document.system.requestAttackCheck({
                         itemId: item._id,
                         attackIdx: 0
@@ -81,8 +81,8 @@
 
             <!--Send to Chat button-->
             <div
-               class="button"
-               use:tooltip={{ content: localize('sendToChat') }}
+                    class="button"
+                    use:tooltip={{ content: localize('sendToChat') }}
             >
                <CharacterSheetItemSendToChatButton {item}/>
             </div>
@@ -94,8 +94,8 @@
 
             <!--Delete Button-->
             <div
-               class="button"
-               use:tooltip={{ content: localize('deleteItem') }}
+                    class="button"
+                    use:tooltip={{ content: localize('deleteItem') }}
             >
                <CharacterSheetItemDeleteButton itemId={item._id}/>
             </div>
@@ -112,8 +112,8 @@
 
                <div class="button">
                   <CharacterSheetItemEquipButton
-                     {item}
-                     equipped={item.system.equipped}
+                          {item}
+                          equipped={item.system.equipped}
                   />
                </div>
             </div>
@@ -171,93 +171,93 @@
 {/if}
 
 <style lang="scss">
-   .item {
+  .item {
+    @include flex-column;
+    @include flex-group-top;
+    width: 100%;
+
+    .header {
+      @include flex-row;
+      @include flex-space-between;
+      @include border;
+      @include panel-1;
+      padding: var(--padding-standard);
+      width: 100%;
+      font-weight: bold;
+
+      .label {
+        @include flex-row;
+        @include flex-group-center;
+
+        .button {
+          margin-left: var(--padding-standard);
+        }
+      }
+
+      .controls {
+        @include flex-row;
+        @include flex-group-right;
+        height: 100%;
+
+        .button {
+          &:not(:first-child) {
+            margin-left: var(--padding-standard);
+          }
+        }
+      }
+    }
+
+    .expandable-content {
       @include flex-column;
       @include flex-group-top;
-      width: 100%;
+      @include panel-3;
+      @include border-bottom-sides;
+      width: calc(100% - 16px);
+      padding: 0 var(--padding-standard);
 
-      .header {
-         @include flex-row;
-         @include flex-space-between;
-         @include border;
-         @include panel-1;
-         padding: var(--padding-standard);
-         width: 100%;
-         font-weight: bold;
+      .section {
+        width: 100%;
 
-         .label {
-            @include flex-row;
-            @include flex-group-center;
+        &:not(.rich-text) {
+          padding-bottom: var(--padding-large);
 
-            .button {
-               margin-left: var(--padding-standard);
-            }
-         }
+          &:not(.tags) {
+            padding-top: var(--padding-large);
+          }
+        }
 
-         .controls {
-            @include flex-row;
-            @include flex-group-right;
-            height: 100%;
+        &:not(:first-child) {
+          @include border-top;
+        }
 
-            .button {
-               &:not(:first-child) {
-                  margin-left: var(--padding-standard);
-               }
-            }
-         }
+        &.buttons {
+          @include flex-row;
+          @include flex-group-center;
+
+          .button:not(:first-child) {
+            margin-left: var(--padding-standard);
+          }
+        }
+
+        &.tags {
+          @include flex-row;
+          @include flex-group-center;
+          flex-wrap: wrap;
+
+          .tag {
+            @include tag-margin;
+          }
+        }
+
+        &:not(.buttons) &:not(.tags) {
+          @include flex-column;
+          @include flex-group-top;
+        }
+
+        &.small-text {
+          @include font-size-small;
+        }
       }
-
-      .expandable-content {
-         @include flex-column;
-         @include flex-group-top;
-         @include panel-3;
-         @include border-bottom-sides;
-         width: calc(100% - 16px);
-         padding: 0 var(--padding-standard);
-
-         .section {
-            width: 100%;
-
-            &:not(.rich-text) {
-               padding-bottom: var(--padding-large);
-
-               &:not(.tags) {
-                  padding-top: var(--padding-large);
-               }
-            }
-
-            &:not(:first-child) {
-               @include border-top;
-            }
-
-            &.buttons {
-               @include flex-row;
-               @include flex-group-center;
-
-               .button:not(:first-child) {
-                  margin-left: var(--padding-standard);
-               }
-            }
-
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-               flex-wrap: wrap;
-
-               .tag {
-                  @include tag-margin;
-               }
-            }
-
-            &:not(.buttons) &:not(.tags) {
-               @include flex-column;
-               @include flex-group-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
-            }
-         }
-      }
-   }
+    }
+  }
 </style>

@@ -1,9 +1,9 @@
 <script>
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { getContext } from 'svelte';
-   import { SEND_TO_CHAT_ICON } from '~/system/Icons.js';
+   import {getContext} from 'svelte';
+   import {SEND_TO_CHAT_ICON} from '~/system/Icons.js';
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let item = void 0;
 
    // Reference to the docuement

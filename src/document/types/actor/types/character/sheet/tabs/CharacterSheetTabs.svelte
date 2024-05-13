@@ -12,7 +12,7 @@
    import CharacterSheetSpellsTab
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    const appState = getContext('applicationState');
 
@@ -51,4 +51,4 @@
    ];
 </script>
 
-<BorderedTabs {tabs} bind:activeTab={$appState.activeTab}/>
+<BorderedTabs bind:activeTab={$appState.activeTab} {tabs}/>

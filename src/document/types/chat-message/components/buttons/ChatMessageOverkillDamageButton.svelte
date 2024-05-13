@@ -4,7 +4,7 @@
    import { OVERKILL_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type number Amount of Damage to apply. */
+   /** @type integer Amount of Damage to apply. */
    export let damage = void 0;
 </script>
 

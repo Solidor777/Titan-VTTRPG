@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
@@ -17,25 +17,25 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemImage
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
-   import CharacterSheetCheckButton
-      from '~/document/types/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
    import CharacterSheetSpellCastingCheck
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import CharacterSheetCondensedItemCheckButton
+      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedItemCheckButton.svelte";
 
    // Reference to the docuement
    const document = getContext('document');
 
-   // Reference to the weapon id
-   export let id = void 0;
+   // Reference to the weapon itemId
+   export let itemId = void 0;
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
    // Item reference
-   $: item = $document.items.get(id);
+   $: item = $document.items.get(itemId);
 </script>
 
 {#if item}
@@ -58,19 +58,7 @@
          <div class="controls">
             <!--Cast Spell-->
             <div>
-               <CharacterSheetCheckButton
-                  check={item.system.castingCheck}
-                  diceMod={$document.system.getCastingCheckMod(
-                     'dice',
-                     item,
-                  )}
-                  expertiseMod={$document.system.getCastingCheckMod(
-                     'expertise',
-                     item,
-                  )}
-                  on:click={() =>
-                     $document.system.requestCastingCheck({itemId: id})}
-               />
+               <CharacterSheetCondensedItemCheckButton {itemId}/>
             </div>
 
             <!--Send to Chat button-->

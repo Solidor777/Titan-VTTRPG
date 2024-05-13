@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
@@ -16,25 +16,24 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemImage
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
-   import CharacterSheetCheckButton
-      from '~/document/types/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
+   import CharacterSheetCondensedItemCheckButton
+      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedItemCheckButton.svelte";
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
-   // Reference to the weapon id
-   export let id = void 0;
+   /** @type {string} The ID of the item. */
+   export let itemId = void 0;
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   // Setup context references
+   /** @type TitanActor Reference to the Character document. */
    const document = getContext('document');
 
-   // Item reference
-   $: item = $document.items.get(id);
+   /** @type TitanActor Reference to the Item document. */
+   $: item = $document.items.get(itemId);
 </script>
-
 {#if item}
    <div class="item">
       <!--Header-->
@@ -47,7 +46,7 @@
 
             <!--Expand button-->
             <div class="button">
-               <CharacterSheetItemExpandButton {item} bind:isExpanded/>
+               <CharacterSheetItemExpandButton bind:isExpanded {item}/>
             </div>
          </div>
 
@@ -56,23 +55,7 @@
             <!--Check-->
             {#if item.system.check.length > 0}
                <div>
-                  <CharacterSheetCheckButton
-                     check={item.system.check[0]}
-                     diceMod={$document.system.getItemCheckMod(
-                        'dice',
-                        item,
-                        item.system.check[0],
-                     )}
-                     expertiseMod={$document.system.getItemCheckMod(
-                        'expertise',
-                        item,
-                        item.system.check[0],
-                     )}
-                     on:click={() =>
-                        $document.system.requestItemCheck(
-                           { itemId: item._id, checkIdx: 0 }
-                        )}
-                  />
+                  <CharacterSheetCondensedItemCheckButton {itemId}/>
                </div>
             {/if}
 
@@ -168,6 +151,7 @@
       {/if}
    </div>
 {/if}
+
 
 <style lang="scss">
    .item {

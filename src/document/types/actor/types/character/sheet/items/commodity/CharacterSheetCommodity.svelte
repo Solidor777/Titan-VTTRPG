@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
@@ -25,7 +25,7 @@
    // Reference to the armor id
    export let id = void 0;
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
    // Setup context references

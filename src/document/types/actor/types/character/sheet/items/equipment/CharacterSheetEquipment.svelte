@@ -1,13 +1,11 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import CharacterSheetCheckButton
-      from '~/document/types/actor/types/character/sheet/CharacterSheetCheckButton.svelte';
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
    import CharacterSheetItemSendToChatButton
@@ -23,18 +21,20 @@
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import CharacterSheetCondensedItemCheckButton
+      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedItemCheckButton.svelte";
 
-   // Reference to the armor id
-   export let id = void 0;
+   // Reference to the armor itemId
+   export let itemId = void 0;
 
-   // Collapsed object
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
    // Setup context references
    const document = getContext('document');
 
    // Item reference
-   $: item = $document.items.get(id);
+   $: item = $document.items.get(itemId);
 </script>
 
 {#if item}
@@ -65,23 +65,7 @@
                </div>
             {:else}
                <div class="button">
-                  <CharacterSheetCheckButton
-                     check={item.system.check[0]}
-                     diceMod={$document.system.getItemCheckMod(
-                        'dice',
-                        item,
-                        item.system.check[0],
-                     )}
-                     expertiseMod={$document.system.getItemCheckMod(
-                        'expertise',
-                        item,
-                        item.system.check[0],
-                     )}
-                     on:click={() =>
-                        $document.system.requestItemCheck(
-                           { itemId: item._id, checkIdx: 0 }
-                        )}
-                  />
+                  <CharacterSheetCondensedItemCheckButton {itemId}/>
                </div>
             {/if}
 

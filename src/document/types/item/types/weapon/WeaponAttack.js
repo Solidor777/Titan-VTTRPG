@@ -6,10 +6,10 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @typedef {object} WeaponAttack
  * @property {string}         label                      The display name of the Attack.
  * @property {string}         type                       The Type of Attack being performed (Melee or Ranged).
- * @property {number}         range                      The Range of the Attack.
+ * @property {integer}         range                      The Range of the Attack.
  * @property {string}         attribute                  The Attribute to use for the Check.
  * @property {string}         skill                      The Skill to use for the Check.
- * @property {number}         damage                     The minimum damage a successful attack will inflict.
+ * @property {integer}         damage                     The minimum damage a successful attack will inflict.
  * @property {boolean}        plusExtraSuccessDamage     Whether to increase the damage for each extra success.
  * @property {AttackTrait[]}  trait                      Array of standard attack traits applied to this Attack.
  * @property {string[]}       customTrait                Array of custom traits applied to this Attack.

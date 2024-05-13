@@ -19,21 +19,21 @@
  * @property {boolean}              reflexesCheck           Whether the effects can be resisted with a Reflexes check.
  * @property {boolean}              resilienceCheck         Whether the effects can be resisted with a Resilience check.
  * @property {boolean}              willpowerCheck          Whether the effects can be resisted with a Willpower check.
- * @property {number}               attributeDice           The number of dice granted by the attribute.
- * @property {number}               complexity              The minimum number of Successes needed.
- * @property {number}               damage                  The minimum Damage to apply on a successful check.
- * @property {number}               damageMod               Modifier for the amount of Damage to be inflicted.
- * @property {number}               diceMod                 Modifier for the number of Dice being rolled.
- * @property {number}               difficulty              The minimum roll on a die to achieve a Success.
- * @property {number}               expertiseMod            Modifier for the amount of Expertise to be applied.
- * @property {number}               healing                 The minimum Healing to apply on a successful check.
- * @property {number}               healingMod              Modifier for the amount of healing to be applied.
- * @property {number}               skillExpertise          The minimum healing to apply on a successful check.
- * @property {number}               skillTrainingDice       The number of dice granted by the skill.
- * @property {number}               totalDice               The total number of dice to be rolled.
- * @property {number}               totalExpertise          The total amount of expertise to apply.
- * @property {number}               totalTrainingDice       The total number of training dice to be rolled.
- * @property {number}               trainingMod             Modifier for the amount of Training to be applied.
+ * @property {integer}               attributeDice           The number of dice granted by the attribute.
+ * @property {integer}               complexity              The minimum number of Successes needed.
+ * @property {integer}               damage                  The minimum Damage to apply on a successful check.
+ * @property {integer}               damageMod               Modifier for the amount of Damage to be inflicted.
+ * @property {integer}               diceMod                 Modifier for the number of Dice being rolled.
+ * @property {integer}               difficulty              The minimum roll on a die to achieve a Success.
+ * @property {integer}               expertiseMod            Modifier for the amount of Expertise to be applied.
+ * @property {integer}               healing                 The minimum Healing to apply on a successful check.
+ * @property {integer}               healingMod              Modifier for the amount of healing to be applied.
+ * @property {integer}               skillExpertise          The minimum healing to apply on a successful check.
+ * @property {integer}               skillTrainingDice       The number of dice granted by the skill.
+ * @property {integer}               totalDice               The total number of dice to be rolled.
+ * @property {integer}               totalExpertise          The total amount of expertise to apply.
+ * @property {integer}               totalTrainingDice       The total number of training dice to be rolled.
+ * @property {integer}               trainingMod             Modifier for the amount of Training to be applied.
  * @property {ScalingAspectBase[]}  scalingAspect           Array of scaling spell aspects.
  * @property {string[]}             customTrait             Array of custom traits applied to the item.
  * @property {string}               attribute               The Attribute to use for the Check.
