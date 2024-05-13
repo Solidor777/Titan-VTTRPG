@@ -32,8 +32,12 @@
    const document = getContext('document');
 
    /** @type TitanActor Reference to the Item document. */
-   $: item = $document.items.get(itemId);
+   let item;
+   $: {
+      item = $document.items.get(itemId);
+   }
 </script>
+
 {#if item}
    <div class="item">
       <!--Header-->
@@ -53,7 +57,10 @@
          <!--Controls-->
          <div class="controls">
             <!--Check-->
-            {#if item.system.check.length > 0}
+            {#if item.system.check.length > 0 && $document.system.validateItemCheckOptions({
+               itemId: itemId,
+               checkIdx: 0
+            })}
                <div>
                   <CharacterSheetCondensedItemCheckButton {itemId}/>
                </div>

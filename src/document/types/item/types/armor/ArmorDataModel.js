@@ -34,6 +34,16 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rarity = this.rarity;
+      retVal.value = this.value;
+      retVal.armor = foundry.utils.deepClone(this.armor);
+      retVal.trait = foundry.utils.deepClone(this.trait);
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return ARMOR_IMAGE;
    }

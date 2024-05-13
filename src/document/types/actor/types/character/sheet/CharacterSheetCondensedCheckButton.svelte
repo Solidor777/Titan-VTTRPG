@@ -83,18 +83,18 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
-         
-         height: 100%;
+
          line-height: normal;
          padding: var(--padding-standard);
 
          .stat {
             @include flex-row;
             @include flex-group-center;
-            @include border-left;
-            @include border-color-button;
 
             &:not(:first-child) {
+               @include border-left;
+               @include border-color-button;
+
                padding-left: var(--padding-standard);
                margin-left: var(--padding-standard);
             }

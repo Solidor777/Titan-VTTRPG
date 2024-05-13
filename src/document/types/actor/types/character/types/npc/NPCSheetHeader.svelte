@@ -52,7 +52,7 @@
 
          <!--Input-->
          <div class="input">
-            <DocumentTextInput bind:value={$document.system.type}/>
+            <DocumentTextInput bind:value={$document.system.bio.type}/>
          </div>
       </div>
 

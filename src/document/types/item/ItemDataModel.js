@@ -70,4 +70,12 @@ export default class ItemDataModel extends TitanDataModel {
    _getDefaultName() {
       return localize('newItem');
    }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.check = foundry.utils.deepClone(this.check);
+      retVal.customTrait = foundry.utils.deepClone(this.customTrait);
+
+      return retVal;
+   }
 }

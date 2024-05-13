@@ -18,6 +18,14 @@ export default class PlayerDataModel extends CharacterDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.xp = foundry.utils.deepClone(this.xp);
+      retVal.inspiration = this.inspiration;
+
+      return retVal;
+   }
+
    _getInitialPrototypeTokenData(data) {
       const retVal = super._getInitialPrototypeTokenData(data);
       retVal.actorLink = data.prototypeToken?.actorLink ?? true;

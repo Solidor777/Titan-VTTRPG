@@ -30,6 +30,16 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rarity = this.rarity;
+      retVal.value = this.value;
+      retVal.defense = this.defense;
+      retVal.trait = foundry.utils.deepClone(this.trait);
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return SHIELD_IMAGE;
    }

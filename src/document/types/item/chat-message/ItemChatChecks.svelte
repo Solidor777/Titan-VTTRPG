@@ -46,7 +46,7 @@
             const actor = controlledTokens[tokenIdx]?.actor;
             if (actor && actor.system.resource?.stamina) {
                // Get the actor roll data
-               const actorRollData = actor.getRollData();
+               const actorRollData = actor.system.getRollData();
 
                // Get a new item check
                const itemCheck = new ItemCheck({

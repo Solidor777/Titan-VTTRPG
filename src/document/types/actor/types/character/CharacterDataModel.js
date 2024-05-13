@@ -200,8 +200,10 @@ export default class CharacterDataModel extends ActorDataModel {
          shield: createStringField(null),
       });
 
-      // Add description
-      schema.description = createStringField();
+      // Add bio
+      schema.bio = createSchemaField({
+         description: createStringField(),
+      })
 
       return schema;
    }
@@ -247,6 +249,21 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       return false;
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.attribute = foundry.utils.deepClone(this.attribute);
+      retVal.resistance = foundry.utils.deepClone(this.resistance);
+      retVal.skill = foundry.utils.deepClone(this.skill);
+      retVal.rating = foundry.utils.deepClone(this.rating);
+      retVal.resource = foundry.utils.deepClone(this.resource);
+      retVal.speed = foundry.utils.deepClone(this.speed);
+      retVal.mod = foundry.utils.deepClone(this.mod);
+      retVal.equipped = foundry.utils.deepClone(this.equipped);
+      retVal.bio = foundry.utils.deepClone(this.bio);
+
+      return retVal;
    }
 
    /* === Data Preparation === */
@@ -957,7 +974,7 @@ export default class CharacterDataModel extends ActorDataModel {
    _applyItemTraitDefenseMods(elements, item) {
       if (item) {
          // Get item traits
-         const itemRollData = item.getRollData();
+         const itemRollData = item.system.getRollData();
          const itemTraits = itemRollData.trait.map((trait) => trait.name);
 
          // If the item has traits
@@ -1442,7 +1459,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateAttributeCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeAttributeCheckOptions(options);
+         const checkOptions = this.initializeAttributeCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getAttributeCheckParameters(checkOptions);
@@ -1468,7 +1485,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateAttributeCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeAttributeCheckOptions(options);
+         const checkOptions = this.initializeAttributeCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getAttributeCheckParameters(checkOptions);
@@ -1513,7 +1530,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {AttributeCheckOptions} The new, fully-populated Attribute Check Options.
     * @private
     */
-   _initializeAttributeCheckOptions(options) {
+   initializeAttributeCheckOptions(options) {
       const checkOptions = createAttributeCheckOptions(options);
 
       // If no attribute is set
@@ -1592,7 +1609,7 @@ export default class CharacterDataModel extends ActorDataModel {
       const parameters = createAttributeCheckParameters(options);
 
       // Initialize common attribute based check parameters
-      const actorRollData = this.parent.getRollData();
+      const actorRollData = this.getRollData();
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
       return parameters;
@@ -1679,7 +1696,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateResistanceCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeResistanceCheckOptions(options);
+         const checkOptions = this.initializeResistanceCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getResistanceCheckParameters(checkOptions);
@@ -1705,7 +1722,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateResistanceCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeResistanceCheckOptions(options);
+         const checkOptions = this.initializeResistanceCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getResistanceCheckParameters(checkOptions);
@@ -1749,7 +1766,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {ResistanceCheckOptions}   The new, fully-populated Resistance Check Options.
     * @private
     */
-   _initializeResistanceCheckOptions(options) {
+   initializeResistanceCheckOptions(options) {
       // For now, there are no actor specific resistance check modifiers,
       // so we only need to fill out the options object.
       return createResistanceCheckOptions(options);
@@ -1763,10 +1780,10 @@ export default class CharacterDataModel extends ActorDataModel {
    getResistanceCheckParameters(options) {
       // Initialize check parameters
       const parameters = createResistanceCheckParameters(options);
-      const actorRollData = this.parent.getRollData();
+      const actorRollData = this.getRollData();
 
       // Get the resistance dice
-      parameters.resistanceDice = actorRollData.system.resistance[parameters.resistance].value;
+      parameters.resistanceDice = actorRollData.resistance[parameters.resistance].value;
 
       // Add the dice mod to the total dice
       parameters.totalDice = parameters.resistanceDice + parameters.diceMod;
@@ -1945,7 +1962,7 @@ export default class CharacterDataModel extends ActorDataModel {
       const checkOptions = createAttackCheckOptions(options);
 
       // Cache the item and attack for later.
-      const itemRollData = this.parent.items.get(checkOptions.itemId).getRollData();
+      const itemRollData = this.parent.items.get(checkOptions.itemId).system.getRollData();
       const attack = itemRollData.attack[checkOptions.attackIdx];
 
       // If no attribute is set
@@ -2124,7 +2141,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (options.targetDefense === undefined) {
          const targets = getCombatTargets();
          if (targets.length > 0) {
-            checkOptions.targetDefense = targets[0].getRollData().rating.defense.value;
+            checkOptions.targetDefense = targets[0].system.getRollData().rating.defense.value;
          } else {
             checkOptions.targetDefense = checkOptions.type === 'melee' ?
                checkOptions.attackerMelee :
@@ -2306,7 +2323,7 @@ export default class CharacterDataModel extends ActorDataModel {
       const parameters = createAttackCheckParameters(options);
 
       // Initialize common attribute based check parameters
-      const actorRollData = this.parent.getRollData();
+      const actorRollData = this.getRollData();
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
       // If this is a multi-attack
@@ -2333,7 +2350,7 @@ export default class CharacterDataModel extends ActorDataModel {
       parameters.difficulty = clamp(parameters.targetDefense - parameters.attackerRating + 4, 2, 6);
 
       // Cache the item and attack stats from the item roll data
-      const itemRollData = this.parent.items.get(options.itemId).getRollData();
+      const itemRollData = this.parent.items.get(options.itemId).system.getRollData();
       const attackData = itemRollData.attack[options.attackIdx];
       parameters.img = itemRollData.img;
       parameters.itemName = itemRollData.name;
@@ -2533,7 +2550,7 @@ export default class CharacterDataModel extends ActorDataModel {
       const checkOptions = createCastingCheckOptions(options);
 
       // Cache the item roll data
-      const itemRollData = this.parent.items.get(checkOptions.itemId).getRollData();
+      const itemRollData = this.parent.items.get(checkOptions.itemId).system.getRollData();
       const checkData = itemRollData.castingCheck;
 
       // If no attribute is set.
@@ -2722,11 +2739,11 @@ export default class CharacterDataModel extends ActorDataModel {
       const parameters = createCastingCheckParameters(options);
 
       // Initialize common attribute based check parameters
-      const actorRollData = this.parent.getRollData();
+      const actorRollData = this.getRollData();
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
       // Cache the item stats from the item roll data
-      const itemRollData = this.parent.items.get(options.itemId).getRollData();
+      const itemRollData = this.parent.items.get(options.itemId).system.getRollData();
       parameters.img = itemRollData.img;
       parameters.itemName = itemRollData.name;
       parameters.itemDescription = itemRollData.description;
@@ -2880,7 +2897,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateItemCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeItemCheckOptions(options);
+         const checkOptions = this.initializeItemCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getItemCheckParameters(checkOptions);
@@ -2906,7 +2923,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateItemCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeItemCheckOptions(options);
+         const checkOptions = this.initializeItemCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getItemCheckParameters(checkOptions);
@@ -2975,12 +2992,11 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {ItemCheckOptions}   The new, fully-populated Item Check Options.
     * @private
     */
-   _initializeItemCheckOptions(options) {
+   initializeItemCheckOptions(options) {
       const checkOptions = createItemCheckOptions(options);
 
       // Cache the item and roll data
-      const itemRollData = this.parent.items.get(checkOptions.itemId).getRollData();
-      console.log(itemRollData);
+      const itemRollData = this.parent.items.get(checkOptions.itemId).system.getRollData();
       const checkData = itemRollData.check[checkOptions.checkIdx];
 
       // If no attribute is set.
@@ -3156,11 +3172,11 @@ export default class CharacterDataModel extends ActorDataModel {
       const parameters = createItemCheckParameters(options);
 
       // Initialize common attribute based check parameters
-      const actorRollData = this.parent.getRollData();
+      const actorRollData = this.getRollData();
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
       // Cache the item stats from the item roll data
-      const itemRollData = this.parent.items.get(options.itemId).getRollData();
+      const itemRollData = this.parent.items.get(options.itemId).system.getRollData();
       const checkData = itemRollData.check[options.checkIdx];
       parameters.img = itemRollData.img;
       parameters.itemName = itemRollData.name;
@@ -3264,15 +3280,15 @@ export default class CharacterDataModel extends ActorDataModel {
    _initializeAttributeBasedCheck(parameters, actorRollData) {
       // If the attribute was set to default, then determine the attribute from the skill
       if (parameters.attribute === 'default') {
-         parameters.attribute = actorRollData.system.skill[parameters.skill].defaultAttribute;
+         parameters.attribute = actorRollData.skill[parameters.skill].defaultAttribute;
       }
 
       // Calculate the attribute dice
-      parameters.attributeDice = actorRollData.system.attribute[parameters.attribute].value;
+      parameters.attributeDice = actorRollData.attribute[parameters.attribute].value;
 
       // Calculate the skill training and expertise
       if (parameters.skill !== 'none') {
-         const skillData = actorRollData.system.skill[parameters.skill];
+         const skillData = actorRollData.skill[parameters.skill];
          parameters.skillTrainingDice = skillData.training.value;
          parameters.skillExpertise = skillData.expertise.value;
       }

@@ -9,10 +9,17 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 export default class NPCDataModel extends CharacterDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
-      schema.type = createStringField();
+      schema.bio.type = createStringField();
       schema.role = createStringField('warrior');
 
       return schema;
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.role = this.role;
+
+      return retVal;
    }
    
    prepareDerivedData() {

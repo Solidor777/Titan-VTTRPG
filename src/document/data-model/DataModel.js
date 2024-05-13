@@ -148,6 +148,10 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @returns {object} Type specific Roll Data for this document.
     */
    getRollData() {
-      return this.parent.getRollData()
+      return {
+         name: this.parent.name,
+         img: this.parent.img,
+         type: this.parent.type,
+      }
    }
 }

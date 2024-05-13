@@ -51,6 +51,18 @@ export default class SpellDataModel extends ItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.xpCost = this.xpCost;
+      retVal.tradition = this.tradition;
+      retVal.castingCheck = foundry.utils.deepClone(this.castingCheck);
+      retVal.quantity = this.quantity;
+      retVal.aspect = foundry.utils.deepClone(this.aspect);
+      retVal.customAspect = foundry.utils.deepClone(this.customAspect);
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return SPELL_IMAGE;
    }

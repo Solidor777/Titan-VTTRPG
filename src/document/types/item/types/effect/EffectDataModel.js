@@ -31,6 +31,14 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.duration = foundry.utils.deepClone(this.duration);
+      retVal.active = this.active;
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return EFFECT_IMAGE;
    }

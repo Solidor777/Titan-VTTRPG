@@ -25,6 +25,15 @@ export default class EquipmentDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rarity = this.rarity;
+      retVal.value = this.value;
+      retVal.equipped = this.equipped;
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return EQUIPMENT_IMAGE;
    }

@@ -117,24 +117,11 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * @typedef {object} ItemRollData  An object containing the roll data for an Item document.
-    * @property {object}   system   The system data for the document.
-    * @property {string}   name     The name of the document.
-    * @property {string}   type     The type of the document.
-    * @property {string}   img      The image used by the document.
-    */
-
-   /**
     * Prepares an object containing the data relevant to performing checks.
-    * @returns {ItemRollData} Object containing the relevant data.
+    * @returns {object} Object containing the relevant data.
     */
    getRollData() {
-      return {
-         name: this.name,
-         img: this.img,
-         type: this.type,
-         system: foundry.utils.deepClone(this.system),
-      };
+      return this.system.getRollData();
    }
 
    /**

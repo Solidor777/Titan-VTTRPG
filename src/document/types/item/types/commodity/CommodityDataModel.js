@@ -24,6 +24,15 @@ export default class CommodityDataModel extends ItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rarity = this.rarity;
+      retVal.value = this.value;
+      retVal.quantity = this.quantity;
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return COMMODITY_IMAGE;
    }

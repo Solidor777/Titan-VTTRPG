@@ -32,6 +32,17 @@ export default class AbilityDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.xpCost = this.xpCost;
+      retVal.rarity = this.rarity;
+      retVal.action = this.action;
+      retVal.reaction = this.reaction;
+      retVal.passive = this.passive;
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return ABILITY_IMAGE;
    }

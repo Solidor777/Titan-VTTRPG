@@ -44,6 +44,18 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rarity = this.rarity;
+      retVal.value = this.value;
+      retVal.equipped = this.equipped;
+      retVal.attack = foundry.utils.deepClone(this.attack);
+      retVal.attackNotes = this.attackNotes;
+      retVal.trait = foundry.utils.deepClone(this.trait);
+
+      return retVal;
+   }
+
    _getDefaultImage() {
       return WEAPON_IMAGE;
    }

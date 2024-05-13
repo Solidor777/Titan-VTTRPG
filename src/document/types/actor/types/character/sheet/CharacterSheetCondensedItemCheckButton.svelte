@@ -9,17 +9,36 @@
    /** @type TitanActor Reference to the Character document. */
    const document = getContext('document');
 
-   /** @type ItemCheckParameters Calculated check parameters. */
-   const parameters = $document.system.getItemCheckParameters($document.system._initializeItemCheckOptions({
+   const checkOptions = {
       itemId: itemId,
       checkIdx: 0
-   }));
+   }
 
+   /** @type ItemCheckParameters Calculated check parameters. */
+   let checkParameters;
+
+   // Update parameters in response to chanes
+   $: {
+      const item = $document.items.get(itemId);
+      if (item &&
+         item.system.check.length > 0 &&
+         $document.system.validateItemCheckOptions(checkOptions)
+      ) {
+         checkParameters = $document.system.getItemCheckParameters(
+            $document.system.initializeItemCheckOptions({
+               itemId: itemId,
+               checkIdx: 0
+            })
+         );
+      }
+   }
 </script>
 <CharacterSheetCondensedCheckButton
-   complexity="{parameters.complexity}"
-   difficulty="{parameters.difficulty}"
-   resolveCost="{parameters.resolveCost}"
-   totalDice="{parameters.totalDice}"
-   totalExpertise="{parameters.totalExpertise}"
+   attribute="{checkParameters.attribute}"
+   complexity="{checkParameters.complexity}"
+   difficulty="{checkParameters.difficulty}"
+   on:click={() => $document.system.requestItemCheck(checkOptions)}
+   resolveCost="{checkParameters.resolveCost}"
+   totalDice="{checkParameters.totalDice}"
+   totalExpertise="{checkParameters.totalExpertise}"
 />

@@ -28,7 +28,7 @@ export default class RulesElementItemDataModel extends ItemDataModel {
          const newElement = createFlatModifierElement();
 
          // Add the Element to the Rules Elements array
-         this.parent.system.rulesElement.push(newElement);
+         this.rulesElement.push(newElement);
          await this.parent.update({
             system: this.parent.system,
          });
@@ -44,12 +44,19 @@ export default class RulesElementItemDataModel extends ItemDataModel {
       if (this.parent.isOwner) {
 
          // Remove the Element from the Rules Elements array
-         this.parent.system.rulesElement.splice(idx, 1);
+         this.rulesElement.splice(idx, 1);
          await this.parent.update({
             system: {
                rulesElement: this.parent.system.rulesElement,
             },
          });
       }
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rulesElement = foundry.utils.deepClone(this.rulesElement);
+
+      return retVal;
    }
 }

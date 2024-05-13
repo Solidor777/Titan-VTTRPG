@@ -14,9 +14,10 @@
    const parameters = $document.system.getAttackCheckParameters($document.system._initializeAttackCheckOptions({
       itemId: itemId,
    }));
+
 </script>
 <CharacterSheetCondensedCheckButton
-        checkIcon="{parameters.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}"
-        totalDice="{parameters.totalDice}"
-        totalExpertise="{parameters.totalExpertise}"
+   checkIcon="{parameters.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}"
+   totalDice="{parameters.totalDice}"
+   totalExpertise="{parameters.totalExpertise}"
 />
