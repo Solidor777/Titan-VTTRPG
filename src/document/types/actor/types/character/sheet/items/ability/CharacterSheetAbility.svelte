@@ -17,7 +17,7 @@
    import CharacterSheetItemImage
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetCondensedItemCheckButton
-      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedItemCheckButton.svelte";
+      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte";
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';

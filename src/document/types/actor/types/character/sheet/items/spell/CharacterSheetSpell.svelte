@@ -23,7 +23,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import CharacterSheetCondensedItemCheckButton
-      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedItemCheckButton.svelte";
+      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte";
 
    // Reference to the docuement
    const document = getContext('document');

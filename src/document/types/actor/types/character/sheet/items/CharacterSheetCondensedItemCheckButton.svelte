@@ -11,13 +11,12 @@
 
    const checkOptions = {
       itemId: itemId,
-      checkIdx: 0
    }
 
    /** @type ItemCheckParameters Calculated check parameters. */
    let checkParameters;
 
-   // Update parameters in response to chanes
+   // Update parameters in response to changes
    $: {
       const item = $document.items.get(itemId);
       if (item &&
@@ -25,10 +24,7 @@
          $document.system.validateItemCheckOptions(checkOptions)
       ) {
          checkParameters = $document.system.getItemCheckParameters(
-            $document.system.initializeItemCheckOptions({
-               itemId: itemId,
-               checkIdx: 0
-            })
+            $document.system.initializeItemCheckOptions(checkOptions)
          );
       }
    }

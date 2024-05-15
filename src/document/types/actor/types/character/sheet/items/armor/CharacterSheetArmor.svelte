@@ -21,7 +21,7 @@
    import CharacterSheetArmorStats
       from '~/document/types/actor/types/character/sheet/items/armor/CharacterSheetArmorStats.svelte';
    import CharacterSheetCondensedItemCheckButton
-      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedItemCheckButton.svelte";
+      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte";
 
    // Reference to the armor itemId
    export let itemId = void 0;

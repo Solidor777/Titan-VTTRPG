@@ -13,6 +13,14 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 export default class TitanItem extends Item {
 
    /**
+    * Returns whether the item is marked for deletion.
+    * @returns {boolean} Whether the item is marked for deletion.
+    */
+   get isMarkedForDeletion() {
+      return (this.flags?.titan?.isMarkedForDeletion === true);
+   }
+
+   /**
     * Performs initialization logic before document creation.
     * @param {object}               data     The initial data object provided to the document creation request.
     * @param {object}               options  Additional options which modify the creation request.
@@ -130,14 +138,17 @@ export default class TitanItem extends Item {
     */
    async addCheck() {
       if (this.isOwner) {
+         // Update document
          this.system.check.push(createItemCheckTemplate());
          await this.update({
-            system: this.system,
+            system: {
+               check: this.system.check,
+            }
          });
 
          // Update Sheet
          const sheet = this._sheet;
-         if (this._sheet) {
+         if (sheet) {
             sheet.addCheck();
          }
       }
@@ -152,16 +163,17 @@ export default class TitanItem extends Item {
       if (this.isOwner) {
          // Update sheet
          const sheet = this._sheet;
-         if (this._sheet) {
+         if (sheet) {
             sheet.removeCheck(idx);
          }
 
-         if (this.isOwner) {
-            this.system.check.splice(idx, 1);
-            await this.update({
-               system: this.system,
-            });
-         }
+         // Update document
+         this.system.check.splice(idx, 1);
+         await this.update({
+            system: {
+               check: this.system.check,
+            }
+         });
       }
    }
 
@@ -218,13 +230,5 @@ export default class TitanItem extends Item {
 
          await this.delete();
       }
-   }
-
-   /**
-    * Returns whether the item is marked for deletion.
-    * @returns {boolean} Whether the item is marked for deletion.
-    */
-   get isMarkedForDeletion() {
-      return (this.flags?.titan?.isMarkedForDeletion === true);
    }
 }

@@ -16,7 +16,7 @@
  * @property {number?}  resolveCost             The Resolve Cost for performing the check, if any.
  * @property {number?}  trainingMod             Modifier for the amount of Training to be applied.
  * @property {string?}  attribute               The Attribute to use for the Check.
- * @property {string?}  itemId                  The the ID of the item being used for the check.
+ * @property {string}   itemId                  The the ID of the item being used for the check.
  * @property {string?}  skill                   The Skill to use for the Check.
  */
 

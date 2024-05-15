@@ -6,8 +6,8 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @typedef {object} SpellCustomAspect
  * @property {string}   label             The display name of the Aspect.
  * @property {boolean}  scaling           Whether the effect of the Aspect increases with extra successes.
- * @property {integer}   initialValue      The initial value of the Aspect's effects when successfully cast.
- * @property {integer}   cost              The Aspect Cost for determine Difficulty and Complexity.
+ * @property {number}   initialValue      The initial value of the Aspect's effects when successfully cast.
+ * @property {number}   cost              The Aspect Cost for determine Difficulty and Complexity.
  * @property {string}   resistanceCheck   A Resistance that can be used to resist the effects of the aspect.
  * @property {boolean}  isDamage          Whether the Aspect inflicts Damage.
  * @property {boolean}  isHealing         Whether the Aspect Heals Damage.

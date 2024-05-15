@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import sort from '~/helpers/utility-functions/Sort.js';
 
    // Component class for the item
@@ -97,7 +97,7 @@
          >
             <svelte:component
                this={itemComponents[item.type]}
-               id={item._id}
+               itemId={item._id}
                bind:isExpanded={isExpandedMap[item._id]}
             />
          </li>

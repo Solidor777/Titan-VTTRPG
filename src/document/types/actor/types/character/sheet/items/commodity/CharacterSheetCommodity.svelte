@@ -23,7 +23,7 @@
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
    // Reference to the armor id
-   export let id = void 0;
+   export let itemId = void 0;
 
    /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
@@ -32,7 +32,7 @@
    const document = getContext('document');
 
    // Item reference
-   $: item = $document.items.get(id);
+   $: item = $document.items.get(itemId);
 </script>
 
 {#if item}

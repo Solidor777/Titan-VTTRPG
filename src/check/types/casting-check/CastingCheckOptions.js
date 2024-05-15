@@ -14,7 +14,7 @@
  * @property {number?}  healingMod              Modifier for the amount of Healing to be applied.
  * @property {number?}  trainingMod             Modifier for the amount of Training to be applied.
  * @property {string?}  attribute               The Attribute to use for the Check.
- * @property {string?}  itemId                  The the ID of the spell being cast for the attack.
+ * @property {string}   itemId                  The the ID of the spell being cast for the attack.
  * @property {string?}  skill                   The Skill to use for the Check.
  */
 

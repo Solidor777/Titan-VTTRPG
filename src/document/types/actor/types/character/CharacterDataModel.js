@@ -251,6 +251,8 @@ export default class CharacterDataModel extends ActorDataModel {
       return false;
    }
 
+   /* === Data Preparation === */
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.attribute = foundry.utils.deepClone(this.attribute);
@@ -265,8 +267,6 @@ export default class CharacterDataModel extends ActorDataModel {
 
       return retVal;
    }
-
-   /* === Data Preparation === */
 
    prepareDerivedData() {
       super.prepareDerivedData();
@@ -1346,6 +1346,8 @@ export default class CharacterDataModel extends ActorDataModel {
       }
    }
 
+   /* === Conditional rating modifiers === */
+
    /**
     * Triggered at the end of data preparation to ensure that
     * all resources remain within minimum and maximum bounds.
@@ -1356,8 +1358,6 @@ export default class CharacterDataModel extends ActorDataModel {
          resource.value = clamp(resource.value, 0, resource.max);
       }
    }
-
-   /* === Conditional rating modifiers === */
 
    /**
     * Helper function for getting the sum conditional rating modifiers for the inputted selector and an array of keys,
@@ -1395,6 +1395,8 @@ export default class CharacterDataModel extends ActorDataModel {
       return Object.keys(retVal).length > 0 ? retVal : false;
    }
 
+   /* === Checks === */
+
    /**
     * Helper function for getting the conditional rating modifiers for the inputted selector and key pair.
     * @param {object}   conditionalRatingModifiers    The parent actor's Rules Element cache of mods for rating.
@@ -1424,8 +1426,6 @@ export default class CharacterDataModel extends ActorDataModel {
 
       return false;
    }
-
-   /* === Checks === */
 
    /**
     * Requests an Attribute Check from this Character.
@@ -1528,7 +1528,6 @@ export default class CharacterDataModel extends ActorDataModel {
     * Populates Attribute Check Options with this Character's specific data, unless specific overrides were applied.
     * @param   {object} options        Options for the Check.
     * @returns {AttributeCheckOptions} The new, fully-populated Attribute Check Options.
-    * @private
     */
    initializeAttributeCheckOptions(options) {
       const checkOptions = createAttributeCheckOptions(options);
@@ -1764,7 +1763,6 @@ export default class CharacterDataModel extends ActorDataModel {
     * Populates Resistance Check Options with this Character's specific data, unless specific overrides were applied.
     * @param   {object} options           Options for the Check.
     * @returns {ResistanceCheckOptions}   The new, fully-populated Resistance Check Options.
-    * @private
     */
    initializeResistanceCheckOptions(options) {
       // For now, there are no actor specific resistance check modifiers,
@@ -1863,7 +1861,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateAttackCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeAttackCheckOptions(options);
+         const checkOptions = this.initializeAttackCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getAttackCheckParameters(checkOptions);
@@ -1889,7 +1887,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateAttackCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeAttackCheckOptions(options);
+         const checkOptions = this.initializeAttackCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getAttackCheckParameters(checkOptions);
@@ -1956,9 +1954,8 @@ export default class CharacterDataModel extends ActorDataModel {
     * Populates Attack Check Options with this Character's specific data, unless specific overrides were applied.
     * @param   {object} options        Options for the Check.
     * @returns {AttributeCheckOptions} The new, fully-populated Attack Check Options.
-    * @private
     */
-   _initializeAttackCheckOptions(options) {
+   initializeAttackCheckOptions(options) {
       const checkOptions = createAttackCheckOptions(options);
 
       // Cache the item and attack for later.
@@ -1994,7 +1991,7 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // If attack-type is not set
-      if (options.type) {
+      if (options.type === undefined) {
 
          // Set the type to the value stored in the attack.
          checkOptions.type = attack.type;
@@ -2464,7 +2461,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateCastingCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeCastingCheckOptions(options);
+         const checkOptions = this.initializeCastingCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getCastingCheckParameters(checkOptions);
@@ -2490,7 +2487,7 @@ export default class CharacterDataModel extends ActorDataModel {
       if (this.parent.isOwner && this.validateCastingCheckOptions(options)) {
 
          // Ensure the check options are initialized
-         const checkOptions = this._initializeCastingCheckOptions(options);
+         const checkOptions = this.initializeCastingCheckOptions(options);
 
          // Calculate the parameters
          const checkParameters = this.getCastingCheckParameters(checkOptions);
@@ -2544,9 +2541,8 @@ export default class CharacterDataModel extends ActorDataModel {
     * Populates Casting Check Options with this Character's specific data, unless specific overrides were applied.
     * @param   {object} options        Options for the Check.
     * @returns {CastingCheckOptions}   The new, fully-populated Casting Check Options.
-    * @private
     */
-   _initializeCastingCheckOptions(options) {
+   initializeCastingCheckOptions(options) {
       const checkOptions = createCastingCheckOptions(options);
 
       // Cache the item roll data
@@ -2990,7 +2986,6 @@ export default class CharacterDataModel extends ActorDataModel {
     * Populates Item Check Options with this Character's specific data, unless specific overrides were applied.
     * @param   {object} options     Options for the Check.
     * @returns {ItemCheckOptions}   The new, fully-populated Item Check Options.
-    * @private
     */
    initializeItemCheckOptions(options) {
       const checkOptions = createItemCheckOptions(options);
@@ -3276,6 +3271,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * Not used by every check, but the logic is common among most.
     * @param {AttributeCheckParameters}   parameters     The check parameters. Will be modified by this function.
     * @param {object}                     actorRollData  The actor roll data
+    * @private
     */
    _initializeAttributeBasedCheck(parameters, actorRollData) {
       // If the attribute was set to default, then determine the attribute from the skill
@@ -3691,6 +3687,20 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
+    * Options for applying Damage to a Character.
+    * @typedef {object} DamageOptions
+    * @property {boolean?} [ignoreArmor = false]   Whether to Ignore Armor when applying the Damage.
+    * @property {boolean?} [ineffective = false]   Whether the Attack had the Ineffective trait.
+    * @property {boolean?} [penetrating = false]   Whether the Attack had the Penetrating trait.
+    * @property {boolean?} [updateActor = true]    Whether to update the Character after applying the Damage.
+    *                                              When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true]         Whether to send a Chat Message report, provided this setting is
+    *                                              enabled. When sending multiple reports, it is useful to set this to
+    *                                              false.
+    * @property {boolean?} [playSound = true]      Whether to play a sound when sending the report.
+    */
+
+   /**
     * Takes a pre-initialized check, rolls it, and sends it to chat, expending resolve as appropriate;
     * @param   {TitanCheck}   check    The check to send to chat.
     * @param   {string[]}     messages Messages to attach to the check
@@ -3709,17 +3719,25 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Options for applying Damage to a Character.
-    * @typedef {object} DamageOptions
-    * @property {boolean?} [ignoreArmor = false]   Whether to Ignore Armor when applying the Damage.
-    * @property {boolean?} [ineffective = false]   Whether the Attack had the Ineffective trait.
-    * @property {boolean?} [penetrating = false]   Whether the Attack had the Penetrating trait.
-    * @property {boolean?} [updateActor = true]    Whether to update the Character after applying the Damage.
-    *                                              When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]         Whether to send a Chat Message report, provided this setting is
-    *                                              enabled. When sending multiple reports, it is useful to set this to
-    *                                              false.
-    * @property {boolean?} [playSound = true]      Whether to play a sound when sending the report.
+    * Data for a report detailing the Damage applied to a character.
+    * @typedef {object} DamageReport
+    * @property {string}   type                 The Chat Message type (damageReport).
+    * @property {boolean?} ignoreArmor  Whether to the attack Ignored Armor.
+    * @property {number?}  damageResisted       The amount of Damage resisted.
+    * @property {number?}  damageTaken          The amount of Damage taken.
+    * @property {number?}  staminaLost          The amount of Stamina lost.
+    * @property {object?}  wounds               The character's Wounds, if any.
+    * @property {number?}  wounds.max           The character's maximum Wounds, if any.
+    * @property {number?}  wounds.value         The character's current Wounds, if any.
+    * @property {number?}  woundsSuffered       The number of Wounds suffered, if any.
+    * @property {object?}  stamina             The character's Stamina.
+    * @property {number}   stamina.max          The character's maximum Stamina.
+    * @property {number}   stamina.value        The character's current Stamina.
+    * @property {object?}  tags                 Tags applied to the damage.
+    * @property {boolean?} tags.ineffective     Whether the Attack had the Ineffective trait.
+    * @property {boolean?} tags.penetrating     Whether the Attack had the Penetrating trait.
+    * @property {string}   actorImg             The character's image.
+    * @property {string}   actorName            The character's name.
     */
 
    /**
@@ -3827,25 +3845,14 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Data for a report detailing the Damage applied to a character.
-    * @typedef {object} DamageReport
-    * @property {string}   type                 The Chat Message type (damageReport).
-    * @property {boolean?} ignoreArmor  Whether to the attack Ignored Armor.
-    * @property {number?}  damageResisted       The amount of Damage resisted.
-    * @property {number?}  damageTaken          The amount of Damage taken.
-    * @property {number?}  staminaLost          The amount of Stamina lost.
-    * @property {object?}  wounds               The character's Wounds, if any.
-    * @property {number?}  wounds.max           The character's maximum Wounds, if any.
-    * @property {number?}  wounds.value         The character's current Wounds, if any.
-    * @property {number?}  woundsSuffered       The number of Wounds suffered, if any.
-    * @property {object?}  stamina             The character's Stamina.
-    * @property {integer}   stamina.max          The character's maximum Stamina.
-    * @property {integer}   stamina.value        The character's current Stamina.
-    * @property {object?}  tags                 Tags applied to the damage.
-    * @property {boolean?} tags.ineffective     Whether the Attack had the Ineffective trait.
-    * @property {boolean?} tags.penetrating     Whether the Attack had the Penetrating trait.
-    * @property {string}   actorImg             The character's image.
-    * @property {string}   actorName            The character's name.
+    * Options for applying Healing to a Character.
+    * @typedef {object} HealingOptions
+    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Healing. When
+    *                                           updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
+    *                                           enabled. When sending multiple reports, it is useful to set this to
+    *                                           false.
+    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
     */
 
    /**
@@ -3932,14 +3939,18 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Options for applying Healing to a Character.
-    * @typedef {object} HealingOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Healing. When
-    *                                           updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
-    *                                           enabled. When sending multiple reports, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * Data for a report detailing the Healing applied to a character.
+    * @typedef {object} HealingReport
+    * @property {string}   type              The Chat Message type (healingReport).
+    * @property {string}   actorImg          The character's image.
+    * @property {string}   actorName         The character's name.
+    * @property {number}   staminaRestored   The amount of Stamina healed.
+    * @property {object}   stamina           The character's Stamina.
+    * @property {number}   stamina.value     The character's current Stamina.
+    * @property {number}   stamina.max       The character's maximum Stamina.
+    * @property {object?}  wounds            The character's Wounds, if any.
+    * @property {number?}  wounds.value      The character's current Wounds, if any.
+    * @property {number?}  wounds.max        The character's maximum Wounds, if any.
     */
 
    /**
@@ -3988,18 +3999,14 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Data for a report detailing the Healing applied to a character.
-    * @typedef {object} HealingReport
-    * @property {string}   type              The Chat Message type (healingReport).
-    * @property {string}   actorImg          The character's image.
-    * @property {string}   actorName         The character's name.
-    * @property {integer}   staminaRestored   The amount of Stamina healed.
-    * @property {object}   stamina           The character's Stamina.
-    * @property {integer}   stamina.value     The character's current Stamina.
-    * @property {integer}   stamina.max       The character's maximum Stamina.
-    * @property {object?}  wounds            The character's Wounds, if any.
-    * @property {number?}  wounds.value      The character's current Wounds, if any.
-    * @property {number?}  wounds.max        The character's maximum Wounds, if any.
+    * Options for restoring a Character's Resolve.
+    * @typedef {object} RestoreResolveOptions
+    * @property {boolean?} [updateActor = true]    Whether to update the Character after restoring the Resolve.
+    *                                              When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true]         Whether to send a Chat Message report, provided this setting
+    *                                              is enabled. When sending multiple reports, it is useful to set this
+    *                                              to false.
+    * @property {boolean?} [playSound = true]      Whether to play a sound when sending the report.
     */
 
    /**
@@ -4033,14 +4040,15 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Options for restoring a Character's Resolve.
-    * @typedef {object} RestoreResolveOptions
-    * @property {boolean?} [updateActor = true]    Whether to update the Character after restoring the Resolve.
-    *                                              When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]         Whether to send a Chat Message report, provided this setting
-    *                                              is enabled. When sending multiple reports, it is useful to set this
-    *                                              to false.
-    * @property {boolean?} [playSound = true]      Whether to play a sound when sending the report.
+    * Options for spending a Character's Resolve.
+    * @typedef {object} SpendResolveOptions
+    * @property {boolean?} [updateActor = true] Whether to update the Character after spending the Resolve.
+    *                                           When updating multiple values, it is useful to set this to
+    *                                           false.
+    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting
+    *                                           is enabled. When sending multiple reports, it is useful to set
+    *                                           this to false.
+    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
     */
 
    /**
@@ -4073,15 +4081,13 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Options for spending a Character's Resolve.
-    * @typedef {object} SpendResolveOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after spending the Resolve.
-    *                                           When updating multiple values, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting
-    *                                           is enabled. When sending multiple reports, it is useful to set
-    *                                           this to false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * Data for a report detailing Resolve spent by the character.
+    * @typedef {object} SpendResolveReport
+    * @property {string}   type              The Chat Message type (spendResolveReport).
+    * @property {string}   actorImg          The character's image.
+    * @property {string}   actorName         The character's name.
+    * @property {number}   resolveSpent      The amount of Resolve spent.
+    * @property {number?}  resolveShortage   How much the character overspent their Resolve.
     */
 
    /**
@@ -4127,13 +4133,15 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Data for a report detailing Resolve spent by the character.
-    * @typedef {object} SpendResolveReport
-    * @property {string}   type              The Chat Message type (spendResolveReport).
-    * @property {string}   actorImg          The character's image.
-    * @property {string}   actorName         The character's name.
-    * @property {integer}   resolveSpent      The amount of Resolve spent.
-    * @property {number?}  resolveShortage   How much the character overspent their Resolve.
+    * Options for Rending the character's Armor.
+    * @typedef {object} RendOptions
+    * @property {boolean?} [magical = false]    Whether the rending Attack was magical.
+    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the Rend. When updating
+    *                                           multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
+    *                                           enabled. When sending multiple reports, it is useful to set this to
+    *                                           false.
+    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
     */
 
    /**
@@ -4165,15 +4173,14 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Options for Rending the character's Armor.
-    * @typedef {object} RendOptions
-    * @property {boolean?} [magical = false]    Whether the rending Attack was magical.
-    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the Rend. When updating
-    *                                           multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
-    *                                           enabled. When sending multiple reports, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * Data for a report detailing Rend applied to the character's Armor.
+    * @typedef {object} RendReport
+    * @property {string}   type        The Chat Message type (rendReport).
+    * @property {string}   actorImg    The character's image.
+    * @property {string}   actorName   The character's name.
+    * @property {string}   armorImg    The armor's image.
+    * @property {string}   armorName   The armor's name.
+    * @property {number?}  armorLost   The amount of Armor lost.
     */
 
    /**
@@ -4235,14 +4242,14 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Data for a report detailing Rend applied to the character's Armor.
-    * @typedef {object} RendReport
-    * @property {string}   type        The Chat Message type (rendReport).
-    * @property {string}   actorImg    The character's image.
-    * @property {string}   actorName   The character's name.
-    * @property {string}   armorImg    The armor's image.
-    * @property {string}   armorName   The armor's name.
-    * @property {number?}  armorLost   The amount of Armor lost.
+    * Options for Repairing the character's Armor.
+    * @typedef {object} RepairsOptions
+    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the repairs.
+    *                                           When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
+    *                                           enabled. When sending multiple reports, it is useful to set this to
+    *                                           false.
+    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
     */
 
    /**
@@ -4275,14 +4282,14 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Options for Repairing the character's Armor.
-    * @typedef {object} RepairsOptions
-    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the repairs.
-    *                                           When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
-    *                                           enabled. When sending multiple reports, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * Data for a report detailing Repairs made to the character's Armor.
+    * @typedef {object} RepairsReport
+    * @property {string}   type           The Chat Message type (repairsReport).
+    * @property {string}   actorImg       The character's image.
+    * @property {string}   actorName      The character's name.
+    * @property {string}   armorImg       The armor's image.
+    * @property {string}   armorName      The armor's name.
+    * @property {number}   armorRepaired  The amount of Armor repaired.
     */
 
    /**
@@ -4327,17 +4334,6 @@ export default class CharacterDataModel extends ActorDataModel {
          }
       }
    }
-
-   /**
-    * Data for a report detailing Repairs made to the character's Armor.
-    * @typedef {object} RepairsReport
-    * @property {string}   type           The Chat Message type (repairsReport).
-    * @property {string}   actorImg       The character's image.
-    * @property {string}   actorName      The character's name.
-    * @property {string}   armorImg       The armor's image.
-    * @property {string}   armorName      The armor's name.
-    * @property {integer}   armorRepaired  The amount of Armor repaired.
-    */
 
    /**
     * Initializes data for a report detailing Repairs made to the character's Armor.
@@ -4586,7 +4582,7 @@ export default class CharacterDataModel extends ActorDataModel {
                if (isNewRound) {
                   effectsToAdvance = initiativeEffects.filter((effect) => {
                      const initiative = effect.system.duration.initiative;
-                     return (initiative > previousInitiative || initiative <= currentInitiative);
+                     return (initiative < previousInitiative || initiative >= currentInitiative);
                   });
                } else {
                   // If this turn is the start of a new round,
@@ -4594,7 +4590,7 @@ export default class CharacterDataModel extends ActorDataModel {
                   // or greater than the previous turn's initiative
                   effectsToAdvance = initiativeEffects.filter((effect) => {
                      const initiative = effect.system.duration.initiative;
-                     return (initiative > previousInitiative && initiative <= currentInitiative);
+                     return (initiative < previousInitiative && initiative >= currentInitiative);
                   });
                }
 
@@ -4881,6 +4877,14 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
+    * Base report Data for an Effect item.
+    * @typedef {object} EffectReportData
+    * @property {string}   label       The name of the Effect item.
+    * @property {string}   img         The image used by the Effect item.
+    * @property {string?}  description The description of the Effect item, if appropriate.
+    */
+
+   /**
     * Decreases the duration of the turn effects, removes expired effects,
     * and logs report data if appropriate.
     * @param {object} reportData Object for storing any necessary data for a message report.
@@ -4909,12 +4913,14 @@ export default class CharacterDataModel extends ActorDataModel {
       }
    }
 
+
    /**
-    * Base report Data for an Effect item.
-    * @typedef {object} EffectReportData
+    * Report Data for a Turn Effect item.
+    * @typedef {object} TurnEffectReportData
     * @property {string}   label       The name of the Effect item.
     * @property {string}   img         The image used by the Effect item.
     * @property {string?}  description The description of the Effect item, if appropriate.
+    * @property {number}   remaining   The remaining turns for the Effect item.
     */
 
    /**
@@ -4938,14 +4944,14 @@ export default class CharacterDataModel extends ActorDataModel {
       });
    }
 
-
    /**
     * Report Data for a Turn Effect item.
-    * @typedef {object} TurnEffectReportData
+    * @typedef {object} InitiativeEffectReportData
     * @property {string}   label       The name of the Effect item.
     * @property {string}   img         The image used by the Effect item.
     * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {integer}   remaining   The remaining turns for the Effect item.
+    * @property {number}  remaining   The remaining turns for the Effect item.
+    * @property {float}    initiative  The initiative count on which the Effect duration is reduced.
     */
 
    /**
@@ -4971,13 +4977,13 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Report Data for a Turn Effect item.
-    * @typedef {object} InitiativeEffectReportData
+    * Report Data for a Custom Effect item.
+    * @typedef {object} CustomEffectReportData
     * @property {string}   label       The name of the Effect item.
     * @property {string}   img         The image used by the Effect item.
     * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {integer}  remaining   The remaining turns for the Effect item.
-    * @property {float}    initiative  The initiative count on which the Effect duration is reduced.
+    * @property {number}   remaining   The remaining turns for the Effect item.
+    * @property {string}   custom      Custom duration of the Effect item.
     */
 
    /**
@@ -5002,16 +5008,6 @@ export default class CharacterDataModel extends ActorDataModel {
          return retVal;
       });
    }
-
-   /**
-    * Report Data for a Custom Effect item.
-    * @typedef {object} CustomEffectReportData
-    * @property {string}   label       The name of the Effect item.
-    * @property {string}   img         The image used by the Effect item.
-    * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {integer}   remaining   The remaining turns for the Effect item.
-    * @property {string}   custom      Custom duration of the Effect item.
-    */
 
    /**
     * Retrieves the Effect Report Data for an array of Initiative Effect items.
@@ -5459,7 +5455,6 @@ export default class CharacterDataModel extends ActorDataModel {
     */
    async addItem(type) {
       if (this.parent.isOwner) {
-
          // Get the desired name
          let desiredName = localize(`new${capitalize(type)}`);
 
@@ -5615,7 +5610,7 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Calculates the total XP cost for an Skill at a given rank.
+    * Calculates the total XP cost for a Skill at a given rank.
     * @param {number} value   The rank of the Skill.
     * @returns {number}       The total XP cost of the Skill.
     */

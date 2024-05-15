@@ -14,28 +14,28 @@
  * @property {boolean}           penetrating             Whether this Attack is a Penetrating attack
  * @property {boolean}           plusExtraSuccessDamage  Whether to increase the damage for each extra success.
  * @property {boolean}           rend                    Whether this check is a Rend attack.
- * @property {integer}           targetDefense           The Defense rating of the target actor.
- * @property {integer}           damage                  The minimum Damage to apply on a successful check.
- * @property {integer}           attackerRating          The attacker's rating used for the attack.
- * @property {integer}           attackerAccuracy        The attacker's accuracy rating.
- * @property {integer}           attackerMelee           The attacker's melee rating.
- * @property {integer}           attributeDice           The number of dice granted by the attribute.
- * @property {integer}           complexity              The minimum number of Successes needed.
- * @property {integer}           damageMod               Modifier for the amount of Damage to be inflicted.
- * @property {integer}           diceMod                 Modifier for the number of Dice being rolled.
- * @property {integer}           difficulty              The minimum roll on a die to achieve a Success.
- * @property {integer}           expertiseMod            Modifier for the amount of Expertise to be applied.
- * @property {integer}           range                   The Range of the Attack.
- * @property {integer}           skillExpertise          The amount of expertise granted by the skill.
- * @property {integer}           skillTrainingDice       The number of dice granted by the skill.
- * @property {integer}           totalDice               The total number of dice to be rolled.
- * @property {integer}           totalExpertise          The total amount of expertise to apply.
- * @property {integer}           totalTrainingDice       The total number of training dice to be rolled.
- * @property {integer}           trainingMod             Modifier for the amount of Training to be applied.
- * @property {string}            attackNotes             Messages to that are specific to this attack, if any.
+ * @property {number}           attackerAccuracy        The attacker's accuracy rating.
+ * @property {number}           attackerMelee           The attacker's melee rating.
+ * @property {number}           attackerRating          The attacker's rating used for the attack.
+ * @property {number}           attributeDice           The number of dice granted by the attribute.
+ * @property {number}           complexity              The minimum number of Successes needed.
+ * @property {number}           damage                  The minimum Damage to apply on a successful check.
+ * @property {number}           damageMod               Modifier for the amount of Damage to be inflicted.
+ * @property {number}           diceMod                 Modifier for the number of Dice being rolled.
+ * @property {number}           difficulty              The minimum roll on a die to achieve a Success.
+ * @property {number}           expertiseMod            Modifier for the amount of Expertise to be applied.
+ * @property {number}           range                   The Range of the Attack.
+ * @property {number}           skillExpertise          The amount of expertise granted by the skill.
+ * @property {number}           skillTrainingDice       The number of dice granted by the skill.
+ * @property {number}           targetDefense           The Defense rating of the target actor.
+ * @property {number}           totalDice               The total number of dice to be rolled.
+ * @property {number}           totalExpertise          The total amount of expertise to apply.
+ * @property {number}           totalTrainingDice       The total number of training dice to be rolled.
+ * @property {number}           trainingMod             Modifier for the amount of Training to be applied.
  * @property {string[]}          attackTrait             Array of standard attack traits applied to this attack.
  * @property {string[]}          customTrait             Array of custom traits applied to this attack.
  * @property {string}            attackName              The display name of the attack.
+ * @property {string}            attackNotes             Messages to that are specific to this attack, if any.
  * @property {string}            attribute               The Attribute to use for the Check.
  * @property {string}            img                     The image to display with the check.
  * @property {string}            itemName                The name of the item being rolled.

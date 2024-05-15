@@ -5,7 +5,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @typedef {object} PersistentDamageElement
  * @property {string}   operation   The operation to be performed by the Rules Element (persistentDamage).
  * @property {string}   selector    Whether to apply the damage at the start or end of the Character's turn.
- * @property {integer}   value       The value by which to damage the Character.
+ * @property {number}   value       The value by which to damage the Character.
  * @property {string}   uuid        Unique identifier for the Rules Element.
  *                                  Used to help keep track of the element when changing types.
  */

@@ -6,7 +6,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string}   operation   The operation to be performed by the Rules Element (mulBase).
  * @property {string}   selector    The type of stat being modified (attribute, rating, training, expertise, resistance, or mod).
  * @property {string}   key         The key of the stat being multiplied (body, willpower, etc.).
- * @property {integer}   value       The value by which to multiply the stat.
+ * @property {number}   value       The value by which to multiply the stat.
  * @property {string}   uuid        Unique identifier for the Rules Element.
  *                                  Used to help keep track of the element when changing types.
  */

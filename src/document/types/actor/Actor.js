@@ -96,7 +96,7 @@ export default class TitanActor extends Actor {
 
          // If this Character is a combatant, then roll initiative as per normal
          if (this.getCombatant()) {
-            await this.rollInitiative({ rerollInitiative: true });
+            await this.rollInitiative({rerollInitiative: true});
 
             return;
          }
@@ -108,12 +108,12 @@ export default class TitanActor extends Actor {
             // Get the message data
             const messageData = {
                speaker: this.getSpeaker(),
-               flavor: game.i18n.format('COMBAT.RollsInitiative', { name: this.name }),
-               flags: { 'core.initiativeRoll': true },
+               flavor: game.i18n.format('COMBAT.RollsInitiative', {name: this.name}),
+               flags: {'core.initiativeRoll': true},
             };
 
             // Create a chat message from the roll and send it to chat
-            const chatData = await roll.toMessage(messageData, { create: false });
+            const chatData = await roll.toMessage(messageData, {create: false});
             chatData.rollMode = game.settings.get('core', 'rollMode');
 
             await ChatMessage.create(chatData);
@@ -128,5 +128,38 @@ export default class TitanActor extends Actor {
     */
    getCombatant() {
       return game.combat?.getCombatantByActor(this.id);
+   }
+
+   /**
+    * Gets the first active Combat this Character has a turn in and has rolled initiative for.
+    * @returns {Combat|boolean} List of active Combats in which this Character has a turn.
+    */
+   getFirstActiveCombat() {
+      // Get active combats
+      const combats = game.combats.filter((combat) => combat.turn !== null && combat.scene.isView);
+      if (combats.length > 0) {
+
+         // If this actor is a token, search for this token in the combat
+         if (this.isToken) {
+            for (const combat of combats) {
+               const combatant = combat.getCombatantByToken(this.token._id);
+               if (combatant) {
+                  return combat;
+               }
+            }
+         }
+
+         // Otherwise, search for the actor
+         else {
+            for (const combat of combats) {
+               const combatant = combat.getCombatantByActor(this);
+               if (combatant) {
+                  return combat;
+               }
+            }
+         }
+      }
+
+      return false;
    }
 }

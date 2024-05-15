@@ -25,11 +25,11 @@
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponMultiAttackButton.svelte';
    import CharacterSheetWeaponAttacks
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
-   import CharacterSheetWeaponAttackButton
-      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponCondensedAttackCheckButton.svelte';
+   import CharacterSheetCondensedAttackCheckButton
+      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte";
 
    // Weapon id
-   export let id = void 0;
+   export let itemId = void 0;
 
    // Expanded object
    export let isExpanded = void 0;
@@ -38,7 +38,7 @@
    const document = getContext('document');
 
    // Item reference
-   $: item = $document.items.get(id);
+   $: item = $document.items.get(itemId);
 </script>
 
 {#if item}
@@ -63,26 +63,18 @@
                {#if !item.system.equipped}
                   <!--Toggle Equipped button-->
                   <CharacterSheetItemEquipButton
-                          {item}
-                          equipped={item.system.equipped}
+                     {item}
+                     equipped={item.system.equipped}
                   />
-               {:else if item.system.attack[0]}
-                  <CharacterSheetWeaponAttackButton
-                          attack={item.system.attack[0]}
-                          {item}
-                          on:click={() =>
-                        $document.system.requestAttackCheck({
-                        itemId: item._id,
-                        attackIdx: 0
-                        })}
-                  />
+               {:else if item.system.attack.length > 0}
+                  <CharacterSheetCondensedAttackCheckButton {itemId}/>
                {/if}
             </div>
 
             <!--Send to Chat button-->
             <div
-                    class="button"
-                    use:tooltip={{ content: localize('sendToChat') }}
+               class="button"
+               use:tooltip={{ content: localize('sendToChat') }}
             >
                <CharacterSheetItemSendToChatButton {item}/>
             </div>
@@ -94,8 +86,8 @@
 
             <!--Delete Button-->
             <div
-                    class="button"
-                    use:tooltip={{ content: localize('deleteItem') }}
+               class="button"
+               use:tooltip={{ content: localize('deleteItem') }}
             >
                <CharacterSheetItemDeleteButton itemId={item._id}/>
             </div>
@@ -112,8 +104,8 @@
 
                <div class="button">
                   <CharacterSheetItemEquipButton
-                          {item}
-                          equipped={item.system.equipped}
+                     {item}
+                     equipped={item.system.equipped}
                   />
                </div>
             </div>
@@ -171,93 +163,93 @@
 {/if}
 
 <style lang="scss">
-  .item {
-    @include flex-column;
-    @include flex-group-top;
-    width: 100%;
-
-    .header {
-      @include flex-row;
-      @include flex-space-between;
-      @include border;
-      @include panel-1;
-      padding: var(--padding-standard);
-      width: 100%;
-      font-weight: bold;
-
-      .label {
-        @include flex-row;
-        @include flex-group-center;
-
-        .button {
-          margin-left: var(--padding-standard);
-        }
-      }
-
-      .controls {
-        @include flex-row;
-        @include flex-group-right;
-        height: 100%;
-
-        .button {
-          &:not(:first-child) {
-            margin-left: var(--padding-standard);
-          }
-        }
-      }
-    }
-
-    .expandable-content {
+   .item {
       @include flex-column;
       @include flex-group-top;
-      @include panel-3;
-      @include border-bottom-sides;
-      width: calc(100% - 16px);
-      padding: 0 var(--padding-standard);
+      width: 100%;
 
-      .section {
-        width: 100%;
+      .header {
+         @include flex-row;
+         @include flex-space-between;
+         @include border;
+         @include panel-1;
+         padding: var(--padding-standard);
+         width: 100%;
+         font-weight: bold;
 
-        &:not(.rich-text) {
-          padding-bottom: var(--padding-large);
+         .label {
+            @include flex-row;
+            @include flex-group-center;
 
-          &:not(.tags) {
-            padding-top: var(--padding-large);
-          }
-        }
+            .button {
+               margin-left: var(--padding-standard);
+            }
+         }
 
-        &:not(:first-child) {
-          @include border-top;
-        }
+         .controls {
+            @include flex-row;
+            @include flex-group-right;
+            height: 100%;
 
-        &.buttons {
-          @include flex-row;
-          @include flex-group-center;
-
-          .button:not(:first-child) {
-            margin-left: var(--padding-standard);
-          }
-        }
-
-        &.tags {
-          @include flex-row;
-          @include flex-group-center;
-          flex-wrap: wrap;
-
-          .tag {
-            @include tag-margin;
-          }
-        }
-
-        &:not(.buttons) &:not(.tags) {
-          @include flex-column;
-          @include flex-group-top;
-        }
-
-        &.small-text {
-          @include font-size-small;
-        }
+            .button {
+               &:not(:first-child) {
+                  margin-left: var(--padding-standard);
+               }
+            }
+         }
       }
-    }
-  }
+
+      .expandable-content {
+         @include flex-column;
+         @include flex-group-top;
+         @include panel-3;
+         @include border-bottom-sides;
+         width: calc(100% - 16px);
+         padding: 0 var(--padding-standard);
+
+         .section {
+            width: 100%;
+
+            &:not(.rich-text) {
+               padding-bottom: var(--padding-large);
+
+               &:not(.tags) {
+                  padding-top: var(--padding-large);
+               }
+            }
+
+            &:not(:first-child) {
+               @include border-top;
+            }
+
+            &.buttons {
+               @include flex-row;
+               @include flex-group-center;
+
+               .button:not(:first-child) {
+                  margin-left: var(--padding-standard);
+               }
+            }
+
+            &.tags {
+               @include flex-row;
+               @include flex-group-center;
+               flex-wrap: wrap;
+
+               .tag {
+                  @include tag-margin;
+               }
+            }
+
+            &:not(.buttons) &:not(.tags) {
+               @include flex-column;
+               @include flex-group-top;
+            }
+
+            &.small-text {
+               @include font-size-small;
+            }
+         }
+      }
+   }
 </style>

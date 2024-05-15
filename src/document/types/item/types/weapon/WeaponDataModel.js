@@ -5,7 +5,7 @@ import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createWeaponAttackTemplate from '~/document/types/item/types/weapon/WeaponAttack.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import { WEAPON_IMAGE } from '~/system/DefaultImages.js';
+import {WEAPON_IMAGE} from '~/system/DefaultImages.js';
 import WeaponEditAttackTraitsDialog from '~/document/types/item/types/weapon/dialogs/WeaponEditAttackTraitsDialog.js';
 import WeaponAddCustomAttackTraitDialog
    from '~/document/types/item/types/weapon/dialogs/WeaponAddCustomAttackTraitDialog.js';
@@ -110,6 +110,51 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
             system: {
                attack: this.parent.system.attack,
             },
+         });
+      }
+   }
+
+   /**
+    * Adds a new Attack to this Weapon.
+    * @returns {Promise<void>}
+    */
+   async addAttack() {
+      if (this.parent.isOwner) {
+         // Update document
+         this.attack.push(createWeaponAttackTemplate());
+         await this.parent.update({
+            system: {
+               attack: this.attack,
+            },
+         });
+
+         // Update Sheet
+         const sheet = this.parent._sheet;
+         if (this._sheet) {
+            sheet.addCheck();
+         }
+      }
+   }
+
+   /**
+    * Removes a Check from this item.
+    * @param {number} idx The Idx of the Check in this item's Checks array.
+    * @returns {Promise<void>}
+    */
+   async removeAttack(idx) {
+      if (this.parent.isOwner) {
+         // Update sheet
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.removeCheck(idx);
+         }
+
+         // Update document
+         this.attack.splice(idx, 1);
+         await this.parent.update({
+            system: {
+               attack: this.attack,
+            }
          });
       }
    }

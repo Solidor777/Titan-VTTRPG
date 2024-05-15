@@ -3,7 +3,7 @@ import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js'
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import { EFFECT_IMAGE } from '~/system/DefaultImages.js';
+import {EFFECT_IMAGE} from '~/system/DefaultImages.js';
 import isCurrentUserBestOwner from '~/helpers/utility-functions/IsCurrentUserBestOwner.js';
 import ActionQueue from '~/helpers/ActionQueue.js';
 import localize from '~/helpers/utility-functions/Localize.js';
@@ -14,39 +14,6 @@ import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
  * @augments TitanDataModel
  */
 export default class EffectDataModel extends RulesElementItemDataModel {
-   static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Duration
-      schema.duration = createSchemaField({
-         type: createStringField('turnStart'),
-         remaining: createIntegerField(1),
-         initiative: createIntegerField(1),
-         custom: createStringField(),
-      });
-
-      // Active
-      schema.active = createBooleanField(true);
-
-      return schema;
-   }
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.duration = foundry.utils.deepClone(this.duration);
-      retVal.active = this.active;
-
-      return retVal;
-   }
-
-   _getDefaultImage() {
-      return EFFECT_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newEffect');
-   }
-
    /**
     * Returns whether this Effect's duration has expired.
     * Permanent Effects never expire.
@@ -83,6 +50,62 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     */
    get actionQueue() {
       return this.parent.actionQueue;
+   }
+
+   static _defineDocumentSchema() {
+      const schema = super._defineDocumentSchema();
+
+      // Duration
+      schema.duration = createSchemaField({
+         type: createStringField('turnStart'),
+         remaining: createIntegerField(1),
+         initiative: createIntegerField(1),
+         custom: createStringField(),
+      });
+
+      // Active
+      schema.active = createBooleanField(true);
+
+      return schema;
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.duration = foundry.utils.deepClone(this.duration);
+      retVal.active = this.active;
+
+      return retVal;
+   }
+
+   _getDefaultImage() {
+      return EFFECT_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newEffect');
+   }
+
+   _getInitialDocumentData(data) {
+      // Check if we have a valid actor owner
+      if (this.parent && !this.parent.pack && this.parent._id && typeof data?.system?.initiative !== 'number') {
+         const actor = this.parent.parent;
+         if (actor) {
+
+            // Check if the actor is in an active combat
+            const initiative = actor.getFirstActiveCombat()?.initiative
+            if (initiative !== null) {
+
+               // If so, set our initiative accordingly
+               return {
+                  system: {
+                     duration: {
+                        initiative: initiative
+                     }
+                  }
+               }
+            }
+         }
+      }
    }
 
    prepareDerivedData() {
