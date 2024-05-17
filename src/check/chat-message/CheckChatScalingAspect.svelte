@@ -1,8 +1,8 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON } from '~/system/Icons.js';
+   import {DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON} from '~/system/Icons.js';
 
    // Aspect
    export let idx = void 0;
@@ -10,75 +10,69 @@
    // Chat context
    const document = getContext('document');
 
-   $: aspect = $document.flags.titan.results.scalingAspect[idx];
-   $: aspectCost = aspect.scalingCost ?? aspect.cost ?? 0;
+   let aspect = $document.flags.titan.results.scalingAspect[idx]
+   const aspectCost = aspect.scalingCost ?? aspect.cost ?? 1;
+   const aspectIncrement = Math.max(aspect.initialValue, 1);
+
+   $: {
+      aspect = $document.flags.titan.results.scalingAspect[idx];
+   }
 
    function increaseAspect() {
       // Increase the aspect
-      aspect.currentValue += Math.max(aspect.initialValue, 1);
+      aspect.currentValue += aspectIncrement;
 
       // Decrease the extra successes by the cost
       $document.flags.titan.results.extraSuccessesRemaining -= aspectCost;
 
-      // Update damage if appropruate
+      // Update damage if appropriate
       if (aspect.isDamage) {
-         $document.flags.titan.results.damage += Math.max(
-            aspect.initialValue,
-            1,
-         );
+         $document.flags.titan.results.damage += aspectIncrement;
       }
 
-      // Update healing if appropruate
+      // Update healing if appropriate
       if (aspect.isHealing) {
-         $document.flags.titan.results.healing += Math.max(
-            aspect.initialValue,
-            1,
-         );
+         $document.flags.titan.results.healing += aspectIncrement;
       }
 
       // Update the document
       $document.update({
-         flags: $document.flags,
+         flags: {
+            titan: $document.flags.titan
+         }
       });
-
-      return;
    }
 
    function decreaseAspect() {
       // Decrease the aspect
-      aspect.currentValue -= Math.max(aspect.initialValue, 1);
+      aspect.currentValue -= aspectIncrement;
 
       // Increase the extra successes by the cost
       $document.flags.titan.results.extraSuccessesRemaining += aspectCost;
 
       // Update damage if appropruate
       if (aspect.isDamage) {
-         $document.flags.titan.results.damage -= Math.max(
-            aspect.initialValue,
-            1,
-         );
+         $document.flags.titan.results.damage -= aspectIncrement;
       }
 
       // Update healing if appropruate
       if (aspect.isHealing) {
-         $document.flags.titan.results.healing -= Math.max(
-            aspect.initialValue,
-            1,
-         );
+         $document.flags.titan.results.healing -= aspectIncrement;
       }
 
       // Update the document
       $document.update({
-         flags: $document.flags,
+         flags: {
+            titan: $document.flags.titan
+         }
       });
-
-      return;
    }
 
    function resetAspect() {
       // Get the aspect delta
       const delta = aspect.currentValue - aspect.initialValue;
-      const cost = delta * aspectCost;
+      const incrementCount = delta / aspectIncrement;
+      const cost = incrementCount * aspectCost;
 
       // Reset the aspect to its original value
       aspect.currentValue = aspect.initialValue;
@@ -96,12 +90,11 @@
          $document.flags.titan.results.healing -= delta;
       }
 
-      // Update the document
       $document.update({
-         flags: $document.flags,
+         flags: {
+            titan: $document.flags.titan
+         }
       });
-
-      return;
    }
 </script>
 
@@ -129,8 +122,8 @@
       <!--Reset Button-->
       <div class="control">
          <Button
-            on:click={resetAspect}
             disabled={aspect.currentValue <= aspect.initialValue}
+            on:click={resetAspect}
          >
             <div class="button-inner">
                <i class="{RESET_ICON}"/>
@@ -141,8 +134,8 @@
       <!--Decrease Button-->
       <div class="control">
          <Button
-            on:click={decreaseAspect}
             disabled={aspect.currentValue <= aspect.initialValue}
+            on:click={decreaseAspect}
          >
             <div class="button-inner">
                <i class="{DECREMENT_ICON}"/>
@@ -153,9 +146,9 @@
       <!--Increase Button-->
       <div class="control">
          <Button
-            on:click={increaseAspect}
             disabled={$document.flags.titan.results.extraSuccessesRemaining <
                aspectCost}
+            on:click={increaseAspect}
          >
             <div class="button-inner">
                <i class="{INCREMENT_ICON}"/>

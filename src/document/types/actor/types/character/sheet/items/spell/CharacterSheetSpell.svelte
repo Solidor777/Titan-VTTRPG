@@ -22,8 +22,8 @@
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import CharacterSheetCondensedItemCheckButton
-      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte";
+   import CharacterSheetCondensedCastingCheckButton
+      from "~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte";
 
    // Reference to the docuement
    const document = getContext('document');
@@ -58,7 +58,7 @@
          <div class="controls">
             <!--Cast Spell-->
             <div>
-               <CharacterSheetCondensedItemCheckButton {itemId}/>
+               <CharacterSheetCondensedCastingCheckButton {itemId}/>
             </div>
 
             <!--Send to Chat button-->

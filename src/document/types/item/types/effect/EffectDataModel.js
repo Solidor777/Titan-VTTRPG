@@ -86,6 +86,8 @@ export default class EffectDataModel extends RulesElementItemDataModel {
    }
 
    _getInitialDocumentData(data) {
+      let retVal = super._getInitialDocumentData(data);
+
       // Check if we have a valid actor owner
       if (this.parent && !this.parent.pack && this.parent._id && typeof data?.system?.initiative !== 'number') {
          const actor = this.parent.parent;
@@ -96,16 +98,15 @@ export default class EffectDataModel extends RulesElementItemDataModel {
             if (initiative !== null) {
 
                // If so, set our initiative accordingly
-               return {
-                  system: {
-                     duration: {
-                        initiative: initiative
-                     }
-                  }
-               }
+               retVal ??= {};
+               retVal.system ??= {};
+               retVal.system.duration ??= {};
+               retVal.system.duration.initiative = initiative;
             }
          }
       }
+
+      return retVal;
    }
 
    prepareDerivedData() {
