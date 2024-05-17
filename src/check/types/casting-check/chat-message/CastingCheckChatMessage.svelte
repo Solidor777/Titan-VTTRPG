@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import CastingCheckChatHeader from '~/check/types/casting-check/chat-message/CastingCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
@@ -109,11 +109,13 @@
    .check-chat-message {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .section {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
          &:not(:first-child):not(.tags) {

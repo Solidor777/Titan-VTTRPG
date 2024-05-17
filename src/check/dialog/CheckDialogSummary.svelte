@@ -20,8 +20,8 @@
       {label}
    </div>
 
-   <!--Input-->
-   <div class="value">
+   <!--Value-->
+   <div class="value ">
       <div class="tag">
          {value}
       </div>

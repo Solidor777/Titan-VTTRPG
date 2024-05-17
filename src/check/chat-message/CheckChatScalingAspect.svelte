@@ -4,26 +4,43 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON} from '~/system/Icons.js';
 
-   // Aspect
+   /** @type number Index of the Scaling Aspect in the Scaling Aspects array. */
    export let idx = void 0;
 
-   // Chat context
+   /** @type ChatMessage Reference to the Chat Message document. */
    const document = getContext('document');
 
+   /** @type ScalingAspect Reference to the scaling aspect. */
    let aspect = $document.flags.titan.results.scalingAspect[idx]
-   const aspectCost = aspect.scalingCost ?? aspect.cost ?? 1;
+
+   /** @type number Calculated scaling cost of the aspect. */
    const aspectIncrement = Math.max(aspect.initialValue, 1);
 
+   /** @type string[] Calculated aspect icons */
+   const icons = [];
+
+   // Add damage icon if appropriate
+   if (aspect.isDamage) {
+      icons.push(DAMAGE_ICON);
+   }
+
+   // Add healing icon if appropriate
+   if (aspect.isHealing) {
+      icons.push(HEALING_ICON);
+   }
+
+   // Update the aspect in response to changes.
    $: {
       aspect = $document.flags.titan.results.scalingAspect[idx];
    }
 
+   // Increases the aspect by the increment, updating the total cost as appropriate.
    function increaseAspect() {
       // Increase the aspect
       aspect.currentValue += aspectIncrement;
 
       // Decrease the extra successes by the cost
-      $document.flags.titan.results.extraSuccessesRemaining -= aspectCost;
+      $document.flags.titan.results.extraSuccessesRemaining -= aspect.cost;
 
       // Update damage if appropriate
       if (aspect.isDamage) {
@@ -43,19 +60,20 @@
       });
    }
 
+   // Decreases the aspect by the increment, updating the total cost as appropriate.
    function decreaseAspect() {
       // Decrease the aspect
       aspect.currentValue -= aspectIncrement;
 
       // Increase the extra successes by the cost
-      $document.flags.titan.results.extraSuccessesRemaining += aspectCost;
+      $document.flags.titan.results.extraSuccessesRemaining += aspect.cost;
 
-      // Update damage if appropruate
+      // Update damage if appropriate
       if (aspect.isDamage) {
          $document.flags.titan.results.damage -= aspectIncrement;
       }
 
-      // Update healing if appropruate
+      // Update healing if appropriate
       if (aspect.isHealing) {
          $document.flags.titan.results.healing -= aspectIncrement;
       }
@@ -68,11 +86,12 @@
       });
    }
 
+   // Resets all increases to the aspect, updating the total cost as appropriate.
    function resetAspect() {
       // Get the aspect delta
       const delta = aspect.currentValue - aspect.initialValue;
       const incrementCount = delta / aspectIncrement;
-      const cost = incrementCount * aspectCost;
+      const cost = incrementCount * aspect.cost;
 
       // Reset the aspect to its original value
       aspect.currentValue = aspect.initialValue;
@@ -80,12 +99,12 @@
       // Reset the extra successes
       $document.flags.titan.results.extraSuccessesRemaining += cost;
 
-      // Update damage if appropruate
+      // Update damage if appropriate
       if (aspect.isDamage) {
          $document.flags.titan.results.damage -= delta;
       }
 
-      // Update healing if appropruate
+      // Update healing if appropriate
       if (aspect.isHealing) {
          $document.flags.titan.results.healing -= delta;
       }
@@ -100,25 +119,43 @@
 
 <!--Aspect-->
 <div class="aspect">
-   <!--Label and value-->
-   <div class="label">
-      <div class="label-inner">
-         {#if aspect.label === localize('damage')}
-            <i class="{DAMAGE_ICON}"/>
-         {:else if aspect.label === localize('healing')}
-            <i class="{HEALING_ICON}"/>
-         {/if}
-         {aspect.label}: {$document.flags.titan.results.scalingAspect[idx]
-         .currentValue}
+
+   <!--Header-->
+   <div class="header">
+
+      <!--Label-->
+      <div class="label">
+
+         <!--Each Icon-->
+         {#each icons as icon}
+            <i class={icon}/>
+         {/each}
+
+         <!--Label Text-->
+         <div>{aspect.label}</div>
       </div>
-      <div class="cost">
-         {localize('cost')}: {`${aspectCost} ${localize(
-         'extraSuccesses.short',
-      )}`}
-      </div>
+
+      <!--Value-->
+      <div class="value">{$document.flags.titan.results.scalingAspect[idx].currentValue}</div>
    </div>
 
+   <!-- Controls-->
    <div class="controls">
+
+      <!--Incremental Cost-->
+      <div class="cost">
+
+         <!--Label-->
+         <div class="label">
+            {localize('cost')}
+         </div>
+
+         <!--Value-->
+         <div class="value">
+            {`${aspect.cost} ${localize('extraSuccesses.short',)}`}
+         </div>
+      </div>
+
       <!--Reset Button-->
       <div class="control">
          <Button
@@ -147,7 +184,7 @@
       <div class="control">
          <Button
             disabled={$document.flags.titan.results.extraSuccessesRemaining <
-               aspectCost}
+               aspect.cost}
             on:click={increaseAspect}
          >
             <div class="button-inner">
@@ -160,51 +197,70 @@
 
 <style lang="scss">
    .aspect {
-      @include flex-row;
-      @include flex-space-between;
-      width: 100%;
-      min-height: 32px;
-      height: 100%;
+      @include border;
+      @include label;
+      @include flex-column;
+      @include flex-group-top;
       @include font-size-small;
+      font-weight: bold;
+
+      padding: var(--padding-standard);
+      width: 100%;
 
       .label {
-         @include flex-column;
-         @include flex-group-top;
+         @include flex-row;
+         @include flex-group-center;
+
          height: 100%;
+
+         i {
+            margin-right: var(--padding-standard);
+         }
+      }
+
+      .value {
+         @include border-left;
+
+         margin-left: var(--padding-standard);
+         padding-left: var(--padding-standard);
+      }
+
+      .header {
+         @include flex-row;
+         @include flex-group-center;
+
          width: 100%;
          flex-wrap: wrap;
-         font-weight: bold;
          margin-right: var(--padding-large);
-
-         .label-inner {
-            @include flex-row;
-            @include flex-group-center;
-            height: 100%;
-            margin-bottom: var(--padding-standard);
-
-            i {
-               margin-right: var(--padding-standard);
-            }
-         }
       }
 
       .controls {
          @include flex-row;
-         @include flex-group-right;
-         flex-wrap: nowrap;
-         height: 100%;
+         @include flex-group-center;
+
+         margin-top: var(--padding-large);
+         width: 100%;
+
          --button-border-radius: var(--button-chat-message-border-radius);
 
-         .control {
-            height: 32px;
+         .cost {
+            @include flex-row;
+            @include flex-group-center;
 
-            &:not(:first-child) {
-               margin-left: var(--padding-standard);
-            }
+            height: 100%;
+            margin-right: var(--padding-large);
+         }
+
+         .control {
+            @include flex-row;
+            @include flex-group-center;
+            
+            margin-left: var(--padding-standard);
 
             .button-inner {
                @include flex-row;
                @include flex-group-center;
+
                height: 100%;
             }
          }

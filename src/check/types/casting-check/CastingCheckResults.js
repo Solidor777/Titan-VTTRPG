@@ -7,7 +7,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property   {number}    cost           The success cost for increasing the value of the aspect.
  * @property   {number}    currentValue   The current value of the aspect.
  * @property   {number}    initialValue   The initial value of the aspect.
- * @property  {string}    label          The display name for the aspect.
+ * @property   {string}    label          The display name for the aspect.
  */
 
 /**

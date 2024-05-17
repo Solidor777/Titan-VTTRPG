@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckChatScalingAspect from '~/check/chat-message/CheckChatScalingAspect.svelte';
 
    // Document reference
@@ -20,21 +20,17 @@
    .aspects {
       @include flex-column;
       @include flex-group-top;
-      @include border;
-      @include label;
-      padding: var(--padding-large);
       width: 100%;
 
       .aspect {
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
+
          width: 100%;
 
          &:not(:first-child) {
-            @include border-top;
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--padding-large);
          }
       }
    }
