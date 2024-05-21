@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
    import ItemCheckChatHeader from '~/check/types/item-check/chat-message/ItemCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
@@ -7,10 +7,9 @@
    import ChatHealingButton from '~/document/types/chat-message/components/buttons/ChatMessageHealingButton.svelte';
    import ChatAttributeCheckButton
       from '~/document/types/chat-message/components/buttons/ChatMessageOpposedAttributeCheckButton.svelte';
-   import ChatResistanceCheckButtons
-      from '~/document/types/chat-message/components/buttons/ChatMessageResistanceCheckButtons.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
    import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
+   import ResistanceCheckButton from "~/helpers/svelte-components/button/ResistanceCheckButton.svelte";
 
    // Document reference
    const document = getContext('document');
@@ -85,21 +84,19 @@
          </div>
       {/if}
 
-      <!--Resistance Check Buttons-->
-      {#if $document.flags.titan.results.reflexesCheck || $document.flags.titan.results.resilienceCheck || $document.flags.titan.results.willpowerCheck}
-         <div class="section tags">
-            <ChatResistanceCheckButtons
-               reflexes={$document.flags.titan.results.reflexesCheck}
-               resilience={$document.flags.titan.results.resilienceCheck}
-               willpower={$document.flags.titan.results.willpowerCheck}
-               difficulty={4}
+      <!--Resistance Check Button-->
+      {#if $document.flags.titan.parameters.resistanceCheck !== 'none'}
+         <div class="section">
+            <ResistanceCheckButton
+               resistance={$document.flags.titan.parameters.resistanceCheck}
                complexity={$document.flags.titan.results.extraSuccesses + 1}
-               damageToReduce={$document.flags.titan.parameters.isDamage &&
-               $document.flags.titan.parameters.damageReducedBy ===
-                  'resistanceCheck'
-                  ? $document.flags.titan.results.damage
-                  : 0}
+               damageToReduce={
+                  $document.flags.titan.parameters.damageReducedBy === 'resistanceCheck' ?
+                  $document.flags.titan.results.damage :
+                  0
+               }
             />
+            /
          </div>
       {/if}
    {/if}

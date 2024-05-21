@@ -1,4 +1,4 @@
-import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
+import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
 
 /**
  * Applies repairs to the user's available combat targets.
@@ -8,7 +8,7 @@ import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
  */
 export default async function applyRepairsToTargets(repairs, options) {
    // Get targets
-   const targets = getCombatTargets();
+   const targets = getBestUserTargets();
 
    // Apply repairs to each target
    for (const target of targets) {

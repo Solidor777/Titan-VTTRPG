@@ -19,9 +19,7 @@
    // Update parameters in response to changes
    $: {
       const item = $document.items.get(itemId);
-      if (item &&
-         $document.system.validateCastingCheckOptions(checkOptions)
-      ) {
+      if (item) {
          checkParameters = $document.system.getCastingCheckParameters(
             $document.system.initializeCastingCheckOptions(checkOptions)
          );

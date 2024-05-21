@@ -18,7 +18,8 @@
                "/^lost-/"
             ]
          }
-      ]
+      ],
+      "at-rule-empty-line-before": "always"
    },
    "ignoreFiles": [
       "node_modules/*",

@@ -57,10 +57,7 @@
          <!--Controls-->
          <div class="controls">
             <!--Check-->
-            {#if item.system.check.length > 0 && $document.system.validateItemCheckOptions({
-               itemId: itemId,
-               checkIdx: 0
-            })}
+            {#if item.system.check.length > 0}
                <div>
                   <CharacterSheetCondensedItemCheckButton {itemId}/>
                </div>
@@ -84,7 +81,7 @@
                class="button"
                use:tooltip={{ content: localize('deleteItem') }}
             >
-               <CharacterSheetItemDeleteButton itemId={item._id}/>
+               <CharacterSheetItemDeleteButton {itemId}/>
             </div>
          </div>
       </div>
@@ -95,7 +92,7 @@
             <!--Item Checks-->
             {#if item.system.check.length > 0}
                <div class="section">
-                  <CharacterSheetItemChecks {item}/>
+                  <CharacterSheetItemChecks {itemId}/>
                </div>
             {/if}
 

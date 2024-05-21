@@ -219,24 +219,14 @@
       .header {
          @include flex-row;
          @include flex-group-center;
+         @include attribute-button;
+
          height: 32px;
 
          .label {
             @include flex-row;
             @include flex-group-center;
             font-weight: bold;
-         }
-
-         &.body {
-            --button-background: var(--body-color);
-         }
-
-         &.mind {
-            --button-background: var(--mind-color);
-         }
-
-         &.soul {
-            --button-background: var(--soul-color);
          }
 
          i {

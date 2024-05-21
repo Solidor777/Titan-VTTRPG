@@ -1,6 +1,6 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { SPEND_RESOLVE_ICON } from '~/system/Icons.js';
+   import {SPEND_RESOLVE_ICON} from '~/system/Icons.js';
 
    // Check reference
    export let check = void 0;
@@ -9,7 +9,7 @@
 </script>
 
 <div class="item-check-button {check.attribute}">
-   <Button on:click {disabled}>
+   <Button {disabled} on:click>
       <div class="button-inner">
          <i class="fa fa-dice"/>
          <div>
@@ -26,18 +26,7 @@
 <style lang="scss">
    .item-check-button {
       @include flex-row;
-
-      &.body {
-         --button-background: var(--body-color);
-      }
-
-      &.mind {
-         --button-background: var(--mind-color);
-      }
-
-      &.soul {
-         --button-background: var(--soul-color);
-      }
+      @include attribute-button;
 
       .button-inner {
          @include flex-row;

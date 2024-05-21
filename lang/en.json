@@ -90,7 +90,7 @@
       "base.label": "Base",
       "baseDamage.label": "Base Damage",
       "blast.label": "Blast",
-      "blindCheck.desc.label": "Privately rolled a check.",
+      "blindCheck.desc.label": "Rolled a Blind Check.",
       "blinded.desc.label": "<p>A <strong>Blinded</strong> creature cannot see.</p><p>A <strong>Blinded</strong> creature automatically fails any <strong>Awareness</strong> and <strong>Perception</strong> checks that rely on sight.</p><p>A <strong>Blinded</strong> creature's <strong>Melee</strong>, <strong>Accuracy</strong>, and <strong>Defense</strong> decrease by <strong>-1</strong>.</p>",
       "blinded.label": "Blinded",
       "body.desc.label": "<p><strong>Body</strong> is your overall strength, speed, and coordination. Characters with a high <strong>Body</strong> tend to do well in a physical fight and excel at manual labor.</p><p><strong>Body</strong> affects your <strong>Melee</strong> (your effectiveness in close combat) and your <strong>Defense</strong> (your ability to avoid damage).</p><p><strong>Body</strong> also greatly affects your <strong>Resilience</strong> (your ability to endure pain and resist illnesses) and slightly affects your <strong>Reflexes</strong> (your ability to duck, dodge, and avoid sudden danger).</p>",

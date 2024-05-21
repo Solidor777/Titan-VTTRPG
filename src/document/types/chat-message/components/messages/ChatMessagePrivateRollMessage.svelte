@@ -2,4 +2,4 @@
    import localize from '~/helpers/utility-functions/Localize.js';
 </script>
 
-<div>{localize('blindCheck')}</div>
+<div>{localize('blindCheck.desc')}</div>

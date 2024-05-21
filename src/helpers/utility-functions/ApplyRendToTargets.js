@@ -1,4 +1,4 @@
-import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
+import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
 
 /**
  * Applies rend to the user's available combat targets.
@@ -8,7 +8,7 @@ import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
  */
 export default async function applyRendToTargets(rend, options) {
    // Get targets
-   const targets = getCombatTargets();
+   const targets = getBestUserTargets();
 
    // Apply rend to each target
    for (const target of targets) {

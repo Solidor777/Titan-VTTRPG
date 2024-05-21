@@ -202,8 +202,8 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;
+      
       font-weight: bold;
-
       padding: var(--padding-standard);
       width: 100%;
 
@@ -238,7 +238,7 @@
          @include flex-row;
          @include flex-group-center;
 
-         margin-top: var(--padding-large);
+         margin-top: var(--padding-standard);
          width: 100%;
 
          --button-border-radius: var(--button-chat-message-border-radius);
@@ -254,7 +254,7 @@
          .control {
             @include flex-row;
             @include flex-group-center;
-            
+
             margin-left: var(--padding-standard);
 
             .button-inner {

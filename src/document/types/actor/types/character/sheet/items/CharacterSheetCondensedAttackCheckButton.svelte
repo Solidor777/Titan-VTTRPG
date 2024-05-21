@@ -22,8 +22,7 @@
    $: {
       const item = $document.items.get(itemId);
       if (item &&
-         item.system.attack.length > 0 &&
-         $document.system.validateAttackCheckOptions(checkOptions)
+         item.system.attack.length > 0
       ) {
          checkParameters = $document.system.getAttackCheckParameters(
             $document.system.initializeAttackCheckOptions(checkOptions)

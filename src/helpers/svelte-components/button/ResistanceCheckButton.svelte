@@ -1,69 +1,59 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
 
-   // Resistance to roll
-   export let resistance = 'reflexes';
+   /** @type string The Resistance to roll. */
+   export let resistance = void 0;
+
+   /** @type string The Difficulty of the Check. */
    export let difficulty = 4;
+
+   /** @type number The Complexity of the Check. */
    export let complexity = 1;
+
+   /** @type number Damage to be reduced by the check, if any. */
    export let damageToReduce = 0;
+
+   /** @type boolean The Complexity of the Check. */
    export let disabled = false;
 
    async function requestResistanceCheck() {
-      // Get the targets
-      let userTargets = game.user.isGM
-         ? Array.from(game.user.targets)
-         : Array.from(canvas.tokens.ownedTokens);
-      if (userTargets.length <= 0 && game.user.isGM) {
-         userTargets = Array.from(canvas.tokens.controlled);
-      }
+      const userTargets = getBestUserTargets();
 
       // For each target
-      for (let idx = 0; idx < userTargets.length; idx++) {
-         // If the target is valid
-         const target = userTargets[idx]?.actor;
-         if (target && target.system.resistance) {
-            // Roll a Resistance Check
-            await target.system.requestResistanceCheck(
-               {
-                  resistance: resistance,
-                  difficulty: difficulty,
-                  complexity: complexity,
-                  damageToReduce: damageToReduce,
-               },
-            );
-         }
+      for (const target of userTargets) {
+         // Roll a Resistance Check
+         await target.system.requestResistanceCheck(
+            {
+               resistance: resistance,
+               difficulty: difficulty,
+               complexity: complexity,
+               damageToReduce: damageToReduce,
+            },
+         );
       }
    }
 </script>
 
 <div class="button {resistance}">
    <Button
+      {disabled}
       on:click={() => {
          requestResistanceCheck();
       }}
-      {disabled}
+      tooltip={localize(`${resistance}.desc`)}
    >
       {`${localize(resistance)} ${difficulty}:${complexity}`}
    </Button>
 </div>
 
 <style lang="scss">
-  .button {
-    @include flex-row;
-    width: 100%;
-    @include font-size-normal;
+   .button {
+      @include flex-row;
+      @include font-size-normal;
+      @include resistance-button;
 
-    &.reflexes {
-      --button-background: var(--reflexes-color);
-    }
-
-    &.resilience {
-      --button-background: var(--resilience-color);
-    }
-
-    &.willpower {
-      --button-background: var(--willpower-color);
-    }
-  }
+      width: 100%;
+   }
 </style>

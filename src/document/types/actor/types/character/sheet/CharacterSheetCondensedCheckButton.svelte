@@ -1,6 +1,10 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
+   import {getContext} from "svelte";
+
+   /** @type TitanActor Reference to the Character document. */
+   const document = getContext('document');
 
    /** @type string The Attribute to be used for the check. */
    export let attribute = void 0;
@@ -25,7 +29,10 @@
 </script>
 
 <div class="check-button {attribute}">
-   <Button on:click>
+   <Button
+      disabled={!$document.isOwner}
+      on:click
+   >
       <div class="button-inner">
          {#if checkIcon}
             <i class="{checkIcon}"/>
@@ -66,18 +73,7 @@
 <style lang="scss">
    .check-button {
       @include flex-row;
-
-      &.body {
-         --button-background: var(--body-color);
-      }
-
-      &.mind {
-         --button-background: var(--mind-color);
-      }
-
-      &.soul {
-         --button-background: var(--soul-color);
-      }
+      @include attribute-button;
 
       .button-inner {
          @include flex-row;

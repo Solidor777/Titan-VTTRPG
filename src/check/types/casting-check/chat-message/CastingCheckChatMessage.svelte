@@ -5,12 +5,12 @@
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
    import ChatDamageButtons from '~/document/types/chat-message/components/buttons/ChatMessageDamageButtons.svelte';
    import ChatHealingButton from '~/document/types/chat-message/components/buttons/ChatMessageHealingButton.svelte';
-   import ChatResistanceCheckButtons
-      from '~/document/types/chat-message/components/buttons/ChatMessageResistanceCheckButtons.svelte';
    import CheckChatScalingAspects from '~/check/chat-message/CheckChatScalingAspects.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
+   import CastingCheckChatMessageResistanceCheckButtons
+      from "~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte";
 
    // Document reference
    const document = getContext('document');
@@ -88,18 +88,12 @@
 
       <!--Resistance Check Buttons-->
       {#if
-         $document.flags.titan.results.reflexesCheck ||
-         $document.flags.titan.results.resilienceCheck ||
-         $document.flags.titan.results.willpowerCheck
+         $document.flags.titan.parameters.reflexesCheck ||
+         $document.flags.titan.parameters.resilienceCheck ||
+         $document.flags.titan.parameters.willpowerCheck
       }
          <div class="section tags">
-            <ChatResistanceCheckButtons
-               reflexes={$document.flags.titan.results.reflexesCheck}
-               resilience={$document.flags.titan.results.resilienceCheck}
-               willpower={$document.flags.titan.results.willpowerCheck}
-               difficulty={4}
-               complexity={$document.flags.titan.results.extraSuccesses + 1}
-            />
+            <CastingCheckChatMessageResistanceCheckButtons/>
          </div>
       {/if}
    {/if}

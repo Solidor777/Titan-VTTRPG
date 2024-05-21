@@ -1,4 +1,4 @@
-import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
+import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
 
 /**
  * Applies damage to the user's available combat targets.
@@ -11,7 +11,7 @@ export default async function applyDamageToTargets(
    options,
 ) {
    // Get targets
-   const targets = getCombatTargets();
+   const targets = getBestUserTargets();
 
    // Apply damage to each target
    for (const target of targets) {

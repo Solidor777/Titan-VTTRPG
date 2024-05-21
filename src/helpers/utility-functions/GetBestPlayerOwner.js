@@ -22,13 +22,15 @@ export default function getBestPlayerOwner(document) {
             // If there are multiple active player owners
             if (activeOwners.length > 1) {
 
-               // Check if one is the current user
-               const userPlayerOwner =
-                  activeOwners.filter((activeOwner) => activeOwner.id === game.user.id);
+               // Check if the current user is an owner
+               if (document.isOwner) {
+                  return game.user;
+               }
 
-               // If so, return that user
-               if (userPlayerOwner) {
-                  return userPlayerOwner[0];
+               // Otherwise, check if one of the players has this document set to their character
+               const mainCharacterPlayers = activeOwners.filter((owner) => owner.character._id === document._id);
+               if (mainCharacterPlayers.length > 0) {
+                  return mainCharacterPlayers[0];
                }
             }
 
@@ -36,7 +38,14 @@ export default function getBestPlayerOwner(document) {
             return activeOwners[0];
          }
       }
-      // Return first player
+
+      // Otherwise, check if one of the players has this document set to their character
+      const mainCharacterPlayers = activeOwners.filter((owner) => owner.character._id === document._id);
+      if (mainCharacterPlayers.length > 0) {
+         return mainCharacterPlayers[0];
+      }
+
+      // Return first player owner as a fallback
       return playerOwners[0];
    }
 

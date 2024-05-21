@@ -283,6 +283,20 @@
    }
 }
 
+@mixin attribute-button {
+   &.body {
+      --button-background: var(--body-color);
+   }
+
+   &.mind {
+      --button-background: var(--mind-color);
+   }
+
+   &.soul {
+      --button-background: var(--soul-color);
+   }
+}
+
 @mixin resistance-colors {
    &.reflexes {
       background: var(--reflexes-color);
@@ -294,6 +308,20 @@
 
    &.willpower {
       background: var(--willpower-color);
+   }
+}
+
+@mixin resistance-button {
+   &.reflexes {
+      --button-background: var(--reflexes-color);
+   }
+
+   &.resilience {
+      --button-background: var(--resilience-color);
+   }
+
+   &.willpower {
+      --button-background: var(--willpower-color);
    }
 }
 

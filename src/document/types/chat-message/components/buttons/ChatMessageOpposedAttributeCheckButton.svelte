@@ -1,5 +1,5 @@
 <script>
-   import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
+   import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -10,7 +10,7 @@
    export let damageToReduce = 0;
 
    async function rollOpposedCheck() {
-      const targets = getCombatTargets();
+      const targets = getBestUserTargets();
       for (const target of targets) {
          target.system.requestAttributeCheck(
             {
@@ -40,20 +40,12 @@
 <style lang="scss">
    .opposed-check-button {
       @include flex-row;
-      width: 100%;
-      --button-border-radius: var(--button-chat-message-border-radius);
       @include font-size-normal;
+      @include attribute-colors;
 
-      &.body {
-         --button-background: var(--body-color);
-      }
+      width: 100%;
 
-      &.mind {
-         --button-background: var(--mind-color);
-      }
+      --button-border-radius: var(--button-chat-message-border-radius);
 
-      &.soul {
-         --button-background: var(--soul-color);
-      }
    }
 </style>

@@ -3179,6 +3179,7 @@ export default class CharacterDataModel extends ActorDataModel {
       parameters.customTrait = itemRollData.customTrait;
       parameters.checkLabel = checkData.label;
       parameters.resolveCost = checkData.resolveCost;
+      parameters.resistanceCheck = checkData.resistanceCheck;
 
       // Set the opposed check data
       if (checkData.opposedCheck.enabled) {

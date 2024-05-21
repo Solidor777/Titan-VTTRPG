@@ -9,6 +9,7 @@
    /** @type TitanActor Reference to the Character document. */
    const document = getContext('document');
 
+   /** @type ItemCheckOptions Options for the check. */
    const checkOptions = {
       itemId: itemId,
    }
@@ -20,8 +21,7 @@
    $: {
       const item = $document.items.get(itemId);
       if (item &&
-         item.system.check.length > 0 &&
-         $document.system.validateItemCheckOptions(checkOptions)
+         item.system.check.length > 0
       ) {
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)

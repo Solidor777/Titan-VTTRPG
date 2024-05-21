@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
@@ -89,10 +89,10 @@
       <!--Total Value-->
       <div class="value" use:tooltip={{ content: totalValueTooltip }}>
          <ModTag
-            currentValue={$document.system.attribute[key].value}
             baseValue={$document.system.attribute[key].baseValue +
                $document.system.attribute[key].mod.equipment +
                $document.system.attribute[key].mod.ability}
+            currentValue={$document.system.attribute[key].value}
          />
       </div>
    </div>
@@ -108,17 +108,7 @@
       .button {
          min-width: 96px;
 
-         &.body {
-            --button-background: var(--body-color);
-         }
-
-         &.mind {
-            --button-background: var(--mind-color);
-         }
-
-         &.soul {
-            --button-background: var(--soul-color);
-         }
+         @include attribute-button;
       }
 
       .stats {

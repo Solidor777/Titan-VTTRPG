@@ -62,7 +62,7 @@
                      equipped={$document.system.equipped.shield === item._id}
                   />
                </div>
-            {:else}
+            {:else if item.system.check.length > 0}
                <div class="button">
                   <CharacterSheetCondensedItemCheckButton {itemId}/>
                </div>

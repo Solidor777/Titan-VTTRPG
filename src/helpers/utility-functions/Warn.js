@@ -1,7 +1,7 @@
 /**
  * Sends a warning message with the TITAN prefix.
  * Also accepts additional values to log, such as when wanting to log an object.
- * @param {string}   message           The message to send.
+ * @param {string}   message           asThe message to send.
  * @param {boolean}  [trace = false]   Whether to perform a trace call.
  * @param {...}      args              Additional objects to log.
  */

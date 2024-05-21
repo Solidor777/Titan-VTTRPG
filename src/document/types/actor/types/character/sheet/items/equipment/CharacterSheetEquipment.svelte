@@ -63,7 +63,7 @@
                      equipped={item.system.equipped}
                   />
                </div>
-            {:else}
+            {:else if (item.system.check.length > 0)}
                <div class="button">
                   <CharacterSheetCondensedItemCheckButton {itemId}/>
                </div>

@@ -1,47 +1,41 @@
 <script>
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
+   import {getContext} from "svelte";
 
-   export let reflexes = false;
-   export let resilience = false;
-   export let willpower = false;
-   export let difficulty = 4;
-   export let complexity = 1;
-   export let damageToReduce = 0;
+   /** @type TitanActor Reference to the Character document. */
+   const document = getContext('document');
+
+   /** @type number Calculated Complexity of the Resistance checks. */
+   const complexity = $document.flags.titan.results.extraSuccesses + 1;
 </script>
 
 <div class="buttons">
    <!--Reflexes-->
-   {#if reflexes}
+   {#if $document.flags.titan.parameters.reflexesCheck}
       <div class="button">
          <ResistanceCheckButton
             resistance={'reflexes'}
-            {difficulty}
             {complexity}
-            {damageToReduce}
          />
       </div>
    {/if}
 
    <!--Resilience-->
-   {#if resilience}
+   {#if $document.flags.titan.parameters.resilienceCheck}
       <div class="button">
          <ResistanceCheckButton
             resistance={'resilience'}
-            {difficulty}
             {complexity}
-            {damageToReduce}
          />
       </div>
    {/if}
 
    <!--Willpower-->
-   {#if willpower}
+   {#if $document.flags.titan.parameters.willpowerCheck}
       <div class="button">
          <ResistanceCheckButton
             resistance={'willpower'}
-            {difficulty}
             {complexity}
-            {damageToReduce}
          />
       </div>
    {/if}
@@ -51,11 +45,13 @@
    .buttons {
       @include flex-row;
       @include flex-group-center;
+
       width: 100%;
       flex-wrap: wrap;
 
       .button {
          @include tag-margin;
+
          --button-border-radius: var(--button-chat-message-border-radius);
       }
    }
