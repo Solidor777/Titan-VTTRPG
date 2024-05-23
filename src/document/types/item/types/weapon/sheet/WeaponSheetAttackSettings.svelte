@@ -1,8 +1,8 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
+   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
@@ -50,8 +50,7 @@
                   },
                });
             }
-         }
-         else if (attack.skill === 'meleeWeapons') {
+         } else if (attack.skill === 'meleeWeapons') {
             attack.skill = 'rangedWeapons';
             $document.update({
                system: {
@@ -385,7 +384,7 @@
 
                flex-wrap: wrap;
                width: 100%;
-               margin-bottom: 0var (--padding-standard);
+               margin-bottom: var(--padding-standard);
 
                .trait {
                   margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);

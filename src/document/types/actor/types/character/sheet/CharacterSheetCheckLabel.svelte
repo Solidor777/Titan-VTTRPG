@@ -166,7 +166,6 @@
          @include flex-group-center;
 
          transform: translateZ(0);
-         transform: translateZ(0);
          flex-wrap: wrap;
 
          &:not(:first-child) {
@@ -193,7 +192,6 @@
             @include flex-group-center;
 
             transform: translateZ(0);
-            transform: translateZ(0);
 
 
             &:not(:first-child) {
@@ -205,7 +203,6 @@
 
             .label {
                margin-right: var(--padding-standard);
-               transform: translateZ(0);
                transform: translateZ(0);
 
                i {

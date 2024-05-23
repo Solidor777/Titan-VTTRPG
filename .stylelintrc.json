@@ -9,7 +9,10 @@
       "function-url-no-scheme-relative": true,
       "function-url-quotes": "always",
       "value-keyword-case": "lower",
-      "unit-disallowed-list": [],
+      "unit-disallowed-list": [
+         "rem",
+         "em"
+      ],
       "no-descending-specificity": null,
       "no-duplicate-selectors": true,
       "font-family-no-missing-generic-family-keyword": null,

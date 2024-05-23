@@ -1,13 +1,6 @@
 <script>
    let scrollClass = '';
 
-   /**
-    * @param event
-    */
-   function scrollFade(event) {
-
-   }
-
    export let scrollTop = 0;
 
    /**
@@ -35,11 +28,9 @@
          if (!isScrolledToTop) {
             scrollClass += ' top-overflowing';
          }
-      }
-      else if (!isScrolledToTop) {
+      } else if (!isScrolledToTop) {
          scrollClass = ' faded top-overflowing';
-      }
-      else {
+      } else {
          scrollClass = '';
       }
    }
@@ -90,18 +81,11 @@
 
          &.faded {
             mask-image: linear-gradient(
-                            to bottom,
-                            transparent 0,
-                            black var(--top-mask-size, 0),
-                            black calc(100% - var(--bottom-mask-size, 0)),
-                            transparent 100%
-            );
-            mask-image: linear-gradient(
-                            to bottom,
-                            transparent 0,
-                            black var(--top-mask-size, 0),
-                            black calc(100% - var(--bottom-mask-size, 0)),
-                            transparent 100%
+                  to bottom,
+                  transparent 0,
+                  black var(--top-mask-size, 0),
+                  black calc(100% - var(--bottom-mask-size, 0)),
+                  transparent 100%
             );
          }
       }
