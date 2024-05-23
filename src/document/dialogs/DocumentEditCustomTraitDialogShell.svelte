@@ -17,6 +17,9 @@
 
    const trait = document.system.customTrait[traitIdx];
 
+   /**
+    *
+    */
    function editTrait() {
       const customTrait = document.system.customTrait;
 

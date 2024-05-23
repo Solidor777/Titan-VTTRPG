@@ -76,6 +76,9 @@
    ];
 
    // Updates the key when the selector changes
+   /**
+    *
+    */
    function onSelectorChange() {
       if ($document?.isOwner) {
          switch (element.selector) {
@@ -111,6 +114,9 @@
    }
 
    // Updates the selector when the rating changes
+   /**
+    *
+    */
    function onRatingChange() {
       switch (element.rating) {
          case 'defense': {
@@ -126,6 +132,9 @@
       onSelectorChange();
    }
 
+   /**
+    *
+    */
    function getSelector() {
       switch (element.selector) {
          case 'attackTrait': {

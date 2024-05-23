@@ -7,20 +7,20 @@ import AttributeCheckDialogShell from '~/check/types/attribute-check/dialog/Attr
 
 /**
  * Creates a dialog window for setting the Options of an Attribute Check.
+ * @param {AttributeCheckOptions} checkOptions - The initial options for the check to be adjusted.
+ * @param {AttributeCheckParameters} checkParameters - The initial parameters for the check,
+ * calculated from the options.
+ * @param {TitanActor} actor - The Actor that will roll the check.
  * @augments TitanDialog
- * @param {AttributeCheckOptions}      checkOptions      The initial options for the check to be adjusted.
- * @param {AttributeCheckParameters}   checkParameters   The initial parameters for the check,
- *                                                       calculated from the options.
- * @param {TitanActor}                 actor             The Actor that will roll the check.
  */
 export default class AttributeCheckDialog extends TitanDialog {
 
    /**
     * Creates a dialog window for setting the Options of an Attribute Check.
-    * @param {AttributeCheckOptions}      checkOptions      The initial options for the check to be adjusted.
-    * @param {AttributeCheckParameters}   checkParameters   The initial parameters for the check,
-    *                                                       calculated from the options.
-    * @param {TitanActor}                 actor             The Actor that will roll the check.
+    * @param {AttributeCheckOptions} checkOptions - The initial options for the check to be adjusted.
+    * @param {AttributeCheckParameters} checkParameters - The initial parameters for the check,
+    * calculated from the options.
+    * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
       super(

@@ -7,6 +7,10 @@ import createRollMessageElement from '~/document/types/item/rules-element/RollMe
 import createConditionalRatingModifierElement from '~/document/types/item/rules-element/ConditionalRatingModifier';
 import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier';
 
+/**
+ * @param document
+ * @param elementIdx
+ */
 export default async function onRulesElementOperationChanged(document, elementIdx) {
    const element = document.system.rulesElement[elementIdx];
    switch (element.operation) {

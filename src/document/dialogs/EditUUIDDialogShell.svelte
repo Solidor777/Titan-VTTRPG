@@ -13,6 +13,9 @@
    // Application reference
    const application = getApplication();
 
+   /**
+    *
+    */
    async function onApplyEdits() {
       if (document) {
          document.update({
@@ -30,6 +33,9 @@
       return;
    }
 
+   /**
+    *
+    */
    function onCancel() {
       application.close();
       return;

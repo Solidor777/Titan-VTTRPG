@@ -9,12 +9,16 @@
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import { RESOLVE_ICON } from '~/system/Icons.js';
+   import {RESOLVE_ICON} from '~/system/Icons.js';
+   import getControlledCharacters from "~/helpers/utility-functions/GetControlledCharacters.js";
 
    export let item = void 0;
 
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
+   /**
+    * @param check
+    */
    function getTagFromCheck(check) {
       let retVal = localize(`${check.attribute}`);
       if (check.skill && check.skill !== 'none') {
@@ -28,72 +32,59 @@
       return retVal;
    }
 
+   /**
+    * @param idx
+    */
    async function rollItemCheck(idx) {
-      const controlledTokens = Array.from(canvas.tokens.controlled);
-      if (controlledTokens.length > 0) {
+      const controlledCharacters = getControlledCharacters();
+      if (controlledCharacters.length > 0) {
          // Initial roll data
          const itemRollData = item.system;
          itemRollData.name = item.name;
          itemRollData.img = item.img;
 
          // Roll for each controlled token
-         for (
-            let tokenIdx = 0;
-            tokenIdx < controlledTokens.length;
-            tokenIdx++
-         ) {
-            // If the target is valid
-            const actor = controlledTokens[tokenIdx]?.actor;
-            if (actor && actor.system.resource?.stamina) {
-               // Get the actor roll data
-               const actorRollData = actor.system.getRollData();
+         for (const actor of controlledCharacters) {
+            // Get the actor roll data
+            const actorRollData = actor.system.getRollData();
 
-               // Get a new item check
-               const itemCheck = new ItemCheck({
-                  actorRollData: actorRollData,
-                  itemRollData: itemRollData,
-                  checkIdx: idx,
-               });
+            // Get a new item check
+            const itemCheck = new ItemCheck({
+               actorRollData: actorRollData,
+               itemRollData: itemRollData,
+               checkIdx: idx,
+            });
 
-               if (itemCheck.isValid) {
-                  // Spend resolve if appropriate
-                  if (
-                     itemCheck.parameters.resolveCost &&
-                     autoSpendResolve &&
-                     actor.system.isCharacter
-                  ) {
-                     await actor.system.spendResolve(
-                        itemCheck.parameters.resolveCost,
-                        { playSound: false },
-                     );
-                  }
-                  await itemCheck.evaluateCheck();
-                  await itemCheck.sendToChat({
-                     user: game.user.id,
-                     speaker: ChatMessage.getSpeaker({ actor: actor }),
-                     rollMode: game.settings.get('core', 'rollMode'),
-                  });
+            if (itemCheck.isValid) {
+               // Spend resolve if appropriate
+               if (
+                  itemCheck.parameters.resolveCost &&
+                  autoSpendResolve
+               ) {
+                  await actor.system.spendResolve(
+                     itemCheck.parameters.resolveCost,
+                     {playSound: false},
+                  );
                }
+               await itemCheck.evaluateCheck();
+               await itemCheck.sendToChat({
+                  user: game.user.id,
+                  speaker: ChatMessage.getSpeaker({actor: actor}),
+                  rollMode: game.settings.get('core', 'rollMode'),
+               });
             }
          }
       }
    }
 
+   /**
+    * @param resolveToSpend
+    */
    async function spendResolve(resolveToSpend) {
       // Get controlled tokens
-      const controlledTokens = Array.from(canvas.tokens.controlled);
-      if (controlledTokens.length > 0) {
-         for (
-            let tokenIdx = 0;
-            tokenIdx < controlledTokens.length;
-            tokenIdx++
-         ) {
-            // If the target is valid
-            const character = controlledTokens[tokenIdx]?.actor?.character;
-            if (character) {
-               character.spendResolve(resolveToSpend);
-            }
-         }
+      const controlledCharacters = getControlledCharacters();
+      for (const actor of controlledCharacters) {
+         actor.system.spendResolve(resolveToSpend);
       }
    }
 </script>

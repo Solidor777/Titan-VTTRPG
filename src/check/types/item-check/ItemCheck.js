@@ -3,8 +3,8 @@ import TitanCheck from '~/check/Check.js';
 
 /**
  * Class for creating and calculating the result of an item check.
+ * @param {ItemCheckParameters} parameters - Parameters for the Check.
  * @augments TitanCheck
- * @param   {ItemCheckParameters} parameters  Parameters for the Check.
  */
 export default class ItemCheck extends TitanCheck {
    /**
@@ -13,9 +13,9 @@ export default class ItemCheck extends TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateItemCheckResults}.
-    * @param   {CheckDiceResults}    diceResults The sorted dice rolled for the check, after Expertise is applied.
-    * @param   {ItemCheckParameters} parameters  The parameters of the check.
-    * @returns {ItemCheckResults}                The final results of the check.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+    * @param {ItemCheckParameters} parameters - The parameters of the check.
+    * @returns {ItemCheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults, parameters) {

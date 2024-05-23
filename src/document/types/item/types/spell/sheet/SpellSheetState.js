@@ -1,6 +1,9 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ *
+ */
 export default function createSpellSheetState() {
    const { set, update, subscribe } = writable({
       activeTab: 'description',
@@ -26,6 +29,9 @@ export default function createSpellSheetState() {
       }
    });
 
+   /**
+    *
+    */
    function addCheck() {
       update((state) => {
          state.isExpanded.checks.push(true);
@@ -34,6 +40,9 @@ export default function createSpellSheetState() {
       });
    }
 
+   /**
+    * @param idx
+    */
    function removeCheck(idx) {
       update((state) => {
          state.isExpanded.checks.splice(idx, 1);
@@ -42,6 +51,9 @@ export default function createSpellSheetState() {
       });
    }
 
+   /**
+    *
+    */
    function addCustomAspect() {
       update((state) => {
          state.isExpanded.customAspects.push(true);
@@ -49,6 +61,9 @@ export default function createSpellSheetState() {
       });
    }
 
+   /**
+    * @param idx
+    */
    function removeCustomAspect(idx) {
       update((state) => {
          state.isExpanded.customAspects.splice(idx, 1);

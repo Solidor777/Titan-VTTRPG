@@ -20,9 +20,7 @@
    // Update parameters in response to changes
    $: {
       const item = $document.items.get(itemId);
-      if (item &&
-         item.system.check.length > 0
-      ) {
+      if (item?.system.check.length > 0) {
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );

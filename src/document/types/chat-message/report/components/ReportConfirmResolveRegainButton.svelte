@@ -8,6 +8,9 @@
    // Context variables
    const document = getContext('document');
 
+   /**
+    *
+    */
    async function confirmRegainResolve() {
       if ($document?.isOwner) {
          // Get the actor

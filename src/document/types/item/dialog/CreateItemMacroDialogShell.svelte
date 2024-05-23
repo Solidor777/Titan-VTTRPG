@@ -113,8 +113,8 @@
          label: localize('itemName'),
       },
       {
-         value: 'id',
-         label: localize('itemId'),
+         value: 'documentId',
+         label: localize('documentId'),
       },
    ];
 
@@ -124,6 +124,9 @@
    // Macro name
    let name = item.name;
 
+   /**
+    *
+    */
    async function onCreateMacro() {
       let macro;
       switch (macroType) {
@@ -191,6 +194,9 @@
       return;
    }
 
+   /**
+    *
+    */
    function onCancel() {
       application.close();
       return;

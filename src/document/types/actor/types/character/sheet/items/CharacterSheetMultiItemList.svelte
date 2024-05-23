@@ -26,6 +26,11 @@
    let hoveredItemId = '';
 
    // Drag item start
+   /**
+    * @param event
+    * @param id
+    * @param type
+    */
    function onDragStart(event, id, type) {
       const item = $document.items.get(id);
       const dragData = item.toDragData();
@@ -43,6 +48,10 @@
    }
 
    // Drag item hovered
+   /**
+    * @param id
+    * @param type
+    */
    function onDragEnter(id, type) {
       if (isDragHovering) {
          hoveredItemId = id;
@@ -50,6 +59,9 @@
    }
 
    // Drag item end
+   /**
+    *
+    */
    function onDragEnd() {
       hoveredItemId = '';
       isDragHovering = false;

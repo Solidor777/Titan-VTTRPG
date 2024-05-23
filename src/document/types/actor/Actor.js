@@ -3,19 +3,19 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
  * Extends the base Actor class to implement additional system-specific logic.
+ * @param {object} data - The initial data object provided to the document creation request.
+ * @param {object} options - Additional options which modify the creation request.
+ * @param {documents.BaseUser} user - The User requesting the document creation.
  * @augments {Actor}
- * @param {object}               data     The initial data object provided to the document creation request.
- * @param {object}               options  Additional options which modify the creation request.
- * @param {documents.BaseUser}   user     The User requesting the document creation.
  */
 export default class TitanActor extends Actor {
 
    /**
     * Performs initialization logic before document creation.
-    * @param {object}               data     The initial data object provided to the document creation request.
-    * @param {object}               options  Additional options which modify the creation request.
-    * @param {documents.BaseUser}   user     The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
+    * @param {documents.BaseUser} user - The User requesting the document creation.
+    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
     * @private
     */
    async _preCreate(data, options, user) {
@@ -55,15 +55,15 @@ export default class TitanActor extends Actor {
 
    /**
     * @typedef {object} Speaker  An object containing data on a Chat Message's speaker.
-    * @property {Scene}   scene  The Scene is which the speaker resides.
-    * @property {Actor}   actor  Actor that is speaking.
-    * @property {string}  alias  The name of the speaker to display.
-    * @property {string}  token  The Token id of the speaker.
+    * @property {Scene} scene The Scene is which the speaker resides.
+    * @property {Actor} actor Actor that is speaking.
+    * @property {string} alias The name of the speaker to display.
+    * @property {string} token The Token id of the speaker.
     */
 
    /**
     * A helper to get a speaker from this actor.
-    * @returns {Speaker}   The identified speaker data
+    * @returns {Speaker} The identified speaker data.
     */
    getSpeaker() {
       return ChatMessage.getSpeaker({
@@ -74,7 +74,7 @@ export default class TitanActor extends Actor {
 
    /**
     * Gets an Initiative roll for this actor.
-    * @returns {Promise<Roll>}   The Initiative roll.
+    * @returns {Promise<Roll>} The Initiative roll.
     */
    async getInitiativeRoll() {
       // Calculate the initiative value

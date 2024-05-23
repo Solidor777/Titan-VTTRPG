@@ -11,10 +11,10 @@ import delay from '~/helpers/utility-functions/Delay.js';
 export default class ActionQueue {
    /**
     * Constructs a new Action Queue.
-    * @param {number} defaultDelay   How many milliseconds (minimum of 1) that the action queue
-    *                               will wait between resolving actions by default.
-    *                               This can be overridden with the Delay property on the input object when
-    *                               enqueuing an action.
+    * @param {number} defaultDelay - How many milliseconds (minimum of 1) that the action queue
+    * will wait between resolving actions by default.
+    * This can be overridden with the Delay property on the input object when
+    * enqueuing an action.
     */
    constructor(defaultDelay = 100) {
       // Initial state
@@ -26,18 +26,18 @@ export default class ActionQueue {
 
    /**
     * Enqueues a new action object.
-    * @param {object} action                    Object containing the properties of the action being performed.
-    * @param {Function} action.callback         The function to be performed by the action.
-    * @param {object} action.thisArg            The 'this' context to use for the action. May be null.
-    * @param {*[]?} action.args        Optional arguments for the function being performed, in order.
-    * @param {number?} action.delay    The delay to wait before attempting this action. If not specified,
-    *                                           the default delay will be used.
-    * @param {string} action.key                An identifier that may be used to enqueue the action.
-    *                                           If the action is enqueued while an action with the same key is already
-    *                                           in the queue, then it will be ignored.
-    *                                           If the previous action is already being performed,
-    *                                           then the duplicate action will be called again.
-    * @returns {Promise<*>}                     The return value of the action being queued.
+    * @param {object} action - Object containing the properties of the action being performed.
+    * @param {Function} action.callback - The function to be performed by the action.
+    * @param {object} action.thisArg - The 'this' context to use for the action. May be null.
+    * @param {*[]?} action.args - Optional arguments for the function being performed, in order.
+    * @param {number?} action.delay - The delay to wait before attempting this action. If not specified,
+    * the default delay will be used.
+    * @param {string} action.key - An identifier that may be used to enqueue the action.
+    * If the action is enqueued while an action with the same key is already
+    * in the queue, then it will be ignored.
+    * If the previous action is already being performed,
+    * then the duplicate action will be called again.
+    * @returns {Promise<*>} The return value of the action being queued.
     */
    async enqueue(action) {
       // If the action is not already in the queue
@@ -73,7 +73,7 @@ export default class ActionQueue {
 
    /**
     * Starts the action queue, and continues to dequeue actions until the queue is empty.
-    * @returns {Promise<void>}   Finishes when the action queue is empty.
+    * @returns {Promise<void>} Finishes when the action queue is empty.
     */
    async runQueue() {
       // While there are still objections in the queue

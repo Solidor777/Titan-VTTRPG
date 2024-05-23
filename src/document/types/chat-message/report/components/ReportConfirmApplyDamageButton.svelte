@@ -9,6 +9,9 @@
    // Context variables
    const document = getContext('document');
 
+   /**
+    *
+    */
    async function confirmdamageApplied() {
       if ($document?.isOwner) {
          // Get the actor

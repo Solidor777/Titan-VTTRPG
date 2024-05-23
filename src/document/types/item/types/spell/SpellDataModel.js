@@ -173,7 +173,7 @@ export default class SpellDataModel extends ItemDataModel {
 
    /**
     * Adds a Standard Aspect to the Spell.
-    * @param {object} aspect The aspect to add.
+    * @param {object} aspect - The aspect to add.
     */
    addStandardAspect(aspect) {
       if (this.parent.isOwner) {
@@ -212,7 +212,7 @@ export default class SpellDataModel extends ItemDataModel {
 
    /**
     * Removes a Custom Aspect from the Spell.
-    * @param {number} idx  The index of the Custom Aspect to remove.
+    * @param {number} idx - The index of the Custom Aspect to remove.
     */
    removeCustomAspect(idx) {
       if (this.parent.isOwner) {

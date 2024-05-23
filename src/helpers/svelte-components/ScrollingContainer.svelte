@@ -1,12 +1,18 @@
 <script>
    let scrollClass = '';
 
+   /**
+    * @param event
+    */
    function scrollFade(event) {
 
    }
 
    export let scrollTop = 0;
 
+   /**
+    * @param event
+    */
    function onScroll(event) {
       scrollTop = event.target.scrollTop;
 
@@ -38,6 +44,9 @@
       }
    }
 
+   /**
+    * @param node
+    */
    function initialScroll(node) {
       node.scrollTop = scrollTop;
    }

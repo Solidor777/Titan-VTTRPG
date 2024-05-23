@@ -21,9 +21,7 @@
    // Update parameters in response to changes
    $: {
       const item = $document.items.get(itemId);
-      if (item &&
-         item.system.attack.length > 0
-      ) {
+      if (item?.system.attack.length > 0) {
          checkParameters = $document.system.getAttackCheckParameters(
             $document.system.initializeAttackCheckOptions(checkOptions)
          );

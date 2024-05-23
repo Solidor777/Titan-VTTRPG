@@ -31,6 +31,10 @@ const CHAT_MESSAGE_TYPES = deepFreeze(new Set([
    'repairsReport',
 ]));
 
+/**
+ * @param message
+ * @param html
+ */
 export default function onRenderChatMessage(message, html) {
    // Check if this is a valid titan chat message
    const chatContext = message?.flags?.titan;

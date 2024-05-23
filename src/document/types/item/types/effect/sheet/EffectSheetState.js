@@ -1,6 +1,9 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ *
+ */
 export default function createEffectSheetState() {
    const { set, update, subscribe } = writable({
       isExpanded: {
@@ -22,6 +25,9 @@ export default function createEffectSheetState() {
       activeTab: 'description'
    });
 
+   /**
+    *
+    */
    function addCheck() {
       update((state) => {
          state.isExpanded.checks.push(true);
@@ -30,6 +36,9 @@ export default function createEffectSheetState() {
       });
    }
 
+   /**
+    * @param idx
+    */
    function removeCheck(idx) {
       update((state) => {
          state.isExpanded.checks.splice(idx, 1);

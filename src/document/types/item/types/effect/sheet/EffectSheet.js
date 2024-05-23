@@ -4,9 +4,8 @@ import createEffectSheetState from '~/document/types/item/types/effect/sheet/Eff
 
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
+    * Default Application options.
+    * @returns {object} Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {

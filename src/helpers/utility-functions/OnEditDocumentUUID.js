@@ -5,8 +5,8 @@ import EditUUIDDialog from '~/document/dialogs/EditUUIDDialog.js';
  * Creates a dialog to manually edit the UUID.
  * This identifier is used for easy lookup during macro calls,
  * but when duplicating an item, it can be useful to change the UUID.
- * @param {TitanActor|TitanItem} document The Actor or Item to edit.
- * @returns {Application|void}            The rendered dialog instance, if a valid document was provided.
+ * @param {TitanActor|TitanItem} document - The Actor or Item to edit.
+ * @returns {Application|void} The rendered dialog instance, if a valid document was provided.
  */
 export default function onEditDocumentUUID(document) {
    if (document) {

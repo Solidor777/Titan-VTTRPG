@@ -3,8 +3,8 @@ import calculateResistanceCheckResults from '~/check/types/resistance-check/Resi
 
 /**
  * Class for creating and calculating the result of a Resistance Check.
+ * @param {ResistanceCheckParameters} parameters - Parameters for the Check.
  * @augments TitanCheck
- * @param   {ResistanceCheckParameters} parameters  Parameters for the Check.
  */
 export default class ResistanceCheck extends TitanCheck {
    /**
@@ -13,9 +13,9 @@ export default class ResistanceCheck extends TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateResistanceCheckResults}.
-    * @param   {CheckDiceResults}            diceResults The sorted dice rolled for the check, after Expertise is applied.
-    * @param   {ResistanceCheckParameters}   parameters  The parameters of the check.
-    * @returns {ResistanceCheckResults}                  The final results of the check.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+    * @param {ResistanceCheckParameters} parameters - The parameters of the check.
+    * @returns {ResistanceCheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults, parameters) {

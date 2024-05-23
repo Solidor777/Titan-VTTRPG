@@ -6,21 +6,21 @@ import CheckDialogShell from '~/check/dialog/CheckDialogShell.svelte';
 import ItemCheckDialogShell from '~/check/types/item-check/dialog/ItemCheckDialogShell.svelte';
 
 /**
+ * @param {ItemCheckOptions} checkOptions - The initial options for the check to be adjusted.
+ * @param {ItemCheckParameters} checkParameters - The initial parameters for the check,
+ * calculated from the options.
+ * @param {TitanActor} actor - The Actor that will roll the check.
  * @augments TitanDialog
  * Creates a dialog window for setting the Options of a Item Check.
- * @param {ItemCheckOptions}      checkOptions     The initial options for the check to be adjusted.
- * @param {ItemCheckParameters}   checkParameters  The initial parameters for the check,
- *                                                   calculated from the options.
- * @param {TitanActor}            actor         The Actor that will roll the check.
  */
 export default class ItemCheckDialog extends TitanDialog {
 
    /**
     * Creates a dialog window for setting the Options of a Item Check.
-    * @param {ItemCheckOptions}      checkOptions     The initial options for the check to be adjusted.
-    * @param {ItemCheckParameters}   checkParameters  The initial parameters for the check,
-    *                                                   calculated from the options.
-    * @param {TitanActor}            actor         The Actor that will roll the check.
+    * @param {ItemCheckOptions} checkOptions - The initial options for the check to be adjusted.
+    * @param {ItemCheckParameters} checkParameters - The initial parameters for the check,
+    * calculated from the options.
+    * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
       super(

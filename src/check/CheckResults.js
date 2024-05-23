@@ -1,21 +1,21 @@
 /**
  * Results of a check in the Titan system.
  * @typedef {object} CheckResults
- * @property   {boolean}      succeeded            Whether the Check Succeeded.
- * @property   {CheckDie[]}   dice                 The sorted dice rolled for the check, after Expertise is applied.
- * @property   {number}       criticalFailures     The number of Critical Failures rolled.
- * @property   {number}       criticalSuccesses    The number of Critical Successes achieved.
- * @property   {number}       expertiseRemaining   The Expertise remaining after being applied to the dice.
- * @property   {number}       extraSuccesses       The number of Critical Successes achieved.
- * @property   {number}       successes            The total number of Successes achieved.
+ * @property {boolean} succeeded Whether the Check Succeeded.
+ * @property {CheckDie[]} dice The sorted dice rolled for the check, after Expertise is applied.
+ * @property {number} criticalFailures The number of Critical Failures rolled.
+ * @property {number} criticalSuccesses The number of Critical Successes achieved.
+ * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
+ * @property {number} extraSuccesses The number of Critical Successes achieved.
+ * @property {number} successes The total number of Successes achieved.
  */
 
 /**
  * Calculates the results of a check in the Titan system, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
- * @param   {CheckDiceResults}   diceResults The sorted dice rolled for the check, after Expertise is applied.
- * @param   {CheckParameters}    parameters  The parameters of the check.
- * @returns {CheckResults}                   The final results of the check.
+ * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+ * @param {CheckParameters} parameters - The parameters of the check.
+ * @returns {CheckResults} The final results of the check.
  */
 export default function calculateCheckResults(diceResults, parameters) {
    // Initialize return value

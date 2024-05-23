@@ -9,6 +9,9 @@
    const document = getContext('document');
 
    // Removes expired effects from the chat message owner
+   /**
+    *
+    */
    async function removeExpiredEffects() {
 
       // If we own this chat message and the actor associated with it

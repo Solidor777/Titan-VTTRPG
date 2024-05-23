@@ -6,6 +6,9 @@
 
    const document = getContext('document');
 
+   /**
+    *
+    */
    async function resetExpertise() {
       // Remove the expertise from the dice
       $document.flags.titan.results.dice.forEach((dice) => {

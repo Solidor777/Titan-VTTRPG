@@ -3,27 +3,27 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Results of an item check.
  * @typedef {object} ItemCheckResults
+ * @property {boolean} succeeded Whether the Check Succeeded.
+ * @property {CheckDie[]} dice The sorted dice rolled for the check, after Expertise is applied.
+ * @property {number} criticalFailures The number of Critical Failures rolled.
+ * @property {number} criticalSuccesses The number of Critical Successes achieved.
+ * @property {number} damage The amount of Damage inflicted.
+ * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
+ * @property {number} extraSuccesses The number of Critical Successes achieved.
+ * @property {number} healing The amount of Healing applied.
+ * @property {number} successes The total number of Successes achieved.
+ * @property {number} opposedCheckComplexity The Complexity of the Opposed check.
  * @augments   CheckResults
- * @property   {boolean}      succeeded               Whether the Check Succeeded.
- * @property   {CheckDie[]}   dice                    The sorted dice rolled for the check, after Expertise is applied.
- * @property   {number}       criticalFailures        The number of Critical Failures rolled.
- * @property   {number}       criticalSuccesses       The number of Critical Successes achieved.
- * @property   {number}       damage                  The amount of Damage inflicted.
- * @property   {number}       expertiseRemaining      The Expertise remaining after being applied to the dice.
- * @property   {number}       extraSuccesses          The number of Critical Successes achieved.
- * @property   {number}       healing                 The amount of Healing applied.
- * @property   {number}       successes               The total number of Successes achieved.
- * @property   {number}       opposedCheckComplexity  The Complexity of the Opposed check.
  */
 
 /**
  * Calculates the results of an item check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
- * See {@link calculateCheckResults}
- * @param   {CheckDiceResults}      diceResults    The sorted dice rolled for the check, after Expertise is applied.
- * @param   {ItemCheckParameters}   parameters     The parameters of the check.
- * @returns {ItemCheckResults}                     The final results of the check.
+ * See {@link calculateCheckResults}.
+ * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+ * @param {ItemCheckParameters} parameters - The parameters of the check.
+ * @returns {ItemCheckResults} The final results of the check.
  */
 export default function calculateItemCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);

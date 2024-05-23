@@ -4,14 +4,14 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
 
 /**
  * Creates a dialog for regenerating a documents UUID.
+ * @param {TitanItem|TitanActor} document - The document to regenerate the UUID for.
  * @augments ConfirmationDialog
- * @param {TitanItem|TitanActor} document The document to regenerate the UUID for.
  */
 export default class ConfirmRegenerateUUIDDialog extends ConfirmationDialog {
 
    /**
     * Creates a dialog for regenerating a documents UUID.
-    * @param {TitanItem|TitanActor} document The document to regenerate the UUID for.
+    * @param {TitanItem|TitanActor} document - The document to regenerate the UUID for.
     */
    constructor(document) {
       super(

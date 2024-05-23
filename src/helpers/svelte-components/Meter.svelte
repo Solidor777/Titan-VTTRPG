@@ -7,6 +7,9 @@
    let meterWidth = (current / max - min) * 100;
    let meterUpdate = false;
 
+   /**
+    *
+    */
    function updateMeterWidth() {
       if (meterWidth < targetMeterWidth) {
          meterWidth = Math.min(meterWidth + meterScaleSpeed, targetMeterWidth);

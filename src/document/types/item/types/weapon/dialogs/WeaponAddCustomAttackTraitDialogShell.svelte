@@ -23,6 +23,9 @@
       uuid: generateUUID(),
    };
 
+   /**
+    *
+    */
    function addTrait() {
       const attack = document.system.attack[attackIdx];
 

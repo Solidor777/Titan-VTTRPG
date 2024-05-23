@@ -9,27 +9,27 @@
    /** @type {string} The ID of the item. */
    export let itemId = void 0;
 
-   /** @type TitanItem Calculated item reference. */
-   let item;
-
+   /** @type ItemCheckTemplate[] Calculated item reference. */
+   let checks = [];
 
    // Update the Item in response to changes.
    $: {
-      item = $document.items.get(itemId);
+      const item = $document.items.get(itemId);
+      if (item) {
+         checks = item.system.checks;
+      }
    }
 </script>
 
 <!--Checks-->
-{#if item && item.system.check.length > 0}
-   <div class="checks">
-      <!--Each Check-->
-      {#each item.system.check as check, checkIdx}
-         <div class="check">
-            <CharacterSheetItemCheck {itemId} {checkIdx}/>
-         </div>
-      {/each}
-   </div>
-{/if}
+<div class="checks">
+   <!--Each Check-->
+   {#each checks as check, checkIdx (check.uuid)}
+      <div class="check">
+         <CharacterSheetItemCheck {itemId} {checkIdx}/>
+      </div>
+   {/each}
+</div>
 
 <style lang="scss">
    .checks {

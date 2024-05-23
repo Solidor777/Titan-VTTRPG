@@ -37,7 +37,7 @@ export default class RulesElementItemDataModel extends ItemDataModel {
 
    /**
     * Removes a Rules Element from this item.
-    * @param {number} idx The index of the Rules Element in the Rules Elements array.
+    * @param {number} idx - The index of the Rules Element in the Rules Elements array.
     * @returns {Promise<void>}
     */
    async removeRulesElement(idx) {

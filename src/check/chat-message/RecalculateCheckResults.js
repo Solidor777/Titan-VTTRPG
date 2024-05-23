@@ -5,6 +5,9 @@ import calculateItemCheckResults from '~/check/types/item-check/ItemCheckResults
 import calculateAttributeCheckResults from '~/check/types/attribute-check/AttributeCheckResults.js';
 import calculateResistanceCheckResults from '~/check/types/resistance-check/ResistanceCheckResults.js';
 
+/**
+ * @param check
+ */
 export default function recalculateCheckResults(check) {
    // Initialize results
    const checkDice = {

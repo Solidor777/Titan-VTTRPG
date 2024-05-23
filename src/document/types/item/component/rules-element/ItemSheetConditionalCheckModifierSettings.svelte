@@ -174,6 +174,9 @@
    };
 
    // Update the check type if necessary when modifier type changes
+   /**
+    *
+    */
    function onModifierTypeChanged() {
       if ($document?.isOwner) {
          if (
@@ -192,6 +195,9 @@
 
    // Update the selector when the check type changes
    // Returns whether an update was triggered
+   /**
+    *
+    */
    function onCheckTypeChange() {
       if (
          element &&
@@ -209,6 +215,9 @@
    }
 
    // Updates the key when the selector changes
+   /**
+    *
+    */
    function onSelectorChange() {
       switch (element.selector) {
          case 'attribute': {
@@ -246,6 +255,9 @@
       });
    }
 
+   /**
+    *
+    */
    function getSelector() {
       switch (element.selector) {
          case 'attribute': {

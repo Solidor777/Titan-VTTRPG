@@ -21,6 +21,9 @@
       input = value;
    }
 
+   /**
+    *
+    */
    function validateInput() {
       let newValue = parseInt(input);
       if (isNaN(newValue)) {
@@ -37,6 +40,9 @@
       dispatch('change');
    }
 
+   /**
+    * @param event
+    */
    function checkInput(event) {
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {
@@ -47,24 +53,39 @@
       }
    }
 
+   /**
+    *
+    */
    function onFocus() {
       editingActive = true;
    }
 
+   /**
+    *
+    */
    function onBlur() {
       editingActive = false;
    }
 
+   /**
+    *
+    */
    function decrementInput() {
       input -= isModifierActive() ? modifierIncrement : increment;
       validateInput();
    }
 
+   /**
+    *
+    */
    function incrementInput() {
       input += isModifierActive() ? modifierIncrement : increment;
       validateInput();
    }
 
+   /**
+    *
+    */
    function onChange() {
       if (isNaN(input)) {
          input = value;

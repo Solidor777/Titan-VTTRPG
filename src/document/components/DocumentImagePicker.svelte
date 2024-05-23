@@ -17,6 +17,9 @@
    // Get the image path from the property
    let src = getProperty($document, path);
 
+   /**
+    *
+    */
    function onEditImage() {
       // If the current user owns this actor
       if ($document?.isOwner) {

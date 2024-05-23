@@ -8,6 +8,10 @@
    // Document reference
    const document = getContext('document');
 
+   /**
+    * @param base
+    * @param expertiseApplied
+    */
    function getLabel(base, expertiseApplied) {
       if (expertiseApplied > 0) {
          return `${base} + ${expertiseApplied}`;
@@ -17,6 +21,9 @@
       }
    }
 
+   /**
+    * @param final
+    */
    function getDieClass(final) {
       const success = final >= $document.flags.titan.parameters.difficulty;
       const criticalSuccess = final >= 6;
@@ -35,6 +42,9 @@
       }
    }
 
+   /**
+    *
+    */
    function applyExpertise() {
       // If expertise can be applied
       if (

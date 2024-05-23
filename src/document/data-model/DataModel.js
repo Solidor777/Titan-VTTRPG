@@ -48,7 +48,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Getter for the map of the data model's components.
-    * @returns {object}    The map of the data model's component.
+    * @returns {object} The map of the data model's component.
     */
    get components() {
       return this.#components;
@@ -70,7 +70,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
     * Defines the schema for the document, minus the component schemas.
     * Component schemas are added later.
-    * @returns {object}  The document schema, minus the component schemas.
+    * @returns {object} The document schema, minus the component schemas.
     * @protected
     */
    static _defineDocumentSchema() {
@@ -85,8 +85,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Migrates the data for each component.
-    * @param {object} source     The source data.
-    * @returns {object}          The migrated data.
+    * @param {object} source - The source data.
+    * @returns {object} The migrated data.
     * @protected
     */
    static _migrateComponentData(source) {
@@ -102,7 +102,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * Perform preliminary operations before a data model of this type is created.
     * Pre-creation operations only occur for the client which requested the operation.
     * Modifications to the pending document before it is persisted should be performed with this.parent.updateSource().
-    * @param {object} data    The initial data object provided to the document creation request.
+    * @param {object} data - The initial data object provided to the document creation request.
     */
    onPreCreate(data) {
       // Initialize document data
@@ -114,8 +114,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Gets the initial data for this document.
-    * @param {object} data    The initial data object provided to the document creation request.
-    * @returns {object|void}  The initial data to update the document with.
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @returns {object|void} The initial data to update the document with.
     * @protected
     */
    _getInitialDocumentData(data) {

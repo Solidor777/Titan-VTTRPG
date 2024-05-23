@@ -1,7 +1,7 @@
 /**
  * OnPreDeleteChatMessage hook.
  * Deletes the svelte components from messages before they are deleted.
- * @param {ChatMessage} message  The chat message being deleted.
+ * @param {ChatMessage} message - The chat message being deleted.
  */
 export default function onPreDeleteChatMessage(message) {
    // Check if this chat message was sent by the titan system and has a svelte component

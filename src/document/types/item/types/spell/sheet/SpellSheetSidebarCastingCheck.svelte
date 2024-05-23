@@ -10,6 +10,9 @@
    const appState = getContext('applicationState');
    const document = getContext('document');
 
+   /**
+    * @param aspects
+    */
    function areAspectsEnabled(aspects) {
       for (let idx = 0; idx < aspects.length; idx++) {
          if (aspects[idx].enabled) {

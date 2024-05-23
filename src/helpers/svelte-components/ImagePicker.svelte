@@ -11,6 +11,9 @@
    const application = getApplication();
 
    // Create an image picker ponting to the path
+   /**
+    *
+    */
    function onEditImage() {
       const current = src;
       const filePicker = new FilePicker({

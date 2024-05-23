@@ -18,20 +18,19 @@
    let checkParameters = $document.system.getAttributeCheckParameters(
       $document.system.initializeAttributeCheckOptions({skill: key}));
 
-   /** @type string Tooltip for the total Training value. **/
+   /** @type string Tooltip for the total Training value. */
    let totalTrainingTooltip = '';
 
-   /** @type string Tooltip for the total Expertise value. **/
+   /** @type string Tooltip for the total Expertise value. */
    let totalExpertiseTooltip = '';
 
-   /** @type string Tooltip for the total Dice value. **/
+   /** @type string Tooltip for the total Dice value. */
    let totalDiceTooltip = '';
 
    /**
     * Calculates the tooltip for the total Training or Expertise value.
-    * @param {object} valueObject   The Training or Expertise object.
-    * @param {number} mod           Modifier for the total value or expertise.
-    *
+    * @param {object} valueObject - The Training or Expertise object.
+    * @param {number} mod - Modifier for the total value or expertise.
     */
    function getTotalValueTooltip(valueObject, mod) {
       // Base value label

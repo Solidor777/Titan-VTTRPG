@@ -1,3 +1,6 @@
+/**
+ * @param node
+ */
 export default function autoScroll(node) {
    setTimeout(() => {
       const chatMessage = node.parentNode;

@@ -7,6 +7,9 @@
    export let standardAspects = void 0;
    export let customAspects = void 0;
 
+   /**
+    * @param aspect
+    */
    function getAspectSize(aspect) {
       let size = 0;
 

@@ -1,6 +1,9 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ *
+ */
 export default function createCommoditySheetState() {
    const { set, update, subscribe } = writable({
       activeTab: 'description',
@@ -22,6 +25,9 @@ export default function createCommoditySheetState() {
       }
    });
 
+   /**
+    *
+    */
    function addCheck() {
       update((state) => {
          state.isExpanded.checks.push(true);
@@ -30,6 +36,9 @@ export default function createCommoditySheetState() {
       });
    }
 
+   /**
+    * @param idx
+    */
    function removeCheck(idx) {
       update((state) => {
          state.isExpanded.checks.splice(idx, 1);

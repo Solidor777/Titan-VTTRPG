@@ -33,6 +33,9 @@
       }
    });
 
+   /**
+    *
+    */
    function applyTraitEdits() {
       // If the document and traits are still valid
       if (document && documentTraits) {

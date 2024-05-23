@@ -1,10 +1,10 @@
 import getPlayerOwners from '~/helpers/utility-functions/GetPlayerOwners.js';
 
 /**
- * Gets the first player owner of the document, prioritizing active players.
- * @param   {Document}  document The document to find the owner for.
- * @returns {User|boolean}       The user first, best, non-gm user who owns the document,
- *                               or false if there are none.
+ * Gets the best Player user who owns of the document, prioritizing active players.
+ * @param {Document} document - The document to find the owner for.
+ * @returns {User|boolean} The user first, best, non-gm user who owns the document,
+ * or false if there are none.
  */
 export default function getBestPlayerOwner(document) {
 
@@ -22,15 +22,15 @@ export default function getBestPlayerOwner(document) {
             // If there are multiple active player owners
             if (activeOwners.length > 1) {
 
-               // Check if the current user is an owner
-               if (document.isOwner) {
-                  return game.user;
-               }
-
-               // Otherwise, check if one of the players has this document set to their character
+               // Check if one of the players has this document set to their character
                const mainCharacterPlayers = activeOwners.filter((owner) => owner.character._id === document._id);
                if (mainCharacterPlayers.length > 0) {
                   return mainCharacterPlayers[0];
+               }
+
+               // Check if the current user is an owner
+               if (document.isOwner) {
+                  return game.user;
                }
             }
 

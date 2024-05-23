@@ -57,10 +57,10 @@ export default class NPCDataModel extends CharacterDataModel {
 
    /**
     * Applies Damage to the Character.
-    * Override for handling Minions dying in 1 hit and overkill damage;
-    * @param {number}         damage         Amount of Damage to apply.
-    * @param {DamageOptions?} options        Options for applying the Damage.
-    * @returns {Promise<DamageReport|void>}  Results of applying the Damage.
+    * Override for handling Minions dying in 1 hit and overkill damage;.
+    * @param {number} damage - Amount of Damage to apply.
+    * @param {DamageOptions?} options - Options for applying the Damage.
+    * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
       // If we are a minion and not already dead

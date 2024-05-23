@@ -14,6 +14,13 @@
    const document = getContext('document');
 
    // Calculate the tooltip for the max value
+   /**
+    * @param baseValue
+    * @param equipment
+    * @param effect
+    * @param ability
+    * @param staticMod
+    */
    function getTotalValueTooltip(
       baseValue,
       equipment,

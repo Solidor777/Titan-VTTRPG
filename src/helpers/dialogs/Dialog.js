@@ -9,7 +9,7 @@ export default class TitanDialog extends TJSDialog {
 
    /**
     * Creates a dialog window for setting the Options of a Check.
-    * @param {object}   options  Options for the dialog window.
+    * @param {object} options - Options for the dialog window.
     */
    constructor(options) {
 
@@ -21,9 +21,8 @@ export default class TitanDialog extends TJSDialog {
    }
 
    /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
+    * Default Application options.
+    * @returns {object} Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {
@@ -36,7 +35,7 @@ export default class TitanDialog extends TJSDialog {
 
    /**
     * Gets the classes to add to this dialog.
-    * @returns {string[]}  List of classes to add to this dialog.
+    * @returns {string[]} List of classes to add to this dialog.
     * @protected
     */
    _getDialogClasses() {

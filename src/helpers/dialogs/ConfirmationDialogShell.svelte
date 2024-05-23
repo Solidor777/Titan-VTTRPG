@@ -18,7 +18,7 @@
    const application = getApplication();
 
    /**
-    * Called when confirmation button clicked. /*
+    * Called when confirmation button clicked. /*.
     */
    function onConfirmed() {
       application.confirmationCallback();

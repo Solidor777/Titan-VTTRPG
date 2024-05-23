@@ -66,7 +66,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Creates a dialog for editing the Standard Traits of an Attack.
-    * @param {number} attackIdx The Idx of the Attack in the Attacks array.
+    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
     */
    editAttackTraits(attackIdx) {
       if (this.parent.isOwner) {
@@ -77,7 +77,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Creates a dialog for adding a new Custom Trait to an Attack.
-    * @param {number} attackIdx The Idx of the Attack in the Attacks array.
+    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
     */
    addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
@@ -88,8 +88,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Creates a dialog for editing an Attack's existing Custom Trait.
-    * @param {number} attackIdx  The Idx of the Attack in the Attacks array.
-    * @param {number} traitIdx   The Idx of the Custom Trait in the Attack's Custom Traits array.
+    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
+    * @param {number} traitIdx - The Idx of the Custom Trait in the Attack's Custom Traits array.
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
@@ -100,8 +100,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Removes a Custom Trait from an Attack.
-    * @param {number} attackIdx  The Idx of the Attack in the Attacks array.
-    * @param {number} traitIdx   The Idx of the Custom Trait in the Attack's Custom Traits array.
+    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
+    * @param {number} traitIdx - The Idx of the Custom Trait in the Attack's Custom Traits array.
     */
    async deleteCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
@@ -138,7 +138,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Removes a Check from this item.
-    * @param {number} idx The Idx of the Check in this item's Checks array.
+    * @param {number} idx - The Idx of the Check in this item's Checks array.
     * @returns {Promise<void>}
     */
    async removeAttack(idx) {

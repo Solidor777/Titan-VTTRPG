@@ -49,6 +49,9 @@
    const document = getContext('document');
 
    // Selector for the chat message type
+   /**
+    *
+    */
    function selectComponent() {
       if (game.user.isGM || !$document.blind) {
          const chatComponents = {

@@ -1,7 +1,7 @@
 /**
  * Recursively freezes all properties of an object or array, so that they can no longer be changes.
- * @param   {object|[]}   data   The object or array to freeze.
- * @returns {object|[]}          The frozen object or array.
+ * @param {object|[]} data - The object or array to freeze.
+ * @returns {object|[]} The frozen object or array.
  */
 export default function deepFreeze(data) {
    // If array, freeze every entry

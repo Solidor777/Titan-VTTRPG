@@ -3,8 +3,8 @@ import calculateAttributeCheckResults from '~/check/types/attribute-check/Attrib
 
 /**
  * Class for creating and calculating the result of an Attribute Check.
+ * @param {AttributeCheckParameters} parameters - Parameters for the Check.
  * @augments TitanCheck
- * @param   {AttributeCheckParameters} parameters  Parameters for the Check.
  */
 export default class AttributeCheck extends TitanCheck {
    /**
@@ -13,9 +13,9 @@ export default class AttributeCheck extends TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttributeCheckResults}.
-    * @param   {CheckDiceResults}         diceResults The sorted dice rolled for the check, after Expertise is applied.
-    * @param   {AttributeCheckParameters} parameters  The parameters of the check.
-    * @returns {AttributeCheckResults}                The final results of the check.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+    * @param {AttributeCheckParameters} parameters - The parameters of the check.
+    * @returns {AttributeCheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults, parameters) {

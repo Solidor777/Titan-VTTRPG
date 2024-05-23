@@ -3,6 +3,10 @@ import onRegenerateDocumentUUID from '~/helpers/utility-functions/OnRegenerateDo
 import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.js';
 import { ID_ICON } from '~/system/Icons.js';
 
+/**
+ * @param html
+ * @param options
+ */
 export default function onGetItemDirectoryEntryContext(html, options) {
 
    // Regenerate UUID
@@ -22,10 +26,16 @@ export default function onGetItemDirectoryEntryContext(html, options) {
    });
 }
 
+/**
+ * @param li
+ */
 function getItem(li) {
    return game.items.get(li.data('document-id'));
 }
 
+/**
+ * @param li
+ */
 function isItemOwner(li) {
    return getItem(li)?.isOwner;
 }

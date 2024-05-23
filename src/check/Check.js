@@ -3,48 +3,48 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Options for a check in the Titan system.
  * @typedef {object} CheckOptions
- * @property {boolean?} doubleExpertise         Whether to double the Expertise to apply..
- * @property {boolean?} extraFailureOnCritical  Whether a roll of 1 equals a negative success.
- * @property {boolean?} extraSuccessOnCritical  Whether a roll of 6 equals an extra success.
- * @property {number?}  complexity              The minimum number of Successes needed.
- * @property {number?}  diceMod                 Modifier for the number of Dice being rolled.
- * @property {number?}  difficulty              The minimum roll on a die to achieve a Success.
- * @property {number?}  expertiseMod            Modifier for the amount of Expertise to be applied.
+ * @property {boolean?} doubleExpertise Whether to double the Expertise to apply..
+ * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
+ * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
+ * @property {number?} complexity The minimum number of Successes needed.
+ * @property {number?} diceMod Modifier for the number of Dice being rolled.
+ * @property {number?} difficulty The minimum roll on a die to achieve a Success.
+ * @property {number?} expertiseMod Modifier for the amount of Expertise to be applied.
  */
 
 /**
  * Base parameters of a check in the Titan system.
  * @typedef {object} CheckParameters
- * @property   {boolean}   doubleExpertise         Whether to double the Expertise to apply..
- * @property   {boolean}   extraFailureOnCritical  Whether a roll of 1 equals a negative success.
- * @property   {boolean}   extraSuccessOnCritical  Whether a roll of 6 equals an extra success.
- * @property   {number}    complexity              The minimum number of Successes needed.
- * @property   {number}    diceMod                 Modifier for the number of Dice being rolled.
- * @property   {number}    difficulty              The minimum roll on a die to achieve a Success.
- * @property   {number}    expertiseMod            Modifier for the amount of Expertise to be applied.
- * @property   {number}    totalDice               The total number of dice to be rolled.
- * @property   {number}    totalExpertise          The total amount of expertise to apply.
+ * @property {boolean} doubleExpertise Whether to double the Expertise to apply..
+ * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
+ * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
+ * @property {number} complexity The minimum number of Successes needed.
+ * @property {number} diceMod Modifier for the number of Dice being rolled.
+ * @property {number} difficulty The minimum roll on a die to achieve a Success.
+ * @property {number} expertiseMod Modifier for the amount of Expertise to be applied.
+ * @property {number} totalDice The total number of dice to be rolled.
+ * @property {number} totalExpertise The total amount of expertise to apply.
  */
 
 /**
  * A check die that has been processed by applying expertise.
  * @typedef {object} CheckDie
- * @property   {number}    base              The base number that was rolled on the dice.
- * @property   {number}    expertiseApplied  The amount of expertise that was applied to the die.
- * @property   {number}    final             The final number after applying expertise to the base result.
+ * @property {number} base The base number that was rolled on the dice.
+ * @property {number} expertiseApplied The amount of expertise that was applied to the die.
+ * @property {number} final The final number after applying expertise to the base result.
  */
 
 /**
  * The sorted dice rolled for the check, after Expertise is applied.
  * @typedef {object} CheckDiceResults
- * @property   {CheckDie[]}   dice                 Array of dice objects that has been processed by applying expertise.
- * @property   {number}       expertiseRemaining   The Expertise remaining after being applied to the dice.
+ * @property {CheckDie[]} dice Array of dice objects that has been processed by applying expertise.
+ * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
  */
 
 
 /**
  * Base class for a creating and evaluating check in the Titan system.
- * @param   {CheckParameters} parameters  Parameters for the Check.
+ * @param {CheckParameters} parameters - Parameters for the Check.
  */
 export default class TitanCheck {
    constructor(parameters = {}) {
@@ -76,8 +76,8 @@ export default class TitanCheck {
 
    /**
     * Gets the base number results of a roll, sorted from largest to smallest.
-    * @param   {Roll}      roll  The evaluated roll to check.
-    * @returns {number[]}        Array of roll results, sorted from largest to smallest.
+    * @param {Roll} roll - The evaluated roll to check.
+    * @returns {number[]} Array of roll results, sorted from largest to smallest.
     * @protected
     */
    _getSortedDiceFromRoll(roll) {
@@ -87,9 +87,9 @@ export default class TitanCheck {
 
    /**
     * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
-    * @param   {number[]}           sortedDice  Results of the dice roll, sorted from largest to smallest.
-    * @returns {CheckDiceResults}               The dice results after Expertise is applied,
-    *                                           along with the expertise remaining.
+    * @param {number[]} sortedDice - Results of the dice roll, sorted from largest to smallest.
+    * @returns {CheckDiceResults} The dice results after Expertise is applied,
+    * along with the expertise remaining.
     * @protected
     */
    _applyExpertise(sortedDice) {
@@ -186,9 +186,9 @@ export default class TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCheckResults}.
-    * @param   {CheckDiceResults}   diceResults The sorted dice rolled for the check, after Expertise is applied.
-    * @param   {CheckParameters}    parameters  The parameters of the check.
-    * @returns {CheckResults}                   The final results of the check.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+    * @param {CheckParameters} parameters - The parameters of the check.
+    * @returns {CheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults, parameters) {
@@ -198,10 +198,10 @@ export default class TitanCheck {
    /**
     * Sends the results of the check to chat.
     * Waits for the check to evaluate if it has not already been evaluated.
-    * @param {object?}     options           Options for the chat message.
-    * @param {string[]?}   options.message   Messages to attach to the check.
-    * @param {object?}     options.speaker   The speaker for the chat message.
-    * @returns {Promise<ChatMessage>}  The newly created Chat Message.
+    * @param {object?} options - Options for the chat message.
+    * @param {string[]?} options.message - Messages to attach to the check.
+    * @param {object?} options.speaker - The speaker for the chat message.
+    * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat(options) {
       // Ensure the check is evaluated

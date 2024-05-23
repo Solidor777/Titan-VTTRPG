@@ -11,6 +11,9 @@
    export let disabled = false;
 
    // Updates the document data when the input changes
+   /**
+    *
+    */
    async function updateDocument() {
       if ($document?.isOwner) {
          await $document.update({

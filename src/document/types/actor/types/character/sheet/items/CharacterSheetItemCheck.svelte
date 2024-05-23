@@ -54,6 +54,9 @@
    }
 
    // Rolls the item check
+   /**
+    *
+    */
    function rollItemCheck() {
       $document.system.requestItemCheck(checkOptions);
    }

@@ -4,23 +4,23 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 
 /**
  * Generic class for creating a confirmation dialog.
+ * @param {string} title - Dialog title.
+ * @param {string[]} headers - Header lines.
+ * @param {string} message - Message explaining the dialog.
+ * @param {string} confirmLabel - Label for the confirmation button.
+ * @param {Function} confirmationCallback - Callback function.
+ * @param {object?} confirmationContext - Optional context to bind for the callback function.
  * @augments TitanDialog
- * @param {string}         title                  Dialog title.
- * @param {string[]}       headers                Header lines.
- * @param {string}         message                Message explaining the dialog.
- * @param {string}         confirmLabel           Label for the confirmation button.
- * @param {Function}       confirmationCallback   Callback function.
- * @param {object?}        confirmationContext    Optional context to bind for the callback function.
  */
 export default class ConfirmationDialog extends TitanDialog {
    /**
     * Generic class for creating a confirmation dialog.
-    * @param {string}         title                  Dialog title.
-    * @param {string[]}       headers                Header lines.
-    * @param {string}         message                Message explaining the dialog.
-    * @param {string}         confirmLabel           Label for the confirmation button.
-    * @param {Function}       confirmationCallback   Callback function.
-    * @param {object?}        confirmationContext    Optional context to bind for the callback function.
+    * @param {string} title - Dialog title.
+    * @param {string[]} headers - Header lines.
+    * @param {string} message - Message explaining the dialog.
+    * @param {string} confirmLabel - Label for the confirmation button.
+    * @param {Function} confirmationCallback - Callback function.
+    * @param {object?} confirmationContext - Optional context to bind for the callback function.
     */
    constructor(
       title,

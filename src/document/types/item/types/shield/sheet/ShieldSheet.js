@@ -4,9 +4,8 @@ import ShieldSheetShell from '~/document/types/item/types/shield/sheet/ShieldShe
 
 export default class TitanShieldSheet extends TitanItemSheet {
    /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
+    * Default Application options.
+    * @returns {object} Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {

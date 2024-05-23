@@ -1,5 +1,10 @@
 import CreateItemMacroDialog from '~/document/types/item/dialog/CreateItemMacroDialog';
 
+/**
+ * @param bar
+ * @param data
+ * @param slot
+ */
 export default function onHotbarDrop(bar, data, slot) {
    // Ensure the object is an item
    if (data.type !== 'Item') {
@@ -71,6 +76,12 @@ export default function onHotbarDrop(bar, data, slot) {
    return false;
 }
 
+/**
+ * @param name
+ * @param img
+ * @param uuid
+ * @param slot
+ */
 async function createToggleDocumentSheetMacro(name, img, uuid, slot) {
    const macro = await game.titan.macros.getToggleDocumentSheetMacro(name, img, uuid);
    game.user.assignHotbarMacro(macro, slot);

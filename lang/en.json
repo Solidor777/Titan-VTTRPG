@@ -200,6 +200,7 @@
       "diplomacy.desc.label": "<strong>Diplomacy</strong> allows you to influence others through negotiation and flattery.",
       "diplomacy.label": "Diplomacy",
       "discipline.label": "Discipline",
+      "documentId.label": "Document ID",
       "doubleExpertise.label": "Double Expertise",
       "doubleExpertiseSpendResolve.label": "Double Expertise (Spend 1 Resolve)",
       "doubleTraining.label": "Double Training",

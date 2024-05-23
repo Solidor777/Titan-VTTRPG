@@ -4,9 +4,8 @@ import createSpellSheetState from '~/document/types/item/types/spell/sheet/Spell
 
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
+    * Default Application options.
+    * @returns {object} Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {

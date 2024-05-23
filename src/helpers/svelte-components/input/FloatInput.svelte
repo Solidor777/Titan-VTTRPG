@@ -5,6 +5,9 @@
    export let max = false;
    export let disabled = false;
 
+   /**
+    *
+    */
    function validateInput() {
       value = parseFloat(value);
       if (min !== false) {
@@ -15,6 +18,9 @@
       }
    }
 
+   /**
+    * @param event
+    */
    function checkInput(event) {
       // Only accept valid inputs
       if (!/[0-9\.,-]/.test(event.key)) {

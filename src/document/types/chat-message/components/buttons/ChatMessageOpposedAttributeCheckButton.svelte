@@ -1,5 +1,5 @@
 <script>
-   import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
+   import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharactersToUpdate.js";
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -9,8 +9,11 @@
    export let complexity = 1;
    export let damageToReduce = 0;
 
+   /**
+    *
+    */
    async function rollOpposedCheck() {
-      const targets = getBestUserTargets();
+      const targets = getBestCharactersToUpdate();
       for (const target of targets) {
          target.system.requestAttributeCheck(
             {

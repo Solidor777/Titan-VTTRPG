@@ -1,3 +1,8 @@
+/**
+ * @param currentCombatant
+ * @param previousCombatant
+ * @param combat
+ */
 export default async function onCombatNextTurn(currentCombatant, previousCombatant, combat) {
    if (currentCombatant && previousCombatant && combat) {
       // Handle Initiative based effects

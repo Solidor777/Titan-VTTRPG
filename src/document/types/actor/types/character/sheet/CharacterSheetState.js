@@ -1,6 +1,9 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ *
+ */
 export default function createCharacterSheetState() {
    const { set, update, subscribe } = writable({
       scrollTop: {
@@ -34,6 +37,9 @@ export default function createCharacterSheetState() {
    });
 
    // Remove an item
+   /**
+    * @param id
+    */
    function deleteItem(id) {
       update((state) => {
          if (state.isExpanded.actions[id]) {

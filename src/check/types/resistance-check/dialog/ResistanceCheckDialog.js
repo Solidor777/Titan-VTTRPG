@@ -6,21 +6,21 @@ import CheckDialogShell from '~/check/dialog/CheckDialogShell.svelte';
 import ResistanceCheckDialogShell from '~/check/types/resistance-check/dialog/ResistanceCheckDialogShell.svelte';
 
 /**
+ * @param {ResistanceCheckOptions} checkOptions - The initial options for the check to be adjusted.
+ * @param {ResistanceCheckParameters} checkParameters - The initial parameters for the check,
+ * calculated from the options.
+ * @param {TitanActor} actor - The Actor that will roll the check.
  * @augments TitanDialog
  * Creates a dialog window for setting the Options of a Resistance Check.
- * @param {ResistanceCheckOptions}     checkOptions     The initial options for the check to be adjusted.
- * @param {ResistanceCheckParameters}  checkParameters  The initial parameters for the check,
- *                                                      calculated from the options.
- * @param {TitanActor}                 actor            The Actor that will roll the check.
  */
 export default class ResistanceCheckDialog extends TitanDialog {
 
    /**
     * Creates a dialog window for setting the Options of a Resistance Check.
-    * @param {ResistanceCheckOptions}     checkOptions     The initial options for the check to be adjusted.
-    * @param {ResistanceCheckParameters}  checkParameters  The initial parameters for the check,
-    *                                                      calculated from the options.
-    * @param {TitanActor}                 actor            The Actor that will roll the check.
+    * @param {ResistanceCheckOptions} checkOptions - The initial options for the check to be adjusted.
+    * @param {ResistanceCheckParameters} checkParameters - The initial parameters for the check,
+    * calculated from the options.
+    * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
       super(

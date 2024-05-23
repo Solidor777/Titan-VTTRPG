@@ -5,6 +5,10 @@ const allowHTML = true;
 const delay = [1000, 250];
 const duration = [400, 250];
 
+/**
+ * @param node
+ * @param params
+ */
 export default function tooltip(node, params) {
    let tippyTooltip = params?.content ? initializeTippy(node, params) : false;
 
@@ -36,6 +40,10 @@ export default function tooltip(node, params) {
    };
 }
 
+/**
+ * @param node
+ * @param params
+ */
 function initializeTippy(node, params) {
    const content = params.content;
    return tippy(node, { content, allowHTML, duration, delay });

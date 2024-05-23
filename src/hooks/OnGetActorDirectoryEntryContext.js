@@ -3,6 +3,10 @@ import onRegenerateDocumentUUID from '~/helpers/utility-functions/OnRegenerateDo
 import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.js';
 import { ID_ICON } from '~/system/Icons.js';
 
+/**
+ * @param html
+ * @param options
+ */
 export default function onGetActorDirectoryEntryContext(html, options) {
 
    // Regenerate UUID
@@ -22,10 +26,16 @@ export default function onGetActorDirectoryEntryContext(html, options) {
    });
 }
 
+/**
+ * @param li
+ */
 function getActorFromDirectoryEntry(li) {
    return game.actors.get(li.data('document-id'));
 }
 
+/**
+ * @param li
+ */
 function isActorOwner(li) {
    return getActorFromDirectoryEntry(li)?.isOwner;
 }

@@ -4,9 +4,8 @@ import createCommoditySheetState from '~/document/types/item/types/commodity/she
 
 export default class TitanCommoditySheet extends TitanItemSheet {
    /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
+    * Default Application options.
+    * @returns {object} Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {

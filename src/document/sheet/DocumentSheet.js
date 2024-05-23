@@ -12,8 +12,8 @@ import { SETTINGS_ICON } from '~/system/Icons.js';
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
     * Constructs a replacement Document Sheet to that supports svelte components.
-    * @param {Document} document The document this sheet is for.
-    * @param {object}   options  Options object.
+    * @param {Document} document - The document this sheet is for.
+    * @param {object} options - Options object.
     */
    constructor(document, options = {}) {
       // Initialize options objects
@@ -53,9 +53,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
+    * Default Application options.
+    * @returns {object} Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {
@@ -74,8 +73,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for getting the sheet application ID.
-    * @param {Document} document The document this sheet is fore.
-    * @returns {string}          The application ID to use for this sheet.
+    * @param {Document} document - The document this sheet is fore.
+    * @returns {string} The application ID to use for this sheet.
     * @protected
     */
    _getSheetID(document) {
@@ -84,7 +83,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for getting the sheet classes.
-    * @returns {string[]}  Array of classes to add to the sheet.
+    * @returns {string[]} Array of classes to add to the sheet.
     * @protected
     */
    _getSheetClasses() {
@@ -100,8 +99,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for creating the reactive document store for this sheet.
-    * @param {Document} document The document being stored.
-    * @param {object} options    Options for the reactive document store.
+    * @param {Document} document - The document being stored.
+    * @param {object} options - Options for the reactive document store.
     * @returns {TJSDocument<Document>} The newly created document store.
     * @protected
     */
@@ -111,7 +110,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @param {object} options    Options for the reactive state store.
+    * @param {object} options - Options for the reactive state store.
     * @returns {Writable<*>} The newly created state store.
     * @protected
     */
@@ -121,7 +120,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for creating the header buttons for this sheet.
-    * @returns {ApplicationHeaderButton[]}  Array of button objects.
+    * @returns {ApplicationHeaderButton[]} Array of button objects.
     * @protected
     */
    _getHeaderButtons() {
@@ -142,7 +141,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Getter function for the document this sheet is for.
-    * @returns {Document}  The document this sheet is for.
+    * @returns {Document} The document this sheet is for.
     */
    get object() {
       return this.document;
@@ -150,8 +149,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Creates a dialog for configuring the sheet.
-    * @param {object}   event Event from clicking the buttons.
-    * @returns {Application}  The newly created Document Sheet Config dialog.
+    * @param {object} event - Event from clicking the buttons.
+    * @returns {Application} The newly created Document Sheet Config dialog.
     * @protected
     */
    _onConfigureSheet(event) {
@@ -176,8 +175,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Closes the sheet and unsubscribes from changes to the reactive stores.
-    * @param {object} [options={}] Options which affect how the Application is closed
-    * @returns {Promise<void>}     A Promise which resolves once the application is closed
+    * @param {object} [options] - Options which affect how the Application is closed.
+    * @returns {Promise<void>} A Promise which resolves once the application is closed.
     */
    async close(options = {}) {
       // Unsubscribe from the document if still subscribed
@@ -192,8 +191,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Called internally by the subscription to the document store to update this sheet when appropriate.
-    * @param {Document} document    The document that was updated.
-    * @param {object}   options     the document update options and action.
+    * @param {Document} document - The document that was updated.
+    * @param {object} options - The document update options and action.
     * @returns {Promise<void>}
     * @protected
     */
@@ -209,9 +208,9 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Called to render the sheet.
-    * Subscribes to the document store if appropriate
-    * @param {boolean}  force Whether to force the sheet to render.
-    * @param {object}   options  Options for rendering the sheet.
+    * Subscribes to the document store if appropriate.
+    * @param {boolean} force - Whether to force the sheet to render.
+    * @param {object} options - Options for rendering the sheet.
     * @returns {TitanDocumentSheet} This sheet after rendering.
     */
    render(force = false, options = {}) {
@@ -228,7 +227,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
    /**
     * Returns whether this application is currently editable.
     * True is editable in the options, the user is the document owner, and the document is not in a locked pack.
-    * @returns {boolean}   Whether the document is editable.
+    * @returns {boolean} Whether the document is editable.
     * @protected
     */
    get isEditable() {
@@ -247,9 +246,9 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Define whether a user is able to begin a dragstart workflow for a given drag selector
-    * @param {string} selector       The candidate HTML selector for dragging
-    * @returns {boolean}             Can the current user drag this selector?
+    * Define whether a user is able to begin a dragstart workflow for a given drag selector.
+    * @param {string} selector - The candidate HTML selector for dragging.
+    * @returns {boolean} Can the current user drag this selector?
     * @protected
     */
    _canDragStart(selector) {
@@ -257,9 +256,9 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
-    * @param {string} selector       The candidate HTML selector for the drop target
-    * @returns {boolean}             Can the current user drop on this selector?
+    * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector.
+    * @param {string} selector - The candidate HTML selector for the drop target.
+    * @returns {boolean} Can the current user drop on this selector?
     * @protected
     */
    _canDragDrop(selector) {

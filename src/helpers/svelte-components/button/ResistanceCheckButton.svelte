@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import getBestUserTargets from "~/helpers/utility-functions/GetBestUserTargets.js";
+   import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharactersToUpdate.js";
 
    /** @type string The Resistance to roll. */
    export let resistance = void 0;
@@ -18,8 +18,11 @@
    /** @type boolean The Complexity of the Check. */
    export let disabled = false;
 
+   /**
+    *
+    */
    async function requestResistanceCheck() {
-      const userTargets = getBestUserTargets();
+      const userTargets = getBestCharactersToUpdate();
 
       // For each target
       for (const target of userTargets) {

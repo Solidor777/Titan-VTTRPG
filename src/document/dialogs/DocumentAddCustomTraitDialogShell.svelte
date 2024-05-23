@@ -16,6 +16,9 @@
 
    const newTrait = createCustomItemTraitTemplate();
 
+   /**
+    *
+    */
    function addTrait() {
       const customTrait = document.system.customTrait;
 

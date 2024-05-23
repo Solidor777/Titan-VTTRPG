@@ -5,10 +5,10 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Extends the base Item class to implement additional system-specific logic.
+ * @param {object} data - The initial data object provided to the document creation request.
+ * @param {object} options - Additional options which modify the creation request.
+ * @param {documents.BaseUser} user - The User requesting the document creation.
  * @augments {Item}
- * @param {object}               data     The initial data object provided to the document creation request.
- * @param {object}               options  Additional options which modify the creation request.
- * @param {documents.BaseUser}   user     The User requesting the document creation.
  */
 export default class TitanItem extends Item {
 
@@ -22,10 +22,10 @@ export default class TitanItem extends Item {
 
    /**
     * Performs initialization logic before document creation.
-    * @param {object}               data     The initial data object provided to the document creation request.
-    * @param {object}               options  Additional options which modify the creation request.
-    * @param {documents.BaseUser}   user     The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
+    * @param {documents.BaseUser} user - The User requesting the document creation.
+    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
     * @private
     */
    async _preCreate(data, options, user) {
@@ -57,9 +57,9 @@ export default class TitanItem extends Item {
 
    /**
     * Performs initialization logic after document creation.
-    * @param {object}               data     The initial data object provided to the document creation request.
-    * @param {object}               options  Additional options which modify the creation request.
-    * @param {documents.BaseUser}   user     The User requesting the document creation.
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
+    * @param {documents.BaseUser} user - The User requesting the document creation.
     * @private
     */
    _onCreate(data, options, user) {
@@ -89,7 +89,7 @@ export default class TitanItem extends Item {
 
    /**
     * Creates a Chat Message containing this item's data and sends it to chat.
-    * @returns {Promise<ChatMessage>}  The newly created Chat Message.
+    * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat() {
       // Create the context object
@@ -156,7 +156,7 @@ export default class TitanItem extends Item {
 
    /**
     * Removes a Check from this item.
-    * @param {number} idx The Idx of the Check in this item's Checks array.
+    * @param {number} idx - The Idx of the Check in this item's Checks array.
     * @returns {Promise<void>}
     */
    async removeCheck(idx) {
@@ -189,7 +189,7 @@ export default class TitanItem extends Item {
 
    /**
     * Creates a dialog for editing an existing Custom Trait belonging to this item.
-    * @param {number} traitIdx   The Idx of the Custom Trait in this item's Custom Traits array.
+    * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
     */
    editCustomTrait(traitIdx) {
       if (this.isOwner) {
@@ -200,7 +200,7 @@ export default class TitanItem extends Item {
 
    /**
     * Removes a Custom Trait from this item.
-    * @param {number} traitIdx   The Idx of the Custom Trait in this item's Custom Traits array.
+    * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
     */
    async deleteCustomTrait(traitIdx) {
       if (this.isOwner) {

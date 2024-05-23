@@ -1,6 +1,9 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ *
+ */
 export default function createShieldSheetState() {
    const { set, update, subscribe } = writable({
       activeTab: 'description',
@@ -23,6 +26,9 @@ export default function createShieldSheetState() {
       }
    });
 
+   /**
+    *
+    */
    function addCheck() {
       update((state) => {
          state.isExpanded.checks.push(true);
@@ -31,6 +37,9 @@ export default function createShieldSheetState() {
       });
    }
 
+   /**
+    * @param idx
+    */
    function removeCheck(idx) {
       update((state) => {
          state.isExpanded.checks.splice(idx, 1);

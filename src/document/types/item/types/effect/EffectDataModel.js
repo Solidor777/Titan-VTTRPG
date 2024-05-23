@@ -18,7 +18,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     * Returns whether this Effect's duration has expired.
     * Permanent Effects never expire.
     * Non-permanent Effects expire when their Turns Remaining is 0.
-    * @returns {boolean}   this Effect's duration has expired.
+    * @returns {boolean} This Effect's duration has expired.
     */
    get isExpired() {
       return this.duration.type !== 'permanent' && this.duration.remaining <= 0;
@@ -28,7 +28,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     * Returns whether this Effect item is currently Active.
     * Permanent Effects can be toggled Active and Inactive.
     * Non-permanent Effects are always Active.
-    * @returns {boolean}   Whether this Effect item is currently Active.
+    * @returns {boolean} Whether this Effect item is currently Active.
     */
    get isActive() {
       return this.active || this.duration.type !== 'permanent';
@@ -38,7 +38,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     * Returns whether Effect item is a Combat Effect.
     * Permanent Effects and effects with a custom Duration are considered non-Combat Effects.
     * Effects with a duration measured in turns are considered Combat Effects.
-    * @returns {boolean}   Whether this Effect item is a Combat Effect.
+    * @returns {boolean} Whether this Effect item is a Combat Effect.
     */
    get isCombatEffect() {
       return this.duration.type !== 'permanent' && this.duration.type !== 'custom';
@@ -46,7 +46,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
 
    /**
     * Gets the parent documents's Action Queue object.
-    * @returns {ActionQueue}  The parent actor's Action Queue.
+    * @returns {ActionQueue} The parent actor's Action Queue.
     */
    get actionQueue() {
       return this.parent.actionQueue;
@@ -209,9 +209,8 @@ export default class EffectDataModel extends RulesElementItemDataModel {
             // Update the label
             const label = this.isExpired ?
                `${this.parent.name} (${localize('expired')})` :
-               this.parent.name
-            ;
-            if (effect.name !== label) {
+               this.parent.name;
+if (effect.name !== label) {
                shouldUpdateEffect = true;
                updateData.label = label;
             }

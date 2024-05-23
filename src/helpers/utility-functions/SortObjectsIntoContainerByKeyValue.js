@@ -1,10 +1,10 @@
 /**
  * Returns an object with arrays of the inputted objects,
  * mapped by the value of a respective key shared by each object.
- * @param {object[]} objects   The objects being sorted.
- * @param {string} key       The key of the object to compare their values against.
- * @returns {object}         Object holding arrays the inputted objects,
- *                           sorted by the value of their inputted key.
+ * @param {object[]} objects - The objects being sorted.
+ * @param {string} key - The key of the object to compare their values against.
+ * @returns {object} Object holding arrays the inputted objects,
+ * sorted by the value of their inputted key.
  */
 export default function sortObjectsIntoContainerByKeyValue(objects, key) {
    // Create retval object

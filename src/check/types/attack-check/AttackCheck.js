@@ -3,17 +3,17 @@ import calculateAttackCheckResults from '~/check/types/attack-check/AttackCheckR
 
 /**
  * Class for creating and calculating the result of an Attack Check.
+ * @param {AttackCheckParameters} parameters - Parameters for the Check.
  * @augments TitanCheck
- * @param   {AttackCheckParameters} parameters  Parameters for the Check.
  */
 export default class AttackCheck extends TitanCheck {
    /**
     * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
     * Makes a call to the parent function, but has some additional functionality for spending expertise to
     * maximize the benefits of attack traits.
-    * @param   {number[]}           sortedDice  Results of the dice roll, sorted from largest to smallest.
-    * @returns {CheckDiceResults}               The dice results after Expertise is applied,
-    *                                           along with the expertise remaining.
+    * @param {number[]} sortedDice - Results of the dice roll, sorted from largest to smallest.
+    * @returns {CheckDiceResults} The dice results after Expertise is applied,
+    * along with the expertise remaining.
     * @protected
     */
 
@@ -61,9 +61,9 @@ export default class AttackCheck extends TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttackCheckResults}.
-    * @param   {CheckDiceResults}      diceResults The sorted dice rolled for the check, after Expertise is applied.
-    * @param   {AttackCheckParameters} parameters  The parameters of the check.
-    * @returns {AttackCheckResults}                The final results of the check.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+    * @param {AttackCheckParameters} parameters - The parameters of the check.
+    * @returns {AttackCheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults, parameters) {

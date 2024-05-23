@@ -36,6 +36,9 @@
    $: attack = $document.system.attack[idx];
    $: isExpanded = $appState.isExpanded.attacks[idx];
 
+   /**
+    *
+    */
    async function updateAttackSkill() {
       if ($document?.isOwner && attack) {
          if (attack.type === 'melee') {

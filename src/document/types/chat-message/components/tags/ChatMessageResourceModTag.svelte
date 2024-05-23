@@ -16,6 +16,9 @@
    export let styleClass = void 0;
 
    // Calculate the tooltip for the resource mod
+   /**
+    *
+    */
    function getTooltip() {
       // Base label
       let retVal = `<p>${localize(`${key}.desc`)}</p>`;

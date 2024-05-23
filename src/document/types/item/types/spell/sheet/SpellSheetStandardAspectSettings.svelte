@@ -16,10 +16,16 @@
    const document = getContext('document');
 
    // Determines whether an aspect should have a details div
+   /**
+    *
+    */
    function hasDetails() {
       return aspectOptions.settings || aspectOptions.template.resistanceCheck;
    }
 
+   /**
+    * @param idx
+    */
    function toggleAspect(idx) {
       if ($document?.isOwner) {
          // If disabled, add the aspect

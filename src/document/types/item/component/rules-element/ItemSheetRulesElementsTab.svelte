@@ -63,6 +63,9 @@
       },
    ];
 
+   /**
+    * @param operation
+    */
    function selectComponent(operation) {
       switch (operation) {
          case 'flatModifier': {

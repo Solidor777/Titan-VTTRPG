@@ -4,6 +4,10 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
 
+/**
+ * @param html
+ * @param options
+ */
 export default function onGetChatLogEntryContext(html, options) {
    // Get the settings for ato spending resolve
    const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
@@ -75,6 +79,9 @@ export default function onGetChatLogEntryContext(html, options) {
    options.push(...doubleTrainingOptions);
 }
 
+/**
+ * @param li
+ */
 function getChatContext(li) {
    // Get the message from the list item
    const message = game.messages.get(li.data('messageId'));
@@ -92,6 +99,9 @@ function getChatContext(li) {
    return false;
 }
 
+/**
+ * @param li
+ */
 function canReRollFailures(li) {
    // Get chat contextt
    const chatContext = getChatContext(li);
@@ -115,6 +125,9 @@ function canReRollFailures(li) {
    return false;
 }
 
+/**
+ * @param li
+ */
 function canDoubleExpertise(li) {
    // Get chat context
    const chatContext = getChatContext(li);
@@ -129,6 +142,9 @@ function canDoubleExpertise(li) {
    return false;
 }
 
+/**
+ * @param li
+ */
 function canDoubleTraining(li) {
    // Get chat context
    const chatContext = getChatContext(li);
@@ -143,6 +159,10 @@ function canDoubleTraining(li) {
    return false;
 }
 
+/**
+ * @param li
+ * @param spendResolve
+ */
 async function reRollCheckFailures(li, spendResolve) {
    // Get the successes and failure count
    const message = game.messages.get(li.data('messageId'));
@@ -201,6 +221,10 @@ async function reRollCheckFailures(li, spendResolve) {
    }
 }
 
+/**
+ * @param li
+ * @param spendResolve
+ */
 async function doubleExpertise(li, spendResolve) {
    // If expertise is not already doubled
    const message = game.messages.get(li.data('messageId'));
@@ -229,6 +253,10 @@ async function doubleExpertise(li, spendResolve) {
    }
 }
 
+/**
+ * @param li
+ * @param spendResolve
+ */
 async function doubleTraining(li, spendResolve) {
    // If expertise is not already doubled
    const message = game.messages.get(li.data('messageId'));
@@ -270,6 +298,9 @@ async function doubleTraining(li, spendResolve) {
    }
 }
 
+/**
+ * @param chatMessageType
+ */
 function isCheck(chatMessageType) {
    switch (chatMessageType) {
       case 'attackCheck':

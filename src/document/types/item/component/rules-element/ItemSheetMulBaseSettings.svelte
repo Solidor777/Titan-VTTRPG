@@ -56,6 +56,9 @@
    ];
 
    // Updates the key when the selector changes
+   /**
+    *
+    */
    function onSelectorChange() {
       if ($document?.isOwner) {
          switch (element.selector) {
@@ -100,6 +103,9 @@
       }
    }
 
+   /**
+    *
+    */
    function getSelector() {
       switch (element.selector) {
          case 'attribute': {

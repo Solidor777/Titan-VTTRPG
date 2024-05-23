@@ -11,12 +11,18 @@
    const application = getApplication();
 
    // Rolls the check and closes the application
+   /**
+    *
+    */
    function onRoll() {
       dispatcher('roll', {});
       application.close();
    }
 
    // Cancels the check and closes the application
+   /**
+    *
+    */
    function onCancel() {
       application.close();
    }

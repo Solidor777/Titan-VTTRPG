@@ -28,7 +28,7 @@ import createItemCheckParameters from '~/check/types/item-check/ItemCheckParamet
 import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
 import createResistanceCheckParameters from '~/check/types/resistance-check/ResistanceCheckParameters.js';
 import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
-import getCombatTargets from '~/helpers/utility-functions/GetCombatTargets.js';
+import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import getOwners from '~/helpers/utility-functions/GetOwners.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
@@ -58,7 +58,7 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Gets the cached rulesElements on the parent actor,
     * sorted by their type.
-    * @returns {object}     The parent actor's Rules Elements cache
+    * @returns {object} The parent actor's Rules Elements cache.
     */
    get rulesElementsCache() {
       return this.parent.rulesElementsCache;
@@ -66,7 +66,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the parent document's Action Queue object.
-    * @returns {ActionQueue}     The parent actor's Action Queue.
+    * @returns {ActionQueue} The parent actor's Action Queue.
     */
    get actionQueue() {
       return this.parent.actionQueue;
@@ -76,7 +76,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Identifies this data model as a Character.
-    * @returns {boolean}   True
+    * @returns {boolean} True.
     */
    get isCharacter() {
       return true;
@@ -86,6 +86,9 @@ export default class CharacterDataModel extends ActorDataModel {
       const schema = super._defineDocumentSchema();
 
       // Gets a schema field formatted as a mod for a Character state (skills, attributes, resistances, etc.).
+      /**
+       *
+       */
       function getStatModSchema() {
          return createSchemaField({
             static: createIntegerField(0),
@@ -93,6 +96,9 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Gets a schema field formatted as a Character attribute (body, mind, or soul).
+      /**
+       * @param initial
+       */
       function getBaseStatSchema(initial) {
          return createSchemaField({
             baseValue: createIntegerField(initial),
@@ -101,6 +107,9 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Gets a schema field formatted as a Character resistance (reflexes, resilience, or willpower).
+      /**
+       *
+       */
       function getDerivedStatSchema() {
          return createSchemaField({
             mod: getStatModSchema(),
@@ -108,6 +117,9 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Gets a schema field formatted as a Character skill (athletics, perception, etc.).
+      /**
+       * @param defaultAttribute
+       */
       function getSkillSchema(defaultAttribute) {
          return createSchemaField({
             defaultAttribute: createStringField(defaultAttribute),
@@ -117,6 +129,9 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Gets a schema field formatted as a Character resource (stamina, resolve, or wounds).
+      /**
+       * @param initial
+       */
       function getResourceSchema(initial) {
          return createSchemaField({
             value: createIntegerField(initial),
@@ -228,8 +243,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets all the Effect items affecting this Character that have Expired.
-    * @returns {TitanItem[]|boolean}   Array of Expired Effect items affecting this character,
-    *                                  or false if there are none.
+    * @returns {TitanItem[]|boolean} Array of Expired Effect items affecting this character,
+    * or false if there are none.
     */
    getExpiredEffectItems() {
       const effects = this.parent.items.filter((item) => item.type === 'effect' && item.system.isExpired);
@@ -238,7 +253,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets all the Effect items affecting this character, sorted by their Duration type, and whether they have Expired.
-    * @returns {object|boolean}  Object containing the sorted Effect items, or False if there are non.
+    * @returns {object|boolean} Object containing the sorted Effect items, or False if there are non.
     */
    getSortedEffectItems() {
       const effects = this.parent.items.filter((item) => item.type === 'effect');
@@ -370,6 +385,9 @@ export default class CharacterDataModel extends ActorDataModel {
     * @private
     */
    _resetDynamicMods() {
+      /**
+       * @param mods
+       */
       function resetMods(mods) {
          mods.equipment = 0;
          mods.effect = 0;
@@ -424,6 +442,10 @@ export default class CharacterDataModel extends ActorDataModel {
          if (item.system.rulesElement && item.system.rulesElement.length > 0) {
 
             // Copies the elements from an item and sets their source type accordingly
+            /**
+             * @param item
+             * @param type
+             */
             function processItemElements(item, type) {
                const copiedElements = foundry.utils.deepClone(item.system.rulesElement);
                for (const element of copiedElements) {
@@ -546,7 +568,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Mul-Base Rules Elements to this Character.
-    * @param {MulBaseElement[]} elements    Array of Mul-Ease Rules Elements to apply.
+    * @param {MulBaseElement[]} elements - Array of Mul-Ease Rules Elements to apply.
     * @private
     */
    _applyMulBaseElements(elements) {
@@ -596,7 +618,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Flat Modifier Rules Elements to this Character.
-    * @param {FlatModifierElement[]} elements    Array of Flat Modifier Rules Elements to apply.
+    * @param {FlatModifierElement[]} elements - Array of Flat Modifier Rules Elements to apply.
     * @private
     */
    _applyFlatModifierElements(elements) {
@@ -647,7 +669,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Fast Healing Rules Elements to this Character.
-    * @param {FastHealingElement[]} elements    Array of Fast Healing Rules Elements to apply.
+    * @param {FastHealingElement[]} elements - Array of Fast Healing Rules Elements to apply.
     * @private
     */
    _applyFastHealingElements(elements) {
@@ -683,7 +705,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Persistent Damage Rules Elements to this Character.
-    * @param {PersistentDamageElement[]} elements    Array of Persistent Damage Rules Elements to apply.
+    * @param {PersistentDamageElement[]} elements - Array of Persistent Damage Rules Elements to apply.
     * @private
     */
    _applyPersistentDamageElements(elements) {
@@ -717,7 +739,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Turn Message Rules Elements to this Character.
-    * @param {TurnMessageElement[]} elements    Array of Turn Message Rules Elements to apply.
+    * @param {TurnMessageElement[]} elements - Array of Turn Message Rules Elements to apply.
     * @private
     */
    _applyTurnMessageElements(elements) {
@@ -755,7 +777,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Roll Message Rules Elements to this Character.
-    * @param {RollMessageElement[]} elements    Array of Roll Damage Rules Elements to apply.
+    * @param {RollMessageElement[]} elements - Array of Roll Damage Rules Elements to apply.
     * @private
     */
    _applyRollMessageElements(elements) {
@@ -850,8 +872,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Conditional Rating Modifier Rules Elements to this Character.
-    * @param {ConditionalRatingModifierElement[]} elements    Array of Conditional Rating Modifier Rules Elements to
-    *                                                         apply.
+    * @param {ConditionalRatingModifierElement[]} elements - Array of Conditional Rating Modifier Rules Elements to
+    * apply.
     * @private
     */
    _applyConditionalRatingModifierElements(elements) {
@@ -966,9 +988,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Defense mods from trait-based Conditional Rating Modifier Rules Elements to this Character.
-    * @param {ConditionalRatingModifierElement[]} elements    Array of Conditional Rating Modifier Rules Elements
-    *                                                         that modify defense.
-    * @param {TitanItem} item                                 Item to check for satisfying modifier conditions.
+    * @param {ConditionalRatingModifierElement[]} elements - Array of Conditional Rating Modifier Rules Elements
+    * that modify defense.
+    * @param {TitanItem} item - Item to check for satisfying modifier conditions.
     * @private
     */
    _applyItemTraitDefenseMods(elements, item) {
@@ -1026,7 +1048,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Applies Conditional Check Modifier Rules Elements to this Character.
-    * @param {ConditionalCheckModifierElement[]} elements   Array of Conditional Check Modifier Rules Elements to apply.
+    * @param {ConditionalCheckModifierElement[]} elements - Array of Conditional Check Modifier Rules Elements to apply.
     * @private
     */
    _applyConditionalCheckModifierElements(elements) {
@@ -1288,6 +1310,9 @@ export default class CharacterDataModel extends ActorDataModel {
       const systemData = this;
 
       // Helper function for applying the mods
+      /**
+       * @param stat
+       */
       function applyMods(stat) {
 
          // Stat value = base value + sum of all mod values
@@ -1298,6 +1323,9 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Helper function for applying mods with multiple lowers
+      /**
+       * @param stats
+       */
       function applyModsDeep(stats) {
 
          // Apply mods to each stat in the stats object
@@ -1360,12 +1388,12 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Helper function for getting the sum conditional rating modifiers for the inputted selector and an array of keys,
-    * @param {object}   conditionalRatingModifiers    The parent actor's Rules Element cache of mods for rating.
-    * @param {string}   selector                      The type of condition for modifying the rating
-    * @param {*[]}      keys                          Array of keys to test against.
-    * @returns {object|boolean}                       Object containing the mods to apply, sorted by source type,
-    *                                                 or false if there were no mods matching the input.
+    * Helper function for getting the sum conditional rating modifiers for the inputted selector and an array of keys,.
+    * @param {object} conditionalRatingModifiers - The parent actor's Rules Element cache of mods for rating.
+    * @param {string} selector - The type of condition for modifying the rating.
+    * @param {*[]} keys - Array of keys to test against.
+    * @returns {object|boolean} Object containing the mods to apply, sorted by source type,
+    * or false if there were no mods matching the input.
     * @private
     */
    _getConditionalRatingModsForSelectorKeys(
@@ -1399,13 +1427,13 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Helper function for getting the conditional rating modifiers for the inputted selector and key pair.
-    * @param {object}   conditionalRatingModifiers    The parent actor's Rules Element cache of mods for rating.
-    * @param {string}   selector                      The type of condition for modifying the rating
-    *                                                 (attackType, etc.).
-    * @param {string}   key                           The specific result of the condition for modifying the rating
-    *                                                 (melee, ranged, etc.).
-    * @returns {object|boolean}                       Object containing the mods to apply, sorted by source type,
-    *                                                 or false if there were no mods matching the input.
+    * @param {object} conditionalRatingModifiers - The parent actor's Rules Element cache of mods for rating.
+    * @param {string} selector - The type of condition for modifying the rating
+    * (attackType, etc.).
+    * @param {string} key - The specific result of the condition for modifying the rating
+    * (melee, ranged, etc.).
+    * @returns {object|boolean} Object containing the mods to apply, sorted by source type,
+    * or false if there were no mods matching the input.
     * @private
     */
    _getConditionalRatingModsForSelectorKey(
@@ -1429,7 +1457,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Requests an Attribute Check from this Character.
-    * @param {AttributeCheckOptions} options     Options for the Check.
+    * @param {AttributeCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestAttributeCheck(options) {
@@ -1450,7 +1478,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates an Attribute check, rolls it, and sends it to chat.
-    * @param   {AttributeCheckOptions} options  Options for the Check.
+    * @param {AttributeCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async rollAttributeCheck(options) {
@@ -1477,7 +1505,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a dialog for setting the options of an Attribute Check.
-    * @param   {AttributeCheckOptions} options  Options for the Check.
+    * @param {AttributeCheckOptions} options - Options for the Check.
     * @private
     */
    _createAttributeCheckDialog(options) {
@@ -1497,8 +1525,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Validates the options for an Attribute check.
-    * @param   {object}    options  Options for the Check.
-    * @returns {boolean}            Whether the check options were valid.
+    * @param {object} options - Options for the Check.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateAttributeCheckOptions(options) {
       // Ensure options were provided
@@ -1526,7 +1554,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Populates Attribute Check Options with this Character's specific data, unless specific overrides were applied.
-    * @param   {object} options        Options for the Check.
+    * @param {object} options - Options for the Check.
     * @returns {AttributeCheckOptions} The new, fully-populated Attribute Check Options.
     */
    initializeAttributeCheckOptions(options) {
@@ -1563,10 +1591,10 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the modifier for a specific aspect of an Attribute Check.
-    * @param   {string}   modifierType   The modifier type to check for.
-    * @param   {string}   attribute      The Attribute being used for the check.
-    * @param   {string}   skill          The Skill being used for the check.
-    * @returns {number}                  The modifier to apply to this aspect of the check.
+    * @param {string} modifierType - The modifier type to check for.
+    * @param {string} attribute - The Attribute being used for the check.
+    * @param {string} skill - The Skill being used for the check.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttributeCheckMod(modifierType, attribute, skill) {
       // Contaminated creatures have -1 to all dice rolls
@@ -1600,8 +1628,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the parameters for an Attribute Check to be rolled by this Character, accounting for the provided options.
-    * @param   {AttributeCheckOptions}    options  Options for the Check.
-    * @returns {AttributeCheckParameters}          Parameters for the check, calculated from the provided options.
+    * @param {AttributeCheckOptions} options - Options for the Check.
+    * @returns {AttributeCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getAttributeCheckParameters(options) {
       // Initialize check parameters
@@ -1616,9 +1644,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets conditional messages to that apply to a specific Attribute Check.
-    * @param   {AttributeCheckParameters} parameters  Parameters of the Check to get messages for.
-    * @returns {string[]|boolean}                     Array of messages to attach to the check,
-    *                                                 or false if there are none.
+    * @param {AttributeCheckParameters} parameters - Parameters of the Check to get messages for.
+    * @returns {string[]|boolean} Array of messages to attach to the check,
+    * or false if there are none.
     * @private
     */
    _getAttributeCheckMessages(parameters) {
@@ -1665,7 +1693,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Requests an Attribute Check from this Character.
-    * @param {ResistanceCheckOptions} options   Options for the Check.
+    * @param {ResistanceCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestResistanceCheck(options) {
@@ -1686,7 +1714,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a Resistance Check, rolls it, and sends it to chat.
-    * @param   {ResistanceCheckOptions} options Options for the Resistance Check.
+    * @param {ResistanceCheckOptions} options - Options for the Resistance Check.
     * @returns {Promise<void>}
     */
    async rollResistanceCheck(options) {
@@ -1713,7 +1741,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a dialog for setting the options of a Resistance Check.
-    * @param   {ResistanceCheckOptions} options  Options for the Check.
+    * @param {ResistanceCheckOptions} options - Options for the Check.
     * @private
     */
    _createResistanceCheckDialog(options) {
@@ -1733,8 +1761,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Validates the options for a Resistance check.
-    * @param   {object}    options  Initial options for the check.
-    * @returns {boolean}            Whether the check options were valid.
+    * @param {object} options - Initial options for the check.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateResistanceCheckOptions(options) {
       // Ensure options were provided
@@ -1761,8 +1789,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Populates Resistance Check Options with this Character's specific data, unless specific overrides were applied.
-    * @param   {object} options           Options for the Check.
-    * @returns {ResistanceCheckOptions}   The new, fully-populated Resistance Check Options.
+    * @param {object} options - Options for the Check.
+    * @returns {ResistanceCheckOptions} The new, fully-populated Resistance Check Options.
     */
    initializeResistanceCheckOptions(options) {
       // For now, there are no actor specific resistance check modifiers,
@@ -1772,8 +1800,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the parameters for a Resistance Check to be rolled by this Character, accounting for the provided options.
-    * @param   {ResistanceCheckOptions}    options Options for the Check.
-    * @returns {ResistanceCheckParameters}         Parameters for the check, calculated from the provided options.
+    * @param {ResistanceCheckOptions} options - Options for the Check.
+    * @returns {ResistanceCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getResistanceCheckParameters(options) {
       // Initialize check parameters
@@ -1794,9 +1822,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets conditional messages to that apply to a specific Resistance Check.
-    * @param   {ResistanceCheckParameters}   parameters  Parameters of the Check to get messages for.
-    * @returns {string[]|boolean}                        Array of messages to attach to the check, if any,
-    *                                                    or false if there are none.
+    * @param {ResistanceCheckParameters} parameters - Parameters of the Check to get messages for.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any,
+    * or false if there are none.
     * @private
     */
    _getResistanceCheckMessages(parameters) {
@@ -1831,7 +1859,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Requests an Attack Check from this Character.
-    * @param {AttackCheckOptions} options Options for the Check.
+    * @param {AttackCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestAttackCheck(options) {
@@ -1852,7 +1880,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates an Attack Check, rolls it, and sends it to chat.
-    * @param   {AttackCheckOptions} options Options for the Check.
+    * @param {AttackCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async rollAttackCheck(options) {
@@ -1879,7 +1907,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a dialog for setting the options of an Attack Check.
-    * @param   {AttackCheckOptions} options  Options for the Check.
+    * @param {AttackCheckOptions} options - Options for the Check.
     * @private
     */
    _createAttackCheckDialog(options) {
@@ -1899,8 +1927,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Validates the options for an Attack Check.
-    * @param   {object}    options  Options for the Check.
-    * @returns {boolean}            Whether the check options were valid.
+    * @param {object} options - Options for the Check.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateAttackCheckOptions(options) {
       // Ensure options were provided
@@ -1952,7 +1980,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Populates Attack Check Options with this Character's specific data, unless specific overrides were applied.
-    * @param   {object} options        Options for the Check.
+    * @param {object} options - Options for the Check.
     * @returns {AttributeCheckOptions} The new, fully-populated Attack Check Options.
     */
    initializeAttackCheckOptions(options) {
@@ -2136,7 +2164,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
       // Target defense
       if (options.targetDefense === undefined) {
-         const targets = getCombatTargets();
+         const targets = getTargetedCharacters();
          if (targets.length > 0) {
             checkOptions.targetDefense = targets[0].system.getRollData().rating.defense.value;
          } else {
@@ -2151,14 +2179,14 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the modifier for a specific aspect of a specific Attack Check.
-    * @param {string}   modifierType   The modifier type to check for.
-    * @param {string}   attribute      The Attribute being used for the check.
-    * @param {string}   skill          The Skill being used for the check.
-    * @param {boolean}  multiAttack    Whether the attack is a multi-attack.
-    * @param {string}   type           The Type of Attack (Melee or Ranged).
-    * @param {string[]} attackTraits   The attack Traits associated with the check.
-    * @param {string[]} customTraits   The camelized names of the Custom Traits associated with the attack and weapon.
-    * @returns {number}                The modifier to apply to this aspect of the check.
+    * @param {string} modifierType - The modifier type to check for.
+    * @param {string} attribute - The Attribute being used for the check.
+    * @param {string} skill - The Skill being used for the check.
+    * @param {boolean} multiAttack - Whether the attack is a multi-attack.
+    * @param {string} type - The Type of Attack (Melee or Ranged).
+    * @param {string[]} attackTraits - The attack Traits associated with the check.
+    * @param {string[]} customTraits - The camelized names of the Custom Traits associated with the attack and weapon.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttackCheckMod(
       modifierType,
@@ -2248,12 +2276,12 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the modifier for a specific rating of a specific Attack Check.
-    * @param {string}         rating         The rating being checked.
-    * @param {boolean}        multiAttack    Whether this attack is a multi-attack.
-    * @param {string}         type           The type of attack (melee or ranged).
-    * @param {object[]}       attackTraits   The standard traits associated with the attack.
-    * @param {string[]}       customTraits   The Custom Traits associated with the attack and weapon.
-    * @returns {number}                      The attack rating for this attack with modifiers applied.
+    * @param {string} rating - The rating being checked.
+    * @param {boolean} multiAttack - Whether this attack is a multi-attack.
+    * @param {string} type - The type of attack (melee or ranged).
+    * @param {object[]} attackTraits - The standard traits associated with the attack.
+    * @param {string[]} customTraits - The Custom Traits associated with the attack and weapon.
+    * @returns {number} The attack rating for this attack with modifiers applied.
     */
    _getAttackRatingMod(
       rating,
@@ -2312,8 +2340,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the parameters for an Attack Check to be rolled by this Character, accounting for the provided options.
-    * @param   {AttackCheckOptions}    options  Options for the Check.
-    * @returns {AttackCheckParameters}          Parameters for the check, calculated from the provided options.
+    * @param {AttackCheckOptions} options - Options for the Check.
+    * @returns {AttackCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getAttackCheckParameters(options) {
       // Initialize check parameters
@@ -2370,9 +2398,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets conditional messages to that apply to a specific Attack Check.
-    * @param   {AttackCheckParameters} parameters  Parameters of the Check to get messages for.
-    * @returns {string[]|boolean}                  Array of messages to attach to the check, if any,
-    *                                              or false if there are none.
+    * @param {AttackCheckParameters} parameters - Parameters of the Check to get messages for.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any,
+    * or false if there are none.
     * @private
     */
    _getAttackCheckMessages(parameters) {
@@ -2431,7 +2459,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Requests a Casting Check from this Character.
-    * @param {CastingCheckOptions} options         Options for the Check.
+    * @param {CastingCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestCastingCheck(options) {
@@ -2452,7 +2480,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a Casting Check, rolls it, and sends it to chat.
-    * @param   {CastingCheckOptions} options Options for the Check.
+    * @param {CastingCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async rollCastingCheck(options) {
@@ -2479,7 +2507,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a dialog for setting the options of a Casting Check.
-    * @param   {CastingCheckOptions} options Options for the Check.
+    * @param {CastingCheckOptions} options - Options for the Check.
     * @private
     */
    _createCastingCheckDialog(options) {
@@ -2499,8 +2527,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Validates the options for a Casting Check.
-    * @param   {object}    options  Options for the Check.
-    * @returns {boolean}            Whether the check options were valid.
+    * @param {object} options - Options for the Check.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateCastingCheckOptions(options) {
       // Ensure options were provided
@@ -2539,8 +2567,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Populates Casting Check Options with this Character's specific data, unless specific overrides were applied.
-    * @param   {object} options        Options for the Check.
-    * @returns {CastingCheckOptions}   The new, fully-populated Casting Check Options.
+    * @param {object} options - Options for the Check.
+    * @returns {CastingCheckOptions} The new, fully-populated Casting Check Options.
     */
    initializeCastingCheckOptions(options) {
       const checkOptions = createCastingCheckOptions(options);
@@ -2644,12 +2672,12 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the modifier for a specific aspect of a specific Casting Check.
-    * @param {string}   modifierType   The modifier type to check for.
-    * @param {string}   attribute      The Attribute being used for the check.
-    * @param {string}   skill          The Skill being used for the check.
-    * @param {string}   tradition      The Tradition of the spell.
-    * @param {string[]} customTraits   The camelized names of the Custom Traits associated with the spell.
-    * @returns {number}                The modifier to apply to this aspect of the check.
+    * @param {string} modifierType - The modifier type to check for.
+    * @param {string} attribute - The Attribute being used for the check.
+    * @param {string} skill - The Skill being used for the check.
+    * @param {string} tradition - The Tradition of the spell.
+    * @param {string[]} customTraits - The camelized names of the Custom Traits associated with the spell.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getCastingCheckMod(
       modifierType,
@@ -2727,8 +2755,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the parameters for a Casting Check to be rolled by this Character, accounting for the provided options.
-    * @param   {CastingCheckOptions}      options  Options for the Check.
-    * @returns {CastingCheckParameters}            Parameters for the check, calculated from the provided options.
+    * @param {CastingCheckOptions} options - Options for the Check.
+    * @returns {CastingCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getCastingCheckParameters(options) {
       // Initialize check parameters
@@ -2753,6 +2781,9 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Process each aspect
+      /**
+       * @param aspects
+       */
       function processAspects(aspects) {
 
          // For each aspect
@@ -2808,9 +2839,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets conditional messages to that apply to a specific Casting Check.
-    * @param   {CastingCheckParameters} parameters Parameters of the Check to get messages for.
-    * @returns {string[]|boolean}                  Array of messages to attach to the check, if any,
-    *                                              or false if there are none.
+    * @param {CastingCheckParameters} parameters - Parameters of the Check to get messages for.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any,
+    * or false if there are none.
     * @private
     */
    _getCastingCheckMessages(parameters) {
@@ -2863,7 +2894,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Requests an Item Check from this Character.
-    * @param {ItemCheckOptions} options            Options for the Check.
+    * @param {ItemCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestItemCheck(options) {
@@ -2884,7 +2915,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates an Item Check, rolls it, and sends it to chat.
-    * @param   {ItemCheckOptions} options Validated check options.
+    * @param {ItemCheckOptions} options - Validated check options.
     * @returns {Promise<void>}
     */
    async rollItemCheck(options) {
@@ -2911,7 +2942,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Creates a dialog for setting the options of an Item Check.
-    * @param   {ItemCheckOptions} options  Options for the Check.
+    * @param {ItemCheckOptions} options - Options for the Check.
     * @private
     */
    _createItemCheckDialog(options) {
@@ -2931,8 +2962,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Validates the options for an Item Check.
-    * @param   {object}    options  Options for the Check.
-    * @returns {boolean}            Whether the check options were valid.
+    * @param {object} options - Options for the Check.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateItemCheckOptions(options) {
       // Ensure options were provided
@@ -2984,8 +3015,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Populates Item Check Options with this Character's specific data, unless specific overrides were applied.
-    * @param   {object} options     Options for the Check.
-    * @returns {ItemCheckOptions}   The new, fully-populated Item Check Options.
+    * @param {object} options - Options for the Check.
+    * @returns {ItemCheckOptions} The new, fully-populated Item Check Options.
     */
    initializeItemCheckOptions(options) {
       const checkOptions = createItemCheckOptions(options);
@@ -3084,11 +3115,11 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the modifier for a specific aspect of a specific Item Check.
-    * @param {string}   modifierType   The modifier type to check for.
-    * @param {string}   attribute      The Attribute being used for the check.
-    * @param {string}   skill          The Skill being used for the check.
-    * @param {string[]} customTraits   The camelized names of the Custom Traits associated with the item.
-    * @returns {number}                The modifier to apply to this aspect of the check.
+    * @param {string} modifierType - The modifier type to check for.
+    * @param {string} attribute - The Attribute being used for the check.
+    * @param {string} skill - The Skill being used for the check.
+    * @param {string[]} customTraits - The camelized names of the Custom Traits associated with the item.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getItemCheckMod(
       modifierType,
@@ -3158,8 +3189,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets the parameters for an Item Check to be rolled by this Character, accounting for the provided options.
-    * @param   {ItemCheckOptions}      options  Options for the Check.
-    * @returns {ItemCheckParameters}            Parameters for the check, calculated from the provided options.
+    * @param {ItemCheckOptions} options - Options for the Check.
+    * @returns {ItemCheckParameters} Parameters for the check, calculated from the provided options.
     * @private
     */
    getItemCheckParameters(options) {
@@ -3217,9 +3248,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Gets conditional messages to that apply to a specific Item Check.
-    * @param   {ItemCheckParameters} parameters Parameters of the Check to get messages for.
-    * @returns {string[]|boolean}               Array of messages to attach to the check, if any,
-    *                                           or false if there are none.
+    * @param {ItemCheckParameters} parameters - Parameters of the Check to get messages for.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any,
+    * or false if there are none.
     * @private
     */
    _getItemCheckMessages(parameters) {
@@ -3270,8 +3301,8 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Helper function for applying attribute and skill modifiers to a check.
     * Not used by every check, but the logic is common among most.
-    * @param {AttributeCheckParameters}   parameters     The check parameters. Will be modified by this function.
-    * @param {object}                     actorRollData  The actor roll data
+    * @param {AttributeCheckParameters} parameters - The check parameters. Will be modified by this function.
+    * @param {object} actorRollData - The actor roll data.
     * @private
     */
    _initializeAttributeBasedCheck(parameters, actorRollData) {
@@ -3308,13 +3339,13 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Helper function for getting the conditional check modifiers for the inputted selector and key pair.
-    * @param {object}   conditionalCheckModifiers  The parent actor's Rules Element cache of mods for desire check
-    *                                              and modifier type.
-    * @param {string}   selector                   The type of condition for modifying the check
-    *                                              (any, attribute, trait, etc.).
-    * @param {string}   key                        The specific result of the condition for modifying the check
-    *                                              (body, melee, etc.).
-    * @returns {number}                            The mod to apply to the requested check.
+    * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check
+    * and modifier type.
+    * @param {string} selector - The type of condition for modifying the check
+    * (any, attribute, trait, etc.).
+    * @param {string} key - The specific result of the condition for modifying the check
+    * (body, melee, etc.).
+    * @returns {number} The mod to apply to the requested check.
     * @private
     */
    _getConditionalCheckModsForSelectorKey(
@@ -3337,12 +3368,12 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Helper function for getting the sum conditional check modifiers for the inputted selector and an array of keys.
-    * @param {object}   conditionalCheckModifiers  The parent actor's Rules Element cache of mods for desire check
-    *                                              and modifier type.
-    * @param {string}   selector                   The type of condition for modifying the check
-    *                                              (trait, customTrait.).
-    * @param {*[]}      keys                       Array of keys to test against.
-    * @returns {number}                            The mod to apply to the requested check.
+    * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check
+    * and modifier type.
+    * @param {string} selector - The type of condition for modifying the check
+    * (trait, customTrait.).
+    * @param {*[]} keys - Array of keys to test against.
+    * @returns {number} The mod to apply to the requested check.
     * @private
     */
    _getConditionalCheckModsForSelectorKeys(
@@ -3370,11 +3401,11 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Searches a category Roll Message elements which match the inputted Selector and Key values.
-    * @param {object}   categoryMessages  Messages that apply to a specific category of checks.
-    * @param {string}   selector          Desired Selector value to filter for.
-    * @param {string}   key               Desired Key value to filter for.
-    * @returns {string[]|boolean}         Array of messages whose Selector and Key values match those provided,
-    *                                     or false if there were no natches.
+    * @param {object} categoryMessages - Messages that apply to a specific category of checks.
+    * @param {string} selector - Desired Selector value to filter for.
+    * @param {string} key - Desired Key value to filter for.
+    * @returns {string[]|boolean} Array of messages whose Selector and Key values match those provided,
+    * or false if there were no natches.
     * @private
     */
    _getRollMessages(categoryMessages, selector, key) {
@@ -3397,11 +3428,11 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Searches a category Roll Message elements which match the inputted Selector and any of any array of Key values.
-    * @param {object}   categoryMessages  Messages that apply to a specific category of checks.
-    * @param {string}   selector          Desired Selector value to filter for.
-    * @param {string[]} keys              Array of desired Key values to filter for.
-    * @returns {string[]|boolean}         Array of messages whose Selector and Key values match those provided,
-    *                                     or false if there were no natches.
+    * @param {object} categoryMessages - Messages that apply to a specific category of checks.
+    * @param {string} selector - Desired Selector value to filter for.
+    * @param {string[]} keys - Array of desired Key values to filter for.
+    * @returns {string[]|boolean} Array of messages whose Selector and Key values match those provided,
+    * or false if there were no natches.
     * @private
     */
    _getRollMessagesForSelectorKeys(categoryMessages, selector, keys) {
@@ -3432,8 +3463,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Appends all check messages that apply to all checks of a specific type (Attack, Attribute, Any, etc.).
-    * @param {object}   categoryMessages  Messages that apply to a specific category of checks.
-    * @param {string[]} outMessages       Array of messages to append the retrieved messages to.
+    * @param {object} categoryMessages - Messages that apply to a specific category of checks.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getCheckMessagesForAny(categoryMessages, outMessages) {
@@ -3445,9 +3476,9 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Appends all check messages that apply to checks of a specific type (Attack, Attribute, Any, etc.) that use this
     * check's Attribute.
-    * @param {object}                     categoryMessages  All messages that apply to a specific category of checks.
-    * @param {AttributeCheckParameters}   parameters        Parameters for the check.
-    * @param {string[]}                   outMessages       Array of messages to append the retrieved messages to.
+    * @param {object} categoryMessages - All messages that apply to a specific category of checks.
+    * @param {AttributeCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getCheckMessagesForAttribute(
@@ -3472,9 +3503,9 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Appends all check messages that apply to checks of a specific type (Attack, Attribute, Any, etc.) that use this
     * check's Skill.
-    * @param {object}                     categoryMessages  All messages that apply to a specific category of checks.
-    * @param {AttributeCheckParameters}   parameters        Parameters for the check.
-    * @param {string[]}                   outMessages       Array of messages to append the retrieved messages to.
+    * @param {object} categoryMessages - All messages that apply to a specific category of checks.
+    * @param {AttributeCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getCheckMessagesForSkill(
@@ -3497,9 +3528,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Appends all check messages that apply to Resistance Checks that use this Check's Resistance.
-    * @param {object}                     resistanceCheckMessages All messages that apply to Resistance Checks.
-    * @param {ResistanceCheckParameters}  parameters              Parameters for the check.
-    * @param {string[]}                   outMessages             Array of messages to append the retrieved messages to.
+    * @param {object} resistanceCheckMessages - All messages that apply to Resistance Checks.
+    * @param {ResistanceCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getResistanceMessages(
@@ -3523,9 +3554,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Appends all check messages that apply to Attack Checks of this Attack's Type.
-    * @param {object}                 attackCheckMessages   All messages that apply to Attack Checks.
-    * @param {AttackCheckParameters}  parameters            Parameters for the check.
-    * @param {string[]}               outMessages           Array of messages to append the retrieved messages to.
+    * @param {object} attackCheckMessages - All messages that apply to Attack Checks.
+    * @param {AttackCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getAttackTypeMessages(
@@ -3549,9 +3580,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Appends all check messages that apply to Attack Checks with this check's Attack Traits.
-    * @param {object}                 attackCheckMessages   All messages that apply to Attack Checks.
-    * @param {AttackCheckParameters}  parameters            Parameters for the check.
-    * @param {string[]}               outMessages           Array of messages to append the retrieved messages to.
+    * @param {object} attackCheckMessages - All messages that apply to Attack Checks.
+    * @param {AttackCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getAttackTraitMessages(
@@ -3579,9 +3610,9 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Appends all check messages that apply to checks of a specific type (Attack, Item, Any, etc.) that apply to this
     * check's Custom Traits.
-    * @param {object}                 categoryMessages   All messages that apply to a specific category of checks.
-    * @param {AttackCheckParameters}  parameters         Parameters for the check.
-    * @param {string[]}               outMessages        Array of messages to append the retrieved messages to.
+    * @param {object} categoryMessages - All messages that apply to a specific category of checks.
+    * @param {AttackCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getCustomTraitMessages(
@@ -3614,9 +3645,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Appends all check messages that apply to Multi-Attack Checks, if appropriate.
-    * @param {object}                 attackCheckMessages   All messages that apply to Attack Checks.
-    * @param {AttackCheckParameters}  parameters            Parameters for the check.
-    * @param {string[]}               outMessages           Array of messages to append the retrieved messages to.
+    * @param {object} attackCheckMessages - All messages that apply to Attack Checks.
+    * @param {AttackCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getMultiAttackMessages(
@@ -3633,9 +3664,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Appends all check messages that apply to Casting Checks of this check's Tradition.
-    * @param {object}                 castingCheckMessages  All messages that apply to Casting Checks.
-    * @param {CastingCheckParameters} parameters            Parameters for the check.
-    * @param {string[]}               outMessages           Array of messages to append the retrieved messages to.
+    * @param {object} castingCheckMessages - All messages that apply to Casting Checks.
+    * @param {CastingCheckParameters} parameters - Parameters for the check.
+    * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
    _getSpellTraditionMessages(
@@ -3659,7 +3690,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Handles automatically expending Resolve for a Check.
-    * @param {ItemCheckParameters}  parameters  Parameters for the Check.
+    * @param {ItemCheckParameters} parameters - Parameters for the Check.
     * @returns {Promise<void>} Returns after the Resolve has been expended.
     * @private
     */
@@ -3690,22 +3721,22 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Options for applying Damage to a Character.
     * @typedef {object} DamageOptions
-    * @property {boolean?} [ignoreArmor = false]   Whether to Ignore Armor when applying the Damage.
-    * @property {boolean?} [ineffective = false]   Whether the Attack had the Ineffective trait.
-    * @property {boolean?} [penetrating = false]   Whether the Attack had the Penetrating trait.
-    * @property {boolean?} [updateActor = true]    Whether to update the Character after applying the Damage.
-    *                                              When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]         Whether to send a Chat Message report, provided this setting is
-    *                                              enabled. When sending multiple reports, it is useful to set this to
-    *                                              false.
-    * @property {boolean?} [playSound = true]      Whether to play a sound when sending the report.
+    * @property {boolean?} [ignoreArmor = false] Whether to Ignore Armor when applying the Damage.
+    * @property {boolean?} [ineffective = false] Whether the Attack had the Ineffective trait.
+    * @property {boolean?} [penetrating = false] Whether the Attack had the Penetrating trait.
+    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Damage.
+    * When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
-    * Takes a pre-initialized check, rolls it, and sends it to chat, expending resolve as appropriate;
-    * @param   {TitanCheck}   check    The check to send to chat.
-    * @param   {string[]}     messages Messages to attach to the check
-    * @returns {ChatMessage}           The chat message being sent
+    * Takes a pre-initialized check, rolls it, and sends it to chat, expending resolve as appropriate;.
+    * @param {TitanCheck} check - The check to send to chat.
+    * @param {string[]} messages - Messages to attach to the check.
+    * @returns {ChatMessage} The chat message being sent.
     * @private
     */
    async _rollCheck(check, messages) {
@@ -3722,30 +3753,30 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Data for a report detailing the Damage applied to a character.
     * @typedef {object} DamageReport
-    * @property {string}   type                 The Chat Message type (damageReport).
-    * @property {boolean?} ignoreArmor  Whether to the attack Ignored Armor.
-    * @property {number?}  damageResisted       The amount of Damage resisted.
-    * @property {number?}  damageTaken          The amount of Damage taken.
-    * @property {number?}  staminaLost          The amount of Stamina lost.
-    * @property {object?}  wounds               The character's Wounds, if any.
-    * @property {number?}  wounds.max           The character's maximum Wounds, if any.
-    * @property {number?}  wounds.value         The character's current Wounds, if any.
-    * @property {number?}  woundsSuffered       The number of Wounds suffered, if any.
-    * @property {object?}  stamina             The character's Stamina.
-    * @property {number}   stamina.max          The character's maximum Stamina.
-    * @property {number}   stamina.value        The character's current Stamina.
-    * @property {object?}  tags                 Tags applied to the damage.
-    * @property {boolean?} tags.ineffective     Whether the Attack had the Ineffective trait.
-    * @property {boolean?} tags.penetrating     Whether the Attack had the Penetrating trait.
-    * @property {string}   actorImg             The character's image.
-    * @property {string}   actorName            The character's name.
+    * @property {string} type The Chat Message type (damageReport).
+    * @property {boolean?} ignoreArmor Whether to the attack Ignored Armor.
+    * @property {number?} damageResisted The amount of Damage resisted.
+    * @property {number?} damageTaken The amount of Damage taken.
+    * @property {number?} staminaLost The amount of Stamina lost.
+    * @property {object?} wounds The character's Wounds, if any.
+    * @property {number?} wounds.max The character's maximum Wounds, if any.
+    * @property {number?} wounds.value The character's current Wounds, if any.
+    * @property {number?} woundsSuffered The number of Wounds suffered, if any.
+    * @property {object?} stamina The character's Stamina.
+    * @property {number} stamina.max The character's maximum Stamina.
+    * @property {number} stamina.value The character's current Stamina.
+    * @property {object?} tags Tags applied to the damage.
+    * @property {boolean?} tags.ineffective Whether the Attack had the Ineffective trait.
+    * @property {boolean?} tags.penetrating Whether the Attack had the Penetrating trait.
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
     */
 
    /**
     * Applies Damage to the Character.
-    * @param {number}         damage         Amount of Damage to apply.
-    * @param {DamageOptions?} options        Options for applying the Damage.
-    * @returns {Promise<DamageReport|void>}  Results of applying the Damage.
+    * @param {number} damage - Amount of Damage to apply.
+    * @param {DamageOptions?} options - Options for applying the Damage.
+    * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
       if (this.parent.isOwner && damage > 0) {
@@ -3849,20 +3880,20 @@ export default class CharacterDataModel extends ActorDataModel {
     * Options for applying Healing to a Character.
     * @typedef {object} HealingOptions
     * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Healing. When
-    *                                           updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
-    *                                           enabled. When sending multiple reports, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Initializes data for a report detailing Damage applied to this character.
-    * @param {number}   damageTaken       The amount of Damage taken.
-    * @param {number}   damageResisted    The amount of Damage resisted.
-    * @param {number}   staminaLost       The amount of Stamina lost.
-    * @param {number?}  woundsSuffered    The number of Wounds suffered, if any.
-    * @param {object?}  options           The options for the Damage.
+    * @param {number} damageTaken - The amount of Damage taken.
+    * @param {number} damageResisted - The amount of Damage resisted.
+    * @param {number} staminaLost - The amount of Stamina lost.
+    * @param {number?} woundsSuffered - The number of Wounds suffered, if any.
+    * @param {object?} options - The options for the Damage.
     * @returns {DamageReport} Populated data for the report.
     * @private
     */
@@ -3942,23 +3973,23 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Data for a report detailing the Healing applied to a character.
     * @typedef {object} HealingReport
-    * @property {string}   type              The Chat Message type (healingReport).
-    * @property {string}   actorImg          The character's image.
-    * @property {string}   actorName         The character's name.
-    * @property {number}   staminaRestored   The amount of Stamina healed.
-    * @property {object}   stamina           The character's Stamina.
-    * @property {number}   stamina.value     The character's current Stamina.
-    * @property {number}   stamina.max       The character's maximum Stamina.
-    * @property {object?}  wounds            The character's Wounds, if any.
-    * @property {number?}  wounds.value      The character's current Wounds, if any.
-    * @property {number?}  wounds.max        The character's maximum Wounds, if any.
+    * @property {string} type The Chat Message type (healingReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {number} staminaRestored The amount of Stamina healed.
+    * @property {object} stamina The character's Stamina.
+    * @property {number} stamina.value The character's current Stamina.
+    * @property {number} stamina.max The character's maximum Stamina.
+    * @property {object?} wounds The character's Wounds, if any.
+    * @property {number?} wounds.value The character's current Wounds, if any.
+    * @property {number?} wounds.max The character's maximum Wounds, if any.
     */
 
    /**
     * Applies Healing to the character.
-    * @param {number}            healing        Amount of Healing to apply.
-    * @param {HealingOptions?}   options        Options for restoring the Stamina.
-    * @returns {Promise<HealingReport|void>}    Results of applying the Healing.
+    * @param {number} healing - Amount of Healing to apply.
+    * @param {HealingOptions?} options - Options for restoring the Stamina.
+    * @returns {Promise<HealingReport|void>} Results of applying the Healing.
     */
    async applyHealing(healing, options) {
       if (healing > 0 && this.parent.isOwner) {
@@ -4002,17 +4033,17 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Options for restoring a Character's Resolve.
     * @typedef {object} RestoreResolveOptions
-    * @property {boolean?} [updateActor = true]    Whether to update the Character after restoring the Resolve.
-    *                                              When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]         Whether to send a Chat Message report, provided this setting
-    *                                              is enabled. When sending multiple reports, it is useful to set this
-    *                                              to false.
-    * @property {boolean?} [playSound = true]      Whether to play a sound when sending the report.
+    * @property {boolean?} [updateActor = true] Whether to update the Character after restoring the Resolve.
+    * When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
+    * is enabled. When sending multiple reports, it is useful to set this
+    * to false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Initializes data for a report detailing Healing applied to this character.
-    * @param {number} staminaRestored The amount of Stamina Healed.
+    * @param {number} staminaRestored - The amount of Stamina Healed.
     * @returns {HealingReport} Populated data for the report.
     * @private
     */
@@ -4044,19 +4075,19 @@ export default class CharacterDataModel extends ActorDataModel {
     * Options for spending a Character's Resolve.
     * @typedef {object} SpendResolveOptions
     * @property {boolean?} [updateActor = true] Whether to update the Character after spending the Resolve.
-    *                                           When updating multiple values, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting
-    *                                           is enabled. When sending multiple reports, it is useful to set
-    *                                           this to false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * When updating multiple values, it is useful to set this to
+    * false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
+    * is enabled. When sending multiple reports, it is useful to set
+    * this to false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Restores the Character's Resolve.
-    * @param {number}                 resolveRestored   Amount of Resolve to restore.
-    * @param {RestoreResolveOptions?} options           Options for restoring the Resolve.
-    * @returns {Promise<void>}                          Returns after the Resolve has been restored.
+    * @param {number} resolveRestored - Amount of Resolve to restore.
+    * @param {RestoreResolveOptions?} options - Options for restoring the Resolve.
+    * @returns {Promise<void>} Returns after the Resolve has been restored.
     */
    async regainResolve(resolveRestored, options) {
       if (resolveRestored > 0 && this.parent.isOwner) {
@@ -4084,18 +4115,18 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Data for a report detailing Resolve spent by the character.
     * @typedef {object} SpendResolveReport
-    * @property {string}   type              The Chat Message type (spendResolveReport).
-    * @property {string}   actorImg          The character's image.
-    * @property {string}   actorName         The character's name.
-    * @property {number}   resolveSpent      The amount of Resolve spent.
-    * @property {number?}  resolveShortage   How much the character overspent their Resolve.
+    * @property {string} type The Chat Message type (spendResolveReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {number} resolveSpent The amount of Resolve spent.
+    * @property {number?} resolveShortage How much the character overspent their Resolve.
     */
 
    /**
     * Spends the Character's Resolve.
-    * @param {number}               resolveSpent   Amount of Resolve to spend.
-    * @param {SpendResolveOptions?} options        Options for restoring the Resolve.
-    * @returns {Promise<SpendResolveReport|void>}  Results of spending Resolve.
+    * @param {number} resolveSpent - Amount of Resolve to spend.
+    * @param {SpendResolveOptions?} options - Options for restoring the Resolve.
+    * @returns {Promise<SpendResolveReport|void>} Results of spending Resolve.
     */
    async spendResolve(resolveSpent, options) {
       if (resolveSpent > 0 && this.parent.isOwner) {
@@ -4136,19 +4167,19 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Options for Rending the character's Armor.
     * @typedef {object} RendOptions
-    * @property {boolean?} [magical = false]    Whether the rending Attack was magical.
+    * @property {boolean?} [magical = false] Whether the rending Attack was magical.
     * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the Rend. When updating
-    *                                           multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
-    *                                           enabled. When sending multiple reports, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Initializes data for a report detailing Resolve spent by the character.
-    * @param {number} resolveSpent     The amount of Resolve spent.
-    * @param {number} initialResolve   The initial Resolve held by this character.
+    * @param {number} resolveSpent - The amount of Resolve spent.
+    * @param {number} initialResolve - The initial Resolve held by this character.
     * @returns {SpendResolveReport} Populated data for the report.
     * @private
     */
@@ -4176,18 +4207,18 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Data for a report detailing Rend applied to the character's Armor.
     * @typedef {object} RendReport
-    * @property {string}   type        The Chat Message type (rendReport).
-    * @property {string}   actorImg    The character's image.
-    * @property {string}   actorName   The character's name.
-    * @property {string}   armorImg    The armor's image.
-    * @property {string}   armorName   The armor's name.
-    * @property {number?}  armorLost   The amount of Armor lost.
+    * @property {string} type The Chat Message type (rendReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {string} armorImg The armor's image.
+    * @property {string} armorName The armor's name.
+    * @property {number?} armorLost The amount of Armor lost.
     */
 
    /**
     * Rends the Character's Armor.
-    * @param {number}            rend     Amount of Rend to apply.
-    * @param {RendOptions?}      options  Options for applying the Rend.
+    * @param {number} rend - Amount of Rend to apply.
+    * @param {RendOptions?} options - Options for applying the Rend.
     * @returns {Promise<RendReport|void>} Resolves of Rending the Armor.
     */
    async applyRend(rend, options) {
@@ -4246,17 +4277,17 @@ export default class CharacterDataModel extends ActorDataModel {
     * Options for Repairing the character's Armor.
     * @typedef {object} RepairsOptions
     * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the repairs.
-    *                                           When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true]      Whether to send a Chat Message report, provided this setting is
-    *                                           enabled. When sending multiple reports, it is useful to set this to
-    *                                           false.
-    * @property {boolean?} [playSound = true]   Whether to play a sound when sending the report.
+    * When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Initializes data for a report detailing Rend applied to this character.
-    * @param {number}      armorLost   The amount of Armor lost.
-    * @param {TitanItem}   armor       Reference to the Armor being Rent.
+    * @param {number} armorLost - The amount of Armor lost.
+    * @param {TitanItem} armor - Reference to the Armor being Rent.
     * @returns {RendReport} Populated data for the report.
     * @private
     */
@@ -4285,18 +4316,18 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Data for a report detailing Repairs made to the character's Armor.
     * @typedef {object} RepairsReport
-    * @property {string}   type           The Chat Message type (repairsReport).
-    * @property {string}   actorImg       The character's image.
-    * @property {string}   actorName      The character's name.
-    * @property {string}   armorImg       The armor's image.
-    * @property {string}   armorName      The armor's name.
-    * @property {number}   armorRepaired  The amount of Armor repaired.
+    * @property {string} type The Chat Message type (repairsReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {string} armorImg The armor's image.
+    * @property {string} armorName The armor's name.
+    * @property {number} armorRepaired The amount of Armor repaired.
     */
 
    /**
     * Repairs the Character's Armor.
-    * @param {number}           repairs      Amount of repairs to apply.
-    * @param {RepairsOptions?}  options      Options for applying the repairs.
+    * @param {number} repairs - Amount of repairs to apply.
+    * @param {RepairsOptions?} options - Options for applying the repairs.
     * @returns {Promise<RepairsReport|void>} Returns after the repairs have been applied.
     */
    async applyRepairs(repairs, options) {
@@ -4338,8 +4369,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Initializes data for a report detailing Repairs made to the character's Armor.
-    * @param {number}      armorRepaired  The amount of Armor repaired.
-    * @param {TitanItem}   armor          Reference to the Armor being Repaired.
+    * @param {number} armorRepaired - The amount of Armor repaired.
+    * @param {TitanItem} armor - Reference to the Armor being Repaired.
     * @returns {RepairsReport} Populated data for the report.
     * @private
     */
@@ -4397,9 +4428,9 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Removes all combat effects from the Character, including Effect items and Static Mods, while also restoring
     * Resolve to its maximum value.
-    * @param {object?}   options              Options for the operation.
-    * @param {boolean?}  options.updateActor  Whether to update the actor after performing the operation.
-    * @param {boolean?}  options.report       Whether to send a Chat Message report after performing the operation.
+    * @param {object?} options - Options for the operation.
+    * @param {boolean?} options.updateActor - Whether to update the actor after performing the operation.
+    * @param {boolean?} options.report - Whether to send a Chat Message report after performing the operation.
     * @returns {Promise<void>}
     */
    async removeCombatEffects(options) {
@@ -4477,9 +4508,9 @@ export default class CharacterDataModel extends ActorDataModel {
     * Performs a Short Rest.
     * Removes all combat effects from the Character, including Effect items and Static Mods.
     * Restores Stamina and Resolve to their maximum value.
-    * @param {object?}   options              Options for the operation.
-    * @param {boolean?}  options.updateActor  Whether to update the actor after performing the operation.
-    * @param {boolean?}  options.report       Whether to send a Chat Message report after performing the operation.
+    * @param {object?} options - Options for the operation.
+    * @param {boolean?} options.updateActor - Whether to update the actor after performing the operation.
+    * @param {boolean?} options.report - Whether to send a Chat Message report after performing the operation.
     * @returns {Promise<void>}
     */
    async shortRest(options) {
@@ -4511,9 +4542,9 @@ export default class CharacterDataModel extends ActorDataModel {
     * Removes all combat effects from the Character, including Effect items and Static Mods.
     * Restores Stamina and Resolve to their maximum value.
     * Restores Wounds equal to the character's Wound Regain.
-    * @param {object?}   options              Options for the operation.
-    * @param {boolean?}  options.updateActor  Whether to update the actor after performing the operation.
-    * @param {boolean?}  options.report       Whether to send a Chat Message report after performing the operation.
+    * @param {object?} options - Options for the operation.
+    * @param {boolean?} options.updateActor - Whether to update the actor after performing the operation.
+    * @param {boolean?} options.report - Whether to send a Chat Message report after performing the operation.
     * @returns {Promise<void>}
     */
    async longRest(options) {
@@ -4559,10 +4590,10 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Updates the status of this character in response to Initiative advancing
-    * @param {float}    currentInitiative    The initiative of the current combat turn.
-    * @param {float}    previousInitiative   The initiative of the previous combat turn.
-    * @param {boolean}  isNewRound           Whether the current combat turn is the start of a new round.
+    * Updates the status of this character in response to Initiative advancing.
+    * @param {float} currentInitiative - The initiative of the current combat turn.
+    * @param {float} previousInitiative - The initiative of the previous combat turn.
+    * @param {boolean} isNewRound - Whether the current combat turn is the start of a new round.
     * @returns {Promise<void>}
     */
    async onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound) {
@@ -4880,16 +4911,16 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Base report Data for an Effect item.
     * @typedef {object} EffectReportData
-    * @property {string}   label       The name of the Effect item.
-    * @property {string}   img         The image used by the Effect item.
-    * @property {string?}  description The description of the Effect item, if appropriate.
+    * @property {string} label The name of the Effect item.
+    * @property {string} img The image used by the Effect item.
+    * @property {string?} description The description of the Effect item, if appropriate.
     */
 
    /**
     * Decreases the duration of the turn effects, removes expired effects,
     * and logs report data if appropriate.
-    * @param {object} reportData Object for storing any necessary data for a message report.
-    * @param {string} selector   Used to determine whether we are checking for turnStart Effects, or turnEnd Effects.
+    * @param {object} reportData - Object for storing any necessary data for a message report.
+    * @param {string} selector - Used to determine whether we are checking for turnStart Effects, or turnEnd Effects.
     * @private
     */
    async _decreaseTurnEffectDuration(reportData, selector) {
@@ -4918,15 +4949,15 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Report Data for a Turn Effect item.
     * @typedef {object} TurnEffectReportData
-    * @property {string}   label       The name of the Effect item.
-    * @property {string}   img         The image used by the Effect item.
-    * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {number}   remaining   The remaining turns for the Effect item.
+    * @property {string} label The name of the Effect item.
+    * @property {string} img The image used by the Effect item.
+    * @property {string?} description The description of the Effect item, if appropriate.
+    * @property {number} remaining The remaining turns for the Effect item.
     */
 
    /**
     * Retrieves the Effect Report Data for an array of Effect items.
-    * @param {TitanItem[]} effectItems  The Effect items to get report data for.
+    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
     * @returns {EffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getEffectReportData(effectItems) {
@@ -4948,16 +4979,16 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Report Data for a Turn Effect item.
     * @typedef {object} InitiativeEffectReportData
-    * @property {string}   label       The name of the Effect item.
-    * @property {string}   img         The image used by the Effect item.
-    * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {number}  remaining   The remaining turns for the Effect item.
-    * @property {float}    initiative  The initiative count on which the Effect duration is reduced.
+    * @property {string} label The name of the Effect item.
+    * @property {string} img The image used by the Effect item.
+    * @property {string?} description The description of the Effect item, if appropriate.
+    * @property {number} remaining The remaining turns for the Effect item.
+    * @property {float} initiative The initiative count on which the Effect duration is reduced.
     */
 
    /**
     * Retrieves the Effect Report Data for an array of Turn Start or Turn End Effect items.
-    * @param {TitanItem[]} effectItems  The Effect items to get report data for.
+    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
     * @returns {TurnEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getTurnEffectReportData(effectItems) {
@@ -4980,16 +5011,16 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Report Data for a Custom Effect item.
     * @typedef {object} CustomEffectReportData
-    * @property {string}   label       The name of the Effect item.
-    * @property {string}   img         The image used by the Effect item.
-    * @property {string?}  description The description of the Effect item, if appropriate.
-    * @property {number}   remaining   The remaining turns for the Effect item.
-    * @property {string}   custom      Custom duration of the Effect item.
+    * @property {string} label The name of the Effect item.
+    * @property {string} img The image used by the Effect item.
+    * @property {string?} description The description of the Effect item, if appropriate.
+    * @property {number} remaining The remaining turns for the Effect item.
+    * @property {string} custom Custom duration of the Effect item.
     */
 
    /**
     * Retrieves the Effect Report Data for an array of Initiative Effect items.
-    * @param {TitanItem[]} effectItems  The Effect items to get report data for.
+    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
     * @returns {InitiativeEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getInitiativeEffectReportData(effectItems) {
@@ -5012,7 +5043,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Retrieves the Effect Report Data for an array of Initiative Effect items.
-    * @param {TitanItem[]} effectItems  The Effect items to get report data for.
+    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
     * @returns {CustomEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getCustomEffectReportData(effectItems) {
@@ -5036,11 +5067,11 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Processes effects that have expired, either by removing them from the character, or adding a button to the
     * report data.
-    * @param {string}      autoRemoveExpiredEffects   The setting for automatically removing expired effects.
-    * @param {TitanItem[]} expiredEffects             The expired effects items for this character.
-    * @param {object}      reportData                 Report data object for storing the result of removing expired
-    *                                                 effects, such as whether they were removed, or whether a button
-    *                                                 should be shown to remove them.
+    * @param {string} autoRemoveExpiredEffects - The setting for automatically removing expired effects.
+    * @param {TitanItem[]} expiredEffects - The expired effects items for this character.
+    * @param {object} reportData - Report data object for storing the result of removing expired
+    * effects, such as whether they were removed, or whether a button
+    * should be shown to remove them.
     * @returns {Promise<void>}
     */
    async _processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData) {
@@ -5066,9 +5097,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Calculate the healing and damage that should be applied to a Character at the Start or End of their turn.
-    * @param {object} reportData Object for storing any necessary data for a message report.
-    * @param {string} selector   Used to determine whether we are checking for turnStart Effects, or turnEnd Effects.
-    * @returns {Promise<boolean>}   Returns true if the actor should be updated.
+    * @param {object} reportData - Object for storing any necessary data for a message report.
+    * @param {string} selector - Used to determine whether we are checking for turnStart Effects, or turnEnd Effects.
+    * @returns {Promise<boolean>} Returns true if the actor should be updated.
     * @private
     */
    async _calculateTurnHealingAndDamage(reportData, selector) {
@@ -5169,7 +5200,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Calculates how much Resolve to regain at the start of the Character's turn.
-    * @param {object} reportData Object for storing any necessary data for a message report.
+    * @param {object} reportData - Object for storing any necessary data for a message report.
     * @returns {Promise<boolean>} Returns true if the actor should be updated.
     * @private
     */
@@ -5219,9 +5250,9 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Sends a private message to the character's owners.
-    * @param {object}   messageData       Object containing the message data.
-    * @param {string}   userId            The ID of the user sending the message.
-    * @param {boolean}  [playSound=true]  Whether to play a sound when sending the message.
+    * @param {object} messageData - Object containing the message data.
+    * @param {string} userId - The ID of the user sending the message.
+    * @param {boolean} [playSound] - Whether to play a sound when sending the message.
     * @returns {Promise<void>}
     * @private
     */
@@ -5247,7 +5278,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Toggles the multi-attack feature of a Weapon Item.
-    * @param {string} itemId  The ID of the weapon item to toggle Multi-Attack on.
+    * @param {string} itemId - The ID of the weapon item to toggle Multi-Attack on.
     * @returns {Promise<void>}
     */
    async toggleMultiAttack(itemId) {
@@ -5270,7 +5301,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * If the item is Armor or a Shield, it will either equip it or unequip it to this character.
     * Otherwise, the Equipped property will be toggled on it.
     * If the item has an "equipped" property in the "system" object, it will update the value of "equipped".
-    * @param {string} itemId  The ID of the item to equip or unequip.
+    * @param {string} itemId - The ID of the item to equip or unequip.
     * @returns {Promise<void>}
     */
    async toggleEquipped(itemId) {
@@ -5323,7 +5354,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Toggles the active state of an Effect Item.
-    * @param {string} itemId  The ID of the item to toggle the active state for.
+    * @param {string} itemId - The ID of the item to toggle the active state for.
     * @returns {Promise<void>}
     */
    async toggleEffectActive(itemId) {
@@ -5356,7 +5387,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Equips an Armor item to the Character.
-    * @param {string} itemId The ID of the Armor item to be equipped.
+    * @param {string} itemId - The ID of the Armor item to be equipped.
     * @returns {Promise<void>}
     */
    async equipArmor(itemId) {
@@ -5410,7 +5441,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Equips a shield item to the Character.
-    * @param {string} itemId The ID of the Shield item to be equipped.
+    * @param {string} itemId - The ID of the Shield item to be equipped.
     * @returns {Promise<void>}
     */
    async equipShield(itemId) {
@@ -5452,7 +5483,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Adds an item of the inputted type to the Character.
-    * @param {string} type The type of item to add.
+    * @param {string} type - The type of item to add.
     */
    async addItem(type) {
       if (this.parent.isOwner) {
@@ -5476,7 +5507,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Requests for an item to be deleted from the Character.
-    * @param {string} itemId  The ID of the item being deleted.
+    * @param {string} itemId - The ID of the item being deleted.
     */
    async requestItemDeletion(itemId) {
       if (this.parent.isOwner) {
@@ -5497,7 +5528,7 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Deletes an item from the Character, while ensuring that this is a valid operation, and un-equipping the item
     * if appropriate.
-    * @param {string} itemId The ID of the item to delete.
+    * @param {string} itemId - The ID of the item to delete.
     * @returns {Promise<void>}
     */
    async safeDeleteItem(itemId) {
@@ -5537,7 +5568,7 @@ export default class CharacterDataModel extends ActorDataModel {
    /**
     * Deletes the given item.
     * Assumes the item is still valid when the deletion is called.
-    * @param {TitanItem} item The item to be deleted.
+    * @param {TitanItem} item - The item to be deleted.
     * @private
     */
    async _deleteItem(item) {
@@ -5593,8 +5624,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Calculates the total XP cost for an Attribute at a given rank.
-    * @param {number} value   The rank of the Attribute.
-    * @returns {number}       The total XP cost of the Attribute.
+    * @param {number} value - The rank of the Attribute.
+    * @returns {number} The total XP cost of the Attribute.
     */
    _calculateAttributeXPCost(value) {
       // Attribute Cost starts at 2 for rank 2, and increases by consecutive odd integers, starting with 5
@@ -5612,8 +5643,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Calculates the total XP cost for a Skill at a given rank.
-    * @param {number} value   The rank of the Skill.
-    * @returns {number}       The total XP cost of the Skill.
+    * @param {number} value - The rank of the Skill.
+    * @returns {number} The total XP cost of the Skill.
     */
    _calculateSkillXPCost(value) {
       // Skill Cost starts at 1 for rank 1, and increases by consecutive even integers, starting with 2

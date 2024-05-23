@@ -21,6 +21,9 @@
 
    const trait = document.system.attack[attackIdx].customTrait[traitIdx];
 
+   /**
+    *
+    */
    function editTrait() {
       const attack = document.system.attack[attackIdx];
 

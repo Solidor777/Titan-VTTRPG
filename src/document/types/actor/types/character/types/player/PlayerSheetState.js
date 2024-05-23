@@ -1,6 +1,9 @@
 
 import { writable } from 'svelte/store';
 
+/**
+ *
+ */
 export default function createPlayerSheetState() {
    const { set, update, subscribe, unsubscribe } = writable({
       scrollTop: {
@@ -39,6 +42,9 @@ export default function createPlayerSheetState() {
    });
 
    // Remove an item
+   /**
+    * @param id
+    */
    function deleteItem(id) {
       update((state) => {
          if (state.isExpanded.inventory[id] === false || state.isExpanded.inventory[id] === true) {

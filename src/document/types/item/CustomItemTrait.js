@@ -4,9 +4,9 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Contains data for a Custom Item Trait.
  * @typedef {object} CustomItemTrait
- * @property   {boolean}   name        The name for the Trait.
- * @property   {string}    description The description of the trait.
- * @property   {string}    uuid        Generated unique identifier for the Trait.
+ * @property {boolean} name The name for the Trait.
+ * @property {string} description The description of the trait.
+ * @property {string} uuid Generated unique identifier for the Trait.
  */
 
 /**

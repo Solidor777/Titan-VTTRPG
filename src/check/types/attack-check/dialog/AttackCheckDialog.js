@@ -7,20 +7,20 @@ import AttackCheckDialogShell from '~/check/types/attack-check/dialog/AttackChec
 
 /**
  * Creates a dialog window for setting the Options of an Attack Check.
+ * @param {AttackCheckOptions} checkOptions - The initial options for the check to be adjusted.
+ * @param {AttackCheckParameters} checkParameters - The initial parameters for the check,
+ * calculated from the options.
+ * @param {TitanActor} actor - The Actor that will roll the check.
  * @augments TitanDialog
- * @param {AttackCheckOptions}      checkOptions     The initial options for the check to be adjusted.
- * @param {AttackCheckParameters}   checkParameters  The initial parameters for the check,
- *                                                   calculated from the options.
- * @param {TitanActor}              actor         The Actor that will roll the check.
  */
 export default class AttackCheckDialog extends TitanDialog {
 
    /**
     * Creates a dialog window for setting the Options of an Attack Check.
-    * @param {AttackCheckOptions}      checkOptions     The initial options for the check to be adjusted.
-    * @param {AttackCheckParameters}   checkParameters  The initial parameters for the check,
-    *                                                   calculated from the options.
-    * @param {TitanActor}              actor         The Actor that will roll the check.
+    * @param {AttackCheckOptions} checkOptions - The initial options for the check to be adjusted.
+    * @param {AttackCheckParameters} checkParameters - The initial parameters for the check,
+    * calculated from the options.
+    * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
       super(

@@ -35,6 +35,9 @@
    }
 
    // Increases the aspect by the increment, updating the total cost as appropriate.
+   /**
+    *
+    */
    function increaseAspect() {
       // Increase the aspect
       aspect.currentValue += aspectIncrement;
@@ -55,12 +58,17 @@
       // Update the document
       $document.update({
          flags: {
-            titan: $document.flags.titan
+            titan: {
+               results: $document.flags.titan.results
+            }
          }
       });
    }
 
    // Decreases the aspect by the increment, updating the total cost as appropriate.
+   /**
+    *
+    */
    function decreaseAspect() {
       // Decrease the aspect
       aspect.currentValue -= aspectIncrement;
@@ -81,12 +89,17 @@
       // Update the document
       $document.update({
          flags: {
-            titan: $document.flags.titan
+            titan: {
+               results: $document.flags.titan.results
+            }
          }
       });
    }
 
    // Resets all increases to the aspect, updating the total cost as appropriate.
+   /**
+    *
+    */
    function resetAspect() {
       // Get the aspect delta
       const delta = aspect.currentValue - aspect.initialValue;
@@ -111,7 +124,9 @@
 
       $document.update({
          flags: {
-            titan: $document.flags.titan
+            titan: {
+               results: $document.flags.titan.results
+            }
          }
       });
    }
@@ -202,7 +217,7 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;
-      
+
       font-weight: bold;
       padding: var(--padding-standard);
       width: 100%;

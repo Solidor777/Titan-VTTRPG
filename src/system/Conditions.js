@@ -2,6 +2,9 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import sort from '~/helpers/utility-functions/Sort.js';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
+/**
+ *
+ */
 export default function setupConditions() {
    // Create list of conditions
    const conditions = [

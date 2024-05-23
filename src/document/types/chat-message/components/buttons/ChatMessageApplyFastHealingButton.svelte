@@ -9,6 +9,9 @@
    const document = getContext('document');
 
    // Calculate the tooltip for the resource mod
+   /**
+    *
+    */
    function getTooltip() {
       // Base label
       let retVal = `<p>${localize(`fastHealing.desc`)}</p>`;
@@ -32,6 +35,9 @@
    }
 
    // Applies healing to the character that owns this chat message and updates the message accordingly
+   /**
+    *
+    */
    async function confirmFastHealing() {
 
       // If we own this chat message and the associated actor
