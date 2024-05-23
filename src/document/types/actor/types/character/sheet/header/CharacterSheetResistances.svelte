@@ -19,15 +19,18 @@
    .resistances {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .resistance {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             padding-top: var(--padding-standard);
             margin-top: var(--padding-standard);
          }

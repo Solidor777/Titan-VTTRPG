@@ -41,6 +41,7 @@
 <style>
    img {
       border-style: var(--border-style);
+
       &.active {
          cursor: pointer;
       }

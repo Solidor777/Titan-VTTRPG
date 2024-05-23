@@ -16,6 +16,7 @@
       @include flex-group-center;
       @include border;
       @include label;
+
       padding: var(--padding-standard);
 
       .label {

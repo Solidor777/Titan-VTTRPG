@@ -157,6 +157,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
+
          font-weight: bold;
 
          i {
@@ -167,6 +168,7 @@
       .options {
          @include flex-row;
          @include flex-group-center;
+
          flex-wrap: wrap;
          width: 100%;
 
@@ -180,17 +182,20 @@
          @include flex-column;
          @include flex-group-top;
          @include font-size-small;
+
          margin-top: var(--padding-large);
 
          .label {
             @include flex-row;
             @include flex-group-center;
+
             font-weight: bold;
          }
 
          .value {
             @include flex-row;
             @include flex-group-center;
+
             margin-top: var(--padding-standard);
          }
       }

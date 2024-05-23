@@ -36,6 +36,7 @@
       @include list;
       @include border-bottom-sides;
       @include panel-3;
+
       width: calc(100% - var(--padding-large));
       padding: 0 var(--padding-standard);
 
@@ -48,6 +49,7 @@
 
          &:not(:first-child) {
             @include border-top;
+
             padding-top: var(--padding-standard);
          }
       }

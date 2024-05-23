@@ -77,6 +77,7 @@
 
       .label {
          @include border-right;
+
          padding-right: var(--padding-standard);
          margin-right: var(--padding-standard);
       }

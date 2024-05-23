@@ -24,6 +24,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border-top;
+
       width: 100%;
       flex-wrap: wrap;
       font-weight: bold;
@@ -32,6 +33,7 @@
          @include flex-row;
          @include flex-group-center;
          @include border;
+
          margin: var(--padding-standard);
          padding: var(--padding-standard);
          background: var(--label-background);

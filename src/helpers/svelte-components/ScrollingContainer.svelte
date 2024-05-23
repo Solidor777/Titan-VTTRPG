@@ -61,6 +61,7 @@
 <style lang="scss">
    .container {
       @include flex-column;
+
       position: relative;
       width: 100%;
       height: 100%;
@@ -68,6 +69,7 @@
 
       .content {
          @include flex-column;
+
          width: 100%;
          height: 100%;
          position: absolute;
@@ -87,14 +89,13 @@
          }
 
          &.faded {
-            -webkit-mask-image: linear-gradient(
+            mask-image: linear-gradient(
                             to bottom,
                             transparent 0,
                             black var(--top-mask-size, 0),
                             black calc(100% - var(--bottom-mask-size, 0)),
                             transparent 100%
             );
-
             mask-image: linear-gradient(
                             to bottom,
                             transparent 0,

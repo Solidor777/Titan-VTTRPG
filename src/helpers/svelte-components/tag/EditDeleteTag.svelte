@@ -50,11 +50,13 @@
       @include flex-group-center;
       @include border;
       @include label;
+
       font-weight: bold;
       padding: var(--padding-standard);
 
       a {
          @include border-left;
+
          margin-left: var(--padding-standard);
          padding-left: var(--padding-standard);
       }

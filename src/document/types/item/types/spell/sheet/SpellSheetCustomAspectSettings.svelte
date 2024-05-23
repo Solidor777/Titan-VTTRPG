@@ -157,6 +157,7 @@
    .aspect {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .header {
@@ -164,14 +165,17 @@
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
+
          padding: var(--padding-standard);
          width: 100%;
 
          .label {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
             margin: 0 var(--padding-large);
+
             --input-font-size: var(--font-size-large);
             --input-height: 32px;
          }
@@ -182,18 +186,22 @@
          @include flex-group-top;
          @include border-bottom-sides;
          @include panel-3;
+
          width: calc(100% - 16px);
          padding: var(--padding-standard);
+
          @include font-size-small;
 
          .row {
             @include flex-row;
             @include flex-group-center;
+
             padding-top: var(--padding-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
+
                margin-top: var(--padding-large);
             }
 
@@ -203,6 +211,7 @@
 
                &:not(:first-child) {
                   @include border-left;
+
                   margin-left: var(--padding-large);
                   padding-left: var(--padding-large);
                }
@@ -214,6 +223,7 @@
                .label {
                   @include flex-row;
                   @include flex-group-center;
+
                   font-weight: bold;
                }
 

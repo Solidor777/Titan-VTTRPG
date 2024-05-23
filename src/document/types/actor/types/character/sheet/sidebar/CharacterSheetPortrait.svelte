@@ -70,11 +70,13 @@
    .portrait {
       @include flex-row;
       @include flex-group-center;
+
       width: 100%;
       position: relative;
 
       .image {
          width: 160px;
+
          --border-style: none;
       }
 

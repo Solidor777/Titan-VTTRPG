@@ -74,6 +74,7 @@
    .confirmation-dialog {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .header {
@@ -97,8 +98,10 @@
       .button {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
          margin-top: var(--padding-standard);
+
          --button-border-radius: var(--button-chat-message-border-radius);
       }
    }

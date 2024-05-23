@@ -104,21 +104,25 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;
+
       width: 100%;
 
       li {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-large);
             padding-top: var(--padding-large);
          }
 
          .row {
             @include flex-row;
+
             width: 100%;
             flex-wrap: wrap;
 
@@ -136,6 +140,7 @@
 
             .attack-name {
                @include font-size-normal;
+
                font-weight: bold;
             }
          }

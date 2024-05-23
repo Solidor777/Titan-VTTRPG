@@ -45,17 +45,20 @@
    .button-content {
       @include flex-row;
       @include flex-space-between;
+
       width: 100%;
       margin: 0;
 
       .aspect-label {
          @include flex-row;
          @include flex-group-left;
+
          margin-left: var(--padding-large);
 
          .icon {
             @include flex-row;
             @include flex-group-right;
+
             margin-left: var(--padding-large);
          }
       }
@@ -63,6 +66,7 @@
       .cost {
          @include flex-row;
          @include flex-group-right;
+
          font-weight: bold;
          margin-right: var(--padding-large);
 

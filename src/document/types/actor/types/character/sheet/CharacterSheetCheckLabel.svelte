@@ -165,10 +165,8 @@
          @include flex-row;
          @include flex-group-center;
 
-         -webkit-transform: translateZ(0);
-
          transform: translateZ(0);
-
+         transform: translateZ(0);
          flex-wrap: wrap;
 
          &:not(:first-child) {
@@ -194,8 +192,7 @@
             @include flex-row;
             @include flex-group-center;
 
-            -webkit-transform: translateZ(0);
-
+            transform: translateZ(0);
             transform: translateZ(0);
 
 
@@ -208,9 +205,7 @@
 
             .label {
                margin-right: var(--padding-standard);
-
-               -webkit-transform: translateZ(0);
-
+               transform: translateZ(0);
                transform: translateZ(0);
 
                i {

@@ -25,6 +25,7 @@
       @include flex-group-center;
       @include border;
       @include label;
+
       padding: var(--padding-standard);
 
       .label {
@@ -33,6 +34,7 @@
 
       .value {
          @include border-left;
+
          padding-left: var(--padding-standard);
          margin-left: var(--padding-standard);
       }

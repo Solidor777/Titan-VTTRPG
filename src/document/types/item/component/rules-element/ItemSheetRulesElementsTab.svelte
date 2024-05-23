@@ -163,12 +163,14 @@
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
+
       height: 100%;
       width: 100%;
 
       .filter {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
       }
 
@@ -191,6 +193,7 @@
       .add-entry-button {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
          margin-top: var(--padding-large);
 

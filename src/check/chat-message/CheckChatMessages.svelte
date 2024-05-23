@@ -18,6 +18,7 @@
    .messages {
       @include flex-column;
       @include flex-group-top-left;
+
       width: 100%;
    }
 
@@ -25,6 +26,7 @@
       @include border;
       @include panel-1;
       @include flex-row;
+
       padding: var(--padding-standard);
 
       &:not(:first-child) {

@@ -174,6 +174,7 @@
    .check {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .buttons {
@@ -188,6 +189,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-small;
+
          flex-wrap: wrap;
 
          .stat {

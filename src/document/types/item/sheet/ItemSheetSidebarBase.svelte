@@ -24,6 +24,7 @@
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
+
       min-width: 208px;
       width: 100%;
       height: 100%;
@@ -31,6 +32,7 @@
       .section {
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-large);
          }
       }

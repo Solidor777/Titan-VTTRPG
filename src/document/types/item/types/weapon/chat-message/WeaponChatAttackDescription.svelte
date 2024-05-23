@@ -12,8 +12,11 @@
    .description {
       @include flex-row;
       @include flex-group-left;
+
       padding: 0 var(--padding-large) 0 var(--padding-large);
+
       @include font-size-normal;
+
       width: 100%;
    }
 </style>

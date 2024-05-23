@@ -57,6 +57,7 @@
    .traits {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
       height: 100%;
 
@@ -65,6 +66,7 @@
          @include flex-group-center;
 
          margin-top: var(--padding-large);
+
          --button-font-size: var(--font-size-small);
          --button-line-height: 20px;
 
@@ -92,6 +94,7 @@
       @include list;
       @include flex-row;
       @include flex-group-center;
+
       flex-wrap: wrap;
 
       .trait {

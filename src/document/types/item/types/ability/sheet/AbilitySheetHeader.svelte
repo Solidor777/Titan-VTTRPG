@@ -99,34 +99,40 @@
       @include flex-row;
       @include flex-space-between;
       @include panel-1;
+
       width: 100%;
       padding: var(--padding-large);
 
       .main-label {
          @include flex-row;
          @include flex-group-left;
+
          width: 100%;
 
          .portrait {
             width: 80px;
+
             --border-style: none;
          }
 
          .label-stats {
             @include flex-column;
             @include flex-group-top-left;
+
             width: calc(100% - 88px);
             margin-left: var(--padding-large);
 
             .name {
                @include flex-row;
                @include flex-group-left;
+
                width: 100%;
             }
 
             .secondary-stats {
                @include flex-row;
                @include flex-group-left;
+
                margin-top: var(--padding-large);
                width: 100%;
 
@@ -136,6 +142,7 @@
 
                   &:not(:first-child) {
                      @include border-left;
+
                      margin-left: var(--padding-large);
                      padding-left: var(--padding-large);
                   }
@@ -143,6 +150,7 @@
                   .label {
                      @include flex-row;
                      @include flex-group-left;
+
                      font-weight: bold;
                      margin-right: var(--padding-large);
                   }
@@ -163,23 +171,27 @@
       .ability-types {
          @include flex-column;
          @include flex-group-top;
+
          margin-right: var(--padding-large);
          margin-left: 24px;
 
          .checkbox {
             @include flex-row;
             @include flex-group-right;
+
             width: 100%;
 
             .label {
                @include flex-row;
                @include flex-group-right;
+
                font-weight: bold;
             }
 
             .input {
                @include flex-row;
                @include flex-group-left;
+
                width: 16px;
             }
          }

@@ -109,6 +109,7 @@
    .attribute {
       @include flex-row;
       @include flex-space-evenly;
+
       height: 100%;
       width: 100%;
 
@@ -121,6 +122,7 @@
       .stats {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
          margin-left: var(--padding-large);
 
@@ -131,6 +133,7 @@
          .input {
             @include flex-row;
             @include flex-group-center;
+
             height: 100%;
             width: 28px;
          }
@@ -138,12 +141,14 @@
          .label {
             @include flex-row;
             @include flex-group-center;
+
             height: 100%;
          }
 
          .value {
             @include flex-row;
             @include flex-group-center;
+
             height: 100%;
             min-width: 28px;
          }

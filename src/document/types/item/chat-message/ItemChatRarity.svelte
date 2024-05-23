@@ -17,6 +17,7 @@
       @include flex-group-center;
       @include border;
       @include rarity-colors;
+
       font-weight: bold;
       padding: var(--padding-standard);
    }

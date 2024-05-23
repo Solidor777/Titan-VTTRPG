@@ -159,6 +159,7 @@
       @include flex-group-center;
       @include label;
       @include font-size-normal;
+
       font-weight: bold;
       width: 100%;
       padding: var(--padding-large);
@@ -167,6 +168,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-large;
+
          width: 100%;
          font-weight: bold;
 
@@ -193,12 +195,14 @@
 
          .button {
             margin-left: var(--padding-standard);
+
             --icon-button-radius: 24px;
             --icon-button-font-size: 14px;
          }
 
          .border-right {
             @include border-right;
+
             margin-right: var(--padding-large);
             padding-right: var(--padding-large);
          }

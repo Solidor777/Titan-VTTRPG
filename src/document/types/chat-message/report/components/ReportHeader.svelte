@@ -34,12 +34,14 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-normal;
+
       width: 100%;
       font-weight: bold;
 
       img {
          @include panel-1;
          @include border;
+
          width: 80px;
          margin-bottom: var(--padding-large);
       }
@@ -49,6 +51,7 @@
          @include flex-group-top;
          @include panel-1;
          @include border;
+
          width: 100%;
          padding: var(--padding-standard);
 
@@ -56,6 +59,7 @@
             @include flex-row;
             @include flex-group-center;
             @include font-size-large;
+
             width: 100%;
             margin: var(--padding-standard) 0 var(--padding-standard);
             flex-wrap: wrap;
@@ -68,6 +72,7 @@
          .name {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
             flex-wrap: wrap;
          }

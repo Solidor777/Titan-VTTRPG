@@ -56,14 +56,17 @@
    .resources {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .resource {
          @include flex-row;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             padding-top: var(--padding-standard);
             margin-top: var(--padding-standard);
          }

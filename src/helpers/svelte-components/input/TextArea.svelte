@@ -10,6 +10,7 @@
       @include input;
       @include flex-row;
       @include flex-group-left;
+
       flex-wrap: wrap;
       width: 100%;
       height: 100%;

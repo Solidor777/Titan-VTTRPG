@@ -37,6 +37,7 @@
 
       .body {
          @include flex-row;
+
          height: 100%;
          width: 100%;
 

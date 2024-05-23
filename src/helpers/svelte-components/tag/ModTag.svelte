@@ -21,6 +21,7 @@
       @include border;
       @include label;
       @include mod-colors;
+
       width: 100%;
       height: 100%;
    }

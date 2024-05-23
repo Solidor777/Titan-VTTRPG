@@ -289,11 +289,13 @@
    .create-macro-dialog {
       @include flex-column;
       @include font-size-normal;
+
       justify-items: flex-end;
 
       .row {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
          width: 100%;
 
@@ -306,11 +308,13 @@
 
          .image {
             width: 80px;
+
             --border-style: none;
          }
 
          .label {
             @include flex-group-right;
+
             font-weight: bold;
             height: 100%;
             width: 100%;
@@ -319,15 +323,18 @@
 
          .input {
             @include flex-group-left;
+
             margin-left: var(--padding-large);
             height: 100%;
             width: 100%;
+
             --input-height: 28px;
             --input-width: 100%;
          }
 
          .button {
             @include flex-row;
+
             width: 100%;
             margin-top: var(--padding-large);
 

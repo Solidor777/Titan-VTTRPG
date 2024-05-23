@@ -27,6 +27,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
+
          height: 100%;
          line-height: normal;
          padding: var(--padding-standard);

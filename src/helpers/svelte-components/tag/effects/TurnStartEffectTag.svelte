@@ -40,11 +40,13 @@
       @include border;
       @include font-size-small;
       @include effect-turn-start;
+
       font-weight: bold;
       padding: var(--padding-standard);
 
       .time {
          @include border-left;
+
          margin-left: var(--padding-standard);
          padding-left: var(--padding-standard);
       }

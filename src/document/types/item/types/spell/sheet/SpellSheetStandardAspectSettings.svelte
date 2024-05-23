@@ -184,21 +184,23 @@
    .aspect {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .details {
          @include flex-column;
          @include flex-group-top;
          @include border-bottom-sides;
-
          @include font-size-small;
          @include panel-3;
+
          padding: 0 var(--padding-standard) var(--padding-standard);
          width: calc(100% - 30px);
 
          .row {
             @include flex-row;
             @include flex-group-center;
+
             flex-wrap: wrap;
             width: 100%;
 
@@ -208,6 +210,7 @@
 
             &:not(:first-child) {
                @include border-top;
+
                margin-top: var(--padding-standard);
 
                &:not(.tags) {
@@ -221,6 +224,7 @@
 
                .label {
                   @include font-size-small;
+
                   font-weight: bold;
                }
 

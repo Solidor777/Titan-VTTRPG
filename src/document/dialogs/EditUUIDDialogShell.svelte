@@ -81,6 +81,7 @@
    .edit-uuid-dialog {
       @include flex-column;
       @include font-size-normal;
+
       justify-items: flex-end;
 
       .header {
@@ -94,6 +95,7 @@
 
          .name {
             @include font-size-large;
+
             margin-left: var(--padding-large);
          }
       }
@@ -105,11 +107,13 @@
       .buttons {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
          width: 100%;
 
          .button {
             @include flex-row;
+
             width: 100%;
             margin-top: var(--padding-large);
 

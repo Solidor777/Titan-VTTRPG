@@ -7,8 +7,11 @@
    .item-footer {
       @include flex-row;
       @include flex-space-evenly;
+
       flex-wrap: wrap;
+
       @include font-size-small;
+
       font-weight: bold;
       width: 100%;
    }

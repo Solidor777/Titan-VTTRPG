@@ -107,14 +107,16 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;
+
       width: 100%;
 
       .section {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
-         &:not(:first-child):not(.tags) {
+         &:not(:first-child, .tags) {
             margin-top: var(--padding-large);
          }
       }

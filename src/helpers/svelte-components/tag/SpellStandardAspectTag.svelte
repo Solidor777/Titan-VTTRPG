@@ -88,6 +88,7 @@
       @include resistance-colors;
       @include border;
       @include label;
+
       padding: var(--padding-standard);
       flex-wrap: wrap;
 
@@ -101,6 +102,7 @@
 
          &:not(:first-child) {
             @include border-left;
+
             margin-left: var(--padding-standard);
             padding-left: var(--padding-standard);
          }

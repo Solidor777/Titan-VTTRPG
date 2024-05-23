@@ -18,10 +18,12 @@
       @include flex-group-center;
       @include border;
       @include label;
+
       padding: var(--padding-standard);
 
       .label {
          @include border-right;
+
          font-weight: bold;
          padding-right: var(--padding-standard);
          margin-right: var(--padding-standard);

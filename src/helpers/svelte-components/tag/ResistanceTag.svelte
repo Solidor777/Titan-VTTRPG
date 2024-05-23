@@ -15,6 +15,7 @@
       @include border;
       @include resistance-colors;
       @include label;
+
       padding: var(--padding-standard);
       font-weight: bold;
    }

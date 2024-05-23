@@ -214,6 +214,7 @@
    .attack {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .header {
@@ -226,6 +227,7 @@
          .label {
             @include flex-row;
             @include flex-group-center;
+
             font-weight: bold;
          }
 
@@ -238,6 +240,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-small;
+
          width: 100%;
          flex-wrap: wrap;
 

@@ -93,15 +93,18 @@
    .header {
       @include panel-1;
       @include border;
+
       padding: var(--padding-standard);
 
       .row {
          @include flex-row;
          @include flex-space-evenly;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-standard);
             padding-top: var(--padding-standard);
          }
@@ -110,11 +113,13 @@
       .main-header {
          @include flex-row;
          @include flex-space-between;
+
          width: 100%;
 
          .actor-name {
             @include flex-row;
             @include flex-group-left;
+
             flex: auto;
             margin-right: var(--padding-standard);
          }
@@ -126,6 +131,7 @@
 
          &:not(:first-child) {
             @include border-left;
+
             margin-left: var(--padding-standard);
             padding-left: var(--padding-standard);
          }
@@ -155,6 +161,7 @@
          @include flex-row;
          @include flex-group-center;
          @include border-top;
+
          width: 100%;
          margin-top: var(--padding-standard);
          padding-top: var(--padding-standard);
@@ -162,10 +169,12 @@
          .section {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
 
             &:not(:first-child) {
                @include border-left;
+
                margin-left: var(--padding-standard);
                padding-left: var(--padding-standard);
             }

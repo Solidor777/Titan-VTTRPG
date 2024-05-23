@@ -98,6 +98,7 @@
    .custom-trait-dialog {
       @include font-size-normal;
       @include flex-column;
+
       width: 100%;
       height: 248px;
 
@@ -107,11 +108,13 @@
 
          .label {
             @include flex-row;
+
             font-weight: bold;
          }
 
          .input {
             @include flex-row;
+
             height: 100%;
             width: 100%;
             margin-left: var(--padding-standard);
@@ -121,6 +124,7 @@
       .description {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
          height: 100%;
          margin-top: var(--padding-standard);
@@ -128,12 +132,14 @@
          .label {
             @include flex-row;
             @include flex-group-center;
+
             font-weight: bold;
          }
 
          .input {
             @include flex-column;
             @include flex-group-top;
+
             width: 100%;
             height: 100%;
             margin-top: var(--padding-standard);
@@ -143,12 +149,15 @@
       .buttons {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
          margin-top: var(--padding-standard);
 
          .button {
             @include flex-row;
+
             width: 100%;
+
             --button-border-radius: var(--button-chat-message-border-radius);
 
             &:not(:first-child) {

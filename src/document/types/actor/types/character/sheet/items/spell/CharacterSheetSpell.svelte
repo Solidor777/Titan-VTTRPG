@@ -157,6 +157,7 @@
    .item {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .header {
@@ -164,6 +165,7 @@
          @include flex-space-between;
          @include border;
          @include panel-1;
+
          padding: var(--padding-standard);
          width: 100%;
          font-weight: bold;
@@ -180,6 +182,7 @@
          .controls {
             @include flex-row;
             @include flex-group-right;
+
             height: 100%;
 
             .button {
@@ -195,6 +198,7 @@
          @include flex-group-top;
          @include panel-3;
          @include border-bottom-sides;
+
          width: calc(100% - 16px);
          padding: 0 var(--padding-standard);
 
@@ -216,6 +220,7 @@
             &.tags {
                @include flex-row;
                @include flex-group-center;
+
                flex-wrap: wrap;
 
                .tag {

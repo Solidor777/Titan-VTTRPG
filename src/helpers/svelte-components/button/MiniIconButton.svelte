@@ -12,7 +12,9 @@
 <style lang="scss">
    button {
       @include icon-button;
+
       cursor: pointer;
+
       --icon-button-font-size: var(--font-size-small);
       --icon-button-line-height: normal;
       --icon-button-radius: 20px;

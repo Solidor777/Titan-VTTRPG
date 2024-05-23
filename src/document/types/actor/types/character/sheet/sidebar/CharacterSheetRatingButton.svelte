@@ -141,6 +141,7 @@
       .stats {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
 
          :not(:first-child) {

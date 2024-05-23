@@ -106,6 +106,7 @@
       @include flex-group-center;
       @include font-size-large;
       @include label;
+
       padding: var(--padding-standard);
       font-weight: bold;
       height: 40px;

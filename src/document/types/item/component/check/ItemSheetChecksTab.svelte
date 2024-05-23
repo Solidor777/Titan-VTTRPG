@@ -84,12 +84,14 @@
    .tab {
       @include flex-column;
       @include flex-group-top;
+
       height: 100%;
       width: 100%;
 
       .filter {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
       }
 
@@ -97,6 +99,7 @@
          @include flex-column;
          @include flex-group-top;
          @include panel-2;
+
          width: 100%;
          height: 100%;
 
@@ -119,6 +122,7 @@
          .add-entry-button {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
             margin-top: var(--padding-large);
 

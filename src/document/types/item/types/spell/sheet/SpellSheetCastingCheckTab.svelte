@@ -149,17 +149,20 @@
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
+
       height: 100%;
       width: 100%;
 
       .row {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
          margin-top: var(--padding-large);
 
          &:not(:first-child) {
             @include border-top;
+
             padding-top: var(--padding-large);
          }
 
@@ -173,26 +176,31 @@
          @include flex-group-top;
          @include border-bottom-sides;
          @include panel-3;
+
          padding: var(--padding-standard);
          width: calc(100% - 16px);
 
          .stat {
             @include flex-row;
             @include flex-group-center;
+
             height: 100%;
 
             .label {
                @include flex-row;
                @include flex-group-center;
+
                height: 100%;
                font-weight: bold;
                margin-right: var(--padding-standard);
+
                @include font-size-small;
             }
 
             .input {
                @include flex-row;
                @include flex-group-center;
+
                height: 100%;
                width: 32px;
             }
@@ -200,12 +208,14 @@
             .value {
                @include flex-row;
                @include flex-group-center;
+
                height: 100%;
             }
          }
 
          .divider {
             @include border-left;
+
             height: 100%;
             margin-left: var(--padding-large);
             padding-right: var(--padding-large);
@@ -214,6 +224,7 @@
 
       .aspect-costs {
          @include flex-column;
+
          padding: var(--padding-standard);
          height: 100%;
          width: 100%;
@@ -222,6 +233,7 @@
             @include flex-row;
             @include flex-group-center;
             @include border-bottom;
+
             padding-bottom: var(--padding-standard);
             margin-top: var(--padding-large);
             width: 100%;
@@ -231,6 +243,7 @@
          .costs-container {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
             flex-wrap: wrap;
 

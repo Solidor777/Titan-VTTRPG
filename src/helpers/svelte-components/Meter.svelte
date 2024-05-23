@@ -45,7 +45,7 @@
       background: var(--meter-background);
       border-radius: 25px;
       padding: 3px;
-      box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+      box-shadow: inset 0 -1px 1px rgb(255 255 255 / 0.3);
 
       span {
          display: block;

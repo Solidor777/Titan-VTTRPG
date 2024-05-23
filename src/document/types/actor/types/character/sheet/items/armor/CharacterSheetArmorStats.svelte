@@ -67,6 +67,7 @@
       @include flex-row;
       @include flex-group-center;
       @include font-size-small;
+
       width: 100%;
       flex-wrap: wrap;
 

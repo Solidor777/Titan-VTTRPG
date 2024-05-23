@@ -21,6 +21,7 @@
    .label {
       @include flex-row;
       @include flex-group-left;
+
       width: 100%;
 
       .content {
@@ -30,6 +31,7 @@
          @include border;
          @include attribute-colors;
          @include font-size-large;
+
          padding: var(--padding-large);
          font-weight: bold;
       }

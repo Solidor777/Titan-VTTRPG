@@ -19,15 +19,18 @@
    .speeds {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .speed {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-standard);
             padding-top: var(--padding-standard);
          }

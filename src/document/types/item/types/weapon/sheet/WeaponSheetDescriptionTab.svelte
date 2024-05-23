@@ -30,6 +30,7 @@
 <style lang="scss">
    .tab {
       @include flex-column;
+
       width: 100%;
       flex-grow: 1;
    }

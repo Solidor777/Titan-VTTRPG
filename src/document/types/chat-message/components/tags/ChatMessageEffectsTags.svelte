@@ -114,6 +114,7 @@
    .effects {
       @include flex-row;
       @include flex-group-center;
+
       flex-wrap: wrap;
 
       .effect {

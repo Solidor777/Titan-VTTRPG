@@ -33,13 +33,16 @@
       @include flex-column;
       @include flex-group-center;
       @include panel-2;
+
       height: 100%;
       width: 100%;
+
       @include font-size-normal;
 
       .description {
          @include flex-column;
          @include flex-group-top;
+
          padding: var(--padding-large);
          width: 100%;
          height: 100%;
@@ -47,6 +50,7 @@
          h3 {
             @include flex-row;
             @include flex-group-left;
+
             width: 100%;
             margin-bottom: 0;
          }
@@ -54,6 +58,7 @@
          .body {
             @include flex-row;
             @include flex-group-left;
+
             margin-top: var(--padding-standard);
             flex-wrap: wrap;
             width: 100%;

@@ -190,18 +190,21 @@
       @include flex-space-between;
       @include border;
       @include panel-1;
+
       width: 100%;
       height: 100%;
 
       .settings {
          @include flex-row;
          @include flex-group-left;
+
          flex-wrap: wrap;
          width: 100%;
          margin-bottom: var(--padding-large);
 
          .field {
             @include flex-row;
+
             margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
 
             &.select {
@@ -210,6 +213,7 @@
 
             &.number {
                @include flex-group-center;
+
                width: 32px;
             }
          }
@@ -218,6 +222,7 @@
       .delete-button {
          @include flex-column;
          @include flex-group-top;
+
          height: 100%;
          margin: var(--padding-large) var(--padding-standard) 0 0;
       }

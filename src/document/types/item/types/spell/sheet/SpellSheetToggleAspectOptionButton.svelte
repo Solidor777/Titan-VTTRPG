@@ -40,6 +40,7 @@
       --button-font-size: var(--font-size-small);
       --button-padding: 0 var(--padding-standard);
       --button-border-radius: var(--button-chat-message-border-radius);
+
       margin: var(--padding-standard);
 
       &.enabled-true {

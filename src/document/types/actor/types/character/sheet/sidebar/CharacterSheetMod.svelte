@@ -87,6 +87,7 @@
    .mod {
       @include flex-row;
       @include flex-space-between;
+
       width: 100%;
       height: 100%;
 
@@ -97,6 +98,7 @@
       .label {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
 
          .fas {
@@ -107,6 +109,7 @@
       .stats {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
 
          :not(:first-child) {
@@ -116,12 +119,14 @@
          .input {
             @include flex-row;
             @include flex-group-center;
+
             width: 28px;
          }
 
          .value {
             @include flex-row;
             @include flex-group-center;
+
             height: 100%;
             min-width: 28px;
          }

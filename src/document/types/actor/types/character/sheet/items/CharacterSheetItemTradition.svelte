@@ -23,6 +23,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
+
       padding: var(--padding-standard);
       background: var(--label-background);
 

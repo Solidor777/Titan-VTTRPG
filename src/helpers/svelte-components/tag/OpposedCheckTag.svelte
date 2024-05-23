@@ -30,6 +30,7 @@
       @include attribute-colors;
       @include border;
       @include label;
+
       padding: var(--padding-standard);
 
       .label {
@@ -38,6 +39,7 @@
 
          &:not(:first-child) {
             @include border-left;
+
             margin-left: var(--padding-standard);
             padding-left: var(--padding-standard);
          }

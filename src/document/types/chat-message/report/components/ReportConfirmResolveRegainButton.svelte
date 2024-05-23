@@ -53,7 +53,9 @@
    .button {
       @include flex-row;
       @include font-size-normal;
+
       width: 100%;
+
       --button-border-radius: var(--button-chat-message-border-radius);
    }
 </style>

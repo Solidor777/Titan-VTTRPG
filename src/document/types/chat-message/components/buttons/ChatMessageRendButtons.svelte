@@ -39,11 +39,14 @@
 <style lang="scss">
    .damage-buttons {
       @include flex-row;
+
       width: 100%;
 
       .button {
          @include flex-row;
+
          width: 100%;
+
          --button-border-radius: var(--button-chat-message-border-radius);
 
          &:not(:first-child) {
@@ -57,6 +60,7 @@
 
       .fas {
          @include font-size-extra-large;
+
          margin-right: var(--padding-standard);
       }
    }

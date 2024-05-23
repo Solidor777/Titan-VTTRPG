@@ -69,6 +69,7 @@
       @include flex-row;
       @include flex-group-center;
       @include font-size-small;
+
       flex-wrap: wrap;
 
       .aspect {

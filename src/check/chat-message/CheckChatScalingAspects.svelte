@@ -21,6 +21,7 @@
    .aspects {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .aspect {

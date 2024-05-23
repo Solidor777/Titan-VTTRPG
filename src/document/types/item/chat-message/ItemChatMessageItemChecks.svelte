@@ -186,10 +186,6 @@
             }
          }
 
-         .button {
-            margin-top: var(--padding-large);
-         }
-
          .tags {
             @include flex-row;
             @include flex-group-center;

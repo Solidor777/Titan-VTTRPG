@@ -24,6 +24,7 @@
       @include border;
       @include font-size-small;
       @include label;
+
       font-weight: bold;
       padding: var(--padding-standard);
 

@@ -45,6 +45,6 @@
       "eslint": "eslint .",
       "eslint-fix": "eslint --fix",
       "stylelint": "stylelint \"**/*.svelte\"",
-      "stylelint-fix": "stylelint --fix \"**/*.svelte\""
+      "stylelint-fix": "stylelint \"**/*.svelte\" --fix"
    }
 }

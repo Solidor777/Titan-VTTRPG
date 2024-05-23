@@ -14,6 +14,7 @@
       @include flex-group-center;
       @include border;
       @include attribute-colors;
+
       flex-wrap: wrap;
       font-weight: bold;
       padding: var(--padding-standard);

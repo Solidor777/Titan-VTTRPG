@@ -63,12 +63,14 @@
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
+
       width: 100%;
       height: 100%;
 
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
          height: 100%;
 
@@ -84,6 +86,7 @@
             li {
                @include flex-row;
                @include flex-group-center;
+
                width: 100%;
                margin-top: var(--padding-large);
             }

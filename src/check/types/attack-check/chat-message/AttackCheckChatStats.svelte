@@ -72,6 +72,7 @@
    .stats {
       @include flex-row;
       @include flex-group-center;
+
       width: 100%;
       flex-wrap: wrap;
 

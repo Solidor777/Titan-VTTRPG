@@ -146,15 +146,18 @@
       @include list;
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       li {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-large);
          }
 
@@ -163,6 +166,7 @@
             @include flex-space-between;
             @include border-bottom;
             @include panel-1;
+
             font-weight: bold;
             width: 100%;
             padding: var(--padding-standard);
@@ -170,6 +174,7 @@
             .label {
                @include flex-row;
                @include flex-group-center;
+
                width: 100%;
 
                .text {
@@ -180,6 +185,7 @@
                i {
                   @include flex-row;
                   @include flex-group-center;
+
                   margin-right: var(--padding-standard);
                }
             }
@@ -187,6 +193,7 @@
             .spacer {
                @include flex-row;
                @include flex-group-center;
+
                width: 48px;
             }
          }
@@ -197,6 +204,7 @@
             @include border-bottom-sides;
             @include panel-3;
             @include font-size-small;
+
             width: calc(100% - var(--padding-large));
             flex-wrap: wrap;
             padding: 0 var(--padding-standard) var(--padding-large) var(--padding-standard);

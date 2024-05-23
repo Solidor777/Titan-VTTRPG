@@ -51,6 +51,7 @@
    .label {
       @include flex-row;
       @include flex-group-left;
+
       width: 100%;
 
       .content {
@@ -59,6 +60,7 @@
          @include attribute-colors;
          @include border;
          @include label;
+
          padding: var(--padding-large);
          font-weight: bold;
 

@@ -21,6 +21,7 @@
       @include border-bottom;
       @include panel-1;
       @include font-size-normal;
+
       width: 100%;
       padding: var(--padding-standard);
 

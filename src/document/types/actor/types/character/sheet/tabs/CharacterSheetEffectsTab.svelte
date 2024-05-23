@@ -81,6 +81,7 @@
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
+
       height: 100%;
       width: 100%;
 
@@ -89,12 +90,14 @@
          @include flex-group-top;
          @include border-bottom;
          @include panel-1;
+
          padding: var(--padding-standard);
          width: 100%;
 
          .row {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
 
             &:not(:first-child) {
@@ -119,12 +122,14 @@
       .scrolling-content {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
          height: 100%;
 
          .list {
             @include flex-column;
             @include flex-group-top;
+
             width: 100%;
             margin-top: var(--padding-large);
          }

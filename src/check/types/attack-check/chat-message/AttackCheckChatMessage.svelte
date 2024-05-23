@@ -84,15 +84,16 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;
+
       width: 100%;
 
       .section {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
-         &:not(:first-child):not(.tags):not(.rich-text):not(
-               .rich-text + section
+         &:not(:first-child, .tags, .rich-text, .rich-text + section
             ) {
             margin-top: var(--padding-large);
          }

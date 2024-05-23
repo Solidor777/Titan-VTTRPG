@@ -325,22 +325,26 @@
       @include flex-group-top-left;
       @include border;
       @include panel-1;
+
       width: 100%;
       height: 100%;
 
       .header {
          @include flex-row;
+
          width: 100%;
 
          .settings {
             @include flex-row;
             @include flex-group-left;
+
             width: 100%;
             margin-bottom: var(--padding-large);
             flex-wrap: wrap;
 
             .field {
                @include flex-row;
+
                margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
 
                &.select {
@@ -352,12 +356,14 @@
          .delete-button {
             @include flex-column;
             @include flex-group-top;
+
             margin: var(--padding-standard) var(--padding-standard) 0 0;
          }
       }
 
       .section {
          @include flex-column;
+
          margin-top: var(--padding-standard);
          width: 100%;
          min-height: 160px;

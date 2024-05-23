@@ -82,6 +82,7 @@
    .casting-check {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
 
       .header {
@@ -90,6 +91,7 @@
          @include border-top-bottom;
          @include attribute-colors;
          @include label;
+
          width: 100%;
          padding: var(--padding-standard);
          font-weight: bold;
@@ -98,6 +100,7 @@
          .label-normal {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
             flex-wrap: wrap;
          }
@@ -105,6 +108,7 @@
          .label-button {
             @include flex-row;
             @include flex-group-right;
+
             width: 100%;
             flex-wrap: wrap;
          }
@@ -112,6 +116,7 @@
          .spacer {
             @include flex-row;
             @include flex-group-right;
+
             width: 48px;
          }
       }
@@ -119,6 +124,7 @@
       .checks {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
       }
    }

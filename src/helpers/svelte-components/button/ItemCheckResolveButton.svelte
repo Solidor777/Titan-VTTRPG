@@ -32,6 +32,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
+
          height: 100%;
          line-height: normal;
          padding: var(--padding-standard);
@@ -42,6 +43,7 @@
 
          .divider {
             @include border-left;
+
             border-color: var(--button-border-color);
             margin-left: var(--padding-standard);
             padding-left: var(--padding-standard);

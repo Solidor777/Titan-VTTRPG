@@ -112,7 +112,7 @@
 
          width: 100%;
 
-         &:not(:first-child):not(.tags) {
+         &:not(:first-child, .tags) {
             margin-top: var(--padding-large);
          }
       }

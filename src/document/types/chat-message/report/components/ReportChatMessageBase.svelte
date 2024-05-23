@@ -79,6 +79,7 @@
 
             &:not(:first-child) {
                @include border-top;
+
                margin-top: var(--padding-large);
             }
 

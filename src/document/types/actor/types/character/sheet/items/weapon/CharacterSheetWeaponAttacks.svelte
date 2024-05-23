@@ -21,17 +21,19 @@
       @include flex-column;
       @include flex-group-top;
       @include list;
+
       width: 100%;
 
       li {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
-            padding-top: var(--padding-large);
 
+            padding-top: var(--padding-large);
             margin-top: 8px;
          }
       }

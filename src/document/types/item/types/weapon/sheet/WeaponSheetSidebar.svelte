@@ -39,6 +39,7 @@
       @include flex-group-top;
       @include border;
       @include panel-2;
+
       width: 100%;
       height: 100%;
       min-width: 208px;
@@ -49,6 +50,7 @@
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-large);
          }
       }

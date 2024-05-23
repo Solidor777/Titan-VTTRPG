@@ -71,16 +71,19 @@
    .header {
       @include border;
       @include panel-1;
+
       padding: var(--padding-standard);
 
       .main-header {
          @include flex-row;
          @include flex-space-between;
+
          width: 100%;
 
          .actor-name {
             @include flex-row;
             @include flex-group-left;
+
             flex: auto;
             margin-right: var(--padding-standard);
          }
@@ -88,29 +91,34 @@
          .inspiration {
             @include flex-row;
             @include flex-group-center;
+
             margin-right: var(--padding-standard);
          }
 
          .xp {
             @include flex-row;
             @include flex-group-center;
+
             margin-right: var(--padding-standard);
 
             .available {
                @include flex-row;
                @include flex-group-center;
+
                width: 40px;
                height: var(--input-height);
             }
 
             .symbol {
                @include flex-row;
+
                margin: var(--padding-standard);
             }
 
             .earned {
                @include flex-row;
                @include flex-group-center;
+
                margin-right: var(--padding-large);
                width: 40px;
             }
@@ -118,6 +126,7 @@
             .label {
                @include flex-row;
                @include flex-group-center;
+
                font-weight: bold;
             }
          }
@@ -127,6 +136,7 @@
          @include flex-row;
          @include flex-group-center;
          @include border-top;
+
          width: 100%;
          margin-top: var(--padding-standard);
          padding-top: var(--padding-standard);
@@ -134,10 +144,12 @@
          .section {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
 
             &:not(:first-child) {
                @include border-left;
+
                margin-left: var(--padding-standard);
                padding-left: var(--padding-standard);
             }

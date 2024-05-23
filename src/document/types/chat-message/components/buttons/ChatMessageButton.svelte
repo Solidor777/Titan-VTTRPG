@@ -16,6 +16,7 @@
 <style lang="scss">
    button {
       @include button;
+
       --button-border-radius: var(--button-chat-message-border-radius);
    }
 </style>

@@ -13,6 +13,7 @@
    .document-name {
       width: 100%;
       height: 100%;
+
       --input-height: 32px;
       --input-padding: var(--padding-standard);
       --font-size: var(--font-size-extra-large);

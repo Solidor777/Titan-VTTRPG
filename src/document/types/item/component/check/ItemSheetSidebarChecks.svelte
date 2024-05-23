@@ -145,15 +145,18 @@
       @include flex-column;
       @include flex-group-top;
       @include list;
+
       width: 100%;
 
       li {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-large);
          }
 
@@ -163,28 +166,33 @@
             @include border-bottom;
             @include attribute-colors;
             @include label;
+
             width: 100%;
             padding: var(--padding-standard);
 
             .label {
                @include flex-row;
                @include flex-group-center;
+
                width: 100%;
 
                .main-label {
                   @include flex-row;
                   @include flex-group-center;
+
                   width: 100%;
 
                   .text {
                      @include flex-row;
                      @include flex-group-center;
+
                      font-weight: bold;
                   }
 
                   i {
                      @include flex-row;
                      @include flex-group-center;
+
                      margin-right: var(--padding-standard);
                   }
                }
@@ -192,6 +200,7 @@
                .spacer {
                   @include flex-row;
                   @include flex-group-center;
+
                   width: 48px;
                }
             }
@@ -206,6 +215,7 @@
             @include flex-group-center;
             @include border-bottom-sides;
             @include panel-3;
+
             width: calc(100% - var(--padding-large));
             flex-wrap: wrap;
             padding: 0 var(--padding-large) var(--padding-large) var(--padding-large);
@@ -213,24 +223,28 @@
             .stat {
                @include flex-row;
                @include flex-group-center;
+
                margin-top: var(--padding-large);
             }
 
             .labeled-stat {
                @include flex-column;
                @include flex-group-top;
+
                margin-top: var(--padding-large);
 
                .label {
                   @include flex-row;
                   @include flex-group-center;
                   @include font-size-small;
+
                   font-weight: bold;
                }
 
                .value {
                   @include flex-row;
                   @include flex-group-center;
+
                   margin-top: var(--padding-standard);
                }
             }

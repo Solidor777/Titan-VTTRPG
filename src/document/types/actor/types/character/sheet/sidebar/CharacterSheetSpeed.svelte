@@ -103,12 +103,14 @@
    .speed {
       @include flex-row;
       @include flex-space-between;
+
       width: 100%;
       height: 100%;
 
       .label {
          @include flex-row;
          @include flex-group-center;
+
          margin-left: var(--padding-standard);
          height: 100%;
       }
@@ -116,17 +118,20 @@
       .value {
          @include flex-row;
          @include flex-group-center;
+
          min-width: 28px;
       }
 
       .stats {
          @include flex-row;
          @include flex-group-center;
+
          height: 100%;
 
          .symbol {
             @include flex-row;
             @include flex-group-center;
+
             height: 100%;
          }
 

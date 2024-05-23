@@ -72,6 +72,7 @@
    .item-chat-message {
       @include flex-column;
       @include font-size-normal;
+
       align-items: flex-start;
       justify-content: center;
       width: 100%;
@@ -79,6 +80,7 @@
       .sections {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
 
          .section {
@@ -103,6 +105,7 @@
             &.tags {
                @include flex-row;
                @include flex-group-center;
+
                flex-wrap: wrap;
 
                .tag {

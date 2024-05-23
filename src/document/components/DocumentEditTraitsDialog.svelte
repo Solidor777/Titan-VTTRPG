@@ -113,11 +113,14 @@
             @include flex-row;
             @include flex-group-center;
             @include panel-2;
+
             width: 100%;
             height: 40px;
             margin-bottom: var(--padding-large);
             padding: var(--padding-standard);
+
             @include font-size-normal;
+
             font-weight: bold;
             page-break-inside: avoid;
 
@@ -128,6 +131,7 @@
             .label {
                @include flex-row;
                @include flex-group-left;
+
                width: 100%;
                height: 100%;
             }
@@ -135,6 +139,7 @@
             .input {
                @include flex-row;
                @include flex-group-center;
+
                width: 30%;
                height: 100%;
             }
@@ -144,13 +149,16 @@
       .row {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
          margin-top: var(--padding-standard);
 
          .button {
             @include flex-row;
             @include flex-group-center;
+
             width: 100%;
+
             --button-border-radius: var(--button-chat-message-border-radius);
 
             &:not(:first-child) {

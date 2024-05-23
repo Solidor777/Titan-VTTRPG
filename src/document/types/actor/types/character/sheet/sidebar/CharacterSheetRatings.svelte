@@ -45,16 +45,19 @@
    .ratings {
       @include flex-column;
       @include flex-group-top;
+
       width: 100%;
       height: 100%;
 
       .rating {
          @include flex-row;
          @include flex-group-center;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-standard);
             padding-top: var(--padding-standard);
          }

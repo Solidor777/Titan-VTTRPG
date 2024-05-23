@@ -281,6 +281,7 @@
                @include flex-row;
                @include flex-group-center;
                @include font-size-small;
+
                height: 100%;
                font-weight: bold;
             }
@@ -288,6 +289,7 @@
             .select {
                @include flex-row;
                @include flex-group-center;
+
                margin-left: var(--padding-standard);
                height: 100%;
             }
@@ -301,6 +303,7 @@
 
             &:not(:first-child) {
                @include border-top;
+
                padding-top: var(--padding-standard);
                margin-top: var(--padding-standard);
             }
@@ -309,6 +312,7 @@
                @include flex-row;
                @include flex-group-right;
                @include font-size-small;
+
                height: 100%;
                font-weight: bold;
                margin-right: var(--padding-standard);
@@ -321,6 +325,7 @@
             .input {
                @include flex-row;
                @include flex-group-center;
+
                height: 100%;
                width: 28px;
                margin-left: var(--padding-standard);
@@ -329,6 +334,7 @@
             .value {
                @include flex-row;
                @include flex-group-center;
+
                font-weight: normal;
                height: 100%;
                width: 28px;
@@ -338,6 +344,7 @@
             .symbol {
                @include flex-row;
                @include flex-group-center;
+
                height: 100%;
                margin-left: var(--padding-standard);
             }
@@ -356,6 +363,7 @@
                @include flex-row;
                @include flex-group-center;
                @include border-bottom;
+
                font-weight: bold;
 
                i {

@@ -122,12 +122,14 @@
     @include flex-column;
     @include flex-group-top;
     @include list;
+
     width: 100%;
     list-style: none;
 
     li {
       @include flex-row;
       @include flex-space-between;
+
       width: 100%;
 
       &.drag-hovered {
