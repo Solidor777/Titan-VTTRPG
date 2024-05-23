@@ -28,7 +28,7 @@
    /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   /** @type TitanActor Reference to the Character document. */
+   /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
    /** @type TitanActor Reference to the Item document. */

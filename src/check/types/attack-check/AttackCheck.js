@@ -34,14 +34,13 @@ export default class AttackCheck extends TitanCheck {
             }
 
             // Apply expertise to dice that are === the increment from being a critical success
-            for (let i = 0; i < sortedDice.length; i++) {
-               if (
-                  retVal.dice[i].final < 6 &&
+            for (const die of retVal.dice) {
+               if (die.final < 6 &&
                   6 - retVal.dice[i].final === increment
                ) {
                   retVal.expertiseRemaining -= increment;
-                  retVal.dice[i].final = 6;
-                  retVal.dice[i].expertiseApplied += increment;
+                  die.final = 6;
+                  die.expertiseApplied += increment;
 
                   // Abort early if we run out of expertise
                   if (increment > retVal.expertiseRemaining) {

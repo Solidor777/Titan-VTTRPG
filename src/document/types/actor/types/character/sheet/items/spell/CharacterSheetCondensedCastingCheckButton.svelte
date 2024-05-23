@@ -6,7 +6,7 @@
    /** @type string ID of the item to get the check from. */
    export let itemId = void 0;
 
-   /** @type TitanActor Reference to the Character document. */
+   /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
    const checkOptions = {

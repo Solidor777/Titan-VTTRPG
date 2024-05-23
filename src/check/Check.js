@@ -3,7 +3,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Options for a check in the Titan system.
  * @typedef {object} CheckOptions
- * @property {boolean?} doubleExpertise Whether to double the Expertise to apply..
+ * @property {boolean?} doubleExpertise Whether to double the Expertise to apply.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {number?} complexity The minimum number of Successes needed.
@@ -15,7 +15,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Base parameters of a check in the Titan system.
  * @typedef {object} CheckParameters
- * @property {boolean} doubleExpertise Whether to double the Expertise to apply..
+ * @property {boolean} doubleExpertise Whether to double the Expertise to apply.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {number} complexity The minimum number of Successes needed.
@@ -115,11 +115,11 @@ export default class TitanCheck {
          // If using critical failures,
          // apply expertise to prevent critical failures
          if (extraFailureOnCritical) {
-            for (let i = 0; i < sortedDice.length; i++) {
-               if (retVal.dice[i].final === 1) {
+            for (const die of retVal.dice) {
+               if (die.final === 1) {
                   retVal.expertiseRemaining -= 1;
-                  retVal.dice[i].final = 2;
-                  retVal.dice[i].expertiseApplied = 1;
+                  die.final = 2;
+                  die.expertiseApplied = 1;
 
                   // Abort early if we run out of expertise
                   if (1 > retVal.expertiseRemaining) {
@@ -139,14 +139,13 @@ export default class TitanCheck {
             }
 
             // Apply expertise to dice that are === the increment from being a success
-            for (let i = 0; i < sortedDice.length; i++) {
-               if (
-                  retVal.dice[i].final < difficulty &&
-                  difficulty - retVal.dice[i].final === increment
+            for (const die of retVal.dice) {
+               if (die.final < difficulty &&
+                  difficulty - die.final === increment
                ) {
                   retVal.expertiseRemaining -= increment;
-                  retVal.dice[i].final = difficulty;
-                  retVal.dice[i].expertiseApplied += increment;
+                  die.final = difficulty;
+                  die.expertiseApplied += increment;
 
                   // Abort operation if we run out of expertise
                   if (increment > retVal.expertiseRemaining) {
@@ -158,14 +157,13 @@ export default class TitanCheck {
             // If using critical successes,
             // apply expertise to dice that are == the increment from being a critical success
             if (extraSuccessOnCritical) {
-               for (let i = 0; i < sortedDice.length; i++) {
-                  if (
-                     retVal.dice[i].final < 6 &&
+               for (const die of retVal.dice) {
+                  if (die.final < 6 &&
                      6 - retVal.dice[i].final === increment
                   ) {
                      retVal.expertiseRemaining -= increment;
-                     retVal.dice[i].final = 6;
-                     retVal.dice[i].expertiseApplied += increment;
+                     die.final = 6;
+                     die.expertiseApplied += increment;
 
                      // Abort early if we run out of expertise
                      if (increment > retVal.expertiseRemaining) {
@@ -244,7 +242,7 @@ export default class TitanCheck {
 
    /**
     * Overridable function for getting the specific check type.
-    * @returns {string} The check type.
+    * @returns {string} String containing the Check type.
     * @protected
     */
    _getCheckType() {

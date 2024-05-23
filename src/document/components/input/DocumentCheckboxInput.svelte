@@ -1,22 +1,22 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   // The value of the input
-   export let value;
+   /** @type number The value that this input should modify. */
+   export let value = void 0;
 
-   // Document reference
+   /** @type Document Reference to the Document this Application is for. */
    const document = getContext('document');
 
+   /** @type boolean Whether editing this input should be disabled. */
    export let disabled = false;
 
-   // Updates the document data when the input changes
    /**
-    *
+    * Update the document data when the input changes.
     */
-   async function updateDocument() {
-      if ($document?.isOwner) {
-         await $document.update({
+   function updateDocument() {
+      if ($document?.isOwner && !disabled) {
+         $document.update({
             system: $document.system,
             flags: $document.flags,
          });
@@ -28,5 +28,5 @@
    bind:value
    disabled={disabled || !$document?.isOwner}
    on:change
-   on:change={()=> updateDocument()}
-   />
+   on:change={updateDocument}
+/>

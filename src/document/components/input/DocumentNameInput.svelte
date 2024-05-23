@@ -1,7 +1,8 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import DocumentTextInput from '~/document/components/input/DocumentTextInput.svelte';
 
+   /** @type Document Reference to the Document this Application is for. */
    const document = getContext('document');
 </script>
 

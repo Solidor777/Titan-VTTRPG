@@ -85,7 +85,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Migrates the data for each component.
-    * @param {object} source - The source data.
+    * @param {object} source - The source data for the document.
     * @returns {object} The migrated data.
     * @protected
     */
@@ -120,7 +120,6 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     */
    _getInitialDocumentData(data) {
    }
-
 
    /**
     * Apply transformations of derivations to the values of the source data object.

@@ -1,15 +1,18 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentEditorInput from '~/document/components/input/DocumentEditorInput.svelte';
+   import DocumentBoundEditorInput from "~/document/components/input/DocumentBoundEditorInput.svelte";
 
-   // Application reference
+   /** @type Document Reference to the Character document. */
+   const document = getContext('document');
+
+   /** @type object Reference to the object containing the application state. */
    const appState = getContext('applicationState');
 </script>
 
 <div class="tab">
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.description}>
-      <DocumentEditorInput fieldName={'system.description'} />
+      <DocumentBoundEditorInput bind:value={$document.system.description}/>
    </ScrollingContainer>
 </div>
 

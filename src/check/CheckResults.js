@@ -31,8 +31,7 @@ export default function calculateCheckResults(diceResults, parameters) {
 
    // Calculate successes and failures
    for (let i = 0; i < retVal.dice.length; i++) {
-      retVal.dice[i].success = false;
-
+      
       // If this die was a critical success
       if (retVal.dice[i].final === 6) {
 
@@ -42,10 +41,6 @@ export default function calculateCheckResults(diceResults, parameters) {
          // Add to the number of successes
          // Add 2 successes if we gain an extra success on critical successes
          retVal.successes += parameters.extraSuccessOnCritical ? 2 : 1;
-
-         // Note the die result
-         retVal.dice[i].success = true;
-         retVal.dice[i].criticalSuccess = true;
       }
 
       // If this dice was a normal success
@@ -53,9 +48,6 @@ export default function calculateCheckResults(diceResults, parameters) {
 
          // Increment the number of successes
          retVal.successes += 1;
-
-         // Note the die result
-         retVal.dice[i].success = true;
       }
 
       // If this die was a critical failure
@@ -63,9 +55,6 @@ export default function calculateCheckResults(diceResults, parameters) {
 
          // Increment the number of critical failures
          retVal.criticalFailures += 1;
-
-         // Note the die as a critical failure
-         retVal.dice[i].criticalFailure = true;
 
          // Decrement the number of successes if we lose a success on critical failures
          if (parameters.extraFailureOnCritical) {

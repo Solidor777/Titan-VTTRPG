@@ -12,7 +12,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} extraSuccesses The number of Critical Successes achieved.
  * @property {number} healing The amount of Healing applied.
  * @property {number} successes The total number of Successes achieved.
- * @property {number} opposedCheckComplexity The Complexity of the Opposed check.
+ * @property {number} opposedCheckComplexity The Complexity of the Opposed check, if any.
  * @augments CheckResults
  */
 

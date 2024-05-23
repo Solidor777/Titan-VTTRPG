@@ -5,5 +5,5 @@
 
 <ItemSheetDescriptionTab
    header={localize('attackNotes')}
-   fieldName={'system.attackNotes'}
+   path={'system.attackNotes'}
 />

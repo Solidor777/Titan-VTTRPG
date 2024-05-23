@@ -3,7 +3,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
    import {getContext} from "svelte";
 
-   /** @type TitanActor Reference to the Character document. */
+   /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
    /** @type {string} The ID of the item to get the check from. */

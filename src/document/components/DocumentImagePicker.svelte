@@ -1,56 +1,68 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication';
 
-   // Property path of the document to change
+   /** @type string Path to the document property this component should modify. */
    export let path = void 0;
 
-   // Alt text for if the path is not a valid image
+   /** @type string Alt text to display if the image path is invalid. */
    export let alt = 'img';
 
-   // Get the aplication
+   /** @type boolean Whether editing this input should be disabled. */
+   export let disabled = false;
+
+   /** @type Application Reference to the Application containing this component. */
    const application = getApplication();
 
-   // Get the contained document
+   /** @type Document Reference to the Document this Application is for. */
    const document = getContext('document');
 
-   // Get the image path from the property
+   /** @type string The value of the image property within the Document. */
    let src = getProperty($document, path);
 
+   // Update the image in response to changes
+   $: {
+      if (document) {
+         src = getProperty($document, path)
+      }
+   }
+
    /**
-    *
+    * Creates a File Picker for setting the value of the image.
+    * @returns {FilePicker.browse|void} The newly created File Picker if any was created.
     */
-   function onEditImage() {
-      // If the current user owns this actor
-      if ($document?.isOwner) {
-         // Create a file picker pointing to the source
-         const current = src;
+   function onOpenFilePicker() {
+      // If the current user owns this document
+      if ($document?.isOwner && !disabled) {
+
+         // Create a file picker pointing at the current source
          const filePicker = new FilePicker({
             type: 'image',
-            current: current,
-            callback: async (newPath) => {
+            current: src,
+            callback: (newPath) => {
                if ($document?.isOwner) {
                   src = newPath;
-                  let updateData = {};
+                  const updateData = {};
                   updateData[path] = src;
-                  await $document.update(updateData);
+                  $document.update(updateData);
                }
             },
             top: application.position.top + 40,
             left: application.position.left + 10,
          });
-         return filePicker.browse();
+
+         filePicker.browse();
       }
    }
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <img
-   class={$document?.isOwner ? 'active' : ''}
    {alt}
+   class={$document?.isOwner && !disabled ? 'active' : ''}
+   on:click={() => onOpenFilePicker()}
+   on:keypress={() => onOpenFilePicker()}
    {src}
-   on:keypress={onEditImage}
-   on:click={onEditImage}
 />
 
 <style>

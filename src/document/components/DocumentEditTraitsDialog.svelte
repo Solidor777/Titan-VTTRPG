@@ -8,162 +8,159 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   // The document
+   /** @type Document The Document to edit the traits of. */
    export let document = void 0;
 
-   // The document traits to update
+   /** @type object[] The traits to be edited. */
    export let documentTraits = void 0;
 
-   // The options
+   /** @type object[] The traits to select from. */
    export let traitOptions = void 0;
 
-   // Descriptions of each trait
+   /** @type object Object containing a mapping of each trait to its description. */
    export let traitDescriptions = void 0;
 
    // Application reference
    const application = getApplication();
 
-   // Initialize trait options to the current value of the traits
-   documentTraits.forEach((trait) => {
+   // Initialize the value of each trait option to the current value of the document's matching trait
+   for (const trait of documentTraits) {
       for (let idx = 0; idx < traitOptions.length; idx++) {
          if (traitOptions[idx].name === trait.name) {
             traitOptions[idx].value = trait.value;
             break;
          }
       }
-   });
+   }
 
    /**
-    *
+    * Applies the trait edits to the Document.
     */
    function applyTraitEdits() {
       // If the document and traits are still valid
       if (document && documentTraits) {
-         // Filter the active traits
-         documentTraits = traitOptions.filter(
-            (trait) =>
-               (trait.type === 'boolean' && trait.value === true) ||
-               (trait.type === 'number' && trait.value > 0),
+
+         // Set the document's traits to equal the active traits from the trait options
+         documentTraits = traitOptions.filter((trait) =>
+            (trait.type === 'boolean' && trait.value === true) ||
+            (trait.type === 'number' && trait.value > 0),
          );
 
          // Update the document
-         const system = document.system;
-         document.update({ system: system });
+         document.update({
+            system: document.system
+         });
       }
 
       application.close();
-      return;
    }
 </script>
 
-<div class="document-edit-traits-dialog">
-   <!--Traits list-->
-   <ol>
-      {#each traitOptions as trait, idx}
-         <!--Trait-->
-         <li use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}>
-            <!--Label-->
-            <div class="label">
-               {localize(trait.name)}
-            </div>
+<!--Traits list-->
+<ol>
+   {#each traitOptions as trait, idx}
+      <!--Trait-->
+      <li use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}>
 
-            <!--Input-->
-            <div class="input">
-               {#if trait.type === 'boolean'}
-                  <!--Boolean-->
-                  <CheckboxInput bind:value={traitOptions[idx].value}/>
-               {:else}
-                  <!--Integer-->
-                  <IntegerInput bind:value={traitOptions[idx].value}/>
-               {/if}
-            </div>
-         </li>
-      {/each}
-   </ol>
+         <!--Label-->
+         <div class="label">
+            {localize(trait.name)}
+         </div>
 
-   <!--Buttons-->
-   <div class="row">
-      <div class="button">
-         <Button on:click={applyTraitEdits}>
-            {localize('applyEdits')}
-         </Button>
-      </div>
+         <!--Input-->
+         <div class="input">
+            {#if trait.type === 'boolean'}
+               <!--Boolean Trait-->
+               <CheckboxInput bind:value={traitOptions[idx].value}/>
+            {:else}
+               <!--Integer Trait-->
+               <IntegerInput bind:value={traitOptions[idx].value}/>
+            {/if}
+         </div>
+      </li>
+   {/each}
+</ol>
 
-      <div class="button">
-         <Button
-            on:click={() => {
-               application.close();
-            }}
-         >{localize('cancel')}
-         </Button>
-      </div>
+<!--Buttons-->
+<div class="buttons">
+
+   <!--Apply Trait Edits Button-->
+   <div class="button">
+      <Button on:click={() => applyTraitEdits()}>
+         {localize('applyEdits')}
+      </Button>
+   </div>
+
+   <!--Cancel Button-->
+   <div class="button">
+      <Button on:click={() => application.close()}>
+         {localize('cancel')}
+      </Button>
    </div>
 </div>
 
 <style lang="scss">
-   .document-edit-traits-dialog {
-      ol {
-         list-style: none;
-         column-count: var(--trait-column-count);
-         margin: 0;
-         padding: 0;
+   ol {
+      list-style: none;
+      column-count: var(--trait-column-count);
+      margin: 0;
+      padding: 0;
 
-         li {
-            @include border;
+      li {
+         @include border;
+         @include flex-row;
+         @include flex-group-center;
+         @include panel-2;
+
+         width: 100%;
+         height: 40px;
+         margin-bottom: var(--padding-large);
+         padding: var(--padding-standard);
+
+         @include font-size-normal;
+
+         font-weight: bold;
+         page-break-inside: avoid;
+
+         &:not(:first-child) {
+            margin-top: var(--padding-large);
+         }
+
+         .label {
             @include flex-row;
-            @include flex-group-center;
-            @include panel-2;
+            @include flex-group-left;
 
             width: 100%;
-            height: 40px;
-            margin-bottom: var(--padding-large);
-            padding: var(--padding-standard);
+            height: 100%;
+         }
 
-            @include font-size-normal;
+         .input {
+            @include flex-row;
+            @include flex-group-center;
 
-            font-weight: bold;
-            page-break-inside: avoid;
-
-            &:not(:first-child) {
-               margin-top: var(--padding-large);
-            }
-
-            .label {
-               @include flex-row;
-               @include flex-group-left;
-
-               width: 100%;
-               height: 100%;
-            }
-
-            .input {
-               @include flex-row;
-               @include flex-group-center;
-
-               width: 30%;
-               height: 100%;
-            }
+            width: 30%;
+            height: 100%;
          }
       }
+   }
 
-      .row {
+   .buttons {
+      @include flex-row;
+      @include flex-group-center;
+
+      width: 100%;
+      margin-top: var(--padding-standard);
+
+      .button {
          @include flex-row;
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--padding-standard);
 
-         .button {
-            @include flex-row;
-            @include flex-group-center;
+         --button-border-radius: var(--button-chat-message-border-radius);
 
-            width: 100%;
-
-            --button-border-radius: var(--button-chat-message-border-radius);
-
-            &:not(:first-child) {
-               margin-left: var(--padding-standard);
-            }
+         &:not(:first-child) {
+            margin-left: var(--padding-standard);
          }
       }
    }

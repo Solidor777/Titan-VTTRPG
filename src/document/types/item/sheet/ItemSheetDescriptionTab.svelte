@@ -1,11 +1,8 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentEditorInput from '~/document/components/input/DocumentEditorInput.svelte';
-
-   export let header = localize('description');
-   export let fieldName = 'system.description';
+   import DocumentBoundEditorInput from "~/document/components/input/DocumentBoundEditorInput.svelte";
 
    // Setup context variables
    const appState = getContext('applicationState');
@@ -17,12 +14,12 @@
       <div class="description">
          <!--Header-->
          <h3>
-            {header}
+            {localize('description')}
          </h3>
 
          <!--Body-->
          <div class="body">
-            <DocumentEditorInput {fieldName}/>
+            <DocumentBoundEditorInput bind:value={$document.system.description}/>
          </div>
       </div>
    </ScrollingContainer>

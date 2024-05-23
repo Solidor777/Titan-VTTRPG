@@ -10,7 +10,7 @@
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
    import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 
-   /** @type TitanActor Reference to the Character document. */
+   /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
    /** @type {string} The ID of the item to get the check from. */
