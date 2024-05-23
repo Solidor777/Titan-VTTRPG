@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckChatDie from '~/check/chat-message/CheckChatDie.svelte';
 
    const document = getContext('document');
@@ -18,6 +18,7 @@
    .container {
       @include flex-row;
       @include flex-group-center;
+
       width: 100%;
       flex-wrap: wrap;
 

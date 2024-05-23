@@ -10,7 +10,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
  * @property {number} extraSuccesses The number of Critical Successes achieved.
  * @property {number} successes The total number of Successes achieved.
- * @augments   CheckResults
+ * @augments CheckResults
  */
 
 /**
@@ -19,7 +19,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * Calls the base version of this function.
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
- * @param {AttackCheckParameters} parameters - The parameters of the check.
+ * @param {AttackCheckParameters} parameters - Object containing the parameters of the check.
  * @returns {AttackCheckResults} The final results of the check.
  */
 export default function calculateAttackCheckResults(diceResults, parameters) {

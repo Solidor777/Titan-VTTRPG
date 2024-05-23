@@ -26,7 +26,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} successes The total number of Successes achieved.
  * @property {number} healing The amount of Healing applied.
  * @property {ScalingAspect[]} scalingAspect The scaling aspects associated with the check.
- * @augments   CheckResults
+ * @augments CheckResults
  */
 
 /**
@@ -35,7 +35,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * Calls the base version of this function.
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
- * @param {CastingCheckParameters} parameters - The parameters of the check.
+ * @param {CastingCheckParameters} parameters - Object containing the parameters of the check.
  * @returns {CastingCheckResults} The final results of the check.
  */
 export default function calculateCastingCheckResults(diceResults, parameters) {

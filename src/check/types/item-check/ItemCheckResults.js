@@ -13,7 +13,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} healing The amount of Healing applied.
  * @property {number} successes The total number of Successes achieved.
  * @property {number} opposedCheckComplexity The Complexity of the Opposed check.
- * @augments   CheckResults
+ * @augments CheckResults
  */
 
 /**
@@ -22,7 +22,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * Calls the base version of this function.
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
- * @param {ItemCheckParameters} parameters - The parameters of the check.
+ * @param {ItemCheckParameters} parameters - Object containing the parameters of the check.
  * @returns {ItemCheckResults} The final results of the check.
  */
 export default function calculateItemCheckResults(diceResults, parameters) {

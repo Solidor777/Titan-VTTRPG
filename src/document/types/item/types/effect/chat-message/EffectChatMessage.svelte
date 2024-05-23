@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatChecks.svelte';
+   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
@@ -16,21 +16,21 @@
 <div class="item-chat-message">
    <!--Header-->
    <div class="header">
-      <ItemChatLabel {item} />
+      <ItemChatLabel {item}/>
    </div>
 
    <div class="sections">
       <!--Checks-->
       {#if item.system.check.length > 0}
          <div class="section">
-            <ItemChatChecks {item} />
+            <ItemChatChecks {item}/>
          </div>
       {/if}
 
       <!--Description-->
       {#if item.system.description !== '' && item.system.description !== '<p></p>'}
          <div class="section rich-text">
-            <RichText text={item.system.description} />
+            <RichText text={item.system.description}/>
          </div>
       {/if}
 
@@ -38,15 +38,15 @@
          <!--Duration-->
          <div class="tag">
             <DurationTag
-               type={item.system.duration.type}
                remaining={item.system.duration.remaining}
+               type={item.system.duration.type}
             />
          </div>
 
          <!--Expired-->
          {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
             <div class="tag">
-               <Tag label={localize('expired')} />
+               <Tag label={localize('expired')}/>
             </div>
          {/if}
 
@@ -54,7 +54,7 @@
          {#if item.system.customTrait.length > 0}
             {#each item.system.customTrait as trait}
                <div class="tag" use:tooltip={{ content: trait.description }}>
-                  <Tag label={trait.name} />
+                  <Tag label={trait.name}/>
                </div>
             {/each}
          {/if}

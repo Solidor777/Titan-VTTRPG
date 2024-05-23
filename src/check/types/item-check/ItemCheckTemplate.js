@@ -26,7 +26,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @property {string} resistanceCheck The Resistance that can be used to oppose this check.
  * @property {string} skill The Skill to use for the Check.
  * @property {string} uuid Generated unique identifier for the Check.
- * @augments   {object}
+ * @augments {object}
  */
 
 /**

@@ -1,5 +1,8 @@
 {
-   "extends": "stylelint-config-standard-scss",
+   "extends": [
+      "stylelint-config-standard-scss",
+      "stylelint-config-html/svelte"
+   ],
    "rules": {
       "font-family-name-quotes": "always-unless-keyword",
       "font-weight-notation": "named-where-possible",
@@ -18,8 +21,7 @@
                "/^lost-/"
             ]
          }
-      ],
-      "at-rule-empty-line-before": "always"
+      ]
    },
    "ignoreFiles": [
       "node_modules/*",

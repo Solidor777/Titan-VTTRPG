@@ -5,7 +5,6 @@
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
-   import ItemCheck from '~/check/types/item-check/ItemCheck.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
@@ -17,14 +16,24 @@
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    /**
-    * @param check
+    * Calculates the formatted text showing a Check's Attribute, Skill, Difficulty, and Complexity.
+    * @param {ItemCheckTemplate} check - The Check to get the text for.
+    * @returns {string} The formatted text showing a Check's Attribute, Skill, Difficulty, and Complexity.
     */
-   function getTagFromCheck(check) {
+   function calculateCheckDCText(check) {
+
+      // Start with the Attribute of the check
       let retVal = localize(`${check.attribute}`);
-      if (check.skill && check.skill !== 'none') {
+
+      // Add the Skill if appropriate
+      if (check.skill !== 'none') {
          retVal += ` (${localize(check.skill)})`;
       }
+
+      // Add the Difficulty of the check
       retVal += ` ${check.difficulty}`;
+
+      // Add the Complexity if appropriate
       if (check.complexity) {
          retVal += `:${check.complexity}`;
       }
@@ -33,58 +42,35 @@
    }
 
    /**
-    * @param idx
+    * Rolls a Check from the Item's roll data.
+    * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check array.
     */
    async function rollItemCheck(idx) {
+
+      // For each controlled character
       const controlledCharacters = getControlledCharacters();
-      if (controlledCharacters.length > 0) {
-         // Initial roll data
-         const itemRollData = item.system;
-         itemRollData.name = item.name;
-         itemRollData.img = item.img;
+      for (const actor of controlledCharacters) {
 
-         // Roll for each controlled token
-         for (const actor of controlledCharacters) {
-            // Get the actor roll data
-            const actorRollData = actor.system.getRollData();
-
-            // Get a new item check
-            const itemCheck = new ItemCheck({
-               actorRollData: actorRollData,
-               itemRollData: itemRollData,
-               checkIdx: idx,
-            });
-
-            if (itemCheck.isValid) {
-               // Spend resolve if appropriate
-               if (
-                  itemCheck.parameters.resolveCost &&
-                  autoSpendResolve
-               ) {
-                  await actor.system.spendResolve(
-                     itemCheck.parameters.resolveCost,
-                     {playSound: false},
-                  );
-               }
-               await itemCheck.evaluateCheck();
-               await itemCheck.sendToChat({
-                  user: game.user.id,
-                  speaker: ChatMessage.getSpeaker({actor: actor}),
-                  rollMode: game.settings.get('core', 'rollMode'),
-               });
-            }
-         }
+         // Roll the check
+         await actor.system.requestItemCheck({
+            itemRollData: item,
+            checkIdx: idx
+         });
       }
    }
 
    /**
-    * @param resolveToSpend
+    * Spends the Resolve necessary to perform the Check.
+    * @param {number} resolveSpent - Amount of Resolve to spend.
     */
-   async function spendResolve(resolveToSpend) {
-      // Get controlled tokens
+   async function spendResolve(resolveSpent) {
+
+      // For each controlled character
       const controlledCharacters = getControlledCharacters();
       for (const actor of controlledCharacters) {
-         actor.system.spendResolve(resolveToSpend);
+
+         // Spend the resolve
+         await actor.system.spendResolve(resolveSpent);
       }
    }
 </script>
@@ -93,17 +79,15 @@
    <!--Each check-->
    {#each item.system.check as check, idx}
       <li>
-         <!--Header-->
 
+         <!--Header-->
          {#if check.resolveCost}
             {#if autoSpendResolve}
                <!--Combined Item Check and Spend Resolve button-->
                <div class="button">
                   <ItemCheckResolveButton
                      {check}
-                     on:click={async () => {
-                        rollItemCheck(idx);
-                     }}
+                     on:click={() => rollItemCheck(idx)}
                   />
                </div>
             {:else}
@@ -134,7 +118,7 @@
             <!--Main Check Stats -->
             <div class="tag">
                <AttributeTag
-                  label={getTagFromCheck(check)}
+                  label={calculateCheckDCText(check)}
                   attribute={check.attribute}
                />
             </div>
@@ -177,15 +161,18 @@
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;
+
       width: 100%;
 
       li {
          @include flex-column;
          @include flex-group-top;
+
          width: 100%;
 
          &:not(:first-child) {
             @include border-top;
+
             margin-top: var(--padding-large);
             padding-top: var(--padding-large);
          }
@@ -199,10 +186,15 @@
             }
          }
 
+         .button {
+            margin-top: var(--padding-large);
+         }
+
          .tags {
             @include flex-row;
             @include flex-group-center;
             @include font-size-small;
+
             flex-wrap: wrap;
 
             .tag {

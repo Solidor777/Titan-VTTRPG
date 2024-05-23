@@ -23,7 +23,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
 
-   /** @type {string} The ID of the item. */
+   /** @type {string} The ID of the item to get the check from. */
    export let itemId = void 0;
 
    /** @type {boolean} Whether this Item is currently expanded. */

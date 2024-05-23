@@ -8,9 +8,9 @@
 /**
  * Options for requesting an Item Check from an Actor.
  * @typedef {object} ItemCheckParameters
- * @property {object|boolean} opposedCheck - Opposed check data, if any.
- * @property {boolean} doubleExpertise - Whether to double the Expertise to apply..
- * @property {boolean} doubleTraining - Whether to double the Training to apply.
+ * @property {object|boolean} opposedCheck Opposed check data, if any.
+ * @property {boolean} doubleExpertise Whether to double the Expertise to apply..
+ * @property {boolean} doubleTraining Whether to double the Training to apply.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {boolean} scaling Whether subsequent successes should scale the initial value.
@@ -33,8 +33,8 @@
  * @property {string[]} customTrait Array of custom traits applied to the item.
  * @property {string} attribute The Attribute to use for the Check.
  * @property {string} checkLabel The display name of the check.
- * @property {string} damageReducedBy Whether Damage from this check can be reduced by an
- * Opposed Check, or a Resistance Check.
+ * @property {string} damageReducedBy Whether Damage from this check can be reduced by an Opposed Check, or a
+ * Resistance Check.
  * @property {string} img The image to display with the check.
  * @property {string} itemDescription The description of the item being rolled.
  * @property {string} itemName The name of the item being rolled.

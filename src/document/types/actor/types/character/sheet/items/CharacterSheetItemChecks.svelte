@@ -6,7 +6,7 @@
    /** @type TitanActor Reference to the Character document. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item. */
+   /** @type {string} The ID of the item to get the check from. */
    export let itemId = void 0;
 
    /** @type ItemCheckTemplate[] Calculated item reference. */
@@ -23,6 +23,7 @@
 
 <!--Checks-->
 <div class="checks">
+
    <!--Each Check-->
    {#each checks as check, checkIdx (check.uuid)}
       <div class="check">

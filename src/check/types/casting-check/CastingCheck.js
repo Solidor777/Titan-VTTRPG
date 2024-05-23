@@ -15,7 +15,7 @@ export default class CastingCheck extends TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCastingCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @param {CastingCheckParameters} parameters - The parameters of the check.
+    * @param {CastingCheckParameters} parameters - Object containing the parameters of the check.
     * @returns {CastingCheckResults} The final results of the check.
     * @protected
     */

@@ -129,37 +129,4 @@ export default class TitanActor extends Actor {
    getCombatant() {
       return game.combat?.getCombatantByActor(this.id);
    }
-
-   /**
-    * Gets the first active Combat this Character has a turn in and has rolled initiative for.
-    * @returns {Combat|boolean} List of active Combats in which this Character has a turn.
-    */
-   getFirstActiveCombat() {
-      // Get active combats
-      const combats = game.combats.filter((combat) => combat.turn !== null && combat.scene.isView);
-      if (combats.length > 0) {
-
-         // If this actor is a token, search for this token in the combat
-         if (this.isToken) {
-            for (const combat of combats) {
-               const combatant = combat.getCombatantByToken(this.token._id);
-               if (combatant) {
-                  return combat;
-               }
-            }
-         }
-
-         // Otherwise, search for the actor
-         else {
-            for (const combat of combats) {
-               const combatant = combat.getCombatantByActor(this);
-               if (combatant) {
-                  return combat;
-               }
-            }
-         }
-      }
-
-      return false;
-   }
 }

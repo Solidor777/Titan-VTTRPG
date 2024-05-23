@@ -187,7 +187,7 @@ export default class TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @param {CheckParameters} parameters - The parameters of the check.
+    * @param {CheckParameters} parameters - Object containing the parameters of the check.
     * @returns {CheckResults} The final results of the check.
     * @protected
     */
@@ -210,35 +210,30 @@ export default class TitanCheck {
       }
 
       // Create the context object
-      const chatContext = {
+      const messageData = {
          parameters: this.parameters,
          results: this.results,
          type: this._getCheckType(),
          failuresReRolled: false,
       };
 
-
       // Add the messages if appropriate
       if (options.message) {
-         chatContext.message = options.message;
+         messageData.message = options.message;
       }
-
-      // Get the speaker
-      const speaker = options?.speaker ?? null;
-      const token = (speaker ? (speaker.token ? speaker.token : game.actors.get(speaker.actor)) : null);
 
       // Create and post the message
       return ChatMessage.create(
          ChatMessage.applyRollMode(
             {
                user: game.user.id,
-               speaker: speaker,
+               speaker: options?.speaker ?? ChatMessage.getSpeaker(),
                token: token,
                rolls: [this.roll],
                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                sound: CONFIG.sounds.dice,
                flags: {
-                  titan: chatContext,
+                  titan: messageData,
                },
                classes: ['titan'],
             },

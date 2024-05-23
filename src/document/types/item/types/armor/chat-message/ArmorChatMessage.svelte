@@ -1,7 +1,7 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatChecks.svelte';
+   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import ArmorChatStats from '~/document/types/item/types/armor/chat-message/ArmorChatStats.svelte';
 

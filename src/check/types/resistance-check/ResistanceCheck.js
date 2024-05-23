@@ -14,7 +14,7 @@ export default class ResistanceCheck extends TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateResistanceCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @param {ResistanceCheckParameters} parameters - The parameters of the check.
+    * @param {ResistanceCheckParameters} parameters - Object containing the parameters of the check.
     * @returns {ResistanceCheckResults} The final results of the check.
     * @protected
     */

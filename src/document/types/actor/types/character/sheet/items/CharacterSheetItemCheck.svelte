@@ -13,7 +13,7 @@
    /** @type TitanActor Reference to the Character document. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item. */
+   /** @type {string} The ID of the item to get the check from. */
    export let itemId = void 0;
 
    /** @type number The index of the check in the checks array. */
@@ -28,9 +28,6 @@
    /** @type boolean Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
-   /** @type TitanItem Calculated Item reference. */
-   let item;
-
    /** @type ItemCheckParameters Calculated item check parameters. */
    let checkParameters;
 
@@ -39,7 +36,7 @@
 
    // Update the Item in response to changes.
    $: {
-      item = $document.items.get(itemId);
+      const item = $document.items.get(itemId);
       if (item &&
          item.system.check.length > checkIdx
       ) {
@@ -53,9 +50,8 @@
       }
    }
 
-   // Rolls the item check
    /**
-    *
+    * Rolls the Item Check.
     */
    function rollItemCheck() {
       $document.system.requestItemCheck(checkOptions);

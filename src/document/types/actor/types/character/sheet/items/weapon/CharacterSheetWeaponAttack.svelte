@@ -22,7 +22,7 @@
    // Context references
    const document = getContext('document');
 
-   /** @type {string} The ID of the item. */
+   /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
    // Reference to the attack idx

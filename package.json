@@ -26,10 +26,10 @@
       "eslint": "^9.3.0",
       "eslint-plugin-jsdoc": "^48.2.5",
       "eslint-plugin-svelte": "^2.38.0",
-      "postcss-html": "^1.6.0",
+      "postcss-html": "^1.7.0",
       "postcss-scss": "^4.0.9",
-      "stylelint": "^16.4.0",
-      "stylelint-config-standard": "^36.0.0",
+      "stylelint": "^16.5.0",
+      "stylelint-config-html": "^1.1.0",
       "stylelint-config-standard-scss": "^13.1.0",
       "svelte": "^4.2.15",
       "svelte-preprocess": "^5",
@@ -43,7 +43,8 @@
       "build": "vite build",
       "dev": "vite",
       "eslint": "eslint .",
-      "stylelint": "stylelint \"**/*.scss\"",
-      "eslint-fix": "eslint --fix"
+      "eslint-fix": "eslint --fix",
+      "stylelint": "stylelint \"**/*.svelte\"",
+      "stylelint-fix": "stylelint --fix \"**/*.svelte\""
    }
 }

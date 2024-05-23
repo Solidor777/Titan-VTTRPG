@@ -5,7 +5,7 @@
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 
-   /** @type {string} The ID of the item. */
+   /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
    // Context references

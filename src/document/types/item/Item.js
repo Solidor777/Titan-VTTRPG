@@ -93,29 +93,18 @@ export default class TitanItem extends Item {
     */
    async sendToChat() {
       // Create the context object
-      const chatContext = {
-         type: this.type,
-         img: this.img,
-         name: this.name,
-         flags: this.flags,
-         system: this.system,
-      };
-
-      const actor = this.parent;
-      const speaker = actor ? actor.getSpeaker() : null;
-      const token = (speaker ? (speaker.token ? speaker.token : game.actors.get(speaker.actor)) : null);
+      const messageData = this.getRollData();
 
       // Create and post the message
       return ChatMessage.create(
          ChatMessage.applyRollMode(
             {
                user: game.user.id,
-               speaker: speaker,
-               token: token,
+               speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
                sound: CONFIG.sounds.notification,
                flags: {
-                  titan: chatContext,
+                  titan: messageData,
                },
                classes: ['titan'],
             },

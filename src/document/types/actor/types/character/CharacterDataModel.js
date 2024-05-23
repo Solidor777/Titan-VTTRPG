@@ -2974,26 +2974,14 @@ export default class CharacterDataModel extends ActorDataModel {
             this);
       }
 
-      // Ensure an item ID  was provided.
-      if (!options.itemId) {
+      // Ensure an item ID or Item Roll Data was provided.
+      let itemRollData = options.rollData ?? this.parent.items.get(options.itemId)?.getRollData();
+      if (!itemRollData) {
          game.titan.error(
-            'Item Check failed before construction. No Item ID was provided.',
+            'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
             true,
             options,
             this);
-
-         return false;
-      }
-
-      // Ensure the item exists in the parent actor.
-      const item = this.parent.items.get(options.itemId);
-      if (!item) {
-         game.titan.error(
-            'Item Check failed before construction. Item ID was invalid.',
-            true,
-            options,
-            this);
-
          return false;
       }
 
@@ -3006,7 +2994,6 @@ export default class CharacterDataModel extends ActorDataModel {
             true,
             options,
             this);
-
          return false;
       }
 
@@ -3022,7 +3009,9 @@ export default class CharacterDataModel extends ActorDataModel {
       const checkOptions = createItemCheckOptions(options);
 
       // Cache the item and roll data
-      const itemRollData = this.parent.items.get(checkOptions.itemId).system.getRollData();
+      const itemRollData = options.itemRollData ?
+         options.itemRollData :
+         this.parent.items.get(checkOptions.itemId).system.getRollData();
       const checkData = itemRollData.check[checkOptions.checkIdx];
 
       // If no attribute is set.
@@ -3202,7 +3191,9 @@ export default class CharacterDataModel extends ActorDataModel {
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
       // Cache the item stats from the item roll data
-      const itemRollData = this.parent.items.get(options.itemId).system.getRollData();
+      const itemRollData = options.itemRollData ?
+         options.itemRollData :
+         this.parent.items.get(options.itemId).system.getRollData();
       const checkData = itemRollData.check[options.checkIdx];
       parameters.img = itemRollData.img;
       parameters.itemName = itemRollData.name;

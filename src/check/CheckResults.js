@@ -14,7 +14,7 @@
  * Calculates the results of a check in the Titan system, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
- * @param {CheckParameters} parameters - The parameters of the check.
+ * @param {CheckParameters} parameters - Object containing the parameters of the check.
  * @returns {CheckResults} The final results of the check.
  */
 export default function calculateCheckResults(diceResults, parameters) {

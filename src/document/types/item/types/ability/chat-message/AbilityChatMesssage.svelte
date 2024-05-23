@@ -1,11 +1,11 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatChecks.svelte';
+   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
