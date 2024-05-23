@@ -2,7 +2,7 @@ import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker
 import localize from '~/helpers/utility-functions/Localize.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
-import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
+import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 
 /**
  * @param html
@@ -172,8 +172,7 @@ async function reRollCheckFailures(li, spendResolve) {
    const successes = chatContext.results.dice.filter((die) => {
       if (die.base >= chatContext.parameters.difficulty) {
          return true;
-      }
-      else {
+      } else {
          failureCount += 1;
          if (die.expertiseApplied) {
             expertiseToRefund += die.expertiseApplied;
@@ -186,7 +185,7 @@ async function reRollCheckFailures(li, spendResolve) {
    if (failureCount > 0) {
       // Re roll dice equal to the number of falures
       const roll = new Roll(`${failureCount}d6`);
-      await roll.evaluate({ async: true });
+      await roll.evaluate({async: true});
       const reRolledDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
       const newDice = successes.concat(reRolledDice.map((die) => {
          return {
@@ -268,7 +267,7 @@ async function doubleTraining(li, spendResolve) {
 
       // Roll the new dice
       const roll = new Roll(`${chatContext.parameters.totalTrainingDice}d6`);
-      await roll.evaluate({ async: true });
+      await roll.evaluate({async: true});
       const newDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
       const newDiceResults = chatContext.results.dice.concat(newDice.map((die) => {
          return {
@@ -292,7 +291,7 @@ async function doubleTraining(li, spendResolve) {
       if (spendResolve) {
          const actor = getActorFromSpeaker(message.speaker.token, message.speaker.actor);
          if (actor && actor.system.isCharacter) {
-            actor.spendResolve(1);
+            actor.system.spendResolve(1);
          }
       }
    }

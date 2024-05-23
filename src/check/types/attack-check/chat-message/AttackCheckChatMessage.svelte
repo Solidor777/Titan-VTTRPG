@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import CheckChatDiceContainer from '~/check/chat-message/CheckChatDiceContainer.svelte';
+   import {getContext} from 'svelte';
+   import CheckChatDiceContainer from '~/check/chat-message/CheckChatMessageDice.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
    import AttackCheckChatHeader from '~/check/types/attack-check/chat-message/AttackCheckChatHeader.svelte';
    import AttackCheckChatStats from '~/check/types/attack-check/chat-message/AttackCheckChatStats.svelte';

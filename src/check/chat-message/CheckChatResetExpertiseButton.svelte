@@ -1,27 +1,28 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
-   import { RESET_ICON } from '~/system/Icons.js';
+   import {RESET_ICON} from '~/system/Icons.js';
 
+   /** @type ChatMessage Reference to the Chat Message document. */
    const document = getContext('document');
 
    /**
-    *
+    * Resets all applied Expertise.
     */
-   async function resetExpertise() {
-      // Remove the expertise from the dice
-      $document.flags.titan.results.dice.forEach((dice) => {
-         dice.final = dice.base;
-         dice.expertiseApplied = 0;
-      });
+   function resetExpertise() {
+      // Remove the expertise from each dice.
+      for (const die of $document.flags.titan.results.dice) {
+         die.final = die.base;
+         die.expertiseApplied = 0;
+      }
+      ;
 
-      // Recalculate the results
-      $document.flags.titan.results.expertiseRemaining =
-         $document.flags.titan.parameters.totalExpertise;
+      // Reset the expertise available and recalculate the check results
+      $document.flags.titan.results.expertiseRemaining = $document.flags.titan.parameters.totalExpertise;
       const newResults = recalculateCheckResults($document.flags.titan);
 
-      await $document.update({
+      $document.update({
          flags: {
             titan: {
                results: newResults,
@@ -32,8 +33,7 @@
 </script>
 
 <IconButton
+   disabled={!$document.isOwner}
    icon="{RESET_ICON}"
-   on:click={() => {
-      resetExpertise();
-   }}
+   on:click={resetExpertise}
 />
