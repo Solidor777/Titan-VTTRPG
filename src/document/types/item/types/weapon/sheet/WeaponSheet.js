@@ -12,7 +12,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 650,
+         width: 700,
          height: 650,
          svelte: {
             props: {

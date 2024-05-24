@@ -1,6 +1,5 @@
 <script>
-   import CharacterSheetCondensedCheckButton
-      from '~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte';
+   import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
    import {getContext} from 'svelte';
    import getItemCheckParametersTooltip from '~/helpers/utility-functions/GetItemCheckParametersTooltip.js';
 
@@ -38,7 +37,7 @@
       }
    }
 </script>
-<CharacterSheetCondensedCheckButton
+<CondensedCheckButton
    attribute="{checkParameters.attribute}"
    complexity="{checkParameters.complexity}"
    difficulty="{checkParameters.difficulty}"

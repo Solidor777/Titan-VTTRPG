@@ -1,7 +1,7 @@
 export const ACCURACY_ICON = 'fas fa-bow-arrow';
 export const ARMOR_ICON = 'fas fa-helmet-battle';
 export const AWARENESS_ICON = 'fas fa-eye';
-export const BODY_ICON = 'fas fa-fist';
+export const BODY_ICON = 'fas fa-hand-fist';
 export const CHECKED_ICON = 'fas fa-square-check';
 export const CLEAVE_ICON = 'fas fa-scythe';
 export const COLLAPSED_ICON = 'fas fa-angle-double-right';

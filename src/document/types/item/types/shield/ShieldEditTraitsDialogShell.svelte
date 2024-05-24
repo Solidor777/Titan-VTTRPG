@@ -3,8 +3,8 @@
 <script>
    import DocumentEditTraitsDialog from '~/document/components/DocumentEditTraitsDialog.svelte';
    import {
-      SHIELD_TRAITS,
       SHIELD_TRAIT_DESCRIPTIONS,
+      SHIELD_TRAITS,
    } from '~/document/types/item/types/shield/ShieldTraits.js';
 
    // The weapon item owning the attack

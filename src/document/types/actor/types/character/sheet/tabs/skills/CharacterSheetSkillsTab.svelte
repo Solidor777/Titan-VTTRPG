@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
@@ -65,7 +65,6 @@
 
             width: 100%;
             margin-bottom: var(--padding-standard);
-            padding: 0 var(--padding-standard);
 
             li {
                @include flex-row;

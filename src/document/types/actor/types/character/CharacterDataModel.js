@@ -16,6 +16,7 @@ import ResistanceCheckDialog from '~/check/types/resistance-check/dialog/Resista
 import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
 import appendUniqueByFunctionValue from '~/helpers/utility-functions/appendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
+import capitalize from '~/helpers/utility-functions/Capitalize.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttackCheckParameters from '~/check/types/attack-check/AttackCheckParameters.js';
@@ -23,29 +24,28 @@ import createAttributeCheckOptions from '~/check/types/attribute-check/Attribute
 import createAttributeCheckParameters from '~/check/types/attribute-check/AttributeCheckParameters.js';
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createCastingCheckParameters from '~/check/types/casting-check/CastingCheckParameters.js';
+import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import createItemCheckParameters from '~/check/types/item-check/ItemCheckParameters.js';
 import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
 import createResistanceCheckParameters from '~/check/types/resistance-check/ResistanceCheckParameters.js';
-import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
-import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import getOwners from '~/helpers/utility-functions/GetOwners.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
+import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
+import getOwners from '~/helpers/utility-functions/GetOwners.js';
+import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import getSumOfObjectValues from '~/helpers/utility-functions/GetSumOfObjectValues.js';
+import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
 import isCurrentUserBestOwner from '~/helpers/utility-functions/IsCurrentUserBestOwner.js';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import pushUnique from '~/helpers/utility-functions/PushUnique.js';
 import shouldConfirmDeletingItems from '~/helpers/utility-functions/ShouldConfirmDeletingItems.js';
 import shouldGetCheckOptions from '~/helpers/utility-functions/ShouldGetCheckOptions.js';
+import sort from '~/helpers/utility-functions/Sort.js';
 import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
-import capitalize from '~/helpers/utility-functions/Capitalize.js';
-import sort from '~/helpers/utility-functions/Sort.js';
 
 /**
  * Actor data model with extra functionality for Characters.
@@ -816,7 +816,7 @@ export default class CharacterDataModel extends ActorDataModel {
                   // Sort elements by key
                   let keys;
                   switch (selector) {
-                     // If the key is determined by using input, sort by camelized keys
+                     // If the key is determined by using input, sort by camel-case keys
                      case 'customTrait':
                      case 'spellTradition': {
                         keys = sortObjectsIntoContainerByFunctionValue(
@@ -917,7 +917,7 @@ export default class CharacterDataModel extends ActorDataModel {
                      // Sort elements by key
                      let keys;
                      switch (selector) {
-                        // If the key can be determined by user input, sort by the camelized keys
+                        // If the key can be determined by user input, sort by the camel-case keys
                         case 'customWeaponTrait':
                         case 'customArmorTrait':
                         case 'customShieldTrait': {
@@ -1095,7 +1095,7 @@ export default class CharacterDataModel extends ActorDataModel {
                         // Sort the objects by key
                         let keys;
                         switch (selector) {
-                           // If the key can be determined by user input, sort by the camelized keys
+                           // If the key can be determined by user input, sort by the camel-case keys
                            case 'customTrait':
                            case 'spellTradition': {
                               keys = sortObjectsIntoContainerByFunctionValue(
@@ -1388,7 +1388,7 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Helper function for getting the sum conditional rating modifiers for the inputted selector and an array of keys,.
+    * Helper function for getting the sum conditional rating modifiers for the inputted selector and an array of keys.
     * @param {object} conditionalRatingModifiers - The parent actor's Rules Element cache of mods for rating.
     * @param {string} selector - The type of condition for modifying the rating.
     * @param {*[]} keys - Array of keys to test against.
@@ -2185,7 +2185,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @param {boolean} multiAttack - Whether the attack is a multi-attack.
     * @param {string} type - The Type of Attack (Melee or Ranged).
     * @param {string[]} attackTraits - The attack Traits associated with the check.
-    * @param {string[]} customTraits - The camelized names of the Custom Traits associated with the attack and weapon.
+    * @param {string[]} customTraits - The camel-case names of the Custom Traits associated with the attack and weapon.
     * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttackCheckMod(
@@ -2676,7 +2676,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @param {string} attribute - The Attribute being used for the check.
     * @param {string} skill - The Skill being used for the check.
     * @param {string} tradition - The Tradition of the spell.
-    * @param {string[]} customTraits - The camelized names of the Custom Traits associated with the spell.
+    * @param {string[]} customTraits - The camel-case names of the Custom Traits associated with the spell.
     * @returns {number} The modifier to apply to this aspect of the check.
     */
    getCastingCheckMod(
@@ -3107,7 +3107,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @param {string} modifierType - The modifier type to check for.
     * @param {string} attribute - The Attribute being used for the check.
     * @param {string} skill - The Skill being used for the check.
-    * @param {string[]} customTraits - The camelized names of the Custom Traits associated with the item.
+    * @param {string[]} customTraits - The camel-case names of the Custom Traits associated with the item.
     * @returns {number} The modifier to apply to this aspect of the check.
     */
    getItemCheckMod(
@@ -5077,7 +5077,7 @@ export default class CharacterDataModel extends ActorDataModel {
                break;
             }
 
-            // Otherwise, log that expired effects were not r  emoved
+            // Otherwise, log that expired effects were not removed
             default: {
                reportData.expiredEffectsRemoved = false;
                break;
@@ -5289,10 +5289,10 @@ export default class CharacterDataModel extends ActorDataModel {
 
    /**
     * Toggles the equipped state of an item.
-    * If the item is Armor or a Shield, it will either equip it or unequip it to this character.
+    * If the item is Armor or a Shield, it will either equip it or un-equip it to this character.
     * Otherwise, the Equipped property will be toggled on it.
     * If the item has an "equipped" property in the "system" object, it will update the value of "equipped".
-    * @param {string} itemId - The ID of the item to equip or unequip.
+    * @param {string} itemId - The ID of the item to equip or un-equip.
     * @returns {Promise<void>}
     */
    async toggleEquipped(itemId) {
@@ -5305,7 +5305,7 @@ export default class CharacterDataModel extends ActorDataModel {
             // If the item is Armor
             if (item.type === 'armor') {
 
-               // Unequip the item if equipped
+               // Un-equip the item if equipped
                if (this.equipped.armor === itemId) {
                   await this.unEquipArmor();
                }
@@ -5319,7 +5319,7 @@ export default class CharacterDataModel extends ActorDataModel {
             // If the item is a Shield
             else if (item.type === 'shield') {
 
-               // Unequip the item if equipped
+               // Un-equip the item if equipped
                if (this.equipped.shield === itemId) {
                   await this.unEquipShield();
                }
@@ -5400,7 +5400,7 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Unequips the currently equipped Armor item from the Character.
+    * Un-equips the currently equipped Armor item from the Character.
     * @returns {Promise<void>}
     */
    async unEquipArmor() {
@@ -5454,7 +5454,7 @@ export default class CharacterDataModel extends ActorDataModel {
    }
 
    /**
-    * Unequips the currently equipped Armor item from the Character.
+    * Un-equips the currently equipped Armor item from the Character.
     * @returns {Promise<void>}
     */
    async unEquipShield() {
@@ -5531,7 +5531,7 @@ export default class CharacterDataModel extends ActorDataModel {
             // Perform type specific deleting
             switch (item.type) {
 
-               // Unequip armor before deletion
+               // Un-equip armor before deletion
                case 'armor': {
                   if (this.equipped.armor === itemId) {
                      await this.unEquipArmor();
@@ -5539,7 +5539,7 @@ export default class CharacterDataModel extends ActorDataModel {
                   break;
                }
 
-               // Unequip should before deletion
+               // Un-equip should before deletion
                case 'shield': {
                   if (this.equipped.armor === itemId) {
                      await this.unEquipShield();

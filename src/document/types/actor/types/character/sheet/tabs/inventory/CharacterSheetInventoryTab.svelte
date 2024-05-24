@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
@@ -20,7 +20,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetMultiItemList.svelte';
    import CharacterSheetTabHeaderButton
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
-   import { CREATE_ICON, RESET_ICON } from '~/system/Icons.js';
+   import {CREATE_ICON, RESET_ICON} from '~/system/Icons.js';
 
    // Application reference
    const appState = getContext('applicationState');
@@ -104,7 +104,7 @@
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.scrollTop.inventory}>
          <CharacterSheetMultiItemList
-            {itemComponents}
+            filter={$appState.filter.inventory}
             filterFunction={(item) => {
                switch (item.type) {
                   case 'armor': {
@@ -142,8 +142,8 @@
                   }
                }
             }}
-            filter={$appState.filter.inventory}
             isExpandedMap={$appState.isExpanded.inventory}
+            {itemComponents}
          />
       </ScrollingContainer>
    </div>
@@ -211,7 +211,6 @@
 
          width: 100%;
          height: 100%;
-         margin-top: var(--padding-large);
       }
    }
 </style>

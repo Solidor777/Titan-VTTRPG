@@ -1,12 +1,12 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
+   import {slide} from 'svelte/transition';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { COLLAPSED_ICON, DICE_ICON, EXPANDED_ICON } from '~/system/Icons.js';
+   import {COLLAPSED_ICON, DICE_ICON, EXPANDED_ICON} from '~/system/Icons.js';
 
    // Document reference
    const document = getContext('document');
@@ -153,17 +153,15 @@
          @include flex-group-top;
 
          width: 100%;
+         margin-left: var(--padding-standard);
+         margin-top: var(--padding-large);
 
-         &:not(:first-child) {
-            @include border-top;
-
-            margin-top: var(--padding-large);
-         }
+         --border-color: var(--button-border-color);
 
          .header {
             @include flex-column;
             @include flex-group-top;
-            @include border-bottom;
+            @include border;
             @include attribute-colors;
             @include label;
 

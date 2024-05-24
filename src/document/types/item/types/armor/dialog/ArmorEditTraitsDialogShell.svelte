@@ -3,8 +3,8 @@
 <script>
    import DocumentEditTraitsDialog from '~/document/components/DocumentEditTraitsDialog.svelte';
    import {
-      ARMOR_TRAITS,
       ARMOR_TRAIT_DESCRIPTIONS,
+      ARMOR_TRAITS,
    } from '~/document/types/item/types/armor/ArmorTraits.js';
 
    // The weapon item owning the attack

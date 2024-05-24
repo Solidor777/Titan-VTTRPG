@@ -109,7 +109,7 @@
          >
             <svelte:component
                this={itemComponents[item.type]}
-               itemId={item._id}
+               {item}
                bind:isExpanded={isExpandedMap[item._id]}
             />
          </li>
@@ -131,13 +131,14 @@
          @include flex-space-between;
 
          width: 100%;
+         margin-top: var(--padding-large);
 
          &.drag-hovered {
             background: var(--highlight-background);
          }
 
-         &:not(:first-child) {
-            margin-top: var(--padding-large);
+         &:last-child {
+            margin-bottom: var(--padding-large);
          }
       }
    }

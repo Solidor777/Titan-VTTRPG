@@ -1,8 +1,7 @@
 <script>
    import {getContext} from 'svelte';
-   import getCheckParametersTooltip from '~/helpers/utility-functions/GetCheckParametersTooltip.js';
-   import CharacterSheetCondensedCheckButton
-      from '~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte';
+   import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
+   import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
 
    /** @type string The ID of the Item to get the check from. */
    export let itemId = void 0;
@@ -10,7 +9,7 @@
    /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
-   /** @type CastingCheckOptions Base options for the Casting Check. */
+   /** @type CastingCheckOptions Base options for the Check. */
    const checkOptions = {
       itemId: itemId,
    };
@@ -32,11 +31,11 @@
          );
 
          // Update the tooltip
-         tooltip = getCheckParametersTooltip(checkParameters);
+         tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
    }
 </script>
-<CharacterSheetCondensedCheckButton
+<CondensedCheckButton
    attribute="{checkParameters.attribute}"
    complexity="{checkParameters.complexity}"
    difficulty="{checkParameters.difficulty}"

@@ -43,6 +43,16 @@
    border-color: var(--border-color);
 }
 
+@mixin border-top-bottom-right {
+   border-top: var(--border-style);
+   border-bottom: var(--border-style);
+   border-right: var(--border-style);
+   border-top-right-radius: var(--border-radius);
+   border-bottom-right-radius: var(--border-radius);
+   border-width: var(--border-width);
+   border-color: var(--border-color);
+}
+
 @mixin border-bottom {
    border-bottom: var(--border-style);
    border-width: var(--border-width);

@@ -10,7 +10,7 @@ export default class TitanAbilitySheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 650,
+         width: 700,
          height: 650,
          svelte: {
             props: {
@@ -19,6 +19,7 @@ export default class TitanAbilitySheet extends TitanItemSheet {
          }
       });
    }
+
    _createReactiveState() {
       return createAbilitySheetState();
    }

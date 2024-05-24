@@ -142,7 +142,7 @@
       .header {
          @include flex-row;
          @include flex-space-between;
-         @include border;
+         @include border-top-bottom-right;
          @include panel-1;
 
          padding: var(--padding-standard);

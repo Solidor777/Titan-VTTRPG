@@ -1,7 +1,7 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
-   import {getContext} from "svelte";
+   import {getContext} from 'svelte';
 
    /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
@@ -28,7 +28,7 @@
    export let checkIcon = void 0;
 
    /** @type string The display Label of the check. */
-   export let checkLabel = void 0;
+   export let label = void 0;
 
    /** @type string Tooltip to show when hovering over the button. */
    export let tooltip = void 0;
@@ -43,7 +43,7 @@
    >
       <div class="button-inner">
          <!--Check Icon & Label-->
-         {#if checkIcon || checkLabel}
+         {#if checkIcon || label}
             <div class="label">
 
                <!-- Check Icon-->
@@ -52,9 +52,9 @@
                {/if}
 
                <!--Label-->
-               {#if checkLabel}
+               {#if label}
                   <div>
-                     {checkLabel}
+                     {label}
                   </div>
                {/if}
             </div>

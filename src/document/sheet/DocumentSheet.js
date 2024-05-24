@@ -1,10 +1,10 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
-import { writable } from 'svelte/store';
+import {SvelteApplication} from '@typhonjs-fvtt/runtime/svelte/application';
+import {TJSDocument} from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
+import {writable} from 'svelte/store';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
-import { SETTINGS_ICON } from '~/system/Icons.js';
+import {SETTINGS_ICON} from '~/system/Icons.js';
 
 /**
  * Replacement Document Sheet to that supports svelte components.
@@ -42,7 +42,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
       // Initialize the reactive  document
       this.document = document;
-      this.options.svelte.props.document = this._createReactiveDocument(this.document, { delete: this.close.bind(this) });
+      this.options.svelte.props.document = this._createReactiveDocument(this.document, {delete: this.close.bind(this)});
 
       // Initialize the reactive state
       this.applicationState = this._createReactiveState();
@@ -59,16 +59,45 @@ export default class TitanDocumentSheet extends SvelteApplication {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 650,
+         width: 700,
          height: 'auto',
          baseApplication: 'DocumentSheet',
          resizable: true,
          minimizable: true,
-         dragDrop: [{ dragSelector: '.directory-list .item', dropSelector: null }],
+         dragDrop: [{dragSelector: '.directory-list .item', dropSelector: null}],
          svelte: {
             target: document.body,
          },
       });
+   }
+
+   /**
+    * Getter function for the document this sheet is for.
+    * @returns {Document} The document this sheet is for.
+    */
+   get object() {
+      return this.document;
+   }
+
+   /**
+    * Returns whether this application is currently editable.
+    * True is editable in the options, the user is the document owner, and the document is not in a locked pack.
+    * @returns {boolean} Whether the document is editable.
+    * @protected
+    */
+   get isEditable() {
+
+      // If editable and owner
+      if (this.options.editable && this.document.isOwner) {
+
+         // If not in a locked pack
+         if (this.document.pack) {
+            const pack = game.packs.get(this.document.pack);
+            return !pack?.locked;
+         }
+         return true;
+      }
+      return false;
    }
 
    /**
@@ -140,14 +169,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Getter function for the document this sheet is for.
-    * @returns {Document} The document this sheet is for.
-    */
-   get object() {
-      return this.document;
-   }
-
-   /**
     * Creates a dialog for configuring the sheet.
     * @param {object} event - Event from clicking the buttons.
     * @returns {Application} The newly created Document Sheet Config dialog.
@@ -188,7 +209,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
       return super.close(options);
    }
 
-
    /**
     * Called internally by the subscription to the document store to update this sheet when appropriate.
     * @param {Document} document - The document that was updated.
@@ -198,7 +218,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     */
    async _onDocumentUpdated(document, options) {
       // If the action was to update or subscribe to this document
-      const { action } = options;
+      const {action} = options;
       if ((action === void 0 || action === 'update' || action === 'subscribe') && document) {
 
          // Update the name of this sheet.
@@ -222,27 +242,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
       super.render(force, options);
       return this;
-   }
-
-   /**
-    * Returns whether this application is currently editable.
-    * True is editable in the options, the user is the document owner, and the document is not in a locked pack.
-    * @returns {boolean} Whether the document is editable.
-    * @protected
-    */
-   get isEditable() {
-
-      // If editable and owner
-      if (this.options.editable && this.document.isOwner) {
-
-         // If not in a locked pack
-         if (this.document.pack) {
-            const pack = game.packs.get(this.document.pack);
-            return !pack?.locked;
-         }
-         return true;
-      }
-      return false;
    }
 
    /**

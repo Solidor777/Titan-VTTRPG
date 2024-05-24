@@ -18,20 +18,18 @@
       "tippy.js": "^6.3.7"
    },
    "devDependencies": {
-      "@typhonjs-config/eslint-config": "^0.6.0",
-      "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
       "esdoc": "^1.1.0",
       "esdoc-ecmascript-proposal-plugin": "^1.0.0",
       "esdoc-standard-plugin": "^1.0.0",
       "eslint": "^9.3.0",
       "eslint-plugin-jsdoc": "^48.2.5",
-      "eslint-plugin-svelte": "^2.38.0",
+      "eslint-plugin-svelte": "^2.39.0",
       "postcss-html": "^1.7.0",
       "postcss-scss": "^4.0.9",
       "stylelint": "^16.5.0",
       "stylelint-config-html": "^1.1.0",
       "stylelint-config-standard-scss": "^13.1.0",
-      "svelte": "^4.2.15",
+      "svelte": "^4.2.17",
       "svelte-preprocess": "^5",
       "vite": "^5.2.10"
    },
@@ -43,7 +41,7 @@
       "build": "vite build",
       "dev": "vite",
       "eslint": "eslint .",
-      "eslint-fix": "eslint --fix",
+      "eslint-fix": "eslint . --fix",
       "stylelint": "stylelint \"**/*.svelte\"",
       "stylelint-fix": "stylelint \"**/*.svelte\" --fix"
    }

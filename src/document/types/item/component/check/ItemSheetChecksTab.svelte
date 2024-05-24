@@ -1,12 +1,12 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
    import ItemSheetCheckSettings from '~/document/types/item/component/check/ItemSheetCheckSettings.svelte';
-   import { CREATE_ICON } from '~/system/Icons.js';
+   import {CREATE_ICON} from '~/system/Icons.js';
 
    // Setup context variables
    const document = getContext('document');
@@ -84,6 +84,7 @@
    .tab {
       @include flex-column;
       @include flex-group-top;
+      @include panel-2;
 
       height: 100%;
       width: 100%;

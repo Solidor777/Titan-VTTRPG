@@ -56,7 +56,6 @@
       position: relative;
       width: 100%;
       height: 100%;
-      z-index: var(--z-index-app);
 
       .content {
          @include flex-column;
@@ -64,19 +63,19 @@
          width: 100%;
          height: 100%;
          position: absolute;
-         top: 0;
-         left: 0;
-         bottom: 0;
-         overflow-y: auto;
-         padding: 0;
-         z-index: var(--z-index-app);
+         overflow-y: scroll;
+         padding: 0 4px 0 0;
 
          &.top-overflowing {
             --top-mask-size: 12px;
+
+            padding-right: 8px;
          }
 
          &.bottom-overflowing {
             --bottom-mask-size: 12px;
+
+            padding-right: 8px;
          }
 
          &.faded {

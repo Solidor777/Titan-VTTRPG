@@ -6,13 +6,11 @@
    const document = getContext('document');
 
    /** @type CheckDie[] Array of processed dice from the Check. */
-   let dice = $document.flags.titan.results.dice;
+   let dice;
 
    // Update the dice in response to changes
    $: {
-      if ($document) {
-         dice = $document.flags.titan.results.dice;
-      }
+      dice = $document.flags.titan.results.dice;
    }
 </script>
 

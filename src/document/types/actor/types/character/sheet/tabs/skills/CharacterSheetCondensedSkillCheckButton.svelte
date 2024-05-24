@@ -1,17 +1,25 @@
 <script>
-   import CharacterSheetCondensedCheckButton
-      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte";
+   import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
+   import {getContext} from 'svelte';
+   import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type AttributeCheckParameters The parameters for the Check */
-   export let checkParameters;
+   /** @type AttributeCheckParameters The Parameters of the Attribute check using this skill. */
+   export let checkParameters = void 0;
 
-   /** @type string Tooltip for the check stats. */
+   /** @type TitanActor Reference to the Character Document. */
+   const document = getContext('document');
 
+   /** @type string Calculated tooltip. */
+   let tooltip = localize(`${checkParameters.skill}.desc`);
+   tooltip += getAttributeCheckParametersTooltip(checkParameters);
 </script>
-<CharacterSheetCondensedCheckButton
-   attribute="{checkParameters.attribute}"
-   checkIcon="{icon}"
-   on:click={() => $document.system.requestAttackCheck(checkOptions)}
-   totalDice="{checkParameters.totalDice}"
-   totalExpertise="{checkParameters.totalExpertise}"
+
+<CondensedCheckButton
+   attribute={checkParameters.attribute}
+   label={localize(checkParameters.skill)}
+   on:click={() => $document.system.requestAttributeCheck({skill: checkParameters.skill})}
+   resolveCost={checkParameters.resolveCost}
+   {tooltip}
+   totalDice={checkParameters.totalDice}
 />
