@@ -8,4 +8,4 @@
    export let activeTab = void 0;
 </script>
 
-<Tabs {tabs} {activeTab} bordered={true}/>
+<Tabs bind:activeTab bordered={true} {tabs}/>

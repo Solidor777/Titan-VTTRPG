@@ -16,7 +16,6 @@
 
    /** @type {boolean}  Whether the tabs should be bordered. */
    export let bordered = false;
-
 </script>
 
 <!--List of tabs-->
@@ -50,7 +49,7 @@
 <style lang="scss">
    .tabs {
       @include flex-column;
-      
+
       &.bordered {
          @include border;
       }

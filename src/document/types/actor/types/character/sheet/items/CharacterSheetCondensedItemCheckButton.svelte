@@ -1,29 +1,40 @@
 <script>
-   import {getContext} from 'svelte';
    import CharacterSheetCondensedCheckButton
-      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte";
+      from '~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte';
+   import {getContext} from 'svelte';
+   import getCheckParametersTooltip from '~/helpers/utility-functions/GetCheckParametersTooltip.js';
 
-   /** @type string ID of the item to get the check from. */
+   /** @type string The ID of the Item to get the check from. */
    export let itemId = void 0;
 
    /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
-   /** @type ItemCheckOptions Options for the check. */
+   /** @type ItemCheckOptions Base options for the Item Check. */
    const checkOptions = {
       itemId: itemId,
-   }
+   };
 
    /** @type ItemCheckParameters Calculated check parameters. */
    let checkParameters;
 
+   /** @type string Calculated tooltip. */
+   let tooltip;
+
    // Update parameters in response to changes
    $: {
+
+      // Ensure the item and check are valid
       const item = $document.items.get(itemId);
       if (item?.system.check.length > 0) {
+
+         // Update the parameters
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );
+
+         // Update the tooltip
+         tooltip = getCheckParametersTooltip(checkParameters);
       }
    }
 </script>
@@ -33,6 +44,7 @@
    difficulty="{checkParameters.difficulty}"
    on:click={() => $document.system.requestItemCheck(checkOptions)}
    resolveCost="{checkParameters.resolveCost}"
+   {tooltip}
    totalDice="{checkParameters.totalDice}"
    totalExpertise="{checkParameters.totalExpertise}"
 />

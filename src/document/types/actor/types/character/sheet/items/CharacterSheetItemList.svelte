@@ -77,14 +77,15 @@
       });
 
    // Sort and filter items
-   $: items = $document.items
-      .filter((item) => {
+   let items = [];
+   $: {
+      items = $document.items.filter((item) => {
          return (
             filterFunction(item) &&
             item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
          );
-      })
-      .sort((a, b) => sort(a.sort, b.sort));
+      }).sort((a, b) => sort(a.sort, b.sort));
+   }
 </script>
 
 <!--Item List-->
@@ -93,24 +94,24 @@
       <!--Each Item-->
       {#each items as item (item._id)}
          <li
-                 class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
-                 data-item-id={item._id}
-                 draggable={true}
-                 on:dragstart={(event) => {
+            class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
+            data-item-id={item._id}
+            draggable={true}
+            on:dragstart={(event) => {
                onDragStart(event, item._id, 'item');
             }}
-                 on:dragenter={() => {
+            on:dragenter={() => {
                onDragEnter(item._id, 'item');
             }}
-                 on:dragend={() => {
+            on:dragend={() => {
                onDragEnd();
             }}
-                 transition:slide|local
+            transition:slide|local
          >
             <svelte:component
-                    this={itemComponent}
-                    itemId={item._id}
-                    bind:isExpanded={isExpandedMap[item._id]}
+               this={itemComponent}
+               {item}
+               bind:isExpanded={isExpandedMap[item._id]}
             />
          </li>
       {/each}
@@ -118,27 +119,27 @@
 {/if}
 
 <style lang="scss">
-  ol {
-    @include flex-column;
-    @include flex-group-top;
-    @include list;
-
-    width: 100%;
-    list-style: none;
-
-    li {
-      @include flex-row;
-      @include flex-space-between;
+   ol {
+      @include flex-column;
+      @include flex-group-top;
+      @include list;
 
       width: 100%;
+      list-style: none;
 
-      &.drag-hovered {
-        background: var(--highlight-background);
-      }
+      li {
+         @include flex-row;
+         @include flex-space-between;
 
-      &:not(:first-child) {
-        margin-top: var(--padding-large);
+         width: 100%;
+
+         &.drag-hovered {
+            background: var(--highlight-background);
+         }
+
+         &:not(:first-child) {
+            margin-top: var(--padding-large);
+         }
       }
-    }
-  }
+   }
 </style>

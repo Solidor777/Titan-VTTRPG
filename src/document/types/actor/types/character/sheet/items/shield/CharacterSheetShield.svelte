@@ -21,111 +21,106 @@
    import CharacterSheetShieldStats
       from '~/document/types/actor/types/character/sheet/items/shield/CharacterSheetShieldStats.svelte';
    import CharacterSheetCondensedItemCheckButton
-      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte";
+      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
 
-   // Reference to the armor itemId
-   export let itemId = void 0;
+   /** @type TitanItem Reference to the Item document. */
+   export let item = void 0;
 
    /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
    // Setup context references
    const document = getContext('document');
-
-   // Item reference
-   $: item = $document.items.get(itemId);
 </script>
 
-{#if item}
-   <div class="item">
-      <!--Header-->
-      <div class="header">
-         <div class="label">
-            <!--Image-->
-            <div class="image">
-               <CharacterSheetItemImage {item}/>
-            </div>
-
-            <!--Expand button-->
-            <div class="button">
-               <CharacterSheetItemExpandButton {item} bind:isExpanded/>
-            </div>
+<div class="item">
+   <!--Header-->
+   <div class="header">
+      <div class="label">
+         <!--Image-->
+         <div class="image">
+            <CharacterSheetItemImage {item}/>
          </div>
 
-         <!--Controls-->
-         <div class="controls">
-            <!--Toggle Equipped button-->
-            {#if $document.system.equipped.shield !== item._id || item.system.check.length === 0}
-               <div class="button">
-                  <CharacterSheetItemEquipButton
-                     {item}
-                     equipped={$document.system.equipped.shield === item._id}
-                  />
-               </div>
-            {:else if item.system.check.length > 0}
-               <div class="button">
-                  <CharacterSheetCondensedItemCheckButton {itemId}/>
-               </div>
-            {/if}
-
-            <!--Send to Chat button-->
-            <div
-               class="button"
-               use:tooltip={{ content: localize('sendToChat') }}
-            >
-               <CharacterSheetItemSendToChatButton {item}/>
-            </div>
-
-            <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize('editItem') }}>
-               <CharacterSheetItemEditButton {item}/>
-            </div>
-
-            <!--Delete Button-->
-            <div
-               class="button"
-               use:tooltip={{ content: localize('deleteItem') }}
-            >
-               <CharacterSheetItemDeleteButton itemId={item._id}/>
-            </div>
+         <!--Expand button-->
+         <div class="button">
+            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
          </div>
       </div>
 
-      <!--Expandable content-->
-      {#if isExpanded === true}
-         <div class="expandable-content" transition:slide|local>
-            <!--Equip button-->
-            {#if item.system.check.length > 0}
-               <div class="section">
-                  <CharacterSheetItemEquipButton
-                     {item}
-                     equipped={$document.system.equipped.shield === item._id}
-                  />
-               </div>
-            {/if}
-
-            <!--Shield Stats-->
-            <div class="section tags">
-               <CharacterSheetShieldStats {item}/>
+      <!--Controls-->
+      <div class="controls">
+         <!--Toggle Equipped button-->
+         {#if $document.system.equipped.shield !== item._id || item.system.check.length === 0}
+            <div class="button">
+               <CharacterSheetItemEquipButton
+                  {item}
+                  equipped={$document.system.equipped.shield === item._id}
+               />
             </div>
+         {:else if item.system.check.length > 0}
+            <div class="button">
+               <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+            </div>
+         {/if}
 
-            <!--Item Checks-->
-            {#if item.system.check.length > 0}
-               <div class="section">
-                  <CharacterSheetItemChecks {item}/>
-               </div>
-            {/if}
-
-            <!--Item Description-->
-            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-               <div class="section rich-text">
-                  <RichText text={item.system.description}/>
-               </div>
-            {/if}
+         <!--Send to Chat button-->
+         <div
+            class="button"
+            use:tooltip={{ content: localize('sendToChat') }}
+         >
+            <CharacterSheetItemSendToChatButton {item}/>
          </div>
-      {/if}
+
+         <!--Edit Button-->
+         <div class="button" use:tooltip={{ content: localize('editItem') }}>
+            <CharacterSheetItemEditButton {item}/>
+         </div>
+
+         <!--Delete Button-->
+         <div
+            class="button"
+            use:tooltip={{ content: localize('deleteItem') }}
+         >
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
+         </div>
+      </div>
    </div>
-{/if}
+
+   <!--Expandable content-->
+   {#if isExpanded === true}
+      <div class="expandable-content" transition:slide|local>
+         <!--Equip button-->
+         {#if item.system.check.length > 0}
+            <div class="section">
+               <CharacterSheetItemEquipButton
+                  {item}
+                  equipped={$document.system.equipped.shield === item._id}
+               />
+            </div>
+         {/if}
+
+         <!--Shield Stats-->
+         <div class="section tags">
+            <CharacterSheetShieldStats {item}/>
+         </div>
+
+         <!--Item Checks-->
+         {#if item.system.check.length > 0}
+            <div class="section">
+               <CharacterSheetItemChecks {item}/>
+            </div>
+         {/if}
+
+         <!--Item Description-->
+         {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+            <div class="section rich-text">
+               <RichText text={item.system.description}/>
+            </div>
+         {/if}
+      </div>
+   {/if}
+</div>
 
 <style lang="scss">
    .item {

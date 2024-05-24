@@ -1,35 +1,21 @@
 <script>
    import CharacterSheetItemCheck
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
-   import {getContext} from "svelte";
 
-   /** @type TitanActor Reference to the Character Document. */
-   const document = getContext('document');
-
-   /** @type {string} The ID of the item to get the check from. */
-   export let itemId = void 0;
-
-   /** @type ItemCheckTemplate[] Calculated item reference. */
-   let checks = [];
-
-   // Update the Item in response to changes.
-   $: {
-      const item = $document.items.get(itemId);
-      if (item) {
-         checks = item.system.checks;
-      }
-   }
+   /** @type TitanItem Reference to the Item document. */
+   export let item = void 0;
 </script>
 
 <!--Checks-->
 <div class="checks">
 
    <!--Each Check-->
-   {#each checks as check, checkIdx (check.uuid)}
+   {#each item.system.checks as check, checkIdx (check.uuid)}
       <div class="check">
-         <CharacterSheetItemCheck {itemId} {checkIdx}/>
+         <CharacterSheetItemCheck itemId={item._id} {checkIdx}/>
       </div>
    {/each}
+
 </div>
 
 <style lang="scss">

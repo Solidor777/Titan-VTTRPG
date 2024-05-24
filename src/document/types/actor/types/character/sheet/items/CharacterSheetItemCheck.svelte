@@ -23,7 +23,7 @@
    const checkOptions = {
       itemId: itemId,
       checkIdx: checkIdx
-   }
+   };
 
    /** @type boolean Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
@@ -34,19 +34,24 @@
    /** @type string Calculated DC Label */
    let dcLabel;
 
-   // Update the Item in response to changes.
+   // Update the component in response to changes
    $: {
+
+      // Ensure the item and check are valid
       const item = $document.items.get(itemId);
-      if (item &&
-         item.system.check.length > checkIdx
+      if (item?.system.check.length > checkIdx
       ) {
+
+         // Update the check parameters
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );
+
+         // Update the DC Label
          dcLabel =
             `${localize(checkParameters.attribute)}
             (${localize(checkParameters.skill)})
-            ${checkParameters.difficulty}:${checkParameters.complexity}`
+            ${checkParameters.difficulty}:${checkParameters.complexity}`;
       }
    }
 

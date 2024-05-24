@@ -8,7 +8,7 @@ import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createCustomAspectTemplate from '~/document/types/item/types/spell/SpellCustomAspect.js';
 import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
-import { SPELL_IMAGE } from '~/system/DefaultImages.js';
+import {SPELL_IMAGE} from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
@@ -59,6 +59,7 @@ export default class SpellDataModel extends ItemDataModel {
       retVal.quantity = this.quantity;
       retVal.aspect = foundry.utils.deepClone(this.aspect);
       retVal.customAspect = foundry.utils.deepClone(this.customAspect);
+      retVal.rarity = this.rarity;
 
       return retVal;
    }
@@ -86,8 +87,7 @@ export default class SpellDataModel extends ItemDataModel {
             if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
                aspect.enabled = false;
                aspect.cost = 0;
-            }
-            else {
+            } else {
                aspect.enabled = true;
 
                // Calculate the cost
@@ -113,8 +113,7 @@ export default class SpellDataModel extends ItemDataModel {
                   // Individual option cost
                   else if (settings.optionCost) {
                      cost += settings.optionCost * aspect.option.length;
-                  }
-                  else if (settings.optionCosts) {
+                  } else if (settings.optionCosts) {
                      aspect.option.forEach((option) => {
                         cost += settings.optionCosts[option];
                      });
@@ -134,8 +133,7 @@ export default class SpellDataModel extends ItemDataModel {
                aspect.cost = cost;
                totalAspectCost += cost;
             }
-         }
-         else {
+         } else {
             aspectsToRemove.add(idx);
          }
       }
@@ -159,8 +157,7 @@ export default class SpellDataModel extends ItemDataModel {
       if (suggestedDifficulty > 5) {
          suggestedComplexity = totalAspectCost - 4;
          suggestedDifficulty = 5;
-      }
-      else {
+      } else {
          suggestedDifficulty = Math.max(suggestedDifficulty, 4);
       }
 

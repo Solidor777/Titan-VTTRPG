@@ -1,5 +1,4 @@
 <script>
-   import {getContext} from 'svelte';
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
@@ -23,50 +22,43 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let itemId = void 0;
+   /** @type TitanItem Reference to the Item document. */
+   export let item = void 0;
 
    /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
-
-   // Setup context references
-   const document = getContext('document');
-
-   // Item reference
-   $: item = $document.items.get(itemId);
 </script>
 
-{#if item}
-   <div class="item">
-      <!--Header-->
-      <div class="header">
-         <div class="label">
-            <!--Image-->
-            <div class="image">
-               <CharacterSheetItemImage {item}/>
-            </div>
-
-            <!--Expand button-->
-            <div class="button">
-               <CharacterSheetItemExpandButton {item} bind:isExpanded/>
-            </div>
+<div class="item">
+   <!--Header-->
+   <div class="header">
+      <div class="label">
+         <!--Image-->
+         <div class="image">
+            <CharacterSheetItemImage {item}/>
          </div>
 
-         <!--Controls-->
-         <div class="controls">
-            <!--Duration-->
-            {#if item.system.duration.type !== 'permanent'}
-               {#if item.system.duration.type === 'initiative'}
-                  <!--Initiative-->
-                  <div class="field margin-right">
-                     <div class="label">
-                        {localize('initiative')}
-                     </div>
-                     <div class="input">
-                        <IntegerInput
-                           min={0}
-                           bind:value={item.system.duration.initiative}
-                           on:change={() => {
+         <!--Expand button-->
+         <div class="button">
+            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
+         </div>
+      </div>
+
+      <!--Controls-->
+      <div class="controls">
+         <!--Duration-->
+         {#if item.system.duration.type !== 'permanent'}
+            {#if item.system.duration.type === 'initiative'}
+               <!--Initiative-->
+               <div class="field margin-right">
+                  <div class="label">
+                     {localize('initiative')}
+                  </div>
+                  <div class="input">
+                     <IntegerInput
+                        min={0}
+                        bind:value={item.system.duration.initiative}
+                        on:change={() => {
                               item.update({
                                  system: {
                                     duration: {
@@ -76,24 +68,24 @@
                                  },
                               });
                            }}
-                        />
-                     </div>
+                     />
                   </div>
-               {/if}
+               </div>
+            {/if}
 
-               <div class="field">
-                  <div class="label">
-                     {item.system.duration.type === 'custom'
-                        ? item.system.duration.custom
-                        : localize('turns')}
-                  </div>
+            <div class="field">
+               <div class="label">
+                  {item.system.duration.type === 'custom'
+                     ? item.system.duration.custom
+                     : localize('turns')}
+               </div>
 
-                  <!--Duration input-->
-                  <div class="input">
-                     <IntegerIncrementInput
-                        min={0}
-                        bind:value={item.system.duration.remaining}
-                        on:change={() => {
+               <!--Duration input-->
+               <div class="input">
+                  <IntegerIncrementInput
+                     min={0}
+                     bind:value={item.system.duration.remaining}
+                     on:change={() => {
                            item.update({
                               system: {
                                  duration: {
@@ -102,86 +94,85 @@
                               },
                            });
                         }}
-                     />
-                  </div>
-               </div>
-            {:else}
-               <!--Toggle Active Button-->
-               <CharacterSheetItemToggleActiveButton {item}/>
-            {/if}
-
-            <!--Send to Chat button-->
-            <div
-               class="button"
-               use:tooltip={{ content: localize('sendToChat') }}
-            >
-               <CharacterSheetItemSendToChatButton {item}/>
-            </div>
-
-            <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize('editItem') }}>
-               <CharacterSheetItemEditButton {item}/>
-            </div>
-
-            <!--Delete Button-->
-            <div
-               class="button"
-               use:tooltip={{ content: localize('deleteItem') }}
-            >
-               <CharacterSheetItemDeleteButton itemId={item._id}/>
-            </div>
-         </div>
-      </div>
-
-      <!--Expandable content-->
-      {#if isExpanded === true}
-         <div class="expandable-content" transition:slide|local>
-            <!--Item Checks-->
-            {#if item.system.check.length > 0}
-               <div class="section">
-                  <CharacterSheetItemChecks {item}/>
-               </div>
-            {/if}
-
-            <!--Item Description-->
-            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-               <div class="section rich-text">
-                  <RichText text={item.system.description}/>
-               </div>
-            {/if}
-
-            <div class="section tags small-text">
-               <!--Duration-->
-               <div class="tag">
-                  <DurationTag
-                     type={item.system.duration.type}
-                     remaining={item.system.duration.remaining}
                   />
                </div>
-
-               <!--Expired-->
-               {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
-                  <div class="tag">
-                     <Tag label={localize('expired')}/>
-                  </div>
-               {/if}
-
-               <!--Traits-->
-               {#if item.system.customTrait.length > 0}
-                  {#each item.system.customTrait as trait}
-                     <div
-                        class="tag"
-                        use:tooltip={{ content: trait.description }}
-                     >
-                        <Tag label={trait.name}/>
-                     </div>
-                  {/each}
-               {/if}
             </div>
+         {:else}
+            <!--Toggle Active Button-->
+            <CharacterSheetItemToggleActiveButton {item}/>
+         {/if}
+
+         <!--Send to Chat button-->
+         <div
+            class="button"
+            use:tooltip={{ content: localize('sendToChat') }}
+         >
+            <CharacterSheetItemSendToChatButton {item}/>
          </div>
-      {/if}
+
+         <!--Edit Button-->
+         <div class="button" use:tooltip={{ content: localize('editItem') }}>
+            <CharacterSheetItemEditButton {item}/>
+         </div>
+
+         <!--Delete Button-->
+         <div
+            class="button"
+            use:tooltip={{ content: localize('deleteItem') }}
+         >
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
+         </div>
+      </div>
    </div>
-{/if}
+
+   <!--Expandable content-->
+   {#if isExpanded === true}
+      <div class="expandable-content" transition:slide|local>
+         <!--Item Checks-->
+         {#if item.system.check.length > 0}
+            <div class="section">
+               <CharacterSheetItemChecks {item}/>
+            </div>
+         {/if}
+
+         <!--Item Description-->
+         {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+            <div class="section rich-text">
+               <RichText text={item.system.description}/>
+            </div>
+         {/if}
+
+         <div class="section tags small-text">
+            <!--Duration-->
+            <div class="tag">
+               <DurationTag
+                  type={item.system.duration.type}
+                  remaining={item.system.duration.remaining}
+               />
+            </div>
+
+            <!--Expired-->
+            {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
+               <div class="tag">
+                  <Tag label={localize('expired')}/>
+               </div>
+            {/if}
+
+            <!--Traits-->
+            {#if item.system.customTrait.length > 0}
+               {#each item.system.customTrait as trait}
+                  <div
+                     class="tag"
+                     use:tooltip={{ content: trait.description }}
+                  >
+                     <Tag label={trait.name}/>
+                  </div>
+               {/each}
+            {/if}
+         </div>
+      </div>
+   {/if}
+</div>
 
 <style lang="scss">
    .item {

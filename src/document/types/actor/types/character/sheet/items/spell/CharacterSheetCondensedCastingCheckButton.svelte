@@ -1,28 +1,38 @@
 <script>
    import {getContext} from 'svelte';
+   import getCheckParametersTooltip from '~/helpers/utility-functions/GetCheckParametersTooltip.js';
    import CharacterSheetCondensedCheckButton
-      from "~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte";
+      from '~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte';
 
-   /** @type string ID of the item to get the check from. */
+   /** @type string The ID of the Item to get the check from. */
    export let itemId = void 0;
 
    /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
+   /** @type CastingCheckOptions Base options for the Casting Check. */
    const checkOptions = {
       itemId: itemId,
-   }
+   };
 
    /** @type CastingCheckParameters Calculated check parameters. */
    let checkParameters;
 
-   // Update parameters in response to changes
+   /** @type string Calculated tooltip. */
+   let tooltip;
+
+   // Update the component in response to changes
    $: {
-      const item = $document.items.get(itemId);
-      if (item) {
+      // Ensure the item is valid
+      if ($document.items.get(item._id)) {
+
+         // Update the parameters
          checkParameters = $document.system.getCastingCheckParameters(
             $document.system.initializeCastingCheckOptions(checkOptions)
          );
+
+         // Update the tooltip
+         tooltip = getCheckParametersTooltip(checkParameters);
       }
    }
 </script>
@@ -31,6 +41,7 @@
    complexity="{checkParameters.complexity}"
    difficulty="{checkParameters.difficulty}"
    on:click={() => $document.system.requestCastingCheck(checkOptions)}
+   {tooltip}
    totalDice="{checkParameters.totalDice}"
    totalExpertise="{checkParameters.totalExpertise}"
 />

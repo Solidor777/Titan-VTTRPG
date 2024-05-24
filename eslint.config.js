@@ -1,5 +1,5 @@
 import eslintPluginSvelte from 'eslint-plugin-svelte';
-import jsdoc from 'eslint-plugin-jsdoc'
+import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [
    // add more generic rule sets here, such as:
@@ -11,7 +11,6 @@ export default [
          jsdoc
       },
       rules: {
-         "semi-style": ["error", "last"],
          'svelte/no-at-html-tags': 'off',
          'svelte/no-unused-svelte-ignore': 'off',
          'jsdoc/check-access': 1, // Recommended

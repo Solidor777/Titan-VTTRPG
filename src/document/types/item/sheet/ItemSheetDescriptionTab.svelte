@@ -5,6 +5,7 @@
    import DocumentBoundEditorInput from "~/document/components/input/DocumentBoundEditorInput.svelte";
 
    // Setup context variables
+   const document = getContext('document');
    const appState = getContext('applicationState');
 </script>
 

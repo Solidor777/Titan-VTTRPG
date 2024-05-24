@@ -25,36 +25,36 @@
    <div class="sections">
       <div class="section">
          <AttributeTag
-            attribute={item.system.castingCheck.attribute}
-            label={`${localize(item.system.castingCheck.attribute)} (${localize(
-               item.system.castingCheck.skill,
-            )}) ${item.system.castingCheck.difficulty}:${
-               item.system.castingCheck.complexity
+            attribute={item.castingCheck.attribute}
+            label={`${localize(item.castingCheck.attribute)} (${localize(
+               item.castingCheck.skill,
+            )}) ${item.castingCheck.difficulty}:${
+               item.castingCheck.complexity
             }`}
          />
       </div>
 
       <!--Aspects-->
-      {#if item.system.aspect.length > 0 || item.system.customAspect.length > 0}
+      {#if item.aspect.length > 0 || item.customAspect.length > 0}
          <div class="section small-text tags">
             <SpellAspectTags
-               standardAspects={item.system.aspect}
-               customAspects={item.system.customAspect}
+               standardAspects={item.aspect}
+               customAspects={item.customAspect}
             />
          </div>
       {/if}
 
       <!--Checks-->
-      {#if item.system.check.length > 0}
+      {#if item.check.length > 0}
          <div class="section">
             <ItemChatChecks {item}/>
          </div>
       {/if}
 
       <!--Description-->
-      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      {#if item.description !== '' && item.description !== '<p></p>'}
          <div class="section rich-text">
-            <RichText text={item.system.description}/>
+            <RichText text={item.description}/>
          </div>
       {/if}
 
@@ -62,26 +62,26 @@
       <div class="section tags">
          <!--Rarity-->
          <div class="tag">
-            <RarityTag rarity={item.system.rarity}/>
+            <RarityTag rarity={item.rarity}/>
          </div>
 
          <!--Tradition-->
          <div class="tag">
             <StatTag
                label={localize('tradition')}
-               value={item.system.tradition}
+               value={item.tradition}
             />
          </div>
 
          <!--XP Cost-->
-         {#if item.system.xpCost}
+         {#if item.xpCost}
             <div class="tag">
-               <StatTag label={localize('xpCost')} value={item.system.xpCost}/>
+               <StatTag label={localize('xpCost')} value={item.xpCost}/>
             </div>
          {/if}
 
          <!--Custom Traits-->
-         {#each item.system.customTrait as trait}
+         {#each item.customTrait as trait}
             <div class="tag" use:tooltip={{ content: trait.description }}>
                <Tag label={trait.name}/>
             </div>

@@ -8,37 +8,37 @@
    /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
-   // Context references
+   /** @type TitanActor Reference to the character document. */
    const document = getContext('document');
 
-   // Calculate dice pool
-   let dicePool = 0;
-   $: {
-      dicePool =
-         $document.system.attribute[item.system.castingCheck.attribute].value +
-         $document.system.skill[item.system.castingCheck.skill].training.value +
-         $document.system.getCastingCheckMod('dice', item);
-   }
+   /** @type CastingCheckOptions Base options for the Casting Check. */
+   const checkOptions = {
+      itemId: item._id,
+   };
 
-   // Calculate expertise
-   let expertise = 0;
+   /** @type CastingCheckParameters Calculated check parameters. */
+   let checkParameters;
+
+   // Update the component in response to changes
    $: {
-      expertise =
-         $document.system.skill[item.system.castingCheck.skill].expertise
-            .value +
-         $document.system.getCastingCheckMod('expertise', item);
+      // Ensure the item is still valid
+      if ($document.items.get(item._id)) {
+
+         // Update the parameters
+         checkParameters = $document.system.getCastingCheckParameters(
+            $document.system.initializeCastingCheckOptions(checkOptions)
+         );
+      }
    }
 </script>
 
 <div class="check">
+   <!--Label-->
    <div class="tag">
       <AttributeTag
-         attribute={item.system.castingCheck.attribute}
-         label={`${localize(item.system.castingCheck.attribute)} (${localize(
-            item.system.castingCheck.skill,
-         )}) ${item.system.castingCheck.difficulty}:${
-            item.system.castingCheck.complexity
-         }`}
+         attribute={checkParameters.attribute}
+         label={`${localize(checkParameters.attribute)} (${localize(checkParameters.skill)})
+         ${checkParameters.difficulty}:${checkParameters.complexity}`}
       />
    </div>
 
@@ -47,28 +47,27 @@
       <IconStatTag
          icon={DICE_ICON}
          label={localize('dice')}
-         value={dicePool}
+         value={checkParameters.totalDice}
       />
    </div>
 
    <!--Training-->
-   {#if $document.system.skill[item.system.castingCheck.skill].training.value !== 0}
+   {#if checkParameters.totalTrainingDice}
       <div class="tag">
          <IconStatTag
             label={localize('training')}
-            value={$document.system.skill[item.system.castingCheck.skill]
-               .training.value}
+            value={checkParameters.totalTrainingDice}
             icon={TRAINING_ICON}
          />
       </div>
    {/if}
 
    <!--Expertise-->
-   {#if expertise !== 0}
+   {#if checkParameters.totalExpertise}
       <div class="tag">
          <IconStatTag
             label={localize('expertise')}
-            value={expertise}
+            value={checkParameters.totalExpertise}
             icon={EXPERTISE_ICON}
          />
       </div>

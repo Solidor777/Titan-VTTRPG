@@ -26,7 +26,7 @@
    import CharacterSheetWeaponAttacks
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
    import CharacterSheetCondensedAttackCheckButton
-      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte";
+      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte';
 
    // Weapon id
    export let itemId = void 0;
@@ -67,7 +67,7 @@
                      equipped={item.system.equipped}
                   />
                {:else if item.system.attack.length > 0}
-                  <CharacterSheetCondensedAttackCheckButton {itemId}/>
+                  <CharacterSheetCondensedAttackCheckButton itemId={item._id}/>
                {/if}
             </div>
 

@@ -1,5 +1,4 @@
 <script>
-   import {getContext} from 'svelte';
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
@@ -17,144 +16,134 @@
    import CharacterSheetItemImage
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetCondensedItemCheckButton
-      from "~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte";
+      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let itemId = void 0;
+   /** @type TitanItem Reference to the Item document. */
+   export let item = void 0;
 
    /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
-
-   /** @type TitanActor Reference to the Character Document. */
-   const document = getContext('document');
-
-   /** @type TitanActor Reference to the Item document. */
-   let item;
-   $: {
-      item = $document.items.get(itemId);
-   }
 </script>
 
-{#if item}
-   <div class="item">
-      <!--Header-->
-      <div class="header">
-         <div class="label">
-            <!--Image-->
-            <div class="image">
-               <CharacterSheetItemImage {item}/>
-            </div>
-
-            <!--Expand button-->
-            <div class="button">
-               <CharacterSheetItemExpandButton bind:isExpanded {item}/>
-            </div>
+<div class="item">
+   <!--Header-->
+   <div class="header">
+      <div class="label">
+         <!--Image-->
+         <div class="image">
+            <CharacterSheetItemImage {item}/>
          </div>
 
-         <!--Controls-->
-         <div class="controls">
-            <!--Check-->
-            {#if item.system.check.length > 0}
-               <div>
-                  <CharacterSheetCondensedItemCheckButton {itemId}/>
-               </div>
-            {/if}
-
-            <!--Send to Chat button-->
-            <div
-               class="button"
-               use:tooltip={{ content: localize('sendToChat') }}
-            >
-               <CharacterSheetItemSendToChatButton {item}/>
-            </div>
-
-            <!--Edit Button-->
-            <div class="button" use:tooltip={{ content: localize('editItem') }}>
-               <CharacterSheetItemEditButton {item}/>
-            </div>
-
-            <!--Delete Button-->
-            <div
-               class="button"
-               use:tooltip={{ content: localize('deleteItem') }}
-            >
-               <CharacterSheetItemDeleteButton {itemId}/>
-            </div>
+         <!--Expand button-->
+         <div class="button">
+            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
          </div>
       </div>
 
-      <!--Expandable content-->
-      {#if isExpanded === true}
-         <div class="expandable-content" transition:slide|local>
-            <!--Item Checks-->
-            {#if item.system.check.length > 0}
-               <div class="section">
-                  <CharacterSheetItemChecks {itemId}/>
-               </div>
-            {/if}
+      <!--Controls-->
+      <div class="controls">
+         <!--Check-->
+         {#if item.system.check.length > 0}
+            <div>
+               <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+            </div>
+         {/if}
 
-            <!--Item Description-->
-            {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-               <div class="section rich-text">
-                  <RichText text={item.system.description}/>
-               </div>
-            {/if}
+         <!--Send to Chat button-->
+         <div
+            class="button"
+            use:tooltip={{ content: localize('sendToChat') }}
+         >
+            <CharacterSheetItemSendToChatButton {item}/>
+         </div>
 
-            <!--Footer-->
-            <div class="section tags small-text">
+         <!--Edit Button-->
+         <div class="button" use:tooltip={{ content: localize('editItem') }}>
+            <CharacterSheetItemEditButton {item}/>
+         </div>
+
+         <!--Delete Button-->
+         <div
+            class="button"
+            use:tooltip={{ content: localize('deleteItem') }}
+         >
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
+         </div>
+      </div>
+   </div>
+
+   <!--Expandable content-->
+   {#if isExpanded === true}
+      <div class="expandable-content" transition:slide|local>
+         <!--Item Checks-->
+         {#if item.system.check.length > 0}
+            <div class="section">
+               <CharacterSheetItemChecks {item}/>
+            </div>
+         {/if}
+
+         <!--Item Description-->
+         {#if !(isHTMLBlank(item.system.description))}
+            <div class="section rich-text">
+               <RichText text={item.system.description}/>
+            </div>
+         {/if}
+
+         <!--Footer-->
+         <div class="section tags small-text">
+            <!-- Rarity-->
+            <div class="tag">
+               <RarityTag rarity={item.system.rarity}/>
+            </div>
+
+            <!--Action-->
+            {#if item.system.action}
                <!-- Rarity-->
                <div class="tag">
-                  <RarityTag rarity={item.system.rarity}/>
+                  <Tag label={localize('action')}/>
                </div>
+            {/if}
 
-               <!--Action-->
-               {#if item.system.action}
-                  <!-- Rarity-->
-                  <div class="tag">
-                     <Tag label={localize('action')}/>
-                  </div>
-               {/if}
+            <!--Reaction-->
+            {#if item.system.reaction}
+               <!-- Rarity-->
+               <div class="tag">
+                  <Tag label={localize('reaction')}/>
+               </div>
+            {/if}
 
-               <!--Reaction-->
-               {#if item.system.reaction}
-                  <!-- Rarity-->
-                  <div class="tag">
-                     <Tag label={localize('reaction')}/>
-                  </div>
-               {/if}
+            <!--Passive-->
+            {#if item.system.passive}
+               <!-- Rarity-->
+               <div class="tag">
+                  <Tag label={localize('passive')}/>
+               </div>
+            {/if}
 
-               <!--Passive-->
-               {#if item.system.passive}
-                  <!-- Rarity-->
-                  <div class="tag">
-                     <Tag label={localize('passive')}/>
-                  </div>
-               {/if}
+            <!--XP Cost-->
+            {#if item.system.xpCost}
+               <div class="tag">
+                  <StatTag
+                     label={localize('xpCost')}
+                     value={item.system.xpCost}
+                  />
+               </div>
+            {/if}
 
-               <!--XP Cost-->
-               {#if item.system.xpCost}
-                  <div class="tag">
-                     <StatTag
-                        label={localize('xpCost')}
-                        value={item.system.xpCost}
-                     />
-                  </div>
-               {/if}
-
-               <!--Custom Traits-->
-               {#each item.system.customTrait as trait}
-                  <div class="tag" use:tooltip={{ content: trait.description }}>
-                     <Tag label={trait.name}/>
-                  </div>
-               {/each}
-            </div>
+            <!--Custom Traits-->
+            {#each item.system.customTrait as trait}
+               <div class="tag" use:tooltip={{ content: trait.description }}>
+                  <Tag label={trait.name}/>
+               </div>
+            {/each}
          </div>
-      {/if}
-   </div>
-{/if}
+      </div>
+   {/if}
+</div>
 
 
 <style lang="scss">
