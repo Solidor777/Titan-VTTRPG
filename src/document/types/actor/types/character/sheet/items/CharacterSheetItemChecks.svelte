@@ -1,4 +1,5 @@
 <script>
+
    import CharacterSheetItemCheck
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
 
@@ -10,7 +11,7 @@
 <div class="checks">
 
    <!--Each Check-->
-   {#each item.system.checks as check, checkIdx (check.uuid)}
+   {#each item.system.check as check, checkIdx (check.uuid)}
       <div class="check">
          <CharacterSheetItemCheck itemId={item._id} {checkIdx}/>
       </div>

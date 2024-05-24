@@ -24,7 +24,7 @@
    // Update the component in response to changes
    $: {
       // Ensure the item is valid
-      if ($document.items.get(item._id)) {
+      if ($document.items.get(itemId)) {
 
          // Update the parameters
          checkParameters = $document.system.getCastingCheckParameters(

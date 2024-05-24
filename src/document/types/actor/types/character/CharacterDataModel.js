@@ -218,7 +218,7 @@ export default class CharacterDataModel extends ActorDataModel {
       // Add bio
       schema.bio = createSchemaField({
          description: createStringField(),
-      })
+      });
 
       return schema;
    }
@@ -2975,7 +2975,7 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Ensure an item ID or Item Roll Data was provided.
-      let itemRollData = options.rollData ?? this.parent.items.get(options.itemId)?.getRollData();
+      let itemRollData = options.itemRollData ?? this.parent.items.get(options.itemId)?.getRollData();
       if (!itemRollData) {
          game.titan.error(
             'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
@@ -2986,7 +2986,7 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       // Ensure the check index is in a valid range.
-      const numChecks = item.system.check.length;
+      const numChecks = itemRollData.check.length;
       if ((options.checkIdx && options.checkIdx > numChecks) ||
          numChecks === 0) {
          game.titan.error(

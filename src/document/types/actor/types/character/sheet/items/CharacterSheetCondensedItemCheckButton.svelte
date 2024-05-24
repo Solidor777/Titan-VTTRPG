@@ -2,7 +2,7 @@
    import CharacterSheetCondensedCheckButton
       from '~/document/types/actor/types/character/sheet/CharacterSheetCondensedCheckButton.svelte';
    import {getContext} from 'svelte';
-   import getCheckParametersTooltip from '~/helpers/utility-functions/GetCheckParametersTooltip.js';
+   import getItemCheckParametersTooltip from '~/helpers/utility-functions/GetItemCheckParametersTooltip.js';
 
    /** @type string The ID of the Item to get the check from. */
    export let itemId = void 0;
@@ -34,7 +34,7 @@
          );
 
          // Update the tooltip
-         tooltip = getCheckParametersTooltip(checkParameters);
+         tooltip = getItemCheckParametersTooltip(checkParameters);
       }
    }
 </script>

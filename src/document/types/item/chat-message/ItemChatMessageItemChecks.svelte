@@ -6,10 +6,9 @@
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import ItemCheckResolveButton from '~/helpers/svelte-components/button/ItemCheckResolveButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
    import {RESOLVE_ICON} from '~/system/Icons.js';
-   import getControlledCharacters from "~/helpers/utility-functions/GetControlledCharacters.js";
+   import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
 
    export let item = void 0;
 
@@ -77,7 +76,7 @@
 
 <ol>
    <!--Each check-->
-   {#each item.system.check as check, idx}
+   {#each item.check as check, idx}
       <li>
 
          <!--Header-->
@@ -85,8 +84,10 @@
             {#if autoSpendResolve}
                <!--Combined Item Check and Spend Resolve button-->
                <div class="button">
-                  <ItemCheckResolveButton
-                     {check}
+                  <ItemCheckButton
+                     label={check.label}
+                     attribute={check.attribute}
+                     resolveCost={check.resolveCost}
                      on:click={() => rollItemCheck(idx)}
                   />
                </div>
@@ -94,7 +95,8 @@
                <!--Item Check Button-->
                <div class="button">
                   <ItemCheckButton
-                     {check}
+                     label={check.label}
+                     attribute={check.attribute}
                      on:click={() => rollItemCheck(idx)}
                   />
                </div>

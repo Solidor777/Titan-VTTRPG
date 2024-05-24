@@ -54,6 +54,8 @@
 
          .resolve {
             @include border-left;
+            @include flex-row;
+            @include flex-group-center;
 
             border-color: var(--button-border-color);
             margin-left: var(--padding-standard);

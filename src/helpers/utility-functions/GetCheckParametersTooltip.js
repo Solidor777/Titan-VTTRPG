@@ -1,10 +1,10 @@
-import {BODY_ICON, DICE_ICON, EXPERTISE_ICON, MIND_ICON, MOD_ICON, SOUL_ICON, TRAINING_ICON} from "~/system/Icons.js";
-import localize from "~/helpers/utility-functions/Localize.js";
+import {BODY_ICON, DICE_ICON, EXPERTISE_ICON, MIND_ICON, MOD_ICON, SOUL_ICON, TRAINING_ICON} from '~/system/Icons.js';
+import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Creates a tooltip based on the provided of an Attribute based check.
  * @param {AttributeCheckParameters} checkParameters - The check parameters used to create the check tooltip.
- * @returns {string} A tooltip based on the provided of an Attribute based check.
+ * @returns {string} A tooltip based on the provided check parameters.
  */
 export default function getCheckParametersTooltip(checkParameters) {
    let retVal = '';

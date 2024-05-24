@@ -5,7 +5,7 @@
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
+   import ItemChatMessageItemChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
@@ -22,16 +22,16 @@
 
    <div class="sections">
       <!--Checks-->
-      {#if item.system.check.length > 0}
+      {#if item.check.length > 0}
          <div class="section">
-            <ItemChatChecks {item}/>
+            <ItemChatMessageItemChecks {item}/>
          </div>
       {/if}
 
       <!--Description-->
-      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      {#if item.description !== '' && item.description !== '<p></p>'}
          <div class="section rich-text">
-            <RichText text={item.system.description}/>
+            <RichText text={item.description}/>
          </div>
       {/if}
 
@@ -39,11 +39,11 @@
       <div class="section small-text tags">
          <!--Rarity-->
          <div class="tag">
-            <RarityTag rarity={item.system.rarity}/>
+            <RarityTag rarity={item.rarity}/>
          </div>
 
          <!--Action-->
-         {#if item.system.action}
+         {#if item.action}
             <!-- Rarity-->
             <div class="tag">
                <Tag label={localize('action')}/>
@@ -51,7 +51,7 @@
          {/if}
 
          <!--Reaction-->
-         {#if item.system.reaction}
+         {#if item.reaction}
             <!-- Rarity-->
             <div class="tag">
                <Tag label={localize('reaction')}/>
@@ -59,7 +59,7 @@
          {/if}
 
          <!--Passive-->
-         {#if item.system.passive}
+         {#if item.passive}
             <!-- Rarity-->
             <div class="tag">
                <Tag label={localize('passive')}/>
@@ -67,14 +67,14 @@
          {/if}
 
          <!--XP Cost-->
-         {#if item.system.xpCost}
+         {#if item.xpCost}
             <div class="tag">
-               <StatTag label={localize('xpCost')} value={item.system.xpCost}/>
+               <StatTag label={localize('xpCost')} value={item.xpCost}/>
             </div>
          {/if}
 
          <!--Custom Traits-->
-         {#each item.system.customTrait as trait}
+         {#each item.customTrait as trait}
             <div class="tag" use:tooltip={{ content: trait.description }}>
                <Tag label={trait.name}/>
             </div>
