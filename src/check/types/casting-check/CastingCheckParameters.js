@@ -11,8 +11,8 @@
 /**
  * Calculated parameters for the creation of a new Casting Check, based off an Actor's data.
  * @typedef {object} CastingCheckParameters
- * @property {boolean} doubleExpertise Whether to double the Expertise to apply..
- * @property {boolean} doubleTraining Whether to double the Training to apply.
+ * @property {boolean} doubleExpertise Whether to double the Expertise applied.
+ * @property {boolean} doubleTraining Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {boolean} reflexesCheck Whether the effects can be resisted with a Reflexes check.

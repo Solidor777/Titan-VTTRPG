@@ -1,15 +1,17 @@
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import {TJSDialog} from '@typhonjs-fvtt/runtime/svelte/application';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
- * Dialog window for setting the Options of a Check.
+ * Base dialog class with system specific functionality.
+ * @param {object} options - Options for the dialog window.
  * @augments TJSDialog
  */
 export default class TitanDialog extends TJSDialog {
 
    /**
-    * Creates a dialog window for setting the Options of a Check.
+    * Base dialog class with system specific functionality.
     * @param {object} options - Options for the dialog window.
+    * @augments TJSDialog
     */
    constructor(options) {
 
@@ -34,7 +36,7 @@ export default class TitanDialog extends TJSDialog {
    }
 
    /**
-    * Gets the classes to add to this dialog.
+    * Gets a list of classes to add to this dialog for identification purposes.
     * @returns {string[]} List of classes to add to this dialog.
     * @protected
     */

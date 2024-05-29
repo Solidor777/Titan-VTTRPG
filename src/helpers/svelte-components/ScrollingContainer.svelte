@@ -40,6 +40,26 @@
     */
    function initialScroll(node) {
       node.scrollTop = scrollTop;
+
+      const isScrollable = node.scrollHeight > node.clientHeight;
+
+      if (isScrollable) {
+         // Find out which direction it is overflowing to
+         const isScrolledToBottom = node.scrollHeight <= node.clientHeight + node.scrollTop + 12;
+
+         //
+         const isScrolledToTop = node.scrollTop === 0;
+         if (!isScrolledToBottom) {
+            scrollClass = ' faded bottom-overflowing';
+            if (!isScrolledToTop) {
+               scrollClass += ' top-overflowing';
+            }
+         } else if (!isScrolledToTop) {
+            scrollClass = ' faded top-overflowing';
+         } else {
+            scrollClass = '';
+         }
+      }
    }
 </script>
 
@@ -64,18 +84,17 @@
          height: 100%;
          position: absolute;
          overflow-y: scroll;
-         padding: 0 4px 0 0;
+         padding: 0 6px 0 0;
+
+         --top-mask-size: 0px;
+         --bottom-mask-size: 0px;
 
          &.top-overflowing {
             --top-mask-size: 12px;
-
-            padding-right: 8px;
          }
 
          &.bottom-overflowing {
             --bottom-mask-size: 12px;
-
-            padding-right: 8px;
          }
 
          &.faded {

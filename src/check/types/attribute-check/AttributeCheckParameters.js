@@ -1,8 +1,8 @@
 /**
  * Calculated parameters for the creation of a new Attribute Check, based off an Actor's data.
  * @typedef {object} AttributeCheckParameters
- * @property {boolean} doubleExpertise Whether to double the Expertise to apply..
- * @property {boolean} doubleTraining Whether to double the Training to apply.
+ * @property {boolean} doubleExpertise Whether to double the Expertise applied.
+ * @property {boolean} doubleTraining Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {number} attributeDice The number of dice granted by the attribute.

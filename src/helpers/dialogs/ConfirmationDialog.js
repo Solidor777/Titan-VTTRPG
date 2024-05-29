@@ -54,4 +54,11 @@ export default class ConfirmationDialog extends TitanDialog {
          this.confirmationCallback = confirmationCallback;
       }
    }
+   
+   _getDialogClasses() {
+      const retVal = super._getDialogClasses();
+      retVal.push('confirmation-dialog');
+
+      return retVal;
+   }
 }

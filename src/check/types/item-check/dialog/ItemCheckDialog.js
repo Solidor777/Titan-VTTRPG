@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import {writable} from 'svelte/store';
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
@@ -11,12 +11,12 @@ import ItemCheckDialogShell from '~/check/types/item-check/dialog/ItemCheckDialo
  * calculated from the options.
  * @param {TitanActor} actor - The Actor that will roll the check.
  * @augments TitanDialog
- * Creates a dialog window for setting the Options of a Item Check.
+ * Creates a dialog window for setting the Options of an Item Check.
  */
 export default class ItemCheckDialog extends TitanDialog {
 
    /**
-    * Creates a dialog window for setting the Options of a Item Check.
+    * Creates a dialog window for setting the Options of an Item Check.
     * @param {ItemCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {ItemCheckParameters} checkParameters - The initial parameters for the check,
     * calculated from the options.

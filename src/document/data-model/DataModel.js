@@ -12,7 +12,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @private
     */
    #components;
-
+   
    constructor(data, options) {
       super(data, options);
 

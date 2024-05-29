@@ -6,34 +6,36 @@ import calculateAttributeCheckResults from '~/check/types/attribute-check/Attrib
 import calculateResistanceCheckResults from '~/check/types/resistance-check/ResistanceCheckResults.js';
 
 /**
- * @param check
+ * Takes a completed Check Chat Message and returns the new results in response to changes in the dice or parameters.
+ * @param {object} checkChatMessage - The Check Chat Message to recalculate the results for.
+ * @returns {CheckResults} The new results in response to changes in the dice or parameters.
  */
-export default function recalculateCheckResults(check) {
+export default function recalculateCheckResults(checkChatMessage) {
    // Initialize results
    const checkDice = {
-      dice: check.results.dice,
-      expertiseRemaining: check.results.expertiseRemaining,
+      dice: checkChatMessage.results.dice,
+      expertiseRemaining: checkChatMessage.results.expertiseRemaining,
    };
 
    // Switch depending on check type
-   switch (check.type) {
+   switch (checkChatMessage.type) {
       case 'attributeCheck': {
-         return calculateAttributeCheckResults(checkDice, check.parameters);
+         return calculateAttributeCheckResults(checkDice, checkChatMessage.parameters);
       }
       case 'resistanceCheck': {
-         return calculateResistanceCheckResults(checkDice, check.parameters);
+         return calculateResistanceCheckResults(checkDice, checkChatMessage.parameters);
       }
       case 'attackCheck': {
-         return calculateAttackCheckResults(checkDice, check.parameters);
+         return calculateAttackCheckResults(checkDice, checkChatMessage.parameters);
       }
       case 'castingCheck': {
-         return calculateCastingCheckResults(checkDice, check.parameters);
+         return calculateCastingCheckResults(checkDice, checkChatMessage.parameters);
       }
       case 'itemCheck': {
-         return calculateItemCheckResults(checkDice, check.parameters);
+         return calculateItemCheckResults(checkDice, checkChatMessage.parameters);
       }
       default: {
-         return calculateCheckResults(checkDice, check.parameters);
+         return calculateCheckResults(checkDice, checkChatMessage.parameters);
       }
    }
 }

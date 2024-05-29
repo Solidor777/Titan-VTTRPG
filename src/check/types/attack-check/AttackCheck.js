@@ -7,6 +7,7 @@ import calculateAttackCheckResults from '~/check/types/attack-check/AttackCheckR
  * @augments TitanCheck
  */
 export default class AttackCheck extends TitanCheck {
+   
    /**
     * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
     * Makes a call to the parent function, but has some additional functionality for spending expertise to
@@ -16,7 +17,6 @@ export default class AttackCheck extends TitanCheck {
     * along with the expertise remaining.
     * @protected
     */
-
    _applyExpertise(sortedDice) {
       const retVal = super._applyExpertise(sortedDice);
 

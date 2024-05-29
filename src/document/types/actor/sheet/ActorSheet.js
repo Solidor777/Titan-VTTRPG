@@ -1,6 +1,6 @@
 import TitanDocumentSheet from '~/document/sheet/DocumentSheet';
 import localize from '~/helpers/utility-functions/Localize.js';
-import { IMPORT_ICON, LINKED_ICON, UNLINKED_ICON, USER_ICON } from '~/system/Icons.js';
+import {IMPORT_ICON, LINKED_ICON, UNLINKED_ICON, USER_ICON} from '~/system/Icons.js';
 
 export default class TitanActorSheet extends TitanDocumentSheet {
    constructor(document, options = {}) {
@@ -9,11 +9,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       this.actor = actor;
    }
 
-   /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
          baseApplication: 'ActorSheet',
@@ -21,21 +16,19 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       });
    }
 
+   get token() {
+      return this.options?.token || this.actor.token || null;
+   }
+
    _getSheetID(document) {
       return `actor-sheet-${document.isToken ? document.parent?.id : document.id}`;
    }
-
-   // Add the actor sheet class
+   
    _getSheetClasses() {
       const retVal = super._getSheetClasses();
       retVal.push('titan-actor-sheet');
 
       return retVal;
-   }
-
-   // Getter for the token
-   get token() {
-      return this.options?.token || this.actor.token || null;
    }
 
    _getHeaderButtons() {
@@ -139,7 +132,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       }
 
       // Update the actor
-      return this.actor.update({ 'token.actorLink': !(isLinked) });
+      return this.actor.update({'token.actorLink': !(isLinked)});
    }
 
    // Unlinking the token
@@ -152,7 +145,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
       // Unlink the actor
       const token = this.token;
-      await token.update({ actorLink: false });
+      await token.update({actorLink: false});
 
       // Update the text of the button
       button.html(button.html().replace('Linked', 'Unlinked'));
@@ -186,9 +179,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
       /**
        * A hook event that fires when some useful data is dropped onto an ActorSheet.
-       * @function dropActorSheetData
-       * @memberof hookEvents
-       * @param {Actor} actor - The Actor.
+       * @param {Actor} actor - The Actor that the data was droped onto.
        * @param {ActorSheet} sheet - The ActorSheet application.
        * @param {object} data - The data that has been dropped onto the sheet.
        */
@@ -345,7 +336,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       }
 
       // Perform the sort
-      const sortUpdates = SortingHelpers.performIntegerSort(source, { target, siblings });
+      const sortUpdates = SortingHelpers.performIntegerSort(source, {target, siblings});
       const updateData = sortUpdates.map((entry) => {
          const update = entry.update;
          update._id = entry.target._id;

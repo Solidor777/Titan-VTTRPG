@@ -6,7 +6,7 @@ export default class DataModelComponent {
    #parent;
 
    /**
-    * Getter for the parent data model.
+    * Class for adding a re-usable component to a data model.
     * @param {TitanDataModel} parent - The parent data model this component is associated with.
     */
    constructor(parent) {

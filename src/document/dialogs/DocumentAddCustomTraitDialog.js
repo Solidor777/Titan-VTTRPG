@@ -1,7 +1,17 @@
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import DocumentAddCustomTraitDialogShell from '~/document/dialogs/DocumentAddCustomTraitDialogShell.svelte';
-export default class DocumentAddCustomTraitDialog extends TJSDialog {
+import TitanDialog from '~/helpers/dialogs/Dialog.js';
+
+/**
+ * Base dialog for adding a custom trait to a document.
+ * @param {Document} document - The Document to add the custom trait to.
+ * @augments TitanDialog
+ */
+export default class DocumentAddCustomTraitDialog extends TitanDialog {
+   /**
+    * Base dialog for adding a custom trait to a document.
+    * @param {Document} document - The Document to add the custom trait to.
+    * @augments TitanDialog
+    */
    constructor(document) {
       super(
          {
@@ -15,11 +25,13 @@ export default class DocumentAddCustomTraitDialog extends TJSDialog {
             zIndex: null,
             id: `add-custom-trait-dialog-${document._id}`,
          },
-         {
-            width: 300,
-            height: 300,
-            classes: getSetting('darkModeSheets') === true ? ['titan', 'titan-dark-mode'] : ['titan']
-         },
       );
+   }
+
+   _getDialogClasses() {
+      const retVal = super._getDialogClasses();
+      retVal.push('add-custom-trait-dialog-');
+
+      return retVal;
    }
 }

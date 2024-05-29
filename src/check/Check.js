@@ -3,7 +3,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Options for a check in the Titan system.
  * @typedef {object} CheckOptions
- * @property {boolean?} doubleExpertise Whether to double the Expertise to apply.
+ * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {number?} complexity The minimum number of Successes needed.
@@ -15,7 +15,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Base parameters of a check in the Titan system.
  * @typedef {object} CheckParameters
- * @property {boolean} doubleExpertise Whether to double the Expertise to apply.
+ * @property {boolean} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
  * @property {number} complexity The minimum number of Successes needed.
@@ -47,6 +47,11 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @param {CheckParameters} parameters - Parameters for the Check.
  */
 export default class TitanCheck {
+
+   /**
+    * Base class for a creating and evaluating check in the Titan system.
+    * @param {CheckParameters} parameters - Parameters for the Check.
+    */
    constructor(parameters = {}) {
       this.parameters = parameters;
 
