@@ -94,7 +94,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
          if (actor) {
 
             // Check if the actor is in an active combat
-            const initiative = actor.getFirstActiveCombat()?.initiative
+            const initiative = actor.getFirstActiveCombat()?.initiative;
             if (initiative !== null) {
 
                // If so, set our initiative accordingly
@@ -183,10 +183,10 @@ export default class EffectDataModel extends RulesElementItemDataModel {
             let shouldUpdateEffect = false;
 
             // Update the icon
-            const icon = this.parent.img;
-            if (effect.icon !== icon) {
+            const img = this.parent.img;
+            if (effect.img !== img) {
                shouldUpdateEffect = true;
-               updateData.icon = icon;
+               updateData.img = img;
             }
 
             // Update the turns remaining
@@ -210,7 +210,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
             const label = this.isExpired ?
                `${this.parent.name} (${localize('expired')})` :
                this.parent.name;
-if (effect.name !== label) {
+            if (effect.name !== label) {
                shouldUpdateEffect = true;
                updateData.label = label;
             }

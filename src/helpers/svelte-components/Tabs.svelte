@@ -90,6 +90,7 @@
          @include flex-column;
          @include flex-group-top;
 
+         width: 100%;
          flex: 2;
       }
    }

@@ -18,12 +18,12 @@
    const document = getContext('document');
 
    /** @type string The value of the image property within the Document. */
-   let src = getProperty($document, path);
+   let src = foundry.utils.getProperty($document, path);
 
    // Update the image in response to changes
    $: {
       if (document) {
-         src = getProperty($document, path)
+         src = foundry.utils.getProperty($document, path);
       }
    }
 

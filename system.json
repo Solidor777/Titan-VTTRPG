@@ -1,42 +1,43 @@
 {
-   "id": "titan",
-   "title": "Titan VTTRPG",
-   "description": "A success based roll system designed for virtual tabletop.",
-   "version": "1.0.0",
-   "compatibility": {
-      "minimum": "12.324",
-      "verified": "12.324",
-      "maximum": "12"
-   },
-   "authors": [
-      {
-         "name": "Solidor",
-         "discord": "solidor",
-         "flags": {}
-      }
-   ],
-   "esmodules": [
-      "index.js"
-   ],
-   "styles": [
-      "style.css"
-   ],
-   "languages": [
-      {
-         "lang": "en",
-         "name": "English",
-         "path": "lang/en.json",
-         "flags": {}
-      }
-   ],
-   "socket": true,
-   "gridDistance": 1,
-   "gridUnits": "sp",
-   "url": "https://github.com/Solidor777/Titan-VTTRPG",
-   "bugs": "https://github.com/Solidor777/Titan-VTTRPG/issues",
-   "readme": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/README.md",
-   "changelog": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/CHANGELOG.md",
-   "manifest": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/system.json",
-   "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/titan.zip",
-   "license": "LICENSE.txt"
+  "id": "titan",
+  "title": "Titan VTTRPG",
+  "description": "A success based roll system designed for virtual tabletop.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "11.308",
+    "verified": "12.324",
+    "maximum": "12"
+  },
+  "authors": [
+    {
+      "name": "Solidor",
+      "discord": "solidor",
+      "flags": {}
+    }
+  ],
+  "esmodules": [
+    "index.js"
+  ],
+  "styles": [
+    "style.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json",
+      "flags": {}
+    }
+  ],
+  "socket": true,
+  "url": "https://github.com/Solidor777/Titan-VTTRPG",
+  "bugs": "https://github.com/Solidor777/Titan-VTTRPG/issues",
+  "readme": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/README.md",
+  "changelog": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/CHANGELOG.md",
+  "manifest": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/system.json",
+  "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/titan.zip",
+  "license": "LICENSE.txt",
+  "grid": {
+    "units": "sp"
+  }
 }
