@@ -42,7 +42,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import pushUnique from '~/helpers/utility-functions/PushUnique.js';
 import shouldConfirmDeletingItems from '~/helpers/utility-functions/ShouldConfirmDeletingItems.js';
 import shouldGetCheckOptions from '~/helpers/utility-functions/ShouldGetCheckOptions.js';
-import sort from '~/helpers/utility-functions/Sort.js';
+import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
@@ -4795,7 +4795,7 @@ export default class CharacterDataModel extends ActorDataModel {
             if (conditions) {
 
                // Add conditions to the report
-               conditions = conditions.sort((a, b) => sort(a.name, b.name));
+               conditions = conditions.sort((a, b) => sortAscending(a.name, b.name));
                reportData.conditions = conditions.map((condition) => {
                   return {
                      label: condition.name,
@@ -4952,7 +4952,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {EffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sort(a.name, b.name)).map((effectItem) => {
+      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
          const retVal = {
             label: effectItem.name,
             img: effectItem.img,
@@ -4983,7 +4983,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {TurnEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getTurnEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sort(a.name, b.name)).map((effectItem) => {
+      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
          const retVal = {
             label: effectItem.name,
             img: effectItem.img,
@@ -5015,7 +5015,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {InitiativeEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getInitiativeEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sort(a.name, b.name)).map((effectItem) => {
+      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
          const retVal = {
             label: effectItem.name,
             img: effectItem.img,
@@ -5038,7 +5038,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {CustomEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getCustomEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sort(a.name, b.name)).map((effectItem) => {
+      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
          const retVal = {
             label: effectItem.name,
             img: effectItem.img,

@@ -109,6 +109,8 @@
    font-weight: var(--titan-button-font-weight);
    padding: var(--titan-button-padding);
    color: var(--titan-button-color);
+   width: var(--titan-button-width);
+   height: var(--titan-button-height);
    line-height: var(--titan-button-line-height);
    margin: 0;
 
@@ -143,8 +145,8 @@
    font-weight: var(--titan-button-font-weight);
    padding: var(--titan-button-padding);
    color: var(--titan-button-color);
-   width: var(--button-width);
-   height: var(--button-height);
+   width: var(--titan-button-width);
+   height: var(--titan-button-height);
    line-height: var(--titan-button-line-height);
    margin: 0;
 

@@ -61,10 +61,12 @@
 
 <style lang="scss">
    .die {
-      height: 60px;
-      min-width: 60px;
+      height: 35px;
+      min-width: 35px;
 
       --titan-button-border-radius: var(--titan-border-radius);
+      --titan-button-height: 100%;
+      --titan-button-width: 100%;
 
       &:disabled {
          cursor: default;

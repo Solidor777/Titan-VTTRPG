@@ -1,4 +1,4 @@
-import sort from '~/helpers/utility-functions/Sort.js';
+import sortDescending from '~/helpers/utility-functions/SortDescending.js';
 
 /**
  * A check die that has been processed by applying expertise.
@@ -16,7 +16,7 @@ import sort from '~/helpers/utility-functions/Sort.js';
 export default async function rollCheckDice(numDie) {
    const roll = new Roll(`${numDie}d6`);
    await roll.evaluate();
-   return roll.terms[0].results.sort((a, b) => sort(a.result, b.result)).map((die) => {
+   return roll.terms[0].results.sort((a, b) => sortDescending(a.result, b.result)).map((die) => {
       return {
          expertiseApplied: 0,
          base: die.result,

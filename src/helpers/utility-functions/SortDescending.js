@@ -4,7 +4,7 @@
  * @param {*} b - Second value.
  * @returns {number} 1 if a > b. -1 if a < b. 0 if a = b.
  */
-export default function sortGreatest(a, b) {
+export default function sortDescending(a, b) {
    if (a < b) {
       return 1;
    }

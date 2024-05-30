@@ -1,7 +1,7 @@
 <script>
    import SpellCustomAspectTag from '~/helpers/svelte-components/tag/SpellCustomAspectTag.svelte';
    import SpellStandardAspectTag from '~/helpers/svelte-components/tag/SpellStandardAspectTag.svelte';
-   import sort from '~/helpers/utility-functions/Sort.js';
+   import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Aspects list
    export let standardAspects = void 0;
@@ -19,8 +19,7 @@
 
       if (aspect.allOptions) {
          size += 1;
-      }
-      else if (aspect.option) {
+      } else if (aspect.option) {
          size += aspect.option.length;
       }
 
@@ -34,7 +33,7 @@
    // Sort the aspects by size
    $: aspectSizeMap = standardAspects
       .map((aspect, idx) => {
-         return { idx: idx, size: getAspectSize(aspect), standardAspect: true };
+         return {idx: idx, size: getAspectSize(aspect), standardAspect: true};
       })
       .concat(
          customAspects.map((aspect, idx) => {
@@ -45,7 +44,7 @@
             };
          }),
       )
-      .sort((a, b) => sort(a.sort, b.sort));
+      .sort((a, b) => sortAscending(a.sort, b.sort));
 </script>
 
 <div class="aspects">

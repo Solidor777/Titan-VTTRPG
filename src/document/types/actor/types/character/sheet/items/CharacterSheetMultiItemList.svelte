@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import {slide} from 'svelte/transition';
-   import sort from '~/helpers/utility-functions/Sort.js';
+   import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Component class for the item
    export let itemComponents = void 0;
@@ -84,7 +84,7 @@
             item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
          );
       })
-      .sort((a, b) => sort(a.sort, b.sort));
+      .sort((a, b) => sortAscending(a.sort, b.sort));
 </script>
 
 <!--Item List-->
