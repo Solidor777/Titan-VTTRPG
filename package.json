@@ -18,6 +18,8 @@
       "tippy.js": "^6.3.7"
    },
    "devDependencies": {
+      "@rollup/plugin-node-resolve": "^15.2.3",
+      "autoprefixer": "^10.4.19",
       "esdoc": "^1.1.0",
       "esdoc-ecmascript-proposal-plugin": "^1.0.0",
       "esdoc-standard-plugin": "^1.0.0",
@@ -34,8 +36,7 @@
       "vite": "^5.2.10"
    },
    "browserslist": [
-      ">5%",
-      "not IE 11"
+      "defaults"
    ],
    "scripts": {
       "build": "vite build",

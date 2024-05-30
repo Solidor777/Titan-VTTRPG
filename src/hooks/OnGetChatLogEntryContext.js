@@ -3,6 +3,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
 import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
+import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 
 /**
  * @param html
@@ -183,18 +184,7 @@ async function reRollCheckFailures(li, spendResolve) {
 
    // If there are any failures
    if (failureCount > 0) {
-      // Re roll dice equal to the number of falures
-      const roll = new Roll(`${failureCount}d6`);
-      await roll.evaluate({async: true});
-      const reRolledDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
-      const newDice = successes.concat(reRolledDice.map((die) => {
-         return {
-            expertiseApplied: 0,
-            base: die,
-            final: die,
-         };
-      }));
-      chatContext.results.dice = newDice;
+      chatContext.results.dice = successes.concat(rollCheckDice(failureCount));
       chatContext.results.expertiseRemaining += expertiseToRefund;
 
       // Recalculate the check
@@ -265,22 +255,11 @@ async function doubleTraining(li, spendResolve) {
    if (chatContext.parameters.doubleTraining === false && chatContext.parameters.totalTrainingDice > 0) {
       chatContext.parameters.doubleTraining = true;
 
-      // Roll the new dice
-      const roll = new Roll(`${chatContext.parameters.totalTrainingDice}d6`);
-      await roll.evaluate({async: true});
-      const newDice = roll.terms[0].results.map((dice) => dice.result).sort((a, b) => b - a);
-      const newDiceResults = chatContext.results.dice.concat(newDice.map((die) => {
-         return {
-            expertiseApplied: 0,
-            base: die,
-            final: die,
-         };
-      }));
-
-      // Update the message
+      // Roll the new dice and update the message
+      chatContext.results.dice =
+         chatContext.results.dice.concat(rollCheckDice(chatContext.parameters.totalTrainingDice));
       chatContext.results.totalDice += chatContext.parameters.totalTrainingDice;
       chatContext.parameters.totalTrainingDice *= 2;
-      chatContext.results.dice = newDiceResults;
       await message.update({
          flags: {
             titan: chatContext,

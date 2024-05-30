@@ -1,4 +1,5 @@
 import calculateCheckResults from '~/check/CheckResults.js';
+import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 
 /**
  * Options for a check in the Titan system.
@@ -27,20 +28,11 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
- * A check die that has been processed by applying expertise.
- * @typedef {object} CheckDie
- * @property {number} base The base number that was rolled on the dice.
- * @property {number} expertiseApplied The amount of expertise that was applied to the die.
- * @property {number} final The final number after applying expertise to the base result.
- */
-
-/**
  * The sorted dice rolled for the check, after Expertise is applied.
  * @typedef {object} CheckDiceResults
  * @property {CheckDie[]} dice Array of dice objects that has been processed by applying expertise.
  * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
  */
-
 
 /**
  * Base class for a creating and evaluating check in the Titan system.
@@ -65,15 +57,9 @@ export default class TitanCheck {
     * Runs evaluation for the check.
     */
    async evaluateCheck() {
-      // Get the roll for the check
-      this.roll = new Roll(`${this.parameters.totalDice}d6`);
-      await this.roll.evaluate({async: true});
-
       // Calculate the results of the check
-      this.results = this._calculateResults(
-         this._applyExpertise(
-            this._getSortedDiceFromRoll(this.roll)),
-         this.parameters);
+      const dice = await rollCheckDice(this.parameters.totalDice);
+      this.results = this._calculateResults(this._applyExpertise(dice));
 
       // Update the state and returns the results
       this.isEvaluated = true;
@@ -92,21 +78,15 @@ export default class TitanCheck {
 
    /**
     * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
-    * @param {number[]} sortedDice - Results of the dice roll, sorted from largest to smallest.
+    * @param {CheckDie[]} dice - Results of the check dice roll, sorted from largest to smallest.
     * @returns {CheckDiceResults} The dice results after Expertise is applied,
     * along with the expertise remaining.
     * @protected
     */
-   _applyExpertise(sortedDice) {
+   _applyExpertise(dice) {
       // Initialize object with array of dice results and the expertise remaining
       const retVal = {
-         dice: sortedDice.map((die) => {
-            return {
-               expertiseApplied: 0,
-               base: die,
-               final: die,
-            };
-         }),
+         dice: dice,
          expertiseRemaining: this.parameters.totalExpertise ?? 0,
       };
 
@@ -190,12 +170,11 @@ export default class TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @param {CheckParameters} parameters - Object containing the parameters of the check.
     * @returns {CheckResults} The final results of the check.
     * @protected
     */
-   _calculateResults(diceResults, parameters) {
-      return calculateCheckResults(diceResults, parameters);
+   _calculateResults(diceResults) {
+      return calculateCheckResults(diceResults, this.parameters);
    }
 
    /**
@@ -231,8 +210,7 @@ export default class TitanCheck {
             {
                user: game.user.id,
                speaker: options?.speaker ?? ChatMessage.getSpeaker(),
-               rolls: [this.roll],
-               type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.dice,
                flags: {
                   titan: messageData,

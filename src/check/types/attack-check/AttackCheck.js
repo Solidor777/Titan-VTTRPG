@@ -7,7 +7,7 @@ import calculateAttackCheckResults from '~/check/types/attack-check/AttackCheckR
  * @augments TitanCheck
  */
 export default class AttackCheck extends TitanCheck {
-   
+
    /**
     * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
     * Makes a call to the parent function, but has some additional functionality for spending expertise to
@@ -61,12 +61,11 @@ export default class AttackCheck extends TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttackCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @param {AttackCheckParameters} parameters - Object containing the parameters of the check.
     * @returns {AttackCheckResults} The final results of the check.
     * @protected
     */
-   _calculateResults(diceResults, parameters) {
-      return calculateAttackCheckResults(diceResults, parameters);
+   _calculateResults(diceResults) {
+      return calculateAttackCheckResults(diceResults, this.parameters);
    }
 
    _getCheckType() {

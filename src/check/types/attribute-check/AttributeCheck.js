@@ -14,12 +14,11 @@ export default class AttributeCheck extends TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttributeCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @param {AttributeCheckParameters} parameters - Object containing the parameters of the check.
     * @returns {AttributeCheckResults} The final results of the check.
     * @protected
     */
-   _calculateResults(diceResults, parameters) {
-      return calculateAttributeCheckResults(diceResults, parameters);
+   _calculateResults(diceResults) {
+      return calculateAttributeCheckResults(diceResults, this.parameters);
    }
 
    _getCheckType() {

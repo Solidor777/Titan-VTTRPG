@@ -4,6 +4,7 @@ import preprocess from 'svelte-preprocess';
 import {postcssConfig, terserConfig} from '@typhonjs-fvtt/runtime/rollup';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import autoprefixer from 'autoprefixer';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -94,7 +95,7 @@ export default () => {
             fileName: 'index',
          },
       },
-      // Necessary when using the dev server for top-level await usage inside of TRL.
+      // Necessary when using the dev server for top-level await usage inside TRL.
       optimizeDeps: {
          esbuildOptions: {
             target: 'es2022',
@@ -104,9 +105,12 @@ export default () => {
          svelte({
             preprocess: preprocess({
                scss: {
-                  prependData: '@import "src//Styles/Mixins.scss";',
+                  prependData: '@import "src//Styles/Mixins.scss";'
                },
-            }),
+               postcss: {
+                  plugins: [autoprefixer()]
+               }
+            })
          }),
 
          resolve(s_RESOLVE_CONFIG),    // Necessary when bundling npm-linked packages.

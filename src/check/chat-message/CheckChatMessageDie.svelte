@@ -61,10 +61,9 @@
 
 <style lang="scss">
    .die {
-      height: 40px;
-      min-width: 40px;
+      height: 60px;
+      min-width: 60px;
 
-      --titan-button-padding: var(--titan-padding-standard);
       --titan-button-border-radius: var(--titan-border-radius);
 
       &:disabled {

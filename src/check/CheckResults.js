@@ -31,7 +31,7 @@ export default function calculateCheckResults(diceResults, parameters) {
 
    // Calculate successes and failures
    for (let i = 0; i < retVal.dice.length; i++) {
-      
+
       // If this die was a critical success
       if (retVal.dice[i].final === 6) {
 

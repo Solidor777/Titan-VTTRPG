@@ -184,7 +184,7 @@
       @include panel-3;
 
       width: 100%;
-      padding: var(--titan-padding-standard);
+      padding: var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-large);
 
       .label-button {
          @include flex-column;

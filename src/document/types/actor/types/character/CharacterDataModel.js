@@ -5252,7 +5252,7 @@ export default class CharacterDataModel extends ActorDataModel {
       const message = {
          user: userId,
          speaker: this.parent.getSpeaker(),
-         type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+         type: CONST.CHAT_MESSAGE_STYLES.OTHER,
          whisper: getOwners(this.parent),
          flags: {
             titan: messageData,

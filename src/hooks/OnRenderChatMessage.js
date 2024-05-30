@@ -1,9 +1,9 @@
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
+import {TJSDocument} from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.svelte';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze';
 
-const CHAT_MESSAGE_TYPES = deepFreeze(new Set([
+const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
    'attributeCheck',
    'skillCheck',
    'resistanceCheck',
@@ -38,7 +38,7 @@ const CHAT_MESSAGE_TYPES = deepFreeze(new Set([
 export default function onRenderChatMessage(message, html) {
    // Check if this is a valid titan chat message
    const chatContext = message?.flags?.titan;
-   if (CHAT_MESSAGE_TYPES.has(chatContext?.type)) {
+   if (TITAN_CHAT_MESSAGE_TYPES.has(chatContext?.type)) {
       // Add the titan class
       const content = html.find('.chat-message').prevObject;
       content.addClass('titan');
