@@ -1,9 +1,9 @@
-import { svelte } from '@sveltejs/vite-plugin-svelte';
+import {svelte} from '@sveltejs/vite-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 import preprocess from 'svelte-preprocess';
-import { postcssConfig, terserConfig } from '@typhonjs-fvtt/runtime/rollup';
+import {postcssConfig, terserConfig} from '@typhonjs-fvtt/runtime/rollup';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -36,6 +36,7 @@ export default () => {
          conditions: ['import', 'browser'],
          alias: {
             '~/': `${path.resolve(__dirname, 'src')}/`,
+            '$fonts/': `${path.resolve(__dirname, 'fonts')}/`,
          },
       },
 
@@ -45,7 +46,7 @@ export default () => {
 
       css: {
          // Creates a standard configuration for PostCSS with autoprefixer & postcss-preset-env.
-         postcss: postcssConfig({ compress: s_COMPRESS, sourceMap: s_SOURCEMAPS }),
+         postcss: postcssConfig({compress: s_COMPRESS, sourceMap: s_SOURCEMAPS}),
       },
 
       define: {
@@ -76,7 +77,7 @@ export default () => {
             [`^(?!/${s_PACKAGE_ID}/)`]: 'http://localhost:30000',
 
             // Enable socket.io from main Foundry server.
-            '/socket.io': { target: 'ws://localhost:30000', ws: true },
+            '/socket.io': {target: 'ws://localhost:30000', ws: true},
          },
       },
       build: {
@@ -86,7 +87,7 @@ export default () => {
          brotliSize: true,
          minify: s_COMPRESS ? 'terser' : false,
          target: ['es2022'],
-         terserOptions: s_COMPRESS ? { ...terserConfig(), ecma: 2022 } : void 0,
+         terserOptions: s_COMPRESS ? {...terserConfig(), ecma: 2022} : void 0,
          lib: {
             entry: './index.js',
             formats: ['es'],
