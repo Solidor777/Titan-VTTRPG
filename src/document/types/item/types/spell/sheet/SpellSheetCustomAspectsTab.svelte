@@ -115,7 +115,7 @@
 
             li {
                width: 100%;
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
          }
 
@@ -124,14 +124,14 @@
             @include flex-group-center;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
 
             .button-content {
                @include flex-row;
                @include flex-group-center;
 
                i {
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
             }
          }

@@ -59,7 +59,7 @@
          width: 100%;
 
          &:not(:first-child, .tags) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

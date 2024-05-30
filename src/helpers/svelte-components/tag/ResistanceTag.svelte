@@ -16,7 +16,7 @@
       @include resistance-colors;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
       font-weight: bold;
    }
 </style>

@@ -17,6 +17,6 @@
 
       flex-wrap: wrap;
       font-weight: bold;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
    }
 </style>

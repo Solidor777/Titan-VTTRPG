@@ -9,7 +9,7 @@
 
 <div class="tag" use:tooltip={{ content: description }}>
    <!--Image-->
-   <img src={img} alt="img" class={checkAddDarkSVGClass(img)}/>
+   <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
 
    <!--Label-->
    <div>
@@ -26,12 +26,12 @@
       @include label;
 
       font-weight: bold;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       img {
          width: 24px;
          border: none;
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

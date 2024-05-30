@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    // Setup context variables
    const document = getContext('document');
@@ -19,6 +19,6 @@
    .rich-text {
       font-weight: normal;
       text-align: left;
-      margin: 0 var(--padding-standard);
+      margin: 0 var(--titan-padding-standard);
    }
 </style>

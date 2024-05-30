@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
 
    // Application statee reference
@@ -33,7 +33,7 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

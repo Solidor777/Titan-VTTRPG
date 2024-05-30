@@ -9,7 +9,7 @@
       from '~/document/types/chat-message/components/buttons/ChatMessageOpposedAttributeCheckButton.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
    import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
-   import ResistanceCheckButton from "~/helpers/svelte-components/button/ResistanceCheckButton.svelte";
+   import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
 
    // Document reference
    const document = getContext('document');
@@ -117,7 +117,7 @@
          width: 100%;
 
          &:not(:first-child, .tags) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

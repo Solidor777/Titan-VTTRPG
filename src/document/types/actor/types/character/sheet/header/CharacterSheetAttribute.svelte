@@ -124,10 +124,10 @@
          @include flex-group-center;
 
          height: 100%;
-         margin-left: var(--padding-large);
+         margin-left: var(--titan-padding-large);
 
          :not(:first-child) {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
 
          .input {

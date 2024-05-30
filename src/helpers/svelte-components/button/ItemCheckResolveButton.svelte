@@ -35,18 +35,18 @@
 
          height: 100%;
          line-height: normal;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .divider {
             @include border-left;
 
-            border-color: var(--button-border-color);
-            margin-left: var(--padding-standard);
-            padding-left: var(--padding-standard);
+            border-color: var(--titan-button-border-color);
+            margin-left: var(--titan-padding-standard);
+            padding-left: var(--titan-padding-standard);
          }
       }
    }

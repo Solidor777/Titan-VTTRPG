@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
-   import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
+   import {getContext} from 'svelte';
+   import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 
    // Reference to the docuement
    const document = getContext('document');
@@ -159,7 +159,7 @@
       @include attribute-colors;
       @include border;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .row {
          @include flex-row;
@@ -169,7 +169,7 @@
          flex-wrap: wrap;
 
          &:not(:first-child) {
-            margin-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
 
          .skill-attribute {
@@ -183,7 +183,7 @@
             @include flex-row;
             @include flex-group-center;
 
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
             font-weight: bold;
          }
 
@@ -197,16 +197,16 @@
             &:not(:first-child) {
                @include border-left;
 
-               margin-left: var(--padding-standard);
-               padding-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
+               padding-left: var(--titan-padding-standard);
             }
 
             .label {
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
                transform: translateZ(0);
 
                i {
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
             }
          }

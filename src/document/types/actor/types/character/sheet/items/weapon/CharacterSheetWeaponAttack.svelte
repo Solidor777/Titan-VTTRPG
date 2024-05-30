@@ -232,7 +232,7 @@
          }
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
 

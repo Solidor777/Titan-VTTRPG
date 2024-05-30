@@ -10,18 +10,18 @@
 
 .titan-dark-mode {
    // Panel styling
-   --panel-1-background: #373949;
-   --panel-2-background: #424557;
-   --panel-3-background: #2e303c;
-   --panel-1-color: rgba(255 255 255 / 0.83);
-   --panel-2-color: rgba(255 255 255 / 0.83);
-   --panel-3-color: rgba(255 255 255 / 0.83);
+   --titan-panel-1-background: #373949;
+   --titan-panel-2-background: #424557;
+   --titan-panel-3-background: #2e303c;
+   --titan-panel-1-color: rgba(255 255 255 / 0.83);
+   --titan-panel-2-color: rgba(255 255 255 / 0.83);
+   --titan-panel-3-color: rgba(255 255 255 / 0.83);
    --color-text-dark-primary: rgba(255 255 255 / 0.83);
    --color-text-dark-secondary: rgba(255 255 255 / 0.83);
    --color-text-dark-header: rgba(255 255 255 / 0.83);
    --color-text-dark-inactive: rgba(255 255 255 / 0.83);
    --color-border-highlight: rgba(255 255 255 / 0.83);
-   --static-value-background: rgb(70 70 70);
+   --titan-static-value-background: rgb(70 70 70);
 
    .content-link {
       --color-text-dark-primary: #191813;
@@ -34,48 +34,48 @@
    }
 
    // Input styling
-   --input-color: #1d1e26;
-   --input-background: #c5bcf8;
-   --border-color: rgba(255 255 255 / 0.83);
+   --titan-input-color: #1d1e26;
+   --titan-input-background: #c5bcf8;
+   --titan-border-color: rgba(255 255 255 / 0.83);
 
    // Button styling
-   --button-border-color: #15171b;
-   --button-background: #f2b58c;
-   --button-border-style: solid;
-   --button-background-disabled: #D0D0D0;
-   --button-background-highlight: #FFE9AE;
-   --button-color: #15171b;
-   --icon-button-border-color: black;
-   --icon-button-background: #f2b58c;
-   --icon-button-highlight: #FFE9AE;
-   --icon-button-color: #15171b;
+   --titan-button-border-color: #15171b;
+   --titan-button-background: #f2b58c;
+   --titan-button-border-style: solid;
+   --titan-button-background-disabled: #D0D0D0;
+   --titan-button-background-highlight: #FFE9AE;
+   --titan-button-color: #15171b;
+   --titan-icon-button-border-color: black;
+   --titan-icon-button-background: #f2b58c;
+   --titan-icon-button-highlight: #FFE9AE;
+   --titan-icon-button-color: #15171b;
 
    select {
-      color: var(--input-color);
-      background: var(--input-background);
+      color: var(--titan-input-color);
+      background: var(--titan-input-background);
    }
 
    // Resource colors
-   --stamina-color: #37da88;
-   --wounds-color: #c55858;
-   --resolve-color: #3fb6dd;
+   --titan-stamina-color: #37da88;
+   --titan-wounds-color: #c55858;
+   --titan-resolve-color: #3fb6dd;
 
    // Resistance colors
-   --reflexes-color: #eff49a;
-   --resilience-color: #f2c88c;
-   --willpower-color: #f28cbf;
+   --titan-reflexes-color: #eff49a;
+   --titan-resilience-color: #f2c88c;
+   --titan-willpower-color: #f28cbf;
 
    // Attribute colors
-   --body-color: #f29d8c;
-   --mind-color: #95f28c;
-   --soul-color: #b5f2e8;
+   --titan-body-color: #f29d8c;
+   --titan-mind-color: #95f28c;
+   --titan-soul-color: #b5f2e8;
 
    // Label styles
-   --label-background: #a6ccf2;
-   --label-color: #1d1e26;
+   --titan-label-background: #a6ccf2;
+   --titan-label-color: #1d1e26;
 
    // Meter styling
-   --meter-background: #1E1E1E;
+   --titan-meter-background: #1E1E1E;
    --font-color: rgba(255 255 255 / 0.83);
 
    .window-content {
@@ -147,7 +147,7 @@
    h2,
    h3,
    h4 {
-      border-color: var(--border-color);
+      border-color: var(--titan-border-color);
    }
 
    &.window-app {
@@ -155,14 +155,14 @@
          background: #262836;
 
          .title {
-            color: var(--input-color);
-            background: var(--input-background);
+            color: var(--titan-input-color);
+            background: var(--titan-input-background);
          }
       }
 
       .journal-header .title {
-         color: var(--input-color);
-         background: var(--input-background);
+         color: var(--titan-input-color);
+         background: var(--titan-input-background);
       }
 
       .journal-sidebar {
@@ -171,29 +171,29 @@
 
       .directory {
          input {
-            color: var(--input-color);
-            background: var(--input-background);
+            color: var(--titan-input-color);
+            background: var(--titan-input-background);
          }
 
          ::placeholder {
-            color: var(--input-color);
+            color: var(--titan-input-color);
          }
 
          .action-buttons {
             button {
-               border-color: var(--button-border-color);
-               background: var(--button-background);
-               color: var(--button-color);
+               border-color: var(--titan-button-border-color);
+               background: var(--titan-button-background);
+               color: var(--titan-button-color);
                margin: 0;
 
                &:disabled {
                   cursor: default;
-                  background: var(--button-background-disabled);
+                  background: var(--titan-button-background-disabled);
                }
 
                &:hover {
                   &:not(:disabled) {
-                     background: radial-gradient(var(--button-background-highlight), var(--button-background));
+                     background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
                   }
                }
             }
@@ -218,7 +218,7 @@
 
 #chat-log .titan-dark-mode.emote.section .message-content {
    text-align: center;
-   color: var(--panel-1-color);
+   color: var(--titan-panel-1-color);
    font-style: italic;
 }
 

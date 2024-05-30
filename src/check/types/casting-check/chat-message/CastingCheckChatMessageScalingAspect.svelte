@@ -11,7 +11,7 @@
    const document = getContext('document');
 
    /** @type ScalingAspect Reference to the scaling aspect. */
-   let aspect = $document.flags.titan.results.scalingAspect[idx]
+   let aspect = $document.flags.titan.results.scalingAspect[idx];
 
    /** @type number Calculated scaling cost of the aspect. */
    const aspectIncrement = Math.max(aspect.initialValue, 1);
@@ -219,7 +219,7 @@
       @include font-size-small;
 
       font-weight: bold;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
       width: 100%;
 
       .label {
@@ -229,15 +229,15 @@
          height: 100%;
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
 
       .value {
          @include border-left;
 
-         margin-left: var(--padding-standard);
-         padding-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
+         padding-left: var(--titan-padding-standard);
       }
 
       .header {
@@ -246,31 +246,31 @@
 
          width: 100%;
          flex-wrap: wrap;
-         margin-right: var(--padding-large);
+         margin-right: var(--titan-padding-large);
       }
 
       .controls {
          @include flex-row;
          @include flex-group-center;
 
-         margin-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
          width: 100%;
 
-         --button-border-radius: var(--button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
          .cost {
             @include flex-row;
             @include flex-group-center;
 
             height: 100%;
-            margin-right: var(--padding-large);
+            margin-right: var(--titan-padding-large);
          }
 
          .control {
             @include flex-row;
             @include flex-group-center;
 
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
 
             .button-inner {
                @include flex-row;

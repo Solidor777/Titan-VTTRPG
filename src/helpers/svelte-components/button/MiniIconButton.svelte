@@ -5,7 +5,7 @@
    export let disabled = false;
 </script>
 
-<button on:click on:mousedown={preventDefault} {disabled}>
+<button {disabled} on:click on:mousedown={preventDefault}>
    <div><i class={icon}/></div>
 </button>
 
@@ -15,15 +15,15 @@
 
       cursor: pointer;
 
-      --icon-button-font-size: var(--font-size-small);
+      --titan-icon-button-font-size: var(--titan-font-size-small);
       --icon-button-line-height: normal;
-      --icon-button-radius: 20px;
+      --titan-icon-button-radius: 20px;
    }
 
    button:hover {
       background: radial-gradient(
-                      var(--button-background-highlight),
-                      var(--button-background)
+            var(--titan-button-background-highlight),
+            var(--titan-button-background)
       );
    }
 </style>

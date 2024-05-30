@@ -32,7 +32,7 @@
          width: 100%;
 
          &:not(:first-child) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

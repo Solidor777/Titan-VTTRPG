@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
+   import {slide} from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
+   import {DELETE_ICON} from '~/system/Icons.js';
 
    // Setup context variables
    const document = getContext('document');
@@ -48,7 +48,7 @@
 
          flex-wrap: wrap;
          width: 100%;
-         margin: 0 var(--padding-standard) 0 var(--padding-standard);
+         margin: 0 var(--titan-padding-standard) 0 var(--titan-padding-standard);
       }
 
       .delete-button {
@@ -56,7 +56,7 @@
          @include flex-group-top;
 
          height: 100%;
-         margin: var(--padding-large) var(--padding-standard) 0 0;
+         margin: var(--titan-padding-large) var(--titan-padding-standard) 0 0;
       }
    }
 </style>

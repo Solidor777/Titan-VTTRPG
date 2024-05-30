@@ -2,7 +2,7 @@
    import CharacterSheetTabs from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabs.svelte';
    import CharacterSheetSidebar
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    // Header to allow this sheet to be used with players or NPCs
    export let header = void 0;
@@ -38,7 +38,7 @@
       @include font-size-normal;
 
       .sidebar {
-         margin-right: var(--padding-large);
+         margin-right: var(--titan-padding-large);
       }
 
       .body {
@@ -47,7 +47,7 @@
          flex-grow: 1;
 
          .tabs {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
             flex-grow: 1;
          }
       }

@@ -32,28 +32,23 @@
    .button {
       @include flex-row;
 
-      margin-right: var(--padding-large);
+      margin-right: var(--titan-padding-large);
 
       .button-inner {
          @include flex-row;
          @include flex-space-between;
 
-         width: 100%;
-         height: 100%;
-
          .name {
             @include flex-row;
             @include flex-group-center;
 
-            padding: var(--padding-standard) 0;
             flex-wrap: wrap;
             width: 100%;
-            line-height: normal;
          }
 
          i {
             width: 20px;
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
       }
    }

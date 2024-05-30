@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { CURRENCY_ICON } from '~/system/Icons.js';
+   import {CURRENCY_ICON} from '~/system/Icons.js';
 
    export let value = void 0;
 </script>
@@ -22,14 +22,14 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
          @include border-right;
 
          font-weight: bold;
-         padding-right: var(--padding-standard);
-         margin: 0 var(--padding-standard);
+         padding-right: var(--titan-padding-standard);
+         margin: 0 var(--titan-padding-standard);
       }
    }
 </style>

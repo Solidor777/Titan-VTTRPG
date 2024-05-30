@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CharacterSheetResistance
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistance.svelte';
 
@@ -31,8 +31,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--padding-standard);
-            margin-top: var(--padding-standard);
+            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
       }
    }

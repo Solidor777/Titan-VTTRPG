@@ -1,15 +1,15 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
+   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import { COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON } from '~/system/Icons.js';
+   import {COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
 
    // Setup context variables
    const document = getContext('document');
@@ -158,7 +158,7 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
 
          .header {
@@ -169,7 +169,7 @@
 
             font-weight: bold;
             width: 100%;
-            padding: var(--padding-standard);
+            padding: var(--titan-padding-standard);
 
             .label {
                @include flex-row;
@@ -186,7 +186,7 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
             }
 
@@ -205,12 +205,12 @@
             @include panel-3;
             @include font-size-small;
 
-            width: calc(100% - var(--padding-large));
+            width: calc(100% - var(--titan-padding-large));
             flex-wrap: wrap;
-            padding: 0 var(--padding-standard) var(--padding-large) var(--padding-standard);
+            padding: 0 var(--titan-padding-standard) var(--titan-padding-large) var(--titan-padding-standard);
 
             .stat {
-               margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
+               margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
             }
          }
       }

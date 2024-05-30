@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    // Document reference
    const document = getContext('document');
@@ -11,7 +11,7 @@
 
 <div class="header">
    <!--Img-->
-   <img src={chatContext.img} alt="img"/>
+   <img alt="img" src={chatContext.img}/>
 
    <!--Header-->
    <div class="label">
@@ -43,7 +43,7 @@
          @include border;
 
          width: 80px;
-         margin-bottom: var(--padding-large);
+         margin-bottom: var(--titan-padding-large);
       }
 
       .label {
@@ -53,7 +53,7 @@
          @include border;
 
          width: 100%;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          .main {
             @include flex-row;
@@ -61,11 +61,11 @@
             @include font-size-large;
 
             width: 100%;
-            margin: var(--padding-standard) 0 var(--padding-standard);
+            margin: var(--titan-padding-standard) 0 var(--titan-padding-standard);
             flex-wrap: wrap;
 
             i {
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
             }
          }
 

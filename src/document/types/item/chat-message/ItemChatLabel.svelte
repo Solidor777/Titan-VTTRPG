@@ -4,7 +4,7 @@
 </script>
 
 <div class="label">
-   <img src={item.img} alt="item"/>
+   <img alt="item" src={item.img}/>
    <div class="name">{item.name}</div>
 </div>
 
@@ -15,7 +15,7 @@
       @include border;
       @include panel-1;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       img {
          border: none;
@@ -28,7 +28,7 @@
          @include flex-group-center;
          @include font-size-large;
 
-         margin: 0 var(--padding-standard);
+         margin: 0 var(--titan-padding-standard);
          height: 100%;
          font-weight: bold;
       }

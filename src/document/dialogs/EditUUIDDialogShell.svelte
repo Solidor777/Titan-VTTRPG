@@ -46,7 +46,7 @@
    <!--Header-->
    <div class="header">
       <!--Image-->
-      <img src={document.img} alt={document.img}/>
+      <img alt={document.img} src={document.img}/>
 
       <!--Name-->
       <div class="name">
@@ -96,7 +96,7 @@
          .name {
             @include font-size-large;
 
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
          }
       }
 
@@ -115,10 +115,10 @@
             @include flex-row;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
 
             &:not(:first-child) {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
       }

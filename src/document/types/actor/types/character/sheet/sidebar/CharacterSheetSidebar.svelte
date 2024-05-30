@@ -43,7 +43,7 @@
       @include flex-group-top;
       @include panel-1;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
       min-width: 208px;
 
       .section {
@@ -52,8 +52,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-padding-standard);
          }
       }
    }

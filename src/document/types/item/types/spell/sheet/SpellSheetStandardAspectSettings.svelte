@@ -1,7 +1,7 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
+   import {slide} from 'svelte/transition';
    import SpellSheetEnableAspectButton
       from '~/document/types/item/types/spell/sheet/SpellSheetEnableAspectButton.svelte';
    import DocumentSelect from '~/document/components/select/DocumentSelect.svelte';
@@ -31,8 +31,7 @@
          // If disabled, add the aspect
          if (idx === -1) {
             $document.system.addStandardAspect(aspectOptions.template);
-         }
-         else {
+         } else {
             // Otherwise remove the aspect
             $document.system.aspect.splice(idx, 1);
 
@@ -56,9 +55,9 @@
 <div class="aspect">
    <!--Header Button-->
    <SpellSheetEnableAspectButton
+      cost={idx === -1 ? 0 : $document.system.aspect[idx].cost}
       enabled={idx !== -1}
       label={localize(aspectOptions.template.label)}
-      cost={idx === -1 ? 0 : $document.system.aspect[idx].cost}
       on:click={() => {
          toggleAspect(idx);
       }}
@@ -194,7 +193,7 @@
          @include font-size-small;
          @include panel-3;
 
-         padding: 0 var(--padding-standard) var(--padding-standard);
+         padding: 0 var(--titan-padding-standard) var(--titan-padding-standard);
          width: calc(100% - 30px);
 
          .row {
@@ -205,16 +204,16 @@
             width: 100%;
 
             &:first-child:not(.tags) {
-               margin-top: var(--padding-standard);
+               margin-top: var(--titan-padding-standard);
             }
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--padding-standard);
+               margin-top: var(--titan-padding-standard);
 
                &:not(.tags) {
-                  padding-top: var(--padding-standard);
+                  padding-top: var(--titan-padding-standard);
                }
             }
 
@@ -229,7 +228,7 @@
                }
 
                .input {
-                  margin-left: var(--padding-standard);
+                  margin-left: var(--titan-padding-standard);
                }
             }
 

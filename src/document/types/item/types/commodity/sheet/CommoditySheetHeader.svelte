@@ -1,12 +1,12 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentImagePicker from '~/document/components/DocumentImagePicker.svelte';
    import DocumentName from '~/document/components/input/DocumentNameInput.svelte';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import DocumentRaritySelect from '~/document/components/select/DocumentRaritySelect.svelte';
    import DocumentIntegerIncrementInput from '~/document/components/input/DocumentIntegerIncrementInput.svelte';
-   import { CURRENCY_ICON } from '~/system/Icons.js';
+   import {CURRENCY_ICON} from '~/system/Icons.js';
 
    // Get Context variables
    const document = getContext('document');
@@ -16,7 +16,7 @@
 <div class="header">
    <!--Portrait-->
    <div class="portrait">
-      <DocumentImagePicker path={'img'} alt={'item portrait'}/>
+      <DocumentImagePicker alt={'item portrait'} path={'img'}/>
    </div>
 
    <!--Name-->
@@ -86,12 +86,12 @@
       @include panel-1;
 
       width: 100%;
-      padding: var(--padding-standard) var(--padding-large);
+      padding: var(--titan-padding-standard) var(--titan-padding-large);
 
       .portrait {
          width: 80px;
 
-         --border-style: none;
+         --titan-border-style: none;
       }
 
       .label-stats {
@@ -99,7 +99,7 @@
          @include flex-group-top-left;
 
          width: calc(100% - 88px);
-         margin-left: var(--padding-large);
+         margin-left: var(--titan-padding-large);
 
          .name {
             @include flex-row;
@@ -112,7 +112,7 @@
             @include flex-row;
             @include flex-group-left;
 
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
             width: 100%;
 
             .stat {
@@ -122,12 +122,12 @@
                &:not(:first-child) {
                   @include border-left;
 
-                  margin-left: var(--padding-large);
-                  padding-left: var(--padding-large);
+                  margin-left: var(--titan-padding-large);
+                  padding-left: var(--titan-padding-large);
                }
 
                i {
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
 
                .label {
@@ -135,7 +135,7 @@
                   @include flex-group-left;
 
                   font-weight: bold;
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
 
                .input {
@@ -143,7 +143,7 @@
                   @include flex-group-center;
 
                   &.large-number {
-                     --input-width: 80px;
+                     --titan-input-width: 80px;
                   }
                }
             }

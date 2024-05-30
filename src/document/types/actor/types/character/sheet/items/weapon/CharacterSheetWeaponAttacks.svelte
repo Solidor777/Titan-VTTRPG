@@ -33,7 +33,7 @@
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--padding-large);
+            padding-top: var(--titan-padding-large);
             margin-top: 8px;
          }
       }

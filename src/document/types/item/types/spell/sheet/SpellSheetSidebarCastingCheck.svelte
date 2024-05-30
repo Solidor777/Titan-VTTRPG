@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
+   import {slide} from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import SpellSheetSidebarAspects from '~/document/types/item/types/spell/sheet/SpellSheetSidebarAspects.svelte';
-   import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
+   import {COLLAPSED_ICON, EXPANDED_ICON} from '~/system/Icons.js';
 
    // Application statee reference
    const appState = getContext('applicationState');
@@ -93,7 +93,7 @@
          @include label;
 
          width: 100%;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          font-weight: bold;
          min-height: 48px;
 

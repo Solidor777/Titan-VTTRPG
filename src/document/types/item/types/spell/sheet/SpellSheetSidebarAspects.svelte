@@ -1,6 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import SpellSheetSidebarCustomAspect
       from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCustomAspect.svelte';
    import SpellSheetSidebarStandardAspect
@@ -37,20 +37,20 @@
       @include border-bottom-sides;
       @include panel-3;
 
-      width: calc(100% - var(--padding-large));
-      padding: 0 var(--padding-standard);
+      width: calc(100% - var(--titan-padding-large));
+      padding: 0 var(--titan-padding-standard);
 
       li {
          @include flex-column;
          @include flex-group-top;
 
          width: 100%;
-         margin: var(--padding-standard) 0;
+         margin: var(--titan-padding-standard) 0;
 
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--padding-standard);
+            padding-top: var(--titan-padding-standard);
          }
       }
    }

@@ -31,7 +31,7 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
          @include flex-row;
@@ -40,8 +40,8 @@
          &:not(:first-child) {
             @include border-left;
 
-            margin-left: var(--padding-standard);
-            padding-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
+            padding-left: var(--titan-padding-standard);
          }
 
          &.main {

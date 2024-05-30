@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    // Document reference
    const document = getContext('document');
@@ -32,7 +32,7 @@
          @include attribute-colors;
          @include font-size-large;
 
-         padding: var(--padding-large);
+         padding: var(--titan-padding-large);
          font-weight: bold;
       }
    }

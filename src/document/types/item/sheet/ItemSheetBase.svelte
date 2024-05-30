@@ -1,6 +1,6 @@
 <script>
    // Header, sidebar, and tabs to allow this layout to be used by multiple item types
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    export let header = void 0;
    export let sidebar = void 0;
@@ -42,12 +42,12 @@
          width: 100%;
 
          .sidebar {
-            margin: var(--padding-large) var(--padding-large) 0 0;
+            margin: var(--titan-padding-large) var(--titan-padding-large) 0 0;
          }
 
          .tabs {
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

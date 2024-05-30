@@ -1,7 +1,7 @@
 <script>
    import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
-   import Button from "~/helpers/svelte-components/button/Button.svelte";
-   import {getContext} from "svelte";
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import {getContext} from 'svelte';
 
    /** @type ChatMessage Reference to the Chat Message document. */
    const document = getContext('document');
@@ -64,31 +64,31 @@
       height: 40px;
       min-width: 40px;
 
-      --button-padding: var(--padding-standard);
-      --button-border-radius: var(--border-radius);
+      --titan-button-padding: var(--titan-padding-standard);
+      --titan-button-border-radius: var(--titan-border-radius);
 
       &:disabled {
          cursor: default;
       }
 
       &.critical-success {
-         --button-background: var(--critical-success-color);
-         --button-background-disabled: var(--critical-success-color);
+         --titan-button-background: var(--titan-critical-success-color);
+         --titan-button-background-disabled: var(--titan-critical-success-color);
       }
 
       &.success {
-         --button-background: var(--success-color);
-         --button-background-disabled: var(--success-color);
+         --titan-button-background: var(--titan-success-color);
+         --titan-button-background-disabled: var(--titan-success-color);
       }
 
       &.failure {
-         --button-background: var(--failure-color);
-         --button-background-disabled: var(--failure-color);
+         --titan-button-background: var(--titan-failure-color);
+         --titan-button-background-disabled: var(--titan-failure-color);
       }
 
       &.critical-failure {
-         --button-background: var(--critical-failure-color);
-         --button-background-disabled: var(--critical-failure-color);
+         --titan-button-background: var(--titan-critical-failure-color);
+         --titan-button-background-disabled: var(--titan-critical-failure-color);
       }
    }
 </style>

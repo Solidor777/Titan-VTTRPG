@@ -29,7 +29,7 @@
          @include resistance-colors;
          @include font-size-large;
 
-         padding: var(--padding-large);
+         padding: var(--titan-padding-large);
          font-weight: bold;
       }
    }

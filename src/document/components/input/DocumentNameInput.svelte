@@ -15,8 +15,8 @@
       width: 100%;
       height: 100%;
 
-      --input-height: 32px;
-      --input-padding: var(--padding-standard);
-      --font-size: var(--font-size-extra-large);
+      --titan-input-height: 32px;
+      --titan-input-padding: var(--titan-padding-standard);
+      --font-size: var(--titan-font-size-extra-large);
    }
 </style>

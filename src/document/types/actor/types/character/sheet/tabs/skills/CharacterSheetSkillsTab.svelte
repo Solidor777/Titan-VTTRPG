@@ -64,14 +64,14 @@
             @include list;
 
             width: 100%;
-            margin-bottom: var(--padding-standard);
+            margin-bottom: var(--titan-padding-standard);
 
             li {
                @include flex-row;
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
          }
       }

@@ -84,10 +84,10 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--padding-large);
+               padding-bottom: var(--titan-padding-large);
 
                &:not(.tags) {
-                  padding-top: var(--padding-large);
+                  padding-top: var(--titan-padding-large);
                }
             }
 

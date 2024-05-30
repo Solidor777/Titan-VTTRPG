@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
@@ -138,7 +138,7 @@
          height: 100%;
 
          &:not(:first-child) {
-            margin-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
 
          .label {
@@ -165,7 +165,7 @@
          .symbol {
             @include flex-row;
 
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .value {

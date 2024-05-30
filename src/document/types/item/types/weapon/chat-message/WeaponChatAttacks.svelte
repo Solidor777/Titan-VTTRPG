@@ -1,13 +1,13 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
+   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
-   import { ACCURACY_ICON, DAMAGE_ICON, MELEE_ICON, RANGE_ICON } from '~/system/Icons.js';
+   import {ACCURACY_ICON, DAMAGE_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
 
    export let item = void 0;
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
@@ -116,8 +116,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-large);
-            padding-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
+            padding-top: var(--titan-padding-large);
          }
 
          .row {

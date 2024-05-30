@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    /** @type ChatMessage Reference to the Chat Message document. */
    const document = getContext('document');
@@ -72,14 +72,14 @@
       }
 
       i {
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
 
       .label {
          @include border-right;
 
-         padding-right: var(--padding-standard);
-         margin-right: var(--padding-standard);
+         padding-right: var(--titan-padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

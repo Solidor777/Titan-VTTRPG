@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    export let skill = 'athletics';
    export let attribute = '';
@@ -30,10 +30,10 @@
       @include border;
       @include attribute-colors;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

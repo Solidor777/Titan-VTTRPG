@@ -67,7 +67,7 @@
 
 <style>
    img {
-      border-style: var(--border-style);
+      border-style: var(--titan-border-style);
 
       &.active {
          cursor: pointer;

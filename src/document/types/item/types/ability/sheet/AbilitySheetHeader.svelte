@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentImagePicker from '~/document/components/DocumentImagePicker.svelte';
    import DocumentName from '~/document/components/input/DocumentNameInput.svelte';
@@ -16,7 +16,7 @@
    <div class="main-label">
       <!--Portrait-->
       <div class="portrait">
-         <DocumentImagePicker path={'img'} alt={'item portrait'}/>
+         <DocumentImagePicker alt={'item portrait'} path={'img'}/>
       </div>
 
       <!--Label Stats-->
@@ -101,7 +101,7 @@
       @include panel-1;
 
       width: 100%;
-      padding: var(--padding-large);
+      padding: var(--titan-padding-large);
 
       .main-label {
          @include flex-row;
@@ -112,7 +112,7 @@
          .portrait {
             width: 80px;
 
-            --border-style: none;
+            --titan-border-style: none;
          }
 
          .label-stats {
@@ -120,7 +120,7 @@
             @include flex-group-top-left;
 
             width: calc(100% - 88px);
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
 
             .name {
                @include flex-row;
@@ -133,7 +133,7 @@
                @include flex-row;
                @include flex-group-left;
 
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
                width: 100%;
 
                .stat {
@@ -143,8 +143,8 @@
                   &:not(:first-child) {
                      @include border-left;
 
-                     margin-left: var(--padding-large);
-                     padding-left: var(--padding-large);
+                     margin-left: var(--titan-padding-large);
+                     padding-left: var(--titan-padding-large);
                   }
 
                   .label {
@@ -152,7 +152,7 @@
                      @include flex-group-left;
 
                      font-weight: bold;
-                     margin-right: var(--padding-large);
+                     margin-right: var(--titan-padding-large);
                   }
 
                   .input {
@@ -160,7 +160,7 @@
                      @include flex-group-center;
 
                      &.number {
-                        --input-width: 32px;
+                        --titan-input-width: 32px;
                      }
                   }
                }
@@ -172,7 +172,7 @@
          @include flex-column;
          @include flex-group-top;
 
-         margin-right: var(--padding-large);
+         margin-right: var(--titan-padding-large);
          margin-left: 24px;
 
          .checkbox {

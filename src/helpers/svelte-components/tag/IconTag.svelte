@@ -17,11 +17,11 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
          font-weight: bold;
-         margin-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
       }
    }
 </style>

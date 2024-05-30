@@ -9,7 +9,7 @@
    export let tooltip = void 0;
 </script>
 
-<button on:click on:mousedown={preventDefault} {disabled} use:tooltipAction="{{content: tooltip}}">
+<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction="{{content: tooltip}}">
    <slot/>
 </button>
 
@@ -17,7 +17,7 @@
    button {
       @include button;
 
-      --button-border-radius: var(--button-chat-message-border-radius);
+      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
    }
 </style>
 

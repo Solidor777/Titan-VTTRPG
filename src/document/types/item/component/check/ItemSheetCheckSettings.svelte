@@ -1,7 +1,7 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
+   import {slide} from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentTextInput from '~/document/components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
@@ -332,7 +332,7 @@
          @include flex-space-between;
          @include panel-1;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          width: 100%;
 
          .label {
@@ -340,10 +340,10 @@
             @include flex-group-center;
 
             width: 100%;
-            margin: 0 var(--padding-large);
+            margin: 0 var(--titan-padding-large);
 
-            --input-font-size: var(--font-size-large);
-            --input-height: 32px;
+            --input-font-size: var(--titan-font-size-large);
+            --titan-input-height: 32px;
          }
       }
 
@@ -354,7 +354,7 @@
          @include panel-3;
 
          width: calc(100% - 16px);
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          @include font-size-small;
 
@@ -362,13 +362,13 @@
             @include flex-row;
             @include flex-group-center;
 
-            padding-top: var(--padding-large);
+            padding-top: var(--titan-padding-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
 
             .field {
@@ -378,12 +378,12 @@
                &:not(:first-child) {
                   @include border-left;
 
-                  margin-left: var(--padding-large);
-                  padding-left: var(--padding-large);
+                  margin-left: var(--titan-padding-large);
+                  padding-left: var(--titan-padding-large);
                }
 
                i {
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
 
                .label {
@@ -399,7 +399,7 @@
                   @include font-size-normal;
 
                   &:not(.checkbox) {
-                     margin-left: var(--padding-large);
+                     margin-left: var(--titan-padding-large);
                   }
 
                   &.number {

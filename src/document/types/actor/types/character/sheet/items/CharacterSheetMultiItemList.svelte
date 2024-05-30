@@ -131,14 +131,14 @@
          @include flex-space-between;
 
          width: 100%;
-         margin-top: var(--padding-large);
+         margin-top: var(--titan-padding-large);
 
          &.drag-hovered {
-            background: var(--highlight-background);
+            background: var(--titan-highlight-background);
          }
 
          &:last-child {
-            margin-bottom: var(--padding-large);
+            margin-bottom: var(--titan-padding-large);
          }
       }
    }

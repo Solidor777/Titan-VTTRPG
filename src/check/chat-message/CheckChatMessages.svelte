@@ -27,10 +27,10 @@
       @include panel-1;
       @include flex-row;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       &:not(:first-child) {
-         margin-top: var(--padding-large);
+         margin-top: var(--titan-padding-large);
       }
    }
 </style>

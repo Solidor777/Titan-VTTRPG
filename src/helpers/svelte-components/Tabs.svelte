@@ -67,21 +67,21 @@
          height: 100%;
          width: 100%;
          flex: 0;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          button {
             @include button;
 
-            --button-border-radius: 5px;
-            --button-line-height: var(--tab-line-height);
-            --button-font-size: var(--tab-font-size);
+            --titan-button-border-radius: 5px;
+            --titan-button-line-height: var(--tab-line-height);
+            --titan-button-font-size: var(--tab-font-size);
 
             height: 100%;
             width: 100%;
             font-weight: normal;
 
             &.active {
-               background: var(--highlight-background);
+               background: var(--titan-highlight-background);
             }
          }
       }

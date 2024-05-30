@@ -1,17 +1,17 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import DocumentImagePicker from '~/document/components/DocumentImagePicker.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
+   import {LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
 
    const document = getContext('document');
 </script>
 
 <div class="portrait">
    <div class="image">
-      <DocumentImagePicker path={'img'} alt={'character portrait'}/>
+      <DocumentImagePicker alt={'character portrait'} path={'img'}/>
    </div>
    <!--Take a long Rest Button-->
    <div
@@ -77,7 +77,7 @@
       .image {
          width: 160px;
 
-         --border-style: none;
+         --titan-border-style: none;
       }
 
       .button {

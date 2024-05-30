@@ -1,96 +1,96 @@
 @mixin input {
-   border-style: var(--input-border-style);
-   border-radius: var(--input-border-radius);
-   border-width: var(--input-border-width);
-   border-color: var(--input-color);
-   background: var(--input-background);
+   border-style: var(--titan-input-border-style);
+   border-radius: var(--titan-input-border-radius);
+   border-width: var(--titan-input-border-width);
+   border-color: var(--titan-input-color);
+   background: var(--titan-input-background);
    font-size: var(--font-size);
    font-family: var(--font-family);
    font-weight: var(--font-weight);
    text-align: var(--text-alignment);
-   height: var(--input-height);
-   width: var(--input-width);
-   padding: var(--input-padding);
-   color: var(--input-color);
+   height: var(--titan-input-height);
+   width: var(--titan-input-width);
+   padding: var(--titan-input-padding);
+   color: var(--titan-input-color);
 }
 
 @mixin input-disabled {
-   border-style: var(--input-border-style);
-   border-width: var(--input-border-width);
+   border-style: var(--titan-input-border-style);
+   border-width: var(--titan-input-border-width);
    border-color: var(--input-border-color);
    color: var(--font-color);
-   background: var(--static-value-background);
-   opacity: var(--disabled-opacity);
+   background: var(--titan-static-value-background);
+   opacity: var(--titan-disabled-opacity);
 }
 
 @mixin border {
-   border-style: var(--border-style);
-   border-radius: var(--border-radius);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-style: var(--titan-border-style);
+   border-radius: var(--titan-border-radius);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-top {
-   border-top: var(--border-style);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-top: var(--titan-border-style);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-top-bottom {
-   border-top: var(--border-style);
-   border-bottom: var(--border-style);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-top: var(--titan-border-style);
+   border-bottom: var(--titan-border-style);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-top-bottom-right {
-   border-top: var(--border-style);
-   border-bottom: var(--border-style);
-   border-right: var(--border-style);
-   border-top-right-radius: var(--border-radius);
-   border-bottom-right-radius: var(--border-radius);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-top: var(--titan-border-style);
+   border-bottom: var(--titan-border-style);
+   border-right: var(--titan-border-style);
+   border-top-right-radius: var(--titan-border-radius);
+   border-bottom-right-radius: var(--titan-border-radius);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-bottom {
-   border-bottom: var(--border-style);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-bottom: var(--titan-border-style);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-bottom-sides {
-   border-right: var(--border-style);
-   border-left: var(--border-style);
-   border-bottom: var(--border-style);
-   border-bottom-right-radius: var(--border-radius);
-   border-bottom-left-radius: var(--border-radius);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-right: var(--titan-border-style);
+   border-left: var(--titan-border-style);
+   border-bottom: var(--titan-border-style);
+   border-bottom-right-radius: var(--titan-border-radius);
+   border-bottom-left-radius: var(--titan-border-radius);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-left {
-   border-left: var(--border-style);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-left: var(--titan-border-style);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-right {
-   border-right: var(--border-style);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-right: var(--titan-border-style);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
 }
 
 @mixin border-color-button {
-   border-color: var(--button-border-color);
+   border-color: var(--titan-button-border-color);
 }
 
 @mixin padding-standard {
-   padding: var(--padding-standard);
+   padding: var(--titan-padding-standard);
 }
 
 @mixin padding-large {
-   padding: var(--padding-large);
+   padding: var(--titan-padding-large);
 }
 
 @mixin button {
@@ -100,26 +100,26 @@
    align-items: center;
    justify-content: center;
    text-align: center;
-   border-style: var(--button-border-style);
-   border-radius: var(--button-border-radius);
-   border-width: var(--button-border-width);
-   border-color: var(--button-border-color);
-   background: var(--button-background);
-   font-size: var(--button-font-size);
-   font-weight: var(--button-font-weight);
-   padding: var(--button-padding);
-   color: var(--button-color);
-   line-height: var(--button-line-height);
+   border-style: var(--titan-button-border-style);
+   border-radius: var(--titan-button-border-radius);
+   border-width: var(--titan-button-border-width);
+   border-color: var(--titan-button-border-color);
+   background: var(--titan-button-background);
+   font-size: var(--titan-button-font-size);
+   font-weight: var(--titan-button-font-weight);
+   padding: var(--titan-button-padding);
+   color: var(--titan-button-color);
+   line-height: var(--titan-button-line-height);
    margin: 0;
 
    &:disabled {
       cursor: default;
-      background: var(--button-background-disabled);
+      background: var(--titan-button-background-disabled);
    }
 
    &:hover {
       &:not(:disabled) {
-         background: radial-gradient(var(--button-background-highlight), var(--button-background));
+         background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
       }
    }
 }
@@ -131,33 +131,33 @@
    align-items: center;
    justify-content: center;
    text-align: center;
-   border-right: var(--button-border-style);
-   border-left: var(--button-border-style);
-   border-bottom: var(--button-border-style);
-   border-bottom-right-radius: var(--button-border-radius);
-   border-bottom-left-radius: var(--button-border-radius);
-   border-width: var(--button-border-width);
-   border-color: var(--button-border-color);
-   background: var(--button-background);
-   font-size: var(--button-font-size);
-   font-weight: var(--button-font-weight);
-   padding: var(--button-padding);
-   color: var(--button-color);
+   border-right: var(--titan-button-border-style);
+   border-left: var(--titan-button-border-style);
+   border-bottom: var(--titan-button-border-style);
+   border-bottom-right-radius: var(--titan-button-border-radius);
+   border-bottom-left-radius: var(--titan-button-border-radius);
+   border-width: var(--titan-button-border-width);
+   border-color: var(--titan-button-border-color);
+   background: var(--titan-button-background);
+   font-size: var(--titan-button-font-size);
+   font-weight: var(--titan-button-font-weight);
+   padding: var(--titan-button-padding);
+   color: var(--titan-button-color);
    width: var(--button-width);
    height: var(--button-height);
-   line-height: var(--button-line-height);
+   line-height: var(--titan-button-line-height);
    margin: 0;
 
    &:disabled {
       cursor: default;
-      background: var(--button-background-disabled);
-      color: var(--button-color-disabled);
+      background: var(--titan-button-background-disabled);
+      color: var(--titan-button-color-disabled);
    }
 
    &:hover {
       &:not(:disabled) {
-         background: radial-gradient(var(--button-background-highlight), var(--button-background));
-         color: var(--button-color-disabled);
+         background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
+         color: var(--titan-button-color-disabled);
       }
    }
 }
@@ -169,28 +169,28 @@
    align-items: center;
    justify-content: center;
    text-align: center;
-   border-style: var(--icon-button-border-style);
-   border-radius: var(--icon-button-border-radius);
-   border-width: var(--icon-button-border-width);
-   border-color: var(--border-color-icon-button);
-   font-size: var(--icon-button-font-size);
-   background: var(--icon-button-background);
-   padding: var(--icon-button-padding);
+   border-style: var(--titan-icon-button-border-style);
+   border-radius: var(--titan-icon-button-border-radius);
+   border-width: var(--titan-icon-button-border-width);
+   border-color: var(--titan-border-color-icon-button);
+   font-size: var(--titan-icon-button-font-size);
+   background: var(--titan-icon-button-background);
+   padding: var(--titan-icon-button-padding);
    line-height: var(--icon-button-line-height);
-   width: var(--icon-button-radius);
-   height: var(--icon-button-radius);
-   color: var(--icon-button-color);
+   width: var(--titan-icon-button-radius);
+   height: var(--titan-icon-button-radius);
+   color: var(--titan-icon-button-color);
    margin: 0;
 
    &:disabled {
       cursor: default;
-      background: var(--button-background-disabled);
+      background: var(--titan-button-background-disabled);
    }
 
    &:hover {
       &:not(:disabled) {
          cursor: pointer;
-         background: radial-gradient(var(--button-background-highlight), var(--button-background));
+         background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
       }
    }
 
@@ -281,71 +281,71 @@
 
 @mixin attribute-colors {
    &.body {
-      background: var(--body-color);
+      background: var(--titan-body-color);
    }
 
    &.mind {
-      background: var(--mind-color);
+      background: var(--titan-mind-color);
    }
 
    &.soul {
-      background: var(--soul-color);
+      background: var(--titan-soul-color);
    }
 }
 
 @mixin attribute-button {
    &.body {
-      --button-background: var(--body-color);
+      --titan-button-background: var(--titan-body-color);
    }
 
    &.mind {
-      --button-background: var(--mind-color);
+      --titan-button-background: var(--titan-mind-color);
    }
 
    &.soul {
-      --button-background: var(--soul-color);
+      --titan-button-background: var(--titan-soul-color);
    }
 }
 
 @mixin resistance-colors {
    &.reflexes {
-      background: var(--reflexes-color);
+      background: var(--titan-reflexes-color);
    }
 
    &.resilience {
-      background: var(--resilience-color);
+      background: var(--titan-resilience-color);
    }
 
    &.willpower {
-      background: var(--willpower-color);
+      background: var(--titan-willpower-color);
    }
 }
 
 @mixin resistance-button {
    &.reflexes {
-      --button-background: var(--reflexes-color);
+      --titan-button-background: var(--titan-reflexes-color);
    }
 
    &.resilience {
-      --button-background: var(--resilience-color);
+      --titan-button-background: var(--titan-resilience-color);
    }
 
    &.willpower {
-      --button-background: var(--willpower-color);
+      --titan-button-background: var(--titan-willpower-color);
    }
 }
 
 @mixin rarity-colors {
    &.uncommon {
-      background: var(--uncommon-color);
+      background: var(--titan-uncommon-color);
    }
 
    &.rare {
-      background: var(--rare-color);
+      background: var(--titan-rare-color);
    }
 
    &.unique {
-      background: var(--unique-color);
+      background: var(--titan-unique-color);
    }
 }
 
@@ -356,31 +356,31 @@
 }
 
 @mixin panel-1 {
-   background: var(--panel-1-background);
-   color: var(--panel-1-color);
+   background: var(--titan-panel-1-background);
+   color: var(--titan-panel-1-color);
 
-   --border-color: var(--panel-1-color);
+   --titan-border-color: var(--titan-panel-1-color);
 }
 
 @mixin panel-2 {
-   background: var(--panel-2-background);
-   color: var(--panel-2-color);
+   background: var(--titan-panel-2-background);
+   color: var(--titan-panel-2-color);
 
-   --border-color: var(--panel-2-color);
+   --titan-border-color: var(--titan-panel-2-color);
 }
 
 @mixin panel-3 {
-   background: var(--panel-3-background);
-   color: var(--panel-3-color);
+   background: var(--titan-panel-3-background);
+   color: var(--titan-panel-3-color);
 
-   --border-color: var(--panel-3-color);
+   --titan-border-color: var(--titan-panel-3-color);
 }
 
 @mixin label {
-   background: var(--label-background);
-   color: var(--label-color);
+   background: var(--titan-label-background);
+   color: var(--titan-label-color);
 
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 }
 
 @mixin tag {
@@ -389,22 +389,22 @@
    align-items: center;
    justify-content: center;
    text-align: center;
-   border-style: var(--border-style);
-   border-radius: var(--border-radius);
-   border-width: var(--border-width);
-   border-color: var(--border-color);
+   border-style: var(--titan-border-style);
+   border-radius: var(--titan-border-radius);
+   border-width: var(--titan-border-width);
+   border-color: var(--titan-border-color);
    font-weight: bold;
-   padding: var(--padding-standard);
+   padding: var(--titan-padding-standard);
 }
 
 @mixin editor {
-   --tjs-editor-background: var(--editor-background);
-   --tjs-editor-border: var(--editor-border);
-   --tjs-editor-border-radius: var(--editor-border-radius);
+   --tjs-editor-background: var(--titan-editor-background);
+   --tjs-editor-border: var(--titan-editor-border);
+   --tjs-editor-border-radius: var(--titan-editor-border-radius);
 }
 
 @mixin tag-margin {
-   margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
+   margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
 }
 
 @mixin tag-margin-small {
@@ -412,99 +412,99 @@
 }
 
 @mixin font-size-normal {
-   font-size: var(--font-size-normal);
+   font-size: var(--titan-font-size-normal);
 }
 
 @mixin font-size-small {
-   font-size: var(--font-size-small);
+   font-size: var(--titan-font-size-small);
 }
 
 @mixin font-size-large {
-   font-size: var(--font-size-large);
+   font-size: var(--titan-font-size-large);
 }
 
 @mixin font-size-extra-large {
-   font-size: var(--font-size-extra-large);
+   font-size: var(--titan-font-size-extra-large);
 }
 
 @mixin static-value {
    color: var(--font-color);
-   background: var(--static-value-background);
+   background: var(--titan-static-value-background);
 }
 
 @mixin mod-colors {
    &.greater {
-      color: var(--greater-color);
-      background: var(--greater-background);
+      color: var(--titan-greater-color);
+      background: var(--titan-greater-background);
    }
 
    &.lesser {
-      color: var(--lesser-color);
-      background: var(--lesser-background);
+      color: var(--titan-lesser-color);
+      background: var(--titan-lesser-background);
    }
 }
 
 @mixin effect-permanent {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--cyan) 0, var(--green) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-cyan) 0, var(--titan-green) 100%);
 }
 
 @mixin effect-turn-start {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--purple) 0, var(--cyan) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple) 0, var(--titan-cyan) 100%);
 }
 
 @mixin effect-turn-end {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--pink) 0, var(--purple) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-pink) 0, var(--titan-purple) 100%);
 }
 
 @mixin effect-expired {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--yellow) 0, var(--red) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-yellow) 0, var(--titan-red) 100%);
 }
 
 @mixin effect-initiative {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--red), var(--purple) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-red), var(--titan-purple) 100%);
 }
 
 @mixin effect-custom {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--purple), var(--yellow) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple), var(--titan-yellow) 100%);
 }
 
 @mixin fast-healing {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--green), var(--yellow) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-green), var(--titan-yellow) 100%);
 }
 
 @mixin persistent-damage {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--maroon), var(--orange) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-maroon), var(--titan-orange) 100%);
 }
 
 @mixin resolve-regain {
-   --border-color: var(--label-color);
+   --titan-border-color: var(--titan-label-color);
 
-   color: var(--label-color);
-   background: linear-gradient(var(--gradient-degree), var(--blue), var(--cyan) 100%);
+   color: var(--titan-label-color);
+   background: linear-gradient(var(--titan-gradient-degree), var(--titan-blue), var(--titan-cyan) 100%);
 }
 
 @mixin z-index-app {

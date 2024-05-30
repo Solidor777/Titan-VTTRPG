@@ -31,16 +31,16 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <img
-   class={$document.isOwner ? 'active' : ''}
    {alt}
-   {src}
-   on:keypress={onEditImage}
+   class={$document.isOwner ? 'active' : ''}
    on:click={onEditImage}
+   on:keypress={onEditImage}
+   {src}
 />
 
 <style>
    img {
-      border-style: var(--border-style);
+      border-style: var(--titan-border-style);
 
       &.active {
          cursor: pointer;

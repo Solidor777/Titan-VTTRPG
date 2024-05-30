@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CharacterSheetAttribute
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttribute.svelte';
 
@@ -32,8 +32,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--padding-standard);
-            margin-top: var(--padding-standard);
+            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
       }
    }

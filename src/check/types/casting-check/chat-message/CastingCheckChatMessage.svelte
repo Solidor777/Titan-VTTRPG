@@ -10,7 +10,7 @@
    import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
    import CastingCheckChatMessageResistanceCheckButtons
-      from "~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte";
+      from '~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte';
 
    // Document reference
    const document = getContext('document');
@@ -113,7 +113,7 @@
          width: 100%;
 
          &:not(:first-child, .tags) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

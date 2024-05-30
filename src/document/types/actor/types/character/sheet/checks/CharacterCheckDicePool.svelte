@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
-   import { DICE_ICON } from '~/system/Icons.js';
+   import {getContext} from 'svelte';
+   import {DICE_ICON} from '~/system/Icons.js';
 
    export let attribute = 'body';
    export let skill = void 0;
@@ -32,10 +32,10 @@
       @include border;
       @include attribute-colors;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

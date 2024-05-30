@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
@@ -9,7 +9,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
    import CharacterSheetTabHeaderButton
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
-   import { CREATE_ICON } from '~/system/Icons.js';
+   import {CREATE_ICON} from '~/system/Icons.js';
 
    // Application reference
    const appState = getContext('applicationState');
@@ -49,12 +49,12 @@
          <!--Spell List-->
          <div class="list">
             <CharacterSheetItemList
-               itemComponent={CharacterSheetSpell}
+               filter={$appState.filter.spells}
                filterFunction={(item) => {
                   return item.type === 'spell';
                }}
-               filter={$appState.filter.spells}
                isExpandedMap={$appState.isExpanded.spells}
+               itemComponent={CharacterSheetSpell}
             />
          </div>
       </ScrollingContainer>
@@ -77,11 +77,11 @@
          @include panel-1;
 
          width: 100%;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          .label {
             font-weight: bold;
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .input {
@@ -89,7 +89,7 @@
          }
 
          .button {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
       }
 
@@ -105,7 +105,7 @@
             @include flex-group-top;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

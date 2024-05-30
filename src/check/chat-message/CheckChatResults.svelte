@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import CheckChatResetExpertiseButton from '~/check/chat-message/CheckChatResetExpertiseButton.svelte';
    import {
@@ -162,7 +162,7 @@
 
       font-weight: bold;
       width: 100%;
-      padding: var(--padding-large);
+      padding: var(--titan-padding-large);
 
       .result {
          @include flex-row;
@@ -173,11 +173,11 @@
          font-weight: bold;
 
          &.succeeded {
-            color: var(--succeeded-color);
+            color: var(--titan-succeeded-color);
          }
 
          &.failed {
-            color: var(--failed-color);
+            color: var(--titan-failed-color);
          }
       }
 
@@ -186,25 +186,25 @@
          @include flex-group-center;
 
          &:not(:first-child) {
-            margin-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .button {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
 
-            --icon-button-radius: 24px;
-            --icon-button-font-size: 14px;
+            --titan-icon-button-radius: 24px;
+            --titan-icon-button-font-size: 14px;
          }
 
          .border-right {
             @include border-right;
 
-            margin-right: var(--padding-large);
-            padding-right: var(--padding-large);
+            margin-right: var(--titan-padding-large);
+            padding-right: var(--titan-padding-large);
          }
       }
    }

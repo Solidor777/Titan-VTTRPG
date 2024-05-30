@@ -3,7 +3,7 @@
    import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { EFFECT_DURATION_TURN_END_ICON } from '~/system/Icons.js';
+   import {EFFECT_DURATION_TURN_END_ICON} from '~/system/Icons.js';
 
    export let label = void 0;
    export let img = void 0;
@@ -18,7 +18,7 @@
 
 <div class="tag" use:tooltip={{ content: formattedTooltip }}>
    <!--Image-->
-   <img src={img} alt="img" class={checkAddDarkSVGClass(img)}/>
+   <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
 
    <!--Label-->
    <div>
@@ -42,23 +42,23 @@
       @include effect-turn-end;
 
       font-weight: bold;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .time {
          @include border-left;
 
-         margin-left: var(--padding-standard);
-         padding-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
+         padding-left: var(--titan-padding-standard);
       }
 
       img {
          width: 24px;
          border: none;
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
 
       i {
-         margin-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
       }
    }
 </style>

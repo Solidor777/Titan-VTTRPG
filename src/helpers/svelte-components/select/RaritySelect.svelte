@@ -29,21 +29,21 @@
 </script>
 
 <div class="rarity-select {value}" on:change>
-   <Select options={rarityOptions} bind:value {disabled} />
+   <Select bind:value {disabled} options={rarityOptions}/>
 </div>
 
 <style lang="scss">
    .rarity-select {
       &.uncommon {
-         --input-background: var(--uncommon-color);
+         --titan-input-background: var(--titan-uncommon-color);
       }
 
       &.rare {
-         --input-background: var(--rare-color);
+         --titan-input-background: var(--titan-rare-color);
       }
 
       &.unique {
-         --input-background: var(--unique-color);
+         --titan-input-background: var(--titan-unique-color);
       }
    }
 </style>

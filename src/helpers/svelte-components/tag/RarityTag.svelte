@@ -16,7 +16,7 @@
       @include label;
       @include rarity-colors;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
       font-weight: bold;
    }
 </style>

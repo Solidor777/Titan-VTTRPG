@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CharacterSheetRating from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetRating.svelte';
    import CharacterSheetRatingButton
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetRatingButton.svelte';
-   import { ACCURACY_ICON, AWARENESS_ICON, DEFENSE_ICON, INITIATIVE_ICON, MELEE_ICON } from '~/system/Icons.js';
+   import {ACCURACY_ICON, AWARENESS_ICON, DEFENSE_ICON, INITIATIVE_ICON, MELEE_ICON} from '~/system/Icons.js';
 
    const document = getContext('document');
 </script>
@@ -12,8 +12,8 @@
    <!--Initiative-->
    <div class="rating">
       <CharacterSheetRatingButton
-         key={'initiative'}
          icon={INITIATIVE_ICON}
+         key={'initiative'}
          onClick={() => {
             $document.requestInitiativeRoll();
          }}
@@ -22,22 +22,22 @@
 
    <!--Awareness-->
    <div class="rating">
-      <CharacterSheetRating key={'awareness'} icon={AWARENESS_ICON}/>
+      <CharacterSheetRating icon={AWARENESS_ICON} key={'awareness'}/>
    </div>
 
    <!--Defense-->
    <div class="rating">
-      <CharacterSheetRating key={'defense'} icon={DEFENSE_ICON}/>
+      <CharacterSheetRating icon={DEFENSE_ICON} key={'defense'}/>
    </div>
 
    <!--Melee-->
    <div class="rating">
-      <CharacterSheetRating key={'melee'} icon={MELEE_ICON}/>
+      <CharacterSheetRating icon={MELEE_ICON} key={'melee'}/>
    </div>
 
    <!--Accuracy-->
    <div class="rating">
-      <CharacterSheetRating key={'accuracy'} icon={ACCURACY_ICON}/>
+      <CharacterSheetRating icon={ACCURACY_ICON} key={'accuracy'}/>
    </div>
 </div>
 
@@ -58,8 +58,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-padding-standard);
          }
       }
    }

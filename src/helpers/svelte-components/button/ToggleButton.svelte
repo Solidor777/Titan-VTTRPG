@@ -1,6 +1,6 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
+   import {CHECKED_ICON, UNCHECKED_ICON} from '~/system/Icons.js';
 
    export let label = void 0;
    export let active = void 0;
@@ -23,7 +23,7 @@
       height: 100%;
 
       :not(:first-child) {
-         margin-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
       }
    }
 </style>

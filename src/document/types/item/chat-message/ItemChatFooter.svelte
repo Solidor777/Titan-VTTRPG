@@ -1,5 +1,5 @@
 <div class="footer">
-   <slot />
+   <slot/>
 </div>
 
 <style lang="scss">
@@ -9,7 +9,7 @@
 
       flex-wrap: wrap;
       width: 100%;
-      padding: 0 var(--padding-large) 0 var(--padding-large);
+      padding: 0 var(--titan-padding-large) 0 var(--titan-padding-large);
 
       @include font-size-small;
    }

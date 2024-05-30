@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    // Document reference
    const document = getContext('document');
@@ -9,11 +9,11 @@
 <div class="label">
    <div class="content {$document.flags.titan.parameters.attribute}">
       <img
-         src={$document.flags.titan.parameters.img}
          alt="item"
          class={$document.flags.titan.parameters.img.indexOf('.svg') === -1
             ? ''
             : 'svg'}
+         src={$document.flags.titan.parameters.img}
       />
 
       <!--Labels-->
@@ -79,13 +79,13 @@
          @include border;
          @include label;
 
-         padding: var(--padding-large);
+         padding: var(--titan-padding-large);
          font-weight: bold;
 
          img {
             width: 32px;
             border: none;
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .labels {

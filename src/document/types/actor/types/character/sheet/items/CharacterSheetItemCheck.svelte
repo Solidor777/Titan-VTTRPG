@@ -186,7 +186,7 @@
          @include flex-row;
 
          .resolve-cost-button {
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
          }
       }
 

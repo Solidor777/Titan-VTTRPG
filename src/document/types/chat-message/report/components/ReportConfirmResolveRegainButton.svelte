@@ -1,9 +1,9 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { REGAIN_RESOLVE_ICON } from '~/system/Icons.js';
+   import {REGAIN_RESOLVE_ICON} from '~/system/Icons.js';
 
    // Context variables
    const document = getContext('document');
@@ -16,7 +16,7 @@
          // Get the actor
          const actor = getActorFromSpeaker($document.speaker.token, $document.speaker.actor);
          if (actor && actor.isOwner && actor.system.isCharacter) {
-            
+
             // Update the actor
             await actor.system.regainResolve($document.flags.titan.resolveRegain.total);
 
@@ -56,6 +56,6 @@
 
       width: 100%;
 
-      --button-border-radius: var(--button-chat-message-border-radius);
+      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
    }
 </style>

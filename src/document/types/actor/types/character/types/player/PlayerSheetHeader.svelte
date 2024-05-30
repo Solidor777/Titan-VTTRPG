@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
@@ -72,7 +72,7 @@
       @include border;
       @include panel-1;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .main-header {
          @include flex-row;
@@ -85,41 +85,41 @@
             @include flex-group-left;
 
             flex: auto;
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .inspiration {
             @include flex-row;
             @include flex-group-center;
 
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
 
          .xp {
             @include flex-row;
             @include flex-group-center;
 
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
 
             .available {
                @include flex-row;
                @include flex-group-center;
 
                width: 40px;
-               height: var(--input-height);
+               height: var(--titan-input-height);
             }
 
             .symbol {
                @include flex-row;
 
-               margin: var(--padding-standard);
+               margin: var(--titan-padding-standard);
             }
 
             .earned {
                @include flex-row;
                @include flex-group-center;
 
-               margin-right: var(--padding-large);
+               margin-right: var(--titan-padding-large);
                width: 40px;
             }
 
@@ -138,8 +138,8 @@
          @include border-top;
 
          width: 100%;
-         margin-top: var(--padding-standard);
-         padding-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
+         padding-top: var(--titan-padding-standard);
 
          .section {
             @include flex-row;
@@ -150,8 +150,8 @@
             &:not(:first-child) {
                @include border-left;
 
-               margin-left: var(--padding-standard);
-               padding-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
+               padding-left: var(--titan-padding-standard);
             }
          }
       }

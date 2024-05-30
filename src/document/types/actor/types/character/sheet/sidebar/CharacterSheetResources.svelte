@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import getSetting from '~/helpers/utility-functions/GetSetting.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import CharacterSheetResource
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte';
-   import { RESOLVE_ICON, STAMINA_ICON, WOUNDS_ICON } from '~/system/Icons.js';
+   import {RESOLVE_ICON, STAMINA_ICON, WOUNDS_ICON} from '~/system/Icons.js';
 
    // Setup context variables
    const document = getContext('document');
@@ -67,20 +67,20 @@
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--padding-standard);
-            margin-top: var(--padding-standard);
+            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
 
          &.stamina {
-            --meter-color: var(--stamina-color);
+            --meter-color: var(--titan-stamina-color);
          }
 
          &.wounds {
-            --meter-color: var(--wounds-color);
+            --meter-color: var(--titan-wounds-color);
          }
 
          &.resolve {
-            --meter-color: var(--resolve-color);
+            --meter-color: var(--titan-resolve-color);
          }
       }
    }

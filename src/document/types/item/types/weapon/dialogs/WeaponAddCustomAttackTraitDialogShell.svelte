@@ -119,7 +119,7 @@
 
             height: 100%;
             width: 100%;
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
       }
 
@@ -129,7 +129,7 @@
 
          width: 100%;
          height: 100%;
-         margin-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
 
          .label {
             @include flex-row;
@@ -144,7 +144,7 @@
 
             width: 100%;
             height: 100%;
-            margin-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
          }
       }
 
@@ -153,17 +153,17 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
 
          .button {
             @include flex-row;
 
             width: 100%;
 
-            --button-border-radius: var(--button-chat-message-border-radius);
+            --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
             &:not(:first-child) {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
       }

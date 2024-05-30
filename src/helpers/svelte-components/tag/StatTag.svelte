@@ -19,14 +19,14 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
          @include border-right;
 
          font-weight: bold;
-         padding-right: var(--padding-standard);
-         margin-right: var(--padding-standard);
+         padding-right: var(--titan-padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

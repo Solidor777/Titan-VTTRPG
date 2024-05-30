@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentBoundEditorInput from "~/document/components/input/DocumentBoundEditorInput.svelte";
+   import DocumentBoundEditorInput from '~/document/components/input/DocumentBoundEditorInput.svelte';
 
    // Setup context variables
    const document = getContext('document');
@@ -41,7 +41,7 @@
          @include flex-column;
          @include flex-group-top;
 
-         padding: var(--padding-large);
+         padding: var(--titan-padding-large);
          width: 100%;
          height: 100%;
 
@@ -57,7 +57,7 @@
             @include flex-row;
             @include flex-group-left;
 
-            margin-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
             flex-wrap: wrap;
             width: 100%;
             flex-grow: 2;

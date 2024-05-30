@@ -95,7 +95,7 @@
 
          &:not(:first-child, .tags, .rich-text, .rich-text + section
             ) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
@@ -11,7 +11,7 @@
       from '~/document/types/actor/types/character/sheet/items/ability/CharacterSheetAbility.svelte';
    import CharacterSheetTabHeaderButton
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
-   import { CREATE_ICON, RESET_ICON } from '~/system/Icons.js';
+   import {CREATE_ICON, RESET_ICON} from '~/system/Icons.js';
 
    // Application reference
    const appState = getContext('applicationState');
@@ -66,8 +66,8 @@
          <!--Add Item Button-->
          <div class="add-entry-button">
             <CharacterSheetTabHeaderButton
-               label={localize('addNewAbility')}
                icon={CREATE_ICON}
+               label={localize('addNewAbility')}
                on:click={() => {
                   $document.system.addItem('ability');
                }}
@@ -82,7 +82,7 @@
          <!--Abilities List-->
          <div class="list">
             <CharacterSheetItemList
-               itemComponent={CharacterSheetAbility}
+               filter={$appState.filter.abilities}
                filterFunction={(item) => {
                   if (item.type !== 'ability') {
                      return false;
@@ -110,8 +110,8 @@
 
                   return true;
                }}
-               filter={$appState.filter.abilities}
                isExpandedMap={$appState.isExpanded.abilities}
+               itemComponent={CharacterSheetAbility}
             />
          </div>
       </ScrollingContainer>
@@ -134,7 +134,7 @@
          @include panel-1;
 
          width: 100%;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          .row {
             @include flex-row;
@@ -143,19 +143,19 @@
             width: 100%;
 
             &:not(:first-child) {
-               margin-top: var(--padding-standard);
+               margin-top: var(--titan-padding-standard);
             }
 
             .reset {
-               --icon-button-font-size: var(--font-size-small);
-               --icon-button-radius: 28px;
+               --titan-icon-button-font-size: var(--titan-font-size-small);
+               --titan-icon-button-radius: 28px;
 
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
 
             .label {
                font-weight: bold;
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
             }
 
             .input {
@@ -164,18 +164,18 @@
 
             .option {
                &:not(:first-child) {
-                  margin-left: var(--padding-standard);
+                  margin-left: var(--titan-padding-standard);
                }
             }
 
             .add-entry-button {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
 
          .option {
             &:not(:first-child) {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
       }
@@ -192,7 +192,7 @@
             @include flex-group-top;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

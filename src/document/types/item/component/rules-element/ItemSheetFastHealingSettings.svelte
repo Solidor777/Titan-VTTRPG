@@ -1,13 +1,13 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/component/rules-element/RulesElementUpdateOperation';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
+   import {DELETE_ICON} from '~/system/Icons.js';
 
    // Setup context variables
    const document = getContext('document');
@@ -84,12 +84,12 @@
 
          flex-wrap: wrap;
          width: 100%;
-         margin-bottom: var(--padding-large);
+         margin-bottom: var(--titan-padding-large);
 
          .field {
             @include flex-row;
 
-            margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
+            margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
 
             &.select {
                @include flex-group-left;
@@ -108,7 +108,7 @@
          @include flex-group-top;
 
          height: 100%;
-         margin: var(--padding-large) var(--padding-standard) 0 0;
+         margin: var(--titan-padding-large) var(--titan-padding-standard) 0 0;
       }
    }
 </style>

@@ -1,10 +1,11 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
-   import SpellSheetStandardAspectSettings from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte';
+   import SpellSheetStandardAspectSettings
+      from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte';
 
    // Setup context variables
    const appState = getContext('applicationState');
@@ -36,7 +37,7 @@
 
 <div class="standard-aspects-tab">
    <!--Filter-->
-   <TopFilter bind:filter={$appState.filter.standardAspects} />
+   <TopFilter bind:filter={$appState.filter.standardAspects}/>
 
    <!--Scrolling aspects list-->
    <div class="scrolling-content">
@@ -49,7 +50,7 @@
                   .indexOf($appState.filter.standardAspects.toLowerCase()) !== -1}
                   <!--Filter the Aspects-->
                   <li>
-                     <SpellSheetStandardAspectSettings {aspectOptions} />
+                     <SpellSheetStandardAspectSettings {aspectOptions}/>
                   </li>
                {/if}
             {/each}
@@ -88,7 +89,7 @@
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
          }
       }

@@ -81,7 +81,7 @@
          @include flex-group-center;
          @include font-size-normal;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
       }
 
       .button {
@@ -89,9 +89,9 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
 
-         --button-border-radius: var(--button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
       }
    }
 </style>

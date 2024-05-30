@@ -1,7 +1,7 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
+   import {slide} from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import DocumentCheckboxInput from '~/document/components/input/DocumentCheckboxInput.svelte';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
@@ -97,9 +97,9 @@
             <div class="input">
                <DocumentIntegerInput
                   bind:value={$document.system.castingCheck.complexity}
-                  min={1}
-                  max={16}
                   disabled={$document.system.castingCheck.autoCalculateDC}
+                  max={16}
+                  min={1}
                />
             </div>
          </div>
@@ -158,16 +158,16 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--padding-large);
+         margin-top: var(--titan-padding-large);
 
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--padding-large);
+            padding-top: var(--titan-padding-large);
          }
 
          &:last-child {
-            margin-bottom: var(--padding-large);
+            margin-bottom: var(--titan-padding-large);
          }
       }
 
@@ -177,7 +177,7 @@
          @include border-bottom-sides;
          @include panel-3;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          width: calc(100% - 16px);
 
          .stat {
@@ -192,7 +192,7 @@
 
                height: 100%;
                font-weight: bold;
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
 
                @include font-size-small;
             }
@@ -217,15 +217,15 @@
             @include border-left;
 
             height: 100%;
-            margin-left: var(--padding-large);
-            padding-right: var(--padding-large);
+            margin-left: var(--titan-padding-large);
+            padding-right: var(--titan-padding-large);
          }
       }
 
       .aspect-costs {
          @include flex-column;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          height: 100%;
          width: 100%;
 
@@ -234,8 +234,8 @@
             @include flex-group-center;
             @include border-bottom;
 
-            padding-bottom: var(--padding-standard);
-            margin-top: var(--padding-large);
+            padding-bottom: var(--titan-padding-standard);
+            margin-top: var(--titan-padding-large);
             width: 100%;
             font-weight: bold;
          }

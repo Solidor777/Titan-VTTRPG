@@ -1,19 +1,19 @@
 <script>
    import CharacterSheetMod from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetMod.svelte';
-   import { ARMOR_ICON, DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
+   import {ARMOR_ICON, DAMAGE_ICON, HEALING_ICON} from '~/system/Icons.js';
 </script>
 
 <div class="mods">
    <div class="mod">
-      <CharacterSheetMod key={'armor'} icon={ARMOR_ICON}/>
+      <CharacterSheetMod icon={ARMOR_ICON} key={'armor'}/>
    </div>
 
    <div class="mod">
-      <CharacterSheetMod key={'damage'} icon={DAMAGE_ICON}/>
+      <CharacterSheetMod icon={DAMAGE_ICON} key={'damage'}/>
    </div>
 
    <div class="mod">
-      <CharacterSheetMod key={'healing'} icon={HEALING_ICON}/>
+      <CharacterSheetMod icon={HEALING_ICON} key={'healing'}/>
    </div>
 </div>
 
@@ -34,8 +34,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-padding-standard);
          }
       }
    }

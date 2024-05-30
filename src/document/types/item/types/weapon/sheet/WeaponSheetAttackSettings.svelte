@@ -281,7 +281,7 @@
          @include flex-space-between;
          @include panel-1;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          width: 100%;
 
          .label {
@@ -289,10 +289,10 @@
             @include flex-group-center;
 
             width: 100%;
-            margin: 0 var(--padding-large);
+            margin: 0 var(--titan-padding-large);
 
-            --input-font-size: var(--font-size-large);
-            --input-height: 32px;
+            --input-font-size: var(--titan-font-size-large);
+            --titan-input-height: 32px;
          }
       }
 
@@ -303,7 +303,7 @@
          @include panel-3;
 
          width: calc(100% - 16px);
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          @include font-size-small;
 
@@ -311,13 +311,13 @@
             @include flex-row;
             @include flex-group-center;
 
-            padding-top: var(--padding-large);
+            padding-top: var(--titan-padding-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
 
             .field {
@@ -327,12 +327,12 @@
                &:not(:first-child) {
                   @include border-left;
 
-                  margin-left: var(--padding-large);
-                  padding-left: var(--padding-large);
+                  margin-left: var(--titan-padding-large);
+                  padding-left: var(--titan-padding-large);
                }
 
                i {
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
 
                .label {
@@ -346,7 +346,7 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-left: var(--padding-standard);
+                  margin-left: var(--titan-padding-standard);
 
                   @include font-size-normal;
 
@@ -361,19 +361,19 @@
             @include border-top;
 
             width: 100%;
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-padding-standard);
 
             .traits-header {
                @include flex-row;
                @include flex-group-center;
 
                .button {
-                  --button-font-size: var(--font-size-small);
-                  --button-line-height: 20px;
+                  --titan-button-font-size: var(--titan-font-size-small);
+                  --titan-button-line-height: 20px;
 
                   &:not(:first-child) {
-                     margin-left: var(--padding-standard);
+                     margin-left: var(--titan-padding-standard);
                   }
                }
             }
@@ -384,10 +384,10 @@
 
                flex-wrap: wrap;
                width: 100%;
-               margin-bottom: var(--padding-standard);
+               margin-bottom: var(--titan-padding-standard);
 
                .trait {
-                  margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
+                  margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
                }
             }
          }

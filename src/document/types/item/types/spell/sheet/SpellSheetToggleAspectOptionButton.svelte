@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    export let enabled = void 0;
@@ -37,14 +37,14 @@
 
 <style lang="scss">
    .toggle {
-      --button-font-size: var(--font-size-small);
-      --button-padding: 0 var(--padding-standard);
-      --button-border-radius: var(--button-chat-message-border-radius);
+      --titan-button-font-size: var(--titan-font-size-small);
+      --titan-button-padding: 0 var(--titan-padding-standard);
+      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
-      margin: var(--padding-standard);
+      margin: var(--titan-padding-standard);
 
       &.enabled-true {
-         --button-background: var(--active-background);
+         --titan-button-background: var(--titan-active-background);
       }
 
       .label {

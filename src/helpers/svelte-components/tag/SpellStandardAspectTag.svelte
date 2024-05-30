@@ -89,7 +89,7 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
       flex-wrap: wrap;
 
       .stat {
@@ -103,12 +103,12 @@
          &:not(:first-child) {
             @include border-left;
 
-            margin-left: var(--padding-standard);
-            padding-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
+            padding-left: var(--titan-padding-standard);
          }
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
    }

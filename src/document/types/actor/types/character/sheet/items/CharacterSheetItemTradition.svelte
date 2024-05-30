@@ -24,11 +24,11 @@
       @include flex-group-center;
       @include border;
 
-      padding: var(--padding-standard);
-      background: var(--label-background);
+      padding: var(--titan-padding-standard);
+      background: var(--titan-label-background);
 
       .label {
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

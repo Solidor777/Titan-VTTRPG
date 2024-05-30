@@ -1,5 +1,5 @@
 <script>
-   import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharactersToUpdate.js";
+   import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharactersToUpdate.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -48,7 +48,7 @@
 
       width: 100%;
 
-      --button-border-radius: var(--button-chat-message-border-radius);
+      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
    }
 </style>

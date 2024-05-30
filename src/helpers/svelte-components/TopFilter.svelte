@@ -23,11 +23,11 @@
       @include font-size-normal;
 
       width: 100%;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
          font-weight: bold;
-         margin-right: var(--padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

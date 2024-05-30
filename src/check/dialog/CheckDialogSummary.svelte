@@ -34,7 +34,7 @@
       @include flex-row;
       @include flex-group-center;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
       width: 100%;
 
       .label {
@@ -43,7 +43,7 @@
 
          width: 100%;
          font-weight: bold;
-         padding-right: var(--padding-large);
+         padding-right: var(--titan-padding-large);
       }
 
       .value {
@@ -53,7 +53,7 @@
             @include border;
             @include label;
 
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
          }
       }
    }

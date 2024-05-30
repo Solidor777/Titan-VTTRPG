@@ -20,17 +20,17 @@
 
 <style lang="scss">
    .button {
-      --button-font-size: var(--font-size-small);
-      --button-padding: var(--padding-standard);
-      --button-line-height: normal;
-      --button-border-radius: var(--button-chat-message-border-radius);
+      --titan-button-font-size: var(--titan-font-size-small);
+      --titan-button-padding: var(--titan-padding-standard);
+      --titan-button-line-height: normal;
+      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
       .label {
          @include flex-row;
          @include flex-group-center;
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
    }

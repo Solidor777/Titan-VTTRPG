@@ -26,7 +26,7 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .label {
          font-weight: bold;
@@ -35,8 +35,8 @@
       .value {
          @include border-left;
 
-         padding-left: var(--padding-standard);
-         margin-left: var(--padding-standard);
+         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-padding-standard);
       }
    }
 </style>

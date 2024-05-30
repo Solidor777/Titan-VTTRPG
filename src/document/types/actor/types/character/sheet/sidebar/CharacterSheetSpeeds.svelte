@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CharacterSheetSpeed from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSpeed.svelte';
 
    // Setup context variables
@@ -31,8 +31,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-padding-standard);
          }
       }
    }

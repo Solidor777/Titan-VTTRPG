@@ -1,12 +1,12 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
    import WeaponSheetAttackSettings from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackSettings.svelte';
-   import { CREATE_ICON } from '~/system/Icons.js';
+   import {CREATE_ICON} from '~/system/Icons.js';
 
    // Setup context variables
    const document = getContext('document');
@@ -116,7 +116,7 @@
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
          }
 
@@ -125,14 +125,14 @@
             @include flex-group-center;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
 
             .button-content {
                @include flex-row;
                @include flex-group-center;
 
                i {
-                  margin-right: var(--padding-standard);
+                  margin-right: var(--titan-padding-standard);
                }
             }
          }

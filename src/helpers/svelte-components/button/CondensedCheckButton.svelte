@@ -102,9 +102,6 @@
          @include flex-group-center;
          @include font-size-normal;
 
-         line-height: normal;
-         padding: var(--padding-standard);
-
          .stat {
             @include flex-row;
             @include flex-group-center;
@@ -113,12 +110,12 @@
                @include border-left;
                @include border-color-button;
 
-               padding-left: var(--padding-standard);
-               margin-left: var(--padding-standard);
+               padding-left: var(--titan-padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
 
             i {
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
             }
          }
       }

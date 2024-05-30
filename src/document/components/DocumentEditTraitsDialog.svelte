@@ -114,8 +114,8 @@
 
          width: 100%;
          height: 40px;
-         margin-bottom: var(--padding-large);
-         padding: var(--padding-standard);
+         margin-bottom: var(--titan-padding-large);
+         padding: var(--titan-padding-standard);
 
          @include font-size-normal;
 
@@ -123,7 +123,7 @@
          page-break-inside: avoid;
 
          &:not(:first-child) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
 
          .label {
@@ -149,7 +149,7 @@
       @include flex-group-center;
 
       width: 100%;
-      margin-top: var(--padding-standard);
+      margin-top: var(--titan-padding-standard);
 
       .button {
          @include flex-row;
@@ -157,10 +157,10 @@
 
          width: 100%;
 
-         --button-border-radius: var(--button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
          &:not(:first-child) {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
       }
    }

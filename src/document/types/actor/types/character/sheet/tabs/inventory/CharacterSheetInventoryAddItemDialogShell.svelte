@@ -45,7 +45,7 @@
 
    <!--Type Select-->
    <div class="select">
-      <Select {options} bind:value/>
+      <Select bind:value {options}/>
    </div>
 
    <!--Buttons-->
@@ -92,7 +92,7 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
       }
 
       .button {
@@ -100,9 +100,9 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
 
-         --button-border-radius: var(--button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
       }
    }
 </style>

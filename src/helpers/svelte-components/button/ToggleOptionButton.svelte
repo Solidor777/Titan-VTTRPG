@@ -7,7 +7,7 @@
 </script>
 
 <div class="toggle enabled-{enabled === true}">
-   <Button on:click {disabled}>
+   <Button {disabled} on:click>
       <div class="label">
          {label}
       </div>
@@ -16,13 +16,13 @@
 
 <style lang="scss">
    .toggle {
-      --button-font-size: var(--font-size-small);
-      --button-padding: var(--padding-standard);
-      --button-line-height: normal;
-      --button-border-radius: var(--button-chat-message-border-radius);
+      --titan-button-font-size: var(--titan-font-size-small);
+      --titan-button-padding: var(--titan-padding-standard);
+      --titan-button-line-height: normal;
+      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
       &.enabled-true {
-         --button-background: var(--active-background);
+         --titan-button-background: var(--titan-active-background);
       }
 
       .label {

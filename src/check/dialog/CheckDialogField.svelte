@@ -27,7 +27,7 @@
 
    <!--Input-->
    <div class="input" on:change>
-      <svelte:component this={input} bind:value {...inputProps}/>
+      <svelte:component {...inputProps} bind:value this={input}/>
    </div>
 </div>
 
@@ -45,17 +45,17 @@
 
          width: 100%;
          font-weight: bold;
-         margin-right: var(--padding-large);
+         margin-right: var(--titan-padding-large);
       }
 
       .input {
          @include flex-group-left;
 
          width: 100%;
-         margin-left: var(--padding-large);
+         margin-left: var(--titan-padding-large);
 
-         --input-height: 28px;
-         --input-padding: 0 8px;
+         --titan-input-height: 28px;
+         --titan-input-padding: 0 8px;
       }
    }
 </style>

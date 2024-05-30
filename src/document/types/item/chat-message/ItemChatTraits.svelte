@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    const document = getContext('document');
@@ -34,9 +34,9 @@
          @include flex-group-center;
          @include border;
 
-         margin: var(--padding-standard);
-         padding: var(--padding-standard);
-         background: var(--label-background);
+         margin: var(--titan-padding-standard);
+         padding: var(--titan-padding-standard);
+         background: var(--titan-label-background);
       }
    }
 </style>

@@ -159,7 +159,7 @@
          @include border-top-bottom-right;
          @include panel-1;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          width: 100%;
          font-weight: bold;
 
@@ -168,7 +168,7 @@
             @include flex-group-center;
 
             .button {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
 
@@ -180,7 +180,7 @@
 
             .button {
                &:not(:first-child) {
-                  margin-left: var(--padding-standard);
+                  margin-left: var(--titan-padding-standard);
                }
             }
          }
@@ -193,16 +193,16 @@
          @include border-bottom-sides;
 
          width: calc(100% - 16px);
-         padding: 0 var(--padding-standard);
+         padding: 0 var(--titan-padding-standard);
 
          .section {
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--padding-large);
+               padding-bottom: var(--titan-padding-large);
 
                &:not(.tags) {
-                  padding-top: var(--padding-large);
+                  padding-top: var(--titan-padding-large);
                }
             }
 

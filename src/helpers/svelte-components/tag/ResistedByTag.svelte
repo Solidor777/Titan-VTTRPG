@@ -20,26 +20,26 @@
       @include border;
       @include label;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       &.reflexes {
-         background: var(--reflexes-color);
+         background: var(--titan-reflexes-color);
       }
 
       &.resilience {
-         background: var(--resilience-color);
+         background: var(--titan-resilience-color);
       }
 
       &.willpower {
-         background: var(--willpower-color);
+         background: var(--titan-willpower-color);
       }
 
       .label {
          @include border-right;
 
          font-weight: bold;
-         padding-right: var(--padding-standard);
-         margin-right: var(--padding-standard);
+         padding-right: var(--titan-padding-standard);
+         margin-right: var(--titan-padding-standard);
       }
    }
 </style>

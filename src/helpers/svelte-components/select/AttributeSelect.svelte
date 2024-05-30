@@ -36,21 +36,21 @@
 </script>
 
 <div class="attribute-select {value}" on:change>
-   <Select {options} bind:value {disabled} />
+   <Select bind:value {disabled} {options}/>
 </div>
 
 <style lang="scss">
    .attribute-select {
       &.body {
-         --input-background: var(--body-color);
+         --titan-input-background: var(--titan-body-color);
       }
 
       &.mind {
-         --input-background: var(--mind-color);
+         --titan-input-background: var(--titan-mind-color);
       }
 
       &.soul {
-         --input-background: var(--soul-color);
+         --titan-input-background: var(--titan-soul-color);
       }
    }
 </style>

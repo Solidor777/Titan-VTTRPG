@@ -134,11 +134,11 @@
          width: 100%;
 
          &.drag-hovered {
-            background: var(--highlight-background);
+            background: var(--titan-highlight-background);
          }
 
          &:not(:first-child) {
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
          }
       }
    }

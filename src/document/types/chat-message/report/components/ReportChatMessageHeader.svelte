@@ -52,10 +52,10 @@
          @include panel-1;
 
          width: 80px;
-         margin-bottom: var(--padding-standard);
+         margin-bottom: var(--titan-padding-standard);
 
          &:not(:first-child) {
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
          }
       }
 
@@ -65,7 +65,7 @@
          @include border;
          @include panel-1;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          .main {
             @include flex-row;
@@ -73,11 +73,11 @@
             @include font-size-large;
 
             width: 100%;
-            margin: var(--padding-standard) 0 var(--padding-standard);
+            margin: var(--titan-padding-standard) 0 var(--titan-padding-standard);
             flex-wrap: wrap;
 
             i {
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
             }
          }
 
@@ -89,7 +89,7 @@
             flex-wrap: wrap;
 
             &:not(:first-child) {
-               margin-top: var(--padding-standard);
+               margin-top: var(--titan-padding-standard);
             }
          }
       }

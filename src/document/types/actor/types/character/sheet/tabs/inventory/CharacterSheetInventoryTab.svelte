@@ -164,7 +164,7 @@
          @include border-bottom;
          @include panel-1;
 
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
          width: 100%;
 
          .row {
@@ -174,19 +174,19 @@
             width: 100%;
 
             &:not(:first-child) {
-               margin-top: var(--padding-standard);
+               margin-top: var(--titan-padding-standard);
             }
 
             .reset {
-               --icon-button-font-size: var(--font-size-small);
-               --icon-button-radius: 28px;
+               --titan-icon-button-font-size: var(--titan-font-size-small);
+               --titan-icon-button-radius: 28px;
 
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
 
             .label {
                font-weight: bold;
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
             }
 
             .input {
@@ -195,12 +195,12 @@
 
             .option {
                &:not(:first-child) {
-                  margin-left: var(--padding-standard);
+                  margin-left: var(--titan-padding-standard);
                }
             }
 
             .add-entry-button {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
       }

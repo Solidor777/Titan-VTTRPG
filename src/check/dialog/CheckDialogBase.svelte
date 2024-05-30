@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { createEventDispatcher } from 'svelte';
+   import {createEventDispatcher} from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
 
    /** @type {*[]} Components for changing the options and displaying the parameters. */
@@ -68,19 +68,19 @@
 
          &:not(:first-child) {
             border-top: solid;
-            padding-top: var(--padding-standard);
-            margin-top: var(--padding-standard);
-            border-width: var(--border-width);
+            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-padding-standard);
+            border-width: var(--titan-border-width);
          }
 
          .button {
             @include flex-row;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
 
             &:not(:first-child) {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
       }

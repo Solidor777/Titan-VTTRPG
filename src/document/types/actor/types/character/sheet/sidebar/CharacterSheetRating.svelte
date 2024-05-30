@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
@@ -85,10 +85,10 @@
       <!--Total Value-->
       <div class="value" use:tooltip={{ content: totalValueTooltip }}>
          <ModTag
-            currentValue={$document.system.rating[key].value}
             baseValue={$document.system.rating[key].baseValue +
                $document.system.rating[key].mod.equipment +
                $document.system.rating[key].mod.ability}
+            currentValue={$document.system.rating[key].value}
          />
       </div>
    </div>
@@ -113,7 +113,7 @@
          height: 100%;
 
          .fas {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
 
@@ -124,7 +124,7 @@
          height: 100%;
 
          :not(:first-child) {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
 
          .input {

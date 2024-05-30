@@ -1,5 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
+
    const document = getContext('document');
 
    // Chat context reference
@@ -13,7 +14,7 @@
       @include flex-row;
       @include flex-group-left;
 
-      padding: 0 var(--padding-large) 0 var(--padding-large);
+      padding: 0 var(--titan-padding-large) 0 var(--titan-padding-large);
 
       @include font-size-normal;
 

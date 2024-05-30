@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    // Chat context reference
@@ -19,6 +19,6 @@
       @include rarity-colors;
 
       font-weight: bold;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
    }
 </style>

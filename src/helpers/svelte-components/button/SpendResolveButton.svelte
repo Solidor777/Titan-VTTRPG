@@ -9,7 +9,7 @@
 </script>
 
 <div class="item-check-button">
-   <Button on:click {disabled}>
+   <Button {disabled} on:click>
       <div class="button-inner">
          <i class="fa fa-bolt"/>
          <div>
@@ -30,10 +30,10 @@
 
          height: 100%;
          line-height: normal;
-         padding: var(--padding-standard);
+         padding: var(--titan-padding-standard);
 
          i {
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
    }

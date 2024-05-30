@@ -36,21 +36,21 @@
 </script>
 
 <div class="resistance-select {value}" on:change>
-   <Select {options} bind:value {disabled} />
+   <Select bind:value {disabled} {options}/>
 </div>
 
 <style lang="scss">
    .resistance-select {
       &.reflexes {
-         --input-background: var(--reflexes-color);
+         --titan-input-background: var(--titan-reflexes-color);
       }
 
       &.resilience {
-         --input-background: var(--resilience-color);
+         --titan-input-background: var(--titan-resilience-color);
       }
 
       &.willpower {
-         --input-background: var(--willpower-color);
+         --titan-input-background: var(--titan-willpower-color);
       }
    }
 </style>

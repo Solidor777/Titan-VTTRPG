@@ -301,15 +301,15 @@
 
          &:not(:first-child) {
             border-top: solid;
-            padding-top: var(--padding-standard);
-            margin-top: var(--padding-standard);
-            border-width: var(--border-width);
+            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-padding-standard);
+            border-width: var(--titan-border-width);
          }
 
          .image {
             width: 80px;
 
-            --border-style: none;
+            --titan-border-style: none;
          }
 
          .label {
@@ -318,28 +318,28 @@
             font-weight: bold;
             height: 100%;
             width: 100%;
-            margin-right: var(--padding-large);
+            margin-right: var(--titan-padding-large);
          }
 
          .input {
             @include flex-group-left;
 
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
             height: 100%;
             width: 100%;
 
-            --input-height: 28px;
-            --input-width: 100%;
+            --titan-input-height: 28px;
+            --titan-input-width: 100%;
          }
 
          .button {
             @include flex-row;
 
             width: 100%;
-            margin-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
 
             &:not(:first-child) {
-               margin-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
             }
          }
       }

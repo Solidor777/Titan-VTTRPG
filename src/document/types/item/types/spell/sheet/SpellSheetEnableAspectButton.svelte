@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
+   import {CHECKED_ICON, UNCHECKED_ICON} from '~/system/Icons.js';
 
    // Value to toggle
    export let enabled = void 0;
@@ -53,13 +53,13 @@
          @include flex-row;
          @include flex-group-left;
 
-         margin-left: var(--padding-large);
+         margin-left: var(--titan-padding-large);
 
          .icon {
             @include flex-row;
             @include flex-group-right;
 
-            margin-left: var(--padding-large);
+            margin-left: var(--titan-padding-large);
          }
       }
 
@@ -68,7 +68,7 @@
          @include flex-group-right;
 
          font-weight: bold;
-         margin-right: var(--padding-large);
+         margin-right: var(--titan-padding-large);
 
          .value {
             @include flex-row;
@@ -78,7 +78,7 @@
 
             height: 24px;
             width: 24px;
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
       }
    }

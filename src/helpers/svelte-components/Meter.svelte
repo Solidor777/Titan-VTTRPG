@@ -13,11 +13,9 @@
    function updateMeterWidth() {
       if (meterWidth < targetMeterWidth) {
          meterWidth = Math.min(meterWidth + meterScaleSpeed, targetMeterWidth);
-      }
-      else if (meterWidth > targetMeterWidth) {
+      } else if (meterWidth > targetMeterWidth) {
          meterWidth = Math.max(meterWidth - meterScaleSpeed, targetMeterWidth);
-      }
-      else {
+      } else {
          clearInterval(meterUpdate);
          meterUpdate = false;
       }
@@ -37,12 +35,12 @@
 
 <style lang="scss">
    .meter {
-      margin-left: var(--padding-standard);
-      margin-right: var(--padding-standard);
+      margin-left: var(--titan-padding-standard);
+      margin-right: var(--titan-padding-standard);
       display: flex;
       height: 24px;
       width: 100%;
-      background: var(--meter-background);
+      background: var(--titan-meter-background);
       border-radius: 25px;
       padding: 3px;
       box-shadow: inset 0 -1px 1px rgb(255 255 255 / 0.3);
@@ -52,8 +50,8 @@
          height: 100%;
          border-radius: 20px;
          background: var(--meter-color);
-         box-shadow: inset 0 2px 9px var(--meter-shadow-1),
-         inset 0 -2px 6px var(--meter-shadow-2);
+         box-shadow: inset 0 2px 9px var(--titan-meter-shadow-1),
+         inset 0 -2px 6px var(--titan-meter-shadow-2);
 
          // overflow: hidden;
       }

@@ -1,6 +1,6 @@
 <script>
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
-   import { DELETE_ICON, EDIT_ICON } from '~/system/Icons.js';
+   import {DELETE_ICON, EDIT_ICON} from '~/system/Icons.js';
 
    export let label = void 0;
    export let deleteFunction = void 0;
@@ -17,30 +17,30 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
-      role="button"
-      tabindex="0"
-      use:tooltip={{ content: editTooltip }}
       class="{EDIT_ICON}"
-      on:keypress={() => {
-         editFunction();
-      }}
       on:click={() => {
          editFunction();
       }}
+      on:keypress={() => {
+         editFunction();
+      }}
+      role="button"
+      tabindex="0"
+      use:tooltip={{ content: editTooltip }}
    />
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
-      role="button"
-      tabindex="0"
-      use:tooltip={{ content: deleteTooltip }}
       class="{DELETE_ICON}"
-      on:keypress={() => {
-         deleteFunction();
-      }}
       on:click={() => {
          deleteFunction();
       }}
+      on:keypress={() => {
+         deleteFunction();
+      }}
+      role="button"
+      tabindex="0"
+      use:tooltip={{ content: deleteTooltip }}
    />
 </div>
 
@@ -52,13 +52,13 @@
       @include label;
 
       font-weight: bold;
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       a {
          @include border-left;
 
-         margin-left: var(--padding-standard);
-         padding-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
+         padding-left: var(--titan-padding-standard);
       }
    }
 </style>

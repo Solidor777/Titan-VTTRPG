@@ -1,8 +1,8 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { CHECKED_ICON, MULTI_ATTACK_ICON, NO_MULTI_ATTCK_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
+   import {CHECKED_ICON, MULTI_ATTACK_ICON, NO_MULTI_ATTCK_ICON, UNCHECKED_ICON} from '~/system/Icons.js';
 
    // Item Reference
    export let item = void 0;
@@ -32,7 +32,7 @@
       height: 100%;
 
       :not(:first-child) {
-         margin-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
       }
    }
 </style>

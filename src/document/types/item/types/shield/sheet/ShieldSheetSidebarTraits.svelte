@@ -1,14 +1,14 @@
 <script>
-   import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
+   import {getContext} from 'svelte';
+   import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { SHIELD_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/shield/ShieldTraits.js';
+   import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import DocumentAddCustomTraitDialog from '~/document/dialogs/DocumentAddCustomTraitDialog';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
-   import { CREATE_ICON, EDIT_ICON } from '~/system/Icons.js';
+   import {CREATE_ICON, EDIT_ICON} from '~/system/Icons.js';
 
    // Application statee reference
    const document = getContext('document');
@@ -97,13 +97,13 @@
          @include flex-row;
          @include flex-group-center;
 
-         margin-top: var(--padding-large);
+         margin-top: var(--titan-padding-large);
 
-         --button-font-size: var(--font-size-small);
-         --button-line-height: 20px;
+         --titan-button-font-size: var(--titan-font-size-small);
+         --titan-button-line-height: 20px;
 
          &:not(:first-child) {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
 
          .button-contents {
@@ -116,7 +116,7 @@
             }
 
             i {
-               margin-right: var(--padding-standard);
+               margin-right: var(--titan-padding-standard);
             }
          }
       }

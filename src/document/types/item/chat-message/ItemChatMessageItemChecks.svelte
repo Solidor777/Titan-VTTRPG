@@ -175,8 +175,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-large);
-            padding-top: var(--padding-large);
+            margin-top: var(--titan-padding-large);
+            padding-top: var(--titan-padding-large);
          }
 
          .button {
@@ -184,7 +184,7 @@
             @include flex-group-center;
 
             &:not(:first-child) {
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
          }
 
@@ -196,7 +196,7 @@
             flex-wrap: wrap;
 
             .tag {
-               margin: var(--padding-large) var(--padding-standard) 0 var(--padding-standard);
+               margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
             }
          }
       }

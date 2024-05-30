@@ -1,6 +1,6 @@
 <script>
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
-   import {getContext} from "svelte";
+   import {getContext} from 'svelte';
 
    /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
@@ -52,7 +52,7 @@
       .button {
          @include tag-margin;
 
-         --button-border-radius: var(--button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
       }
    }
 </style>

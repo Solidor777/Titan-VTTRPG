@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentName from '~/document/components/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
@@ -65,13 +65,13 @@
 
          <!--Input-->
          <div class="input">
-            <DocumentSelect {options} bind:value={$document.system.role}/>
+            <DocumentSelect bind:value={$document.system.role} {options}/>
          </div>
       </div>
 
       <!--Exp-->
       <div class="tag">
-         <StatTag value={$document.system.xp} label={localize('xp')}/>
+         <StatTag label={localize('xp')} value={$document.system.xp}/>
       </div>
    </div>
 
@@ -94,7 +94,7 @@
       @include panel-1;
       @include border;
 
-      padding: var(--padding-standard);
+      padding: var(--titan-padding-standard);
 
       .row {
          @include flex-row;
@@ -105,8 +105,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--padding-standard);
-            padding-top: var(--padding-standard);
+            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-padding-standard);
          }
       }
 
@@ -121,7 +121,7 @@
             @include flex-group-left;
 
             flex: auto;
-            margin-right: var(--padding-standard);
+            margin-right: var(--titan-padding-standard);
          }
       }
 
@@ -132,8 +132,8 @@
          &:not(:first-child) {
             @include border-left;
 
-            margin-left: var(--padding-standard);
-            padding-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
+            padding-left: var(--titan-padding-standard);
          }
 
          .label {
@@ -141,7 +141,7 @@
          }
 
          .input {
-            margin-left: var(--padding-standard);
+            margin-left: var(--titan-padding-standard);
          }
 
          &.text {
@@ -154,7 +154,7 @@
       }
 
       .tag {
-         margin-left: var(--padding-standard);
+         margin-left: var(--titan-padding-standard);
       }
 
       .stats {
@@ -163,8 +163,8 @@
          @include border-top;
 
          width: 100%;
-         margin-top: var(--padding-standard);
-         padding-top: var(--padding-standard);
+         margin-top: var(--titan-padding-standard);
+         padding-top: var(--titan-padding-standard);
 
          .section {
             @include flex-row;
@@ -175,8 +175,8 @@
             &:not(:first-child) {
                @include border-left;
 
-               margin-left: var(--padding-standard);
-               padding-left: var(--padding-standard);
+               margin-left: var(--titan-padding-standard);
+               padding-left: var(--titan-padding-standard);
             }
          }
       }

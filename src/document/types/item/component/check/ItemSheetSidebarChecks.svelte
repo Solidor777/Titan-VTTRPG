@@ -153,10 +153,10 @@
          @include flex-group-top;
 
          width: 100%;
-         margin-left: var(--padding-standard);
-         margin-top: var(--padding-large);
+         margin-left: var(--titan-padding-standard);
+         margin-top: var(--titan-padding-large);
 
-         --border-color: var(--button-border-color);
+         --titan-border-color: var(--titan-button-border-color);
 
          .header {
             @include flex-column;
@@ -166,7 +166,7 @@
             @include label;
 
             width: 100%;
-            padding: var(--padding-standard);
+            padding: var(--titan-padding-standard);
 
             .label {
                @include flex-row;
@@ -191,7 +191,7 @@
                      @include flex-row;
                      @include flex-group-center;
 
-                     margin-right: var(--padding-standard);
+                     margin-right: var(--titan-padding-standard);
                   }
                }
 
@@ -204,7 +204,7 @@
             }
 
             .value {
-               margin-top: var(--padding-standard);
+               margin-top: var(--titan-padding-standard);
             }
          }
 
@@ -214,22 +214,22 @@
             @include border-bottom-sides;
             @include panel-3;
 
-            width: calc(100% - var(--padding-large));
+            width: calc(100% - var(--titan-padding-large));
             flex-wrap: wrap;
-            padding: 0 var(--padding-large) var(--padding-large) var(--padding-large);
+            padding: 0 var(--titan-padding-large) var(--titan-padding-large) var(--titan-padding-large);
 
             .stat {
                @include flex-row;
                @include flex-group-center;
 
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
             }
 
             .labeled-stat {
                @include flex-column;
                @include flex-group-top;
 
-               margin-top: var(--padding-large);
+               margin-top: var(--titan-padding-large);
 
                .label {
                   @include flex-row;
@@ -243,7 +243,7 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-top: var(--padding-standard);
+                  margin-top: var(--titan-padding-standard);
                }
             }
          }
