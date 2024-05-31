@@ -2,6 +2,9 @@
    import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {getContext} from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import {DICE_ICON, EXPERTISE_ICON} from '~/system/Icons.js';
 
    /** @type ChatMessage Reference to the Chat Message document. */
    const document = getContext('document');
@@ -51,9 +54,17 @@
    const disabled = !$document.isOwner ||
       $document.flags.titan.results.expertiseRemaining === 0 ||
       die.final >= 6;
+
+   /** @type string Tooltip to show for the die. */
+   let dieTooltip = disabled ? '' : `<p>${localize('dieButton.desc')}</p>`;
+   if (die.expertiseApplied) {
+      dieTooltip += `<p><i class="${DICE_ICON}"></i> ${localize('roll')}: ${die.base}</p>`;
+      dieTooltip += `<p><i class="${EXPERTISE_ICON}"></i> ${localize('expertise')}: ${die.expertiseApplied}</p>`;
+   }
+
 </script>
 
-<div class={`die ${result}`}>
+<div class={`die ${result}`} use:tooltip={{content: dieTooltip}}>
    <Button {disabled} on:click={applyExpertise}>
       {label}
    </Button>

@@ -104,7 +104,7 @@ function getChatContext(li) {
  * @param li
  */
 function canReRollFailures(li) {
-   // Get chat contextt
+   // Get chat context
    const chatContext = getChatContext(li);
    if (chatContext) {
       // If this is a check that has not re-rolled failures
@@ -184,7 +184,8 @@ async function reRollCheckFailures(li, spendResolve) {
 
    // If there are any failures
    if (failureCount > 0) {
-      chatContext.results.dice = successes.concat(rollCheckDice(failureCount));
+      const rerolledDice = await rollCheckDice(failureCount);
+      chatContext.results.dice = successes.concat(rerolledDice);
       chatContext.results.expertiseRemaining += expertiseToRefund;
 
       // Recalculate the check
@@ -204,9 +205,11 @@ async function reRollCheckFailures(li, spendResolve) {
       if (spendResolve) {
          const actor = getActorFromSpeaker(message.speaker.token, message.speaker.actor);
          if (actor && actor.system.isCharacter) {
-            actor.system.spendResolve(1);
+            actor.system.spendResolve(1, {playSound: false});
          }
       }
+
+      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false});
    }
 }
 
@@ -256,8 +259,9 @@ async function doubleTraining(li, spendResolve) {
       chatContext.parameters.doubleTraining = true;
 
       // Roll the new dice and update the message
+      const newTrainingDice = await rollCheckDice(chatContext.parameters.totalTrainingDice);
       chatContext.results.dice =
-         chatContext.results.dice.concat(rollCheckDice(chatContext.parameters.totalTrainingDice));
+         chatContext.results.dice.concat(newTrainingDice);
       chatContext.results.totalDice += chatContext.parameters.totalTrainingDice;
       chatContext.parameters.totalTrainingDice *= 2;
       await message.update({
@@ -270,9 +274,11 @@ async function doubleTraining(li, spendResolve) {
       if (spendResolve) {
          const actor = getActorFromSpeaker(message.speaker.token, message.speaker.actor);
          if (actor && actor.system.isCharacter) {
-            actor.system.spendResolve(1);
+            actor.system.spendResolve(1, {playSound: false});
          }
       }
+
+      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false});
    }
 }
 

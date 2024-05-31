@@ -126,44 +126,6 @@
    }
 }
 
-@mixin button-top {
-   box-sizing: border-box;
-   display: flex;
-   flex-direction: row;
-   align-items: center;
-   justify-content: center;
-   text-align: center;
-   border-right: var(--titan-button-border-style);
-   border-left: var(--titan-button-border-style);
-   border-bottom: var(--titan-button-border-style);
-   border-bottom-right-radius: var(--titan-button-border-radius);
-   border-bottom-left-radius: var(--titan-button-border-radius);
-   border-width: var(--titan-button-border-width);
-   border-color: var(--titan-button-border-color);
-   background: var(--titan-button-background);
-   font-size: var(--titan-button-font-size);
-   font-weight: var(--titan-button-font-weight);
-   padding: var(--titan-button-padding);
-   color: var(--titan-button-color);
-   width: var(--titan-button-width);
-   height: var(--titan-button-height);
-   line-height: var(--titan-button-line-height);
-   margin: 0;
-
-   &:disabled {
-      cursor: default;
-      background: var(--titan-button-background-disabled);
-      color: var(--titan-button-color-disabled);
-   }
-
-   &:hover {
-      &:not(:disabled) {
-         background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
-         color: var(--titan-button-color-disabled);
-      }
-   }
-}
-
 @mixin icon-button {
    box-sizing: border-box;
    display: flex;

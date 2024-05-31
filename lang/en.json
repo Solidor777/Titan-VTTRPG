@@ -193,6 +193,7 @@
       "details.label": "Details",
       "dexterity.desc.label": "<p><strong>Dexterity</strong> measures your ability to perform tasks requiring coordination, grace, and flexibility.</p>",
       "dexterity.label": "Dexterity",
+      "dieButton.desc.label": "Click to spend Expertise.",
       "dice.label": "Dice",
       "diceMod.label": "Dice Mod",
       "dieMod.label": "Die Mod",
