@@ -1,6 +1,5 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import CreateItemMacroDialogShell from '~/document/types/item/dialog/CreateItemMacroDialogShell.svelte';
-import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
 
 /**
@@ -16,18 +15,17 @@ export default class CreateItemMacroDialog extends TitanDialog {
     */
    constructor(item, slot, uuid) {
       super({
-            title: `${localize('createMacro')} (${item.name})`,
-            content: {
-               class: CreateItemMacroDialogShell,
-               props: {
-                  item: item,
-                  slot: slot,
-                  uuid: uuid
-               },
+         title: `${localize('createMacro')} (${item.name})`,
+         content: {
+            class: CreateItemMacroDialogShell,
+            props: {
+               item: item,
+               slot: slot,
+               uuid: uuid
             },
-            id: `titan-create-macro-dialog-${item._id}-${generateUUID()}`,
-         }
-      );
+         },
+         id: `titan-create-macro-dialog-${item._id}`,
+      });
    }
 
    _getDialogClasses() {

@@ -1,5 +1,5 @@
-import DocumentAddCustomTraitDialog from '~/document/dialogs/DocumentAddCustomTraitDialog';
-import DocumentEditCustomTraitDialog from '~/document/dialogs/DocumentEditCustomTraitDialog';
+import AddCustomTraitDialog from '~/document/types/item/dialog/AddCustomTraitDialog.js';
+import EditCustomTraitDialog from '~/document/types/item/dialog/EditCustomTraitDialog.js';
 import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
@@ -171,7 +171,7 @@ export default class TitanItem extends Item {
     */
    addCustomTrait() {
       if (this.isOwner) {
-         const dialog = new DocumentAddCustomTraitDialog(this);
+         const dialog = new AddCustomTraitDialog(this);
          dialog.render(true);
       }
    }
@@ -182,7 +182,7 @@ export default class TitanItem extends Item {
     */
    editCustomTrait(traitIdx) {
       if (this.isOwner) {
-         const dialog = new DocumentEditCustomTraitDialog(this, traitIdx);
+         const dialog = new EditCustomTraitDialog(this, traitIdx);
          dialog.render(true);
       }
    }

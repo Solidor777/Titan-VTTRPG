@@ -6,10 +6,9 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createWeaponAttackTemplate from '~/document/types/item/types/weapon/WeaponAttack.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
 import {WEAPON_IMAGE} from '~/system/DefaultImages.js';
-import WeaponEditAttackTraitsDialog from '~/document/types/item/types/weapon/dialogs/WeaponEditAttackTraitsDialog.js';
-import WeaponAddCustomAttackTraitDialog
-   from '~/document/types/item/types/weapon/dialogs/WeaponAddCustomAttackTraitDialog.js';
-import WeaponEditCustomTraitDialog from '~/document/types/item/types/weapon/dialogs/WeaponEditCustomTraitDialog.js';
+import EditAttackTraitsDialog from '~/document/types/item/types/weapon/dialog/EditAttackTraitsDialog.js';
+import AddCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/AddCustomAttackTraitDialog.js';
+import EditCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/EditCustomAttackTraitDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
@@ -70,7 +69,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    editAttackTraits(attackIdx) {
       if (this.parent.isOwner) {
-         const dialog = new WeaponEditAttackTraitsDialog(this.parent, attackIdx);
+         const dialog = new EditAttackTraitsDialog(this.parent, attackIdx);
          dialog.render(true);
       }
    }
@@ -81,7 +80,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
-         const dialog = new WeaponAddCustomAttackTraitDialog(this.parent, attackIdx);
+         const dialog = new AddCustomAttackTraitDialog(this.parent, attackIdx);
          dialog.render(true);
       }
    }
@@ -93,7 +92,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
-         const dialog = new WeaponEditCustomTraitDialog(this.parent, attackIdx, traitIdx);
+         const dialog = new EditCustomAttackTraitDialog(this.parent, attackIdx, traitIdx);
          dialog.render(true);
       }
    }

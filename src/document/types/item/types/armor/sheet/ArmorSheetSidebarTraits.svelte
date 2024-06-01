@@ -6,7 +6,6 @@
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import DocumentAddCustomTraitDialog from '~/document/dialogs/DocumentAddCustomTraitDialog';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
    import {CREATE_ICON, EDIT_ICON} from '~/system/Icons.js';
 
@@ -36,9 +35,7 @@
    <div class="button">
       <Button
          on:click={() => {
-            const dialog = new DocumentAddCustomTraitDialog($document);
-            dialog.render(true);
-         }}
+            $document.addCustomTrait()}}
       >
          <div class="button-contents">
             <i class="{CREATE_ICON}"/>

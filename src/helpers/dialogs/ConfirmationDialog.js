@@ -1,5 +1,4 @@
 import ConfirmationDialogShell from '~/helpers/dialogs/ConfirmationDialogShell.svelte';
-import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
 
 /**
@@ -15,7 +14,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 export default class ConfirmationDialog extends TitanDialog {
    /**
     * Generic class for creating a confirmation dialog.
-    * @param {string} title - Dialog title.
+    * @param {string} title - The title for the Dialog.
     * @param {string[]} headers - Header lines.
     * @param {string} message - Message explaining the dialog.
     * @param {string} confirmLabel - Label for the confirmation button.
@@ -29,20 +28,18 @@ export default class ConfirmationDialog extends TitanDialog {
       confirmLabel,
       confirmationCallback,
       confirmationContext) {
-      super(
-         {
-            title: title,
-            content: {
-               class: ConfirmationDialogShell,
-               props: {
-                  headers: headers,
-                  message: message,
-                  confirmLabel: confirmLabel,
-               },
+      super({
+         title: title,
+         content: {
+            class: ConfirmationDialogShell,
+            props: {
+               headers: headers,
+               message: message,
+               confirmLabel: confirmLabel,
             },
-            id: `titan-confirmation-dialog-${generateUUID()}`,
          },
-      );
+         id: `titan-confirmation-dialog`,
+      });
 
       // If we were provided with a callback context then bind the function to the context
       if (confirmationContext) {

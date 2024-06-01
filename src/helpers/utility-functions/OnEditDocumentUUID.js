@@ -1,4 +1,4 @@
-import EditUUIDDialog from '~/document/dialogs/EditUUIDDialog.js';
+import EditUUIDDialog from '~/document/dialog/EditUUIDDialog.js';
 
 /**
  * Called when the user chooses to edit the UUID of an Actor or Item.

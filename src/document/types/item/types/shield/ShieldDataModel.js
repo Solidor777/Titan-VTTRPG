@@ -3,8 +3,8 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
-import ShieldEditTraitsDialog from '~/document/types/item/types/shield/ShieldEditTraitsDialog.js';
-import { SHIELD_IMAGE } from '~/system/DefaultImages.js';
+import EditShieldTraitsDialog from '~/document/types/item/types/shield/dialog/EditShieldTraitsDialog.js';
+import {SHIELD_IMAGE} from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
@@ -53,7 +53,7 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
     */
    editShieldTraits() {
       if (this.parent.isOwner) {
-         const dialog = new ShieldEditTraitsDialog(this.parent);
+         const dialog = new EditShieldTraitsDialog(this.parent);
          dialog.render(true);
       }
    }

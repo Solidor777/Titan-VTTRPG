@@ -4,8 +4,8 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import { ARMOR_IMAGE } from '~/system/DefaultImages.js';
-import ArmorEditTraitsDialog from '~/document/types/item/types/armor/dialog/ArmorEditTraitsDialog.js';
+import {ARMOR_IMAGE} from '~/system/DefaultImages.js';
+import EditArmorTraitsDialog from '~/document/types/item/types/armor/dialog/EditArmorTraitsDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
@@ -57,7 +57,7 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
     */
    editArmorTraits() {
       if (this.parent.isOwner) {
-         const dialog = new ArmorEditTraitsDialog(this.parent);
+         const dialog = new EditArmorTraitsDialog(this.parent);
          dialog.render(true);
       }
    }

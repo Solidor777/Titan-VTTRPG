@@ -172,7 +172,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Creates a dialog for configuring the sheet.
-    * @param {object} event - Event from clicking the buttons.
+    * @param {Event} event - The DOM Event from clicking the button.
     * @returns {Application} The newly created Document Sheet Config dialog.
     * @protected
     */
@@ -249,7 +249,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
    /**
     * Define whether a user is able to begin a dragstart workflow for a given drag selector.
     * @param {string} selector - The candidate HTML selector for dragging.
-    * @returns {boolean} Can the current user drag this selector?
+    * @returns {boolean} Whether the current user drag this selector.
     * @protected
     */
    _canDragStart(selector) {
@@ -259,7 +259,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
    /**
     * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector.
     * @param {string} selector - The candidate HTML selector for the drop target.
-    * @returns {boolean} Can the current user drop on this selector?
+    * @returns {boolean} Whether current user can drop on this selector.
     * @protected
     */
    _canDragDrop(selector) {

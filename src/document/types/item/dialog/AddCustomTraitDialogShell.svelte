@@ -9,7 +9,7 @@
    import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 
    // The document owning the trait
-   export let document = void 0;
+   export let item = void 0;
 
    // Application reference
    const application = getApplication();
@@ -20,12 +20,12 @@
     *
     */
    function addTrait() {
-      const customTrait = document.system.customTrait;
+      const customTrait = item.system.customTrait;
 
       if (customTrait) {
          customTrait.push(newTrait);
 
-         document.update({
+         item.update({
             system: {
                customTrait: customTrait,
             },

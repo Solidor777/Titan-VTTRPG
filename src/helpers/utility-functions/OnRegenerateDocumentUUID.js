@@ -1,4 +1,4 @@
-import ConfirmRegenerateUUIDDialog from '~/document/dialogs/ConfirmRegenerateUUIDDialog.js';
+import ConfirmRegenerateUUIDDialog from '~/document/dialog/ConfirmRegenerateUUIDDialog.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import regenerateDocumentUUID from '~/helpers/utility-functions/RegenerateDocumentUUID.js';
 

@@ -46,6 +46,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
+import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 
 /**
  * Actor data model with extra functionality for Characters.
@@ -5649,5 +5650,13 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       return retVal;
+   }
+
+   /**
+    * Creates a dialog for adding an item to this Character's inventory.
+    * @returns {Promise<Application>} The newly created dialog.
+    */
+   async addInventoryItem() {
+      return new AddInventoryItemDialog(this.parent).render(true);
    }
 }

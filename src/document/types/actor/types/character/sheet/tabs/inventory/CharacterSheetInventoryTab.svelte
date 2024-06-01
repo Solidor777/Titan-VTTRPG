@@ -1,6 +1,5 @@
 <script>
    import {getContext} from 'svelte';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
@@ -24,7 +23,9 @@
 
    // Application reference
    const appState = getContext('applicationState');
-   const application = getApplication();
+
+   /** @type Document Reference to the Document this Application is for. */
+   const document = getContext('document');
 
    const itemComponents = {
       weapon: CharacterSheetWeapon,
@@ -90,10 +91,11 @@
          <!--Add Item Button-->
          <div class="add-entry-button">
             <CharacterSheetTabHeaderButton
+               disabled={!$document.isOwner}
                icon={CREATE_ICON}
                label={localize('addNewItem')}
                on:click={() => {
-                  application.addInventoryItem();
+                  $document.system.addInventoryItem();
                }}
             />
          </div>

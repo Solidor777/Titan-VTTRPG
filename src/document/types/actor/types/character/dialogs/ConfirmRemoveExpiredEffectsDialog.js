@@ -10,9 +10,9 @@ export default class ConfirmRemoveExpiredEffectsDialog extends ConfirmationDialo
    /**
     * Creates a confirmation dialog for confirming removing expired Effects from the Actor.
     * @param {TitanActor} actor - The Actor to remove expired Effects from.
-    * @param callback
+    * @augments ConfirmationDialog
     */
-   constructor(actor, callback) {
+   constructor(actor) {
       super(
          localize('removeExpiredEffects'),
          [actor.name],
@@ -26,9 +26,5 @@ export default class ConfirmRemoveExpiredEffectsDialog extends ConfirmationDialo
       );
 
       this.actor = actor;
-   }
-
-   async onConfirmed() {
-
    }
 }

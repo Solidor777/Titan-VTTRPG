@@ -1,7 +1,6 @@
 import {writable} from 'svelte/store';
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
-import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import CheckDialogShell from '~/check/dialog/CheckDialogShell.svelte';
 import CastingCheckDialogShell from '~/check/types/casting-check/dialog/CastingCheckDialogShell.svelte';
 
@@ -21,6 +20,7 @@ export default class CastingCheckDialog extends TitanDialog {
     * @param {CastingCheckParameters} checkParameters - The initial parameters for the check,
     * calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
+    * @augments TitanDialog
     */
    constructor(checkOptions, checkParameters, actor) {
       super({
@@ -34,7 +34,7 @@ export default class CastingCheckDialog extends TitanDialog {
                checkParameters: writable(checkParameters),
             },
          },
-         id: `titan-casting-check-dialog-${actor._id}-${generateUUID()}`,
+         id: `titan-casting-check-dialog-${actor._id}`,
       });
    }
 

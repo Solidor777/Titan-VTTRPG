@@ -8,8 +8,8 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   /** @type Document The Document to edit the traits of. */
-   export let document = void 0;
+   /** @type TitanItem The Item to edit the Traits of. */
+   export let item = void 0;
 
    /** @type object[] The traits to be edited. */
    export let documentTraits = void 0;
@@ -38,7 +38,7 @@
     */
    function applyTraitEdits() {
       // If the document and traits are still valid
-      if (document && documentTraits) {
+      if (item && documentTraits) {
 
          // Set the document's traits to equal the active traits from the trait options
          documentTraits = traitOptions.filter((trait) =>
@@ -47,8 +47,8 @@
          );
 
          // Update the document
-         document.update({
-            system: document.system
+         item.update({
+            system: item.system
          });
       }
 

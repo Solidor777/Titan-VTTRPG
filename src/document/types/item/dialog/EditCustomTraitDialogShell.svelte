@@ -8,25 +8,25 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    // The document document owning the trait
-   export let document = void 0;
+   export let item = void 0;
 
    // Application reference
    const application = getApplication();
 
    export let traitIdx = void 0;
 
-   const trait = document.system.customTrait[traitIdx];
+   const trait = item.system.customTrait[traitIdx];
 
    /**
     *
     */
    function editTrait() {
-      const customTrait = document.system.customTrait;
+      const customTrait = item.system.customTrait;
 
       if (customTrait && customTrait[traitIdx]) {
          customTrait[traitIdx] = trait;
 
-         document.update({
+         item.update({
             system: {
                customTrait: customTrait,
             },

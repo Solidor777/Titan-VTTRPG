@@ -3,7 +3,6 @@
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import DocumentAddCustomTraitDialog from '~/document/dialogs/DocumentAddCustomTraitDialog';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
    import {CREATE_ICON} from '~/system/Icons.js';
 
@@ -16,8 +15,7 @@
    <div class="button">
       <Button
          on:click={() => {
-            const dialog = new DocumentAddCustomTraitDialog($document);
-            dialog.render(true);
+            $document.addCustomTrait();
          }}
       >
          <div class="button-contents">
