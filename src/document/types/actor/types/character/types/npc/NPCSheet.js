@@ -17,8 +17,7 @@ export default class TitanNPCSheet extends TitanCharacterSheet {
          },
       });
    }
-
-   // Add the npc sheet class
+   
    _getSheetClasses() {
       const retVal = super._getSheetClasses();
       retVal.push('titan-npc-sheet');

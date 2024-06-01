@@ -86,128 +86,131 @@ export default class CharacterDataModel extends ActorDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Gets a schema field formatted as a mod for a Character state (skills, attributes, resistances, etc.).
       /**
-       *
+       * Creates a schema field formatted as a mod for a Character state (Skills, Attributes, Resistances, etc.).
+       * @returns {SchemaField} A schema field formatted as a mod for a Character state.
        */
-      function getStatModSchema() {
+      function createStatModField() {
          return createSchemaField({
             static: createIntegerField(0),
          });
       }
 
-      // Gets a schema field formatted as a Character attribute (body, mind, or soul).
       /**
-       * @param initial
+       * Creates a schema field formatted as a base stat for the Character (Attributes, Speeds, etc.).
+       * @param {number?} initial - The initial value of the schema field.
+       * @returns {SchemaField} A schema field formatted as a base stat for the Character.
        */
-      function getBaseStatSchema(initial) {
+      function createBaseStatField(initial) {
          return createSchemaField({
             baseValue: createIntegerField(initial),
-            mod: getStatModSchema(),
+            mod: createStatModField(),
          });
       }
 
-      // Gets a schema field formatted as a Character resistance (reflexes, resilience, or willpower).
       /**
-       *
+       * Creates a schema field formatted as a derived stat for the Character (Resistances, Ratings, etc.).
+       * @returns {SchemaField} A schema field formatted as a derived stat for the Character.
        */
-      function getDerivedStatSchema() {
+      function createDerivedStatField() {
          return createSchemaField({
-            mod: getStatModSchema(),
+            mod: createStatModField(),
          });
       }
 
-      // Gets a schema field formatted as a Character skill (athletics, perception, etc.).
       /**
-       * @param defaultAttribute
+       * Creates a schema field formatted as a Character Akill (Athletics, Perception, etc.).
+       * @param {string} defaultAttribute - The default Attribute to be used when rolling the Skill.
+       * @returns {SchemaField} A schema field formatted as a Character Skill.
        */
-      function getSkillSchema(defaultAttribute) {
+      function createSkillSchema(defaultAttribute) {
          return createSchemaField({
             defaultAttribute: createStringField(defaultAttribute),
-            training: getBaseStatSchema(),
-            expertise: getBaseStatSchema(),
+            training: createBaseStatField(),
+            expertise: createBaseStatField(),
          });
       }
 
-      // Gets a schema field formatted as a Character resource (stamina, resolve, or wounds).
       /**
-       * @param initial
+       * Creates a schema field formatted as a Character Resource (Stamina, Resolve, or Wounds).
+       * @param {number} initial - The initial value of the field.
+       * @returns {SchemaField} A schema field formatted as a Character Resource.
        */
-      function getResourceSchema(initial) {
+      function createResourceSchema(initial) {
          return createSchemaField({
             value: createIntegerField(initial),
-            mod: getStatModSchema(),
+            mod: createStatModField(),
          });
       }
 
       // Add attributes
       schema.attribute = createSchemaField({
-         body: getBaseStatSchema(1),
-         mind: getBaseStatSchema(1),
-         soul: getBaseStatSchema(1),
+         body: createBaseStatField(1),
+         mind: createBaseStatField(1),
+         soul: createBaseStatField(1),
       });
 
       // Add resistances
       schema.resistance = createSchemaField({
-         reflexes: getDerivedStatSchema(1),
-         resilience: getDerivedStatSchema(1),
-         willpower: getDerivedStatSchema(1),
+         reflexes: createDerivedStatField(),
+         resilience: createDerivedStatField(),
+         willpower: createDerivedStatField(),
       });
 
       // Add skills
       schema.skill = createSchemaField({
-         arcana: getSkillSchema(getSetting('defaultAttribute.arcana')),
-         athletics: getSkillSchema(getSetting('defaultAttribute.athletics')),
-         deception: getSkillSchema(getSetting('defaultAttribute.deception')),
-         dexterity: getSkillSchema(getSetting('defaultAttribute.dexterity')),
-         diplomacy: getSkillSchema(getSetting('defaultAttribute.diplomacy')),
-         engineering: getSkillSchema(getSetting('defaultAttribute.engineering')),
-         intimidation: getSkillSchema(getSetting('defaultAttribute.intimidation')),
-         investigation: getSkillSchema(getSetting('defaultAttribute.investigation')),
-         lore: getSkillSchema(getSetting('defaultAttribute.lore')),
-         medicine: getSkillSchema(getSetting('defaultAttribute.medicine')),
-         meleeWeapons: getSkillSchema(getSetting('defaultAttribute.meleeWeapons')),
-         metaphysics: getSkillSchema(getSetting('defaultAttribute.metaphysics')),
-         nature: getSkillSchema(getSetting('defaultAttribute.nature')),
-         perception: getSkillSchema(getSetting('defaultAttribute.perception')),
-         performance: getSkillSchema(getSetting('defaultAttribute.performance')),
-         rangedWeapons: getSkillSchema(getSetting('defaultAttribute.rangedWeapons')),
-         subterfuge: getSkillSchema(getSetting('defaultAttribute.subterfuge')),
-         stealth: getSkillSchema(getSetting('defaultAttribute.stealth')),
+         arcana: createSkillSchema(getSetting('defaultAttribute.arcana')),
+         athletics: createSkillSchema(getSetting('defaultAttribute.athletics')),
+         deception: createSkillSchema(getSetting('defaultAttribute.deception')),
+         dexterity: createSkillSchema(getSetting('defaultAttribute.dexterity')),
+         diplomacy: createSkillSchema(getSetting('defaultAttribute.diplomacy')),
+         engineering: createSkillSchema(getSetting('defaultAttribute.engineering')),
+         intimidation: createSkillSchema(getSetting('defaultAttribute.intimidation')),
+         investigation: createSkillSchema(getSetting('defaultAttribute.investigation')),
+         lore: createSkillSchema(getSetting('defaultAttribute.lore')),
+         medicine: createSkillSchema(getSetting('defaultAttribute.medicine')),
+         meleeWeapons: createSkillSchema(getSetting('defaultAttribute.meleeWeapons')),
+         metaphysics: createSkillSchema(getSetting('defaultAttribute.metaphysics')),
+         nature: createSkillSchema(getSetting('defaultAttribute.nature')),
+         perception: createSkillSchema(getSetting('defaultAttribute.perception')),
+         performance: createSkillSchema(getSetting('defaultAttribute.performance')),
+         rangedWeapons: createSkillSchema(getSetting('defaultAttribute.rangedWeapons')),
+         subterfuge: createSkillSchema(getSetting('defaultAttribute.subterfuge')),
+         stealth: createSkillSchema(getSetting('defaultAttribute.stealth')),
       });
 
       // Add ratings
       schema.rating = createSchemaField({
-         awareness: getDerivedStatSchema(),
-         defense: getDerivedStatSchema(),
-         melee: getDerivedStatSchema(),
-         accuracy: getDerivedStatSchema(),
-         initiative: getDerivedStatSchema(),
+         awareness: createDerivedStatField(),
+         defense: createDerivedStatField(),
+         melee: createDerivedStatField(),
+         accuracy: createDerivedStatField(),
+         initiative: createDerivedStatField(),
       });
 
       // Add resources
       schema.resource = createSchemaField({
-         stamina: getResourceSchema(Math.ceil(3 * getSetting('staminaBaseMultiplier'))),
-         resolve: getResourceSchema(Math.ceil(1 * getSetting('resolveBaseMultiplier'))),
-         wounds: getResourceSchema(0),
+         stamina: createResourceSchema(Math.ceil(3 * getSetting('staminaBaseMultiplier'))),
+         resolve: createResourceSchema(Math.ceil(1 * getSetting('resolveBaseMultiplier'))),
+         wounds: createResourceSchema(0),
       });
 
       // Add speeds
       schema.speed = createSchemaField({
-         stride: getBaseStatSchema(),
-         fly: getBaseStatSchema(),
-         climb: getBaseStatSchema(),
-         swim: getBaseStatSchema(),
-         burrow: getBaseStatSchema(),
+         stride: createBaseStatField(),
+         fly: createBaseStatField(),
+         climb: createBaseStatField(),
+         swim: createBaseStatField(),
+         burrow: createBaseStatField(),
       });
 
       // Add mods
       schema.mod = createSchemaField({
-         armor: getDerivedStatSchema(),
-         damage: getDerivedStatSchema(),
-         healing: getDerivedStatSchema(),
-         resolveRegain: getDerivedStatSchema(),
-         woundRegain: getDerivedStatSchema(),
+         armor: createDerivedStatField(),
+         damage: createDerivedStatField(),
+         healing: createDerivedStatField(),
+         resolveRegain: createDerivedStatField(),
+         woundRegain: createDerivedStatField(),
       });
 
       // Add equipment
@@ -387,7 +390,8 @@ export default class CharacterDataModel extends ActorDataModel {
     */
    _resetDynamicMods() {
       /**
-       * @param mods
+       * Resets the Mods of a mod object to 0.
+       * @param {object} mods - Mod object to reset.
        */
       function resetMods(mods) {
          mods.equipment = 0;
@@ -439,21 +443,23 @@ export default class CharacterDataModel extends ActorDataModel {
    _applyRulesElements() {
       // Get all the Rules Elements.
       const rulesElements = [];
+
+      /**
+       * Copies the Rules Elements from an item to the Rules Elements array.
+       * @param {TitanItem} item - The Item to copy the Rules Elements from.
+       * @param {string} type - The type by which to categorize the items Rules Elements (ability, equipment, or effect).
+       */
+      function processItemElements(item, type) {
+         const copiedElements = foundry.utils.deepClone(item.system.rulesElement);
+         for (const element of copiedElements) {
+            element.type = type;
+         }
+         rulesElements.push(...copiedElements);
+      }
+
       this.parent.items.forEach((item) => {
          if (item.system.rulesElement && item.system.rulesElement.length > 0) {
 
-            // Copies the elements from an item and sets their source type accordingly
-            /**
-             * @param item
-             * @param type
-             */
-            function processItemElements(item, type) {
-               const copiedElements = foundry.utils.deepClone(item.system.rulesElement);
-               for (const element of copiedElements) {
-                  element.type = type;
-               }
-               rulesElements.push(...copiedElements);
-            }
 
             // Equipment, armor, shields, and weapons only apply elements if they are equipped.
             // Abilities and effects should apply their Rules Elements as normal.
@@ -1310,9 +1316,9 @@ export default class CharacterDataModel extends ActorDataModel {
       // Get a reference to the parent system data
       const systemData = this;
 
-      // Helper function for applying the mods
       /**
-       * @param stat
+       * Applies mods to a stat's final value.
+       * @param {object} stat - The stat to apply mods to.
        */
       function applyMods(stat) {
 
@@ -1323,15 +1329,15 @@ export default class CharacterDataModel extends ActorDataModel {
          }
       }
 
-      // Helper function for applying mods with multiple lowers
       /**
-       * @param stats
+       * Applies mods to the final value of a stat with nested stats.
+       * @param {object} stat - The stat to apply mods to.
        */
-      function applyModsDeep(stats) {
+      function applyModsDeep(stat) {
 
          // Apply mods to each stat in the stats object
-         for (const stat of Object.values(stats)) {
-            applyMods(stat);
+         for (const nestedState of Object.values(stat)) {
+            applyMods(nestedState);
          }
       }
 
@@ -2781,9 +2787,10 @@ export default class CharacterDataModel extends ActorDataModel {
          aspect.label = localize(aspect.unit ?? aspect.label);
       }
 
-      // Process each aspect
       /**
-       * @param aspects
+       * Converts each provided aspect into a format suitable for being read by the check, and adds them to
+       * parameter's aspects.
+       * @param {object[]} aspects - Array of aspects to process.
        */
       function processAspects(aspects) {
 
@@ -3294,7 +3301,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * Helper function for applying attribute and skill modifiers to a check.
     * Not used by every check, but the logic is common among most.
     * @param {AttributeCheckParameters} parameters - The check parameters. Will be modified by this function.
-    * @param {object} actorRollData - The actor roll data.
+    * @param {object} actorRollData - Roll Data of the Actor, used to determine the Training and Attribute bonuses.
     * @private
     */
    _initializeAttributeBasedCheck(parameters, actorRollData) {
@@ -3469,7 +3476,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * Appends all check messages that apply to checks of a specific type (Attack, Attribute, Any, etc.) that use this
     * check's Attribute.
     * @param {object} categoryMessages - All messages that apply to a specific category of checks.
-    * @param {AttributeCheckParameters} parameters - Parameters for the check.
+    * @param {AttributeCheckParameters} parameters - The parameters of the Check, used to find appropriate messages.
     * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
@@ -3496,7 +3503,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * Appends all check messages that apply to checks of a specific type (Attack, Attribute, Any, etc.) that use this
     * check's Skill.
     * @param {object} categoryMessages - All messages that apply to a specific category of checks.
-    * @param {AttributeCheckParameters} parameters - Parameters for the check.
+    * @param {AttributeCheckParameters} parameters - The parameters of the Check, used to find appropriate messages.
     * @param {string[]} outMessages - Array of messages to append the retrieved messages to.
     * @private
     */
@@ -4203,7 +4210,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string} actorImg The character's image.
     * @property {string} actorName The character's name.
     * @property {string} armorImg The armor's image.
-    * @property {string} armorName The armor's name.
+    * @property {string} armorName The armor's display name.
     * @property {number?} armorLost The amount of Armor lost.
     */
 
@@ -4312,7 +4319,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @property {string} actorImg The character's image.
     * @property {string} actorName The character's name.
     * @property {string} armorImg The armor's image.
-    * @property {string} armorName The armor's name.
+    * @property {string} armorName The armor's display name.
     * @property {number} armorRepaired The amount of Armor repaired.
     */
 

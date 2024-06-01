@@ -41,8 +41,7 @@ export default class PlayerDataModel extends CharacterDataModel {
       super.prepareDerivedData();
       this.xp.available = this.xp.earned - this._getSpentXP();
    }
-
-
+   
    /**
     * Toggles Inspiration on and off for this Player Character.
     * @returns {Promise<void>}
