@@ -1,6 +1,6 @@
 /**
  * Calculated parameters for the creation of a new Attack Check, based off an Actor's data.
- * @typedef {object} AttackCheckParameters
+ * @typedef {CheckParameters} AttackCheckParameters
  * @property {boolean} cleave Whether this check is a Cleave attack.
  * @property {boolean} doubleExpertise Whether to double the Expertise applied..
  * @property {boolean} doubleTraining Whether to double the Training applied.
@@ -40,7 +40,6 @@
  * @property {string} itemName The name of the item being rolled.
  * @property {string} skill The Skill to use for the Check.
  * @property {string} type The Type of Attack being performed (Melee or Ranged).
- * @augments CheckParameters
  */
 
 /**

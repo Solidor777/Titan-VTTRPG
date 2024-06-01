@@ -2,7 +2,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
 
 /**
  * Results of an item check.
- * @typedef {object} ItemCheckResults
+ * @typedef {CheckResults} ItemCheckResults
  * @property {boolean} succeeded Whether the Check Succeeded.
  * @property {CheckDie[]} dice The sorted dice rolled for the check, after Expertise is applied.
  * @property {number} criticalFailures The number of Critical Failures rolled.
@@ -13,7 +13,6 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} healing The amount of Healing applied.
  * @property {number} successes The total number of Successes achieved.
  * @property {number} opposedCheckComplexity The Complexity of the Opposed check, if any.
- * @augments CheckResults
  */
 
 /**

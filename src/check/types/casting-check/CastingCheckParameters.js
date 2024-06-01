@@ -10,7 +10,7 @@
 
 /**
  * Calculated parameters for the creation of a new Casting Check, based off an Actor's data.
- * @typedef {object} CastingCheckParameters
+ * @typedef {CheckParameters} CastingCheckParameters
  * @property {boolean} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean} doubleTraining Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
@@ -41,7 +41,6 @@
  * @property {string} itemName The name of the item being rolled.
  * @property {string} skill The Skill to use for the Check.
  * @property {string} tradition The tradition of the spell being rolled.
- * @augments CheckParameters
  */
 
 /**

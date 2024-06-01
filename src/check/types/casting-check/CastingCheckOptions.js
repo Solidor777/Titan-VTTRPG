@@ -1,6 +1,6 @@
 /**
  * Options for requesting a Casting Check from an Actor.
- * @typedef {object} CastingCheckOptions
+ * @typedef {CheckOptions} CastingCheckOptions
  * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean?} doubleTraining Whether to double the Training applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
@@ -15,7 +15,6 @@
  * @property {string?} attribute The Attribute to use for the Check.
  * @property {string} itemId The the ID of the spell being cast for the attack.
  * @property {string?} skill The Skill to use for the Check.
- * @augments CheckOptions
  */
 
 /**

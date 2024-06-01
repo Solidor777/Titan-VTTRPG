@@ -7,7 +7,7 @@
 
 /**
  * Options for requesting an Item Check from an Actor.
- * @typedef {object} ItemCheckParameters
+ * @typedef {CheckParameters} ItemCheckParameters
  * @property {object|boolean} opposedCheck Opposed check data, if any.
  * @property {boolean} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean} doubleTraining Whether to double the Training applied.
@@ -40,7 +40,6 @@
  * @property {string} itemName The name of the item being rolled.
  * @property {string} resistanceCheck The Resistance that can be used to oppose this check.
  * @property {string} skill The Skill to use for the Check.
- * @augments CheckParameters
  */
 
 /**

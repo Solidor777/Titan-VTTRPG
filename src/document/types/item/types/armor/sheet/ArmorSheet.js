@@ -14,8 +14,6 @@ export default class TitanArmorSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 650,
          svelte: {
             props: {
                shell: ArmorSheetShell

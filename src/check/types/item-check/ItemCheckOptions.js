@@ -1,6 +1,6 @@
 /**
  * Options for requesting an Item Check from an Actor.
- * @typedef {object} ItemCheckOptions
+ * @typedef {CheckOptions} ItemCheckOptions
  * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean?} doubleTraining Whether to double the Training applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
@@ -18,7 +18,6 @@
  * @property {string?} itemId The the ID of the item being used for the check.
  * @property {object?} itemRollData The roll data for the item being used for the check.
  * @property {string?} skill The Skill to use for the Check.
- * @augments CheckOptions
  */
 
 /**

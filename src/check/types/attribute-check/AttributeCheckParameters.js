@@ -1,6 +1,6 @@
 /**
  * Calculated parameters for the creation of a new Attribute Check, based off an Actor's data.
- * @typedef {object} AttributeCheckParameters
+ * @typedef {CheckParameters} AttributeCheckParameters
  * @property {boolean} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean} doubleTraining Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
@@ -19,7 +19,6 @@
  * @property {number} trainingMod Modifier for the amount of Training to be applied.
  * @property {string} attribute The Attribute to use for the Check.
  * @property {string} skill The Skill to use for the Check.
- * @augments CheckParameters
  */
 
 /**

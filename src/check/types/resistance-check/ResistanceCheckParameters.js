@@ -1,6 +1,6 @@
 /**
  * Calculated parameters for the creation of a new Resistance Check, based off an Actor's data.
- * @typedef {object} ResistanceCheckParameters
+ * @typedef {CheckParameters} ResistanceCheckParameters
  * @property {boolean} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
@@ -12,7 +12,6 @@
  * @property {number} totalDice The total number of dice to be rolled.
  * @property {number} totalExpertise The total amount of expertise to apply.
  * @property {string} resistance The Resistance to roll for the Check.
- * @augments CheckParameters
  */
 
 /**

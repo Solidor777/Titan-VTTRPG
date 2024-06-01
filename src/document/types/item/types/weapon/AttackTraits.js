@@ -3,7 +3,7 @@
  * @typedef {object} AttackTrait
  * @property {string} name The name of the trait.
  * @property {string} type The type of the trait (number, boolean).
- * @property {boolean|number} value The value of the value.
+ * @property {boolean|number} value The value of the trait..
  */
 
 export const ATTACK_TRAITS = [

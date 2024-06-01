@@ -20,7 +20,6 @@ import getTrackableAttributes from '~/system/TrackableAttributes.js';
 import registerSystemSettings from '~/system/SystemSettings.js';
 import registerInitiativeFormula from '~/system/Initiative.js';
 import AbilityDataModel from '~/document/types/item/types/ability/AbilityDataModel.js';
-import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 import CommodityDataModel from '~/document/types/item/types/commodity/CommodityDataModel.js';
 import EffectDataModel from '~/document/types/item/types/effect/EffectDataModel.js';
 import EquipmentDataModel from '~/document/types/item/types/equipment/EquipmentDataModel.js';
@@ -55,20 +54,25 @@ export default function onceInit() {
 
    // Configure Actors
    CONFIG.Actor.documentClass = TitanActor;
-   CONFIG.Actor.dataModels.player = PlayerDataModel;
-   CONFIG.Actor.dataModels.npc = NPCDataModel;
+   CONFIG.Actor.dataModels = {
+      player: PlayerDataModel,
+      npc: NPCDataModel,
+   };
    CONFIG.Actor.trackableAttributes = getTrackableAttributes();
 
    // Configure Items
    CONFIG.Item.documentClass = TitanItem;
-   CONFIG.Item.dataModels.ability = AbilityDataModel;
-   CONFIG.Item.dataModels.armor = ArmorDataModel;
-   CONFIG.Item.dataModels.commodity = CommodityDataModel;
-   CONFIG.Item.dataModels.effect = EffectDataModel;
-   CONFIG.Item.dataModels.equipment = EquipmentDataModel;
-   CONFIG.Item.dataModels.shield = ShieldDataModel;
-   CONFIG.Item.dataModels.spell = SpellDataModel;
-   CONFIG.Item.dataModels.weapon = WeaponDataModel;
+   CONFIG.Item.dataModels = {
+      ability: AbilityDataModel,
+      armor: AbilityDataModel,
+      commodity: CommodityDataModel,
+      effect: EffectDataModel,
+      equipment: EquipmentDataModel,
+      shield: ShieldDataModel,
+      spell: SpellDataModel,
+      weapon: WeaponDataModel,
+   };
+   
    CONFIG.time.roundTime = 6;
    CONFIG.ActiveEffect.legacyTransferral = false;
 

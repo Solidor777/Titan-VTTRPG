@@ -2,7 +2,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
 
 /**
  * Results of a Resistance Check.
- * @typedef {object} ResistanceCheckResults
+ * @typedef {CheckResults} ResistanceCheckResults
  * @property {CheckDie[]} dice The sorted dice rolled for the check, after Expertise is applied.
  * @property {boolean} succeeded Whether the Check Succeeded.
  * @property {number} criticalFailures The number of Critical Failures rolled.

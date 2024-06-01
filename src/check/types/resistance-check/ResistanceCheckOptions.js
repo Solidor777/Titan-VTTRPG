@@ -1,6 +1,6 @@
 /**
  * Options for requesting a Resistance Check from an Actor.
- * @typedef {object} ResistanceCheckOptions
+ * @typedef {CheckOptions} ResistanceCheckOptions
  * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
@@ -10,7 +10,6 @@
  * @property {number?} difficulty The minimum roll on a die to achieve a Success.
  * @property {number?} expertiseMod Modifier for the amount of Expertise to be applied.
  * @property {string?} resistance The Resistance to roll for the Check.
- * @augments CheckOptions
  */
 
 /**

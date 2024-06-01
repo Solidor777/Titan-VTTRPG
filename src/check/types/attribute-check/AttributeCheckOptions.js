@@ -1,6 +1,6 @@
 /**
  * Options for requesting an Attribute Check from an Actor.
- * @typedef {object} AttributeCheckOptions
+ * @typedef {CheckOptions} AttributeCheckOptions
  * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean?} doubleTraining Whether to double the Training applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
@@ -13,7 +13,6 @@
  * @property {number?} trainingMod Modifier for the amount of Training to be applied.
  * @property {string?} attribute The Attribute to use for the Check.
  * @property {string?} skill The Skill to use for the Check.
- * @augments CheckOptions
  */
 
 /**

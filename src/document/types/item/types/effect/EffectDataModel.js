@@ -45,7 +45,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
    }
 
    /**
-    * Gets the parent documents's Action Queue object.
+    * Gets the parent document's Action Queue object.
     * @returns {ActionQueue} The parent actor's Action Queue.
     */
    get actionQueue() {
@@ -216,12 +216,13 @@ export default class EffectDataModel extends RulesElementItemDataModel {
             }
 
             // Update visual active effects description if appropriate
-            const description = isHTMLBlank(this.description) ?
-               '' :
-               TextEditor.enrichHTML(this.description, {
+            let description = '';
+            if (!isHTMLBlank(this.description)) {
+               description = await TextEditor.enrichHTML(this.description, {
                   async: false,
                   secrets: true,
                });
+            }
             if (description !== effect['flags.visual-active-effects.data.content']) {
                shouldUpdateEffect = true;
                updateData['flags.visual-active-effects.data.content'] = description;

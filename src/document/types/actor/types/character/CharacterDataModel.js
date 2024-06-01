@@ -5664,6 +5664,8 @@ export default class CharacterDataModel extends ActorDataModel {
     * @returns {Promise<Application>} The newly created dialog.
     */
    async addInventoryItem() {
-      return new AddInventoryItemDialog(this.parent).render(true);
+      if (this.parent.isOwner) {
+         return new AddInventoryItemDialog(this.parent).render(true);
+      }
    }
 }

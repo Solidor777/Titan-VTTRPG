@@ -1,6 +1,11 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
 import EffectSheetShell from '~/document/types/item/types/effect/sheet/EffectSheetShell.svelte';
 
+/**
+ * Sheet for a Titan Effect item.
+ * @param {Document} document - The document this sheet is for.
+ * @param {object} options - Options object.
+ */
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
     * Default Application options.
@@ -9,8 +14,6 @@ export default class TitanEffectSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 650,
          svelte: {
             props: {
                shell: EffectSheetShell

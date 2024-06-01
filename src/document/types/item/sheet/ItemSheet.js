@@ -28,6 +28,8 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
          baseApplication: 'ItemSheet',
+         width: 700,
+         height: 650,
       });
    }
 

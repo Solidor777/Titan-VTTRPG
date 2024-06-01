@@ -1,6 +1,6 @@
 /**
  * Options for requesting an Attack Check from an Actor.
- * @typedef {object} AttackCheckOptions
+ * @typedef {CheckOptions} AttackCheckOptions
  * @property {boolean?} cleave Whether this Attack is a Cleave attack.
  * @property {boolean?} doubleExpertise Whether to double the Expertise applied..
  * @property {boolean?} doubleTraining Whether to double the Training applied.
@@ -26,7 +26,6 @@
  * @property {string} itemId The the ID of the weapon being used for the attack.
  * @property {string?} skill The Skill to use for the Check.
  * @property {string?} type The Type of Attack being performed (Melee or Ranged).
- * @augments CheckOptions
  */
 
 /**

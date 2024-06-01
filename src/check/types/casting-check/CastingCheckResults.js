@@ -12,21 +12,18 @@ import calculateCheckResults from '~/check/CheckResults.js';
 
 /**
  * Results of a Casting Check.
- * @typedef    {object} CastingCheckResults
- * @property {CheckDie[]} dice The sorted dice rolled for the check, after having expertise
- * applied.
+ * @typedef {CheckResults} CastingCheckResults
+ * @property {CheckDie[]} dice The sorted dice rolled for the check, after having expertise applied.
  * @property {boolean} succeeded Whether the Check Succeeded.
  * @property {number} criticalFailures The number of Critical Failures rolled.
  * @property {number} criticalSuccesses The number of Critical Successes achieved.
  * @property {number} damage The amount of Damage inflicted.
  * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
  * @property {number} extraSuccesses The number of Critical Successes achieved.
- * @property {number} extraSuccessesRemaining The remaining successes that have not yet been applied to
- * scaling aspects.
+ * @property {number} extraSuccessesRemaining The remaining successes that have not yet been applied to scaling aspects.
  * @property {number} successes The total number of Successes achieved.
  * @property {number} healing The amount of Healing applied.
  * @property {ScalingAspect[]} scalingAspect The scaling aspects associated with the check.
- * @augments CheckResults
  */
 
 /**

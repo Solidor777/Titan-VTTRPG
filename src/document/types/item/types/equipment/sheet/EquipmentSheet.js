@@ -1,6 +1,11 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
 import EquipmentSheetShell from '~/document/types/item/types/equipment/sheet/EquipmentSheetShell.svelte';
 
+/**
+ * Sheet for a Titan Equipment item.
+ * @param {Document} document - The document this sheet is for.
+ * @param {object} options - Options object.
+ */
 export default class TitanEquipmentSheet extends TitanItemSheet {
    /**
     * Default Application options.
@@ -9,8 +14,6 @@ export default class TitanEquipmentSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 650,
          svelte: {
             props: {
                shell: EquipmentSheetShell
