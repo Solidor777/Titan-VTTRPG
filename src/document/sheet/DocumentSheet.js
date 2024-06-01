@@ -142,7 +142,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
    /**
     * Overridable function for creating the reactive state store for this sheet.
     * @param {object} options - Options for the reactive state store.
-    * @returns {Writable<*>} The newly created state store.
+    * @returns {object} The newly created state store.
     * @protected
     */
    _createReactiveState(options = {}) {

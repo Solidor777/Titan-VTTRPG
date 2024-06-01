@@ -1,6 +1,5 @@
 import PlayerSheetShell from '~/document/types/actor/types/character/types/player/PlayerSheetShell.svelte';
 import TitanCharacterSheet from '~/document/types/actor/types/character/sheet/CharacterSheet.js';
-import createPlayerSheetState from '~/document/types/actor/types/character/types/player/PlayerSheetState.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 export default class TitanPlayerSheet extends TitanCharacterSheet {
@@ -11,17 +10,12 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 750,
          svelte: {
             props: {
                shell: PlayerSheetShell,
             },
          },
       });
-   }
-
-   _createReactiveState() {
-      return createPlayerSheetState();
    }
 
    _getSheetClasses() {

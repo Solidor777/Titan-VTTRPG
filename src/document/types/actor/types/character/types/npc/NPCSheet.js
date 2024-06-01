@@ -1,6 +1,5 @@
 import NPCSheetShell from '~/document/types/actor/types/character/types/npc/NPCSheetShell.svelte';
 import TitanCharacterSheet from '~/document/types/actor/types/character/sheet/CharacterSheet.js';
-import createNPCSheetState from '~/document/types/actor/types/character/types/npc/NPCSheetState.js';
 
 export default class TitanNPCSheet extends TitanCharacterSheet {
 
@@ -11,17 +10,12 @@ export default class TitanNPCSheet extends TitanCharacterSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 750,
          svelte: {
             props: {
                shell: NPCSheetShell,
             },
          },
       });
-   }
-
-   _createReactiveState() {
-      return createNPCSheetState();
    }
 
    // Add the npc sheet class

@@ -13,6 +13,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       return foundry.utils.mergeObject(super.defaultOptions, {
          baseApplication: 'ActorSheet',
          token: null,
+         width: 750,
       });
    }
 

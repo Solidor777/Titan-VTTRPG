@@ -1,6 +1,7 @@
 import TitanActorSheet from '~/document/types/actor/sheet/ActorSheet';
 import CharacterSheetInventoryAddItemDialog
    from '~/document/types/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryAddItemDialog';
+import createCharacterSheetState from '~/document/types/actor/types/character/sheet/CharacterSheetState.js';
 
 export default class TitanCharacterSheet extends TitanActorSheet {
    addInventoryItem() {
@@ -10,16 +11,18 @@ export default class TitanCharacterSheet extends TitanActorSheet {
       }
    }
 
-   // Delete Item from the sheet state
    deleteItem(itemId) {
       this.applicationState.deleteItem(itemId);
    }
 
-   // Add the npc sheet class
    _getSheetClasses() {
       const retVal = super._getSheetClasses();
       retVal.push('titan-character-sheet');
 
       return retVal;
+   }
+
+   _createReactiveState(options = {}) {
+      return createCharacterSheetState();
    }
 }
