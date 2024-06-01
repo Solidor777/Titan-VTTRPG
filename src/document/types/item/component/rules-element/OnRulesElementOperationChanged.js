@@ -8,42 +8,43 @@ import createConditionalRatingModifierElement from '~/document/types/item/rules-
 import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier';
 
 /**
- * @param document
- * @param elementIdx
+ * Used to update a Rules Element when its Operation type changes.
+ * @param {TitanItem} item - The Item to update the Rules Element of.
+ * @param {number} elementIdx - The idx of the Rules Element in the rules elements array.
  */
-export default async function onRulesElementOperationChanged(document, elementIdx) {
-   const element = document.system.rulesElement[elementIdx];
+export default async function onRulesElementOperationChanged(item, elementIdx) {
+   const element = item.system.rulesElement[elementIdx];
    switch (element.operation) {
       case 'flatModifier': {
-         document.system.rulesElement[elementIdx] = createFlatModifierElement(element);
+         item.system.rulesElement[elementIdx] = createFlatModifierElement(element);
          break;
       }
       case 'mulBase': {
-         document.system.rulesElement[elementIdx] = createMulBaseElement(element);
+         item.system.rulesElement[elementIdx] = createMulBaseElement(element);
          break;
       }
       case 'fastHealing': {
-         document.system.rulesElement[elementIdx] = createFastHealingElement(element);
+         item.system.rulesElement[elementIdx] = createFastHealingElement(element);
          break;
       }
       case 'persistentDamage': {
-         document.system.rulesElement[elementIdx] = createPersistentDamageElement(element);
+         item.system.rulesElement[elementIdx] = createPersistentDamageElement(element);
          break;
       }
       case 'turnMessage': {
-         document.system.rulesElement[elementIdx] = createTurnMessageElement(element);
+         item.system.rulesElement[elementIdx] = createTurnMessageElement(element);
          break;
       }
       case 'rollMessage': {
-         document.system.rulesElement[elementIdx] = createRollMessageElement(element);
+         item.system.rulesElement[elementIdx] = createRollMessageElement(element);
          break;
       }
       case 'conditionalRatingModifier': {
-         document.system.rulesElement[elementIdx] = createConditionalRatingModifierElement(element);
+         item.system.rulesElement[elementIdx] = createConditionalRatingModifierElement(element);
          break;
       }
       case 'conditionalCheckModifier': {
-         document.system.rulesElement[elementIdx] = createConditionalCheckModifierElement(element);
+         item.system.rulesElement[elementIdx] = createConditionalCheckModifierElement(element);
          break;
       }
       default: {
@@ -52,9 +53,9 @@ export default async function onRulesElementOperationChanged(document, elementId
       }
    }
 
-   return await document.update({
+   return await item.update({
       system: {
-         rulesElement: document.system.rulesElement,
+         rulesElement: item.system.rulesElement,
       },
    });
 }

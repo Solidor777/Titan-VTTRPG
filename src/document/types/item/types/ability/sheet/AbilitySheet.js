@@ -2,7 +2,7 @@ import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
 import AbilitySheetShell from '~/document/types/item/types/ability/sheet/AbilitySheetShell.svelte';
 
 /**
- * Base sheet for Titan Abilities.
+ * Sheet for a Titan Ability item.
  * @param {Document} document - The document this sheet is for.
  * @param {object} options - Options object.
  */

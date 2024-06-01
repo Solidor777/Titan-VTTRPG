@@ -193,7 +193,7 @@
             class="stat"
             use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}
          >
-            {#if trait.type === 'number'}
+            {#if typeof (trait.value) === 'number'}
                <StatTag label={localize(trait.name)} value={trait.value}/>
             {:else}
                <Tag label={localize(trait.name)}/>

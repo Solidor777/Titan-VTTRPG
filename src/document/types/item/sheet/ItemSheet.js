@@ -45,6 +45,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
+      // Button for sending the item to chat
       buttons.unshift({
          class: 'send-to-chat',
          icon: SEND_TO_CHAT_ICON,
@@ -52,6 +53,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
          onclick: () => this.item.sendToChat(),
       });
 
+      // Button for importing the item from a compendium pack
       if (this.item.pack) {
          buttons.unshift({
             class: 'import',

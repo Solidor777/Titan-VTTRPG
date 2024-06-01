@@ -1,26 +1,40 @@
-export const ARMOR_TRAITS = [
+import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
+
+/**
+ * @typedef StandardTrait
+ * A standardized trait used by various items.
+ * @property {string} name The name and identifier of the trait.
+ * @property {boolean|number} value The value of the trait.
+ * @augments {object}
+ */
+
+/**
+ * All traits specific to Armor items.
+ * @type {StandardTrait[]}
+ */
+export const ARMOR_TRAITS = deepFreeze([
    {
       name: 'magical',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'loud',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'encumbering',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'heavy',
-      type: 'boolean',
       value: false,
    }
-];
+]);
 
+/**
+ * Keys for the localized description strings for Armor Traits, mapped to the Trait name.
+ * @type {object}
+ */
 export const ARMOR_TRAIT_DESCRIPTIONS = {
    magical: 'armor.magical.desc',
    loud: 'armor.loud.desc',

@@ -10,7 +10,6 @@
    export let idx = void 0;
    export let element = void 0;
 
-   // Setup tabs
 </script>
 
 {#if element && element.operation === 'flatModifier'}

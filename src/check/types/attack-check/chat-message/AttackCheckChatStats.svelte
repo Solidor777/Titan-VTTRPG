@@ -1,13 +1,13 @@
 <script>
-   import { getContext } from 'svelte';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
+   import {getContext} from 'svelte';
+   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON } from '~/system/Icons.js';
+   import {ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON} from '~/system/Icons.js';
 
    // Document reference
    const document = getContext('document');
@@ -59,7 +59,7 @@
          class="stat"
          use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}
       >
-         {#if trait.type === 'number'}
+         {#if typeof (trait.value) === 'number'}
             <StatTag label={localize(trait.name)} value={trait.value}/>
          {:else}
             <Tag label={localize(trait.name)}/>

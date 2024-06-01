@@ -5,7 +5,7 @@
    import DocumentSelect from '~/document/components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged
-      from '~/document/types/item/component/rules-element/RulesElementUpdateOperation';
+      from '~/document/types/item/component/rules-element/OnRulesElementOperationChanged.js';
    import DocumentBoundEditorInput from '~/document/components/input/DocumentBoundEditorInput.svelte';
    import {DELETE_ICON} from '~/system/Icons.js';
 

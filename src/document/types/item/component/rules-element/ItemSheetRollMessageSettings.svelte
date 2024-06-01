@@ -8,7 +8,7 @@
    import DocumentAttributeSelect from '~/document/components/select/DocumentAttributeSelect.svelte';
    import DocumentResistanceSelect from '~/document/components/select/DocumentResistanceSelect.svelte';
    import onRulesElementOperationChanged
-      from '~/document/types/item/component/rules-element/RulesElementUpdateOperation';
+      from '~/document/types/item/component/rules-element/OnRulesElementOperationChanged.js';
    import DocumentBoundEditorInput from '~/document/components/input/DocumentBoundEditorInput.svelte';
    import DocumentAttackTypeSelect from '~/document/components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/components/select/DocumentAttackTraitSelect.svelte';

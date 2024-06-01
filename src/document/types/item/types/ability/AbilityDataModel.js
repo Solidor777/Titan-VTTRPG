@@ -3,11 +3,11 @@ import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.j
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
-import { ABILITY_IMAGE } from '~/system/DefaultImages.js';
+import {ABILITY_IMAGE} from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
- * Data model with extra functionality for Abilities.
+ * Data model with extra functionality for Ability items.
  * @augments TitanDataModel
  */
 export default class AbilityDataModel extends RulesElementItemDataModel {

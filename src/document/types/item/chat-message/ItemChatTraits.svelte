@@ -12,7 +12,7 @@
    {#each chatContext.system.traits as trait}
       <div class="trait">
          {localize(trait.name)}
-         {#if trait.type === 'number'}
+         {#if typeof (trait.value) === 'number'}
             {trait.value}
          {/if}
       </div>

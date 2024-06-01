@@ -223,7 +223,7 @@
                               content: localize(traitDescriptions[trait.name]),
                            }}
                         >
-                           {#if trait.type === 'number'}
+                           {#if typeof (trait.value) === 'number'}
                               <!--Number Trait-->
                               <StatTag
                                  label={localize(trait.name)}

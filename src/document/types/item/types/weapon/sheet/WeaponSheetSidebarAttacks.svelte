@@ -112,7 +112,7 @@
                      }}
                      transition:slide|local
                   >
-                     {#if trait.type === 'number'}
+                     {#if typeof (trait.value) === 'number'}
                         <!--Number Trait-->
                         <StatTag
                            label={localize(trait.name)}

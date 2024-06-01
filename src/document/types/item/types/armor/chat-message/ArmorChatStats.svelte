@@ -1,13 +1,13 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { ARMOR_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/armor/ArmorTraits.js';
+   import {ARMOR_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/armor/ArmorTraits.js';
    import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
-   import { ARMOR_ICON } from '~/system/Icons.js';
+   import {ARMOR_ICON} from '~/system/Icons.js';
 
    // Item reference
    export let item = void 0;
@@ -43,7 +43,7 @@
          class="stat"
          use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}
       >
-         {#if trait.type === 'number'}
+         {#if typeof (trait.value) === 'number'}
             <StatTag label={localize(trait.name)} value={trait.value}/>
          {:else}
             <Tag label={localize(trait.name)}/>

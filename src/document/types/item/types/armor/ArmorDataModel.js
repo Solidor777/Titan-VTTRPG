@@ -9,7 +9,7 @@ import EditArmorTraitsDialog from '~/document/types/item/types/armor/dialog/Edit
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
- * Data model with extra functionality for Armor.
+ * Data model with extra functionality for Armor items.
  * @augments TitanDataModel
  */
 export default class ArmorDataModel extends RulesElementItemDataModel {

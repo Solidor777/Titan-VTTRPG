@@ -13,7 +13,7 @@
    import DocumentResourceSelect from '~/document/components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/components/select/DocumentSpeedSelect.svelte';
    import onRulesElementOperationChanged
-      from '~/document/types/item/component/rules-element/RulesElementUpdateOperation';
+      from '~/document/types/item/component/rules-element/OnRulesElementOperationChanged.js';
    import {DELETE_ICON} from '~/system/Icons.js';
 
    // Setup context variables

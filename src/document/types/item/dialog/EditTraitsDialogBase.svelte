@@ -42,8 +42,8 @@
 
          // Set the document's traits to equal the active traits from the trait options
          documentTraits = traitOptions.filter((trait) =>
-            (trait.type === 'boolean' && trait.value === true) ||
-            (trait.type === 'number' && trait.value > 0),
+            (typeof (trait.value) === 'boolean' && trait.value === true) ||
+            (typeof (trait.value) === 'number' && trait.value > 0),
          );
 
          // Update the document
@@ -69,7 +69,7 @@
 
          <!--Input-->
          <div class="input">
-            {#if trait.type === 'boolean'}
+            {#if typeof (trait.value) === 'boolean'}
                <!--Boolean Trait-->
                <CheckboxInput bind:value={traitOptions[idx].value}/>
             {:else}
