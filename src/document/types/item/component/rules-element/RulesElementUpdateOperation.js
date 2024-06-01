@@ -15,35 +15,35 @@ export default async function onRulesElementOperationChanged(document, elementId
    const element = document.system.rulesElement[elementIdx];
    switch (element.operation) {
       case 'flatModifier': {
-         document.system.rulesElement[elementIdx] = createFlatModifierElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createFlatModifierElement(element);
          break;
       }
       case 'mulBase': {
-         document.system.rulesElement[elementIdx] = createMulBaseElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createMulBaseElement(element);
          break;
       }
       case 'fastHealing': {
-         document.system.rulesElement[elementIdx] = createFastHealingElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createFastHealingElement(element);
          break;
       }
       case 'persistentDamage': {
-         document.system.rulesElement[elementIdx] = createPersistentDamageElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createPersistentDamageElement(element);
          break;
       }
       case 'turnMessage': {
-         document.system.rulesElement[elementIdx] = createTurnMessageElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createTurnMessageElement(element);
          break;
       }
       case 'rollMessage': {
-         document.system.rulesElement[elementIdx] = createRollMessageElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createRollMessageElement(element);
          break;
       }
       case 'conditionalRatingModifier': {
-         document.system.rulesElement[elementIdx] = createConditionalRatingModifierElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createConditionalRatingModifierElement(element);
          break;
       }
       case 'conditionalCheckModifier': {
-         document.system.rulesElement[elementIdx] = createConditionalCheckModifierElement(element.uuid);
+         document.system.rulesElement[elementIdx] = createConditionalCheckModifierElement(element);
          break;
       }
       default: {

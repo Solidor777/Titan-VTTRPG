@@ -1,5 +1,4 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
-import createArmorSheetState from '~/document/types/item/types/armor/sheet/ArmorSheetState.js';
 import ArmorSheetShell from '~/document/types/item/types/armor/sheet/ArmorSheetShell.svelte';
 
 export default class TitanArmorSheet extends TitanItemSheet {
@@ -18,9 +17,5 @@ export default class TitanArmorSheet extends TitanItemSheet {
             },
          }
       });
-   }
-
-   _createReactiveState() {
-      return createArmorSheetState();
    }
 }

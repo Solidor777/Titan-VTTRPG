@@ -7,11 +7,13 @@ import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import {SETTINGS_ICON} from '~/system/Icons.js';
 
 /**
- * Replacement Document Sheet to that supports svelte components.
+ * A replacement Document Sheet to that supports svelte components.
+ * @param {Document} document - The document this sheet is for.
+ * @param {object} options - Options object.
  */
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
-    * Constructs a replacement Document Sheet to that supports svelte components.
+    * A replacement Document Sheet to that supports svelte components.
     * @param {Document} document - The document this sheet is for.
     * @param {object} options - Options object.
     */
@@ -107,7 +109,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _getSheetID(document) {
-      return `document-sheet-${document.id}`;
+      return `titan-document-sheet-${document.id}`;
    }
 
    /**
@@ -116,7 +118,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _getSheetClasses() {
-      const retVal = ['titan', 'titan-document-sheet'];
+      const retVal = ['titan', 'titan-titan-document-sheet'];
 
       // Add dark mode class if dark mode enabled
       if (getSetting('darkModeSheets')) {

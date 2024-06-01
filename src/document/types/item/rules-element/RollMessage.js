@@ -14,17 +14,16 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a Rules Element for conditionally displaying a message when a Character rolls a check.
- * @param {string?} uuid - Unique identifier for the Rules Element. Used when changing Rules Element types.
- * If none is provided, one will be generated.
+ * @param {object?} options - Options for the rules element.
  * @returns {RollMessageElement} The new Rules Element.
  */
-export default function createRollMessageElement(uuid) {
+export default function createRollMessageElement(options) {
    return {
       operation: 'rollMessage',
       checkType: 'any',
       selector: 'attribute',
       key: 'body',
       message: '',
-      uuid: uuid ?? generateUUID(),
+      uuid: options.uuid ?? generateUUID(),
    };
 }

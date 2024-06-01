@@ -24,7 +24,7 @@ export default class SocketManager {
    /**
     * Triggers a Hook from a message sent by the system's socket.
     * @param {string} id - ID of the Hook to send.
-    * @param {*[]} args - Arguments to send with the Hook.
+    * @param {...*} args - Arguments to send with the Hook.
     */
    triggerSocketHook(id, ...args) {
       const message = {

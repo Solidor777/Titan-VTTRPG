@@ -35,14 +35,14 @@ export default class ItemCheckDialog extends TitanDialog {
                   checkParameters: writable(checkParameters),
                },
             },
-            id: `item-check-dialog-${actor._id}-${generateUUID()}`,
+            id: `titan-item-check-dialog-${actor._id}-${generateUUID()}`,
          },
       );
    }
 
    _getDialogClasses() {
       const retVal = super._getDialogClasses();
-      retVal.push('check-dialog', 'item-check-dialog');
+      retVal.push('titan-check-dialog', 'titan-item-check-dialog');
 
       return retVal;
    }

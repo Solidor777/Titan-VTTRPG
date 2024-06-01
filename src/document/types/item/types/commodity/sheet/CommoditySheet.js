@@ -1,6 +1,5 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
 import CommoditySheetShell from '~/document/types/item/types/commodity/sheet/CommoditySheetShell.svelte';
-import createCommoditySheetState from '~/document/types/item/types/commodity/sheet/CommoditySheetState.js';
 
 export default class TitanCommoditySheet extends TitanItemSheet {
    /**
@@ -18,9 +17,5 @@ export default class TitanCommoditySheet extends TitanItemSheet {
             },
          }
       });
-   }
-
-   _createReactiveState() {
-      return createCommoditySheetState();
    }
 }

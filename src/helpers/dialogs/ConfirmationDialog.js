@@ -40,7 +40,7 @@ export default class ConfirmationDialog extends TitanDialog {
                   confirmLabel: confirmLabel,
                },
             },
-            id: `confirmation-dialog-${generateUUID()}`,
+            id: `titan-confirmation-dialog-${generateUUID()}`,
          },
       );
 
@@ -54,10 +54,10 @@ export default class ConfirmationDialog extends TitanDialog {
          this.confirmationCallback = confirmationCallback;
       }
    }
-   
+
    _getDialogClasses() {
       const retVal = super._getDialogClasses();
-      retVal.push('confirmation-dialog');
+      retVal.push('titan-confirmation-dialog');
 
       return retVal;
    }

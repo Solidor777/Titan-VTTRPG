@@ -1,6 +1,5 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
 import EffectSheetShell from '~/document/types/item/types/effect/sheet/EffectSheetShell.svelte';
-import createEffectSheetState from '~/document/types/item/types/effect/sheet/EffectSheetState';
 
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
@@ -18,9 +17,5 @@ export default class TitanEffectSheet extends TitanItemSheet {
             },
          }
       });
-   }
-
-   _createReactiveState() {
-      return createEffectSheetState();
    }
 }

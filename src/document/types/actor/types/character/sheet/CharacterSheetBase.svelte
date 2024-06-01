@@ -11,7 +11,7 @@
 </script>
 {#if $document}
    <!--Sheet-->
-   <div class="actor-sheet">
+   <div class="titan-sheet">
       <!--Sidebar-->
       <div class="sidebar">
          <CharacterSheetSidebar/>
@@ -33,7 +33,7 @@
 {/if}
 
 <style lang="scss">
-   .actor-sheet {
+   .titan-sheet {
       @include flex-row;
       @include font-size-normal;
 

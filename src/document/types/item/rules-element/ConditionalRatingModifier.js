@@ -13,17 +13,16 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a Rules Element for conditionally modifying a Character's Rating.
- * @param {string?} uuid - Unique identifier for the Rules Element. Used when changing Rules Element types.
- * If none is provided, one will be generated.
+ * @param {object?} options - Options for the rules element.
  * @returns {ConditionalRatingModifierElement} The new Rules Element.
  */
-export default function createConditionalRatingModifierElement(uuid) {
+export default function createConditionalRatingModifierElement(options) {
    return {
       operation: 'conditionalRatingModifier',
       rating: 'accuracy',
       selector: 'attackTrait',
       key: 'blast',
       value: 1,
-      uuid: uuid ?? generateUUID(),
+      uuid: options.uuid ?? generateUUID(),
    };
 }

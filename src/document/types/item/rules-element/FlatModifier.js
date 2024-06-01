@@ -13,16 +13,15 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a Rules Element for add a simple bonus or penalty to the value of a Character's stat.
- * @param {string?} uuid - Unique identifier for the Rules Element. Used when changing Rules Element types.
- * If none is provided, one will be generated.
+ * @param {object?} options - Options for the rules element.
  * @returns {FlatModifierElement} The new Rules Element.
  */
-export default function createFlatModifierElement(uuid) {
+export default function createFlatModifierElement(options) {
    return {
       operation: 'flatModifier',
       selector: 'attribute',
       key: 'body',
       value: 1,
-      uuid: uuid ?? generateUUID(),
+      uuid: options.uuid ?? generateUUID(),
    };
 }

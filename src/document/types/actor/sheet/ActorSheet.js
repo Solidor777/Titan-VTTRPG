@@ -21,9 +21,9 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    _getSheetID(document) {
-      return `actor-sheet-${document.isToken ? document.parent?.id : document.id}`;
+      return `titan-actor-sheet-${document.isToken ? document.parent?.id : document.id}`;
    }
-   
+
    _getSheetClasses() {
       const retVal = super._getSheetClasses();
       retVal.push('titan-actor-sheet');

@@ -13,16 +13,15 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a Rules Element for multiplying the base value of a Character's stat.
- * @param {string?} uuid - Unique identifier for the Rules Element. Used when changing Rules Element types.
- * If none is provided, one will be generated.
+ * @param {object?} options - Options for the rules element.
  * @returns {MulBaseElement} The new Rules Element.
  */
-export default function createMulBaseElement(uuid) {
+export default function createMulBaseElement(options) {
    return {
       operation: 'mulBase',
       selector: 'attribute',
       key: 'body',
       value: 2,
-      uuid: uuid ?? generateUUID(),
+      uuid: options.uuid ?? generateUUID(),
    };
 }

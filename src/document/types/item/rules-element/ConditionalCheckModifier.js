@@ -13,11 +13,10 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a Rules Element for conditionally modifying a Check made a Character.
- * @param {string?} uuid - Unique identifier for the Rules Element. Used when changing Rules Element types.
- * If none is provided, one will be generated.
+ * @param {object?} options - Options for the rules element.
  * @returns {ConditionalCheckModifierElement} The new Rules Element.
  */
-export default function createConditionalCheckModifierElement(uuid) {
+export default function createConditionalCheckModifierElement(options) {
    return {
       operation: 'conditionalCheckModifier',
       modifierType: 'damage',
@@ -25,6 +24,6 @@ export default function createConditionalCheckModifierElement(uuid) {
       selector: 'any',
       key: '',
       value: 1,
-      uuid: uuid ?? generateUUID(),
+      uuid: options.uuid ?? generateUUID(),
    };
 }

@@ -1,8 +1,13 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
 import AbilitySheetShell from '~/document/types/item/types/ability/sheet/AbilitySheetShell.svelte';
-import createAbilitySheetState from '~/document/types/item/types/ability/sheet/AbilitySheetState';
 
+/**
+ * Base sheet for Titan Abilities.
+ * @param {Document} document - The document this sheet is for.
+ * @param {object} options - Options object.
+ */
 export default class TitanAbilitySheet extends TitanItemSheet {
+
    /**
     * Default Application options.
     * @returns {object} Options - Application options.
@@ -18,9 +23,5 @@ export default class TitanAbilitySheet extends TitanItemSheet {
             },
          }
       });
-   }
-
-   _createReactiveState() {
-      return createAbilitySheetState();
    }
 }

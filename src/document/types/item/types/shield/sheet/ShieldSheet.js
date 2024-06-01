@@ -1,5 +1,4 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
-import createShieldSheetState from '~/document/types/item/types/shield/sheet/ShieldSheetState.js';
 import ShieldSheetShell from '~/document/types/item/types/shield/sheet/ShieldSheetShell.svelte';
 
 export default class TitanShieldSheet extends TitanItemSheet {
@@ -18,9 +17,5 @@ export default class TitanShieldSheet extends TitanItemSheet {
             }
          }
       });
-   }
-
-   _createReactiveState() {
-      return createShieldSheetState();
    }
 }

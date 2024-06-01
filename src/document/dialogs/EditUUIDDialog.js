@@ -3,7 +3,18 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import EditUUIDDialogShell from '~/document/dialogs/EditUUIDDialogShell.svelte';
 
+/**
+ * A dialog for editing the UUID used by Titan Macros for identifying a Document.
+ * @param {TitanItem|TitanActor} document - The document to regenerate the UUID for.
+ * @augments ConfirmationDialog
+ */
 export default class EditUUIDDialog extends TJSDialog {
+
+   /**
+    * A dialog for editing the UUID used by Titan Macros for identifying a Document.
+    * @param {TitanItem|TitanActor} document - The document to regenerate the UUID for.
+    * @augments ConfirmationDialog
+    */
    constructor(document) {
       super(
          {

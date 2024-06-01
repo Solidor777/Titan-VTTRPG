@@ -1,6 +1,5 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
 import EquipmentSheetShell from '~/document/types/item/types/equipment/sheet/EquipmentSheetShell.svelte';
-import createEquipmentSheetState from '~/document/types/item/types/equipment/sheet/EquipmentSheetState.js';
 
 export default class TitanEquipmentSheet extends TitanItemSheet {
    /**
@@ -18,10 +17,5 @@ export default class TitanEquipmentSheet extends TitanItemSheet {
             }
          }
       });
-   }
-
-
-   _createReactiveState() {
-      return createEquipmentSheetState();
    }
 }

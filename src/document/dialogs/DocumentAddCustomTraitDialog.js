@@ -23,14 +23,14 @@ export default class DocumentAddCustomTraitDialog extends TitanDialog {
                },
             },
             zIndex: null,
-            id: `add-custom-trait-dialog-${document._id}`,
+            id: `titan-add-custom-trait-dialog-${document._id}`,
          },
       );
    }
 
    _getDialogClasses() {
       const retVal = super._getDialogClasses();
-      retVal.push('add-custom-trait-dialog-');
+      retVal.push('titan-add-custom-trait-dialog-');
 
       return retVal;
    }

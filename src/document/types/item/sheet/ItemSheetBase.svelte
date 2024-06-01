@@ -9,7 +9,7 @@
    const document = getContext('document');
 </script>
 {#if $document}
-   <div class="item-sheet">
+   <div class="titan-sheet">
       <!--Header-->
       <div class="header">
          <svelte:component this={header}/>
@@ -31,7 +31,7 @@
 {/if}
 
 <style lang="scss">
-   .item-sheet {
+   .titan-sheet {
       @include flex-column;
       @include font-size-normal;
 

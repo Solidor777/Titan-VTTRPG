@@ -74,7 +74,7 @@ export default class TitanActor extends Actor {
 
    /**
     * Gets an Initiative roll for this actor.
-    * @returns {Promise<Roll>} The Initiative roll.
+    * @returns {Promise<Roll>} The Initiative roll for this actor.
     */
    async getInitiativeRoll() {
       // Calculate the initiative value

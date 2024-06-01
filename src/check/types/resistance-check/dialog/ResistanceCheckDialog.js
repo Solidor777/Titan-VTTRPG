@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import {writable} from 'svelte/store';
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
@@ -35,14 +35,14 @@ export default class ResistanceCheckDialog extends TitanDialog {
                   checkParameters: writable(checkParameters),
                },
             },
-            id: `resistance-check-dialog-${actor._id}-${generateUUID()}`,
+            id: `titan-resistance-check-dialog-${actor._id}-${generateUUID()}`,
          },
       );
    }
 
    _getDialogClasses() {
       const retVal = super._getDialogClasses();
-      retVal.push('check-dialog', 'resistance-check-dialog');
+      retVal.push('titan-check-dialog', 'titan-resistance-check-dialog');
 
       return retVal;
    }

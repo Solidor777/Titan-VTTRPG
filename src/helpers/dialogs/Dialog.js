@@ -1,5 +1,6 @@
 import {TJSDialog} from '@typhonjs-fvtt/runtime/svelte/application';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import {Z_INDEX_APP} from '~/system/Constants.js';
 
 /**
  * Base dialog class with system specific functionality.
@@ -31,7 +32,7 @@ export default class TitanDialog extends TJSDialog {
       return foundry.utils.mergeObject(super.defaultOptions, {
          width: 320,
          height: 'auto',
-         zIndex: 30,
+         zIndex: Z_INDEX_APP,
       });
    }
 

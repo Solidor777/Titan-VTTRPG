@@ -1,9 +1,20 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDocumentSheet from '~/document/sheet/DocumentSheet';
-import { IMPORT_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
+import {IMPORT_ICON, SEND_TO_CHAT_ICON} from '~/system/Icons.js';
+import createItemSheetState from '~/document/types/item/sheet/ItemSheetState.js';
 
+/**
+ * Base sheet for Titan Items.
+ * @param {Document} document - The document this sheet is for.
+ * @param {object} options - Options object.
+ */
 export default class TitanItemSheet extends TitanDocumentSheet {
 
+   /**
+    * Base Item sheet for Titan Items.
+    * @param {Document} document - The document this sheet is for.
+    * @param {object} options - Options object.
+    */
    constructor(document, options = {}) {
       super(document, options);
       this.item = document;
@@ -21,10 +32,9 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    _getSheetID(document) {
-      return `item-sheet-${document.id}`;
+      return `titan-item-sheet-${document.id}`;
    }
 
-   // Add the item sheet class
    _getSheetClasses() {
       const retVal = super._getSheetClasses();
       retVal.push('titan-item-sheet');
@@ -54,6 +64,12 @@ export default class TitanItemSheet extends TitanDocumentSheet {
       return buttons;
    }
 
+   /**
+    * Called when the Import button is clicked on an Item in a compendium pack.
+    * @param {Event} event - The DOM event of the click.
+    * @returns {Promise<Document>} The newly imported document.
+    * @private
+    */
    _onImport(event) {
       if (event) {
          event.preventDefault();
@@ -61,15 +77,22 @@ export default class TitanItemSheet extends TitanDocumentSheet {
       return this.item.collection.importFromCompendium(this.item.compendium, this.item.id);
    }
 
+   /**
+    * Adds an Item Check to this sheet's application state.
+    */
    addCheck() {
       this.applicationState.addCheck();
-
-      return;
    }
 
+   /**
+    * Removes the Check at the provided idx from this sheet's application station.
+    * @param {number} idx - The idx of the check to remove.
+    */
    async removeCheck(idx) {
       this.applicationState.removeCheck(idx);
+   }
 
-      return;
+   _createReactiveState() {
+      return createItemSheetState();
    }
 }
