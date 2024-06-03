@@ -3,7 +3,7 @@ import EditCustomTraitDialogShell from '~/document/types/item/dialog/EditCustomT
 
 /**
  * Dialog for editing the Custom Trait of an Item.
- * @param {Document} document - The Item to edit the Traits of.
+ * @param {TitanItem} document - The Item to edit the Traits of.
  * @param {number} traitIdx - The idx of the Trait in the traits array.
  * @augments TitanDialog
  */

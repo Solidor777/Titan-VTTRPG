@@ -28,7 +28,6 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
          baseApplication: 'ItemSheet',
-         width: 700,
          height: 650,
       });
    }
@@ -89,7 +88,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Removes the Check at the provided idx from this sheet's application station.
+    * Removes the Check at the provided idx from this sheet's application state.
     * @param {number} idx - The idx of the check to remove.
     */
    async removeCheck(idx) {

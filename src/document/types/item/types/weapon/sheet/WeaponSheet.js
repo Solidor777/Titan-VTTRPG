@@ -12,8 +12,6 @@ export default class TitanWeaponSheet extends TitanItemSheet {
     */
    static get defaultOptions() {
       return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 650,
          svelte: {
             props: {
                shell: WeaponSheetShell
@@ -26,10 +24,17 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       return createWeaponSheetState(isHTMLBlank(this.document.system.attackNotes) ? 'itemDescription' : 'attackNotes');
    }
 
+   /**
+    * Adds an Attack to this sheet's application state.
+    */
    addAttack() {
       this.applicationState.addAttack();
    }
 
+   /**
+    * Removes the Attack at the provided idx from this sheet's application state.
+    * @param {number} idx - The idx of the attack to remove.
+    */
    removeAttack(idx) {
       this.applicationState.removeAttack(idx);
    }

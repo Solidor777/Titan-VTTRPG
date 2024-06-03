@@ -11,6 +11,7 @@ import createConditionalCheckModifierElement from '~/document/types/item/rules-e
  * Used to update a Rules Element when its Operation type changes.
  * @param {TitanItem} item - The Item to update the Rules Element of.
  * @param {number} elementIdx - The idx of the Rules Element in the rules elements array.
+ * @returns {Promise<void>} Returns after the item owning the Rules Element has been updated.
  */
 export default async function onRulesElementOperationChanged(item, elementIdx) {
    const element = item.system.rulesElement[elementIdx];
@@ -53,7 +54,7 @@ export default async function onRulesElementOperationChanged(item, elementIdx) {
       }
    }
 
-   return await item.update({
+   await item.update({
       system: {
          rulesElement: item.system.rulesElement,
       },

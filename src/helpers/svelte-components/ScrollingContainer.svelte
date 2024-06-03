@@ -84,7 +84,7 @@
          height: 100%;
          position: absolute;
          overflow-y: scroll;
-         padding: 0 8px 0 0;
+         padding: 0;
 
          --top-mask-size: 0px;
          --bottom-mask-size: 0px;

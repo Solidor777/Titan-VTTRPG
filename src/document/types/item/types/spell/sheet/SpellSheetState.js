@@ -12,6 +12,7 @@ export default function createSpellSheetState() {
       filter: {
          checks: '',
          customAspects: '',
+         rulesElements: '',
          standardAspects: '',
       },
       isExpanded: {
@@ -23,9 +24,11 @@ export default function createSpellSheetState() {
          }
       },
       scrollTop: {
+         checks: 0,
          castingCheck: 0,
          customAspects: 0,
          description: 0,
+         rulesElements: 0,
          sidebar: 0,
          standardAspects: 0,
       },

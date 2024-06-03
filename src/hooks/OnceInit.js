@@ -29,6 +29,7 @@ import WeaponDataModel from '~/document/types/item/types/weapon/WeaponDataModel.
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanCombat from '~/document/types/combat/Combat.js';
 import SocketManager from '~/helpers/SocketManager.js';
+import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 
 /**
  * Attached to the Init Hook.
@@ -64,7 +65,7 @@ export default function onceInit() {
    CONFIG.Item.documentClass = TitanItem;
    CONFIG.Item.dataModels = {
       ability: AbilityDataModel,
-      armor: AbilityDataModel,
+      armor: ArmorDataModel,
       commodity: CommodityDataModel,
       effect: EffectDataModel,
       equipment: EquipmentDataModel,
@@ -72,7 +73,7 @@ export default function onceInit() {
       spell: SpellDataModel,
       weapon: WeaponDataModel,
    };
-   
+
    CONFIG.time.roundTime = 6;
    CONFIG.ActiveEffect.legacyTransferral = false;
 

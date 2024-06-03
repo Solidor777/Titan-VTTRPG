@@ -10,7 +10,7 @@ import AddCustomAttackTraitDialogShell
 export default class AddCustomTraitDialog extends TitanDialog {
    /**
     * Dialog for adding a Custom Trait to an Item.
-    * @param {Document} item - The Item to add the Trait to.
+    * @param {TitanItem} item - The Item to add the Trait to.
     * @augments TitanDialog
     */
    constructor(item) {

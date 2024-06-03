@@ -31,15 +31,19 @@ export default class TitanSpellSheet extends TitanItemSheet {
       return retVal;
    }
 
+   /**
+    * Adds a Custom Aspect to this sheet's application state.
+    */
    addCustomAspect() {
       this.applicationState.addCustomAspect();
-
-      return;
    }
 
+
+   /**
+    * Removes the Custom Aspect at the provided idx from this sheet's application state.
+    * @param {number} idx - The idx of the aspect to remove.
+    */
    async removeCustomAspect(idx) {
       this.applicationState.removeCustomAspect(idx);
-
-      return;
    }
 }
