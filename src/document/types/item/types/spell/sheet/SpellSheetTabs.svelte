@@ -1,12 +1,13 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ItemSheetChecksTab from '~/document/types/item/component/check/ItemSheetChecksTab.svelte';
    import SpellSheetCastingCheckTab from '~/document/types/item/types/spell/sheet/SpellSheetCastingCheckTab.svelte';
-   import SpellSheetStandardAspectsTab from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectsTab.svelte';
+   import SpellSheetStandardAspectsTab
+      from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectsTab.svelte';
    import SpellSheetCustomAspectsTab from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectsTab.svelte';
    import ItemSheetDescriptionTab from '~/document/types/item/sheet/ItemSheetDescriptionTab.svelte';
-   import BorderedTabs from '~/helpers/svelte-components/BorderedTabs.svelte';
+   import Tabs from '~/helpers/svelte-components/Tabs.svelte';
 
    const appState = getContext('applicationState');
 
@@ -40,4 +41,4 @@
    ];
 </script>
 
-<BorderedTabs {tabs} bind:activeTab={$appState.activeTab} />
+<Tabs bind:activeTab={$appState.activeTab} border={true} {tabs}/>

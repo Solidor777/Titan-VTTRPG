@@ -45,9 +45,6 @@
          @include flex-group-center;
          @include font-size-normal;
 
-         line-height: normal;
-         padding: var(--titan-padding-standard);
-
          i {
             margin-right: var(--titan-padding-standard);
          }

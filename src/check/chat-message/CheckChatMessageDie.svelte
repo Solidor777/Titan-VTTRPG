@@ -75,7 +75,7 @@
       height: 35px;
       min-width: 35px;
 
-      --titan-button-border-radius: var(--titan-border-radius);
+      --titan-button-border-radius: var(--titan-border-radius-normal);
       --titan-button-height: 100%;
       --titan-button-width: 100%;
 

@@ -104,7 +104,7 @@
                <!--Resolve Cost Button-->
                <div class="button">
                   <SpendResolveButton
-                     cost={check.resolveCost}
+                     resolveCost={check.resolveCost}
                      on:click={() => spendResolve(check.resolveCost)}
                   />
                </div>

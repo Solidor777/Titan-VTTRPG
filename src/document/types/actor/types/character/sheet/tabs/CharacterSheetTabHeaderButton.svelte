@@ -22,7 +22,6 @@
    .button {
       --titan-button-font-size: var(--titan-font-size-small);
       --titan-button-padding: var(--titan-padding-standard);
-      --titan-button-line-height: normal;
       --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
 
       .label {

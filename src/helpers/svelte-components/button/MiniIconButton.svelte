@@ -1,29 +1,26 @@
 <script>
-   import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
 
+   /** @type boolean The icon to display for this button. */
    export let icon = void 0;
+
+   /** @type boolean Whether this input is disabled. */
    export let disabled = false;
+
+   /** @type string Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 </script>
 
-<button {disabled} on:click on:mousedown={preventDefault}>
-   <div><i class={icon}/></div>
-</button>
+<div class="button">
+   <IconButton {disabled} {icon} on:click {tooltip}/>
+</div>
 
 <style lang="scss">
-   button {
-      @include icon-button;
-
+   .button {
       cursor: pointer;
 
+      --titan-button-line-height: var(--titan-line-height-small);
       --titan-icon-button-font-size: var(--titan-font-size-small);
-      --icon-button-line-height: normal;
       --titan-icon-button-radius: 20px;
-   }
-
-   button:hover {
-      background: radial-gradient(
-            var(--titan-button-background-highlight),
-            var(--titan-button-background)
-      );
    }
 </style>

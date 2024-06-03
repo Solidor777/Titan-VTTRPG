@@ -91,7 +91,7 @@
             <!--Resolve Cost Button-->
             <div class="resolve-cost-button">
                <SpendResolveButton
-                  cost={checkParameters.resolveCost}
+                  resolveCost={checkParameters.resolveCost}
                   on:click={() => $document.system.spendResolve(checkParameters.resolveCost)}
                />
             </div>

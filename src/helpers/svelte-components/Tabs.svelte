@@ -1,5 +1,5 @@
 <script>
-   import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    /**
     * Object for storing tab information.
@@ -15,24 +15,20 @@
    export let activeTab = void 0;
 
    /** @type {boolean}  Whether the tabs should be bordered. */
-   export let bordered = false;
+   export let border = false;
 </script>
 
 <!--List of tabs-->
-<div class={`tabs${bordered ? ' bordered' : ''}`}>
+<div class={`tabs${border ? ' bordered' : ''}`}>
    <!--Tab List-->
    <div class="tab-list">
       <!--For each tab-->
       {#each tabs as tab}
-         <button
-            class={activeTab === tab.id ? 'active ' : ''}
-            on:click={() => {
-               activeTab = tab.id;
-            }}
-            on:mousedown={preventDefault}
-         >
-            {tab.label}
-         </button>
+         <div class={`button${activeTab === tab.id ? ' active' : ''}`}>
+            <Button on:click={() => activeTab = tab.id}>
+               {tab.label}
+            </Button>
+         </div>
       {/each}
    </div>
 
@@ -69,19 +65,13 @@
          flex: 0;
          padding: var(--titan-padding-standard);
 
-         button {
-            @include button;
+         .button {
+            @include mini-button;
 
-            --titan-button-border-radius: 5px;
-            --titan-button-line-height: var(--tab-line-height);
-            --titan-button-font-size: var(--tab-font-size);
-
-            height: 100%;
             width: 100%;
-            font-weight: normal;
 
             &.active {
-               background: var(--titan-highlight-background);
+               --titan-button-background: var(--titan-highlight-background);
             }
          }
       }

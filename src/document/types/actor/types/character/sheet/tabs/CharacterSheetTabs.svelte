@@ -1,5 +1,4 @@
 <script>
-   import BorderedTabs from '~/helpers/svelte-components/BorderedTabs.svelte';
    import CharacterSheetAbilitiesTab
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetAbilitiesTab.svelte';
    import CharacterSheetEffectsTab
@@ -13,6 +12,7 @@
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
+   import Tabs from '~/helpers/svelte-components/Tabs.svelte';
 
    const appState = getContext('applicationState');
 
@@ -51,4 +51,4 @@
    ];
 </script>
 
-<BorderedTabs bind:activeTab={$appState.activeTab} {tabs}/>
+<Tabs bind:activeTab={$appState.activeTab} border={true} {tabs}/>

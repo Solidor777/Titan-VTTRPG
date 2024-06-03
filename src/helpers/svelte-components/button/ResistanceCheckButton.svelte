@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharactersToUpdate.js";
+   import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharactersToUpdate.js';
 
    /** @type string The Resistance to roll. */
    export let resistance = void 0;
@@ -19,7 +19,7 @@
    export let disabled = false;
 
    /**
-    *
+    * Requests a resistance check from each user target.
     */
    async function requestResistanceCheck() {
       const userTargets = getBestCharactersToUpdate();
@@ -42,9 +42,7 @@
 <div class="button {resistance}">
    <Button
       {disabled}
-      on:click={() => {
-         requestResistanceCheck();
-      }}
+      on:click={() => requestResistanceCheck()}
       tooltip={localize(`${resistance}.desc`)}
    >
       {`${localize(resistance)} ${difficulty}:${complexity}`}
@@ -54,7 +52,6 @@
 <style lang="scss">
    .button {
       @include flex-row;
-      @include font-size-normal;
       @include resistance-button;
 
       width: 100%;
