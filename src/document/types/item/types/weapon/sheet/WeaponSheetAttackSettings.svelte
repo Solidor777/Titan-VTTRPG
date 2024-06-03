@@ -50,7 +50,8 @@
                   },
                });
             }
-         } else if (attack.skill === 'meleeWeapons') {
+         }
+         else if (attack.skill === 'meleeWeapons') {
             attack.skill = 'rangedWeapons';
             $document.update({
                system: {
@@ -219,9 +220,7 @@
                      {#each attack.trait as trait (trait.name)}
                         <div
                            class="trait"
-                           use:tooltip={{
-                              content: localize(traitDescriptions[trait.name]),
-                           }}
+                           use:tooltip={localize(traitDescriptions[trait.name])}
                         >
                            {#if typeof (trait.value) === 'number'}
                               <!--Number Trait-->

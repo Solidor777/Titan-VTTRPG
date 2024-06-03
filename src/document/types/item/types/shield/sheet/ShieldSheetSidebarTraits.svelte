@@ -54,9 +54,7 @@
             <div
                class="trait"
                transition:slide|local
-               use:tooltip={{
-                  content: localize(traitDescriptions[trait.name]),
-               }}
+               use:tooltip={localize(traitDescriptions[trait.name])}
             >
                <Tag label={localize(trait.name)}/>
             </div>

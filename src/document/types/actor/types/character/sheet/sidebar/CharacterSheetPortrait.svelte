@@ -16,7 +16,7 @@
    <!--Take a long Rest Button-->
    <div
       class="button long-rest"
-      use:tooltip={{ content: localize('longRest.desc') }}
+      use:tooltip={localize('longRest.desc')}
    >
       <IconButton
          icon={LONG_REST_ICON}
@@ -29,7 +29,7 @@
    <!--Take a Short rest Button-->
    <div
       class="button short-rest"
-      use:tooltip={{ content: localize('shortRest.desc') }}
+      use:tooltip={localize('shortRest.desc')}
    >
       <IconButton
          icon={SHORT_REST_ICON}
@@ -42,7 +42,7 @@
    <!--Remove Temp Effects button-->
    <div
       class="button clear"
-      use:tooltip={{ content: localize('removeCombatEffects') }}
+      use:tooltip={localize('removeCombatEffects')}
    >
       <IconButton
          icon={REMOVE_TEMP_EFFECTS_ICON}
@@ -55,7 +55,7 @@
    <!--Spend Resolve button-->
    <div
       class="button resolve"
-      use:tooltip={{ content: localize('spendX%Resolve').replace('X%', 1) }}
+      use:tooltip={localize('spendX%Resolve').replace('X%', 1)}
    >
       <IconButton
          icon={SPEND_RESOLVE_ICON}

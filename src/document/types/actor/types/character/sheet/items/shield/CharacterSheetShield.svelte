@@ -1,8 +1,6 @@
 <script>
    import {getContext} from 'svelte';
    import {slide} from 'svelte/transition';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
@@ -65,23 +63,17 @@
          {/if}
 
          <!--Send to Chat button-->
-         <div
-            class="button"
-            use:tooltip={{ content: localize('sendToChat') }}
-         >
+         <div class="button">
             <CharacterSheetItemSendToChatButton {item}/>
          </div>
 
          <!--Edit Button-->
-         <div class="button" use:tooltip={{ content: localize('editItem') }}>
+         <div class="button">
             <CharacterSheetItemEditButton {item}/>
          </div>
 
          <!--Delete Button-->
-         <div
-            class="button"
-            use:tooltip={{ content: localize('deleteItem') }}
-         >
+         <div class="button">
             <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>

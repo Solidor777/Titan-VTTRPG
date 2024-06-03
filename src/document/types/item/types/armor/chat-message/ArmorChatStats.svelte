@@ -15,7 +15,7 @@
 </script>
 
 <div class="stats">
-   <div class="stat" use:tooltip={{ content: localize('armor.desc') }}>
+   <div class="stat" use:tooltip={localize('armor.desc')}>
       <IconStatTag
          icon={ARMOR_ICON}
          label={localize('armor')}
@@ -41,7 +41,7 @@
    {#each item.system.trait as trait}
       <div
          class="stat"
-         use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}
+         use:tooltip={localize(traitDescriptions[trait.name])}
       >
          {#if typeof (trait.value) === 'number'}
             <StatTag label={localize(trait.name)} value={trait.value}/>
@@ -53,7 +53,7 @@
 
    <!--Custom Traits-->
    {#each item.system.customTrait as trait}
-      <div class="stat" use:tooltip={{ content: trait.description }}>
+      <div class="stat" use:tooltip={trait.description}>
          <Tag label={trait.name}/>
       </div>
    {/each}

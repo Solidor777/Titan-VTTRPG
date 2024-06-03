@@ -1,5 +1,8 @@
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
+/**
+ * Object containing the standard spell aspects mapped by name.
+ */
 export default deepFreeze({
    range: {
       template: {

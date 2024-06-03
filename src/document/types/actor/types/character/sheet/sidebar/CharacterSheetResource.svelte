@@ -74,9 +74,7 @@
       </div>
 
       <!--Label-->
-      <span class="label" use:tooltip={{ content: localize(`${key}.desc`) }}
-      >{localize(key)}</span
-      >
+      <span class="label" use:tooltip={localize(`${key}.desc`)}>{localize(key)}</span>
 
       <!--Static Mod-->
       <div class="static-mod">
@@ -101,7 +99,7 @@
       <!--The Meter-->
       <div
          class="meter {key}"
-         use:tooltip={{ content: localize(`${key}.desc`) }}
+         use:tooltip={localize(`${key}.desc`)}
       >
          <Meter
             current={$document.system.resource[key].value}
@@ -110,7 +108,7 @@
       </div>
 
       <!--Max Value Display-->
-      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
+      <div class="value" use:tooltip={totalValueTooltip}>
          <ModTag
             baseValue={$document.system.resource[key].maxBase +
                $document.system.resource[key].mod.equipment +

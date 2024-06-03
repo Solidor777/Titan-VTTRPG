@@ -10,6 +10,7 @@ import createCustomAspectTemplate from '~/document/types/item/types/spell/SpellC
 import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
 import {SPELL_IMAGE} from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
+import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
 /**
  * Data model with extra functionality for Spells.
@@ -72,84 +73,85 @@ export default class SpellDataModel extends ItemDataModel {
       return localize('newSpell');
    }
 
-
    prepareDerivedData() {
+
+      // Update the spell's aspects
       let totalAspectCost = 0;
 
-      const aspectsToRemove = new Set();
-      for (let idx = 0; idx < this.aspect.length; idx++) {
+      // For each standard aspect
+      for (const aspect of this.aspect) {
+
          // Determine whether the aspect is enabled
          const aspect = this.aspect[idx];
          const aspectSettings = SpellAspects[aspect.label];
-         if (aspectSettings) {
-            const settings = aspectSettings.settings;
-            const template = aspectSettings.template;
-            if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
-               aspect.enabled = false;
-               aspect.cost = 0;
-            } else {
-               aspect.enabled = true;
+         const settings = aspectSettings.settings;
+         const template = aspectSettings.template;
 
-               // Calculate the cost
-               let cost = template.cost;
+         // The aspect is disabled if it requires an option and has no options set
+         if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
+            aspect.enabled = false;
+            aspect.cost = 0;
+         }
 
-               if (settings) {
-                  // Initial value cost
-                  if (settings.initialValueCosts) {
-                     cost = settings.initialValueCosts[aspect.initialValue];
-                  }
+         // Otherwise, the aspect is enabled
+         else {
+            aspect.enabled = true;
 
-                  // Unit Cost
-                  if (settings.unitCosts) {
-                     cost = settings.unitCosts[aspect.unit];
-                  }
+            // Calculate the cost of the aspect
+            let aspectCost = template.cost;
+            if (settings) {
 
-                  // Add option cost
-                  // All options
-                  if (aspect.allOptions && settings.allOptionsCost) {
-                     cost += settings.allOptionsCost;
-                  }
+               // Initial value cost
+               if (settings.initialValueCosts) {
+                  aspectCost = settings.initialValueCosts[aspect.initialValue];
+               }
 
-                  // Individual option cost
-                  else if (settings.optionCost) {
-                     cost += settings.optionCost * aspect.option.length;
-                  } else if (settings.optionCosts) {
+               // Unit Cost
+               if (settings.unitCosts) {
+                  aspectCost = settings.unitCosts[aspect.unit];
+               }
+
+               // Add option costs
+               // All options
+               if (aspect.allOptions && settings.allOptionsCost) {
+                  aspectCost += settings.allOptionsCost;
+               }
+
+               // Add the cost for each option when the cost of each option is the same
+               else if (settings.optionCost) {
+                  aspectCost += settings.optionCost * aspect.option.length;
+               }
+
+               // Add the cost for each option when the cost of each option is different
+               else if (settings.optionCosts) {
+                  for (const option of aspect.option) {
                      aspect.option.forEach((option) => {
-                        cost += settings.optionCosts[option];
+                        aspectCost += settings.optionCosts[option];
                      });
                   }
-
-                  // Scaling aspect cost
-                  if (settings.scalingCost) {
-                     aspect.scalingLost = settings.scalingCost;
-                  }
                }
 
-               // Halve the cost if the aspect has a Resistance Check
-               if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
-                  cost = Math.max(Math.floor(cost / 2), 1);
+               // Add scaling aspect cost
+               if (settings.scalingCost) {
+                  aspect.scalingLost = settings.scalingCost;
                }
-
-               aspect.cost = cost;
-               totalAspectCost += cost;
             }
-         } else {
-            aspectsToRemove.add(idx);
+
+            // Halve the cost if the aspect has a Resistance Check
+            if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
+               aspectCost = Math.max(Math.floor(aspectCost / 2), 1);
+            }
+
+            aspect.cost = aspectCost;
+            totalAspectCost += aspectCost;
          }
       }
 
-      // Remove deprecated aspects if appropriate
-      if (aspectsToRemove.size > 0) {
-         this.aspect = this.aspect.filter((aspect, idx) => {
-            return !aspectsToRemove.has(idx);
-         });
-      }
-
-      // Calculate total cost
-      this.customAspect.forEach((aspect) => {
+      // Add the cost of each custom aspect
+      for (const aspect of this.customAspect) {
          totalAspectCost += aspect.cost;
-      });
-      this.totaAspectCost = totalAspectCost;
+      }
+      this.totalAspectCost = totalAspectCost;
 
       // Calculate suggested complexity and difficulty
       let suggestedDifficulty = totalAspectCost;
@@ -157,7 +159,8 @@ export default class SpellDataModel extends ItemDataModel {
       if (suggestedDifficulty > 5) {
          suggestedComplexity = totalAspectCost - 4;
          suggestedDifficulty = 5;
-      } else {
+      }
+      else {
          suggestedDifficulty = Math.max(suggestedDifficulty, 4);
       }
 
@@ -172,34 +175,65 @@ export default class SpellDataModel extends ItemDataModel {
     * Adds a Standard Aspect to the Spell.
     * @param {object} aspect - The aspect to add.
     */
-   addStandardAspect(aspect) {
+   async addStandardAspect(aspect) {
+      // If the current user owns this item
       if (this.parent.isOwner) {
-         let aspects = this.aspect;
-         aspects.push(aspect);
-         aspects = aspects.sort((a, b) => SpellAspects[a.label].sortOrder - SpellAspects[b.label].sortOrder);
 
-         this.parent.update({
+         // Add the aspect
+         this.aspect.push(aspect);
+
+         // Sort the aspects
+         this.aspect = this.aspect.sort((a, b) =>
+            sortAscending(SpellAspects[a.label].sortOrder, SpellAspects[b.label].sortOrder));
+
+         // Update the document
+         await this.parent.update({
             system: {
-               aspect: aspects,
+               aspect: this.aspect
             },
          });
       }
    }
 
    /**
-    * Adds a new Custom Aspect to the Spell.
+    * Removes a Standard Aspect from the Spell.
+    * @param {number} idx - The index of the Standard Aspect to remove.
+    */
+   async removeStandardAspect(idx) {
+      // If the current user owns this item
+      if (this.parent.isOwner) {
+
+         // Remove the aspect
+         this.aspect.splice(idx, 1);
+
+         // Update the document
+         await this.parent.update({
+            system: {
+               aspect: this.aspect,
+            },
+         });
+      }
+   }
+
+   /**
+    * Adds a Custom Aspect to the Spell.
     * @returns {Promise<void>}
     */
    async addCustomAspect() {
+      // If the current user owns this item
       if (this.parent.isOwner) {
+
+         // Add the aspect
          this.customAspect.push(createCustomAspectTemplate());
-         this.parent.update({
+
+         // Update the document
+         await this.parent.update({
             system: {
                customAspect: this.customAspect,
             },
          });
 
-         // Update sheet
+         // Update the sheet
          const sheet = this.parent._sheet;
          if (sheet) {
             sheet.addCustomAspect();
@@ -211,17 +245,19 @@ export default class SpellDataModel extends ItemDataModel {
     * Removes a Custom Aspect from the Spell.
     * @param {number} idx - The index of the Custom Aspect to remove.
     */
-   removeCustomAspect(idx) {
+   async removeCustomAspect(idx) {
+      // If the current user owns this item
       if (this.parent.isOwner) {
 
-         // Update sheet
+         // Update the sheet
          const sheet = this.parent._sheet;
          if (sheet) {
             sheet.removeCustomAspect(idx);
          }
 
+         // Remove the aspect
          this.customAspect.splice(idx, 1);
-         this.parent.update({
+         await this.parent.update({
             system: {
                customAspect: this.customAspect,
             },

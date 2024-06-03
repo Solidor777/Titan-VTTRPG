@@ -34,7 +34,7 @@
          <!--Available-->
          <div
             class="available"
-            use:tooltip={{ content: localize('xpAvailable') }}
+            use:tooltip={localize('xpAvailable')}
          >
             <ModTag
                baseValue={0}
@@ -44,7 +44,7 @@
          <div class="symbol">/</div>
 
          <!--Earned Input-->
-         <div class="earned" use:tooltip={{ content: localize('xpEarned') }}>
+         <div class="earned" use:tooltip={localize('xpEarned')}>
             <DocumentIntegerInput bind:value={$document.system.xp.earned}/>
          </div>
 

@@ -66,7 +66,7 @@
 
 <div class="resistance" data-resistance={key}>
    <!--Resistance Label-->
-   <div class="button {key}" use:tooltip={{ content: localize(`${key}.desc`) }}>
+   <div class="button {key}" use:tooltip={localize(`${key}.desc`)}>
       <Button
          on:click={() =>
             $document.system.requestResistanceCheck(
@@ -94,7 +94,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
+      <div class="value" use:tooltip={totalValueTooltip}>
          <ModTag
             baseValue={$document.system.resistance[key].baseValue +
                $document.system.resistance[key].mod.equipment +

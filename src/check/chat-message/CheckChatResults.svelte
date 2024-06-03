@@ -97,7 +97,7 @@
       {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
-            use:tooltip={{ content: localize('attack.rend.desc') }}
+            use:tooltip={localize('attack.rend.desc')}
          >
             <i class={REND_ICON}/>
             {localize('rend')}:
@@ -109,7 +109,7 @@
       {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
-            use:tooltip={{ content: localize('attack.cleave.desc') }}
+            use:tooltip={localize('attack.cleave.desc')}
          >
             <i class={CLEAVE_ICON}/>
             {localize('cleave')}:

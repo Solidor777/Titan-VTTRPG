@@ -67,7 +67,7 @@
 
 <div class="mod">
    <!--Button-->
-   <div class="button" use:tooltip={{ content: localize(`${key}.desc`) }}>
+   <div class="button" use:tooltip={localize(`${key}.desc`)}>
       <Button
          on:click={() => {
             onClick();
@@ -96,12 +96,13 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
+      <div class="value">
          <ModTag
             baseValue={$document.system.rating[key].baseValue +
                $document.system.rating[key].mod.equipment +
                $document.system.rating[key].mod.ability}
             currentValue={$document.system.rating[key].value}
+            tooltip={totalValueTooltip}
          />
       </div>
    </div>

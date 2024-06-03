@@ -54,23 +54,17 @@
          {/if}
 
          <!--Send to Chat button-->
-         <div
-            class="button"
-            use:tooltip={{ content: localize('sendToChat') }}
-         >
+         <div class="button">
             <CharacterSheetItemSendToChatButton {item}/>
          </div>
 
          <!--Edit Button-->
-         <div class="button" use:tooltip={{ content: localize('editItem') }}>
+         <div class="button">
             <CharacterSheetItemEditButton {item}/>
          </div>
 
          <!--Delete Button-->
-         <div
-            class="button"
-            use:tooltip={{ content: localize('deleteItem') }}
-         >
+         <div class="button">
             <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>
@@ -136,7 +130,7 @@
 
             <!--Custom Traits-->
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltip={{ content: trait.description }}>
+               <div class="tag" use:tooltip={trait.description}>
                   <Tag label={trait.name}/>
                </div>
             {/each}
@@ -144,7 +138,6 @@
       </div>
    {/if}
 </div>
-
 
 <style lang="scss">
    .item {

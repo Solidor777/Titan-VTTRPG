@@ -1,105 +1,89 @@
-/**
- * A trait that can be applied to a weapon attack.
- * @typedef {object} AttackTrait
- * @property {string} name The name of the trait.
- * @property {string} type The type of the trait (number, boolean).
- * @property {boolean|number} value The value of the trait..
- */
+import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
-export const ATTACK_TRAITS = [
+/**
+ * All traits specific to Attacks.
+ * @type {StandardTrait[]}
+ */
+export const ATTACK_TRAITS = deepFreeze([
    {
       name: 'blast',
-      type: 'number',
       value: 0,
    },
    {
       name: 'cleave',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'close',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'crushing',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'ineffective',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'loud',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'magical',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'flurry',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'penetrating',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'piercing',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'push',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'reload',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'rend',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'restraining',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'slashing',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'splash',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'twoHanded',
-      type: 'boolean',
       value: false,
    },
    {
       name: 'vicious',
-      type: 'boolean',
       value: false,
    },
-];
+]);
 
-export const ATTACK_TRAIT_DESCRIPTIONS = {
+/**
+ * Keys for the localized description strings for Attack Traits, mapped to the Trait name.
+ * @type {object}
+ */
+export const ATTACK_TRAIT_DESCRIPTIONS = deepFreeze({
    blast: 'attack.blast.desc',
    cleave: 'attack.cleave.desc',
    close: 'attack.close.desc',
@@ -118,4 +102,4 @@ export const ATTACK_TRAIT_DESCRIPTIONS = {
    splash: 'attack.splash.desc',
    twoHanded: 'attack.twoHanded.desc',
    vicious: 'attack.vicious.desc',
-};
+});

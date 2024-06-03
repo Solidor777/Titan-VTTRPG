@@ -15,7 +15,7 @@
       : localize('effect.expired.desc');
 </script>
 
-<div class="tag" use:tooltip={{ content: formattedTooltip }}>
+<div class="tag" use:tooltip={formattedTooltip}>
    <!--Image-->
    <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
 

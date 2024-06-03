@@ -1,7 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import { getContext, setContext } from 'svelte';
+   import {getContext, setContext} from 'svelte';
    import WeaponChatMessage from '~/document/types/item/types/weapon/chat-message/WeaponChatMessage.svelte';
    import ArmorChatMessage from '~/document/types/item/types/armor/chat-message/ArmorChatMessage.svelte';
    import SpellChatMessage from '~/document/types/item/types/spell/chat-message/SpellChatMessage.svelte';
@@ -47,6 +47,7 @@
    // Setup
    setContext('document', documentStore);
    const document = getContext('document');
+   console.log($document);
 
    // Selector for the chat message type
    /**

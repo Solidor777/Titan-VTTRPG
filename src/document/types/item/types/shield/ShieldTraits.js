@@ -1,11 +1,20 @@
-export const SHIELD_TRAITS = [
+import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
+
+/**
+ * All traits specific to Shield items.
+ * @type {StandardTrait[]}
+ */
+export const SHIELD_TRAITS = deepFreeze([
    {
       name: 'magical',
-      type: 'boolean',
       value: false,
    },
-];
+]);
 
-export const SHIELD_TRAIT_DESCRIPTIONS = {
+/**
+ * Keys for the localized description strings for Shield Traits, mapped to the Trait name.
+ * @type {object}
+ */
+export const SHIELD_TRAIT_DESCRIPTIONS = deepFreeze({
    magical: 'armor.magical.desc'
-};
+});

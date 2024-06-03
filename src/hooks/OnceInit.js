@@ -30,6 +30,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import TitanCombat from '~/document/types/combat/Combat.js';
 import SocketManager from '~/helpers/SocketManager.js';
 import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
+import TitanChatMessage from '~/document/chat-message/ChatMessage.js';
 
 /**
  * Attached to the Init Hook.
@@ -73,6 +74,9 @@ export default function onceInit() {
       spell: SpellDataModel,
       weapon: WeaponDataModel,
    };
+
+   // Configure Chat Messages
+   CONFIG.ChatMessage.documentClass = TitanChatMessage;
 
    CONFIG.time.roundTime = 6;
    CONFIG.ActiveEffect.legacyTransferral = false;

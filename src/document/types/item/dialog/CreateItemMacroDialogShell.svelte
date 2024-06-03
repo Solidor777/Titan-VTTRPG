@@ -259,7 +259,7 @@
    {/if}
 
    <!--ID Method-->
-   <div class="row" use:tooltip={{ content: localize(`idMethod.desc`) }}>
+   <div class="row" use:tooltip={localize(`idMethod.desc`)}>
       <!--Label-->
       <div class="label">
          {localize('idMethod')}

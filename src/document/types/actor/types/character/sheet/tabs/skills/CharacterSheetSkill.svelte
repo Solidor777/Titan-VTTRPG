@@ -84,7 +84,6 @@
          <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute}/>
       </div>
 
-
       <!--Training and Expertise-->
       <div class="column">
 
@@ -92,7 +91,7 @@
          <div class="row">
 
             <!--Label-->
-            <div class="label" use:tooltip={{ content: localize('training.desc') }}>
+            <div class="label" use:tooltip={localize('training.desc')}>
 
                <!--Icon-->
                <i class="{EXPERTISE_ICON}"/>
@@ -116,15 +115,16 @@
 
             <!--Total Value-->
             <div class="symbol">=</div>
-            <div class="value" use:tooltip={{ content: totalTrainingTooltip}}>
+            <div class="value">
                <ModTag
                   baseValue={
-               $document.system.skill[key].training.baseValue +
-               $document.system.skill[key].training.mod.ability +
-               $document.system.skill[key].training.mod.equipment +
-               checkParameters.trainingMod
-               }
+                     $document.system.skill[key].training.baseValue +
+                     $document.system.skill[key].training.mod.ability +
+                     $document.system.skill[key].training.mod.equipment +
+                     checkParameters.trainingMod
+                  }
                   currentValue={checkParameters.totalTrainingDice}
+                  tooltip={totalTrainingTooltip}
                />
             </div>
          </div>
@@ -132,7 +132,7 @@
          <!--Expertise row-->
          <div class="row">
             <!--Label-->
-            <div class="label" use:tooltip={{ content: localize('expertise.desc') }}>
+            <div class="label" use:tooltip={localize('expertise.desc')}>
 
                <!--Icon-->
                <i class="{TRAINING_ICON}"/>
@@ -158,21 +158,21 @@
 
             <!--Total Value-->
             <div class="symbol">=</div>
-            <div class="value" use:tooltip={{ content: totalExpertiseTooltip }}>
+            <div class="value">
                <ModTag
                   baseValue={
-                  $document.system.skill[key].expertise.baseValue +
-                  $document.system.skill[key].expertise.mod.ability +
-                  $document.system.skill[key].expertise.mod.equipment +
-                  checkParameters.expertiseMod
-               }
+                     $document.system.skill[key].expertise.baseValue +
+                     $document.system.skill[key].expertise.mod.ability +
+                     $document.system.skill[key].expertise.mod.equipment +
+                     checkParameters.expertiseMod
+                  }
                   currentValue={checkParameters.totalExpertise}
+                  toolTip={totalExpertiseTooltip}
                />
             </div>
          </div>
       </div>
    </div>
-
 
 </div>
 

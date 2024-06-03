@@ -42,7 +42,7 @@
    }
 </script>
 
-<div class="tag {styleClass}" use:tooltip={{ content: getTooltip() }}>
+<div class="tag {styleClass}" use:tooltip={getTooltip()}>
    <!--Icon-->
    <i class="{icon}"/>
 

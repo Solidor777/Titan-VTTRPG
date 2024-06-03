@@ -82,7 +82,7 @@
 
          <!--Custom Traits-->
          {#each item.customTrait as trait}
-            <div class="tag" use:tooltip={{ content: trait.description }}>
+            <div class="tag" use:tooltip={trait.description}>
                <Tag label={trait.name}/>
             </div>
          {/each}

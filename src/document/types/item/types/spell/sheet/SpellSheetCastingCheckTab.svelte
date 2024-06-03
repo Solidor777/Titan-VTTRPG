@@ -110,12 +110,12 @@
          <div class="stat">
             <!--Label-->
             <div class="label">
-               {localize('totaAspectCost')}:
+               {localize('totalAspectCost')}:
             </div>
 
             <!--Value-->
             <div class="value">
-               {$document.system.totaAspectCost}
+               {$document.system.totalAspectCost}
             </div>
          </div>
       </div>

@@ -64,7 +64,7 @@
 <!--Speeds-->
 <div class="speed">
    <!--Label-->
-   <div class="label" use:tooltip={{ content: localize(`${key}.desc`) }}>
+   <div class="label" use:tooltip={localize(`${key}.desc`)}>
       <!--Icon-->
       {localize(key)}
    </div>
@@ -88,7 +88,7 @@
       <div class="symbol">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
+      <div class="value" use:tooltip={totalValueTooltip}>
          <ModTag
             baseValue={$document.system.speed[key].baseValue +
                $document.system.speed[key].mod.ability +

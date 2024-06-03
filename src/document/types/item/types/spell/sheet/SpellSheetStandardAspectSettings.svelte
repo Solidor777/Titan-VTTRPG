@@ -31,16 +31,9 @@
          // If disabled, add the aspect
          if (idx === -1) {
             $document.system.addStandardAspect(aspectOptions.template);
-         } else {
-            // Otherwise remove the aspect
-            $document.system.aspect.splice(idx, 1);
-
-            // Update the document
-            $document.update({
-               system: {
-                  aspect: $document.system.aspect,
-               },
-            });
+         }
+         else {
+            $document.system.removeStandardAspect(idx);
          }
       }
    }

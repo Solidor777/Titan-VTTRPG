@@ -8,7 +8,7 @@
    const document = getContext('document');
 </script>
 
-<div class="button" use:tooltip={{ content: localize('inspiration.desc') }}>
+<div class="button" use:tooltip={localize('inspiration.desc')}>
    <IconButton
       icon={$document.system.inspiration ? INSPIRATION_ICON: ''}
       on:click={() => {

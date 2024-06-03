@@ -53,7 +53,7 @@
          <!--Traits-->
          {#if item.system.customTrait.length > 0}
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltip={{ content: trait.description }}>
+               <div class="tag" use:tooltip={trait.description}>
                   <Tag label={trait.name}/>
                </div>
             {/each}

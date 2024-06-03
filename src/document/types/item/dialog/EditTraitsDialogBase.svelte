@@ -60,7 +60,7 @@
 <ol>
    {#each traitOptions as trait, idx}
       <!--Trait-->
-      <li use:tooltip={{ content: localize(traitDescriptions[trait.name]) }}>
+      <li use:tooltip={localize(traitDescriptions[trait.name])}>
 
          <!--Label-->
          <div class="label">

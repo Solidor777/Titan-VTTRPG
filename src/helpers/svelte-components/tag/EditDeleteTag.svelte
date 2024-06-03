@@ -11,7 +11,7 @@
 </script>
 
 <div class="tag">
-   <div use:tooltip={{ content: labelTooltip }}>
+   <div use:tooltip={labelTooltip}>
       {label}
    </div>
    <!-- svelte-ignore a11y-missing-attribute -->
@@ -26,7 +26,7 @@
       }}
       role="button"
       tabindex="0"
-      use:tooltip={{ content: editTooltip }}
+      use:tooltip={editTooltip}
    />
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
@@ -40,7 +40,7 @@
       }}
       role="button"
       tabindex="0"
-      use:tooltip={{ content: deleteTooltip }}
+      use:tooltip={deleteTooltip}
    />
 </div>
 

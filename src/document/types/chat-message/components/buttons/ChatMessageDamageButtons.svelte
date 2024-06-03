@@ -13,7 +13,7 @@
 
 <div class="damage-buttons">
    <!--Apply damage button-->
-   <div class="button" use:tooltip={{ content: localize('applyDamage') }}>
+   <div class="button" use:tooltip={localize('applyDamage')}>
       <Button
          on:click={() => {
             applyDamageToTargets(damage, {
@@ -28,7 +28,7 @@
    <!--Apply damage ignore armor button-->
    <div
       class="button"
-      use:tooltip={{ content: localize('applyDamageIgnoreArmor') }}
+      use:tooltip={localize('applyDamageIgnoreArmor')}
    >
       <Button
          on:click={() =>
@@ -42,7 +42,7 @@
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" use:tooltip={{ content: localize('applyHalfDamage') }}>
+   <div class="button" use:tooltip={localize('applyHalfDamage')}>
       <Button
          on:click={() =>
             applyDamageToTargets(Math.floor(damage / 2), {
@@ -55,7 +55,7 @@
    </div>
 
    <!--Apply healing button-->
-   <div class="button" use:tooltip={{ content: localize('applyHealing') }}>
+   <div class="button" use:tooltip={localize('applyHealing')}>
       <Button on:click={() => applyHealingToTargets(damage)}>
          <i class="{HEALING_ICON}"/>
       </Button>

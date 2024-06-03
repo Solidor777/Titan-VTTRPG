@@ -32,6 +32,9 @@
          "player": {},
          "npc": {}
       },
+      "ChatMessage": {
+         "testChat": {}
+      },
       "Item": {
          "ability": {},
          "armor": {},

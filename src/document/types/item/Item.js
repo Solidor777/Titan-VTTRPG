@@ -56,31 +56,10 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Performs initialization logic after document creation.
-    * @param {object} data - The initial data object provided to the document creation request.
-    * @param {object} options - Additional options which modify the creation request.
-    * @param {documents.BaseUser} user - The User requesting the document creation.
-    * @private
-    */
-   _onCreate(data, options, user) {
-      super._onCreate(data, options, user);
-
-      // Perform data model type specific updates
-      if (typeof this.system.onPreCreate === 'function') {
-         this.system.onPreCreate(data);
-      }
-   }
-
-   /**
     * Apply transformations of derivations to the values of the source data object.
     * Compute data fields whose values are not stored to the database.
     */
    prepareDerivedData() {
-      // Create type component if necessary
-      if (!this.system) {
-         this._initializeTypeComponent();
-      }
-
       // Prepare type specific data
       if (this.system) {
          this.system.prepareDerivedData();

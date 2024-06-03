@@ -13,7 +13,7 @@
 </script>
 
 <!--Field-->
-<div class="field" use:tooltip={{content: fieldTooltip ?? ''}}>
+<div class="field" use:tooltip={fieldTooltip}>
 
    <!--Label-->
    <div class="label">
@@ -27,7 +27,6 @@
       </div>
    </div>
 </div>
-
 
 <style lang="scss">
    .field {

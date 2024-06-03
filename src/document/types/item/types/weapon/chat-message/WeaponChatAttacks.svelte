@@ -89,7 +89,7 @@
 
             <!--Custom Traits-->
             {#each attack.customTrait as trait}
-               <div class="stat" use:tooltip={{ content: trait.description }}>
+               <div class="stat" use:tooltip={trait.description}>
                   <Tag label={trait.name}/>
                </div>
             {/each}

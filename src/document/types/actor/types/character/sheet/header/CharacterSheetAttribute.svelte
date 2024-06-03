@@ -64,7 +64,7 @@
 
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
-   <div class="button {key}" use:tooltip={{ content: localize(`${key}.desc`) }}>
+   <div class="button {key}" use:tooltip={localize(`${key}.desc`)}>
       <Button
          on:click={() =>
             $document.system.requestAttributeCheck(
@@ -94,7 +94,7 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={{ content: totalValueTooltip }}>
+      <div class="value" use:tooltip={totalValueTooltip}>
          <ModTag
             baseValue={$document.system.attribute[key].baseValue +
                $document.system.attribute[key].mod.equipment +

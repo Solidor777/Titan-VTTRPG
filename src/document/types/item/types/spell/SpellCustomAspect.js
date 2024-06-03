@@ -15,12 +15,8 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  */
 
 /**
- * Creates a new Weapon Attack.
- * @returns {SpellCustomAspect} The Weapon Attack with the default options sat.
- */
-
-/**
- *
+ * Creates a new Custom Aspect for spells.
+ * @returns {SpellCustomAspect} The Custom Aspect with the default options sat.
  */
 export default function createCustomAspectTemplate() {
    return {

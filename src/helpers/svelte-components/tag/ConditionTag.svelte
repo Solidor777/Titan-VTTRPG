@@ -7,7 +7,7 @@
    export let description = void 0;
 </script>
 
-<div class="tag" use:tooltip={{ content: description }}>
+<div class="tag" use:tooltip={description}>
    <!--Image-->
    <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
 

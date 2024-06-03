@@ -18,7 +18,7 @@
 </script>
 
 <!--Field-->
-<div class="field" on:change use:tooltip={{content: fieldTooltip ?? ''}}>
+<div class="field" on:change use:tooltip={fieldTooltip}>
 
    <!--Label-->
    <div class="label">
@@ -30,7 +30,6 @@
       <svelte:component {...inputProps} bind:value this={input}/>
    </div>
 </div>
-
 
 <style lang="scss">
    .field {

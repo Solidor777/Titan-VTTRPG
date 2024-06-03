@@ -107,9 +107,7 @@
                {#each attack.trait as trait (trait.name)}
                   <div
                      class="stat"
-                     use:tooltip={{
-                        content: localize(traitDescriptions[trait.name]),
-                     }}
+                     use:tooltip={localize(traitDescriptions[trait.name])}
                      transition:slide|local
                   >
                      {#if typeof (trait.value) === 'number'}
@@ -129,7 +127,7 @@
                {#each attack.customTrait as trait (trait.uuid)}
                   <div
                      class="stat"
-                     use:tooltip={{ content: trait.description }}
+                     use:tooltip={trait.description}
                      transition:slide|local
                   >
                      <Tag label={trait.name}/>

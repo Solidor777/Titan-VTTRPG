@@ -14,7 +14,7 @@
    const aspectOptions = foundry.utils.deepClone(SpellAspects);
 
    // Localize Option Labels
-   for (const [aspectKey, aspect] of Object.entries(aspectOptions)) {
+   for (const aspect of Object.values(aspectOptions)) {
       // Localize value options
       if (aspect.settings?.initialValueOptions) {
          aspect.settings.initialValueOptions.forEach((option) => {
