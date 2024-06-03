@@ -46,6 +46,12 @@
          "weapon": {}
       }
    },
+   "grid": {
+      "type": 1,
+      "distance": 1,
+      "units": "sp",
+      "diagonals": 4
+   },
    "socket": true,
    "url": "https://github.com/Solidor777/Titan-VTTRPG",
    "bugs": "https://github.com/Solidor777/Titan-VTTRPG/issues",
@@ -53,8 +59,5 @@
    "changelog": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/CHANGELOG.md",
    "manifest": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/system.json",
    "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/latest/titan.zip",
-   "license": "LICENSE.txt",
-   "grid": {
-      "units": "sp"
-   }
+   "license": "LICENSE.txt"
 }
