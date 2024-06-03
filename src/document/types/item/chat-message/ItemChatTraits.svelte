@@ -5,11 +5,11 @@
    const document = getContext('document');
 
    // Chat context reference
-   const chatContext = $document.flags.titan;
+   const titanFlags = $document.flags.titan;
 </script>
 
 <div class="traits">
-   {#each chatContext.system.traits as trait}
+   {#each titanFlags.system.traits as trait}
       <div class="trait">
          {localize(trait.name)}
          {#if typeof (trait.value) === 'number'}

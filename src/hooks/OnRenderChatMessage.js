@@ -3,6 +3,10 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.svelte';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze';
 
+/**
+ * List if Titan Chat Message types.
+ * @type {Set<string>}
+ */
 const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
    'attributeCheck',
    'skillCheck',
@@ -32,13 +36,14 @@ const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
 ]));
 
 /**
- * @param message
- * @param html
+ * Called efore a Chat Message is rendered to attach svelte components and the dark mode class if appropriate.
+ * @param {Node} html - The DOM element of the Chat Message being rendered.
+ * @param {ChatMessage} message - The Chat Message being rendered.
  */
 export default function onRenderChatMessage(message, html) {
    // Check if this is a valid titan chat message
-   const chatContext = message?.flags?.titan;
-   if (TITAN_CHAT_MESSAGE_TYPES.has(chatContext?.type)) {
+   const titanFlags = message?.flags?.titan;
+   if (TITAN_CHAT_MESSAGE_TYPES.has(titanFlags?.type)) {
       // Add the titan class
       const content = html.find('.chat-message').prevObject;
       content.addClass('titan');

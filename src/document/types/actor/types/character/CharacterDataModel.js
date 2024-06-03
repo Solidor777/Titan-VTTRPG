@@ -618,7 +618,8 @@ export default class CharacterDataModel extends ActorDataModel {
             }
          }
          this.rulesElementsCache.mulBase = mulBase;
-      } else {
+      }
+      else {
          this.rulesElementsCache.mulBase = false;
       }
    }
@@ -669,7 +670,8 @@ export default class CharacterDataModel extends ActorDataModel {
          }
 
          this.rulesElementsCache.flatModifier = flatModifier;
-      } else {
+      }
+      else {
          this.rulesElementsCache.flatModifier = false;
       }
    }
@@ -705,7 +707,8 @@ export default class CharacterDataModel extends ActorDataModel {
          }
 
          this.rulesElementsCache.fastHealing = fastHealing;
-      } else {
+      }
+      else {
          this.rulesElementsCache.fastHealing = false;
       }
    }
@@ -739,7 +742,8 @@ export default class CharacterDataModel extends ActorDataModel {
          }
 
          this.rulesElementsCache.persistentDamage = persistentDamage;
-      } else {
+      }
+      else {
          this.rulesElementsCache.persistentDamage = false;
       }
    }
@@ -817,7 +821,8 @@ export default class CharacterDataModel extends ActorDataModel {
                   if (selectorMessages.length > 0) {
                      checkTypeMessages[selector] = selectorMessages;
                   }
-               } else {
+               }
+               else {
                   const selectorMessages = {};
 
                   // Sort elements by key
@@ -916,7 +921,8 @@ export default class CharacterDataModel extends ActorDataModel {
                            ratingMap.multiAttack[type] += element.value;
                         }
                      }
-                  } else {
+                  }
+                  else {
                      // Initialize rating map
                      ratingMap[selector] = {};
                      const selectorMap = ratingMap[selector];
@@ -2174,7 +2180,8 @@ export default class CharacterDataModel extends ActorDataModel {
          const targets = getTargetedCharacters();
          if (targets.length > 0) {
             checkOptions.targetDefense = targets[0].system.getRollData().rating.defense.value;
-         } else {
+         }
+         else {
             checkOptions.targetDefense = checkOptions.type === 'melee' ?
                checkOptions.attackerMelee :
                checkOptions.attackerAccuracy;
@@ -4615,7 +4622,8 @@ export default class CharacterDataModel extends ActorDataModel {
                      const initiative = effect.system.duration.initiative;
                      return (initiative < previousInitiative || initiative >= currentInitiative);
                   });
-               } else {
+               }
+               else {
                   // If this turn is the start of a new round,
                   // advance effects with an initiative lesser or equal to the current turn's initiative,
                   // or greater than the previous turn's initiative
@@ -4720,7 +4728,8 @@ export default class CharacterDataModel extends ActorDataModel {
                break;
             }
          }
-      } else if (this.parent.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
+      }
+      else if (this.parent.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
          // If the current user is a player and an owner,
          // open the sheet if auto open sheets is enabled for players.
          this.parent.sheet.render(true);
@@ -4894,7 +4903,7 @@ export default class CharacterDataModel extends ActorDataModel {
          // Send a report if appropriate
          if (Object.keys(reportData).length > 0) {
 
-            // Prepare chat context
+            // Prepare Titan Flags
             reportData.type = 'turnEndReport';
             reportData.actorName = this.parent.name;
             reportData.actorImg = this.parent.img;

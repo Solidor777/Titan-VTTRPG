@@ -130,7 +130,7 @@
             <!--Custom Traits-->
             {#each item.system.customTrait as trait}
                <div class="tag">
-                  <Tag label={trait.name} toolTip={trait.description}/>
+                  <Tag label={trait.name} tooltip={trait.description}/>
                </div>
             {/each}
          </div>

@@ -1,8 +1,8 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { PERSISTENT_DAMAGE_ICON } from '~/system/Icons.js';
+   import {PERSISTENT_DAMAGE_ICON} from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
    /** @type ChatMessage Reference to the Chat Message document. */
@@ -42,7 +42,7 @@
 
       // If we own this chat message and the associated actor
       if ($document?.isOwner) {
-         const actor = getActorFromSpeaker($document.speaker.token, $document.speaker.actor);
+         const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Update the actor

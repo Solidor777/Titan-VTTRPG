@@ -1,11 +1,12 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import onRegenerateDocumentUUID from '~/helpers/utility-functions/OnRegenerateDocumentUUID.js';
 import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.js';
-import { ID_ICON } from '~/system/Icons.js';
+import {ID_ICON} from '~/system/Icons.js';
 
 /**
- * @param html
- * @param options
+ * Generates contextual options when right-clicking on an Actor in the Actors directory.
+ * @param {Node} html - The DOM element that was clicked.
+ * @param {object} options - Array of buttons contenting the contextual options.
  */
 export default function onGetActorDirectoryEntryContext(html, options) {
 
@@ -14,7 +15,7 @@ export default function onGetActorDirectoryEntryContext(html, options) {
       name: localize('regenerateUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
       condition: isActorOwner,
-      callback: (li) => onRegenerateDocumentUUID(getActorFromDirectoryEntry(li)),
+      callback: (entry) => onRegenerateDocumentUUID(getActorFromDirectoryEntry(entry)),
    });
 
    // Edit UUID
@@ -22,20 +23,24 @@ export default function onGetActorDirectoryEntryContext(html, options) {
       name: localize('editUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
       condition: isActorOwner,
-      callback: (li) => onEditDocumentUUID(getActorFromDirectoryEntry(li)),
+      callback: (entry) => onEditDocumentUUID(getActorFromDirectoryEntry(entry)),
    });
 }
 
 /**
- * @param li
+ * Gets the Actor from an Entry in the Actors directory.
+ * @param {Node} entry - DOM element Entry for the Document in the directory.
+ * @returns {TitanActor} The Document from the Entry in the directory.
  */
-function getActorFromDirectoryEntry(li) {
-   return game.actors.get(li.data('document-id'));
+function getActorFromDirectoryEntry(entry) {
+   return game.actors.get(entry.data('document-id'));
 }
 
 /**
- * @param li
+ * Determines whether the current user owns the Actor for an Entry in the Actors directory.
+ * @param {Node} entry - DOM element Entry for the Document in the directory.
+ * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
  */
-function isActorOwner(li) {
-   return getActorFromDirectoryEntry(li)?.isOwner;
+function isActorOwner(entry) {
+   return getActorFromDirectoryEntry(entry)?.isOwner;
 }

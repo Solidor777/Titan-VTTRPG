@@ -55,10 +55,10 @@ export default class TitanActor extends Actor {
 
    /**
     * @typedef {object} Speaker  An object containing data on a Chat Message's speaker.
-    * @property {Scene} scene The Scene is which the speaker resides.
-    * @property {Actor} actor Actor that is speaking.
+    * @property {Scene} scene The Scene in which the speaker resides.
+    * @property {string} actor The ID of the speaker's actor.
     * @property {string} alias The name of the speaker to display.
-    * @property {string} token The Token id of the speaker.
+    * @property {string} token The ID of the speaker's Token.
     */
 
    /**

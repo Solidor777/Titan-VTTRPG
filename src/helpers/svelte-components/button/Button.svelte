@@ -7,6 +7,8 @@
 
    /** @type string Tooltip to display for this element, if any. */
    export let tooltip = void 0;
+
+   console.log(tooltip);
 </script>
 
 <button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>

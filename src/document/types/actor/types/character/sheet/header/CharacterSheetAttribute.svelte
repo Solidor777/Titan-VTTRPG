@@ -1,7 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
@@ -64,12 +63,13 @@
 
 <div class="attribute" data-attribute={key}>
    <!--attribute Label-->
-   <div class="button {key}" use:tooltip={localize(`${key}.desc`)}>
+   <div class="button {key}">
       <Button
          on:click={() =>
             $document.system.requestAttributeCheck(
                { attribute: key },
             )}
+         tooltip={localize(`${key}.desc`)}
       >
          {localize(key)}
       </Button>
@@ -94,12 +94,13 @@
       <div class="label">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={totalValueTooltip}>
+      <div class="value">
          <ModTag
             baseValue={$document.system.attribute[key].baseValue +
                $document.system.attribute[key].mod.equipment +
                $document.system.attribute[key].mod.ability}
             currentValue={$document.system.attribute[key].value}
+            tooltip={totalValueTooltip}
          />
       </div>
    </div>

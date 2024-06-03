@@ -16,7 +16,7 @@ const TOOLTIP_DURATION = [400, 250];
  */
 export default function tooltip(node, content) {
    // Initialize a tooltip if the provided tooltip string is valid
-   let tippyTooltip = isHTMLBlank(content) ?
+   let tippyTooltip = !isHTMLBlank(content) ?
       initializeTippy(node, content) :
       false;
 

@@ -167,7 +167,7 @@
                      checkParameters.expertiseMod
                   }
                   currentValue={checkParameters.totalExpertise}
-                  toolTip={totalExpertiseTooltip}
+                  tooltip={totalExpertiseTooltip}
                />
             </div>
          </div>

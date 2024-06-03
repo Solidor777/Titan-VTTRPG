@@ -1,5 +1,5 @@
-import getTargetedTokens from "~/helpers/utility-functions/GetTargetedTokens.js";
-import getControlledTokens from "~/helpers/utility-functions/GetControlledTokens.js";
+import getTargetedTokens from '~/helpers/utility-functions/GetTargetedTokens.js';
+import getControlledTokens from '~/helpers/utility-functions/GetControlledTokens.js';
 
 /**
  * Gets an array of Character Actors targeted by the current user.
@@ -18,7 +18,7 @@ export default function getTargetedCharacters() {
       targetedTokens = getControlledTokens();
    }
 
-   // Filter for for Character actors.
+   // Filter for Character actors.
    for (const target of targetedTokens) {
       if (target.actor?.system.isCharacter) {
          retVal.push(target.actor);

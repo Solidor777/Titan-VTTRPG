@@ -1,11 +1,13 @@
 import CreateItemMacroDialog from '~/document/types/item/dialog/CreateItemMacroDialog';
 
 /**
- * @param bar
- * @param data
- * @param slot
+ * Called when an object is dropped on the user's Hotbar.
+ * @param {Hotbar} hotbar - The hotbar the object was dropped on.
+ * @param {data} data - The data extracted from the drop event.
+ * @param {number} slot - The hotbar slot that the item was dropped on.
+ * @returns {boolean|void} - Returns Void if the default action should be performed. Otherwise, returns False.
  */
-export default function onHotbarDrop(bar, data, slot) {
+export default function onHotbarDrop(hotbar, data, slot) {
    // Ensure the object is an item
    if (data.type !== 'Item') {
       return;
@@ -77,14 +79,13 @@ export default function onHotbarDrop(bar, data, slot) {
 }
 
 /**
- * @param name
- * @param img
- * @param uuid
- * @param slot
+ * Creates a macro for toggling a Document's sheet.
+ * @param {string} name - The name of the macro.
+ * @param {string} img - The source image path for the macro.
+ * @param {string} uuid - The Foundry UUID of the item.
+ * @param {number} slot - The slot on the user's hotbar to add the macro to.
  */
 async function createToggleDocumentSheetMacro(name, img, uuid, slot) {
    const macro = await game.titan.macros.getToggleDocumentSheetMacro(name, img, uuid);
-   game.user.assignHotbarMacro(macro, slot);
-
-   return;
+   await game.user.assignHotbarMacro(macro, slot);
 }

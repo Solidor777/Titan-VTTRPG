@@ -1,6 +1,5 @@
 /**
- * OnPreDeleteChatMessage hook.
- * Deletes the svelte components from messages before they are deleted.
+ * Called on a Chat Message to destroy the svelte components before it is deleted.
  * @param {ChatMessage} message - The chat message being deleted.
  */
 export default function onPreDeleteChatMessage(message) {

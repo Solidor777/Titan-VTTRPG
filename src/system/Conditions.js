@@ -3,7 +3,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 /**
- *
+ * Sets up the system conditions.
  */
 export default function setupConditions() {
    // Create list of conditions

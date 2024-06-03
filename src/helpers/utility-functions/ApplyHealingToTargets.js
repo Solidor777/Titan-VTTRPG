@@ -1,4 +1,4 @@
-import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharactersToUpdate.js";
+import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharactersToUpdate.js';
 
 /**
  * Applies damage to the user's available combat targets.
@@ -6,10 +6,7 @@ import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharac
  * @param {HealingOptions?} options - Options for applying the healing.
  * @returns {Promise<void>} Returns after the healing has been applied.
  */
-export default async function applyHealingToTargets(
-   healing,
-   options,
-) {
+export default async function applyHealingToTargets(healing, options,) {
    // Get targets
    const targets = getBestCharactersToUpdate();
 

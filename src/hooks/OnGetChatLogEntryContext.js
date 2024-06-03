@@ -6,8 +6,9 @@ import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
 import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 
 /**
- * @param html
- * @param options
+ * Generates contextual options when right-clicking on a Chat Message in the Chat Log.
+ * @param {Node} html - The DOM element that was clicked.
+ * @param {object} options - Array of buttons contenting the contextual options.
  */
 export default function onGetChatLogEntryContext(html, options) {
    // Get the settings for ato spending resolve
@@ -21,7 +22,7 @@ export default function onGetChatLogEntryContext(html, options) {
          name: localize('reRollFailuresSpendResolve'),
          icon: `<i class="${DICE_ICON}"></i>`,
          condition: canReRollFailures,
-         callback: (li) => reRollCheckFailures(li, true),
+         callback: (entry) => reRollFailures(entry, true),
       },
    ];
 
@@ -31,7 +32,7 @@ export default function onGetChatLogEntryContext(html, options) {
          name: localize('reRollFailures'),
          icon: `<i class="${DICE_ICON}"></i>`,
          condition: canReRollFailures,
-         callback: (li) => reRollCheckFailures(li, false),
+         callback: (entry) => reRollFailures(entry, false),
       });
    }
 
@@ -41,7 +42,7 @@ export default function onGetChatLogEntryContext(html, options) {
          name: localize('doubleExpertiseSpendResolve'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
          condition: canDoubleExpertise,
-         callback: (li) => doubleExpertise(li, true),
+         callback: (entry) => doubleExpertise(entry, true),
       },
    ];
 
@@ -51,7 +52,7 @@ export default function onGetChatLogEntryContext(html, options) {
          name: localize('doubleExpertise'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
          condition: canDoubleExpertise,
-         callback: (li) => doubleExpertise(li, false),
+         callback: (entry) => doubleExpertise(entry, false),
       });
    }
 
@@ -61,7 +62,7 @@ export default function onGetChatLogEntryContext(html, options) {
          name: localize('doubleTrainingSpendResolve'),
          icon: `<i class="${TRAINING_ICON}"></i>`,
          condition: canDoubleTraining,
-         callback: (li) => doubleTraining(li, true),
+         callback: (entry) => doubleTraining(entry, true),
       },
    ];
 
@@ -71,7 +72,7 @@ export default function onGetChatLogEntryContext(html, options) {
          name: localize('doubleTraining'),
          icon: `<i class="${TRAINING_ICON}"></i>`,
          condition: canDoubleTraining,
-         callback: (li) => doubleTraining(li, false),
+         callback: (entry) => doubleTraining(entry, false),
       });
    }
 
@@ -81,19 +82,21 @@ export default function onGetChatLogEntryContext(html, options) {
 }
 
 /**
- * @param li
+ * Gets the Titan flags from the Entry for a Chat Message in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @returns {object} The Titan flags from the Entry for a Chat Message in the Chat Log.
  */
-function getChatContext(li) {
+function getTitanFlags(entry) {
    // Get the message from the list item
-   const message = game.messages.get(li.data('messageId'));
+   const message = game.messages.get(entry.data('messageId'));
 
    // Check if this message is visible and the user owns the speaker
    if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
 
       // Check if the message is a titan message
-      const chatContext = message?.flags?.titan;
-      if (chatContext) {
-         return chatContext;
+      const titanFlags = message?.flags?.titan;
+      if (titanFlags) {
+         return titanFlags;
       }
    }
 
@@ -101,25 +104,24 @@ function getChatContext(li) {
 }
 
 /**
- * @param li
+ * Determines whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @returns {boolean} Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
  */
-function canReRollFailures(li) {
-   // Get chat context
-   const chatContext = getChatContext(li);
-   if (chatContext) {
-      // If this is a check that has not re-rolled failures
-      if (isCheck(chatContext.type) && (chatContext.failuresReRolled === false || game.user.isGM)) {
+function canReRollFailures(entry) {
+   // Get the Titan Flags
+   const titanFlags = getTitanFlags(entry);
+   if (titanFlags) {
 
-         // Check if the check has any failures
-         let retVal = false;
-         for (const die of chatContext.results.dice) {
-            if (die.base < chatContext.parameters.difficulty) {
-               retVal = true;
-               break;
+      // If this is a check AND it has not re-rolled failures OR the current user is a GM
+      if (isCheck(titanFlags.type) && (titanFlags.failuresReRolled === false || game.user.isGM)) {
+
+         // Return true if the check has any failures.
+         for (const die of titanFlags.results.dice) {
+            if (die.base < titanFlags.parameters.difficulty) {
+               return true;
             }
          }
-
-         return retVal;
       }
    }
 
@@ -127,53 +129,21 @@ function canReRollFailures(li) {
 }
 
 /**
- * @param li
+ * Re-Rolls the failures for a Check belonging to a Chat Message Entry in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
  */
-function canDoubleExpertise(li) {
-   // Get chat context
-   const chatContext = getChatContext(li);
-   if (chatContext) {
-
-      // Check if this is a check with expertise that has not yet been doubled
-      return isCheck(chatContext.type) &&
-         chatContext.parameters.totalExpertise > 0 &&
-         (chatContext.parameters.doubleExpertise === false || game.user.isGM);
-   }
-
-   return false;
-}
-
-/**
- * @param li
- */
-function canDoubleTraining(li) {
-   // Get chat context
-   const chatContext = getChatContext(li);
-   if (chatContext) {
-
-      // Check if this is a check with training that has not yet been doubled
-      return isCheck(chatContext.type) &&
-         chatContext.parameters.totalTrainingDice > 0 &&
-         (chatContext.parameters.doubleTraining === false || game.user.isGM);
-   }
-
-   return false;
-}
-
-/**
- * @param li
- * @param spendResolve
- */
-async function reRollCheckFailures(li, spendResolve) {
+async function reRollFailures(entry, spendResolve) {
    // Get the successes and failure count
-   const message = game.messages.get(li.data('messageId'));
-   const chatContext = message?.flags?.titan;
+   const message = game.messages.get(entry.data('messageId'));
+   const titanFlags = message?.flags?.titan;
    let failureCount = 0;
    let expertiseToRefund = 0;
-   const successes = chatContext.results.dice.filter((die) => {
-      if (die.base >= chatContext.parameters.difficulty) {
+   const successes = titanFlags.results.dice.filter((die) => {
+      if (die.base >= titanFlags.parameters.difficulty) {
          return true;
-      } else {
+      }
+      else {
          failureCount += 1;
          if (die.expertiseApplied) {
             expertiseToRefund += die.expertiseApplied;
@@ -185,11 +155,11 @@ async function reRollCheckFailures(li, spendResolve) {
    // If there are any failures
    if (failureCount > 0) {
       const rerolledDice = await rollCheckDice(failureCount);
-      chatContext.results.dice = successes.concat(rerolledDice);
-      chatContext.results.expertiseRemaining += expertiseToRefund;
+      titanFlags.results.dice = successes.concat(rerolledDice);
+      titanFlags.results.expertiseRemaining += expertiseToRefund;
 
       // Recalculate the check
-      const newResults = recalculateCheckResults(chatContext);
+      const newResults = recalculateCheckResults(titanFlags);
 
       // Update the message
       await message.update({
@@ -203,87 +173,119 @@ async function reRollCheckFailures(li, spendResolve) {
 
       // Spend resolve if appropriate
       if (spendResolve) {
-         const actor = getActorFromSpeaker(message.speaker.token, message.speaker.actor);
+         const actor = getActorFromSpeaker(message.speaker);
          if (actor && actor.system.isCharacter) {
-            actor.system.spendResolve(1, {playSound: false});
+            await actor.system.spendResolve(1, {playSound: false});
          }
       }
 
-      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false});
+      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false}, true);
    }
 }
 
 /**
- * @param li
- * @param spendResolve
+ * Determines whether to display the Double Training contextual option for a Chat Message in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @returns {boolean} Whether to display the Double Training contextual option for a Chat Message in the Chat Log.
  */
-async function doubleExpertise(li, spendResolve) {
+function canDoubleTraining(entry) {
+   // Return true if the message is a check with Training that has not yet been doubled.
+   const titanFlags = getTitanFlags(entry);
+   return (titanFlags &&
+      isCheck(titanFlags.type) &&
+      titanFlags.parameters.totalTrainingDice > 0 &&
+      (titanFlags.parameters.doubleTraining === false));
+}
+
+/**
+ * Doubles the Training for a Check belonging to a Chat Message Entry in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
+ */
+async function doubleTraining(entry, spendResolve) {
    // If expertise is not already doubled
-   const message = game.messages.get(li.data('messageId'));
-   const chatContext = message?.flags?.titan;
+   const message = game.messages.get(entry.data('messageId'));
+   const titanFlags = message?.flags?.titan;
+
+   // Re roll dice equal to the number of falures
+   if (titanFlags.parameters.doubleTraining === false && titanFlags.parameters.totalTrainingDice > 0) {
+      titanFlags.parameters.doubleTraining = true;
+
+      // Roll the new dice and update the message
+      const newTrainingDice = await rollCheckDice(titanFlags.parameters.totalTrainingDice);
+      titanFlags.results.dice =
+         titanFlags.results.dice.concat(newTrainingDice);
+      titanFlags.results.totalDice += titanFlags.parameters.totalTrainingDice;
+      titanFlags.parameters.totalTrainingDice *= 2;
+      await message.update({
+         flags: {
+            titan: titanFlags,
+         },
+      });
+
+      // Spend resolve if appropriate
+      if (spendResolve) {
+         const actor = getActorFromSpeaker(message.speaker);
+         if (actor && actor.system.isCharacter) {
+            await actor.system.spendResolve(1, {playSound: false});
+         }
+      }
+
+      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false}, true);
+   }
+}
+
+/**
+ * Determines whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @returns {boolean} Whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
+ */
+function canDoubleExpertise(entry) {
+   // Return true if the message is a check with Expertise that has not yet been doubled.
+   const titanFlags = getTitanFlags(entry);
+   return (titanFlags &&
+      isCheck(titanFlags.type) &&
+      titanFlags.parameters.totalExpertise > 0 &&
+      (titanFlags.parameters.doubleExpertise === false));
+}
+
+/**
+ * Doubles the Expertise for a Check belonging to a Chat Message Entry in the Chat Log.
+ * @param {Node} entry - The Entry for a Chat Message in the Chat Log.
+ * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
+ */
+async function doubleExpertise(entry, spendResolve) {
+   // If expertise is not already doubled
+   const message = game.messages.get(entry.data('messageId'));
+   const titanFlags = message?.flags?.titan;
 
    // Double the expertise
-   if (chatContext.parameters.doubleExpertise === false && chatContext.parameters.totalExpertise > 0) {
-      chatContext.parameters.doubleExpertise = true;
-      chatContext.results.expertiseRemaining += chatContext.parameters.totalExpertise;
-      chatContext.parameters.totalExpertise *= 2;
+   if (titanFlags.parameters.doubleExpertise === false && titanFlags.parameters.totalExpertise > 0) {
+      titanFlags.parameters.doubleExpertise = true;
+      titanFlags.results.expertiseRemaining += titanFlags.parameters.totalExpertise;
+      titanFlags.parameters.totalExpertise *= 2;
 
       // Update the message
       await message.update({
          flags: {
-            titan: chatContext,
+            titan: titanFlags,
          },
       });
 
       // Spend resolve if appropriate
       if (spendResolve) {
-         const actor = getActorFromSpeaker(message.speaker.token, message.speaker.actor);
+         const actor = getActorFromSpeaker(message.speaker);
          if (actor && actor.system.isCharacter) {
-            actor.system.spendResolve(1);
+            await actor.system.spendResolve(1);
          }
       }
    }
 }
 
 /**
- * @param li
- * @param spendResolve
- */
-async function doubleTraining(li, spendResolve) {
-   // If expertise is not already doubled
-   const message = game.messages.get(li.data('messageId'));
-   const chatContext = message?.flags?.titan;
-
-   // Re roll dice equal to the number of falures
-   if (chatContext.parameters.doubleTraining === false && chatContext.parameters.totalTrainingDice > 0) {
-      chatContext.parameters.doubleTraining = true;
-
-      // Roll the new dice and update the message
-      const newTrainingDice = await rollCheckDice(chatContext.parameters.totalTrainingDice);
-      chatContext.results.dice =
-         chatContext.results.dice.concat(newTrainingDice);
-      chatContext.results.totalDice += chatContext.parameters.totalTrainingDice;
-      chatContext.parameters.totalTrainingDice *= 2;
-      await message.update({
-         flags: {
-            titan: chatContext,
-         },
-      });
-
-      // Spend resolve if appropriate
-      if (spendResolve) {
-         const actor = getActorFromSpeaker(message.speaker.token, message.speaker.actor);
-         if (actor && actor.system.isCharacter) {
-            actor.system.spendResolve(1, {playSound: false});
-         }
-      }
-
-      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false});
-   }
-}
-
-/**
- * @param chatMessageType
+ * Returns whether the provided chat message type is a Check Chat Message.
+ * @param {string} chatMessageType - The chat message type to check.
+ * @returns {boolean} Whether the provided chat message type is a Check Chat Message.
  */
 function isCheck(chatMessageType) {
    switch (chatMessageType) {

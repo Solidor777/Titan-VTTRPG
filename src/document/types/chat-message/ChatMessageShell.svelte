@@ -47,7 +47,6 @@
    // Setup
    setContext('document', documentStore);
    const document = getContext('document');
-   console.log($document);
 
    // Selector for the chat message type
    /**

@@ -14,7 +14,7 @@
    async function confirmRegainResolve() {
       if ($document?.isOwner) {
          // Get the actor
-         const actor = getActorFromSpeaker($document.speaker.token, $document.speaker.actor);
+         const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Update the actor

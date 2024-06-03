@@ -4,7 +4,7 @@
    const document = getContext('document');
 
    // Chat context reference
-   const chatContext = $document.flags.titan;
+   const titanFlags = $document.flags.titan;
 </script>
 
 <div class="description">Temporary Attack Notes</div>

@@ -1,4 +1,4 @@
-import getControlledCharacters from "~/helpers/utility-functions/GetControlledCharacters.js";
+import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
 
 const ATTACK_CHECK_MACRO_VERSION = 0;
 const CASTING_CHECK_MACRO_VERSION = 0;
@@ -6,6 +6,9 @@ const ITEM_CHECK_MACRO_VERSION = 0;
 const TOGGLE_EFFECT_ACTIVE_MACRO_VERSION = 0;
 const TOGGLE_DOCUMENT_SHEET_MACRO_VERSION = 0;
 
+/**
+ * Object for creating and executing macros.
+ */
 export default class TitanMacros {
    /**
     * Rolls an Attack Check for each controlled Character using the provided Item and Attack idx.
@@ -109,7 +112,7 @@ export default class TitanMacros {
          const command = `game.titan.macros.requestAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
 
          // Get or create the macro
-         return this.getOrCreateMacro(name, img, command, 'attackCheck', ATTACK_CHECK_MACRO_VERSION)
+         return this.getOrCreateMacro(name, img, command, 'attackCheck', ATTACK_CHECK_MACRO_VERSION);
       }
    }
 
@@ -132,7 +135,7 @@ export default class TitanMacros {
          const command = `game.titan.macros.rollCastingCheck('${id}', '${idMethod}')`;
 
          // Get or create the macro
-         return this.getOrCreateMacro(name, img, command, 'castingCheck', CASTING_CHECK_MACRO_VERSION)
+         return this.getOrCreateMacro(name, img, command, 'castingCheck', CASTING_CHECK_MACRO_VERSION);
       }
    }
 
@@ -156,7 +159,7 @@ export default class TitanMacros {
          const command = `game.titan.macros.rollItemCheck('${id}', '${idMethod}', ${checkIdx})`;
 
          // Get or create the macro
-         return this.getOrCreateMacro(name, img, command, 'itemCheck', ITEM_CHECK_MACRO_VERSION)
+         return this.getOrCreateMacro(name, img, command, 'itemCheck', ITEM_CHECK_MACRO_VERSION);
       }
    }
 

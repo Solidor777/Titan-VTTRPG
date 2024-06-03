@@ -3,7 +3,7 @@
 
    // Document reference
    const document = getContext('document');
-   const chatContext = $document.flags.titan;
+   const titanFlags = $document.flags.titan;
 
    export let icon = void 0;
    export let label = void 0;
@@ -11,13 +11,13 @@
 
 <div class="header">
    <!--Img-->
-   <img alt="img" src={chatContext.img}/>
+   <img alt="img" src={titanFlags.img}/>
 
    <!--Header-->
    <div class="label">
       <!--Sub Header-->
       <div class="name">
-         {chatContext.name}
+         {titanFlags.name}
       </div>
 
       <!--Main Header-->

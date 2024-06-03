@@ -7,7 +7,6 @@
  * sorted by the value of their inputted key.
  */
 export default function sortObjectsIntoContainerByKeyValue(objects, key) {
-   // Create retval object
    const retVal = {};
 
    // For each object

@@ -8,7 +8,7 @@
    export let currentValue = void 0;
 
    /** @type string Tooltip to show for the tag. */
-   export let toolTip = void 0;
+   export let tooltip = void 0;
 
    // Calculate the class
    let tagClass = 'tag';
@@ -21,7 +21,7 @@
 </script>
 
 <!--Total Value-->
-<div class={tagClass} use:tooltipAction={toolTip}>
+<div class={tagClass} use:tooltipAction={tooltip}>
    {currentValue}
 </div>
 

@@ -4,11 +4,11 @@
 
    // Chat context reference
    const document = getContext('document');
-   const chatContext = $document.flags.titan;
+   const titanFlags = $document.flags.titan;
 </script>
 
-<div class="tag {chatContext.system.rarity}">
-   {localize(chatContext.system.rarity)}
+<div class="tag {titanFlags.system.rarity}">
+   {localize(titanFlags.system.rarity)}
 </div>
 
 <style lang="scss">
