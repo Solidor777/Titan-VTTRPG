@@ -1,37 +1,27 @@
 import '~/styles/Fonts.scss';
-import '~/styles/Variables.scss';
-import '~/styles/Mixins.scss';
 import '~/styles/Global.scss';
-import onceInit from '~/hooks/OnceInit';
-import onceSetup from '~/hooks/OnceSetup';
-import onceReady from '~/hooks/OnceReady';
-import onRenderChatMessage from '~/hooks/OnRenderChatMessage';
-import onPreDeleteChatMessage from '~/hooks/OnPreDeleteChatMessage';
-import onRenderJournalSheet from '~/hooks/OnRenderJournalSheet.js';
-import onRenderJournalTextPageSheet from '~/hooks/OnRenderJournalTextPageSheet';
+import '~/styles/Mixins.scss';
+import '~/styles/Variables.scss';
+import onCombatNextTurn from '~/hooks/OnCombatNextTurn.js';
+import onGetActorDirectoryEntryContext from '~/hooks/OnGetActorDirectoryEntryContext.js';
 import onGetChatLogEntryContext from '~/hooks/OnGetChatLogEntryContext.js';
 import onGetItemDirectoryEntryContext from '~/hooks/OnGetItemDirectoryEntryContext.js';
-import onGetActorDirectoryEntryContext from '~/hooks/OnGetActorDirectoryEntryContext.js';
-import onCombatNextTurn from '~/hooks/OnCombatNextTurn.js';
-
-Hooks.once('init', onceInit);
-
-Hooks.once('setup', onceSetup);
-
-Hooks.once('ready', onceReady);
-
-Hooks.on('renderChatMessage', onRenderChatMessage);
-
-Hooks.on('preDeleteChatMessage', onPreDeleteChatMessage);
-
-Hooks.on('renderJournalSheet', onRenderJournalSheet);
-
-Hooks.on('renderJournalTextPageSheet', onRenderJournalTextPageSheet);
-
-Hooks.on('getChatLogEntryContext', onGetChatLogEntryContext);
-
-Hooks.on('getItemDirectoryEntryContext', onGetItemDirectoryEntryContext);
-
-Hooks.on('getActorDirectoryEntryContext', onGetActorDirectoryEntryContext);
+import onPreDeleteChatMessage from '~/hooks/OnPreDeleteChatMessage';
+import onRenderChatMessage from '~/hooks/OnRenderChatMessage';
+import onRenderJournalSheet from '~/hooks/OnRenderJournalSheet.js';
+import onRenderJournalTextPageSheet from '~/hooks/OnRenderJournalTextPageSheet';
+import onceInit from '~/hooks/OnceInit';
+import onceReady from '~/hooks/OnceReady';
+import onceSetup from '~/hooks/OnceSetup';
 
 Hooks.on('combatNextTurn', onCombatNextTurn);
+Hooks.on('getActorDirectoryEntryContext', onGetActorDirectoryEntryContext);
+Hooks.on('getChatLogEntryContext', onGetChatLogEntryContext);
+Hooks.on('getItemDirectoryEntryContext', onGetItemDirectoryEntryContext);
+Hooks.on('preDeleteChatMessage', onPreDeleteChatMessage);
+Hooks.on('renderChatMessage', onRenderChatMessage);
+Hooks.on('renderJournalSheet', onRenderJournalSheet);
+Hooks.on('renderJournalTextPageSheet', onRenderJournalTextPageSheet);
+Hooks.once('init', onceInit);
+Hooks.once('ready', onceReady);
+Hooks.once('setup', onceSetup);
