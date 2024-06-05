@@ -22,4 +22,11 @@ export default class TitanAbilitySheet extends TitanItemSheet {
          }
       });
    }
+
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-ability-sheet');
+
+      return retVal;
+   }
 }

@@ -21,4 +21,11 @@ export default class TitanEffectSheet extends TitanItemSheet {
          }
       });
    }
+
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-effect-sheet');
+
+      return retVal;
+   }
 }

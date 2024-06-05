@@ -180,7 +180,6 @@
    .skill {
       @include flex-row;
       @include flex-space-between;
-      @include border-top-bottom-right;
       @include panel-3;
 
       width: 100%;

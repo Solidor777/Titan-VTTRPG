@@ -21,4 +21,11 @@ export default class TitanCommoditySheet extends TitanItemSheet {
          }
       });
    }
+
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-commodity-sheet');
+
+      return retVal;
+   }
 }

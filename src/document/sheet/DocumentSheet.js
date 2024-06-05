@@ -118,7 +118,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _getSheetClasses() {
-      const retVal = ['titan', 'titan-titan-document-sheet'];
+      const retVal = ['titan', 'titan-document-sheet'];
 
       // Add dark mode class if dark mode enabled
       if (getSetting('darkModeSheets')) {

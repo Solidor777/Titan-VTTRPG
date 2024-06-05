@@ -1,42 +1,33 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import {ARMOR_TRAITS} from '~/document/types/item/types/armor/ArmorTraits.js';
 
-   // Value
+   /** @type number The value to bind to the input. */
    export let value = void 0;
 
-   // Whether to allow none
+   /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
 
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 
-   // Options
-   const options = [
-      {
-         label: localize('magical'),
-         value: 'magical',
-      },
-      {
-         label: localize('loud'),
-         value: 'loud',
-      },
-      {
-         label: localize('encumbering'),
-         value: 'encumbering',
-      },
-      {
-         label: localize('heavy'),
-         value: 'heavy',
-      },
-   ];
+   /** @type SelectOption[] Options for the Select. */
+   const options = [];
+   for (const trait of ARMOR_TRAITS) {
+      options.push({
+         value: trait.name,
+         label: localize(trait.name),
+      });
+   }
 
-   // Add none option
+   // Add none option if appropriate.
    if (allowNone) {
-      skillOptions.push({
+      options.push({
          label: localize('none'),
          value: 'none',
       });
    }
 </script>
 
-<Select {options} bind:value {disabled} on:change />
+<Select bind:value {disabled} on:change {options}/>

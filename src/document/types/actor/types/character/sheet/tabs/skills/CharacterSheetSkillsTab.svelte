@@ -71,7 +71,12 @@
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--titan-padding-large);
+
+               &:not(:last-child) {
+                  @include border-bottom;
+
+                  border-width: 4px;
+               }
             }
          }
       }

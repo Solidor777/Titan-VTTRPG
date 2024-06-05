@@ -1,12 +1,5 @@
 <script>
-   /**
-    * @typedef SelectOption
-    * Object used to store data for an Option within a Select component.
-    * @property {*} value The value for this option.
-    * @property {string} label The display label for this option.
-    */
-
-   /** @type SelectOption[] Options for the Select component. */
+   /** @type number[] Options for the Select component. */
    export let options = void 0;
 
    /** @type number The value to bind to the input. */
@@ -18,8 +11,8 @@
 
 <select bind:value {disabled} on:change>
    {#each options as option}
-      <option value={option.value}>
-         {option.label}
+      <option value={option}>
+         {option}
       </option>
    {/each}
 </select>

@@ -82,7 +82,6 @@ export default class SpellDataModel extends ItemDataModel {
       for (const aspect of this.aspect) {
 
          // Determine whether the aspect is enabled
-         const aspect = this.aspect[idx];
          const aspectSettings = SpellAspects[aspect.label];
          const settings = aspectSettings.settings;
          const template = aspectSettings.template;

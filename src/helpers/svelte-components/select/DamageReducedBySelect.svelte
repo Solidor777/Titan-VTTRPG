@@ -2,17 +2,19 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
 
-   // Value
+   /** @type number The value to bind to the input. */
    export let value = void 0;
+
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 
-   // Whether to allow a resistance check option
-   export let allowResistanceCheck = true;
+   /** @type boolean Whether Resistance Check as an option */
+   export let allowResistanceCheck = void 0;
 
-   // Whether to allow an opposed check option
-   export let allowOpposedCheck = true;
+   /** @type boolean Whether Opposed Check as an option */
+   export let allowOpposedCheck = void 0;
 
-   // Options
+   /** @type SelectOption[] Options for the Select. */
    export let options = [
       {
          label: localize('none'),
@@ -20,7 +22,7 @@
       },
    ];
 
-   // Allow resistance check option
+   // Add Resistance Check if appropriate.
    if (allowResistanceCheck) {
       options.push({
          label: localize('resistanceCheck'),
@@ -28,7 +30,7 @@
       });
    }
 
-   // Allow opposed check option
+   // Add Opposed Check if appropriate.
    if (allowOpposedCheck) {
       options.push({
          label: localize('opposedCheck'),
@@ -37,6 +39,4 @@
    }
 </script>
 
-<div class="damage-reduced-by-select {value}" on:change>
-   <Select {options} bind:value {disabled}/>
-</div>
+<Select bind:value {disabled} {options}/>

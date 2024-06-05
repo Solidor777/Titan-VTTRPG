@@ -20,6 +20,13 @@ export default class TitanWeaponSheet extends TitanItemSheet {
       });
    }
 
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-weapon-sheet');
+
+      return retVal;
+   }
+
    _createReactiveState() {
       return createWeaponSheetState(isHTMLBlank(this.document.system.attackNotes) ? 'itemDescription' : 'attackNotes');
    }

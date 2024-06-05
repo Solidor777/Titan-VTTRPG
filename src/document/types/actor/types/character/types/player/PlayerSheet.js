@@ -1,6 +1,5 @@
 import PlayerSheetShell from '~/document/types/actor/types/character/types/player/PlayerSheetShell.svelte';
 import TitanCharacterSheet from '~/document/types/actor/types/character/sheet/CharacterSheet.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 export default class TitanPlayerSheet extends TitanCharacterSheet {
    /**
@@ -19,12 +18,8 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
    }
 
    _getSheetClasses() {
-      const retVal = ['titan', 'titan-titan-document-sheet'];
-
-      // Add dark mode class if dark mode enabled
-      if (getSetting('darkModeSheets')) {
-         retVal.push('titan-dark-mode');
-      }
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-player-sheet');
 
       return retVal;
    }

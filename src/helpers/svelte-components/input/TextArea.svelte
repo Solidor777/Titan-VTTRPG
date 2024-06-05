@@ -1,9 +1,12 @@
 <script>
+   /** @type number The value to bind to the input. */
    export let value = void 0;
+
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 </script>
 
-<textarea bind:value on:change {disabled} />
+<textarea bind:value {disabled} on:change/>
 
 <style lang="scss">
    textarea {

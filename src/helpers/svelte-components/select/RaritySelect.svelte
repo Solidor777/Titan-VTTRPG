@@ -2,12 +2,13 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
 
-   // Value
+   /** @type number The value to bind to the input. */
    export let value = void 0;
 
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 
-   // Options
+   /** @type SelectOption[] Options for the Select. */
    const rarityOptions = [
       {
          label: localize('common'),

@@ -1,99 +1,25 @@
 <script>
-   import { createEventDispatcher } from 'svelte';
+   import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 
-   // The value of the input
+   /** @type number The value to bind to the input. */
    export let value = void 0;
+
+   /** @type {number|boolean} The minimum value of the input. */
    export let min = false;
+
+   /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
+
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 
-   let editingActive = false;
-   let input = value;
-
-   const dispatch = createEventDispatcher();
-
-   $: if (!editingActive) {
-      input = value;
-   }
-
-   /**
-    *
-    */
-   function validateInput() {
-      let newValue = parseInt(input);
-      if (isNaN(newValue)) {
-         newValue = 0;
-      }
-      if (min !== false) {
-         newValue = Math.max(newValue, min);
-      }
-      if (max !== false) {
-         newValue = Math.min(newValue, max);
-      }
-
-      if (value !== newValue) {
-         value = newValue;
-         dispatch('change');
-      }
-   }
-
-   /**
-    * @param event
-    */
-   function checkInput(event) {
-      // Only accept valid inputs
-      if (!/[0-9\.,-]/.test(event.key)) {
-         event.preventDefault();
-      }
-      else if (/[\.,]/.test(event.key)) {
-         event.preventDefault();
-      }
-   }
-
-   /**
-    *
-    */
-   function onFocus() {
-      editingActive = true;
-   }
-
-   /**
-    *
-    */
-   function onBlur() {
-      editingActive = false;
-   }
-
-   /**
-    *
-    */
-   function onChange() {
-      if (isNaN(input)) {
-         input = value;
-      }
-   }
 </script>
 
-<input
-   type="number"
-   on:keyup={validateInput}
-   on:keyup
-   on:change={onChange}
-   on:focus={onFocus}
-   on:focus
-   on:blur={onBlur}
-   on:blur
-   bind:value={input}
-   on:keypress={(event) => checkInput(event)}
+<NumberInput
+   bind:value
    {disabled}
+   isInteger={true}
+   {max}
+   {min}
+   on:change
 />
-
-<style lang="scss">
-   input {
-      @include input;
-
-      &:disabled {
-         @include input-disabled;
-      }
-   }
-</style>

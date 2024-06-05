@@ -13,8 +13,8 @@
    import DocumentSpeedSelect from '~/document/components/select/DocumentSpeedSelect.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/component/rules-element/OnRulesElementOperationChanged.js';
-   import DocumentFloatInput from '~/document/components/input/DocumentFloatInput.svelte';
    import {DELETE_ICON} from '~/system/Icons.js';
+   import DocumentNumberInput from '~/document/components/input/DocumentNumberInput.svelte';
 
    // Setup context variables
    const document = getContext('document');
@@ -168,7 +168,7 @@
 
          <!--Value-->
          <div class="field number">
-            <DocumentFloatInput bind:value={element.value}/>
+            <DocumentNumberInput bind:value={element.value}/>
          </div>
       </div>
 

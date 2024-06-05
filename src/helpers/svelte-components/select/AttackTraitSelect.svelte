@@ -1,90 +1,33 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import {ATTACK_TRAITS} from '~/document/types/item/types/weapon/AttackTraits.js';
 
-   // Value
+   /** @type number The value to bind to the input. */
    export let value = void 0;
 
-   // Whether to allow none
+   /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
 
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 
-   // Options
-   const options = [
-      {
-         label: localize('blast'),
-         value: 'blast',
-      },
-      {
-         label: localize('cleave'),
-         value: 'cleave',
-      },
-      {
-         label: localize('close'),
-         value: 'close',
-      },
-      {
-         label: localize('crushing'),
-         value: 'crushing',
-      },
-      {
-         label: localize('ineffective'),
-         value: 'ineffective',
-      },
-      {
-         label: localize('loud'),
-         value: 'loud',
-      },
-      {
-         label: localize('magical'),
-         value: 'magical',
-      },
-      {
-         label: localize('flurry'),
-         value: 'flurry',
-      },
-      {
-         label: localize('penetrating'),
-         value: 'penetrating',
-      },
-      {
-         label: localize('piercing'),
-         value: 'piercing',
-      },
-      {
-         label: localize('reload'),
-         value: 'reload',
-      },
-      {
-         label: localize('rend'),
-         value: 'rend',
-      },
-      {
-         label: localize('restraining'),
-         value: 'restraining',
-      },
-      {
-         label: localize('slashing'),
-         value: 'slashing',
-      },
-      {
-         label: localize('splash'),
-         value: 'splash',
-      },
-      {
-         label: localize('twoHanded'),
-         value: 'twoHanded',
-      },
-   ];
+   /** @type SelectOption[] Options for the Select. */
+   const options = [];
+   for (const trait of ATTACK_TRAITS) {
+      options.push({
+         value: trait.name,
+         label: localize(trait.name),
+      });
+   }
 
-   // Add none option
+   // Add none option if appropriate.
    if (allowNone) {
-      skillOptions.push({
+      options.push({
          label: localize('none'),
          value: 'none',
       });
    }
 </script>
 
-<Select {options} bind:value {disabled} on:change />
+<Select bind:value {disabled} on:change {options}/>

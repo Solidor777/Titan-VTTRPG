@@ -1,8 +1,8 @@
 <script>
-   import { createEventDispatcher } from 'svelte';
+   import {createEventDispatcher} from 'svelte';
    import isModifierActive from '~/helpers/utility-functions/IsModifierActive.js';
    import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
-   import { DECREMENT_ICON, INCREMENT_ICON } from '~/system/icons.js';
+   import {DECREMENT_ICON, INCREMENT_ICON} from '~/system/icons.js';
 
    // The value of the input
    export let value = void 0;
@@ -96,29 +96,29 @@
 <div class="input">
    <div class="decrement">
       <MiniIconButton
+         {disabled}
          icon={DECREMENT_ICON}
          on:click={decrementInput}
-         {disabled}
       />
    </div>
    <input
-      type="number"
-      on:keyup={validateInput}
-      on:keyup
+      bind:value={input}
+      {disabled}
+      on:blur={onBlur}
+      on:blur
       on:change={onChange}
       on:focus={onFocus}
       on:focus
-      on:blur={onBlur}
-      on:blur
-      bind:value={input}
       on:keypress={(event) => checkInput(event)}
-      {disabled}
+      on:keyup={validateInput}
+      on:keyup
+      type="number"
    />
    <div class="increment">
       <MiniIconButton
+         {disabled}
          icon={INCREMENT_ICON}
          on:click={incrementInput}
-         {disabled}
       />
    </div>
 </div>
@@ -130,10 +130,6 @@
 
       input {
          @include input;
-
-         &:disabled {
-            @include input-disabled;
-         }
       }
 
       .increment {

@@ -1,10 +1,12 @@
 <script>
-   // The value of the input
-   export let value;
+   /** @type number The value to bind to the input. */
+   export let value = void 0;
+
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 </script>
 
-<input bind:value on:change on:keyup {disabled} />
+<input bind:value {disabled} on:change on:keyup/>
 
 <style lang="scss">
    input {

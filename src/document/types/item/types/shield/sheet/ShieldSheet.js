@@ -16,4 +16,11 @@ export default class TitanShieldSheet extends TitanItemSheet {
          }
       });
    }
+
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-shield-sheet');
+
+      return retVal;
+   }
 }

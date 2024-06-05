@@ -1,8 +1,9 @@
 <script>
-   // The value of the input
+   /** @type boolean The value to bind to the input. */
    export let value;
 
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 </script>
 
-<input type="checkbox" bind:checked={value} {disabled} on:change />
+<input bind:checked={value} {disabled} on:change type="checkbox"/>

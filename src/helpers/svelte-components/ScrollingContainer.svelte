@@ -28,9 +28,11 @@
          if (!isScrolledToTop) {
             scrollClass += ' top-overflowing';
          }
-      } else if (!isScrolledToTop) {
+      }
+      else if (!isScrolledToTop) {
          scrollClass = ' faded top-overflowing';
-      } else {
+      }
+      else {
          scrollClass = '';
       }
    }
@@ -54,9 +56,11 @@
             if (!isScrolledToTop) {
                scrollClass += ' top-overflowing';
             }
-         } else if (!isScrolledToTop) {
+         }
+         else if (!isScrolledToTop) {
             scrollClass = ' faded top-overflowing';
-         } else {
+         }
+         else {
             scrollClass = '';
          }
       }
@@ -85,6 +89,8 @@
          position: absolute;
          overflow-y: scroll;
          padding: 0;
+         will-change: opacity, scroll-position;
+         scrollbar-gutter: stable;
 
          --top-mask-size: 0px;
          --bottom-mask-size: 0px;

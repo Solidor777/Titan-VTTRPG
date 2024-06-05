@@ -27,10 +27,5 @@
       &.enabled-true {
          --titan-button-background: var(--titan-active-background);
       }
-
-      .label {
-         @include flex-row;
-         @include flex-group-center;
-      }
    }
 </style>

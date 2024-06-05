@@ -12,15 +12,15 @@
    width: var(--titan-input-width);
    padding: var(--titan-input-padding);
    color: var(--titan-input-color);
-}
 
-@mixin input-disabled {
-   border-style: var(--titan-input-border-style);
-   border-width: var(--titan-input-border-width);
-   border-color: var(--input-border-color);
-   color: var(--font-color);
-   background: var(--titan-static-value-background);
-   opacity: var(--titan-disabled-opacity);
+   &:disabled {
+      border-style: var(--titan-input-border-style);
+      border-width: var(--titan-input-border-width);
+      border-color: var(--input-border-color);
+      color: var(--font-color);
+      background: var(--titan-static-value-background);
+      opacity: var(--titan-disabled-opacity);
+   }
 }
 
 @mixin border {
@@ -127,6 +127,7 @@
 }
 
 @mixin mini-button {
+   --titan-button-font-weight: normal;
    --titan-button-border-radius: var(--titan-border-radius);
    --titan-button-line-height: var(--titan-line-height-small);
    --titan-button-font-size: var(--titan-font-size-small);
@@ -275,6 +276,8 @@
    &.soul {
       --titan-button-background: var(--titan-soul-color);
    }
+
+   --titan-button-background-disabled: var(--titan-button-background);
 }
 
 @mixin resistance-colors {

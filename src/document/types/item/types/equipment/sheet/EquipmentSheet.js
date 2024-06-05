@@ -21,4 +21,11 @@ export default class TitanEquipmentSheet extends TitanItemSheet {
          }
       });
    }
+
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-equipment-sheet');
+
+      return retVal;
+   }
 }

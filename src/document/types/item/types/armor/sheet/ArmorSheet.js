@@ -21,4 +21,11 @@ export default class TitanArmorSheet extends TitanItemSheet {
          }
       });
    }
+
+   _getSheetClasses() {
+      const retVal = super._getSheetClasses();
+      retVal.push('titan-armor-sheet');
+
+      return retVal;
+   }
 }

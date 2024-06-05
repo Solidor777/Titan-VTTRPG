@@ -2,15 +2,16 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
 
-   // Value
+   /** @type number The value to bind to the input. */
    export let value = void 0;
 
-   // Whether to allow none
+   /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
 
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
 
-   // Options
+   /** @type SelectOption[] Options for the Select. */
    const options = [
       {
          label: localize('body'),
@@ -26,7 +27,7 @@
       },
    ];
 
-   // Add none option
+   // Add none option if appropriate
    if (allowNone) {
       skillOptions.push({
          label: localize('none'),
@@ -35,22 +36,20 @@
    }
 </script>
 
-<div class="attribute-select {value}" on:change>
-   <Select bind:value {disabled} {options}/>
+<div class="{value}">
+   <Select bind:value {disabled} on:change {options}/>
 </div>
 
 <style lang="scss">
-   .attribute-select {
-      &.body {
-         --titan-input-background: var(--titan-body-color);
-      }
+   .body {
+      --titan-input-background: var(--titan-body-color);
+   }
 
-      &.mind {
-         --titan-input-background: var(--titan-mind-color);
-      }
+   .mind {
+      --titan-input-background: var(--titan-mind-color);
+   }
 
-      &.soul {
-         --titan-input-background: var(--titan-soul-color);
-      }
+   .soul {
+      --titan-input-background: var(--titan-soul-color);
    }
 </style>

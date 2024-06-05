@@ -1,18 +1,21 @@
 <script>
    import {getContext} from 'svelte';
-   import FloatInput from '~/helpers/svelte-components/input/FloatInput.svelte';
+   import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 
-   /** @type number The value that this input should modify. */
+   /** @type number The value to bind to the input. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value for this input, or false if there is none. */
+   /** @type {number|boolean} The minimum value of the input. */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value for this input, or false if there is none. */
+   /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
 
-   /** @type boolean Whether editing this input should be disabled. */
+   /** @type boolean Whether the input is currently disabled. */
    export let disabled = false;
+
+   /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */
+   export let isInteger = false;
 
    /** @type Document Reference to the Document this Application is for. */
    const document = getContext('document');
@@ -30,9 +33,10 @@
    }
 </script>
 
-<FloatInput
+<NumberInput
    bind:value
    disabled={disabled || !$document?.isOwner}
+   {isInteger}
    {max}
    {min}
    on:change
