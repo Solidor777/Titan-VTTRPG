@@ -10,14 +10,14 @@ const TOOLTIP_DURATION = [400, 250];
 
 /**
  * Svelte action for adding a hovering tooltip to a node.
- * @param {Node} node - The node to add the tooltip to.
+ * @param {Element} element - The node to add the tooltip to.
  * @param {string} content - The content of the tooltip. May be formatted as HTML.
  * @returns {object|null} - The new tooltip if the content was valid.
  */
-export default function tooltip(node, content) {
+export default function tooltip(element, content) {
    // Initialize a tooltip if the provided tooltip string is valid
    let tippyTooltip = !isHTMLBlank(content) ?
-      initializeTippy(node, content) :
+      initializeTippy(element, content) :
       false;
 
    // Return the update and destroy functions
@@ -43,7 +43,7 @@ export default function tooltip(node, content) {
 
             // Otherwise, create a new tooltip object
             else {
-               tippyTooltip = initializeTippy(node, newContent);
+               tippyTooltip = initializeTippy(element, newContent);
             }
          }
 
@@ -65,13 +65,13 @@ export default function tooltip(node, content) {
 
 /**
  * Initializes a tippy tooltip object.
- * @param {Node} node - The node to add the tooltip to.
+ * @param {Element} element - The node to add the tooltip to.
  * @param {string} content - The content of the tooltip. May be formatted as HTML.
  * @returns {tippy} - The new tooltip object.
  */
-function initializeTippy(node, content) {
+function initializeTippy(element, content) {
    return tippy(
-      node,
+      element,
       {
          content: content,
          allowHTML: true,

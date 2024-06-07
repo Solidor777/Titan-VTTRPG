@@ -172,7 +172,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Creates a dialog for configuring the sheet.
-    * @param {Event} event - The DOM Event from clicking the button.
+    * @param {DOM Event} event - The DOM Event from clicking the button.
     * @returns {Application} The newly created Document Sheet Config dialog.
     * @protected
     */

@@ -5,10 +5,10 @@ import {ID_ICON} from '~/system/Icons.js';
 
 /**
  * Generates contextual options when right-clicking on an Actor in the Actors directory.
- * @param {Node} html - The DOM element that was clicked.
+ * @param {Element} element - The Element that was clicked.
  * @param {object} options - Array of buttons contenting the contextual options.
  */
-export default function onGetActorDirectoryEntryContext(html, options) {
+export default function onGetActorDirectoryEntryContext(element, options) {
 
    // Regenerate UUID
    options.push({
@@ -29,18 +29,18 @@ export default function onGetActorDirectoryEntryContext(html, options) {
 
 /**
  * Gets the Actor from an Entry in the Actors directory.
- * @param {Node} entry - DOM element Entry for the Document in the directory.
+ * @param {Element} element - Element Entry for the Document in the directory.
  * @returns {TitanActor} The Document from the Entry in the directory.
  */
-function getActorFromDirectoryEntry(entry) {
-   return game.actors.get(entry.data('document-id'));
+function getActorFromDirectoryEntry(element) {
+   return game.actors.get(element.data('document-id'));
 }
 
 /**
  * Determines whether the current user owns the Actor for an Entry in the Actors directory.
- * @param {Node} entry - DOM element Entry for the Document in the directory.
+ * @param {Element} element - Element Entry for the Document in the directory.
  * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
  */
-function isActorOwner(entry) {
-   return getActorFromDirectoryEntry(entry)?.isOwner;
+function isActorOwner(element) {
+   return getActorFromDirectoryEntry(element)?.isOwner;
 }

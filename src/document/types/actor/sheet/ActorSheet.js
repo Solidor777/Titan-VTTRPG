@@ -102,7 +102,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Creates a dialog for configuring the Token used by this Actor.
-    * @param {Event} event - The DOM Event from clicking the button.
+    * @param {DOM Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the dialog has been created.
     * @private
     */
@@ -124,7 +124,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Toggles whether this Actor is linked to their Token.
-    * @param {Event} event - The DOM Event from clicking the button.
+    * @param {DOM Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the Actor has been updated.
     * @private
     */
@@ -154,7 +154,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Unlinks a token placed in a scene from the actor to which it is currently linked.
-    * @param {Event} event - The DOM Event from clicking the button.
+    * @param {DOM Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the Actor has been updated.
     * @private
     */
@@ -180,7 +180,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Imports the Actor from a compendium pack.
-    * @param {Event} event - The DOM Event from clicking the button.
+    * @param {DOM Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the document has been imported.
     * @private
     */

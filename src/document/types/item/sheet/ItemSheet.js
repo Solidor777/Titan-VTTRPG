@@ -69,7 +69,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
    /**
     * Imports the Item from a compendium pack.
-    * @param {Event} event - The DOM Event from clicking the button.
+    * @param {DOM Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the document has been imported.
     * @private
     */

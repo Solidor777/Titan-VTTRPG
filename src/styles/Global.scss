@@ -11,9 +11,7 @@
 
 .titan-document-sheet > * {
    z-index: var(--z-index-app);
-   will-change: transform;
    transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-   -webkit-font-smoothing: antialiased;
 }
 
 .titan-dark-mode {

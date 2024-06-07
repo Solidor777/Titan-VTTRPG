@@ -1,68 +1,74 @@
 <script>
-   let scrollClass = '';
 
+   import isChromium from '~/helpers/utility-functions/IsChromium.js';
+
+   /** @type number Initial scroll top of this container. */
    export let scrollTop = 0;
 
+
+   /** @type string Computed class for affect the display of the scrolling container. */
+   let scrollClass = '';
+
    /**
-    * @param event
+    * @type number The length of the scroll fade in pixels, if any. Excluded from Chromium because it causes the entire
+    * element to be blurred on Chromium browsers.
+    */
+   const fadeLength = !isChromium() ? 0 : 12;
+
+   /**
+    * Called when the element is scrolled.
+    * @param {DOM Event} event - The DOM Event of the scroll input.
     */
    function onScroll(event) {
+
+      // Update the scroll top state variable.
       scrollTop = event.target.scrollTop;
 
-      const node = event.target;
-      const isScrollable = node.scrollHeight > node.clientHeight;
-
-      // If element is not scrollable, remove all classes
-      if (!isScrollable) {
-         node.classList.remove('is-bottom-overflowing', 'is-top-overflowing');
-         return;
-      }
-
-      // Find out which direction it is overflowing to
-      const isScrolledToBottom = node.scrollHeight <= node.clientHeight + node.scrollTop + 12;
-
-      //
-      const isScrolledToTop = node.scrollTop === 0;
-      if (!isScrolledToBottom) {
-         scrollClass = ' faded bottom-overflowing';
-         if (!isScrolledToTop) {
-            scrollClass += ' top-overflowing';
-         }
-      }
-      else if (!isScrolledToTop) {
-         scrollClass = ' faded top-overflowing';
-      }
-      else {
-         scrollClass = '';
+      // Styling code for a blur at the top and bottom of an overflowing element.
+      if (fadeLength > 0) {
+         const element = event.target;
+         updateScrollClass(element);
       }
    }
 
    /**
-    * @param node
+    * Initializes the position of the scroll and the scroll classes on the scrollable element.
+    * @param {Element} element - The scrollable element.
     */
-   function initialScroll(node) {
-      node.scrollTop = scrollTop;
+   function initialScroll(element) {
+      // Initialize the element's scroll top.
+      element.scrollTop = scrollTop;
 
-      const isScrollable = node.scrollHeight > node.clientHeight;
+      // Styling code for a blur at the top and bottom of an overflowing element.
+      if (fadeLength > 0) {
+         updateScrollClass(element);
+      }
+   }
 
-      if (isScrollable) {
-         // Find out which direction it is overflowing to
-         const isScrolledToBottom = node.scrollHeight <= node.clientHeight + node.scrollTop + 12;
+   /**
+    * Updates the scroll class depending on whether the top or bottom of the element is overflowing.
+    * @param {Element} element - The scrollable element.
+    */
+   function updateScrollClass(element) {
 
-         //
-         const isScrolledToTop = node.scrollTop === 0;
-         if (!isScrolledToBottom) {
-            scrollClass = ' faded bottom-overflowing';
-            if (!isScrolledToTop) {
-               scrollClass += ' top-overflowing';
-            }
+      // If the element is scrollable, add the faded class
+      if (element.scrollHeight > element.clientHeight) {
+         scrollClass = ' faded';
+
+         // Update whether the element is overflowing its top.
+         if (element.scrollTop > fadeLength) {
+            scrollClass += ' top-overflowing';
          }
-         else if (!isScrolledToTop) {
-            scrollClass = ' faded top-overflowing';
+
+         // Update whether the element is overflowing its bottom.
+         if (element.scrollHeight > element.clientHeight + element.scrollTop + 12) {
+            scrollClass += ' bottom-overflowing';
          }
-         else {
-            scrollClass = '';
-         }
+      }
+
+      // If the element is not scrollable, blank out the scroll class
+      else {
+         scrollClass = '';
       }
    }
 </script>
@@ -87,9 +93,9 @@
          width: 100%;
          height: 100%;
          position: absolute;
-         overflow-y: scroll;
          padding: 0;
-         will-change: opacity, scroll-position;
+         will-change: scroll-position;
+         overflow: clip scroll;
          scrollbar-gutter: stable;
 
          --top-mask-size: 0px;
