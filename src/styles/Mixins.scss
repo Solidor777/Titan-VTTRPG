@@ -26,20 +26,20 @@
 @mixin border {
    border-style: var(--titan-border-style);
    border-radius: var(--titan-border-radius-normal);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
 @mixin border-top {
    border-top: var(--titan-border-style);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
 @mixin border-top-bottom {
    border-top: var(--titan-border-style);
    border-bottom: var(--titan-border-style);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
@@ -49,13 +49,13 @@
    border-right: var(--titan-border-style);
    border-top-right-radius: var(--titan-border-radius-normal);
    border-bottom-right-radius: var(--titan-border-radius-normal);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
 @mixin border-bottom {
    border-bottom: var(--titan-border-style);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
@@ -65,19 +65,19 @@
    border-bottom: var(--titan-border-style);
    border-bottom-right-radius: var(--titan-border-radius-normal);
    border-bottom-left-radius: var(--titan-border-radius-normal);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
 @mixin border-left {
    border-left: var(--titan-border-style);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
 @mixin border-right {
    border-right: var(--titan-border-style);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
 }
 
@@ -364,7 +364,7 @@
    text-align: center;
    border-style: var(--titan-border-style);
    border-radius: var(--titan-border-radius-normal);
-   border-width: var(--titan-border-width);
+   border-width: var(--titan-border-width-normal);
    border-color: var(--titan-border-color);
    font-weight: bold;
    padding: var(--titan-padding-standard);

@@ -180,7 +180,7 @@
    .skill {
       @include flex-row;
       @include flex-space-between;
-      @include panel-3;
+      @include panel-1;
 
       width: 100%;
       padding: var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-large);

@@ -10,18 +10,16 @@
    const dispatcher = createEventDispatcher();
    const application = getApplication();
 
-   // Rolls the check and closes the application
    /**
-    *
+    * Rolls the check and closes the application.
     */
    function onRoll() {
       dispatcher('roll', {});
       application.close();
    }
 
-   // Cancels the check and closes the application
    /**
-    *
+    * Cancels the check and closes the application.
     */
    function onCancel() {
       application.close();
@@ -70,7 +68,7 @@
             border-top: solid;
             padding-top: var(--titan-padding-standard);
             margin-top: var(--titan-padding-standard);
-            border-width: var(--titan-border-width);
+            border-width: var(--titan-border-width-normal);
          }
 
          .button {

@@ -303,7 +303,7 @@
             border-top: solid;
             padding-top: var(--titan-padding-standard);
             margin-top: var(--titan-padding-standard);
-            border-width: var(--titan-border-width);
+            border-width: var(--titan-border-width-normal);
          }
 
          .image {

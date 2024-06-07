@@ -1,10 +1,14 @@
 <script>
-
    import isChromium from '~/helpers/utility-functions/IsChromium.js';
+
+   /** @type object Svelte Component containing the content to show in the scrollable container. */
+   export let content = void 0;
+
+   /** @type {*[]} Properties to pass to the Content component. */
+   export let props = void 0;
 
    /** @type number Initial scroll top of this container. */
    export let scrollTop = 0;
-
 
    /** @type string Computed class for affect the display of the scrolling container. */
    let scrollClass = '';
@@ -75,7 +79,7 @@
 
 <div class="container">
    <div class="content{scrollClass}" on:scroll={onScroll} use:initialScroll>
-      <slot>Scrolling Content</slot>
+      <svelte:component {...props} this={content}/>
    </div>
 </div>
 
