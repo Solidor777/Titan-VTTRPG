@@ -3,7 +3,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import {DICE_ICON, EXPERTISE_ICON} from '~/system/Icons.js';
 
    /** @type ChatMessage Reference to the Chat Message document. */
@@ -64,7 +64,7 @@
 
 </script>
 
-<div class={`die ${result}`} use:tooltip={dieTooltip}>
+<div class={`die ${result}`} use:tooltipAction="{dieTooltip}">
    <Button {disabled} on:click={applyExpertise}>
       {label}
    </Button>

@@ -1,7 +1,7 @@
 <script>
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
@@ -157,7 +157,7 @@
                {#each item.system.customTrait as trait}
                   <div
                      class="tag"
-                     use:tooltip={trait.description}
+                     use:tooltipAction="{trait.description}"
                   >
                      <Tag label={trait.name}/>
                   </div>

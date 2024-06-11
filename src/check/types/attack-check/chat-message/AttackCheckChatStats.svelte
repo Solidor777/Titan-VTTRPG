@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
@@ -48,7 +48,7 @@
 
    <!--Custom Traits-->
    {#each $document.flags.titan.parameters.customTrait as trait}
-      <div class="stat" use:tooltip={trait.description}>
+      <div class="stat" use:tooltipAction="{trait.description}">
          <Tag label={trait.name}/>
       </div>
    {/each}
@@ -57,7 +57,7 @@
    {#each $document.flags.titan.parameters.attackTrait as trait}
       <div
          class="stat"
-         use:tooltip={localize(traitDescriptions[trait.name])}
+         use:tooltipAction="{localize(traitDescriptions[trait.name])}"
       >
          {#if typeof (trait.value) === 'number'}
             <StatTag label={localize(trait.name)} value={trait.value}/>

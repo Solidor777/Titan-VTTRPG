@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
@@ -82,7 +82,7 @@
 
          <!--Custom Traits-->
          {#each item.customTrait as trait}
-            <div class="tag" use:tooltip={trait.description}>
+            <div class="tag" use:tooltipAction="{trait.description}">
                <Tag label={trait.name}/>
             </div>
          {/each}

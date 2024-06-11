@@ -3,9 +3,9 @@ import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetA
 import {RESOLVE_ICON} from '~/system/Icons.js';
 
 /**
- * Creates a tooltip based on the provided parameters of an Item check.
- * @param {ItemCheckParameters} checkParameters - The check parameters used to create the check tooltip.
- * @returns {string} A tooltip based on the provided check parameters.
+ * Creates a tooltipAction based on the provided parameters of an Item check.
+ * @param {ItemCheckParameters} checkParameters - The check parameters used to create the check tooltipAction.
+ * @returns {string} A tooltipAction based on the provided check parameters.
  */
 export default function getItemCheckParametersTooltip(checkParameters) {
    let retVal = getAttributeCheckParametersTooltip(checkParameters);

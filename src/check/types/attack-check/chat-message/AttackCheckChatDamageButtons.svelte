@@ -1,7 +1,7 @@
 <script>
    import applyDamageToTargets from '~/helpers/utility-functions/ApplyDamageToTargets.js';
    import applyHealingToTargets from '~/helpers/utility-functions/ApplyHealingToTargets.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {CLEAVE_ICON, DAMAGE_ICON, HALF_DAMAGE_ICON, HEALING_ICON, IGNORE_ARMOR_ICON} from '~/system/Icons';
@@ -14,7 +14,7 @@
 
 <div class="damage-buttons">
    <!--Apply damage button-->
-   <div class="button" use:tooltip={localize('applyDamage')}>
+   <div class="button" use:tooltipAction="{localize('applyDamage')}">
       <Button
          on:click={() => {
             applyDamageToTargets(damage, {
@@ -30,7 +30,7 @@
    {#if cleave > 0}
       <div
          class="button"
-         use:tooltip={localize('applyCleaveDamage')}
+         use:tooltipAction="{localize('applyCleaveDamage')}"
       >
          <Button
             on:click={() => {
@@ -48,7 +48,7 @@
    <!--Apply damage ignore armor button-->
    <div
       class="button"
-      use:tooltip={localize('applyDamageIgnoreArmor')}
+      use:tooltipAction="{localize('applyDamageIgnoreArmor')}"
    >
       <Button
          on:click={() => {
@@ -63,7 +63,7 @@
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" use:tooltip={localize('applyHalfDamage')}>
+   <div class="button" use:tooltipAction="{localize('applyHalfDamage')}">
       <Button
          on:click={() => {
             applyDamageToTargets(Math.max(Math.floor(damage / 2), 1), {
@@ -77,7 +77,7 @@
    </div>
 
    <!--Apply healing button-->
-   <div class="button" use:tooltip={localize('applyHealing')}>
+   <div class="button" use:tooltipAction="{localize('applyHealing')}">
       <Button on:click={() => applyHealingToTargets(damage)}>
          <i class="{HEALING_ICON}"/>
       </Button>

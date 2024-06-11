@@ -3,7 +3,7 @@
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
@@ -54,7 +54,7 @@
             <div
                class="trait"
                transition:slide|local
-               use:tooltip={localize(traitDescriptions[trait.name])}
+               use:tooltipAction="{localize(traitDescriptions[trait.name])}"
             >
                <Tag label={localize(trait.name)}/>
             </div>

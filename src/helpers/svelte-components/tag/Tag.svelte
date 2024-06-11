@@ -1,5 +1,5 @@
 <script>
-   import tooltipAction from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type string Label to show for this element. */
    export let label = void 0;
@@ -8,13 +8,13 @@
    export let tooltip = void 0;
 </script>
 
-<div class="tag" use:tooltipAction={tooltip}>
+<div class="tag" use:tooltipAction="{tooltip}">
    {label}
 </div>
 
 <style lang="scss">
    .tag {
       @include tag;
-      @include label;
+      @include tag;
    }
 </style>

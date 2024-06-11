@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
@@ -13,7 +13,7 @@
    // Setup context variables
    const document = getContext('document');
 
-   // Calculate the tooltip for the max value
+   // Calculate the tooltipAction for the max value
    /**
     * @param baseValue
     * @param equipment
@@ -67,7 +67,7 @@
 
 <div class="mod">
    <!--Button-->
-   <div class="button" use:tooltip={localize(`${key}.desc`)}>
+   <div class="button" use:tooltipAction="{localize(`${key}.desc`)}">
       <Button
          on:click={() => {
             onClick();

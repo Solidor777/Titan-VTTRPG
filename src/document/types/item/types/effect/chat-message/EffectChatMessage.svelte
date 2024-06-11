@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
@@ -53,7 +53,7 @@
          <!--Traits-->
          {#if item.system.customTrait.length > 0}
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltip={trait.description}>
+               <div class="tag" use:tooltipAction="{trait.description}">
                   <Tag label={trait.name}/>
                </div>
             {/each}

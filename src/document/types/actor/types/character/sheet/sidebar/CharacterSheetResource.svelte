@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
@@ -14,7 +14,7 @@
    // Setup context variables
    const document = getContext('document');
 
-   // Calculate the tooltip for the max value
+   // Calculate the tooltipAction for the max value
    /**
     * @param maxBase
     * @param equipment
@@ -74,7 +74,7 @@
       </div>
 
       <!--Label-->
-      <span class="label" use:tooltip={localize(`${key}.desc`)}>{localize(key)}</span>
+      <span class="label" use:tooltipAction="{localize(`${key}.desc`)}">{localize(key)}</span>
 
       <!--Static Mod-->
       <div class="static-mod">
@@ -99,7 +99,7 @@
       <!--The Meter-->
       <div
          class="meter {key}"
-         use:tooltip={localize(`${key}.desc`)}
+         use:tooltipAction="{localize(`${key}.desc`)}"
       >
          <Meter
             current={$document.system.resource[key].value}
@@ -108,7 +108,7 @@
       </div>
 
       <!--Max Value Display-->
-      <div class="value" use:tooltip={totalValueTooltip}>
+      <div class="value" use:tooltipAction="{totalValueTooltip}">
          <ModTag
             baseValue={$document.system.resource[key].maxBase +
                $document.system.resource[key].mod.equipment +

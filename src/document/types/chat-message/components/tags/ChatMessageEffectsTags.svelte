@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import ChatTurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStartEffectTag.svelte';
    import ChatPermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
    import ChatTurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
@@ -85,13 +85,7 @@
    {#if $document.flags.titan.effects.custom}
       {#each $document.flags.titan.effects.custom as effect}
          <div class="effect">
-            <ChatCustomEffectTag
-               label={effect.label}
-               remaining={effect.remaining}
-               img={effect.img}
-               custom={effect.custom}
-               description={effect.description}
-            />
+            <ChatCustomEffectTag {effect}/>
          </div>
       {/each}
    {/if}

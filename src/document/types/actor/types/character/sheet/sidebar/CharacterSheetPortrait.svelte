@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentImagePicker from '~/document/components/DocumentImagePicker.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import {LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
@@ -16,7 +16,7 @@
    <!--Take a long Rest Button-->
    <div
       class="button long-rest"
-      use:tooltip={localize('longRest.desc')}
+      use:tooltipAction="{localize('longRest.desc')}"
    >
       <IconButton
          icon={LONG_REST_ICON}
@@ -29,7 +29,7 @@
    <!--Take a Short rest Button-->
    <div
       class="button short-rest"
-      use:tooltip={localize('shortRest.desc')}
+      use:tooltipAction="{localize('shortRest.desc')}"
    >
       <IconButton
          icon={SHORT_REST_ICON}
@@ -42,7 +42,7 @@
    <!--Remove Temp Effects button-->
    <div
       class="button clear"
-      use:tooltip={localize('removeCombatEffects')}
+      use:tooltipAction="{localize('removeCombatEffects')}"
    >
       <IconButton
          icon={REMOVE_TEMP_EFFECTS_ICON}
@@ -55,7 +55,7 @@
    <!--Spend Resolve button-->
    <div
       class="button resolve"
-      use:tooltip={localize('spendX%Resolve').replace('X%', 1)}
+      use:tooltipAction="{localize('spendX%Resolve').replace('X%', 1)}"
    >
       <IconButton
          icon={SPEND_RESOLVE_ICON}

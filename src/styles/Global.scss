@@ -42,6 +42,8 @@
    // Input styling
    --titan-input-color: #1d1e26;
    --titan-input-background: #c5bcf8;
+
+   // Generic Styling
    --titan-border-color: rgba(255 255 255 / 0.83);
 
    // Button styling
@@ -56,10 +58,10 @@
    --titan-icon-button-highlight: #FFE9AE;
    --titan-icon-button-color: #15171b;
 
-   select {
-      color: var(--titan-input-color);
-      background: var(--titan-input-background);
-   }
+   // Tag styling
+   --titan-tag-border-color: #15171b;
+   --titan-tag-background: #a6ccf2;
+   --titan-tag-color: #1d1e26;
 
    // Resource colors
    --titan-stamina-color: #37da88;
@@ -75,10 +77,6 @@
    --titan-body-color: #f29d8c;
    --titan-mind-color: #95f28c;
    --titan-soul-color: #b5f2e8;
-
-   // Label styles
-   --titan-label-background: #a6ccf2;
-   --titan-label-color: #1d1e26;
 
    // Meter styling
    --titan-meter-background: #1E1E1E;
@@ -100,6 +98,12 @@
          }
       }
    }
+
+   select {
+      color: var(--titan-input-color);
+      background: var(--titan-input-background);
+   }
+
 
    &.chat-message {
       background: #424557;

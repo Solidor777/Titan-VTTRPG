@@ -163,7 +163,7 @@
             @include flex-group-top;
             @include border;
             @include attribute-colors;
-            @include label;
+            @include tag;
 
             width: 100%;
             padding: var(--titan-padding-standard);

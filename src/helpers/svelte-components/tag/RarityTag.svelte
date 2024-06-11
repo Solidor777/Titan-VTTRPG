@@ -13,7 +13,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
-      @include label;
+      @include tag;
       @include rarity-colors;
 
       padding: var(--titan-padding-standard);

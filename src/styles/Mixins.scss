@@ -4,10 +4,9 @@
    border-width: var(--titan-input-border-width);
    border-color: var(--titan-input-color);
    background: var(--titan-input-background);
-   font-size: var(--font-size);
-   font-family: var(--font-family);
-   font-weight: var(--font-weight);
-   text-align: var(--text-alignment);
+   font-size: var(--titan-input-font-size);
+   font-family: var(--titan-input-font);
+   font-weight: var(--titan-input-font-weight);
    height: var(--titan-input-height);
    width: var(--titan-input-width);
    padding: var(--titan-input-padding);
@@ -17,7 +16,7 @@
       border-style: var(--titan-input-border-style);
       border-width: var(--titan-input-border-width);
       border-color: var(--input-border-color);
-      color: var(--font-color);
+      color: var(--titan-input-color);
       background: var(--titan-static-value-background);
       opacity: var(--titan-disabled-opacity);
    }
@@ -121,7 +120,7 @@
 
    &:hover {
       &:not(:disabled) {
-         background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
+         background: radial-gradient(ellipse at center, var(--titan-button-background-highlight), var(--titan-button-background));
       }
    }
 }
@@ -161,7 +160,7 @@
    &:hover {
       &:not(:disabled) {
          cursor: pointer;
-         background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
+         background: radial-gradient(ellipse at center, var(--titan-button-background-highlight), var(--titan-button-background));
       }
    }
 
@@ -349,25 +348,19 @@
    --titan-border-color: var(--titan-panel-3-color);
 }
 
-@mixin label {
-   background: var(--titan-label-background);
-   color: var(--titan-label-color);
-
-   --titan-border-color: var(--titan-label-color);
-}
-
 @mixin tag {
    display: flex;
    flex-direction: row;
    align-items: center;
    justify-content: center;
    text-align: center;
-   border-style: var(--titan-border-style);
-   border-radius: var(--titan-border-radius-normal);
-   border-width: var(--titan-border-width-normal);
-   border-color: var(--titan-border-color);
    font-weight: bold;
-   padding: var(--titan-padding-standard);
+   border-style: var(--titan-tag-border-style);
+   border-radius: var(--titan-tag-border-radius);
+   border-width: var(--titan-tag-border-width);
+   border-color: var(--titan-tag-border-color);
+   color: var(--titan-tag-color);
+   padding: var(--titan-tag-padding);
 }
 
 @mixin editor {
@@ -417,67 +410,40 @@
    }
 }
 
-@mixin effect-permanent {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-cyan) 0, var(--titan-green) 100%);
+@mixin permanent-effect-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-cyan) 0, var(--titan-green) 100%);
 }
 
-@mixin effect-turn-start {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple) 0, var(--titan-cyan) 100%);
+@mixin turn-start-effect-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple) 0, var(--titan-cyan) 100%);
 }
 
-@mixin effect-turn-end {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-pink) 0, var(--titan-purple) 100%);
+@mixin turn-end-effect-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-pink) 0, var(--titan-purple) 100%);
 }
 
-@mixin effect-expired {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-yellow) 0, var(--titan-red) 100%);
+@mixin expired-effect-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-yellow) 0, var(--titan-red) 100%);
 }
 
-@mixin effect-initiative {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-red), var(--titan-purple) 100%);
+@mixin initiative-effect-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-red), var(--titan-purple) 100%);
 }
 
-@mixin effect-custom {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple), var(--titan-yellow) 100%);
+@mixin custom-effect-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple), var(--titan-yellow) 100%);
 }
 
-@mixin fast-healing {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-green), var(--titan-yellow) 100%);
+@mixin fast-healing-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-green), var(--titan-yellow) 100%);
 }
 
-@mixin persistent-damage {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-maroon), var(--titan-orange) 100%);
+@mixin persistent-damage-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-maroon), var(--titan-orange) 100%);
 }
 
-@mixin resolve-regain {
-   --titan-border-color: var(--titan-label-color);
-
-   color: var(--titan-label-color);
-   background: linear-gradient(var(--titan-gradient-degree), var(--titan-blue), var(--titan-cyan) 100%);
+@mixin resolve-regain-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-blue), var(--titan-cyan) 100%);
 }
 
 @mixin z-index-app {

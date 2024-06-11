@@ -25,7 +25,7 @@
       width: 100%;
 
       .content {
-         @include label;
+         @include tag;
          @include flex-row;
          @include flex-group-center;
          @include border;

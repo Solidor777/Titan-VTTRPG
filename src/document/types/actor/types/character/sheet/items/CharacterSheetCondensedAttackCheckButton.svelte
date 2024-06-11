@@ -21,7 +21,7 @@
    /** @type string Calculated check icon. */
    let icon;
 
-   /** @type string Calculated tooltip. */
+   /** @type string Calculated tooltipAction. */
    let tooltip;
 
    // Update parameters in response to changes
@@ -39,7 +39,7 @@
          // Update the icon
          icon = checkParameters.type === 'melee' ? MELEE_ICON : ACCURACY_ICON;
 
-         // Update the tooltip
+         // Update the tooltipAction
          tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
    }

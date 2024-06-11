@@ -1,5 +1,5 @@
 <script>
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** The label for the field. */
    export let label = void 0;
@@ -10,7 +10,7 @@
    /** The input component to bind to the value. */
    export let input = void 0;
 
-   /** The tooltip to display when the label is hovered. */
+   /** The tooltipAction to display when the label is hovered. */
    export let fieldTooltip = void 0;
 
    /** Properties for the input component. */
@@ -18,7 +18,7 @@
 </script>
 
 <!--Field-->
-<div class="field" on:change use:tooltip={fieldTooltip}>
+<div class="field" on:change use:tooltipAction="{fieldTooltip}">
 
    <!--Label-->
    <div class="label">

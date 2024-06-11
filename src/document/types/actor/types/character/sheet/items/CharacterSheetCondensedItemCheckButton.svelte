@@ -17,7 +17,7 @@
    /** @type ItemCheckParameters Calculated check parameters. */
    let checkParameters;
 
-   /** @type string Calculated tooltip. */
+   /** @type string Calculated tooltipAction. */
    let tooltip;
 
    // Update parameters in response to changes
@@ -32,7 +32,7 @@
             $document.system.initializeItemCheckOptions(checkOptions)
          );
 
-         // Update the tooltip
+         // Update the tooltipAction
          tooltip = getItemCheckParametersTooltip(checkParameters);
       }
    }

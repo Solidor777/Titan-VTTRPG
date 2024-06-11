@@ -1,13 +1,13 @@
 <script>
    import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    export let label = void 0;
    export let img = void 0;
    export let description = void 0;
 </script>
 
-<div class="tag" use:tooltip={description}>
+<div class="tag" use:tooltipAction="{description}">
    <!--Image-->
    <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
 
@@ -23,7 +23,7 @@
       @include flex-group-center;
       @include border;
       @include font-size-small;
-      @include label;
+      @include tag;
 
       font-weight: bold;
       padding: var(--titan-padding-standard);

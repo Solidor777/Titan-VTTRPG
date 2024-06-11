@@ -10,7 +10,7 @@
    /** @type TitanActor Reference to the Character Document. */
    const document = getContext('document');
 
-   /** @type string Calculated tooltip. */
+   /** @type string Calculated tooltipAction. */
    let tooltip = localize(`${checkParameters.skill}.desc`);
    tooltip += getAttributeCheckParametersTooltip(checkParameters);
 </script>

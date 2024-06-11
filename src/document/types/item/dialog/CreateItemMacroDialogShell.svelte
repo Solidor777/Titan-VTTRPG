@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ImagePicker from '~/helpers/svelte-components/ImagePicker.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
@@ -259,7 +259,7 @@
    {/if}
 
    <!--ID Method-->
-   <div class="row" use:tooltip={localize(`idMethod.desc`)}>
+   <div class="row" use:tooltipAction="{localize(`idMethod.desc`)}">
       <!--Label-->
       <div class="label">
          {localize('idMethod')}

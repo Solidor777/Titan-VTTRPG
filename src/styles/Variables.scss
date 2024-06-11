@@ -1,12 +1,12 @@
 :root {
    // Fonts
    --font-primary: 'Lato';
-   --font-mono: 'Lato';
-   --font-awesome: 'Lato';
-   --font-family: 'Lato';
+   --font-monospace: 'Lato';
    --font-size: 16px;
    --font-color: black;
    --font-body: 'Open Sans';
+   --titan-font-normal: 'Lato';
+   --titan-font-body: 'Open Sans';
 
    // Font sizes
    --titan-font-size-normal: 16px;
@@ -42,6 +42,10 @@
    --titan-input-width: 100%;
    --titan-input-background: white;
    --titan-input-padding: 0 4px;
+   --titan-input-text-alignment: center;
+   --titan-input-font: 'Lato';
+   --titan-input-font-weight: bold;
+   --titan-input-font-size: 16px;
 
    // Button Styling
    --titan-button-border-style: solid;
@@ -73,6 +77,16 @@
    --titan-icon-button-radius: 32px;
    --titan-icon-button-font-size: 16px;
    --titan-icon-button-color: black;
+
+   // Tag styling
+   --titan-tag-font-size: 16px;
+   --titan-tag-border-style: solid;
+   --titan-tag-border-radius: 4px;
+   --titan-tag-border-width: 2px;
+   --titan-tag-border-color: black;
+   --titan-tag-background: whitesmoke;
+   --titan-tag-color: black;
+   --titan-tag-padding: 4px;
 
    // Resource colors
    --titan-stamina-color: #008442;
@@ -112,10 +126,6 @@
    --titan-panel-3-background: #eee9e683;
    --titan-panel-3-color: black;
 
-   // Label styles
-   --titan-label-background: whitesmoke;
-   --titan-label-color: black;
-
    // Rarity colors
    --titan-uncommon-color: #d0ffbb;
    --titan-rare-color: #ffdeac;
@@ -140,15 +150,20 @@
    --titan-meter-shadow-2: rgba(0 0 0 / 0.4);
    --titan-meter-background: whitesmoke;
 
-   // Effect colors
+   // Gradient styling
    --titan-gradient-degree: 135deg;
-   --titan-purple: #9580ff;
-   --titan-blue: #809cff;
-   --titan-cyan: #80ffea;
-   --titan-pink: #ff80bf;
-   --titan-green: #8aff80;
-   --titan-yellow: #ffff80;
-   --titan-maroon: #ff8282;
-   --titan-red: #ff9580;
-   --titan-orange: #ffca80;
+
+   // Effect styling
+   --titan-custom-effect-primary: #9580ff;
+   --titan-custom-effect-secondary: #ffff80;
+   --titan-expired-effect-primary: #ffff80;
+   --titan-expired-effect-secondary: #ff9580;
+   --titan-initiative-effect-primary: #ff9580;
+   --titan-initiative-effect-secondary: #9580ff;
+   --titan-permanent-effect-primary: #80ffea;
+   --titan-permanent-effect-secondary: #8aff80;
+   --titan-turn-end-effect-primary: #ff80bf;
+   --titan-turn-end-effect-secondary: #9580ff;
+   --titan-turn-start-effect-primary: #9580ff;
+   --titan-turn-start-effect-secondary: #80ffea;
 }

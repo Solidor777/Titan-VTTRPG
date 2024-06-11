@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import {getContext} from 'svelte';
 
    /** @type ChatMessage Reference to the Chat Message document. */
@@ -15,7 +15,7 @@
    /** @type string The ctyle class to use for the tag.. */
    export let styleClass = void 0;
 
-   // Calculate the tooltip for the resource mod
+   // Calculate the tooltipAction for the resource mod
    /**
     *
     */
@@ -42,7 +42,7 @@
    }
 </script>
 
-<div class="tag {styleClass}" use:tooltip={getTooltip()}>
+<div class="tag {styleClass}" use:tooltipAction="{getTooltip()}">
    <!--Icon-->
    <i class="{icon}"/>
 
@@ -60,15 +60,15 @@
       @include tag;
 
       &.fast-healing {
-         @include fast-healing;
+         @include fast-healing-tag;
       }
 
       &.persistent-damage {
-         @include persistent-damage;
+         @include persistent-damage-tag;
       }
 
       &.resolve-regain {
-         @include resolve-regain;
+         @include resolve-regain-tag;
       }
 
       i {

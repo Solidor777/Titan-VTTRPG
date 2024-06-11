@@ -90,7 +90,7 @@
          @include flex-group-center;
          @include border-top-bottom;
          @include attribute-colors;
-         @include label;
+         @include tag;
 
          width: 100%;
          padding: var(--titan-padding-standard);

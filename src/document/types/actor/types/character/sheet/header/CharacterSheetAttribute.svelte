@@ -11,7 +11,7 @@
    // Setup context variables
    const document = getContext('document');
 
-   // Calculate the tooltip for the total value
+   // Calculate the tooltipAction for the total value
    /**
     * @param baseValue
     * @param equipment

@@ -5,7 +5,7 @@
    import DocumentAttributeSelect from '~/document/components/select/DocumentAttributeSelect.svelte';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
@@ -26,10 +26,10 @@
    let totalExpertiseTooltip = '';
 
    /**
-    * Calculates the tooltip for the total Training or Expertise value.
+    * Calculates the tooltipAction for the total Training or Expertise value.
     * @param {object} valueObject - The Training or Expertise object.
     * @param {number} mod - Modifier for the total value or expertise.
-    * @returns {string} The tooltip for the total Training or Expertise value.
+    * @returns {string} The tooltipAction for the total Training or Expertise value.
     */
    function getTotalValueTooltip(valueObject, mod) {
       // Base value label
@@ -64,7 +64,7 @@
       checkParameters = $document.system.getAttributeCheckParameters(
          $document.system.initializeAttributeCheckOptions({skill: key}));
 
-      // Update total training tooltip
+      // Update total training tooltipAction
       totalTrainingTooltip = getTotalValueTooltip(
          $document.system.skill[key].training,
          checkParameters.trainingMod
@@ -91,7 +91,7 @@
          <div class="row">
 
             <!--Label-->
-            <div class="label" use:tooltip={localize('training.desc')}>
+            <div class="label" use:tooltipAction="{localize('training.desc')}">
 
                <!--Icon-->
                <i class="{EXPERTISE_ICON}"/>
@@ -132,7 +132,7 @@
          <!--Expertise row-->
          <div class="row">
             <!--Label-->
-            <div class="label" use:tooltip={localize('expertise.desc')}>
+            <div class="label" use:tooltipAction="{localize('expertise.desc')}">
 
                <!--Icon-->
                <i class="{TRAINING_ICON}"/>
@@ -264,7 +264,7 @@
                   @include flex-column;
                   @include flex-group-top;
                   @include border;
-                  @include label;
+                  @include tag;
                   @include font-size-small;
 
                   padding: var(--titan-padding-standard);

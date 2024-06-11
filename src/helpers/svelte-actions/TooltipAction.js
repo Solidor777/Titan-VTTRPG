@@ -2,20 +2,20 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 
-// The delay before showing and hiding a tooltip
+// The delay before showing and hiding a tooltipAction
 const TOOLTIP_DELAY = [1000, 250];
 
-// The time it takes to show or hide a tooltip,
+// The time it takes to show or hide a tooltipAction,
 const TOOLTIP_DURATION = [400, 250];
 
 /**
- * Svelte action for adding a hovering tooltip to a node.
- * @param {Element} element - The node to add the tooltip to.
- * @param {string} content - The content of the tooltip. May be formatted as HTML.
- * @returns {object|null} - The new tooltip if the content was valid.
+ * Svelte action for adding a hovering tooltipAction to a node.
+ * @param {Element} element - The node to add the tooltipAction to.
+ * @param {string} content - The content of the tooltipAction. May be formatted as HTML.
+ * @returns {object|null} - The new tooltipAction if the content was valid.
  */
-export default function tooltip(element, content) {
-   // Initialize a tooltip if the provided tooltip string is valid
+export default function tooltipAction(element, content) {
+   // Initialize a tooltipAction if the provided tooltipAction string is valid
    let tippyTooltip = !isHTMLBlank(content) ?
       initializeTippy(element, content) :
       false;
@@ -26,13 +26,13 @@ export default function tooltip(element, content) {
       // Update function
       update: (newContent) => {
 
-         // If the tooltip string is valid
+         // If the tooltipAction string is valid
          if (!isHTMLBlank(newContent)) {
 
-            // If the tooltip object already exists
+            // If the tooltipAction object already exists
             if (tippyTooltip) {
 
-               // Update the tooltip object
+               // Update the tooltipAction object
                tippyTooltip.setProps({
                   content: newContent,
                   allowHTML: true,
@@ -41,20 +41,20 @@ export default function tooltip(element, content) {
                });
             }
 
-            // Otherwise, create a new tooltip object
+            // Otherwise, create a new tooltipAction object
             else {
                tippyTooltip = initializeTippy(element, newContent);
             }
          }
 
-         // Otherwise, destroy the tooltip object
+         // Otherwise, destroy the tooltipAction object
          else if (tippyTooltip) {
             tippyTooltip.destroy();
             tippyTooltip = false;
          }
       },
 
-      // Destroy the tooltip object when this object is destroyed.
+      // Destroy the tooltipAction object when this object is destroyed.
       destroy: () => {
          if (tippyTooltip) {
             tippyTooltip.destroy();
@@ -64,10 +64,10 @@ export default function tooltip(element, content) {
 }
 
 /**
- * Initializes a tippy tooltip object.
- * @param {Element} element - The node to add the tooltip to.
- * @param {string} content - The content of the tooltip. May be formatted as HTML.
- * @returns {tippy} - The new tooltip object.
+ * Initializes a tippy tooltipAction object.
+ * @param {Element} element - The node to add the tooltipAction to.
+ * @param {string} content - The content of the tooltipAction. May be formatted as HTML.
+ * @returns {tippy} - The new tooltipAction object.
  */
 function initializeTippy(element, content) {
    return tippy(

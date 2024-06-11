@@ -1,5 +1,5 @@
 <script>
-   import tooltipAction from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type number the Base value of the stat before any modifiers are applied. */
    export let baseValue = void 0;
@@ -21,7 +21,7 @@
 </script>
 
 <!--Total Value-->
-<div class={tagClass} use:tooltipAction={tooltip}>
+<div class={tagClass} use:tooltipAction="{tooltip}">
    {currentValue}
 </div>
 
@@ -30,7 +30,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
-      @include label;
+      @include tag;
       @include mod-colors;
 
       width: 100%;

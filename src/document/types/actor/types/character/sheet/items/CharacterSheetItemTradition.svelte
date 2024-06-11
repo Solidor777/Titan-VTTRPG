@@ -25,7 +25,7 @@
       @include border;
 
       padding: var(--titan-padding-standard);
-      background: var(--titan-label-background);
+      background: var(--titan-tag-background);
 
       .label {
          margin-right: var(--titan-padding-standard);

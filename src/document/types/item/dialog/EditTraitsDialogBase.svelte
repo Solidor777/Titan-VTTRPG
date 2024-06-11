@@ -3,7 +3,7 @@
 <script>
    import getApplication from '~/helpers/utility-functions/GetApplication';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
@@ -60,7 +60,7 @@
 <ol>
    {#each traitOptions as trait, idx}
       <!--Trait-->
-      <li use:tooltip={localize(traitDescriptions[trait.name])}>
+      <li use:tooltipAction="{localize(traitDescriptions[trait.name])}">
 
          <!--Label-->
          <div class="label">

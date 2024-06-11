@@ -17,7 +17,7 @@
    /** @type CastingCheckParameters Calculated check parameters. */
    let checkParameters;
 
-   /** @type string Calculated tooltip. */
+   /** @type string Calculated tooltipAction. */
    let tooltip;
 
    // Update the component in response to changes
@@ -30,7 +30,7 @@
             $document.system.initializeCastingCheckOptions(checkOptions)
          );
 
-         // Update the tooltip
+         // Update the tooltipAction
          tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
    }

@@ -4,6 +4,7 @@
     * Object used to store data for an Option within a Select component.
     * @property {*} value The value for this option.
     * @property {string} label The display label for this option.
+    * @augments {object}
     */
 
    /** @type SelectOption[] Options for the Select component. */

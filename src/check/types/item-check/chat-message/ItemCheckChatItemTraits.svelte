@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Document reference
@@ -10,7 +10,7 @@
 <div class="stats">
    <!--Item Traits-->
    {#each $document.flags.titan.parameters.itemTrait as trait}
-      <div class="stat" use:tooltip={trait.description}>
+      <div class="stat" use:tooltipAction="{trait.description}">
          <Tag label={trait.name}/>
       </div>
    {/each}

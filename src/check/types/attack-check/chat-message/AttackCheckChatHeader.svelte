@@ -77,7 +77,7 @@
          @include flex-group-left;
          @include attribute-colors;
          @include border;
-         @include label;
+         @include tag;
 
          padding: var(--titan-padding-large);
          font-weight: bold;

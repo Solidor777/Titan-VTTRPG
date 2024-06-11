@@ -1,6 +1,6 @@
 <script>
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
-   import tooltipAction from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type boolean Whether this button is disabled. */
    export let disabled = false;

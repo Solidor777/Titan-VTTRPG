@@ -24,7 +24,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
-      @include label;
+      @include tag;
 
       padding: var(--titan-padding-standard);
 

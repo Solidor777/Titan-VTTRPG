@@ -1,65 +1,20 @@
 <script>
-   import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
-   import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import {DURATION_ICON} from '~/system/Icons.js';
+   import {INITIATIVE_ICON} from '~/system/Icons.js';
+   import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   export let label = void 0;
-   export let img = void 0;
-   export let description = void 0;
-   export let remaining = void 0;
-   export let initiative = void 0;
+   /**@type InitiativeEffectData Data for the effect this tag is for. */
+   export let effect = void 0;
 
-   // Calclate the tooltip
-   const formattedTooltip = !isHTMLBlank(description)
-      ? `${localize('effect.initative.desc')}${description}`
-      : localize('effect.initiative.desc');
 </script>
 
-<div class="tag" use:tooltip={formattedTooltip}>
-   <!--Image-->
-   <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
-
-   <!--Label-->
-   <div>
-      {label}
-   </div>
-
-   <div class="time">
-      {`${remaining} (${initiative})`}
-   </div>
-
-   <!--Icon-->
-   <i class={DURATION_ICON}/>
+<div class="tag">
+   <EffectTag {effect} icon={INITIATIVE_ICON}/>
 </div>
 
 <style lang="scss">
    .tag {
-      @include flex-row;
-      @include flex-group-center;
-      @include border;
-      @include font-size-small;
-      @include effect-initiative;
-
-      font-weight: bold;
-      padding: var(--titan-padding-standard);
-
-      .time {
-         @include border-left;
-
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
-      }
-
-      img {
-         width: 24px;
-         border: none;
-         margin-right: var(--titan-padding-standard);
-      }
-
-      i {
-         margin-left: var(--titan-padding-standard);
-      }
+      --titan-tag-background: linear-gradient(
+            var(--titan-gradient-degree), var(--titan-initiative-effect-primary), var(--titan-initiative-effect-secondary) 100%
+      );
    }
 </style>

@@ -8,7 +8,7 @@
    /** @type ChatMessage Reference to the Chat Message document. */
    const document = getContext('document');
 
-   // Calculate the tooltip for the resource mod
+   // Calculate the tooltipAction for the resource mod
    /**
     *
     */

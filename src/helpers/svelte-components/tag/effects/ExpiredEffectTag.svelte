@@ -1,52 +1,20 @@
 <script>
-   import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
-   import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import {EFFECT_DURATION_EXPIRED_ICON} from '~/system/Icons.js';
+   import {EXPIRED_ICON} from '~/system/Icons.js';
+   import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   export let label = void 0;
-   export let img = void 0;
-   export let description = void 0;
+   /**@type ExpiredEffectData Data for the effect this tag is for. */
+   export let effect = void 0;
 
-   // Calclate the tooltip
-   const formattedTooltip = !isHTMLBlank(description)
-      ? `${localize('effect.expired.desc')}${description}`
-      : localize('effect.expired.desc');
 </script>
 
-<div class="tag" use:tooltip={formattedTooltip}>
-   <!--Image-->
-   <img alt="img" class={checkAddDarkSVGClass(img)} src={img}/>
-
-   <!--Label-->
-   <div>
-      {label}
-   </div>
-
-   <!--Icon-->
-   <i class={EFFECT_DURATION_EXPIRED_ICON}/>
+<div class="tag">
+   <EffectTag {effect} icon={EXPIRED_ICON}/>
 </div>
 
 <style lang="scss">
    .tag {
-      @include flex-row;
-      @include flex-group-center;
-      @include border;
-      @include font-size-small;
-      @include effect-expired;
-
-      font-weight: bold;
-      padding: var(--titan-padding-standard);
-
-      img {
-         width: 24px;
-         border: none;
-         margin-right: var(--titan-padding-standard);
-      }
-
-      i {
-         margin-left: var(--titan-padding-standard);
-      }
+      --titan-tag-background: linear-gradient(
+            var(--titan-gradient-degree), var(--titan-expired-effect-primary), var(--titan-expired-effect-secondary) 100%
+      );
    }
 </style>

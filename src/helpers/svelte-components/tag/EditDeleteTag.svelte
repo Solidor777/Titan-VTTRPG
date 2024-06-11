@@ -1,5 +1,5 @@
 <script>
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import {DELETE_ICON, EDIT_ICON} from '~/system/Icons.js';
 
    export let label = void 0;
@@ -11,7 +11,7 @@
 </script>
 
 <div class="tag">
-   <div use:tooltip={labelTooltip}>
+   <div use:tooltipAction="{labelTooltip}">
       {label}
    </div>
    <!-- svelte-ignore a11y-missing-attribute -->
@@ -26,7 +26,7 @@
       }}
       role="button"
       tabindex="0"
-      use:tooltip={editTooltip}
+      use:tooltipAction="{editTooltip}"
    />
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
@@ -40,7 +40,7 @@
       }}
       role="button"
       tabindex="0"
-      use:tooltip={deleteTooltip}
+      use:tooltipAction="{deleteTooltip}"
    />
 </div>
 
@@ -49,7 +49,7 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
-      @include label;
+      @include tag;
 
       font-weight: bold;
       padding: var(--titan-padding-standard);

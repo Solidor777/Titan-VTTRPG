@@ -1,6 +1,6 @@
 <script>
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
-   import tooltipAction from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type boolean Whether this input is disabled. */
    export let disabled = false;
@@ -9,7 +9,7 @@
    export let tooltip = void 0;
 </script>
 
-<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>
+<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction="{tooltip}">
    <slot/>
 </button>
 

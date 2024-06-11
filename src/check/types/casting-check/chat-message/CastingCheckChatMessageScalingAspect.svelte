@@ -213,7 +213,7 @@
 <style lang="scss">
    .aspect {
       @include border;
-      @include label;
+      @include tag;
       @include flex-column;
       @include flex-group-top;
       @include font-size-small;

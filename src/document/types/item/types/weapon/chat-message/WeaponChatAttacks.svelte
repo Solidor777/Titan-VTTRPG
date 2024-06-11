@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
@@ -72,9 +72,9 @@
             {#each attack.trait as trait}
                <div
                   class="stat"
-                  use:tooltip={{
+                  use:tooltipAction="{{
                      content: localize(traitDescriptions[trait.name]),
-                  }}
+                  }}"
                >
                   {#if typeof (trait.value) === 'number'}
                      <StatTag
@@ -89,7 +89,7 @@
 
             <!--Custom Traits-->
             {#each attack.customTrait as trait}
-               <div class="stat" use:tooltip={trait.description}>
+               <div class="stat" use:tooltipAction="{trait.description}">
                   <Tag label={trait.name}/>
                </div>
             {/each}

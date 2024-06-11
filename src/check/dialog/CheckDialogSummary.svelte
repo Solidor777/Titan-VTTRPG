@@ -1,5 +1,5 @@
 <script>
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** The label for the summary. */
    export let label = void 0;
@@ -7,13 +7,13 @@
    /** The value to display. */
    export let value = void 0;
 
-   /** The tooltip to display when the label is hovered. */
+   /** The tooltipAction to display when the label is hovered. */
    export let fieldTooltip = void 0;
 
 </script>
 
 <!--Field-->
-<div class="field" use:tooltip={fieldTooltip}>
+<div class="field" use:tooltipAction="{fieldTooltip}">
 
    <!--Label-->
    <div class="label">
@@ -50,7 +50,7 @@
 
          .tag {
             @include border;
-            @include label;
+            @include tag;
 
             margin-left: var(--titan-padding-large);
          }

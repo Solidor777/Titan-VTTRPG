@@ -3,7 +3,7 @@
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
@@ -107,7 +107,7 @@
                {#each attack.trait as trait (trait.name)}
                   <div
                      class="stat"
-                     use:tooltip={localize(traitDescriptions[trait.name])}
+                     use:tooltipAction="{localize(traitDescriptions[trait.name])}"
                      transition:slide|local
                   >
                      {#if typeof (trait.value) === 'number'}
@@ -127,7 +127,7 @@
                {#each attack.customTrait as trait (trait.uuid)}
                   <div
                      class="stat"
-                     use:tooltip={trait.description}
+                     use:tooltipAction="{trait.description}"
                      transition:slide|local
                   >
                      <Tag label={trait.name}/>

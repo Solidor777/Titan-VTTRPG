@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import CheckChatResetExpertiseButton from '~/check/chat-message/CheckChatResetExpertiseButton.svelte';
    import {
       CLEAVE_ICON,
@@ -97,7 +97,7 @@
       {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
-            use:tooltip={localize('attack.rend.desc')}
+            use:tooltipAction="{localize('attack.rend.desc')}"
          >
             <i class={REND_ICON}/>
             {localize('rend')}:
@@ -109,7 +109,7 @@
       {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
-            use:tooltip={localize('attack.cleave.desc')}
+            use:tooltipAction="{localize('attack.cleave.desc')}"
          >
             <i class={CLEAVE_ICON}/>
             {localize('cleave')}:
@@ -157,7 +157,7 @@
       @include border;
       @include flex-column;
       @include flex-group-center;
-      @include label;
+      @include tag;
       @include font-size-normal;
 
       font-weight: bold;

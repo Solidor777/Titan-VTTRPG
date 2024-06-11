@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import tooltip from '~/helpers/svelte-actions/Tooltip.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
@@ -11,7 +11,7 @@
    // The Character Data
    const document = getContext('document');
 
-   // Calculate the tooltip for the max value
+   // Calculate the tooltipAction for the max value
    /**
     * @param baseValue
     * @param equipment
@@ -64,7 +64,7 @@
 <!--Speeds-->
 <div class="speed">
    <!--Label-->
-   <div class="label" use:tooltip={localize(`${key}.desc`)}>
+   <div class="label" use:tooltipAction="{localize(`${key}.desc`)}">
       <!--Icon-->
       {localize(key)}
    </div>
@@ -88,7 +88,7 @@
       <div class="symbol">=</div>
 
       <!--Total Value-->
-      <div class="value" use:tooltip={totalValueTooltip}>
+      <div class="value" use:tooltipAction="{totalValueTooltip}">
          <ModTag
             baseValue={$document.system.speed[key].baseValue +
                $document.system.speed[key].mod.ability +

@@ -2,14 +2,14 @@ import {BODY_ICON, DICE_ICON, EXPERTISE_ICON, MIND_ICON, MOD_ICON, SOUL_ICON, TR
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
- * Creates a tooltip based on the provided parameters ofan Attribute based check.
- * @param {AttributeCheckParameters} checkParameters - The check parameters used to create the check tooltip.
- * @returns {string} A tooltip based on the provided check parameters.
+ * Creates a tooltipAction based on the provided parameters ofan Attribute based check.
+ * @param {AttributeCheckParameters} checkParameters - The check parameters used to create the check tooltipAction.
+ * @returns {string} A tooltipAction based on the provided check parameters.
  */
 export default function getAttributeCheckParametersTooltip(checkParameters) {
    let retVal = '';
 
-   // Add Attribute tooltip
+   // Add Attribute tooltipAction
    if (checkParameters.attributeDice) {
 
       // Add the icon appropriate to the attribute
@@ -33,22 +33,22 @@ export default function getAttributeCheckParametersTooltip(checkParameters) {
          `<p><i style="width:20px;text-align:center" class="${attributeIcon}"></i> ${localize(checkParameters.attribute)}: ${checkParameters.attributeDice}</p>`;
    }
 
-   // Add Training tooltip
+   // Add Training tooltipAction
    if (checkParameters.totalTrainingDice) {
       retVal +=
          `<p><i style="width:20px;text-align:center" class="${TRAINING_ICON}"></i> ${localize('training')}: ${checkParameters.totalTrainingDice}</p>`;
    }
 
-   // Add Dice Mod tooltip
+   // Add Dice Mod tooltipAction
    if (checkParameters.diceMod) {
       retVal +=
          `<p><i style="width:20px;text-align:center" class="${MOD_ICON}"></i> ${localize('diceMod')}: ${checkParameters.diceMod}</p>`;
    }
 
-   // Add Total Dice tooltip
+   // Add Total Dice tooltipAction
    retVal += `<p><i style="width:20px;text-align:center" class="${DICE_ICON}"></i> ${localize('totalDice')}: ${checkParameters.totalDice}</p>`;
 
-   // Add Expertise tooltip
+   // Add Expertise tooltipAction
    if (checkParameters.totalExpertise) {
       retVal += `<p><i style="width:20px;text-align:center" class="${EXPERTISE_ICON}"></i> ${localize('expertise')}: ${checkParameters.totalExpertise}</p>`;
    }

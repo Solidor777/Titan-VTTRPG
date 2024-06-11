@@ -9,12 +9,12 @@
 
 <style lang="scss">
    .tag {
-      @include label;
+      @include tag;
       @include flex-row;
       @include flex-group-center;
       @include border;
       @include resistance-colors;
-      @include label;
+      @include tag;
 
       padding: var(--titan-padding-standard);
       font-weight: bold;

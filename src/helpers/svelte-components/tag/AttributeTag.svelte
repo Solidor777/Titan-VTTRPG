@@ -9,7 +9,7 @@
 
 <style lang="scss">
    .tag {
-      @include label;
+      @include tag;
       @include flex-row;
       @include flex-group-center;
       @include border;

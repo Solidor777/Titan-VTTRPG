@@ -55,7 +55,7 @@
       @include flex-group-center;
       @include resistance-colors;
       @include border;
-      @include label;
+      @include tag;
 
       padding: var(--titan-padding-standard);
       flex-wrap: wrap;

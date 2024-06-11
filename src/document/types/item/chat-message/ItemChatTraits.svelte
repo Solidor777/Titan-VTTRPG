@@ -36,7 +36,7 @@
 
          margin: var(--titan-padding-standard);
          padding: var(--titan-padding-standard);
-         background: var(--titan-label-background);
+         background: var(--titan-tag-background);
       }
    }
 </style>
