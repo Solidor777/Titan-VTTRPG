@@ -11,7 +11,7 @@
    /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
 
-   /** @type boolean Whether the input is currently disabled. */
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */

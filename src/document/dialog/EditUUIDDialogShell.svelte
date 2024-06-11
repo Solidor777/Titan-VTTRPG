@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication';
-   import TextArea from '~/helpers/svelte-components/input/TextArea.svelte';
+   import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    // document to edit the UUID for

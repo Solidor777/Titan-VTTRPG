@@ -3,13 +3,13 @@
    import Select from '~/helpers/svelte-components/select/Select.svelte';
    import {ATTACK_TRAITS} from '~/document/types/item/types/weapon/AttackTraits.js';
 
-   /** @type number The value to bind to the input. */
+   /** @type string The value to bind to the input. */
    export let value = void 0;
 
    /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
 
-   /** @type boolean Whether the input is currently disabled. */
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type SelectOption[] Options for the Select. */

@@ -2,7 +2,7 @@
    /** @type boolean The value to bind to the input. */
    export let value;
 
-   /** @type boolean Whether the input is currently disabled. */
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 </script>
 

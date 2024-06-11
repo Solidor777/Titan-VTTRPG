@@ -1,95 +1,46 @@
 <script>
-   import {createEventDispatcher} from 'svelte';
    import isModifierActive from '~/helpers/utility-functions/IsModifierActive.js';
    import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
    import {DECREMENT_ICON, INCREMENT_ICON} from '~/system/icons.js';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 
-   // The value of the input
+   /** @type number The value to bind to the input. */
    export let value = void 0;
+
+   /** @type {number|boolean} The minimum value of the input. */
    export let min = false;
+
+   /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
+
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
+
+   /**
+    * @type number
+    * How much to increment or decrement the value when the increase or decrease buttons are pressed while the modifier
+    * is NOT active.
+    */
    export let increment = 1;
+
+   /**
+    * @type number
+    * How much to increment or decrement the value when the increase or decrease buttons while the modifier IS active.
+    */
    export let modifierIncrement = 10;
 
-   let editingActive = false;
-   let input = value;
-
-   const dispatch = createEventDispatcher();
-
-   $: if (!editingActive) {
-      input = value;
-   }
-
    /**
-    *
-    */
-   function validateInput() {
-      let newValue = parseInt(input);
-      if (isNaN(newValue)) {
-         newValue = 0;
-      }
-      if (min !== false) {
-         newValue = Math.max(newValue, min);
-      }
-      if (max !== false) {
-         newValue = Math.min(newValue, max);
-      }
-
-      value = newValue;
-      dispatch('change');
-   }
-
-   /**
-    * @param event
-    */
-   function checkInput(event) {
-      // Only accept valid inputs
-      if (!/[0-9\.,-]/.test(event.key)) {
-         event.preventDefault();
-      }
-      else if (/[\.,]/.test(event.key)) {
-         event.preventDefault();
-      }
-   }
-
-   /**
-    *
-    */
-   function onFocus() {
-      editingActive = true;
-   }
-
-   /**
-    *
-    */
-   function onBlur() {
-      editingActive = false;
-   }
-
-   /**
-    *
+    * Called when the decrement button is pressed to decrement the value.
     */
    function decrementInput() {
-      input -= isModifierActive() ? modifierIncrement : increment;
-      validateInput();
+      value -= isModifierActive() ? modifierIncrement : increment;
    }
 
    /**
-    *
+    * Called when the increment button is pressed to increment the value.
     */
    function incrementInput() {
-      input += isModifierActive() ? modifierIncrement : increment;
-      validateInput();
-   }
-
-   /**
-    *
-    */
-   function onChange() {
-      if (isNaN(input)) {
-         input = value;
-      }
+      value += isModifierActive() ? modifierIncrement : increment;
    }
 </script>
 
@@ -101,18 +52,11 @@
          on:click={decrementInput}
       />
    </div>
-   <input
-      bind:value={input}
-      {disabled}
-      on:blur={onBlur}
-      on:blur
-      on:change={onChange}
-      on:focus={onFocus}
-      on:focus
-      on:keypress={(event) => checkInput(event)}
-      on:keyup={validateInput}
-      on:keyup
-      type="number"
+   <IntegerInput
+      bind:value
+      {max}
+      {min}
+      on:change
    />
    <div class="increment">
       <MiniIconButton
@@ -127,10 +71,6 @@
    .input {
       @include flex-row;
       @include flex-group-center;
-
-      input {
-         @include input;
-      }
 
       .increment {
          margin-left: 2px;

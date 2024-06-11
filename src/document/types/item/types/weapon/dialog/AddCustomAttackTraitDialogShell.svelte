@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
-   import TextArea from '~/helpers/svelte-components/input/TextArea.svelte';
+   import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 

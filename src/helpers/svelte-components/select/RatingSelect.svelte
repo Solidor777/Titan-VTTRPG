@@ -2,16 +2,17 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
 
-   // Value
+   /** @type string The value to bind to the input. */
    export let value = void 0;
 
-   // Whether to allow none
+   /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
 
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
-   // Options
-   const ratingOptions = [
+   /** @type SelectOption[] Options for the Select. */
+   const options = [
       {
          label: localize('awareness'),
          value: 'awareness',
@@ -34,13 +35,13 @@
       },
    ];
 
-   // Add none option
+   // Add None option if appropriate.
    if (allowNone) {
-      ratingOptions.push({
+      options.push({
          label: localize('none'),
          value: 'none',
       });
    }
 </script>
 
-<Select options={ratingOptions} bind:value on:change {disabled} />
+<Select bind:value {disabled} on:change {options}/>
