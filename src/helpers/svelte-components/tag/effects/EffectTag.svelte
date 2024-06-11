@@ -1,8 +1,8 @@
 <script>
    import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /**
     * @typedef CustomEffectData
@@ -54,7 +54,6 @@
     * @augments {object}
     */
 
-
    /**
     * @type {CustomEffectData|ExpiredEffectData|InitiativeEffectData|PermanentEffectData|TurnEffectData}
     * Object containing the essential data for this effect.
@@ -65,12 +64,12 @@
    export let icon = void 0;
 
    /** @type string Calculated tooltipAction depending on whether the effect has a description */
-   const formattedTooltip = !isHTMLBlank(effect.description) ?
+   const tooltip = !isHTMLBlank(effect.description) ?
       `${localize('effect.custom.desc')}${effect.description}` :
       localize('effect.custom.desc');
 </script>
 
-<div class="tag" use:tooltipAction={formattedTooltip}>
+<div class="tag" use:tooltipAction={tooltip}>
    <!--Image-->
    <img alt="img" class={checkAddDarkSVGClass(effect.img)} src={effect.img}/>
 
@@ -102,6 +101,7 @@
 <style lang="scss">
    .tag {
       @include tag;
+      @include large-tag;
 
       .time {
          @include border-left;

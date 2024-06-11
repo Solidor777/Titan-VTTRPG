@@ -1,7 +1,6 @@
 <script>
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
@@ -15,12 +14,12 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import CharacterSheetItemToggleActiveButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type TitanItem Reference to the Item document. */
    export let item = void 0;
@@ -148,18 +147,17 @@
             <!--Expired-->
             {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
                <div class="tag">
-                  <Tag label={localize('expired')}/>
+                  <Tag>{localize('expired')}</Tag>
                </div>
             {/if}
 
             <!--Traits-->
             {#if item.system.customTrait.length > 0}
                {#each item.system.customTrait as trait}
-                  <div
-                     class="tag"
-                     use:tooltipAction="{trait.description}"
-                  >
-                     <Tag label={trait.name}/>
+                  <div class="tag">
+                     <Tag tooltip={trait.description}>
+                        {trait.name}
+                     </Tag>
                   </div>
                {/each}
             {/if}

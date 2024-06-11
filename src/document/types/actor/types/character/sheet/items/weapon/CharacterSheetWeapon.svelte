@@ -1,10 +1,8 @@
 <script>
    import {slide} from 'svelte/transition';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
    import CharacterSheetItemSendToChatButton
@@ -25,6 +23,7 @@
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
    import CharacterSheetCondensedAttackCheckButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type TitanItem Reference to the Item document. */
    export let item = void 0;
@@ -137,8 +136,10 @@
 
             <!--Custom Traits-->
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltipAction="{trait.description}">
-                  <Tag label={trait.name}/>
+               <div class="tag">
+                  <Tag tooltip={trait.description}>
+                     {trait.name}
+                  </Tag>
                </div>
             {/each}
          </div>

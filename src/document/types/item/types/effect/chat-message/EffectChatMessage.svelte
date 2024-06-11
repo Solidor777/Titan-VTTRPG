@@ -1,12 +1,11 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Chat context reference
    const document = getContext('document');
@@ -46,15 +45,17 @@
          <!--Expired-->
          {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
             <div class="tag">
-               <Tag label={localize('expired')}/>
+               <Tag>{localize('expired')}</Tag>
             </div>
          {/if}
 
          <!--Traits-->
          {#if item.system.customTrait.length > 0}
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltipAction="{trait.description}">
-                  <Tag label={trait.name}/>
+               <div class="tag">
+                  <Tag tooltip={trait.description}>
+                     {trait.name}
+                  </Tag>
                </div>
             {/each}
          {/if}

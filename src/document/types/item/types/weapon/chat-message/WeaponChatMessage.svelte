@@ -1,13 +1,12 @@
 <script>
    import {getContext} from 'svelte';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Chat context reference
    const document = getContext('document');
@@ -63,8 +62,10 @@
 
          <!--Custom Traits-->
          {#each item.system.customTrait as trait}
-            <div class="tag" use:tooltipAction="{trait.description }">
-               <Tag label={trait.name}/>
+            <div class="tag">
+               <Tag tooltip={trait.description}>
+                  {trait.name}
+               </Tag>
             </div>
          {/each}
       </div>

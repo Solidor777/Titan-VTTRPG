@@ -2,12 +2,11 @@
    import {getContext} from 'svelte';
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import {ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON} from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Document reference
    const document = getContext('document');
@@ -48,8 +47,10 @@
 
    <!--Custom Traits-->
    {#each $document.flags.titan.parameters.customTrait as trait}
-      <div class="stat" use:tooltipAction="{trait.description}">
-         <Tag label={trait.name}/>
+      <div class="stat">
+         <Tag tooltip={trait.description}>
+            {trait.name}
+         </Tag>
       </div>
    {/each}
 
@@ -57,12 +58,17 @@
    {#each $document.flags.titan.parameters.attackTrait as trait}
       <div
          class="stat"
-         use:tooltipAction="{localize(traitDescriptions[trait.name])}"
       >
          {#if typeof (trait.value) === 'number'}
-            <StatTag label={localize(trait.name)} value={trait.value}/>
+            <StatTag
+               tooltip={localize(traitDescriptions[trait.name])}
+               label={localize(trait.name)}
+               value={trait.value}
+            />
          {:else}
-            <Tag label={localize(trait.name)}/>
+            <Tag tooltip={localize(traitDescriptions[trait.name])}>
+               {localize(trait.name)}
+            </Tag>
          {/if}
       </div>
    {/each}

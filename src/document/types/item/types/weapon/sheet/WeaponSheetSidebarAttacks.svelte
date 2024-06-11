@@ -4,12 +4,12 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import {COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Setup context variables
    const document = getContext('document');
@@ -66,7 +66,7 @@
             <div class="stats" transition:slide|local>
                <!--Attack Type-->
                <div class="stat">
-                  <Tag label={localize(attack.type)}/>
+                  <Tag>{localize(attack.type)}</Tag>
                </div>
 
                <!--Range-->
@@ -118,19 +118,17 @@
                         />
                      {:else}
                         <!--Bool Trait-->
-                        <Tag label={localize(trait.name)}/>
+                        <Tag>{localize(trait.name)}</Tag>
                      {/if}
                   </div>
                {/each}
 
                <!--Custom Traits-->
                {#each attack.customTrait as trait (trait.uuid)}
-                  <div
-                     class="stat"
-                     use:tooltipAction="{trait.description}"
-                     transition:slide|local
-                  >
-                     <Tag label={trait.name}/>
+                  <div class="stat" transition:slide|local>
+                     <Tag tooltip={trait.description}>
+                        {trait.name}
+                     </Tag>
                   </div>
                {/each}
             </div>

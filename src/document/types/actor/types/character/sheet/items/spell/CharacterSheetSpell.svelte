@@ -19,9 +19,9 @@
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import CharacterSheetCondensedCastingCheckButton
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type TitanItem Reference to the Item document. */
    export let item = void 0;
@@ -130,7 +130,9 @@
             <!--Custom Traits-->
             {#each item.system.customTrait as trait}
                <div class="tag">
-                  <Tag label={trait.name} tooltip={trait.description}/>
+                  <Tag tooltip={trait.description}>
+                     {trait.name}
+                  </Tag>
                </div>
             {/each}
          </div>

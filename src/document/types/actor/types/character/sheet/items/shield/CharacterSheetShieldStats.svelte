@@ -4,10 +4,10 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import {DEFENSE_ICON} from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Item reference
    export let item = void 0;
@@ -38,22 +38,26 @@
 
    <!--Traits-->
    {#each item.system.trait as trait}
-      <div
-         class="stat"
-         use:tooltipAction="{localize(traitDescriptions[trait.name])}"
-      >
+      <div class="stat">
          {#if typeof (trait.value) === 'number'}
-            <StatTag label={localize(trait.name)} value={trait.value}/>
+            <StatTag
+               tooltip={localize(traitDescriptions[trait.name])}
+               label={localize(trait.name)}
+               value={trait.value}/>
          {:else}
-            <Tag label={localize(trait.name)}/>
+            <Tag tooltip={localize(traitDescriptions[trait.name])}>
+               {localize(trait.name)}
+            </Tag>
          {/if}
       </div>
    {/each}
 
    <!--Custom Traits-->
    {#each item.system.customTrait as trait}
-      <div class="stat" use:tooltipAction="{trait.description}">
-         <Tag label={trait.name}/>
+      <div class="stat">
+         <Tag tooltip={trait.description}>
+            {trait.name}
+         </Tag>
       </div>
    {/each}
 </div>

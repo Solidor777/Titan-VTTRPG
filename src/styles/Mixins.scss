@@ -363,6 +363,10 @@
    padding: var(--titan-tag-padding);
 }
 
+@mixin large-tag {
+   --titan-tag-font-size: var(--titaan-font-size-normal);
+}
+
 @mixin editor {
    --tjs-editor-background: var(--titan-editor-background);
    --tjs-editor-border: var(--titan-editor-border);

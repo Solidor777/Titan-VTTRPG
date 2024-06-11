@@ -2,10 +2,8 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
@@ -18,6 +16,7 @@
       RANGE_ICON,
       TRAINING_ICON,
    } from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Context references
    const document = getContext('document');
@@ -189,22 +188,26 @@
 
       <!--Traits-->
       {#each attack.trait as trait}
-         <div
-            class="stat"
-            use:tooltipAction="{localize(traitDescriptions[trait.name])}"
-         >
+         <div class="stat">
             {#if typeof (trait.value) === 'number'}
-               <StatTag label={localize(trait.name)} value={trait.value}/>
+               <StatTag
+                  tooltip={localize(traitDescriptions[trait.name])}
+                  label={localize(trait.name)}
+                  value={trait.value}/>
             {:else}
-               <Tag label={localize(trait.name)}/>
+               <Tag tooltip={localize(traitDescriptions[trait.name])}>
+                  {localize(trait.name)}
+               </Tag>
             {/if}
          </div>
       {/each}
 
       <!--Custom Traits-->
       {#each attack.customTrait as trait}
-         <div class="stat" use:tooltipAction="{trait.description}">
-            <Tag label={trait.name}/>
+         <div class="stat">
+            <Tag tooltip={trait.description}>
+               {trait.name}
+            </Tag>
          </div>
       {/each}
    </div>

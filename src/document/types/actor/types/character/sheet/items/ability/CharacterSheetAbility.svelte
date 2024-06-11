@@ -1,8 +1,6 @@
 <script>
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import CharacterSheetItemExpandButton
@@ -21,6 +19,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type TitanItem Reference to the Item document. */
    export let item = void 0;
@@ -98,7 +97,7 @@
             {#if item.system.action}
                <!-- Rarity-->
                <div class="tag">
-                  <Tag label={localize('action')}/>
+                  <Tag>{localize('action')}</Tag>
                </div>
             {/if}
 
@@ -106,7 +105,7 @@
             {#if item.system.reaction}
                <!-- Rarity-->
                <div class="tag">
-                  <Tag label={localize('reaction')}/>
+                  <Tag>{localize('reaction')}</Tag>
                </div>
             {/if}
 
@@ -114,7 +113,7 @@
             {#if item.system.passive}
                <!-- Rarity-->
                <div class="tag">
-                  <Tag label={localize('passive')}/>
+                  <Tag>{localize('passive')}</Tag>
                </div>
             {/if}
 
@@ -130,8 +129,10 @@
 
             <!--Custom Traits-->
             {#each item.system.customTrait as trait}
-               <div class="tag" use:tooltipAction="{trait.description}">
-                  <Tag label={trait.name}/>
+               <div class="tag">
+                  <Tag tooltip={trait.description}>
+                     {trait.name}
+                  </Tag>
                </div>
             {/each}
          </div>

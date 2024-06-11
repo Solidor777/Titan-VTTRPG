@@ -3,11 +3,10 @@
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
    import {CREATE_ICON, EDIT_ICON} from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Application statee reference
    const document = getContext('document');
@@ -51,12 +50,10 @@
    <div class="traits-container" transition:slide|local>
       {#if $document.system.trait.length > 0 || $document.system.customTrait.length > 0}
          {#each $document.system.trait as trait (trait.name)}
-            <div
-               class="trait"
-               transition:slide|local
-               use:tooltipAction="{localize(traitDescriptions[trait.name])}"
-            >
-               <Tag label={localize(trait.name)}/>
+            <div class="trait" transition:slide|local>
+               <Tag tooltip={localize(traitDescriptions[trait.name])}>
+                  {localize(trait.name)}
+               </Tag>
             </div>
          {/each}
 

@@ -1,6 +1,5 @@
 <script>
    import {getContext} from 'svelte';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
@@ -50,8 +49,8 @@
 
          <!--Custom Traits-->
          {#each item.system.customTrait as trait}
-            <div class="tag" use:tooltipAction="{trait.description}">
-               <Tag label={trait.name}/>
+            <div class="tag">
+               <Tag tooltip={trait.description}>{trait.name}</Tag>
             </div>
          {/each}
       </div>

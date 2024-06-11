@@ -10,13 +10,17 @@
 <style lang="scss">
    .tag {
       @include tag;
-      @include flex-row;
-      @include flex-group-center;
-      @include border;
-      @include attribute-colors;
 
-      flex-wrap: wrap;
-      font-weight: bold;
-      padding: var(--titan-padding-standard);
+      &.body {
+         --titan-tag-background: var(--titan-body-color);
+      }
+
+      &.mind {
+         --titan-tag-background: var(--titan-mind-color);
+      }
+
+      &.soul {
+         --titan-tag-background: var(--titan-soul-color);
+      }
    }
 </style>

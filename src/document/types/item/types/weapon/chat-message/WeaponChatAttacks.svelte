@@ -3,11 +3,11 @@
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import {ACCURACY_ICON, DAMAGE_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    export let item = void 0;
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
@@ -82,15 +82,17 @@
                         value={trait.value}
                      />
                   {:else}
-                     <Tag label={localize(trait.name)}/>
+                     <Tag>{localize(trait.name)}</Tag>
                   {/if}
                </div>
             {/each}
 
             <!--Custom Traits-->
             {#each attack.customTrait as trait}
-               <div class="stat" use:tooltipAction="{trait.description}">
-                  <Tag label={trait.name}/>
+               <div class="stat">
+                  <Tag tooltip={trait.description}>
+                     {trait.name}
+                  </Tag>
                </div>
             {/each}
          </div>

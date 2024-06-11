@@ -5,7 +5,6 @@
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import DocumentTextInput from '~/document/components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
@@ -24,6 +23,7 @@
       EXPANDED_ICON,
       RANGE_ICON,
    } from '~/system/Icons.js';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Attack idx
    export let idx = void 0;
@@ -230,7 +230,7 @@
                               />
                            {:else}
                               <!--Bool Trait-->
-                              <Tag label={localize(trait.name)}/>
+                              <Tag>{localize(trait.name)}</Tag>
                            {/if}
                         </div>
                      {/each}

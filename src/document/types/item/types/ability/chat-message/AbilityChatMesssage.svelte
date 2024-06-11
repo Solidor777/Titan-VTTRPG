@@ -1,13 +1,12 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import ItemChatMessageItemChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Chat context reference
    const document = getContext('document');
@@ -46,7 +45,7 @@
          {#if item.action}
             <!-- Rarity-->
             <div class="tag">
-               <Tag label={localize('action')}/>
+               <Tag>{localize('action')}</Tag>
             </div>
          {/if}
 
@@ -54,7 +53,7 @@
          {#if item.reaction}
             <!-- Rarity-->
             <div class="tag">
-               <Tag label={localize('reaction')}/>
+               <Tag>{localize('reaction')}</Tag>
             </div>
          {/if}
 
@@ -62,7 +61,7 @@
          {#if item.passive}
             <!-- Rarity-->
             <div class="tag">
-               <Tag label={localize('passive')}/>
+               <Tag>{localize('passive')}</Tag>
             </div>
          {/if}
 
@@ -75,8 +74,10 @@
 
          <!--Custom Traits-->
          {#each item.customTrait as trait}
-            <div class="tag" use:tooltipAction="{trait.description}">
-               <Tag label={trait.name}/>
+            <div class="tag">
+               <Tag tooltip={trait.description}>
+                  {trait.name}
+               </Tag>
             </div>
          {/each}
       </div>
