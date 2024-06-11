@@ -348,6 +348,16 @@
    --titan-border-color: var(--titan-panel-3-color);
 }
 
+@mixin label {
+   border-style: var(--titan-label-border-style);
+   border-radius: var(--titan-label-border-radius);
+   border-width: var(--titan-label-border-width);
+   border-color: var(--titan-label-border-color);
+   color: var(--titan-label-color);
+   padding: var(--titan-label-padding);
+   background: var(--titan-label-background);
+}
+
 @mixin tag {
    display: flex;
    flex-direction: row;
@@ -361,6 +371,7 @@
    border-color: var(--titan-tag-border-color);
    color: var(--titan-tag-color);
    padding: var(--titan-tag-padding);
+   background: var(--titan-tag-background);
 }
 
 @mixin large-tag {
