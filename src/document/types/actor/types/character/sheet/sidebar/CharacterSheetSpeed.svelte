@@ -2,13 +2,13 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
    // The key / name of the speed
    export let key;
 
-   // The Character Data
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Calculate the tooltipAction for the max value

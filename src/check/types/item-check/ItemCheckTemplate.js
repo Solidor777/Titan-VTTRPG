@@ -16,7 +16,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @property {boolean} isDamage Whether the check inflicts damage.
  * @property {boolean} isHealing Whether the check heals damage.
  * @property {boolean} scaling Whether subsequent successes should scale the initial value.
- * @property {number} complexity The minimum number of Successes needed.
+ * @property {number} complexity The minimum number of Successes needed to succeed at the Check.
  * @property {number} difficulty The minimum roll on a die to achieve a Success.
  * @property {number} initialValue The initial value of the Healing or Damage, if applicable.
  * @property {number} resolveCost The resolve cost for performing the check, if any.
@@ -26,7 +26,6 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @property {string} resistanceCheck The Resistance that can be used to oppose this check.
  * @property {string} skill The Skill to use for the Check.
  * @property {string} uuid Generated unique identifier for the Check.
- * @augments {object}
  */
 
 /**

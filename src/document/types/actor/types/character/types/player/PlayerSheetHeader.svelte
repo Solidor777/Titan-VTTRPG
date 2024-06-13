@@ -2,8 +2,8 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
-   import DocumentNameInput from '~/document/components/input/DocumentNameInput.svelte';
+   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentNameInput from '~/document/sheet/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
    import CharacterSheetResistances
@@ -12,7 +12,7 @@
    import CharacterSheetInspiration
       from '~/document/types/actor/types/character/types/player/PlayerSheetInspiration.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

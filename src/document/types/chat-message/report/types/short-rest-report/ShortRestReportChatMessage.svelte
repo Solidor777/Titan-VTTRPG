@@ -7,10 +7,10 @@
    import ReportChatMessageStaminaRestoredMessage
       from '~/document/types/chat-message/components/messages/ChatMessageStaminaRestoredMessage.svelte';
 
-   /** @type object Header component to use. */
+   /** @type object Header svelte-components to use. */
    const header = ShortRestReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section components. */
+   /** @type {object|string[]} Calculated section svelte-components. */
    const sections = [
       ReportChatMessageResolveRestoredMessage,
       ReportChatMessageStaminaRestoredMessage,

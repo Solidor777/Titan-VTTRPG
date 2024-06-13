@@ -2,6 +2,7 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Chat context reference

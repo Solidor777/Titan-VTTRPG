@@ -20,7 +20,7 @@
    /** @type object Object containing a mapping of each trait to its description. */
    export let traitDescriptions = void 0;
 
-   // Application reference
+   /** @type Application The Svelte Component's Application. */
    const application = getApplication();
 
    // Initialize the value of each trait option to the current value of the document's matching trait

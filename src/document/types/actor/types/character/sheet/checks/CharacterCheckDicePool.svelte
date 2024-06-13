@@ -6,7 +6,7 @@
    export let attribute = 'body';
    export let skill = void 0;
 
-   // Reference to the docuement
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

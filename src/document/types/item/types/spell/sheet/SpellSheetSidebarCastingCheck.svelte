@@ -6,8 +6,10 @@
    import SpellSheetSidebarAspects from '~/document/types/item/types/spell/sheet/SpellSheetSidebarAspects.svelte';
    import {COLLAPSED_ICON, EXPANDED_ICON} from '~/system/Icons.js';
 
-   // Application statee reference
+   /** @type object Reference to the Document store. */
    const appState = getContext('applicationState');
+
+   /** @type object Reference to the Application State store. */
    const document = getContext('document');
 
    /**

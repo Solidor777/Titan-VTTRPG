@@ -6,7 +6,7 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
  * @param {object} data - The initial data object provided to the document creation request.
  * @param {object} options - Additional options which modify the creation request.
  * @param {documents.BaseUser} user - The User requesting the document creation.
- * @augments {Actor}
+ * @augments Actor
  */
 export default class TitanActor extends Actor {
 

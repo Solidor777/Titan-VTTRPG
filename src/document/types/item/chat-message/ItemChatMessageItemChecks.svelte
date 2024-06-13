@@ -3,12 +3,12 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
    import {RESOLVE_ICON} from '~/system/Icons.js';
    import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    export let item = void 0;
 
@@ -119,9 +119,11 @@
          <div class="tags">
             <!--Main Check Stats -->
             <div class="tag">
-               <AttributeTag
-                  label={calculateCheckDCText(check)}
+               <AttributeCheckTag
                   attribute={check.attribute}
+                  difficulty={check.difficulty}
+                  complexity={check.complexity}
+                  skill={check.skill}
                />
             </div>
 

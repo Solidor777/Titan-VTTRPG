@@ -7,7 +7,7 @@
    // Alt text for if the path is not a valid image
    export let alt = 'img';
 
-   // Get the aplication
+   /** @type Application The Svelte Component's Application. */
    const application = getApplication();
 
    // Create an image picker ponting to the path

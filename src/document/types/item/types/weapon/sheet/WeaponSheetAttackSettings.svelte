@@ -6,14 +6,13 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import DocumentTextInput from '~/document/components/input/DocumentTextInput.svelte';
-   import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
-   import DocumentAttributeSelect from '~/document/components/select/DocumentAttributeSelect.svelte';
-   import DocumentSkillSelect from '~/document/components/select/DocumentSkillSelect.svelte';
-   import DocumentCheckboxInput from '~/document/components/input/DocumentCheckboxInput.svelte';
-   import DocumentAttackTypeSelect from '~/document/components/select/DocumentAttackTypeSelect.svelte';
+   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
+   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
+   import DocumentSkillSelect from '~/document/sheet/select/DocumentSkillSelect.svelte';
+   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
+   import DocumentAttackTypeSelect from '~/document/sheet/select/DocumentAttackTypeSelect.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
    import {
       COLLAPSED_ICON,
       CREATE_ICON,
@@ -24,12 +23,16 @@
       RANGE_ICON,
    } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import WeaponSheetAttackCustomTraitTag
+      from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
 
    // Attack idx
    export let idx = void 0;
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
@@ -238,25 +241,7 @@
                      <!--Each custom trait-->
                      {#each attack.customTrait as trait, traitIdx (trait.uuid)}
                         <div class="trait">
-                           <!--Bool Trait-->
-                           <EditDeleteTag
-                              label={trait.name}
-                              editFunction={() => {
-                                 $document.system.editCustomAttackTrait(
-                                    idx,
-                                    traitIdx,
-                                 );
-                              }}
-                              deleteFunction={() => {
-                                 $document.system.deleteCustomAttackTrait(
-                                    idx,
-                                    traitIdx,
-                                 );
-                              }}
-                              labelTooltip={trait.description}
-                              editTooltip={localize('editTrait')}
-                              deleteTooltip={localize('deleteTrait')}
-                           />
+                           <WeaponSheetAttackCustomTraitTag attackIdx={idx} {traitIdx}/>
                         </div>
                      {/each}
                   </div>

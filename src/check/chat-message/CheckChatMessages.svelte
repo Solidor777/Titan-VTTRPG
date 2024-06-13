@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

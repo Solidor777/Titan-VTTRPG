@@ -2,7 +2,7 @@
    import {CUSTOM_ICON} from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /**@type CustomEffectData Data for the effect this tag is for. */
+   /**@type CustomEffectData Data for this tag's Effect. */
    export let effect = void 0;
 
 </script>

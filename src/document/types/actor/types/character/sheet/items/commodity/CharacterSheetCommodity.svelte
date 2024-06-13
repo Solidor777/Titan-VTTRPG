@@ -23,7 +23,7 @@
    /** @type TitanItem Reference to the Item document. */
    export let item = void 0;
 
-   /** @type {boolean} Whether this Item is currently expanded. */
+   /** @type boolean Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
 </script>

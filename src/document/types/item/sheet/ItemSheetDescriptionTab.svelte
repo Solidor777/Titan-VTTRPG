@@ -2,10 +2,12 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentBoundEditorInput from '~/document/components/input/DocumentBoundEditorInput.svelte';
+   import DocumentBoundEditorInput from '~/document/sheet/input/DocumentBoundEditorInput.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 </script>
 

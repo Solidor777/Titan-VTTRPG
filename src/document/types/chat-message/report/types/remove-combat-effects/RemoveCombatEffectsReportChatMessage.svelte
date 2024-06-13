@@ -5,10 +5,10 @@
    import ReportChatMessageResolveRestoredMessage
       from '~/document/types/chat-message/components/messages/ChatMessageResolveRestoredMessage.svelte';
 
-   /** @type object Header component to use. */
+   /** @type object Header svelte-components to use. */
    const header = RemoveCombatEffectsReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section components. */
+   /** @type {object|string[]} Calculated section svelte-components. */
    const sections = [ReportChatMessageResolveRestoredMessage];
 </script>
 

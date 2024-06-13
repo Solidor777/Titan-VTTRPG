@@ -6,7 +6,7 @@
    import SpellSheetSidebarStandardAspect
       from '~/document/types/item/types/spell/sheet/SpellSheetSidebarStandardAspect.svelte';
 
-   // Application statee reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    $: enabledAspects = $document.system.aspect.filter(

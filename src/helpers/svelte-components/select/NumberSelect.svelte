@@ -1,5 +1,5 @@
 <script>
-   /** @type number[] Options for the Select component. */
+   /** @type number[] Options for the Select svelte-components. */
    export let options = void 0;
 
    /** @type number The value to bind to the input. */

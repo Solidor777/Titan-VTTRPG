@@ -30,7 +30,7 @@ export default [
          'jsdoc/multiline-blocks': 1, // Recommended
          'jsdoc/no-bad-blocks': 1,
          'jsdoc/no-blank-block-descriptions': 1,
-         'jsdoc/no-defaults': 1,
+         // 'jsdoc/no-defaults': 1,
          // 'jsdoc/no-missing-syntax': 1,
          'jsdoc/no-multi-asterisks': 1, // Recommended
          // 'jsdoc/no-restricted-syntax': 1,

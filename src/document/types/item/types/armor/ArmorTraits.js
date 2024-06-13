@@ -9,7 +9,7 @@ import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 /**
  * All traits specific to Armor items.
- * @type {StandardTrait[]}
+ * @type StandardTrait[]
  */
 export const ARMOR_TRAITS = deepFreeze([
    {
@@ -32,7 +32,7 @@ export const ARMOR_TRAITS = deepFreeze([
 
 /**
  * Keys for the localized description strings for Armor Traits, mapped to the Trait name.
- * @type {object}
+ * @type object
  */
 export const ARMOR_TRAIT_DESCRIPTIONS = deepFreeze({
    magical: 'armor.magical.desc',

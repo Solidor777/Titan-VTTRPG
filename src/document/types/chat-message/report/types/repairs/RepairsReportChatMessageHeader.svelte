@@ -1,10 +1,10 @@
 <script>
    import ChatReportHeader from '~/document/types/chat-message/report/components/ReportChatMessageHeader.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { REPAIR_ICON } from '~/system/Icons.js';
-   import { getContext } from 'svelte';
+   import {REPAIR_ICON} from '~/system/Icons.js';
+   import {getContext} from 'svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type string[] Actor and armor images. */
@@ -19,8 +19,8 @@
 </script>
 
 <ChatReportHeader
-   {headerLabel}
    headerIcon="{REPAIR_ICON}"
-   {subHeaderLabels}
+   {headerLabel}
    {images}
+   {subHeaderLabels}
 />

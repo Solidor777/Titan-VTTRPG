@@ -5,7 +5,7 @@
  * @property {boolean?} doubleTraining Whether to double the Training applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
- * @property {number?} complexity The minimum number of Successes needed.
+ * @property {number?} complexity The minimum number of Successes needed to succeed at the Check.
  * @property {number?} damageMod Modifier for the amount of Damage to be inflicted.
  * @property {number?} difficulty The minimum roll on a die to achieve a Success.
  * @property {number?} diceMod Modifier for the number of Dice being rolled.

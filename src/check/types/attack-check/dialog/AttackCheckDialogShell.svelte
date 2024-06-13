@@ -1,7 +1,7 @@
 <script>
    import CheckDialogAttributeField from '~/check/dialog/CheckDialogAttributeField.svelte';
    import CheckDialogBase from '~/check/dialog/CheckDialogBase.svelte';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckDialogSkillField from '~/check/dialog/CheckDialogSkillField.svelte';
    import CheckDialogDiceModField from '~/check/dialog/CheckDialogDiceModField.svelte';
    import CheckDialogTrainingModField from '~/check/dialog/CheckDialogTrainingModField.svelte';
@@ -25,13 +25,13 @@
    /** @type TitanActor The Actor that will roll the Check. */
    export let actor = void 0;
 
-   /** @type {AttackCheckOptions}   Reference to the Check Options. */
+   /** @type object Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {AttackCheckParameters}   Reference to calculated Check Parameters. */
+   /** @type object Reference to calculated Check Parameters Store. */
    const checkParameters = getContext('checkParameters');
 
-   /** @type {Application} Reference to the dialog application. */
+   /** @type AttackCheckDialog The Svelte Component's Application. */
    const application = getApplication();
 
    /** @type {*[]} Components for changing the options and displaying the parameters. */
@@ -88,4 +88,4 @@
 
 </script>
 
-<CheckDialogBase {rows} on:roll={onRoll}/>
+<CheckDialogBase on:roll={onRoll} {rows}/>

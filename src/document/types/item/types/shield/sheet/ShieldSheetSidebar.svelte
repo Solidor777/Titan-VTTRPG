@@ -1,10 +1,10 @@
 <script>
-   import { getContext } from 'svelte';
-   import ItemSheetSidebarChecks from '~/document/types/item/component/check/ItemSheetSidebarChecks.svelte';
+   import {getContext} from 'svelte';
+   import ItemSheetSidebarChecks from '~/document/types/item/sheet/check/ItemSheetSidebarChecks.svelte';
    import ItemSheetSidebarBase from '~/document/types/item/sheet/ItemSheetSidebarBase.svelte';
    import ShieldSheetSidebarTraits from '~/document/types/item/types/shield/sheet/ShieldSheetSidebarTraits.svelte';
 
-   // Application statee reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    $: sections =
@@ -13,4 +13,4 @@
          : [ShieldSheetSidebarTraits];
 </script>
 
-<ItemSheetSidebarBase {sections} />
+<ItemSheetSidebarBase {sections}/>

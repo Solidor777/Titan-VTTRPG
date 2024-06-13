@@ -2,21 +2,21 @@ import createNumberField from '~/helpers/utility-functions/CreateNumberField.js'
 
 /**
  * A specialized subclass of TypeDataModel,
- * with extra functionality to support data model components and version migrations.
- * @augments {TypeDataModel}
+ * with extra functionality to support data model svelte-components and version migrations.
+ * @augments TypeDataModel
  */
 export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
-    * Map of the object's components, sorted by Name and Component Class.
+    * Map of the object's svelte-components, sorted by Name and Component Class.
     * @type {object}
     * @private
     */
    #components;
-   
+
    constructor(data, options) {
       super(data, options);
 
-      // Construct the document components
+      // Construct the document svelte-components
       const components = {};
       for (const [key, component] of Object.entries(this.constructor._prototypeComponents)) {
          components[key] = new component(this);
@@ -38,7 +38,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Static getter for the base components used for construction.
+    * Static getter for the base svelte-components used for construction.
     * @type {object}
     * @protected
     */
@@ -47,8 +47,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Getter for the map of the data model's components.
-    * @returns {object} The map of the data model's component.
+    * Getter for the map of the data model's svelte-components.
+    * @returns {object} The map of the data model's svelte-components.
     */
    get components() {
       return this.#components;
@@ -58,7 +58,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
       // Define the document schema
       const documentSchema = this._defineDocumentSchema();
 
-      // Add each component's schema to the document schema
+      // Add each svelte-components's schema to the document schema
       for (const [key, component] of Object.entries(this._prototypeComponents)) {
          if (component.defineSchema !== undefined) {
             documentSchema[key] = component.defineSchema();
@@ -68,9 +68,9 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Defines the schema for the document, minus the component schemas.
+    * Defines the schema for the document, minus the svelte-components schemas.
     * Component schemas are added later.
-    * @returns {object} The document schema, minus the component schemas.
+    * @returns {object} The document schema, minus the svelte-components schemas.
     * @protected
     */
    static _defineDocumentSchema() {
@@ -84,7 +84,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Migrates the data for each component.
+    * Migrates the data for each svelte-components.
     * @param {object} source - The source data for the document.
     * @returns {object} The migrated data.
     * @protected
@@ -131,7 +131,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Prepares the data for each data model component.
+    * Prepares the data for each data model svelte-components.
     * @protected
     */
    _prepareComponentDerivedData() {

@@ -3,7 +3,7 @@
    import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
    import {getContext} from 'svelte';
 
-   /** @type TitanActor Reference to the Character Document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type string The Attribute to be used for the check. */

@@ -2,7 +2,7 @@
    import CharacterSheetWeaponAttack
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte';
 
-   /** @type {string} The ID of the item to get the check from. */
+   /** @type string The ID of the item to get the check from. */
    export let item = void 0;
 </script>
 

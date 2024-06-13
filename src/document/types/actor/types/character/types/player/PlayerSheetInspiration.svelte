@@ -5,6 +5,7 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import {INSPIRATION_ICON} from '~/system/Icons.js';
 
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

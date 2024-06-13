@@ -3,7 +3,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import {getContext} from 'svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type string The Key of the resource to display information for. */

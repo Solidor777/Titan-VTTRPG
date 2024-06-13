@@ -8,7 +8,7 @@
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   // Chat context reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
 </script>

@@ -3,7 +3,7 @@
    import CheckChatScalingAspect
       from '~/check/types/casting-check/chat-message/CastingCheckChatMessageScalingAspect.svelte';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

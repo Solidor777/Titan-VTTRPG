@@ -5,15 +5,15 @@
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
    import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON} from '~/system/Icons.js';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type TitanActor Reference to the Character Document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item to get the check from. */
+   /** @type string The ID of the item to get the check from. */
    export let itemId = void 0;
 
    /** @type number The index of the check in the checks array. */
@@ -31,10 +31,7 @@
    /** @type ItemCheckParameters Calculated item check parameters. */
    let checkParameters;
 
-   /** @type string Calculated DC Label */
-   let dcLabel;
-
-   // Update the component in response to changes
+   // Update the svelte-components in response to changes
    $: {
 
       // Ensure the item and check are valid
@@ -46,12 +43,6 @@
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );
-
-         // Update the DC Label
-         dcLabel =
-            `${localize(checkParameters.attribute)}
-            (${localize(checkParameters.skill)})
-            ${checkParameters.difficulty}:${checkParameters.complexity}`;
       }
    }
 
@@ -111,9 +102,11 @@
    <div class="stats">
       <!--DC, Attribute, and Skill-->
       <div class="stat">
-         <AttributeTag
+         <AttributeCheckTag
             attribute={checkParameters.attribute}
-            label={dcLabel}
+            complexity={checkParameters.complexity}
+            difficulty={checkParameters.difficulty}
+            skill={checkParameters.skill}
          />
       </div>
 

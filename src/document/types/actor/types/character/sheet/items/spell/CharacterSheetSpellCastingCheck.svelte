@@ -1,14 +1,14 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {string} The ID of the item to get the check from. */
+   /** @type string The ID of the item to get the check from. */
    export let item = void 0;
 
-   /** @type TitanActor Reference to the character document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type CastingCheckOptions Base options for the Casting Check. */
@@ -19,7 +19,7 @@
    /** @type CastingCheckParameters Calculated check parameters. */
    let checkParameters;
 
-   // Update the component in response to changes
+   // Update the svelte-components in response to changes
    $: {
       // Ensure the item is still valid
       if ($document.items.get(item._id)) {
@@ -35,10 +35,11 @@
 <div class="check">
    <!--Label-->
    <div class="tag">
-      <AttributeTag
+      <AttributeCheckTag
          attribute={checkParameters.attribute}
-         label={`${localize(checkParameters.attribute)} (${localize(checkParameters.skill)})
-         ${checkParameters.difficulty}:${checkParameters.complexity}`}
+         complexity={checkParameters.complexity}
+         difficulty={checkParameters.difficulty}
+         skill={checkParameters.skill}
       />
    </div>
 

@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
-   // Chat context reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
    const titanFlags = $document.flags.titan;
 </script>

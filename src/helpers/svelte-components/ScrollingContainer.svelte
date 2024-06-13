@@ -4,7 +4,7 @@
    /** @type object Svelte Component containing the content to show in the scrollable container. */
    export let content = void 0;
 
-   /** @type {*[]} Properties to pass to the Content component. */
+   /** @type {*[]} Properties to pass to the Content svelte-components. */
    export let props = void 0;
 
    /** @type number Initial scroll top of this container. */

@@ -1,10 +1,10 @@
 <script>
    import ChatReportHeader from '~/document/types/chat-message/report/components/ReportChatMessageHeader.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { ARMOR_ICON, REND_ICON } from '~/system/Icons.js';
-   import { getContext } from 'svelte';
+   import {ARMOR_ICON, REND_ICON} from '~/system/Icons.js';
+   import {getContext} from 'svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type string[] Actor and armor images. */
@@ -34,8 +34,8 @@
 </script>
 
 <ChatReportHeader
-   {headerLabel}
    {headerIcon}
-   {subHeaderLabels}
+   {headerLabel}
    {images}
+   {subHeaderLabels}
 />

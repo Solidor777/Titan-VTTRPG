@@ -13,7 +13,7 @@
    /** @type object Writable for storing the sheet's state. */
    export let applicationState = void 0;
 
-   /** @type object Child component that contains the sheet functionality. */
+   /** @type object Child svelte-components that contains the sheet functionality. */
    export let shell = void 0;
 
    // Setup context variables

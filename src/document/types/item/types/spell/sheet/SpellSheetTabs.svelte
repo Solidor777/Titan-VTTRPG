@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import ItemSheetChecksTab from '~/document/types/item/component/check/ItemSheetChecksTab.svelte';
+   import ItemSheetChecksTab from '~/document/types/item/sheet/check/ItemSheetChecksTab.svelte';
    import SpellSheetCastingCheckTab from '~/document/types/item/types/spell/sheet/SpellSheetCastingCheckTab.svelte';
    import SpellSheetStandardAspectsTab
       from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectsTab.svelte';
@@ -9,6 +9,7 @@
    import ItemSheetDescriptionTab from '~/document/types/item/sheet/ItemSheetDescriptionTab.svelte';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';
 
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Tabs

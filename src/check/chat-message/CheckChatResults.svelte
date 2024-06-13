@@ -13,7 +13,7 @@
       TRAINING_ICON,
    } from '~/system/Icons.js';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

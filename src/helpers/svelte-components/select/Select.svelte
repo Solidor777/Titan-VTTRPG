@@ -1,13 +1,12 @@
 <script>
    /**
-    * @typedef SelectOption
-    * Object used to store data for an Option within a Select component.
+    * @typedef {object} SelectOption
+    * Object used to store data for an Option within a Select svelte-components.
     * @property {*} value The value for this option.
     * @property {string} label The display label for this option.
-    * @augments {object}
     */
 
-   /** @type SelectOption[] Options for the Select component. */
+   /** @type SelectOption[] Options for the Select svelte-components. */
    export let options = void 0;
 
    /** @type number The value to bind to the input. */

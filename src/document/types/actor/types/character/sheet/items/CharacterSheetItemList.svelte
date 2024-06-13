@@ -18,7 +18,7 @@
    // Whether the object should be expanded by default
    export let isExpandedDefault = false;
 
-   // Character reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Currently drag hovered state

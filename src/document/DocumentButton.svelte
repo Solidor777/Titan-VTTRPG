@@ -8,7 +8,7 @@
    /** @type boolean Tooltip for this button, if any. */
    export let tooltip = void 0;
 
-   /** @type Document Reference to the Document this Application is for. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
 </script>

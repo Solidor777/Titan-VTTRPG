@@ -19,7 +19,7 @@
  * @property {boolean} resilienceCheck Whether the effects can be resisted with a Resilience check.
  * @property {boolean} willpowerCheck Whether the effects can be resisted with a Willpower check.
  * @property {number} attributeDice The number of dice granted by the attribute.
- * @property {number} complexity The minimum number of Successes needed.
+ * @property {number} complexity The minimum number of Successes needed to succeed at the Check.
  * @property {number} damage The minimum Damage to apply on a successful check.
  * @property {number} damageMod Modifier for the amount of Damage to be inflicted.
  * @property {number} diceMod Modifier for the number of Dice being rolled.

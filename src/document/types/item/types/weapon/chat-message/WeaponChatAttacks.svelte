@@ -4,10 +4,10 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import {ACCURACY_ICON, DAMAGE_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    export let item = void 0;
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
@@ -60,11 +60,9 @@
 
             <!--Attribute and skill-->
             <div class="stat">
-               <AttributeTag
+               <AttributeCheckTag
                   attribute={attack.attribute}
-                  label={`${localize(attack.attribute)} (${localize(
-                     attack.skill,
-                  )})`}
+                  skill={attack.skill}
                />
             </div>
 

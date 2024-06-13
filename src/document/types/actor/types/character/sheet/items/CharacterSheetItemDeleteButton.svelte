@@ -4,10 +4,10 @@
    import {DELETE_ICON} from '~/system/Icons.js';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type TitanActor Reference to the Character Document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item this button is for. */
+   /** @type string The ID of the item this button is for. */
    export let itemId = void 0;
 </script>
 

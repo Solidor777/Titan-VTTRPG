@@ -5,7 +5,7 @@
    export let skill = 'athletics';
    export let attribute = '';
 
-   // Reference to the docuement
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

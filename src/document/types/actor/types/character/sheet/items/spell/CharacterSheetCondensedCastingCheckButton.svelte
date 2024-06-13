@@ -6,7 +6,7 @@
    /** @type string The ID of the Item to get the check from. */
    export let itemId = void 0;
 
-   /** @type TitanActor Reference to the Character Document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type CastingCheckOptions Base options for the Check. */
@@ -20,7 +20,7 @@
    /** @type string Calculated tooltipAction. */
    let tooltip;
 
-   // Update the component in response to changes
+   // Update the svelte-components in response to changes
    $: {
       // Ensure the item is valid
       if ($document.items.get(itemId)) {

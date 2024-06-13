@@ -2,10 +2,11 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import DocumentImagePicker from '~/document/components/DocumentImagePicker.svelte';
+   import DocumentImagePicker from '~/document/sheet/DocumentImagePicker.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import {LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
 
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

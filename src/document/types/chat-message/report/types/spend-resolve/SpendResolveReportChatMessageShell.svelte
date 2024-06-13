@@ -4,15 +4,15 @@
    import SpendResolveReportChatMessageHeader
       from '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageHeader.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Header component to use. */
+   /** @type object Header svelte-components to use. */
    const header = SpendResolveReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section components. */
+   /** @type {object|string[]} Calculated section svelte-components. */
    const sections = [ChatMessageResolve];
 
    // Add resolve shortage message if appropriate.

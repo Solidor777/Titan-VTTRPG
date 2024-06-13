@@ -9,6 +9,7 @@
    // Character Sheet
    export let actor = void 0;
 
+   /** @type Application The Svelte Component's Application. */
    const application = getApplication();
 
    const options = [

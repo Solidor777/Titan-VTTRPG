@@ -2,7 +2,7 @@
    import {INITIATIVE_ICON} from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /**@type InitiativeEffectData Data for the effect this tag is for. */
+   /**@type InitiativeEffectData Data for this tag's Effect. */
    export let effect = void 0;
 
 </script>

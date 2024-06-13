@@ -7,7 +7,7 @@
    import SpellSheetStandardAspectSettings
       from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Aspect Options

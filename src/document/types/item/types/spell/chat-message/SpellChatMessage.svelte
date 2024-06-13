@@ -3,14 +3,14 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   // Chat context reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
 </script>
@@ -23,13 +23,11 @@
 
    <div class="sections">
       <div class="section">
-         <AttributeTag
+         <AttributeCheckTag
             attribute={item.castingCheck.attribute}
-            label={`${localize(item.castingCheck.attribute)} (${localize(
-               item.castingCheck.skill,
-            )}) ${item.castingCheck.difficulty}:${
-               item.castingCheck.complexity
-            }`}
+            complexity={item.castingCheck.complexity}
+            difficulty={item.castingCheck.difficulty}
+            skill={item.castingCheck.skill}
          />
       </div>
 

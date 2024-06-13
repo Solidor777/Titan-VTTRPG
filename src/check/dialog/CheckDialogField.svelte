@@ -7,13 +7,13 @@
    /** The value to bind to the input. */
    export let value = void 0;
 
-   /** The input component to bind to the value. */
+   /** The input svelte-components to bind to the value. */
    export let input = void 0;
 
    /** The tooltipAction to display when the label is hovered. */
    export let fieldTooltip = void 0;
 
-   /** Properties for the input component. */
+   /** Properties for the input svelte-components. */
    export let inputProps = void 0;
 </script>
 

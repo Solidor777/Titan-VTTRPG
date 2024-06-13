@@ -1,8 +1,8 @@
 <script>
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import ChatExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

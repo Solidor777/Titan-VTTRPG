@@ -3,7 +3,7 @@
    import CharacterSheetAttribute
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttribute.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

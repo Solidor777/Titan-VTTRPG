@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
    import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
 
@@ -11,7 +11,7 @@
    export let icon = void 0;
    export let resourceTooltip = void 0;
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Calculate the tooltipAction for the max value

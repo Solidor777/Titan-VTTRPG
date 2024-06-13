@@ -2,7 +2,7 @@
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
    import {getContext} from 'svelte';
 
-   /** @type TitanActor Reference to the Character Document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type number Calculated Complexity of the Resistance checks. */

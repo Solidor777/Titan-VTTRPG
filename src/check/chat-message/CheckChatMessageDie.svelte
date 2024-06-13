@@ -6,7 +6,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import {DICE_ICON, EXPERTISE_ICON} from '~/system/Icons.js';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type CheckDie The individual die being display. */

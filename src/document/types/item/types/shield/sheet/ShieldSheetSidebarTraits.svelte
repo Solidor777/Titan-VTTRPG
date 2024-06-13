@@ -4,11 +4,11 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
    import {CREATE_ICON, EDIT_ICON} from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
 
-   // Application statee reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
    const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 </script>
@@ -60,18 +60,7 @@
          <!--Custom Traits-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
             <div class="trait" transition:slide|local>
-               <EditDeleteTag
-                  label={trait.name}
-                  editFunction={() => {
-                     $document.editCustomTrait(idx);
-                  }}
-                  deleteFunction={() => {
-                     $document.deleteCustomTrait(idx);
-                  }}
-                  labelTooltip={trait.description}
-                  editTooltip={localize('editTrait')}
-                  deleteTooltip={localize('deleteTrait')}
-               />
+               <ItemSheetCustomTraitTag {idx}/>
             </div>
          {/each}
       {/if}

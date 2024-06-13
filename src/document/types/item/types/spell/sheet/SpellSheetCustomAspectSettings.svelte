@@ -2,15 +2,17 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
-   import DocumentCheckboxInput from '~/document/components/input/DocumentCheckboxInput.svelte';
-   import DocumentResistanceSelect from '~/document/components/select/DocumentResistanceSelect.svelte';
-   import DocumentTextInput from '~/document/components/input/DocumentTextInput.svelte';
+   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
+   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
+   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
    import {COLLAPSED_ICON, DAMAGE_ICON, DELETE_ICON, EXPANDED_ICON, HEALING_ICON} from '~/system/Icons.js';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Idx of the custom aspect being represented

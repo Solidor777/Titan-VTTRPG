@@ -4,15 +4,15 @@
    import {slide} from 'svelte/transition';
    import SpellSheetEnableAspectButton
       from '~/document/types/item/types/spell/sheet/SpellSheetEnableAspectButton.svelte';
-   import DocumentSelect from '~/document/components/select/DocumentSelect.svelte';
-   import DocumentResistanceSelect from '~/document/components/select/DocumentResistanceSelect.svelte';
-   import DocumentCheckboxInput from '~/document/components/input/DocumentCheckboxInput.svelte';
+   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
+   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
+   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
 
    export let aspectOptions = void 0;
    let idx = 0;
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Determines whether an aspect should have a details div

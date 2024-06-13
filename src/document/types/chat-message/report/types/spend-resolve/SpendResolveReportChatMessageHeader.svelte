@@ -1,10 +1,10 @@
 <script>
    import ReportChatMessageHeader from '~/document/types/chat-message/report/components/ReportChatMessageHeader.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { SPEND_RESOLVE_ICON } from '~/system/Icons.js';
-   import { getContext } from 'svelte';
+   import {SPEND_RESOLVE_ICON} from '~/system/Icons.js';
+   import {getContext} from 'svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type string Calculated header label. */
@@ -17,8 +17,8 @@
 </script>
 
 <ReportChatMessageHeader
-   headerLabel="{headerLabel}"
    headerIcon="{SPEND_RESOLVE_ICON}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerLabel="{headerLabel}"
    images="{[$document.flags.titan.actorImg]}"
+   subHeaderLabels="{[$document.flags.titan.actorName]}"
 />

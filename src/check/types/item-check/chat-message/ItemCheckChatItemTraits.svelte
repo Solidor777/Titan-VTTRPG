@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

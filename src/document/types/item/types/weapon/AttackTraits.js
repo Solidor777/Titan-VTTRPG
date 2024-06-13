@@ -2,7 +2,7 @@ import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 /**
  * All traits specific to Attacks.
- * @type {StandardTrait[]}
+ * @type StandardTrait[]
  */
 export const ATTACK_TRAITS = deepFreeze([
    {
@@ -81,7 +81,7 @@ export const ATTACK_TRAITS = deepFreeze([
 
 /**
  * Keys for the localized description strings for Attack Traits, mapped to the Trait name.
- * @type {object}
+ * @type object
  */
 export const ATTACK_TRAIT_DESCRIPTIONS = deepFreeze({
    blast: 'attack.blast.desc',

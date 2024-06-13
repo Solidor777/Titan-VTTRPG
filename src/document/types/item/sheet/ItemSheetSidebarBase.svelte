@@ -3,7 +3,7 @@
    import {slide} from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
 
-   // Application statee reference
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
    export let sections = void 0;
 </script>

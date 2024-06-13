@@ -1,16 +1,16 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import DocumentName from '~/document/components/input/DocumentNameInput.svelte';
+   import DocumentName from '~/document/sheet/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
    import CharacterSheetResistances
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
-   import DocumentSelect from '~/document/components/select/DocumentSelect.svelte';
+   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import DocumentTextInput from '~/document/components/input/DocumentTextInput.svelte';
+   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
    const options = [
       {

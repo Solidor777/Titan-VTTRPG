@@ -11,10 +11,10 @@
       from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
    import {CREATE_ICON, REMOVE_TEMP_EFFECTS_ICON} from '~/system/Icons.js';
 
-   // Application reference
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

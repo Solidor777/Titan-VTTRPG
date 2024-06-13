@@ -7,13 +7,13 @@ import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import {SETTINGS_ICON} from '~/system/Icons.js';
 
 /**
- * A replacement Document Sheet to that supports svelte components.
+ * A replacement Document Sheet to that supports svelte svelte-components.
  * @param {Document} document - The document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
-    * A replacement Document Sheet to that supports svelte components.
+    * A replacement Document Sheet to that supports svelte svelte-components.
     * @param {Document} document - The document this sheet is for.
     * @param {object} options - Options object.
     */

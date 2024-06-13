@@ -2,7 +2,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

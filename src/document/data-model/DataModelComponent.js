@@ -1,13 +1,13 @@
 /**
- * Class for adding a re-usable component to a data model.
+ * Class for adding a re-usable svelte-components to a data model.
  */
 export default class DataModelComponent {
    // Reference to the parent data model.
    #parent;
 
    /**
-    * Class for adding a re-usable component to a data model.
-    * @param {TitanDataModel} parent - The parent data model this component is associated with.
+    * Class for adding a re-usable svelte-components to a data model.
+    * @param {TitanDataModel} parent - The parent data model this svelte-components is associated with.
     */
    constructor(parent) {
       this.#parent = parent;
@@ -15,7 +15,7 @@ export default class DataModelComponent {
 
    /**
     * Getter for the parent data model.
-    * @returns {TitanDataModel} - The parent data model this component is associated with.
+    * @returns {TitanDataModel} - The parent data model this svelte-components is associated with.
     */
    get parent() {
       return this.#parent;

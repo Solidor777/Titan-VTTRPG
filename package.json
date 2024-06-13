@@ -43,7 +43,7 @@
       "dev": "vite",
       "eslint": "eslint .",
       "eslint-fix": "eslint . --fix",
-      "stylelint": "stylelint \"**/*.svelte\"",
-      "stylelint-fix": "stylelint \"**/*.svelte\" --fix"
+      "stylelint": "stylelint \"src/**/*.{css,svelte}\"",
+      "stylelint-fix": "stylelint \"src/**/*.{css,svelte}\" --fix"
    }
 }

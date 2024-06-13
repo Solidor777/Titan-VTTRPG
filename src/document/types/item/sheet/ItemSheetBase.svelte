@@ -6,6 +6,7 @@
    export let sidebar = void 0;
    export let tabs = void 0;
 
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 {#if $document}

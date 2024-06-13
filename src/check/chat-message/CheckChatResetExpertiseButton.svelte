@@ -4,7 +4,7 @@
    import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
    import {RESET_ICON} from '~/system/Icons.js';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /**

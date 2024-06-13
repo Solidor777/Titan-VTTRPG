@@ -1,6 +1,6 @@
 <script>
    import CheckDialogBase from '~/check/dialog/CheckDialogBase.svelte';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import CheckDialogComplexityField from '~/check/dialog/CheckDialogComplexityField.svelte';
    import CheckDialogDifficultyField from '~/check/dialog/CheckDialogDifficultyField.svelte';
    import CheckDialogDiceModField from '~/check/dialog/CheckDialogDiceModField.svelte';
@@ -16,13 +16,13 @@
    /** @type TitanActor The Actor that will roll the Check. */
    export let actor = void 0;
 
-   /** @type {ResistanceCheckOptions}   Reference to the Check Options. */
+   /** @type object Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {ResistanceCheckParameters}   Reference to calculated Check Parameters. */
+   /** @type object Reference to calculated Check Parameters store. */
    const checkParameters = getContext('checkParameters');
 
-   /** @type {Application} Reference to the dialog application. */
+   /** @type ResistanceCheckDialog The Svelte Component's Application. */
    const application = getApplication();
 
    /** @type {*[]} Components for changing the options and displaying the parameters. */
@@ -71,4 +71,4 @@
 
 </script>
 
-<CheckDialogBase {rows} on:roll={onRoll}/>
+<CheckDialogBase on:roll={onRoll} {rows}/>

@@ -14,7 +14,7 @@
    // The attack idx
    export let attackIdx = void 0;
 
-   // Application reference
+   /** @type Application The Svelte Component's Application. */
    const application = getApplication();
 
    const newTrait = {

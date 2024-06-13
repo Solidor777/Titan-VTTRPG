@@ -7,6 +7,7 @@
    // Header to allow this sheet to be used with players or NPCs
    export let header = void 0;
 
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 {#if $document}

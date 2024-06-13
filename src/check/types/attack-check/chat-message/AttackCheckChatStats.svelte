@@ -8,7 +8,7 @@
    import {ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON} from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>

@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import CheckChatMessageDie from '~/check/chat-message/CheckChatMessageDie.svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type CheckDie[] Array of processed dice from the Check. */

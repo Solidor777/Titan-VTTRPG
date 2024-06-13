@@ -5,7 +5,7 @@
    /** @type boolean Whether this input is disabled. */
    export let disabled = false;
 
-   /** @type string Tooltip to display for this element, if any. */
+   /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

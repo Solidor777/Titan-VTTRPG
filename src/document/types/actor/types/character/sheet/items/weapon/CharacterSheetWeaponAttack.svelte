@@ -4,7 +4,6 @@
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import {
@@ -17,11 +16,12 @@
       TRAINING_ICON,
    } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   // Context references
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item to get the check from. */
+   /** @type string The ID of the item to get the check from. */
    export let item = void 0;
 
    // Reference to the attack idx
@@ -180,9 +180,9 @@
 
       <!--Attribute and skill-->
       <div class="stat">
-         <AttributeTag
+         <AttributeCheckTag
             attribute={attack.attribute}
-            label={`${localize(attack.attribute)} (${localize(attack.skill)})`}
+            skill={attack.skill}
          />
       </div>
 

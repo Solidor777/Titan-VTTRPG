@@ -9,8 +9,10 @@
       from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';
    import {CREATE_ICON} from '~/system/Icons.js';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Initialize expanded state

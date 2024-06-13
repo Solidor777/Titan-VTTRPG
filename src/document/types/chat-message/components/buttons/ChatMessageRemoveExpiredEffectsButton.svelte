@@ -5,7 +5,7 @@
    import {REMOVE_TEMP_EFFECTS_ICON} from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Removes expired effects from the chat message owner

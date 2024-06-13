@@ -11,7 +11,7 @@
    // The document owning the trait
    export let item = void 0;
 
-   // Application reference
+   /** @type Application The Svelte Component's Application. */
    const application = getApplication();
 
    const newTrait = createCustomItemTraitTemplate();

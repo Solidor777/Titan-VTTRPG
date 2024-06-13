@@ -5,7 +5,7 @@
    export let enabled = void 0;
    export let label = void 0;
 
-   // Setup
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Copy of the document data

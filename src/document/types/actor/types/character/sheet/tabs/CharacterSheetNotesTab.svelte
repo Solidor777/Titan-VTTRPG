@@ -1,12 +1,12 @@
 <script>
    import {getContext} from 'svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentBoundEditorInput from "~/document/components/input/DocumentBoundEditorInput.svelte";
+   import DocumentBoundEditorInput from '~/document/sheet/input/DocumentBoundEditorInput.svelte';
 
-   /** @type Document Reference to the Character document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the object containing the application state. */
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 </script>
 

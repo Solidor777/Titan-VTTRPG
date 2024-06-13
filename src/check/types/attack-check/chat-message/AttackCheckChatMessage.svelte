@@ -10,7 +10,7 @@
    import AttackCheckChatDamageButtons
       from '~/check/types/attack-check/chat-message/AttackCheckChatDamageButtons.svelte';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

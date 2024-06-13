@@ -6,7 +6,8 @@
 
    // Item Reference
    export let item = void 0;
-   // Reference to the application
+
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

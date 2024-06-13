@@ -2,12 +2,14 @@
    import {getContext} from 'svelte';
    import {slide} from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import ItemSheetSidebarChecks from '~/document/types/item/component/check/ItemSheetSidebarChecks.svelte';
+   import ItemSheetSidebarChecks from '~/document/types/item/sheet/check/ItemSheetSidebarChecks.svelte';
    import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
    import WeaponSheetSidebarAttacks from '~/document/types/item/types/weapon/sheet/WeaponSheetSidebarAttacks.svelte';
 
-   // Application statee reference
+   /** @type object Reference to the Document store. */
    const appState = getContext('applicationState');
+
+   /** @type object Reference to the Application State store. */
    const document = getContext('document');
 </script>
 

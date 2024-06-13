@@ -1,14 +1,13 @@
 <script>
    import {getContext} from 'svelte';
-   import ChatTurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStartEffectTag.svelte';
-   import ChatPermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
-   import ChatTurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
-   import ChatExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
-   import ChatConditionTag from '~/helpers/svelte-components/tag/ConditionTag.svelte';
-   import ChatInitiativeEffectTag from '~/helpers/svelte-components/tag/effects/InitiativeEffectTag.svelte';
-   import ChatCustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
+   import PermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
+   import TurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
+   import ExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
+   import InitiativeEffectTag from '~/helpers/svelte-components/tag/effects/InitiativeEffectTag.svelte';
+   import CustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
+   import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -16,11 +15,7 @@
    {#if $document.flags.titan.conditions}
       {#each $document.flags.titan.conditions as effect}
          <div class="effect">
-            <ChatConditionTag
-               label={effect.label}
-               img={effect.img}
-               description={effect.description}
-            />
+            <EffectTag {effect}/>
          </div>
       {/each}
    {/if}
@@ -29,11 +24,7 @@
    {#if $document.flags.titan.effects.permanent}
       {#each $document.flags.titan.effects.permanent as effect}
          <div class="effect">
-            <ChatPermanentEffectTag
-               label={effect.label}
-               img={effect.img}
-               description={effect.description}
-            />
+            <PermanentEffectTag {effect}/>
          </div>
       {/each}
    {/if}
@@ -42,12 +33,7 @@
    {#if $document.flags.titan.effects.turnStart}
       {#each $document.flags.titan.effects.turnStart as effect}
          <div class="effect">
-            <ChatTurnStartEffectTag
-               label={effect.label}
-               remaining={effect.remaining}
-               img={effect.img}
-               description={effect.description}
-            />
+            <TurnEndEffectTag {effect}/>
          </div>
       {/each}
    {/if}
@@ -56,12 +42,7 @@
    {#if $document.flags.titan.effects.turnEnd}
       {#each $document.flags.titan.effects.turnEnd as effect}
          <div class="effect">
-            <ChatTurnEndEffectTag
-               label={effect.label}
-               remaining={effect.remaining}
-               img={effect.img}
-               description={effect.description}
-            />
+            <TurnEndEffectTag {effect}/>
          </div>
       {/each}
    {/if}
@@ -70,13 +51,7 @@
    {#if $document.flags.titan.effects.initiative}
       {#each $document.flags.titan.effects.initiative as effect}
          <div class="effect">
-            <ChatInitiativeEffectTag
-               label={effect.label}
-               remaining={effect.remaining}
-               img={effect.img}
-               initiative={effect.initiative}
-               description={effect.description}
-            />
+            <InitiativeEffectTag {effect}/>
          </div>
       {/each}
    {/if}
@@ -85,7 +60,7 @@
    {#if $document.flags.titan.effects.custom}
       {#each $document.flags.titan.effects.custom as effect}
          <div class="effect">
-            <ChatCustomEffectTag {effect}/>
+            <CustomEffectTag {effect}/>
          </div>
       {/each}
    {/if}
@@ -94,11 +69,7 @@
    {#if $document.flags.titan.effects.expired}
       {#each $document.flags.titan.effects.expired as effect}
          <div class="effect">
-            <ChatExpiredEffectTag
-               label={effect.label}
-               img={effect.img}
-               description={effect.description}
-            />
+            <ExpiredEffectTag {effect}/>
          </div>
       {/each}
    {/if}

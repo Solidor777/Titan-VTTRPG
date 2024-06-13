@@ -7,7 +7,7 @@
    /** @type number Index of the Scaling Aspect in the Scaling Aspects array. */
    export let idx = void 0;
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type ScalingAspect Reference to the scaling aspect. */

@@ -1,16 +1,16 @@
 <script>
 
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import CheckDialogSummary from '~/check/dialog/CheckDialogSummary.svelte';
 
-   /** @type {CheckParameters}   Reference to the Check Parameters. */
+   /** @type object Reference to the Check Parameters store. */
    const checkParameters = getContext('checkParameters');
 
 </script>
 
 <CheckDialogSummary
-   label="{localize('totalDice')}"
    fieldTooltip="{localize('check.totalDice.desc')}"
+   label="{localize('totalDice')}"
    value={$checkParameters.totalDice
    }/>

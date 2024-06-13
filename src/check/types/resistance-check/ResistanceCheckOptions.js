@@ -4,7 +4,7 @@
  * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
- * @property {number?} complexity The minimum number of Successes needed.
+ * @property {number?} complexity The minimum number of Successes needed to succeed at the Check.
  * @property {number?} damageToReduce Base amount of damage to be reduced by this check if any.
  * @property {number?} diceMod Modifier for the number of Dice being rolled.
  * @property {number?} difficulty The minimum roll on a die to achieve a Success.

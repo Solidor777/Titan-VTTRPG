@@ -6,7 +6,7 @@
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetResource.svelte';
    import {RESOLVE_ICON, STAMINA_ICON, WOUNDS_ICON} from '~/system/Icons.js';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

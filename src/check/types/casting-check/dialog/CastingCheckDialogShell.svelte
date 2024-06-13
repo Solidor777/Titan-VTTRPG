@@ -15,21 +15,21 @@
    import CheckDialogTrainingModField from '~/check/dialog/CheckDialogTrainingModField.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { getContext } from 'svelte';
+   import {getContext} from 'svelte';
 
    /** @type TitanActor The Actor that will roll the Check. */
    export let actor = void 0;
 
-   /** @type {CastingCheckOptions}   Reference to the Check Options. */
+   /** @type object Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {CastingCheckParameters}   Reference to calculated Check Parameters. */
+   /** @type object Reference to calculated Check Parameters Store. */
    const checkParameters = getContext('checkParameters');
 
-   /** @type {Application} Reference to the dialog application. */
+   /** @type CastingCheckDialog The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {*[]} Base template for the component rows. */
+   /** @type {*[]} Base template for the svelte-components rows. */
    const baseRows = [
       CheckDialogAttributeField,
       CheckDialogSkillField,
@@ -97,4 +97,4 @@
 
 </script>
 
-<CheckDialogBase {rows} on:roll={onRoll}/>
+<CheckDialogBase on:roll={onRoll} {rows}/>

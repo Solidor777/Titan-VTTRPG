@@ -5,57 +5,60 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /**
-    * @typedef CustomEffectData
+    * @typedef {object} CustomEffectData
     * Data object for an Effect with a Custom duration.
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
     * @property {string} custom The custom duration unit for the effect.
     * @property {number} remaining The number of duration units remaining for the effect.
-    * @augments {object}
     */
 
    /**
-    * @typedef ExpiredEffectData
+    * @typedef {object} ExpiredEffectData
     * Data object for an Effect with an Expired duration.
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
-    * @augments {object}
     */
 
    /**
-    * @typedef InitiativeEffectData
+    * @typedef {object} InitiativeEffectData
     * Data object for an Effect with an Initiative-based duration.
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
     * @property {number} initiative The Initiative turn in combat on which this effect's duration should decrease.
     * @property {number} remaining The number of duration units remaining for the effect.
-    * @augments {object}
     */
 
    /**
-    * @typedef PermanentEffectData
+    * @typedef {object} PermanentEffectData
     * Data object for an Effect with a Permanent duration.
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
-    * @augments {object}
     */
 
    /**
-    * @typedef TurnEffectData
+    * @typedef {object} TurnEffectData
     * Data object for an Effect with a Turn-Start or Turn-End based duration.
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
     * @property {number} remaining The number of duration units remaining for the effect.
-    * @augments {object}
     */
 
    /**
-    * @type {CustomEffectData|ExpiredEffectData|InitiativeEffectData|PermanentEffectData|TurnEffectData}
+    * @typedef {object} ConditionEffectData
+    * Data object for a standard Condition Effect.
+    * @property {string} label The label to display for the effect.
+    * @property {string} img The image to display for the effect.
+    * @property {string} description The description of the effect.
+    */
+
+   /**
+    * @type {CustomEffectData|ExpiredEffectData|InitiativeEffectData|PermanentEffectData|TurnEffectData|ConditionEffectData}
     * Object containing the essential data for this effect.
     */
    export let effect = void 0;
@@ -95,7 +98,9 @@
    {/if}
 
    <!--Icon-->
-   <i class={icon}/>
+   {#if icon}
+      <i class={icon}/>
+   {/if}
 </div>
 
 <style lang="scss">

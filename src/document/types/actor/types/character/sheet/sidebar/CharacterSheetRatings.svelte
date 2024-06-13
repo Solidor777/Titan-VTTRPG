@@ -5,6 +5,7 @@
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetRatingButton.svelte';
    import {ACCURACY_ICON, AWARENESS_ICON, DEFENSE_ICON, INITIATIVE_ICON, MELEE_ICON} from '~/system/Icons.js';
 
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

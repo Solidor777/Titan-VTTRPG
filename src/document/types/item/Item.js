@@ -8,7 +8,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @param {object} data - The initial data object provided to the document creation request.
  * @param {object} options - Additional options which modify the creation request.
  * @param {documents.BaseUser} user - The User requesting the document creation.
- * @augments {Item}
+ * @augments Item
  */
 export default class TitanItem extends Item {
 

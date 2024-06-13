@@ -7,7 +7,7 @@
    /** @type AttributeCheckParameters The Parameters of the Attribute check using this skill. */
    export let checkParameters = void 0;
 
-   /** @type TitanActor Reference to the Character Document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    /** @type string Calculated tooltipAction. */

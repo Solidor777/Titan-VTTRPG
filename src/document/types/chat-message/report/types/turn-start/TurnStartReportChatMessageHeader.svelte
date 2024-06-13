@@ -1,17 +1,17 @@
 <script>
    import ReportChatMessageHeader from '~/document/types/chat-message/report/components/ReportChatMessageHeader.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { TURN_START_ICON } from '~/system/Icons.js';
-   import { getContext } from 'svelte';
+   import {TURN_START_ICON} from '~/system/Icons.js';
+   import {getContext} from 'svelte';
 
-   /** @type ChatMessage Reference to the Chat Message document. */
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
 </script>
 
 <ReportChatMessageHeader
-   headerLabel="{localize('turnStart')}"
    headerIcon="{TURN_START_ICON}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerLabel="{localize('turnStart')}"
    images="{[$document.flags.titan.actorImg]}"
+   subHeaderLabels="{[$document.flags.titan.actorName]}"
 />

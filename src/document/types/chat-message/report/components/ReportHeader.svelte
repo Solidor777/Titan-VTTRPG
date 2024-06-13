@@ -1,9 +1,8 @@
 <script>
    import {getContext} from 'svelte';
 
-   // Document reference
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
-   const titanFlags = $document.flags.titan;
 
    export let icon = void 0;
    export let label = void 0;
@@ -11,13 +10,13 @@
 
 <div class="header">
    <!--Img-->
-   <img alt="img" src={titanFlags.img}/>
+   <img alt="img" src={$document.flags.titan.img}/>
 
    <!--Header-->
    <div class="label">
       <!--Sub Header-->
       <div class="name">
-         {titanFlags.name}
+         {$document.flags.titan.name}
       </div>
 
       <!--Main Header-->

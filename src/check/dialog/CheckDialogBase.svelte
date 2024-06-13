@@ -8,6 +8,8 @@
    export let rows = void 0;
 
    const dispatcher = createEventDispatcher();
+
+   /** @type Application The Svelte Component's Application. */
    const application = getApplication();
 
    /**

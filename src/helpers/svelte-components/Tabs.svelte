@@ -5,7 +5,7 @@
     * Object for storing tab information.
     * @typedef {object} Tab
     * @property {string} id The ID to use for the type.
-    * @property {object} component The svelte component to use for the Tab.
+    * @property {object} component The svelte svelte-components to use for the Tab.
     */
 
    /** @type Tab[] Array of Tab objects. */
@@ -14,7 +14,7 @@
    /** @type string The ID of the active Tab object. */
    export let activeTab = void 0;
 
-   /** @type {boolean}  Whether the tabs should be bordered. */
+   /** @type boolean Whether the tabs should be bordered. */
    export let border = false;
 </script>
 

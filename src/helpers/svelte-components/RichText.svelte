@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    export let text = void 0;

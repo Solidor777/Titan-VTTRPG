@@ -14,7 +14,7 @@
    /** @type string Label for the confirmation button. */
    export let confirmLabel = void 0;
 
-   /** @type ConfirmationDialog Application reference. */
+   /** @type ConfirmationDialog The Svelte Component's Application. */
    const application = getApplication();
 
    /**

@@ -107,10 +107,9 @@
                            icon={optionIcons[option]}
                         />
                      {:else if aspect.label === 'decreaseAttribute' || aspect.label === 'increaseAttribute'}
-                        <AttributeTag
-                           label={localize(option)}
-                           attribute={option}
-                        />
+                        <AttributeTag attribute={option}>
+                           {localize(option)}
+                        </AttributeTag>
                      {:else if aspect.label === 'decreaseResistance' || aspect.label === 'increaseResistance'}
                         <ResistanceTag
                            label={localize(option)}

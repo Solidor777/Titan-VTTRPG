@@ -5,15 +5,18 @@
    import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import {COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
+   
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    // Initialize expanded state
@@ -95,11 +98,9 @@
 
                <!--Skill & Attribute-->
                <div class="stat">
-                  <AttributeTag
+                  <AttributeCheckTag
                      attribute={attack.attribute}
-                     label={`${localize(attack.attribute)} (${localize(
-                        attack.skill,
-                     )})`}
+                     skill={attack.skill}
                   />
                </div>
 

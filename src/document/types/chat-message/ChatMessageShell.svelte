@@ -46,6 +46,8 @@
 
    // Setup
    setContext('document', documentStore);
+
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 
    // Selector for the chat message type

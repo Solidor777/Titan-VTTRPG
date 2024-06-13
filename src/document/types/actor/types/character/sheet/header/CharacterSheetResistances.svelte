@@ -3,7 +3,7 @@
    import CharacterSheetResistance
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistance.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
 </script>
 

@@ -3,15 +3,17 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentCheckboxInput from '~/document/components/input/DocumentCheckboxInput.svelte';
-   import DocumentIntegerInput from '~/document/components/input/DocumentIntegerInput.svelte';
-   import DocumentSkillSelect from '~/document/components/select/DocumentSkillSelect.svelte';
-   import DocumentAttributeSelect from '~/document/components/select/DocumentAttributeSelect.svelte';
-   import DocumentCheckDifficultySelect from '~/document/components/select/DocumentCheckDifficultySelect.svelte';
+   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
+   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentSkillSelect from '~/document/sheet/select/DocumentSkillSelect.svelte';
+   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
+   import DocumentCheckDifficultySelect from '~/document/sheet/select/DocumentCheckDifficultySelect.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
-   // Setup context variables
+   /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 </script>
 
