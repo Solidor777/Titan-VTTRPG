@@ -89,6 +89,6 @@
 </script>
 {#if $document}
    <div>
-
+      <svelte:component this={selectComponent()}/>
    </div>
 {/if}

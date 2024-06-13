@@ -3,5 +3,5 @@
  * @returns {boolean} Whether the current user is on a Chromium browser.
  */
 export default function isChromium() {
-   return !window.chrome;
+   return window.chrome;
 }

@@ -29,7 +29,7 @@
 
    // Add none option if appropriate
    if (allowNone) {
-      skillOptions.push({
+      options.push({
          label: localize('none'),
          value: 'none',
       });
@@ -43,6 +43,7 @@
 <style lang="scss">
    .body {
       --titan-input-background: var(--titan-body-color);
+      --titan-static-background: var(--titan-body-color);
    }
 
    .mind {

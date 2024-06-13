@@ -37,7 +37,7 @@
 
    // Add None option if appropriate.
    if (allowNone) {
-      skillOptions.push({
+      options.push({
          label: localize('none'),
          value: 'none',
       });

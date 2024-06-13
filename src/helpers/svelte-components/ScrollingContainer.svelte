@@ -17,7 +17,7 @@
     * @type number The length of the scroll fade in pixels, if any. Excluded from Chromium because it causes the entire
     * element to be blurred on Chromium browsers.
     */
-   const fadeLength = !isChromium() ? 0 : 12;
+   const fadeLength = isChromium() ? 0 : 12;
 
    /**
     * Called when the element is scrolled.
