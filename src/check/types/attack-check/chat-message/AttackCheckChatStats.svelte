@@ -28,7 +28,7 @@
    {#if $document.flags.titan.parameters.range !== 1}
       <div class="stat">
          <IconStatTag
-            label={localize('range')}
+            stat={localize('range')}
             value={$document.flags.titan.parameters.range}
             icon={RANGE_ICON}
          />

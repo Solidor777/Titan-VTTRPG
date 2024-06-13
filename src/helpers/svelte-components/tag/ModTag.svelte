@@ -1,13 +1,13 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type number the Base value of the stat before any modifiers are applied. */
+   /** @type number The Base value of the stat before any modifiers are applied. */
    export let baseValue = void 0;
 
    /** @type number The Current value of the stat after modifiers are applied. */
    export let currentValue = void 0;
 
-   /** @type string Tooltip to show for the tag. */
+   /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    // Calculate the class
@@ -21,19 +21,22 @@
 </script>
 
 <!--Total Value-->
-<div class={tagClass} use:tooltipAction="{tooltip}">
+<div class={tagClass} use:tooltipAction={tooltip}>
    {currentValue}
 </div>
 
 <style lang="scss">
    .tag {
-      @include flex-row;
-      @include flex-group-center;
-      @include border;
       @include tag;
-      @include mod-colors;
 
-      width: 100%;
-      height: 100%;
+      &.greater {
+         --titan-tag-color: var(--titan-greater-color);
+         --titan-tag-background: var(--titan-greater-background);
+      }
+
+      &.lesser {
+         --titan-tag-color: var(--titan-lesser-color);
+         --titan-tag-background: var(--titan-lesser-background);
+      }
    }
 </style>

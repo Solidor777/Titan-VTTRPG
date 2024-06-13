@@ -30,9 +30,8 @@
    /** @type string The display Label of the check. */
    export let label = void 0;
 
-   /** @type string Tooltip to show when hovering over the button. */
+   /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
-
 </script>
 
 <div class="check-button {attribute}">

@@ -28,7 +28,6 @@
          @include tag;
          @include flex-row;
          @include flex-group-center;
-         @include border;
          @include attribute-colors;
          @include font-size-large;
 

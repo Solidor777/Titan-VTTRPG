@@ -18,7 +18,7 @@
    <div class="stat" use:tooltipAction="{localize('armor.desc')}">
       <IconStatTag
          icon={ARMOR_ICON}
-         label={localize('armor')}
+         stat={localize('armor')}
          value={item.system.armor.value === item.system.armor.max
             ? item.system.armor.value
             : `${item.system.armor.value} / ${item.system.armor.max}`}

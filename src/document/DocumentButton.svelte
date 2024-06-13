@@ -5,7 +5,7 @@
    /** @type boolean Whether this button is disabled. */
    export let disabled = false;
 
-   /** @type boolean Tooltip for this button, if any. */
+   /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** @type object Reference to the Document store. */

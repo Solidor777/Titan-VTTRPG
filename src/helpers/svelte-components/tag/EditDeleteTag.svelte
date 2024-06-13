@@ -8,7 +8,7 @@
    /** @type function Callback for when the Edit icon is pressed. */
    export let editFunction = void 0;
 
-   /** @type string The Label to display for the tag. */
+   /** @type string The Label to display for this element. */
    export let label = void 0;
 
    /** @type string The Tooltip to display when the Label is hovered. */

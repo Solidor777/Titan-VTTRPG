@@ -5,11 +5,11 @@
    /** @type boolean Whether this button is disabled. */
    export let disabled = false;
 
-   /** @type boolean Tooltip for this button, if any. */
+   /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 
-<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction="{tooltip}">
+<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>
    <slot/>
 </button>
 

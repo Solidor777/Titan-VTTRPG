@@ -408,47 +408,6 @@
    font-size: var(--titan-font-size-extra-large);
 }
 
-@mixin static-value {
-   color: var(--font-color);
-   background: var(--titan-static-value-background);
-}
-
-@mixin mod-colors {
-   &.greater {
-      color: var(--titan-greater-color);
-      background: var(--titan-greater-background);
-   }
-
-   &.lesser {
-      color: var(--titan-lesser-color);
-      background: var(--titan-lesser-background);
-   }
-}
-
-@mixin permanent-effect-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-cyan) 0, var(--titan-green) 100%);
-}
-
-@mixin turn-start-effect-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple) 0, var(--titan-cyan) 100%);
-}
-
-@mixin turn-end-effect-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-pink) 0, var(--titan-purple) 100%);
-}
-
-@mixin expired-effect-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-yellow) 0, var(--titan-red) 100%);
-}
-
-@mixin initiative-effect-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-red), var(--titan-purple) 100%);
-}
-
-@mixin custom-effect-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-purple), var(--titan-yellow) 100%);
-}
-
 @mixin fast-healing-tag {
    --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-green), var(--titan-yellow) 100%);
 }

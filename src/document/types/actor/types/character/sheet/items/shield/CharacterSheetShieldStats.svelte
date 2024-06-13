@@ -1,7 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
@@ -16,10 +15,11 @@
 </script>
 
 <div class="stats">
-   <div class="stat" use:tooltipAction="{localize('defense.desc')}">
+   <div class="stat">
       <IconStatTag
          icon={DEFENSE_ICON}
          label={localize('defense')}
+         tooltip={localize('defense.desc')}
          value={item.system.defense}
       />
    </div>

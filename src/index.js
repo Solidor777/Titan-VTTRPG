@@ -1,4 +1,5 @@
-import '~/styles/Fonts.scss';
+import '~/styles/Lato.scss';
+import '~/styles/OpenSans.scss';
 import '~/styles/Global.scss';
 import '~/styles/Mixins.scss';
 import '~/styles/Variables.scss';

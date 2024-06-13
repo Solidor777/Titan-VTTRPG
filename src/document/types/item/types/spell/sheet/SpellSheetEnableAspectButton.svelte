@@ -73,9 +73,10 @@
          .value {
             @include flex-row;
             @include flex-group-center;
-            @include static-value;
             @include border;
 
+            color: var(--titan-font-color);
+            background: var(--titan-static-value-background);
             height: 24px;
             width: 24px;
             margin-left: var(--titan-padding-standard);

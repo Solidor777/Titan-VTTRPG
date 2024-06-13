@@ -32,9 +32,9 @@
                   icon={DAMAGE_ICON}
                   label={localize('damage')}
                   value={`${attack.damage}${
-                     attack.plusExtraSuccessDamage
-                        ? ` + ${localize('extraSuccesses.short')}`
-                        : ''
+                     attack.plusExtraSuccessDamage ?
+                     ` + ${localize('extraSuccesses.short')}` :
+                     ''
                   }`}
                />
             </div>
