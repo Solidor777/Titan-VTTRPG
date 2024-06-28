@@ -1,5 +1,5 @@
 <script>
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type string The Label to display for this element. */
    export let label = void 0;
@@ -14,7 +14,7 @@
    export let tooltip = void 0;
 </script>
 
-<Tag {tooltip}>
+<div class="tag" use:tooltipAction={tooltip}>
    <!--Icon-->
    <i class={icon}/>
 
@@ -27,15 +27,18 @@
    <div class="value">
       {value}
    </div>
-</Tag>
+</div>
 
 <style lang="scss">
+   .tag {
+      @include tag;
 
-   .label {
-      @include border-right;
+      .label {
+         @include border-right;
 
-      font-weight: bold;
-      padding-right: var(--titan-padding-standard);
-      margin: 0 var(--titan-padding-standard);
+         font-weight: bold;
+         padding-right: var(--titan-padding-standard);
+         margin: 0 var(--titan-padding-standard);
+      }
    }
 </style>

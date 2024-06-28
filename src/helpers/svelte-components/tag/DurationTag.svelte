@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type string The Duration unit type (permanent, initiative, turnStart, turnEnd, or custom).*/
    export let type = void 0;
@@ -13,7 +13,7 @@
    void 0;
 </script>
 
-<Tag {tooltip}>
+<div class="tag" use:tooltipAction={tooltip}>
    <!--Label-->
    <div class="label">
       {localize('duration')}
@@ -30,17 +30,21 @@
          {remaining}
       </div>
    {/if}
-</Tag>
+</div>
 
 <style lang="scss">
-   .label {
-      font-weight: bold;
-   }
+   .tag {
+      @include tag;
 
-   .value {
-      @include border-left;
+      .label {
+         font-weight: bold;
+      }
 
-      padding-left: var(--titan-padding-standard);
-      margin-left: var(--titan-padding-standard);
+      .value {
+         @include border-left;
+
+         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-padding-standard);
+      }
    }
 </style>
