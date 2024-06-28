@@ -7,7 +7,8 @@
    /** @type {*[]} Components for changing the options and displaying the parameters. */
    export let rows = void 0;
 
-   const dispatcher = createEventDispatcher();
+   /** @type EventDispatcher Dispatcher for component Events. */
+   const eventDispatcher = createEventDispatcher();
 
    /** @type Application The Svelte Component's Application. */
    const application = getApplication();
@@ -16,7 +17,7 @@
     * Rolls the check and closes the application.
     */
    function onRoll() {
-      dispatcher('roll', {});
+      eventDispatcher('roll', {});
       application.close();
    }
 

@@ -1,21 +1,15 @@
 <script>
    import {getContext} from 'svelte';
-   import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
+   import ImagePicker from '~/helpers/svelte-components/ImagePicker.svelte';
 
-   /** @type number The value that this input should modify. */
+   /** @type string The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value of the input. */
-   export let min = false;
-
-   /** @type {number|boolean} The maximum value of the input. */
-   export let max = false;
+   /** @type string Text to display if the value is not a path to valid image. */
+   export let alt = 'img';
 
    /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
-
-   /** @type boolean Whether the input should be an Integer. If False, it will be a Float. */
-   export let isInteger = false;
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -33,12 +27,10 @@
    }
 </script>
 
-<NumberInput
-   bind:value
+<ImagePicker
+   {alt}
    disabled={disabled || !$document?.isOwner}
-   {isInteger}
-   {max}
-   {min}
    on:change
    on:change={updateDocument}
+   {value}
 />

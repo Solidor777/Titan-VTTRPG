@@ -1,7 +1,7 @@
 <script>
    import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 
-   /** @type number The value to bind to the input. */
+   /** @type number The value that this input should modify. */
    export let value = void 0;
 
    /** @type {number|boolean} The minimum value of the input. */

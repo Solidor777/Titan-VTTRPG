@@ -1,48 +1,53 @@
 <script>
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import {createEventDispatcher} from 'svelte';
 
-   // Path to the image location
-   export let src = void 0;
+   /** @type string The value that this input should modify. */
+   export let value = void 0;
 
-   // Alt text for if the path is not a valid image
+   /** @type string Text to display if the value is not a path to valid image. */
    export let alt = 'img';
 
-   /** @type Application The Svelte Component's Application. */
-   const application = getApplication();
+   /** @type boolean Whether the input should currently be disabled. */
+   export let disabled = false;
 
-   // Create an image picker ponting to the path
+   /** @type EventDispatcher Dispatcher for component Events. */
+   const eventDispatcher = createEventDispatcher();
+
    /**
-    *
+    * Creates an image picker pointing to the current source path.
     */
    function onEditImage() {
-      const current = src;
-      const filePicker = new FilePicker({
-         type: 'image',
-         current: current,
-         callback: async (newPath) => {
-            src = newPath;
-         },
-         top: application.position.top + 40,
-         left: application.position.left + 10,
-      });
-      return filePicker.browse();
+      if (!disabled) {
+         const current = value;
+         const filePicker = new FilePicker({
+            type: 'image',
+            current: current,
+            callback: async (newPath) => {
+               value = newPath;
+               eventDispatcher('change');
+            },
+            top: application.position.top + 40,
+            left: application.position.left + 10,
+         });
+         filePicker.browse();
+      }
    }
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <img
    {alt}
-   class={$document.isOwner ? 'active' : ''}
+   class={disabled ? 'disabled' : ''}
    on:click={onEditImage}
    on:keypress={onEditImage}
-   {src}
+   src={value}
 />
 
 <style>
    img {
       border-style: var(--titan-border-style);
 
-      &.active {
+      &:not(.disabled) {
          cursor: pointer;
       }
    }

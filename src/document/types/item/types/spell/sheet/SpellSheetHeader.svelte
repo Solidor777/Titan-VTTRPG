@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import DocumentImagePicker from '~/document/sheet/DocumentImagePicker.svelte';
+   import DocumentImagePicker from '~/document/sheet/input/DocumentImagePicker.svelte';
    import DocumentNameInput from '~/document/sheet/input/DocumentNameInput.svelte';
    import DocumentRaritySelect from '~/document/sheet/select/DocumentRaritySelect.svelte';
    import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
@@ -15,7 +15,7 @@
 <div class="header">
    <!--Portrait-->
    <div class="portrait">
-      <DocumentImagePicker alt={'item portrait'} path={'img'}/>
+      <DocumentImagePicker alt={'item portrait'} bind:value={$document.img}/>
    </div>
 
    <!--Name-->

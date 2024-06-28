@@ -1,5 +1,5 @@
 <script>
-   /** @type boolean The value to bind to the input. */
+   /** @type boolean The value that this input should modify. */
    export let value;
 
    /** @type boolean Whether the input should currently be disabled. */

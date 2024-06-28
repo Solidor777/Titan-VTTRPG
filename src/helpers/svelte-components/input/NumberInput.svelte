@@ -1,7 +1,7 @@
 <script>
    import {createEventDispatcher} from 'svelte';
 
-   /** @type number The value to bind to the input. */
+   /** @type number The value that this input should modify. */
    export let value = void 0;
 
    /** @type {number|boolean} The minimum value of the input. */
@@ -22,7 +22,7 @@
    /** @type string The actual input from the user. */
    let input = value.toString();
 
-   // Dispatcher for On Changed events.
+   /** @type EventDispatcher Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
    // Update the input if the value changes

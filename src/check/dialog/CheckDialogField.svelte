@@ -4,7 +4,7 @@
    /** The label for the field. */
    export let label = void 0;
 
-   /** The value to bind to the input. */
+   /** The value that this input should modify. */
    export let value = void 0;
 
    /** The input svelte-components to bind to the value. */

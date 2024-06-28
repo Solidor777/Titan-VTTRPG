@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
-   import DocumentImagePicker from '~/document/sheet/DocumentImagePicker.svelte';
+   import DocumentImagePicker from '~/document/sheet/input/DocumentImagePicker.svelte';
    import DocumentName from '~/document/sheet/input/DocumentNameInput.svelte';
    import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
    import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
@@ -40,7 +40,7 @@
 <div class="header">
    <!--Portrait-->
    <div class="portrait">
-      <DocumentImagePicker alt={'item portrait'} path={'img'}/>
+      <DocumentImagePicker alt={'item portrait'} bind:value={$document.img}/>
    </div>
 
    <!--Name-->
