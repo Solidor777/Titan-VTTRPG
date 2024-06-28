@@ -674,7 +674,7 @@
          "label": "Base Stamina Multiplier",
          "hint": "Base Stamina as a multiple of an character's Body + Mind + Soul."
       },
-      "staminaMinionMultiplier": {
+      "minionStaminaMultiplier": {
          "label": "Minion Stamina Multiplier",
          "hint": "Additional multiplier applied to the Base Stamina of Minions."
       },

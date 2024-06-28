@@ -53,10 +53,9 @@
 
             <!--Value-->
             <div class="value">
-               <ResistanceTag
-                  resistance={aspect.resistanceCheck}
-                  label={localize(aspect.resistanceCheck)}
-               />
+               <ResistanceTag resistance={aspect.resistanceCheck}>
+                  {localize(aspect.resistanceCheck)}
+               </ResistanceTag>
             </div>
          </div>
       {/if}

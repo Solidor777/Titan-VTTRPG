@@ -72,15 +72,15 @@
          }
 
          &.stamina {
-            --meter-color: var(--titan-stamina-color);
+            --meter-color: var(--titan-stamina-background);
          }
 
          &.wounds {
-            --meter-color: var(--titan-wounds-color);
+            --meter-color: var(--titan-wounds-background);
          }
 
          &.resolve {
-            --meter-color: var(--titan-resolve-color);
+            --meter-color: var(--titan-resolve-background);
          }
       }
    }

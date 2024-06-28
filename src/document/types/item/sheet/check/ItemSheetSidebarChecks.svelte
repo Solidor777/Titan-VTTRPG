@@ -99,10 +99,9 @@
 
                      <!--Value-->
                      <div class="value">
-                        <ResistanceTag
-                           resistance={check.resistanceCheck}
-                           label={localize(check.resistanceCheck)}
-                        />
+                        <ResistanceTag resistance={check.resistanceCheck}>
+                           {localize(check.resistanceCheck)}
+                        </ResistanceTag>
                      </div>
                   </div>
                {/if}

@@ -4,7 +4,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
-   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
+   import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 
    // Resource key
    export let key = void 0;
@@ -109,7 +109,7 @@
 
       <!--Max Value Display-->
       <div class="value" use:tooltipAction="{totalValueTooltip}">
-         <ModTag
+         <StatModLabel
             baseValue={$document.system.resource[key].maxBase +
                $document.system.resource[key].mod.equipment +
                $document.system.resource[key].mod.ability}

@@ -20,7 +20,7 @@
       cursor: pointer;
 
       --titan-button-line-height: var(--titan-line-height-small);
-      --titan-icon-button-font-size: var(--titan-font-size-small);
+      --titan-button-font-size: var(--titan-font-size-small);
       --titan-icon-button-radius: 20px;
    }
 </style>

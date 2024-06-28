@@ -1,109 +1,107 @@
+// Application
 :root {
    .app {
-      background-color: rgba(15 15 15 / 0.80)
+      background-color: var(--titan-app-background)
    }
 }
 
+// Titan application
 .titan {
    --color-scrollbar: var(--titan-scrollbar-color);
    --color-scrollbar-track: var(--titan-scrollbar-gutter-color);
 }
 
+// Titan sheet
 .titan-document-sheet > * {
    z-index: var(--z-index-app);
    transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 }
 
+// Titan dark mode
 .titan-dark-mode {
-   // Panel styling
-   --titan-panel-1-background: #373949;
-   --titan-panel-2-background: #424557;
-   --titan-panel-3-background: #2e303c;
-   --titan-panel-1-color: rgba(255 255 255 / 0.83);
-   --titan-panel-2-color: rgba(255 255 255 / 0.83);
-   --titan-panel-3-color: rgba(255 255 255 / 0.83);
-   --color-text-dark-primary: rgba(255 255 255 / 0.83);
-   --color-text-dark-secondary: rgba(255 255 255 / 0.83);
-   --color-text-dark-header: rgba(255 255 255 / 0.83);
-   --color-text-dark-inactive: rgba(255 255 255 / 0.83);
-   --color-border-highlight: rgba(255 255 255 / 0.83);
-   --titan-static-value-background: rgb(70 70 70);
-   --titan-static-value-color: rgba(255 255 255 / 0.83);
-   --titan-static-value-border-color: rgba(170 170 170 / 0.83);
+   // Font color
+   --font-color: var(--titan-font-color-dark);
+   --titan-font-color: var(--titan-font-color-dark);
+
+   // Panel 1
+   --titan-panel-1-background: var(--titan-panel-1-background-dark);
+   --titan-panel-1-color: var(--titan-panel-1-color-dark);
+
+   // Panel 2
+   --titan-panel-2-background: var(--titan-panel-2-background-dark);
+   --titan-panel-2-color: var(--titan-panel-2-color-dark);
+
+   // Panel 3
+   --titan-panel-3-background: var(--titan-panel-3-background-dark);
+   --titan-panel-3-color: var(--titan-panel-3-color-dark);
+
+   // Dark mode
+   --color-border-highlight: var(--titan-font-color-dark);
+   --color-text-dark-header: var(--titan-font-color-dark);
+   --color-text-dark-inactive: var(--titan-font-color-dark);
+   --color-text-dark-primary: var(--titan-font-color-dark);
+   --color-text-dark-secondary: var(--titan-font-color-dark);
+
+   // Static value
+   --titan-static-value-background: var(--titan-static-value-background-dark);
+   --titan-static-value-border-color: var(--titan-static-value-border-color);
+   --titan-static-value-color: var(--titan-static-value-color-dark);
+
+   // Input
+   --titan-input-background: var(--titan-input-background-dark);
+   --titan-input-color: var(--titan-input-color-dark);
+
+   // Border
+   --titan-border-color: var(--titan-border-color-dark);
+
+   // Button
+   --titan-button-background: var(--titan-button-background-disabled-dark);
+   --titan-button-border-color: var(--titan-button-border-color-dark);
+   --titan-button-color: var(--titan-button-color-dark);
+
+   // Labels
+   --titan-label-border-color: var(--titan-label-border-color-dark);
+   --titan-label-background: var(--titan-label-background-dark);
+   --titan-label-color: var(--titan-label-color-dark);
+
+   // Tags
+   --titan-tag-background: var(--titan-tag-background-dark);
+   --titan-tag-border-color: var(--titan-border-color-dark);
+   --titan-tag-color: var(--titan-tag-color-dark);
+
+   // Resource
+   --titan-resolve-background: var(--titan-resolve-background-dark);
+   --titan-stamina-background: var(--titan-stamina-background-dark);
+   --titan-wounds-background: var(--titan-wounds-background-dark);
+
+   // Meter
+   --titan-meter-background: var(--titan-meter-background-dark);
 
    .content-link {
-      --color-text-dark-primary: #191813;
+      --color-text-dark-primary: var(--titan-content-link-color-dark);
 
-      color: var(--color-text-dark-primary);
+      color: var(--titan-content-link-color-dark);
 
       i {
-         color: var(--color-text-dark-primary);
+         --color-text-dark-primary: var(--titan-content-link-color-dark);
+
+         color: var(--titan-content-link-color-dark);
       }
    }
 
-   // Input styling
-   --titan-input-color: #1d1e26;
-   --titan-input-background: #c5bcf8;
-
-   // Generic Styling
-   --titan-border-color: rgba(255 255 255 / 0.83);
-
-   // Button styling
-   --titan-button-border-color: #15171b;
-   --titan-button-background: #f2b58c;
-   --titan-button-border-style: solid;
-   --titan-button-background-disabled: #D0D0D0;
-   --titan-button-background-highlight: #FFE9AE;
-   --titan-button-color: #15171b;
-   --titan-icon-button-border-color: black;
-   --titan-icon-button-background: #f2b58c;
-   --titan-icon-button-highlight: #FFE9AE;
-   --titan-icon-button-color: #15171b;
-
-   // Label styling
-   --titan-label-border-color: #15171b;
-   --titan-label-background: #a6ccf2;
-   --titan-label-color: #1d1e26;
-
-   // Tag styling
-   --titan-tag-border-color: #15171b;
-   --titan-tag-background: #a6ccf2;
-   --titan-tag-color: #1d1e26;
-
-   // Resource colors
-   --titan-stamina-color: #37da88;
-   --titan-wounds-color: #c55858;
-   --titan-resolve-color: #3fb6dd;
-
-   // Resistance colors
-   --titan-reflexes-color: #eff49a;
-   --titan-resilience-color: #f2c88c;
-   --titan-willpower-color: #f28cbf;
-
-   // Attribute colors
-   --titan-body-color: #f29d8c;
-   --titan-mind-color: #95f28c;
-   --titan-soul-color: #b5f2e8;
-
-   // Meter styling
-   --titan-meter-background: #1E1E1E;
-
-   --font-color: rgba(255 255 255 / 0.83);
-   --titan-font-color: rgba(255 255 255 / 0.83);
-
    .window-content {
-      background: #262836;
+      background: var(--titan-window-content-background-dark);
       color: var(--color-text-dark-primary);
 
       .content-link {
-         --color-text-dark-primary: #191813;
+         --color-text-dark-primary: var(--titan-content-link-color-dark);
 
-         color: var(--color-text-dark-primary);
+         color: var(--titan-content-link-color-dark);
 
          i {
-            --color-text-dark-primary: #191813;
+            --color-text-dark-primary: var(--titan-content-link-color-dark);
 
-            color: var(--color-text-dark-primary);
+            color: var(--titan-content-link-color-dark);
          }
       }
    }
@@ -115,14 +113,14 @@
 
 
    &.chat-message {
-      background: #424557;
+      background: var(--titan-chat-message-background-dark);
 
       &.whisper {
-         background: #20203e;
+         background: var(--titan-chat-message-whisper-background-dark);
       }
 
       &.blind {
-         background: #2e1b2e;
+         background: var(--titan-chat-message-blind-background-dark);
       }
    }
 
@@ -132,34 +130,34 @@
 
    .prosemirror {
       .editor-menu {
-         --color-text-dark-primary: #191813;
+         --color-text-dark-primary: var(--titan-editor-menu-color-dark);
 
          button:not(.pm-dropdown) {
             &:not(.active) {
-               color: rgba(255 255 255 / 0.83);
+               color: var(--titan-font-color-dark);
             }
 
             &.active {
-               --color-text-dark-primary: #191813;
+               --color-text-dark-primary: var(--titan-editor-menu-color-dark);
 
-               color: var(--color-text-dark-primary);
+               color: var(--titan-editor-menu-color-dark);
             }
 
             &:hover {
-               --color-text-dark-primary: #191813;
+               --color-text-dark-primary: var(--titan-editor-menu-color-dark);
 
-               color: var(--color-text-dark-primary);
+               color: var(--titan-editor-menu-color-dark);
             }
          }
       }
 
       &.editing-source {
          textarea {
-            color: rgba(255 255 255 / 0.83);
+            color: var(--titan-font-color-dark);
          }
       }
 
-      --color-hover-bg: #FFE9AE;
+      --color-hover-bg: var(--titan-highlight-background);
    }
 
    h1,
@@ -212,7 +210,7 @@
 
                &:hover {
                   &:not(:disabled) {
-                     background: radial-gradient(var(--titan-button-background-highlight), var(--titan-button-background));
+                     background: radial-gradient(ellipse at center, var(--titan-button-background-highlight), var(--titan-button-background));
                   }
                }
             }

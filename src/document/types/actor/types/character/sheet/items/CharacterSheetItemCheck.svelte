@@ -162,7 +162,10 @@
       <!--Opposed Check-->
       {#if checkParameters.opposedCheck.enabled}
          <div class="stat">
-            <OpposedCheckTag opposedCheck={checkParameters.opposedCheck}/>
+            <OpposedCheckTag
+               attribute={checkParameters.opposedCheck.attribute}
+               skill={checkParameters.opposedCheck.skill}
+            />
          </div>
       {/if}
    </div>

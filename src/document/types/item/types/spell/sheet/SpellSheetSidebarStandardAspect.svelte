@@ -111,10 +111,9 @@
                            {localize(option)}
                         </AttributeTag>
                      {:else if aspect.label === 'decreaseResistance' || aspect.label === 'increaseResistance'}
-                        <ResistanceTag
-                           label={localize(option)}
-                           resistance={option}
-                        />
+                        <ResistanceTag resistance={option}>
+                           {localize(option)}
+                        </ResistanceTag>
                      {:else}
                         <Tag>{localize(option)}</Tag>
                      {/if}

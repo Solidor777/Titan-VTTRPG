@@ -21,6 +21,6 @@
 <style lang="scss">
    .button {
       --titan-icon-button-padding: 0;
-      --titan-icon-button-font-size: 24px;
+      --titan-button-font-size: 24px;
    }
 </style>

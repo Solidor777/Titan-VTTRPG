@@ -43,15 +43,15 @@
 <style lang="scss">
    .resistance-select {
       &.reflexes {
-         --titan-input-background: var(--titan-reflexes-color);
+         --titan-input-background: var(--titan-reflexes-background);
       }
 
       &.resilience {
-         --titan-input-background: var(--titan-resilience-color);
+         --titan-input-background: var(--titan-resilience-background);
       }
 
       &.willpower {
-         --titan-input-background: var(--titan-willpower-color);
+         --titan-input-background: var(--titan-willpower-background);
       }
    }
 </style>

@@ -3,8 +3,8 @@
    import {getContext} from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
-   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 
    export let key = void 0;
    export let icon = void 0;
@@ -97,7 +97,7 @@
 
       <!--Total Value-->
       <div class="value">
-         <ModTag
+         <StatModLabel
             baseValue={$document.system.rating[key].baseValue +
                $document.system.rating[key].mod.equipment +
                $document.system.rating[key].mod.ability}

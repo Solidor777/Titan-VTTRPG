@@ -21,7 +21,7 @@ export default class NPCDataModel extends CharacterDataModel {
 
       return retVal;
    }
-   
+
    prepareDerivedData() {
       super.prepareDerivedData();
       this.parent.system.xp = this._getSpentXP();
@@ -36,21 +36,31 @@ export default class NPCDataModel extends CharacterDataModel {
 
       // Resource amounts vary by NPC types
       switch (this.role) {
-         // Minions have an additional resolve multiplier
+         // Minions and below have a special stamina multiplier.
          case 'minion': {
             this.resource.stamina.maxBase =
-               Math.max(this.resource.stamina.maxBase * getSetting('staminaMinionMultiplier'), 1);
+               Math.max(this.resource.stamina.maxBase * getSetting('minionStaminaMultiplier'), 1);
+            this.resource.resolve.maxBase = 0;
+            this.resource.wounds.maxBase = 0;
+            return;
          }
+
          // Warriors and below have no resolve
          case 'warrior': {
             this.resource.resolve.maxBase = 0;
+            this.resource.wounds.maxBase = 0;
+            return;
          }
+
          // Elites and below have no wounds
          case 'elite': {
             this.resource.wounds.maxBase = 0;
+            return;
          }
+
+         // Champions have the same stats as players
          default: {
-            break;
+            return;
          }
       }
    }

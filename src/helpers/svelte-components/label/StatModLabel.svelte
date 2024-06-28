@@ -10,31 +10,33 @@
    /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
-   // Calculate the class
-   let tagClass = 'tag';
+   /** @type string The class to use for styling the label. */
+   let styleClass = 'label';
+
+   // Adjust the style class, depending on whether this stat has been modified.
    if (baseValue < currentValue) {
-      tagClass += ' greater';
+      styleClass += ' bonus';
    }
    else if (baseValue > currentValue) {
-      tagClass += ' lesser';
+      styleClass += ' penalty';
    }
 </script>
 
 <!--Total Value-->
-<div class={tagClass} use:tooltipAction={tooltip}>
+<div class={styleClass} use:tooltipAction={tooltip}>
    {currentValue}
 </div>
 
 <style lang="scss">
-   .tag {
-      @include tag;
+   .label {
+      @include label;
 
-      &.greater {
+      &.bonus {
          --titan-tag-color: var(--titan-greater-color);
          --titan-tag-background: var(--titan-greater-background);
       }
 
-      &.lesser {
+      &.penalty {
          --titan-tag-color: var(--titan-lesser-color);
          --titan-tag-background: var(--titan-lesser-background);
       }

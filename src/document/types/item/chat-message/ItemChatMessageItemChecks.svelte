@@ -15,32 +15,6 @@
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    /**
-    * Calculates the formatted text showing a Check's Attribute, Skill, Difficulty, and Complexity.
-    * @param {ItemCheckTemplate} check - The Check to get the text for.
-    * @returns {string} The formatted text showing a Check's Attribute, Skill, Difficulty, and Complexity.
-    */
-   function calculateCheckDCText(check) {
-
-      // Start with the Attribute of the check
-      let retVal = localize(`${check.attribute}`);
-
-      // Add the Skill if appropriate
-      if (check.skill !== 'none') {
-         retVal += ` (${localize(check.skill)})`;
-      }
-
-      // Add the Difficulty of the check
-      retVal += ` ${check.difficulty}`;
-
-      // Add the Complexity if appropriate
-      if (check.complexity) {
-         retVal += `:${check.complexity}`;
-      }
-
-      return retVal;
-   }
-
-   /**
     * Rolls a Check from the Item's roll data.
     * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check array.
     */
@@ -78,7 +52,6 @@
    <!--Each check-->
    {#each item.check as check, idx}
       <li>
-
          <!--Header-->
          {#if check.resolveCost}
             {#if autoSpendResolve}
@@ -151,7 +124,10 @@
             <!--Opposed Check-->
             {#if check.opposedCheck.enabled}
                <div class="tag">
-                  <OpposedCheckTag opposedCheck={check.opposedCheck}/>
+                  <OpposedCheckTag
+                     attribute={check.opposedCheck.attribute}
+                     skill={check.opposedCheck.skill}
+                  />
                </div>
             {/if}
          </div>

@@ -321,12 +321,12 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Base multiplier for a Minion's maximum Stamina
-   game.settings.register('titan', 'staminaMinionMultiplier', {
+   // Base multiplier for a Minion or Warrior's maximum Stamina
+   game.settings.register('titan', 'minionStaminaMultiplier', {
       config: true,
       default: 0.5,
-      hint: 'SETTINGS.staminaMinionMultiplier.hint',
-      name: 'SETTINGS.staminaMinionMultiplier.label',
+      hint: 'SETTINGS.minionStaminaMultiplier.hint',
+      name: 'SETTINGS.minionStaminaMultiplier.label',
       restricted: true,
       scope: 'world',
       type: Number,

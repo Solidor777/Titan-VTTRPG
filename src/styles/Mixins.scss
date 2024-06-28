@@ -134,16 +134,16 @@
 
 @mixin icon-button {
    align-items: center;
-   background: var(--titan-icon-button-background);
+   background: var(--titan-button-background);
    border-color: var(--titan-border-color-icon-button);
    border-radius: var(--titan-icon-button-border-radius);
-   border-style: var(--titan-icon-button-border-style);
-   border-width: var(--titan-icon-button-border-width);
+   border-style: var(--titan-button-border-style);
+   border-width: var(--titan-button-border-width);
    box-sizing: border-box;
-   color: var(--titan-icon-button-color);
+   color: var(--titan-button-color);
    display: flex;
    flex-direction: row;
-   font-size: var(--titan-icon-button-font-size);
+   font-size: var(--titan-button-font-size);
    height: var(--titan-icon-button-radius);
    justify-content: center;
    line-height: var(--icon-button-line-height);
@@ -251,29 +251,29 @@
 
 @mixin attribute-colors {
    &.body {
-      background: var(--titan-body-color);
+      background: var(--titan-body-background);
    }
 
    &.mind {
-      background: var(--titan-mind-color);
+      background: var(--titan-mind-background);
    }
 
    &.soul {
-      background: var(--titan-soul-color);
+      background: var(--titan-soul-background);
    }
 }
 
 @mixin attribute-button {
    &.body {
-      --titan-button-background: var(--titan-body-color);
+      --titan-button-background: var(--titan-body-background);
    }
 
    &.mind {
-      --titan-button-background: var(--titan-mind-color);
+      --titan-button-background: var(--titan-mind-background);
    }
 
    &.soul {
-      --titan-button-background: var(--titan-soul-color);
+      --titan-button-background: var(--titan-soul-background);
    }
 
    --titan-button-background-disabled: var(--titan-button-background);
@@ -281,29 +281,29 @@
 
 @mixin resistance-colors {
    &.reflexes {
-      background: var(--titan-reflexes-color);
+      background: var(--titan-reflexes-background);
    }
 
    &.resilience {
-      background: var(--titan-resilience-color);
+      background: var(--titan-resilience-background);
    }
 
    &.willpower {
-      background: var(--titan-willpower-color);
+      background: var(--titan-willpower-background);
    }
 }
 
 @mixin resistance-button {
    &.reflexes {
-      --titan-button-background: var(--titan-reflexes-color);
+      --titan-button-background: var(--titan-reflexes-background);
    }
 
    &.resilience {
-      --titan-button-background: var(--titan-resilience-color);
+      --titan-button-background: var(--titan-resilience-background);
    }
 
    &.willpower {
-      --titan-button-background: var(--titan-willpower-color);
+      --titan-button-background: var(--titan-willpower-background);
    }
 }
 
@@ -372,6 +372,18 @@
    color: var(--titan-tag-color);
    padding: var(--titan-tag-padding);
    background: var(--titan-tag-background);
+}
+
+@mixin tag-container {
+   @include flex-row;
+   @include flex-group-center;
+   @include font-size-small;
+
+   flex-wrap: wrap;
+
+   .tag {
+      @include tag-margin;
+   }
 }
 
 @mixin large-tag {

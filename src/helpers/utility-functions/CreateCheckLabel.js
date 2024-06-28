@@ -7,6 +7,6 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @param {string} stat - Key the for state being used to roll the Check (typically an Attribute or Resistance).
  * @returns {string} A formatted and localized DC Label for the provided Check.
  */
-export default function createAttributeCheckLabel(difficulty, complexity, stat) {
+export default function createCheckLabel(difficulty, complexity, stat) {
    return `${localize(stat)} ${difficulty}:${complexity}`;
 }

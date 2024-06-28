@@ -8,9 +8,9 @@
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
    import CharacterSheetResistances
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
-   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
    import CharacterSheetInspiration
       from '~/document/types/actor/types/character/types/player/PlayerSheetInspiration.svelte';
+   import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -36,7 +36,7 @@
             class="available"
             use:tooltipAction="{localize('xpAvailable')}"
          >
-            <ModTag
+            <StatModLabel
                baseValue={0}
                currentValue={$document.system.xp.available}
             />

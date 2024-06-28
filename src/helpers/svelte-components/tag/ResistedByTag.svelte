@@ -1,45 +1,32 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
+   import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
+   /** @type string The Resistance to associate with the tag. */
    export let resistance = void 0;
+
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 </script>
 
-<div class="tag {resistance}">
+<ResistanceTag {resistance} {tooltip}>
+   <!--Label-->
    <div class="label">
       {localize('resistedBy')}
    </div>
-   <div class="value">
+
+   <!--Resistance-->
+   <div class="resistance">
       {localize(resistance)}
    </div>
-</div>
+</ResistanceTag>
 
 <style lang="scss">
-   .tag {
-      @include flex-row;
-      @include flex-group-center;
-      @include border;
-      @include tag;
+   .label {
+      @include border-right;
 
-      padding: var(--titan-padding-standard);
-
-      &.reflexes {
-         background: var(--titan-reflexes-color);
-      }
-
-      &.resilience {
-         background: var(--titan-resilience-color);
-      }
-
-      &.willpower {
-         background: var(--titan-willpower-color);
-      }
-
-      .label {
-         @include border-right;
-
-         font-weight: bold;
-         padding-right: var(--titan-padding-standard);
-         margin-right: var(--titan-padding-standard);
-      }
+      font-weight: bold;
+      padding-right: var(--titan-padding-standard);
+      margin-right: var(--titan-padding-standard);
    }
 </style>

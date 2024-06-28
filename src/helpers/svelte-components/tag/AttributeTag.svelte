@@ -17,15 +17,15 @@
       @include tag;
 
       &.body {
-         --titan-tag-background: var(--titan-body-color);
+         --titan-tag-background: var(--titan-body-background);
       }
 
       &.mind {
-         --titan-tag-background: var(--titan-mind-color);
+         --titan-tag-background: var(--titan-mind-background);
       }
 
       &.soul {
-         --titan-tag-background: var(--titan-soul-color);
+         --titan-tag-background: var(--titan-soul-background);
       }
    }
 </style>

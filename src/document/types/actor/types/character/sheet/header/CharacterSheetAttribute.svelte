@@ -3,7 +3,7 @@
    import {getContext} from 'svelte';
    import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
+   import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 
    // The key / name of the attribute
    export let key;
@@ -95,7 +95,7 @@
 
       <!--Total Value-->
       <div class="value">
-         <ModTag
+         <StatModLabel
             baseValue={$document.system.attribute[key].baseValue +
                $document.system.attribute[key].mod.equipment +
                $document.system.attribute[key].mod.ability}

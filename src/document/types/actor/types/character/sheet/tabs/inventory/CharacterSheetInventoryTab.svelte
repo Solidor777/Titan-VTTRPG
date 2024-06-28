@@ -180,7 +180,7 @@
             }
 
             .reset {
-               --titan-icon-button-font-size: var(--titan-font-size-small);
+               --titan-button-font-size: var(--titan-font-size-small);
                --titan-icon-button-radius: 28px;
 
                margin-left: var(--titan-padding-standard);

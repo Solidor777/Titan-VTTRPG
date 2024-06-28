@@ -197,7 +197,7 @@
             margin-left: var(--titan-padding-standard);
 
             --titan-icon-button-radius: 24px;
-            --titan-icon-button-font-size: 14px;
+            --titan-button-font-size: 14px;
          }
 
          .border-right {

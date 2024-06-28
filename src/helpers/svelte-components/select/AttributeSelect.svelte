@@ -42,15 +42,15 @@
 
 <style lang="scss">
    .body {
-      --titan-input-background: var(--titan-body-color);
-      --titan-static-background: var(--titan-body-color);
+      --titan-input-background: var(--titan-body-background);
+      --titan-static-background: var(--titan-body-background);
    }
 
    .mind {
-      --titan-input-background: var(--titan-mind-color);
+      --titan-input-background: var(--titan-mind-background);
    }
 
    .soul {
-      --titan-input-background: var(--titan-soul-color);
+      --titan-input-background: var(--titan-soul-background);
    }
 </style>

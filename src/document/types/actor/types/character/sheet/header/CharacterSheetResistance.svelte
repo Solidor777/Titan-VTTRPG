@@ -4,7 +4,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import ModTag from '~/helpers/svelte-components/tag/ModTag.svelte';
+   import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 
    // The key / name of the resistance
    export let key;
@@ -95,7 +95,7 @@
 
       <!--Total Value-->
       <div class="value" use:tooltipAction="{totalValueTooltip}">
-         <ModTag
+         <StatModLabel
             baseValue={$document.system.resistance[key].baseValue +
                $document.system.resistance[key].mod.equipment +
                $document.system.resistance[key].mod.ability}
