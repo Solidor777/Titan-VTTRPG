@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import ModSelect from '~/helpers/svelte-components/select/ModSelect.svelte';
+   import ModSelect from '~/helpers/svelte-components/input/select/ModSelect.svelte';
 
    // The value of the input
    export let value;

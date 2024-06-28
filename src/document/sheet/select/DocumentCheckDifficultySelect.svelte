@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
+   import CheckDifficultySelect from '~/helpers/svelte-components/input/select/CheckDifficultySelect.svelte';
 
    // The value of the input
    export let value = void 0;

@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import ImagePicker from '~/helpers/svelte-components/ImagePicker.svelte';
+   import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -29,8 +29,8 @@
 
 <ImagePicker
    {alt}
+   bind:value
    disabled={disabled || !$document?.isOwner}
-   on:change
    on:change={updateDocument}
-   {value}
+   on:change
 />

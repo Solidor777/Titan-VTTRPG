@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import DamageReducedBySelect from '~/helpers/svelte-components/select/DamageReducedBySelect.svelte';
+   import DamageReducedBySelect from '~/helpers/svelte-components/input/select/DamageReducedBySelect.svelte';
 
    // Value
    export let value = void 0;

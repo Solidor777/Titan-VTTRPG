@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import SkillSelect from '~/helpers/svelte-components/select/SkillSelect.svelte';
+   import SkillSelect from '~/helpers/svelte-components/input/select/SkillSelect.svelte';
 
    // The value of the input
    export let value;

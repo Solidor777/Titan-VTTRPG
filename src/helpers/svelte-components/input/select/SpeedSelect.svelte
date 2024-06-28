@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -14,28 +14,28 @@
    /** @type SelectOption[] Options for the Select. */
    const options = [
       {
-         label: localize('armor'),
-         value: 'armor',
+         label: localize('burrow'),
+         value: 'burrow',
       },
       {
-         label: localize('damage'),
-         value: 'damage',
+         label: localize('climb'),
+         value: 'climb',
       },
       {
-         label: localize('healing'),
-         value: 'healing',
+         label: localize('fly'),
+         value: 'fly',
       },
       {
-         label: localize('resolveRegain'),
-         value: 'resolveRegain',
+         label: localize('stride'),
+         value: 'stride',
       },
       {
-         label: localize('woundRegain'),
-         value: 'woundRegain',
+         label: localize('swim'),
+         value: 'swim',
       },
    ];
 
-   // Add None option if appropriate.
+   // Add none option if appropriate.
    if (allowNone) {
       options.push({
          label: localize('none'),

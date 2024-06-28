@@ -1,5 +1,5 @@
 <script>
-   import RaritySelect from '~/helpers/svelte-components/select/RaritySelect.svelte';
+   import RaritySelect from '~/helpers/svelte-components/input/select/RaritySelect.svelte';
    import {getContext} from 'svelte';
 
    // The value of the input

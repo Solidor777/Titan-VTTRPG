@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import ArmorTraitSelect from '~/helpers/svelte-components/select/ArmorTraitSelect.svelte';
+   import ArmorTraitSelect from '~/helpers/svelte-components/input/select/ArmorTraitSelect.svelte';
 
    // The value of the input
    export let value;

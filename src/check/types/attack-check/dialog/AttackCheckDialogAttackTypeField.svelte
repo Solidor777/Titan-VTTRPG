@@ -1,7 +1,7 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import AttackTypeSelect from '~/helpers/svelte-components/select/AttackTypeSelect.svelte';
+   import AttackTypeSelect from '~/helpers/svelte-components/input/select/AttackTypeSelect.svelte';
    import {getContext} from 'svelte';
 
    /** @type object Reference to the Check Options store. */

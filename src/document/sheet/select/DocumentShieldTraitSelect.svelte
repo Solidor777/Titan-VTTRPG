@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import ShieldTraitSelect from '~/helpers/svelte-components/select/ShieldTraitSelect.svelte';
+   import ShieldTraitSelect from '~/helpers/svelte-components/input/select/ShieldTraitSelect.svelte';
 
    // The value of the input
    export let value;

@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -14,28 +14,20 @@
    /** @type SelectOption[] Options for the Select. */
    const options = [
       {
-         label: localize('burrow'),
-         value: 'burrow',
+         label: localize('resolve'),
+         value: 'resolve',
       },
       {
-         label: localize('climb'),
-         value: 'climb',
+         label: localize('stamina'),
+         value: 'stamina',
       },
       {
-         label: localize('fly'),
-         value: 'fly',
-      },
-      {
-         label: localize('stride'),
-         value: 'stride',
-      },
-      {
-         label: localize('swim'),
-         value: 'swim',
+         label: localize('wounds'),
+         value: 'wounds',
       },
    ];
 
-   // Add none option if appropriate.
+   // Add None option if appropriate.
    if (allowNone) {
       options.push({
          label: localize('none'),
@@ -44,4 +36,4 @@
    }
 </script>
 
-<Select bind:value {disabled} on:change {options}/>
+<Select bind:value {disabled} on:change options={options}/>

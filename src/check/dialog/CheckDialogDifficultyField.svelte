@@ -1,6 +1,6 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
-   import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
+   import CheckDifficultySelect from '~/helpers/svelte-components/input/select/CheckDifficultySelect.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
 

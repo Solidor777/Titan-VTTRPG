@@ -1,6 +1,6 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
-   import ResistanceSelect from '~/helpers/svelte-components/select/ResistanceSelect.svelte';
+   import ResistanceSelect from '~/helpers/svelte-components/input/select/ResistanceSelect.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
 

@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import SpeedSelect from '~/helpers/svelte-components/select/SpeedSelect.svelte';
+   import SpeedSelect from '~/helpers/svelte-components/input/select/SpeedSelect.svelte';
 
    // The value of the input
    export let value;

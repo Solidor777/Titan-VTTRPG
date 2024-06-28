@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
    // Character Sheet
    export let actor = void 0;
