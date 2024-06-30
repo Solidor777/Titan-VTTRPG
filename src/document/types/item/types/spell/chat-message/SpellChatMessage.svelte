@@ -13,6 +13,9 @@
    /** @type object Reference to the Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
+
+   /** @type SpellAspect[] List of enabled Spell Aspects. */
+   const enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
 </script>
 
 <div class="item-chat-message">
@@ -32,10 +35,10 @@
       </div>
 
       <!--Aspects-->
-      {#if item.aspect.length > 0 || item.customAspect.length > 0}
+      {#if enabledAspects.length > 0 || item.customAspect.length > 0}
          <div class="section small-text tags">
             <SpellAspectTags
-               standardAspects={item.aspect}
+               standardAspects={enabledAspects}
                customAspects={item.customAspect}
             />
          </div>

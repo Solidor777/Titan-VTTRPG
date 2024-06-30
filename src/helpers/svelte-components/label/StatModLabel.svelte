@@ -31,6 +31,9 @@
    .label {
       @include label;
 
+      --titan-label-height: var(--titan-input-height);
+      --titan-label-padding: var(--titan-input-padding);
+
       &.bonus {
          --titan-tag-color: var(--titan-greater-color);
          --titan-tag-background: var(--titan-greater-background);

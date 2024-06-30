@@ -53,10 +53,14 @@
 
          width: 100%;
 
+         &:not(:first-child) {
+            @include border-top;
+         }
+
          &:not(:last-child) {
             @include border-bottom;
 
-            border-width: var(--titan-border-width-thick);
+            margin-bottom: var(--titan-padding-large);
          }
       }
    }

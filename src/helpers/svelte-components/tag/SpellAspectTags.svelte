@@ -1,10 +1,10 @@
 <script>
    import SpellCustomAspectTag from '~/helpers/svelte-components/tag/SpellCustomAspectTag.svelte';
-   import SpellStandardAspectTag from '~/helpers/svelte-components/tag/SpellStandardAspectTag.svelte';
+   import SpellAspectTag from '~/helpers/svelte-components/tag/SpellAspectTag.svelte';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Aspects list
-   /** @type object[] Array of Spell Custom Aspects to display. */
+   /** @type SpellAspect[] Array of Spell Custom Aspects to display. */
    export let standardAspects = void 0;
 
    /** @type SpellCustomAspect[] Array of Spell Custom Aspects to display. */
@@ -72,7 +72,7 @@
       {#if aspect?.standardAspect === true}
          <!--Standard Aspect-->
          <div class="tag">
-            <SpellStandardAspectTag
+            <SpellAspectTag
                aspect={standardAspects[aspect.idx]}
             />
          </div>

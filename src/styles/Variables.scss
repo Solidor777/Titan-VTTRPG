@@ -22,7 +22,8 @@
 
    // Border
    --titan-border-style: solid;
-   --titan-border-radius-normal: 4px;
+   --titan-border-radius: 4px;
+   --titan-border-width: 2px;
    --titan-border-width-normal: 2px;
    --titan-border-width-thick: 4px;
    --titan-border-color: #000;
@@ -90,6 +91,8 @@
    --titan-label-color: #000;
    --titan-label-color-dark: #1d1e26;
    --titan-label-padding: 4px;
+   --titan-label-width: 100%;
+   --titan-label-height: 100%;
 
    // Tag
    --titan-tag-background: #F5F5F5;

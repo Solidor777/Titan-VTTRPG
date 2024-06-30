@@ -3,10 +3,11 @@
 
    export let label = void 0;
    export let icon = void 0;
+   export let disabled = void 0;
 </script>
 
 <div class="button">
-   <Button on:click>
+   <Button {disabled} on:click>
       <div class="label">
          {#if icon}
             <i class={icon}/>

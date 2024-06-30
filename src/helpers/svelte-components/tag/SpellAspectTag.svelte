@@ -18,7 +18,7 @@
       increaseSpeed: DECREASE_SPEED_ICON,
    };
 
-   // Spell aspect
+   /** @type SpellAspect The Spell Aspect represented by this element. */
    export let aspect = void 0;
 </script>
 
@@ -36,11 +36,16 @@
    <!--Initial value-->
    {#if aspect.initialValue !== undefined}
       <div class="stat">
+
          <!--Scaling value-->
          {#if aspect.scaling}
+
+            <!--Initial value if it is not 0-->
             {#if aspect.initialValue}
                {aspect.initialValue}
             {/if}
+
+            <!--The cost of the aspect-->
             {#if aspect.cost > 1}
                {`+ (${localize('extraSuccesses.short')} / ${aspect.cost})`}
             {:else}

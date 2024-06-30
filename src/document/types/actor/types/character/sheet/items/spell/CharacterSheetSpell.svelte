@@ -29,6 +29,16 @@
    /** @type boolean Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
+   /** @type SpellAspect[] List of enabled Spell Aspects. */
+   let enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
+
+   // Update enabled aspects in response to changes
+   $: {
+      if (item) {
+         enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
+      }
+   }
+
 </script>
 
 <div class="item">
@@ -79,10 +89,10 @@
          </div>
 
          <!--Spell Aspects-->
-         {#if item.system.aspect.length > 0}
+         {#if enabledAspects.length > 0 || item.system.customAspect.length > 0}
             <div class="section tags">
                <SpellAspectTags
-                  standardAspects={item.system.aspect}
+                  standardAspects={enabledAspects}
                   customAspects={item.system.customAspect}
                />
             </div>

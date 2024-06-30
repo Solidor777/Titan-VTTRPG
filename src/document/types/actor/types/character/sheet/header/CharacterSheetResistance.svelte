@@ -141,10 +141,9 @@
          .base-value {
             @include flex-row;
             @include flex-group-center;
-            @include tag;
-            @include border;
+            @include label;
 
-            height: 100%;
+            height: var(--titan-input-height);
             width: 28px;
          }
 

@@ -1,6 +1,23 @@
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 /**
+ * @typedef {object} SpellAspect
+ * Object containing the data for a spell.
+ * @property {boolean?} allOptions Whether the Aspect should apply all its Options.
+ * @property {boolean?} isDamage Whether the Aspect inflicts Damage.
+ * @property {boolean?} isHealing Whether the Aspect applies Healing.
+ * @property {boolean?} scaling Whether the Aspect should scale with extra successes.
+ * @property {boolean} enabled Whether the Aspect is currently Enabled.
+ * @property {number} cost The Cost of the Aspect.
+ * @property {number} scalingCost The number of extra successes needed to increase the aspect's value.
+ * @property {string?|number?} initialValue The initial Value of the Aspect.
+ * @property {string?} unit The Unit by which the Aspect increases with extra successes.
+ * @property {string[]?} option List of Options for the Aspect.
+ * @property {string} label Key for the localized display name of the Aspect.
+ * @property {string} resistanceCheck What Resistance can be used to resist the Aspect, if any.
+ */
+
+/**
  * Object containing the standard spell aspects mapped by name.
  */
 export default deepFreeze({

@@ -16,7 +16,9 @@
    </div>
 
    <div class="scrolling-container">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.skills} content={CharacterSheetSkillsList}/>
+      <ScrollingContainer bind:scrollTop={$appState.scrollTop.skills}>
+         <CharacterSheetSkillsList/>
+      </ScrollingContainer>
    </div>
 
    <!--Each skill-->

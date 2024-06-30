@@ -14,12 +14,12 @@ export default function createAttributeCheckLabel(attribute, skill, difficulty, 
 
    // Add skill if appropriate.
    if (skill && skill !== 'none') {
-      retVal += `(${localize(skill)})`;
+      retVal += ` (${localize(skill)})`;
    }
 
    // Add difficulty and complexity if appropriate.
    if (difficulty) {
-      retVal += `${difficulty}:${complexity ?? 0}`;
+      retVal += ` ${difficulty}:${complexity ?? 0}`;
    }
 
    return retVal;
