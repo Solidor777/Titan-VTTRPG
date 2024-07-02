@@ -28,14 +28,14 @@
       <!--Attack Notes-->
       {#if item.system.attackNotes !== '' && item.system.attackNotes !== '<p></p>'}
          <div class="section rich-text">
-            <RichText text={item.system.attackNotes}/>
+            <RichText value={item.system.attackNotes}/>
          </div>
       {/if}
 
       <!--Description-->
       {#if item.system.description !== '' && item.system.description !== '<p></p>'}
          <div class="section rich-text">
-            <RichText text={item.system.description}/>
+            <RichText value={item.system.description}/>
          </div>
       {/if}
 

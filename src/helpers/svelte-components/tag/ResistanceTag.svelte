@@ -16,18 +16,16 @@
    .tag {
       @include tag;
 
-      @mixin resistance-colors {
-         &.reflexes {
-            --titan-tag-background: var(--titan-reflexes-background);
-         }
+      &.reflexes {
+         --titan-tag-background: var(--titan-reflexes-background);
+      }
 
-         &.resilience {
-            --titan-tag-background: var(--titan-resilience-background);
-         }
+      &.resilience {
+         --titan-tag-background: var(--titan-resilience-background);
+      }
 
-         &.willpower {
-            --titan-tag-background: var(--titan-willpower-background);
-         }
+      &.willpower {
+         --titan-tag-background: var(--titan-willpower-background);
       }
    }
 </style>

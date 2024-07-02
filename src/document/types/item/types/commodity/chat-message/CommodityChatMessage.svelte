@@ -31,7 +31,7 @@
       <!--Description-->
       {#if item.system.description !== '' && item.system.description !== '<p></p>'}
          <div class="section rich-text">
-            <RichText text={item.system.description}/>
+            <RichText value={item.system.description}/>
          </div>
       {/if}
 

@@ -23,7 +23,7 @@
    <!--Attack Notes-->
    {#if $document.flags.titan.parameters.attackNotes !== '' && $document.flags.titan.parameters.attackNotes !== '<p></p>'}
       <div class="section rich-text">
-         <RichText text={$document.flags.titan.parameters.attackNotes}/>
+         <RichText value={$document.flags.titan.parameters.attackNotes}/>
       </div>
    {/if}
 

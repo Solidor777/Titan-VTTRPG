@@ -4,6 +4,12 @@
    /** @type number Initial scroll top of this container. */
    export let scrollTop = 0;
 
+   /** @type boolean Whether the container is overflowing its top. */
+   let isOverflowingTop = false;
+
+   /** @type boolean Whether the container is overflowing its bottom. */
+   let isOverflowingBottom = false;
+
    /** @type string Computed class for affect the display of the scrolling container. */
    let scrollClass = '';
 
@@ -25,7 +31,7 @@
       // Styling code for a blur at the top and bottom of an overflowing element.
       if (fadeLength > 0) {
          const element = event.target;
-         updateScrollClass(element);
+         updateOverflowingState(element);
       }
    }
 
@@ -39,7 +45,7 @@
 
       // Styling code for a blur at the top and bottom of an overflowing element.
       if (fadeLength > 0) {
-         updateScrollClass(element);
+         updateOverflowingState(element);
       }
    }
 
@@ -47,7 +53,7 @@
     * Updates the scroll class depending on whether the top or bottom of the element is overflowing.
     * @param {Element} element - The scrollable element.
     */
-   function updateScrollClass(element) {
+   function updateOverflowingState(element) {
 
       // If the element is scrollable, add the faded class
       if (element.scrollHeight > element.clientHeight) {
@@ -55,11 +61,13 @@
 
          // Update whether the element is overflowing its top.
          if (element.scrollTop > fadeLength) {
+            isOverflowingTop = true;
             scrollClass += ' top-overflowing';
          }
 
          // Update whether the element is overflowing its bottom.
          if (element.scrollHeight > element.clientHeight + element.scrollTop + 12) {
+            isOverflowingBottom = true;
             scrollClass += ' bottom-overflowing';
          }
       }

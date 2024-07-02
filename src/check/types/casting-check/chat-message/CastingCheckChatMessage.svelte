@@ -46,7 +46,7 @@
    <!--Description-->
    {#if $document.flags.titan.results.succeeded && $document.flags.titan.parameters.itemDescription !== '' && $document.flags.titan.parameters.itemDescription !== '<p></p>'}
       <div class="section rich-text">
-         <RichText text={$document.flags.titan.parameters.itemDescription}/>
+         <RichText value={$document.flags.titan.parameters.itemDescription}/>
       </div>
    {/if}
 

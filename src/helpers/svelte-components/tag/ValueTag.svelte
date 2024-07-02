@@ -1,35 +1,8 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {CURRENCY_ICON} from '~/system/Icons.js';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
+   /** @type {string} The Value represented by this tag. */
    export let value = void 0;
 </script>
-
-<div class="stat">
-   <i class="{CURRENCY_ICON}"/>
-   <div class="label">
-      {localize('value')}
-   </div>
-   <div class="value">
-      {value}
-   </div>
-</div>
-
-<style lang="scss">
-   .stat {
-      @include flex-row;
-      @include flex-group-center;
-      @include border;
-      @include tag;
-
-      padding: var(--titan-padding-standard);
-
-      .label {
-         @include border-right;
-
-         font-weight: bold;
-         padding-right: var(--titan-padding-standard);
-         margin: 0 var(--titan-padding-standard);
-      }
-   }
-</style>
+<StatTag label={localize('value')} {value}/>

@@ -82,7 +82,7 @@
          <!--Item Description-->
          {#if !(isHTMLBlank(item.system.description))}
             <div class="section rich-text">
-               <RichText text={item.system.description}/>
+               <RichText value={item.system.description}/>
             </div>
          {/if}
 

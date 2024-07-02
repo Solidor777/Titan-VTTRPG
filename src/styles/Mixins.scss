@@ -363,7 +363,7 @@
 
 @mixin tag {
    display: flex;
-   flex-direction: row;
+   flex-flow: row wrap;
    align-items: center;
    justify-content: center;
    text-align: center;

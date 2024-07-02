@@ -8,6 +8,7 @@
       RADIUS_ICON,
       RANGE_ICON,
    } from '~/system/Icons.js';
+   import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
    const labelIcons = {
       damage: DAMAGE_ICON,
@@ -22,7 +23,7 @@
    export let aspect = void 0;
 </script>
 
-<div class="aspect {aspect.resistanceCheck ? aspect.resistanceCheck : ''}">
+<ResistanceTag resistance={aspect.resistanceCheck ?? ''}>
    <!--Label-->
    <div class="stat label">
       <!--Icon-->
@@ -30,17 +31,18 @@
          <i class={labelIcons[aspect.label]}/>
       {/if}
 
+      <!--Label or Units-->
       {localize(aspect.unit ?? aspect.label)}
    </div>
 
-   <!--Initial value-->
+   <!--Initial Value-->
    {#if aspect.initialValue !== undefined}
       <div class="stat">
 
-         <!--Scaling value-->
          {#if aspect.scaling}
+            <!--Scaling Value-->
 
-            <!--Initial value if it is not 0-->
+            <!--Initial Value if it is not 0-->
             {#if aspect.initialValue}
                {aspect.initialValue}
             {/if}
@@ -52,7 +54,7 @@
                {`+ ${localize('extraSuccesses.short')}`}
             {/if}
          {:else}
-            <!--Non scaling value-->
+            <!--Non Scaling Value-->
             {#if typeof aspect.initialValue === 'string'}
                {localize(aspect.initialValue)}
             {:else}
@@ -69,6 +71,7 @@
          {localize('all')}
       </div>
    {:else if aspect.option}
+      <!--Each options-->
       {#each aspect.option as option}
          <!--Each option-->
          <div class="stat">
@@ -84,37 +87,28 @@
          {localize(aspect.resistanceCheck)}
       </div>
    {/if}
-</div>
+</ResistanceTag>
 
 <style lang="scss">
-   .aspect {
+
+   .stat {
       @include flex-row;
       @include flex-group-center;
-      @include resistance-colors;
-      @include border;
-      @include tag;
 
-      padding: var(--titan-padding-standard);
-      flex-wrap: wrap;
+      &.label {
+         font-weight: bold;
+      }
 
-      .stat {
-         @include flex-row;
-         @include flex-group-center;
+      &:not(:first-child) {
+         @include border-left;
 
-         &.label {
-            font-weight: bold;
-         }
+         margin-left: var(--titan-padding-standard);
+         padding-left: var(--titan-padding-standard);
+      }
 
-         &:not(:first-child) {
-            @include border-left;
-
-            margin-left: var(--titan-padding-standard);
-            padding-left: var(--titan-padding-standard);
-         }
-
-         i {
-            margin-right: var(--titan-padding-standard);
-         }
+      i {
+         margin-right: var(--titan-padding-standard);
       }
    }
+
 </style>

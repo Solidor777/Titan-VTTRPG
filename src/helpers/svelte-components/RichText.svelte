@@ -4,14 +4,37 @@
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   export let text = void 0;
-   $: displayText = TextEditor.enrichHTML(text, {
+   /** @type string The raw html to display. */
+   export let value = void 0;
+
+   /** @type string Enriched HTMl to display. */
+   let displayText = TextEditor.enrichHTML(value, {
       async: false,
       secrets: true,
    });
+
+   /** @type string Calculated class for Rich Text object. */
+   let textClass = $document.isOwner ?
+      'rich-text' :
+      'rich-text not-owner';
+
+   // Update in response to changes.
+   $: {
+      // Update display text
+      displayText = TextEditor.enrichHTML(value, {
+         async: false,
+         secrets: true,
+      });
+
+      // Update text class
+      textClass = $document.isOwner ?
+         'rich-text' :
+         'rich-text not-owner';
+   }
+
 </script>
 
-<div class="rich-text {$document.isOwner ? '' : 'not-owner'}">
+<div class={textClass}>
    {@html displayText}
 </div>
 
