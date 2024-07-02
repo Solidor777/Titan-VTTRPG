@@ -43,7 +43,6 @@
     * @param {Element} element - The scrollable element.
     */
    function updateOverflowingState(element) {
-      // Reset overflowing state.
       isOverflowingTop = element.scrollTop > fadeLength;
       isOverflowingBottom = element.scrollHeight > element.clientHeight + element.scrollTop + fadeLength;
    }

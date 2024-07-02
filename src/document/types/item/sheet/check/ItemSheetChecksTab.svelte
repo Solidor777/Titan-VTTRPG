@@ -40,7 +40,7 @@
    <!--Filter-->
    {#if $document.system.check.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:filter={$appState.filter.checks}/>
+         <TopFilter bind:value={$appState.filter.checks}/>
       </div>
    {/if}
 

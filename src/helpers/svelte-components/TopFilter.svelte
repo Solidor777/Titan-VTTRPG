@@ -2,15 +2,15 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
-   // Filter Items
-   export let filter = void 0;
+   /** @type number The value that this input should modify. */
+   export let value = void 0;
 </script>
 
 <!--Filter-->
 <div class="filter">
    <div class="label">{localize('filter')}</div>
    <div class="input">
-      <TextInput bind:value={filter}/>
+      <TextInput bind:value/>
    </div>
 </div>
 

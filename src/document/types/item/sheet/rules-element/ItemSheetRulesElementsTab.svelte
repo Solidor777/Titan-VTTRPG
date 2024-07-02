@@ -113,7 +113,7 @@
    {#if $document.system.rulesElement.length > 0}
       <!--Filter-->
       <div class="filter" transition:slide|local>
-         <TopFilter bind:filter={$appState.filter.rulesElements}/>
+         <TopFilter bind:value={$appState.filter.rulesElements}/>
       </div>
    {/if}
 

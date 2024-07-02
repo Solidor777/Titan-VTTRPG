@@ -12,7 +12,7 @@
 <div class="skill-tab">
    <!--Filter-->
    <div class="header">
-      <TopFilter bind:filter={$appState.filter.skills}/>
+      <TopFilter bind:value={$appState.filter.skills}/>
    </div>
 
    <div class="scrolling-container">

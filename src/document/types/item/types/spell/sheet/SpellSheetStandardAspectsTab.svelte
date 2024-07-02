@@ -37,7 +37,7 @@
 
 <div class="standard-aspects-tab">
    <!--Filter-->
-   <TopFilter bind:filter={$appState.filter.standardAspects}/>
+   <TopFilter bind:value={$appState.filter.standardAspects}/>
 
    <!--Scrolling aspects list-->
    <div class="scrolling-content">

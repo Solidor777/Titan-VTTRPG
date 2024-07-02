@@ -69,6 +69,7 @@
             @include mini-button;
 
             width: 100%;
+            height: 100%;
 
             &.active {
                --titan-button-background: var(--titan-highlight-background);

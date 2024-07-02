@@ -40,7 +40,7 @@
    <!--Filter-->
    {#if $document.system.attack.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:filter={$appState.filter.attacks}/>
+         <TopFilter bind:value={$appState.filter.attacks}/>
       </div>
    {/if}
 

@@ -41,7 +41,7 @@
    <!--Filter-->
    {#if $document.system.customAspect && $document.system.customAspect.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:filter={$appState.filter.customAspects}/>
+         <TopFilter bind:value={$appState.filter.customAspects}/>
       </div>
    {/if}
 
