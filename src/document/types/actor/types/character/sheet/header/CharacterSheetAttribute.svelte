@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 

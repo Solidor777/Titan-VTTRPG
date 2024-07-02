@@ -6,12 +6,12 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
-   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
-   import DocumentSkillSelect from '~/document/sheet/select/DocumentSkillSelect.svelte';
-   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
-   import DocumentAttackTypeSelect from '~/document/sheet/select/DocumentAttackTypeSelect.svelte';
+   import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
+   import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
+   import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {
       COLLAPSED_ICON,

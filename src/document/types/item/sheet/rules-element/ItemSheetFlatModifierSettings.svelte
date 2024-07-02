@@ -2,16 +2,16 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
-   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
+   import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import DocumentSkillSelect from '~/document/sheet/select/DocumentSkillSelect.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
-   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
-   import DocumentModSelect from '~/document/sheet/select/DocumentModSelect.svelte';
-   import DocumentRatingSelect from '~/document/sheet/select/DocumentRatingSelect.svelte';
-   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
-   import DocumentResourceSelect from '~/document/sheet/select/DocumentResourceSelect.svelte';
-   import DocumentSpeedSelect from '~/document/sheet/select/DocumentSpeedSelect.svelte';
+   import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentModSelect from '~/document/svelte-components/select/DocumentModSelect.svelte';
+   import DocumentRatingSelect from '~/document/svelte-components/select/DocumentRatingSelect.svelte';
+   import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
+   import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
+   import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
    import {DELETE_ICON} from '~/system/Icons.js';

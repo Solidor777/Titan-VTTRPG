@@ -4,9 +4,9 @@
    import {slide} from 'svelte/transition';
    import SpellSheetEnableAspectButton
       from '~/document/types/item/types/spell/sheet/SpellSheetEnableAspectButton.svelte';
-   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
-   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
-   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
+   import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
+   import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
+   import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
 
    export let aspectOptions = void 0;

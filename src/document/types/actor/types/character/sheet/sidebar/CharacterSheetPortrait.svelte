@@ -2,7 +2,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {getContext} from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import DocumentImagePicker from '~/document/sheet/input/DocumentImagePicker.svelte';
+   import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import {LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
 

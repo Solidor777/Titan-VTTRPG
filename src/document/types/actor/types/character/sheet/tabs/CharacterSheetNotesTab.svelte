@@ -1,7 +1,7 @@
 <script>
    import {getContext} from 'svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import DocumentBoundEditorInput from '~/document/sheet/input/DocumentBoundEditorInput.svelte';
+   import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');

@@ -2,7 +2,7 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
    import StatModLabel from '~/helpers/svelte-components/label/StatModLabel.svelte';
 

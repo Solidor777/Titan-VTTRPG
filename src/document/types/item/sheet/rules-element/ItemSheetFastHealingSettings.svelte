@@ -2,11 +2,11 @@
    import {getContext} from 'svelte';
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
+   import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import {DELETE_ICON} from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */

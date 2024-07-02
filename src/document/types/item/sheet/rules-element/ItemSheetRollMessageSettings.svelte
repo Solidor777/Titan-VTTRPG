@@ -2,17 +2,17 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
-   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
+   import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import DocumentSkillSelect from '~/document/sheet/select/DocumentSkillSelect.svelte';
-   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
-   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
+   import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
+   import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
-   import DocumentBoundEditorInput from '~/document/sheet/input/DocumentBoundEditorInput.svelte';
-   import DocumentAttackTypeSelect from '~/document/sheet/select/DocumentAttackTypeSelect.svelte';
-   import DocumentAttackTraitSelect from '~/document/sheet/select/DocumentAttackTraitSelect.svelte';
-   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
+   import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
+   import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
+   import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
+   import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import {DELETE_ICON} from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */

@@ -2,11 +2,11 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
-   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
-   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
-   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
+   import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
+   import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
+   import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import {COLLAPSED_ICON, DAMAGE_ICON, DELETE_ICON, EXPANDED_ICON, HEALING_ICON} from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */

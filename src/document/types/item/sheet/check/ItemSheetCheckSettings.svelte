@@ -3,14 +3,14 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
-   import DocumentResistanceSelect from '~/document/sheet/select/DocumentResistanceSelect.svelte';
-   import DocumentCheckboxInput from '~/document/sheet/input/DocumentCheckboxInput.svelte';
-   import DocumentSkillSelect from '~/document/sheet/select/DocumentSkillSelect.svelte';
-   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
-   import DocumentCheckDifficultySelect from '~/document/sheet/select/DocumentCheckDifficultySelect.svelte';
-   import DocumentDamageReducedBySelect from '~/document/sheet/select/DocumentDamageReducedBySelect.svelte';
+   import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
+   import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
+   import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
+   import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentCheckDifficultySelect from '~/document/svelte-components/select/DocumentCheckDifficultySelect.svelte';
+   import DocumentDamageReducedBySelect from '~/document/svelte-components/select/DocumentDamageReducedBySelect.svelte';
    import {
       COLLAPSED_ICON,
       DAMAGE_ICON,

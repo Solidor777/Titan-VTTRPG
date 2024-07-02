@@ -1,11 +1,11 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import DocumentImagePicker from '~/document/sheet/input/DocumentImagePicker.svelte';
-   import DocumentNameInput from '~/document/sheet/input/DocumentNameInput.svelte';
-   import DocumentRaritySelect from '~/document/sheet/select/DocumentRaritySelect.svelte';
-   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
+   import DocumentNameInput from '~/document/svelte-components/input/DocumentNameInput.svelte';
+   import DocumentRaritySelect from '~/document/svelte-components/select/DocumentRaritySelect.svelte';
+   import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');

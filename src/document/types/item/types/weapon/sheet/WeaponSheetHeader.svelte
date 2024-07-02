@@ -1,10 +1,10 @@
 <script>
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import DocumentImagePicker from '~/document/sheet/input/DocumentImagePicker.svelte';
-   import DocumentName from '~/document/sheet/input/DocumentNameInput.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
-   import DocumentRaritySelect from '~/document/sheet/select/DocumentRaritySelect.svelte';
+   import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
+   import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import DocumentRaritySelect from '~/document/svelte-components/select/DocumentRaritySelect.svelte';
    import {CURRENCY_ICON} from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */

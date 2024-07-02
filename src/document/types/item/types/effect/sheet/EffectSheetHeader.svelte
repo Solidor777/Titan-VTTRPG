@@ -2,12 +2,12 @@
    import {getContext} from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import {slide} from 'svelte/transition';
-   import DocumentImagePicker from '~/document/sheet/input/DocumentImagePicker.svelte';
-   import DocumentName from '~/document/sheet/input/DocumentNameInput.svelte';
-   import DocumentSelect from '~/document/sheet/select/DocumentSelect.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
-   import DocumentTextInput from '~/document/sheet/input/DocumentTextInput.svelte';
-   import DocumentIntegerIncrementInput from '~/document/sheet/input/DocumentIntegerIncrementInput.svelte';
+   import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
+   import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
+   import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
+   import DocumentIntegerIncrementInput from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');

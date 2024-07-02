@@ -2,8 +2,8 @@
    import {EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
    import CharacterSheetCondensedSkillCheckButton
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetCondensedSkillCheckButton.svelte';
-   import DocumentAttributeSelect from '~/document/sheet/select/DocumentAttributeSelect.svelte';
-   import DocumentIntegerInput from '~/document/sheet/input/DocumentIntegerInput.svelte';
+   import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import {getContext} from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import localize from '~/helpers/utility-functions/Localize.js';
