@@ -1,5 +1,4 @@
 <script>
-   import isChromium from '~/helpers/utility-functions/IsChromium.js';
 
    /** @type number Initial scroll top of this container. */
    export let scrollTop = 0;
@@ -10,14 +9,8 @@
    /** @type boolean Whether the container is overflowing its bottom. */
    let isOverflowingBottom = false;
 
-   /** @type string Computed class for affect the display of the scrolling container. */
-   let scrollClass = '';
-
-   /**
-    * @type number The length of the scroll fade in pixels, if any. Excluded from Chromium because it causes the entire
-    * element to be blurred on Chromium browsers.
-    */
-   const fadeLength = isChromium() ? 0 : 12;
+   /** @type number The length of the scroll fade in pixels, if any. */
+   const fadeLength = 12;
 
    /**
     * Called when the element is scrolled.
@@ -29,10 +22,8 @@
       scrollTop = event.target.scrollTop;
 
       // Styling code for a blur at the top and bottom of an overflowing element.
-      if (fadeLength > 0) {
-         const element = event.target;
-         updateOverflowingState(element);
-      }
+      const element = event.target;
+      updateOverflowingState(element);
    }
 
    /**
@@ -44,9 +35,7 @@
       element.scrollTop = scrollTop;
 
       // Styling code for a blur at the top and bottom of an overflowing element.
-      if (fadeLength > 0) {
-         updateOverflowingState(element);
-      }
+      updateOverflowingState(element);
    }
 
    /**
@@ -54,35 +43,27 @@
     * @param {Element} element - The scrollable element.
     */
    function updateOverflowingState(element) {
-
-      // If the element is scrollable, add the faded class
-      if (element.scrollHeight > element.clientHeight) {
-         scrollClass = ' faded';
-
-         // Update whether the element is overflowing its top.
-         if (element.scrollTop > fadeLength) {
-            isOverflowingTop = true;
-            scrollClass += ' top-overflowing';
-         }
-
-         // Update whether the element is overflowing its bottom.
-         if (element.scrollHeight > element.clientHeight + element.scrollTop + 12) {
-            isOverflowingBottom = true;
-            scrollClass += ' bottom-overflowing';
-         }
-      }
-
-      // If the element is not scrollable, blank out the scroll class
-      else {
-         scrollClass = '';
-      }
+      // Reset overflowing state.
+      isOverflowingTop = element.scrollTop > fadeLength;
+      isOverflowingBottom = element.scrollHeight > element.clientHeight + element.scrollTop + fadeLength;
    }
 </script>
 
 <div class="container">
-   <div class="content{scrollClass}" on:scroll={onScroll} use:initialScroll>
+   <!--Content-->
+   <div class="content" on:scroll={onScroll} use:initialScroll>
       <slot/>
    </div>
+
+   <!--Top Overflowing Blur-->
+   {#if isOverflowingTop}
+      <span class="overflow top"/>
+   {/if}
+
+   <!--Bottom Overflowing Blur-->
+   {#if isOverflowingBottom}
+      <span class="overflow bottom"/>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -103,25 +84,29 @@
          will-change: scroll-position;
          overflow: clip scroll;
          scrollbar-gutter: stable;
+      }
 
-         --top-mask-size: 0px;
-         --bottom-mask-size: 0px;
+      .overflow {
+         background: black;
+         position: absolute;
+         width: 100%;
+         height: 12px;
+         pointer-events: none;
 
-         &.top-overflowing {
-            --top-mask-size: 12px;
-         }
-
-         &.bottom-overflowing {
-            --bottom-mask-size: 12px;
-         }
-
-         &.faded {
-            mask-image: linear-gradient(
+         &.top {
+            background: linear-gradient(
                   to bottom,
-                  transparent 0,
-                  black var(--top-mask-size, 0),
-                  black calc(100% - var(--bottom-mask-size, 0)),
-                  transparent 100%
+                  var(--titan-panel-1-background, 0),
+                  transparent,
+            );
+         }
+
+         &.bottom {
+            bottom: 0;
+            background: linear-gradient(
+                  to top,
+                  var(--titan-panel-1-background, 0),
+                  transparent,
             );
          }
       }
