@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import CharacterSheetSkillsList
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';

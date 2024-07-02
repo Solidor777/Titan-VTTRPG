@@ -1,18 +1,18 @@
 <script>
    import {getContext} from 'svelte';
-   import CheckDifficultySelect from '~/helpers/svelte-components/input/select/CheckDifficultySelect.svelte';
+   import CheckDifficultySelect from '~/helpers/svelte-components/select/CheckDifficultySelect.svelte';
 
-   // The value of the input
+   /** @type number The value that this input should modify. */
    export let value = void 0;
 
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   // Updates the document data when the input changes
    /**
-    *
+    * Update the document data when the input changes.
     */
    async function updateDocument() {
       if ($document?.isOwner) {

@@ -3,7 +3,7 @@
    import {slide} from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import SpellSheetCustomAspectSettings
       from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';

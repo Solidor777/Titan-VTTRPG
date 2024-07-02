@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import SpellSheetStandardAspectSettings
       from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte';
 

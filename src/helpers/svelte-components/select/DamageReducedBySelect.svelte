@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -8,10 +8,10 @@
    /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type boolean Whether Resistance Check as an option */
+   /** @type boolean Whether to allow Resistance Check as an option */
    export let allowResistanceCheck = void 0;
 
-   /** @type boolean Whether Opposed Check as an option */
+   /** @type boolean Whether to allow Opposed Check as an option */
    export let allowOpposedCheck = void 0;
 
    /** @type SelectOption[] Options for the Select. */

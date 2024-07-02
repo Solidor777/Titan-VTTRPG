@@ -2,7 +2,7 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type boolean Whether this input is disabled. */
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type string The Tooltip to display for this element, if any. */

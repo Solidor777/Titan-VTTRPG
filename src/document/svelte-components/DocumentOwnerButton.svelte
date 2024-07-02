@@ -2,7 +2,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {getContext} from 'svelte';
 
-   /** @type boolean Whether this button is disabled. */
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type string The Tooltip to display for this element, if any. */

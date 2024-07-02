@@ -1,7 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
-   import {ATTACK_TRAITS} from '~/document/types/item/types/weapon/AttackTraits.js';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -13,15 +12,30 @@
    export let disabled = false;
 
    /** @type SelectOption[] Options for the Select. */
-   const options = [];
-   for (const trait of ATTACK_TRAITS) {
-      options.push({
-         value: trait.name,
-         label: localize(trait.name),
-      });
-   }
+   const options = [
+      {
+         label: localize('awareness'),
+         value: 'awareness',
+      },
+      {
+         label: localize('defense'),
+         value: 'defense',
+      },
+      {
+         label: localize('melee'),
+         value: 'melee',
+      },
+      {
+         label: localize('accuracy'),
+         value: 'accuracy',
+      },
+      {
+         label: localize('initiative'),
+         value: 'initiative',
+      },
+   ];
 
-   // Add none option if appropriate.
+   // Add None option if appropriate.
    if (allowNone) {
       options.push({
          label: localize('none'),

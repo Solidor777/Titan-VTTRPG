@@ -1,5 +1,5 @@
 <script>
-   import IntegerSelect from '~/helpers/svelte-components/input/select/NumberSelect.svelte';
+   import IntegerSelect from '~/helpers/svelte-components/select/NumberSelect.svelte';
 
    /** @type number The value that this input should modify. */
    export let value = void 0;

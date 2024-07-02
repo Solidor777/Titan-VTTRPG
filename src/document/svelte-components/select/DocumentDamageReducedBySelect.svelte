@@ -1,23 +1,24 @@
 <script>
    import {getContext} from 'svelte';
-   import DamageReducedBySelect from '~/helpers/svelte-components/input/select/DamageReducedBySelect.svelte';
+   import DamageReducedBySelect from '~/helpers/svelte-components/select/DamageReducedBySelect.svelte';
 
-   // Value
+   /** @type string The value that this input should modify. */
    export let value = void 0;
+
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
-   // Whether to allow a resistance check option
+   /** @type boolean Whether to allow Resistance Check as an option */
    export let allowResistanceCheck = true;
 
-   // Whether to allow an opposed check option
+   /** @type boolean Whether to allow Opposed Check as an option */
    export let allowOpposedCheck = true;
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   // Updates the document data when the input changes
    /**
-    *
+    * Update the document data when the input changes.
     */
    async function updateDocument() {
       if ($document?.isOwner) {

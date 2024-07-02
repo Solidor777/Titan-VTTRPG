@@ -5,7 +5,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
-   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    // Item to edit
    export let item = void 0;

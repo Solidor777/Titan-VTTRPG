@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;

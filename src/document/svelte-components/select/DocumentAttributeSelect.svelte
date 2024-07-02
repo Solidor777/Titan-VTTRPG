@@ -1,21 +1,21 @@
 <script>
-   import AttributeSelect from '~/helpers/svelte-components/input/select/AttributeSelect.svelte';
+   import AttributeSelect from '~/helpers/svelte-components/select/AttributeSelect.svelte';
    import {getContext} from 'svelte';
 
-   // The value of the input
+   /** @type string The value that this input should modify. */
    export let value;
 
-   // Whether to allow none
+   /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
 
+   /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   // Updates the document data when the input changes
    /**
-    *
+    * Update the document data when the input changes.
     */
    async function updateDocument() {
       if ($document?.isOwner) {

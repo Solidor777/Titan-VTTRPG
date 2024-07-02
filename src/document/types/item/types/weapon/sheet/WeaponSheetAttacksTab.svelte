@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
-   import TopFilter from '~/helpers/svelte-components/TopFilter.svelte';
+   import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import WeaponSheetAttackSettings from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackSettings.svelte';
    import {CREATE_ICON} from '~/system/Icons.js';
 
