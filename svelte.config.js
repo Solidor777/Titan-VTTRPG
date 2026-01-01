@@ -1,10 +1,11 @@
-import preprocess from 'svelte-preprocess';
 import autoprefixer from 'autoprefixer';
+import {sveltePreprocess} from 'svelte-preprocess';
 
 const config = {
-   preprocess: preprocess({
+   preprocess: sveltePreprocess({
       scss: {
-         prependData: '@import "src//Styles/Mixins.scss";'
+         api: 'modern',
+         prependData: '@use "src/Styles/Root.scss" as *;'
       },
       postcss: {
          plugins: [autoprefixer()]

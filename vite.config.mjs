@@ -1,6 +1,6 @@
 import {svelte} from '@sveltejs/vite-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
-import preprocess from 'svelte-preprocess';
+import {sveltePreprocess} from 'svelte-preprocess';
 import {postcssConfig, terserConfig} from '@typhonjs-fvtt/runtime/rollup';
 import path from 'path';
 import {fileURLToPath} from 'url';
@@ -103,9 +103,10 @@ export default () => {
       },
       plugins: [
          svelte({
-            preprocess: preprocess({
+            preprocess: sveltePreprocess({
                scss: {
-                  prependData: '@import "src//Styles/Mixins.scss";'
+                  api: 'modern',
+                  prependData: '@use "src/Styles/Root.scss" as *;'
                },
                postcss: {
                   plugins: [autoprefixer()]
