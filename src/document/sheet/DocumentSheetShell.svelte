@@ -1,7 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import {ApplicationShell} from '@typhonjs-fvtt/runtime/svelte/component/core';
+   import {ApplicationShell} from '@typhonjs-fvtt/runtime/svelte/component/application';
    import {setContext} from 'svelte';
 
    /** @type object The root element of the application. */

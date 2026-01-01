@@ -1,6 +1,6 @@
 <script>
    import {getContext} from 'svelte';
-   import {TJSProseMirror} from '@typhonjs-fvtt/svelte-standard/component';
+   import {TJSProseMirror} from '@typhonjs-fvtt/standard/component/fvtt/editor';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
