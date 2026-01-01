@@ -64,10 +64,16 @@
       checkParameters = $document.system.getAttributeCheckParameters(
          $document.system.initializeAttributeCheckOptions({skill: key}));
 
-      // Update total training tooltipAction
+      // Update total training tooltip
       totalTrainingTooltip = getTotalValueTooltip(
          $document.system.skill[key].training,
          checkParameters.trainingMod
+      );
+
+      // Update total expertise tooltipAction
+      totalExpertiseTooltip = getTotalValueTooltip(
+         $document.system.skill[key].expertise,
+         checkParameters.expertiseMod
       );
    }
 </script>
@@ -80,7 +86,7 @@
 
    <div class="columns">
       <!--Default Attribute-->
-      <div class="column">
+      <div class="column" use:tooltipAction={localize('defaultAttribute.desc')}>
          <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute}/>
       </div>
 
@@ -91,7 +97,7 @@
          <div class="row">
 
             <!--Label-->
-            <div class="label" use:tooltipAction="{localize('training.desc')}">
+            <div class="label" use:tooltipAction={localize('training.desc')}>
 
                <!--Icon-->
                <i class="{EXPERTISE_ICON}"/>

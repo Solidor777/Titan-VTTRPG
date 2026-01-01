@@ -24,15 +24,17 @@
    <div class="stats">
 
       <!--Base Value-->
-      <div class="base-value">
-         {$document.system.resistance[resistance].baseValue}
+      <div class="number">
+         <div class='label'>
+            {$document.system.resistance[resistance].baseValue}
+         </div>
       </div>
 
       <!--Plus Sign-->
       <div class="sign">+</div>
 
       <!--Static Mod-->
-      <div class="input">
+      <div class="number">
          <DocumentIntegerInput
             bind:value={$document.system.resistance[resistance].mod.static}
          />
@@ -42,7 +44,7 @@
       <div class="sign">=</div>
 
       <!--Total Value-->
-      <div class="value">
+      <div class="number">
          <ModifiableStatValueLabel
             abilityMod={$document.system.resistance[resistance].mod.ability}
             baseTooltip={localize(`${resistance}.baseValue`)}
@@ -78,14 +80,6 @@
             margin-left: var(--titan-padding-standard);
          }
 
-         .input {
-            @include flex-row;
-            @include flex-group-center;
-
-            height: 100%;
-            width: 28px;
-         }
-
          .sign {
             @include flex-row;
             @include flex-group-center;
@@ -93,12 +87,19 @@
             height: 100%;
          }
 
-         .value {
+         .number {
             @include flex-row;
             @include flex-group-center;
 
             height: 100%;
-            min-width: 28px;
+            width: 28px;
+         }
+
+         .label {
+            @include label;
+
+            --titan-label-height: var(--titan-input-height);
+            --titan-label-padding: var(--titan-input-padding);
          }
       }
    }
