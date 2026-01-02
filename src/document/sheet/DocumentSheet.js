@@ -1,7 +1,6 @@
 import {SvelteApplication} from '@typhonjs-fvtt/runtime/svelte/application';
 import {TJSDocument} from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import {writable} from 'svelte/store';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import {SETTINGS_ICON} from '~/system/Icons.js';
@@ -10,7 +9,7 @@ import isDarkModeSheetsEnabled from "~/helpers/Settings/DarkModeSheets.js";
 
 /**
  * A replacement Document Sheet to that supports svelte svelte-components.
- * @param {Document} document - The document this sheet is for.
+ * @param {Document} sheetDocument - The document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanDocumentSheet extends SvelteApplication {
@@ -46,7 +45,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
       // Initialize the reactive  document
       this.document = sheetDocument;
-      this.options.svelte.props.document = this._createReactiveDocument(this.document, {delete: this.close.bind(this)});
+      this.options.svelte.props.document = this._createReactiveDocument(
+         this.document,
+         {delete: this.close.bind(this)}
+      );
 
       // Initialize the reactive state
       this.applicationState = this._createReactiveState();
@@ -75,7 +77,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Getter function for the document this sheet is for.
+    * Gets the document this sheet is for.
     * @returns {Document} The document this sheet is for.
     */
    get object() {
@@ -101,32 +103,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
          return true;
       }
       return false;
-   }
-
-   /**
-    * Overridable function for getting the sheet application ID.
-    * @param {Document} document - The document this sheet is fore.
-    * @returns {string} The application ID to use for this sheet.
-    * @protected
-    */
-   _getSheetID(document) {
-      return `titan-document-sheet-${document.id}`;
-   }
-
-   /**
-    * Overridable function for getting the sheet classes.
-    * @returns {string[]} Array of classes to add to the sheet.
-    * @protected
-    */
-   _getSheetClasses() {
-      const retVal = ['titan', 'titan-document-sheet'];
-
-      // Add dark mode class if dark mode enabled
-      if (getSetting('darkModeSheets')) {
-         retVal.push('titan-dark-mode');
-      }
-
-      return retVal;
    }
 
    /**
@@ -237,7 +213,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @returns {TitanDocumentSheet} This sheet after rendering.
     */
    render(force = false, options = {}) {
-
       // Subscribe to the document if not already subscribed
       if (!this.documentUnsubscribe) {
          this.documentUnsubscribe = this.options.svelte.props.document.subscribe(this._onDocumentUpdated.bind(this));

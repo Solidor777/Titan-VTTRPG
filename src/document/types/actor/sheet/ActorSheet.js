@@ -1,18 +1,35 @@
 import TitanDocumentSheet from '~/document/sheet/DocumentSheet';
 import localize from '~/helpers/utility-functions/Localize.js';
 import {IMPORT_ICON, LINKED_ICON, UNLINKED_ICON, USER_ICON} from '~/system/Icons.js';
+import mergeArrays from "~/helpers/utility-functions/MergeArrays.js";
 
+/**
+ * An Actor Sheet class with functionality shared by all Actors.
+ * @param {Document} sheetDocument - The document this sheet is for.
+ * @param {object} options - Options object.
+ */
 export default class TitanActorSheet extends TitanDocumentSheet {
-   constructor(document, options = {}) {
-      const actor = document.isToken ? document.parent.actor : document;
+   /**
+    * An Actor Sheet class with functionality shared by all Actors.
+    * @param {Document} sheetDocument - The document this sheet is for.
+    * @param {object} options - Options object.
+    */
+   constructor(sheetDocument, options = {}) {
+      // Calculate whether this actor is a token or a proxy
+      const actor = sheetDocument.isToken ? sheetDocument.parent.actor : sheetDocument;
+
+      // Add actor class
       options.token ??= null;
+      options.classes ??= [];
+      options.classes = mergeArrays(['titan-actor-sheet'], options.classes);
+
+      // Initialize object
       super(
          actor,
          foundry.utils.mergeObject(
             options,
             {
                token: null,
-               classes: ['titan-actor-sheet']
             }
          )
       );
@@ -38,17 +55,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     */
    get token() {
       return this.options?.token || this.actor.token || null;
-   }
-
-   _getSheetID(document) {
-      return `titan-actor-sheet-${document.isToken ? document.parent?.id : document.id}`;
-   }
-
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-actor-sheet');
-
-      return retVal;
    }
 
    _getHeaderButtons() {
