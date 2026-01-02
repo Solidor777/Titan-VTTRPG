@@ -5,14 +5,29 @@ import {IMPORT_ICON, LINKED_ICON, UNLINKED_ICON, USER_ICON} from '~/system/Icons
 export default class TitanActorSheet extends TitanDocumentSheet {
    constructor(document, options = {}) {
       const actor = document.isToken ? document.parent.actor : document;
-      super(actor, options);
+      options.token ??= null;
+      super(
+         actor,
+         foundry.utils.mergeObject(
+            options,
+            {
+               token: null,
+               classes: ['titan-actor-sheet']
+            }
+         )
+      );
       this.actor = actor;
    }
 
+   /**
+    * Default Application options.
+    * @returns {object} Options - Application options.
+    * @see https://foundryvtt.com/api/Application.html#options
+    */
    static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
+      let parentOptions = super.defaultOptions;
+      return foundry.utils.mergeObject(parentOptions, {
          baseApplication: 'ActorSheet',
-         token: null,
          width: 750,
       });
    }

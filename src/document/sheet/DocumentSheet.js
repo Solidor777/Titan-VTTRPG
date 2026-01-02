@@ -5,6 +5,8 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import {SETTINGS_ICON} from '~/system/Icons.js';
+import mergeArrays from "~/helpers/utility-functions/MergeArrays.js";
+import isDarkModeSheetsEnabled from "~/helpers/Settings/DarkModeSheets.js";
 
 /**
  * A replacement Document Sheet to that supports svelte svelte-components.
@@ -14,36 +16,36 @@ import {SETTINGS_ICON} from '~/system/Icons.js';
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
     * A replacement Document Sheet to that supports svelte svelte-components.
-    * @param {Document} document - The document this sheet is for.
+    * @param {Document} sheetDocument - The document this sheet is for.
     * @param {object} options - Options object.
     */
-   constructor(document, options = {}) {
-      // Initialize options objects
-      options.svelte ??= {};
+   constructor(sheetDocument, options = {}) {
+      // Calculate sheet classes
+      const classes = ['titan-document-sheet'];
+      if (isDarkModeSheetsEnabled()) {
+         classes.push('titan-dark-mode');
+      }
+      options.classes = mergeArrays(classes, options.classes)
 
-      // Set base properties for the sheet
+      // Initialize the object with pre-requisite base properties
       super(foundry.utils.mergeObject(
          options,
          {
-            title: document.name,
-            token: null,
+            id: `titan-document-sheet-${sheetDocument.id}`,
+            title: sheetDocument.name,
             svelte: {
+               class: DocumentSheetShell,
+               target: document.body,
                props: {
                   document: null,
+                  applicationState: null,
                },
-               class: DocumentSheetShell,
             },
          },
       ));
 
-      // Get sheet id
-      this.options.id = this._getSheetID(document);
-
-      // Add the sheet classes
-      this.options.classes.push(...this._getSheetClasses());
-
       // Initialize the reactive  document
-      this.document = document;
+      this.document = sheetDocument;
       this.options.svelte.props.document = this._createReactiveDocument(this.document, {delete: this.close.bind(this)});
 
       // Initialize the reactive state
@@ -60,16 +62,15 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
+      let parentOptions = super.defaultOptions;
+      return foundry.utils.mergeObject(parentOptions, {
          width: 700,
          height: 'auto',
          baseApplication: 'DocumentSheet',
          resizable: false,
          minimizable: true,
          dragDrop: [{dragSelector: '.directory-list .item', dropSelector: null}],
-         svelte: {
-            target: document.body,
-         },
+         classes: ['titan-document-sheet'],
       });
    }
 
