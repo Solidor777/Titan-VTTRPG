@@ -19,12 +19,14 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @param {object} options - Options object.
     */
    constructor(sheetDocument, options = {}) {
-      // Calculate sheet classes
+      // Add sheet classes
       const classes = ['titan-document-sheet'];
       if (isDarkModeSheetsEnabled()) {
          classes.push('titan-dark-mode');
       }
-      options.classes = mergeArrays(classes, options.classes)
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes;
 
       // Initialize the object with pre-requisite base properties
       super(foundry.utils.mergeObject(

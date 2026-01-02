@@ -4,35 +4,29 @@ import {IMPORT_ICON, LINKED_ICON, UNLINKED_ICON, USER_ICON} from '~/system/Icons
 import mergeArrays from "~/helpers/utility-functions/MergeArrays.js";
 
 /**
- * An Actor Sheet class with functionality shared by all Actors.
+ * A Document Sheet class with functionality shared by all Actors.
  * @param {Document} sheetDocument - The document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanActorSheet extends TitanDocumentSheet {
    /**
-    * An Actor Sheet class with functionality shared by all Actors.
+    * A Document Sheet class with functionality shared by all Actors.
     * @param {Document} sheetDocument - The document this sheet is for.
     * @param {object} options - Options object.
     */
    constructor(sheetDocument, options = {}) {
       // Calculate whether this actor is a token or a proxy
       const actor = sheetDocument.isToken ? sheetDocument.parent.actor : sheetDocument;
-
-      // Add actor class
       options.token ??= null;
-      options.classes ??= [];
-      options.classes = mergeArrays(['titan-actor-sheet'], options.classes);
+
+      // Add sheet classes
+      const classes = ['titan-actor-sheet'];
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes;
 
       // Initialize object
-      super(
-         actor,
-         foundry.utils.mergeObject(
-            options,
-            {
-               token: null,
-            }
-         )
-      );
+      super(actor, options);
       this.actor = actor;
    }
 
