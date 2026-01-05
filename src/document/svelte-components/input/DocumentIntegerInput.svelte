@@ -1,6 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
@@ -20,13 +21,8 @@
    /**
     * Update the document data when the input changes.
     */
-   function updateDocument() {
-      if ($document?.isOwner && !disabled) {
-         $document.update({
-            system: $document.system,
-            flags: $document.flags,
-         });
-      }
+   function updateDocument () {
+      refreshSystemDocument($document, disabled);
    }
 </script>
 
@@ -35,7 +31,6 @@
    disabled={disabled || !$document?.isOwner}
    {max}
    {min}
-   on:change
    on:change={updateDocument}
-   on:keyup
+   on:keyup={updateDocument}
 />

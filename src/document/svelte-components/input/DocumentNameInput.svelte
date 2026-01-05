@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
+   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -10,11 +11,7 @@
 
    /** Update the name when the input changes. */
    function updateDocument () {
-      if (!disabled && $document?.isOwner) {
-         $document.update({
-            name: $document.name,
-         });
-      }
+      refreshSystemDocument($document, disabled);
    }
 </script>
 
