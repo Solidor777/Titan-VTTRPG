@@ -2,7 +2,7 @@ import getPlayerOwners from '~/helpers/utility-functions/GetPlayerOwners.js';
 
 /**
  * Gets the best Player user who owns of the document, prioritizing active players.
- * @param {Document} document - The document to find the owner for.
+ * @param {Document} document - The Document this sheet is for.ocument to find the owner for.
  * @returns {User|boolean} The user first, best, non-gm user who owns the document,
  * or false if there are none.
  */

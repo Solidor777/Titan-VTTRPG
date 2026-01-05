@@ -19,8 +19,8 @@ export default class TitanDialog extends TJSDialog {
 
       // Set base properties for the dialog
       options.id = options.id ?
-                   `${options.id}-${generateUUID()}` :
-                   `titan-dialog-${generateUUID()}`;
+         `${options.id}-${generateUUID()}` :
+         `titan-dialog-${generateUUID()}`;
       super(options);
 
       // Add the sheet classes

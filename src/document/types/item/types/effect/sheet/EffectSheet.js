@@ -1,31 +1,37 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
-import EffectSheetShell from '~/document/types/item/types/effect/sheet/EffectSheetShell.svelte';
+import TitanItemSheet from '~/document/types/item/sheet/ItemSheet'
+import EffectSheetShell from '~/document/types/item/types/effect/sheet/EffectSheetShell.svelte'
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
 
 /**
- * Sheet for a Titan Effect item.
- * @param {Document} document - The document this sheet is for.
+ * An Item Sheet class with functionality shared by all Effect Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Commodity Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         svelte: {
-            props: {
-               shell: EffectSheetShell
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-effect-sheet']
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes
+
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: EffectSheetShell,
+               },
             },
          }
-      });
-   }
+      )
 
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-effect-sheet');
-
-      return retVal;
-   }
+      // Initialize object
+      super(sheetDocument, options)
+   };
 }

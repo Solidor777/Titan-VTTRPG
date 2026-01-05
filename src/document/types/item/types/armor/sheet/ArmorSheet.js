@@ -1,31 +1,37 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
-import ArmorSheetShell from '~/document/types/item/types/armor/sheet/ArmorSheetShell.svelte';
+import TitanItemSheet from '~/document/types/item/sheet/ItemSheet'
+import ArmorSheetShell from '~/document/types/item/types/armor/sheet/ArmorSheetShell.svelte'
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
 
 /**
- * Sheet for a Titan Armor item.
- * @param {Document} document - The document this sheet is for.
+ * An Item Sheet class with functionality shared by all Armor Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanArmorSheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Armor Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         svelte: {
-            props: {
-               shell: ArmorSheetShell
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-armor-sheet']
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes
+
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: ArmorSheetShell,
+               },
             },
          }
-      });
-   }
+      )
 
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-armor-sheet');
-
-      return retVal;
-   }
+      // Initialize object
+      super(sheetDocument, options)
+   };
 }

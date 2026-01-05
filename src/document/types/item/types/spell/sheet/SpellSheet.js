@@ -1,49 +1,63 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
-import SpellSheetShell from '~/document/types/item/types/spell/sheet/SpellSheetShell.svelte';
-import createSpellSheetState from '~/document/types/item/types/spell/sheet/SpellSheetState';
+import TitanItemSheet from '~/document/types/item/sheet/ItemSheet'
+import SpellSheetShell from '~/document/types/item/types/spell/sheet/SpellSheetShell.svelte'
+import createSpellSheetState from '~/document/types/item/types/spell/sheet/SpellSheetState'
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
 
+/**
+ * An Item Sheet class with functionality shared by all Spell Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
+ * @param {object} options - Options object.
+ * @property {SpellSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.
+ */
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Spell Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         width: 700,
-         height: 650,
-         svelte: {
-            props: {
-               shell: SpellSheetShell
-            }
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-spell-sheet']
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes
+
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: SpellSheetShell,
+               },
+            },
          }
-      });
-   }
+      )
 
-   _createReactiveState() {
-      return createSpellSheetState();
-   }
-
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-spell-sheet');
-
-      return retVal;
-   }
+      // Initialize object
+      super(sheetDocument, options)
+   };
 
    /**
     * Adds a Custom Aspect to this sheet's application state.
     */
-   addCustomAspect() {
-      this.applicationState.addCustomAspect();
+   addCustomAspect () {
+      this.applicationState.addCustomAspect()
    }
-
 
    /**
     * Removes the Custom Aspect at the provided idx from this sheet's application state.
     * @param {number} idx - The idx of the aspect to remove.
     */
-   async removeCustomAspect(idx) {
-      this.applicationState.removeCustomAspect(idx);
+   removeCustomAspect (idx) {
+      this.applicationState.removeCustomAspect(idx)
+   }
+
+   /**
+    * Overridable function for creating the reactive state store for this sheet.
+    * @returns {SpellSheetState} The newly created state store.
+    * @protected
+    */
+   _createReactiveState () {
+      return createSpellSheetState()
    }
 }

@@ -1,31 +1,37 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
-import CommoditySheetShell from '~/document/types/item/types/commodity/sheet/CommoditySheetShell.svelte';
+import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js'
+import CommoditySheetShell from '~/document/types/item/types/commodity/sheet/CommoditySheetShell.svelte'
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
 
 /**
- * Sheet for a Titan Commodity item.
- * @param {Document} document - The document this sheet is for.
+ * An Item Sheet class with functionality shared by all Commodity Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanCommoditySheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Commodity Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         svelte: {
-            props: {
-               shell: CommoditySheetShell
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-commodity-sheet']
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes
+
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: CommoditySheetShell,
+               },
             },
          }
-      });
-   }
+      )
 
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-commodity-sheet');
-
-      return retVal;
-   }
+      // Initialize object
+      super(sheetDocument, options)
+   };
 }

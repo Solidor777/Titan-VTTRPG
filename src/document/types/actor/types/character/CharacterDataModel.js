@@ -120,7 +120,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
       /**
        * Creates a schema field formatted as a Character Akill (Athletics, Perception, etc.).
-       * @param {string} defaultAttribute - The default Attribute to be used when rolling the Skill.
+       * @param {string} defaultAttribute - The Document this sheet is for.efault Attribute to be used when rolling the Skill.
        * @returns {SchemaField} A schema field formatted as a Character Skill.
        */
       function createSkillSchema(defaultAttribute) {

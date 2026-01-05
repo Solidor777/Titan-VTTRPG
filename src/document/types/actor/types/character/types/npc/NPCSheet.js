@@ -4,13 +4,13 @@ import mergeArrays from "~/helpers/utility-functions/MergeArrays.js";
 
 /**
  * A Character Sheet class with functionality shared by all NPCs.
- * @param {Document} sheetDocument - The document this sheet is for.
+ * @param {Document} sheetDocument - The Document this sheet is for..
  * @param {object} options - Options object.
  */
 export default class TitanNPCSheet extends TitanCharacterSheet {
    /**
     * A Character Sheet class with functionality shared by all NPCs.
-    * @param {Document} sheetDocument - The document this sheet is for.
+    * @param {Document} sheetDocument - The Document this sheet is for..
     * @param {object} options - Options object.
     */
    constructor(sheetDocument, options = {}) {
@@ -33,12 +33,5 @@ export default class TitanNPCSheet extends TitanCharacterSheet {
 
       // Initialize object
       super(sheetDocument, options);
-   }
-
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-npc-sheet');
-
-      return retVal;
    }
 }

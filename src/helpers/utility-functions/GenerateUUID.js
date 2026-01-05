@@ -6,5 +6,5 @@ import ShortUniqueId from 'short-unique-id';
  * @returns {string} The generated UUID.
  */
 export default function generateUUID(idLength = 16) {
-   return new ShortUniqueId({ length: idLength }).rnd();
+   return new ShortUniqueId({length: idLength}).rnd();
 }

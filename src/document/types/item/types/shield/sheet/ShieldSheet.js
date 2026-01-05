@@ -1,26 +1,36 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
-import ShieldSheetShell from '~/document/types/item/types/shield/sheet/ShieldSheetShell.svelte';
+import TitanItemSheet from '~/document/types/item/sheet/ItemSheet'
+import ShieldSheetShell from '~/document/types/item/types/shield/sheet/ShieldSheetShell.svelte'
 
+/**
+ * An Item Sheet class with functionality shared by all Shield Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
+ * @param {object} options - Options object.
+ */
 export default class TitanShieldSheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Shield Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         svelte: {
-            props: {
-               shell: ShieldSheetShell
-            }
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-shield-sheet']
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes
+
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: ShieldSheetShell,
+               },
+            },
          }
-      });
-   }
+      )
 
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-shield-sheet');
-
-      return retVal;
-   }
+      // Initialize object
+      super(sheetDocument, options)
+   };
 }

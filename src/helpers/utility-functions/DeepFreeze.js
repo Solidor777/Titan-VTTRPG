@@ -19,6 +19,6 @@ export default function deepFreeze(data) {
          }
       }
    }
-   
+
    return Object.freeze(data);
 }

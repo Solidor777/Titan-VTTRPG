@@ -4,14 +4,14 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
 
 /**
  * A dialog for regenerating the UUID used by Titan Macros for identifying a Document.
- * @param {TitanItem|TitanActor} document - The document to regenerate the UUID for.
+ * @param {TitanItem|TitanActor} document - The Document this sheet is for.ocument to regenerate the UUID for.
  * @augments ConfirmationDialog
  */
 export default class ConfirmRegenerateUUIDDialog extends ConfirmationDialog {
 
    /**
     * A dialog for regenerating the UUID used by Titan Macros for identifying a Document.
-    * @param {TitanItem|TitanActor} document - The document to regenerate the UUID for.
+    * @param {TitanItem|TitanActor} document - The Document this sheet is for.ocument to regenerate the UUID for.
     * @augments ConfirmationDialog
     */
    constructor(document) {

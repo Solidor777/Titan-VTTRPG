@@ -1,29 +1,29 @@
-import {svelte} from '@sveltejs/vite-plugin-svelte';
-import resolve from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
-import {sveltePreprocess} from 'svelte-preprocess';
-import {postcssConfig, terserConfig} from '@typhonjs-fvtt/runtime/rollup';
-import path from 'path';
-import {fileURLToPath} from 'url';
-import autoprefixer from 'autoprefixer';
+import { svelte } from '@sveltejs/vite-plugin-svelte'
+import resolve from '@rollup/plugin-node-resolve' // This resolves NPM modules from node_modules.
+import { sveltePreprocess } from 'svelte-preprocess'
+import { postcssConfig, terserConfig } from '@typhonjs-fvtt/runtime/rollup'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import autoprefixer from 'autoprefixer'
 
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const __dirname = path.dirname(__filename); // get the name of the directory
+const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
+const __dirname = path.dirname(__filename) // get the name of the directory
 
 // ATTENTION!
 // Please modify the below variables: s_PACKAGE_ID and s_SVELTE_HASH_ID appropriately.
 
 // For convenience, you just need to modify the package ID below as it is used to fill in default proxy settings for
 // the dev server.
-const s_PACKAGE_ID = 'systems/titan';
+const s_PACKAGE_ID = 'systems/titan'
 
-const s_COMPRESS = false;  // Set to true to compress the module bundle.
-const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).
+const s_COMPRESS = false  // Set to true to compress the module bundle.
+const s_SOURCEMAPS = true // Generate sourcemaps for the bundle (recommended).
 
 // Used in bundling particularly during development. If you npm-link packages to your project add them here.
 const s_RESOLVE_CONFIG = {
    browser: true,
    dedupe: ['svelte'],
-};
+}
 
 export default () => {
    /** @type {import('vite').UserConfig} */
@@ -47,7 +47,14 @@ export default () => {
 
       css: {
          // Creates a standard configuration for PostCSS with autoprefixer & postcss-preset-env.
-         postcss: postcssConfig({compress: s_COMPRESS, sourceMap: s_SOURCEMAPS}),
+         postcss: postcssConfig({ compress: s_COMPRESS, sourceMap: s_SOURCEMAPS }),
+
+         // Use the modern compiler
+         preprocessorOptions: {
+            scss: {
+               api: 'modern-compiler' // or "modern"
+            }
+         }
       },
 
       define: {
@@ -78,7 +85,7 @@ export default () => {
             [`^(?!/${s_PACKAGE_ID}/)`]: 'http://localhost:30000',
 
             // Enable socket.io from main Foundry server.
-            '/socket.io': {target: 'ws://localhost:30000', ws: true},
+            '/socket.io': { target: 'ws://localhost:30000', ws: true },
          },
       },
       build: {
@@ -88,7 +95,7 @@ export default () => {
          brotliSize: true,
          minify: s_COMPRESS ? 'terser' : false,
          target: ['es2022'],
-         terserOptions: s_COMPRESS ? {...terserConfig(), ecma: 2022} : void 0,
+         terserOptions: s_COMPRESS ? { ...terserConfig(), ecma: 2022 } : void 0,
          lib: {
             entry: './index.js',
             formats: ['es'],
@@ -116,5 +123,5 @@ export default () => {
 
          resolve(s_RESOLVE_CONFIG),    // Necessary when bundling npm-linked packages.
       ],
-   };
+   }
 };

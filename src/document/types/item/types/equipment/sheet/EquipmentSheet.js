@@ -1,31 +1,37 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
-import EquipmentSheetShell from '~/document/types/item/types/equipment/sheet/EquipmentSheetShell.svelte';
+import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js'
+import EquipmentSheetShell from '~/document/types/item/types/equipment/sheet/EquipmentSheetShell.svelte'
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
 
 /**
- * Sheet for a Titan Equipment item.
- * @param {Document} document - The document this sheet is for.
+ * An Item Sheet class with functionality shared by all Equipment Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanEquipmentSheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Equipment Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         svelte: {
-            props: {
-               shell: EquipmentSheetShell
-            }
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-equipment-sheet']
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes
+
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: EquipmentSheetShell,
+               },
+            },
          }
-      });
-   }
+      )
 
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-equipment-sheet');
-
-      return retVal;
-   }
+      // Initialize object
+      super(sheetDocument, options)
+   };
 }

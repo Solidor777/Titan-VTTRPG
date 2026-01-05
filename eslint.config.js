@@ -1,5 +1,5 @@
-import eslintPluginSvelte from 'eslint-plugin-svelte';
-import jsdoc from 'eslint-plugin-jsdoc';
+import eslintPluginSvelte from 'eslint-plugin-svelte'
+import jsdoc from 'eslint-plugin-jsdoc'
 
 export default [
    // add more generic rule sets here, such as:
@@ -61,6 +61,7 @@ export default [
          'jsdoc/sort-tags': 1,
          'jsdoc/tag-lines': 1, // Recommended
          // 'jsdoc/valid-types': 1 // Recommended
+         'capitalized-comments': 'ignorePattern'
       },
    },
    {
@@ -78,4 +79,4 @@ export default [
          'node_modules/',
       ],
    },
-];
+]

@@ -30,7 +30,7 @@ export default class ActionQueue {
     * @param {Function} action.callback - The function to be performed by the action.
     * @param {object} action.thisArg - The 'this' context to use for the action. May be null.
     * @param {*[]?} action.args - Optional arguments for the function being performed, in order.
-    * @param {number?} action.delay - The delay to wait before attempting this action. If not specified,
+    * @param {number?} action.delay - The Document this sheet is for.elay to wait before attempting this action. If not specified,
     * the default delay will be used.
     * @param {string} action.key - An identifier that may be used to enqueue the action.
     * If the action is enqueued while an action with the same key is already

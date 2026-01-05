@@ -5,7 +5,7 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
 import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 import localize from '~/helpers/utility-functions/Localize.js';
-import { ITEM_IMAGE } from '~/system/DefaultImages.js';
+import {ITEM_IMAGE} from '~/system/DefaultImages.js';
 
 /**
  * Data model with extra functionality for Items.
