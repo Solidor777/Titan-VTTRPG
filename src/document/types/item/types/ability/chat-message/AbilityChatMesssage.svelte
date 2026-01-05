@@ -1,16 +1,16 @@
 <script>
-   import {getContext} from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import ItemChatMessageItemChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import { getContext } from 'svelte'
+   import localize from '~/helpers/utility-functions/Localize.js'
+   import RichText from '~/helpers/svelte-components/RichText.svelte'
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte'
+   import ItemChatMessageItemChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte'
+   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte'
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte'
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte'
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document');
-   const item = $document.flags.titan;
+   const document = getContext('document')
+   const item = $document.flags.titan
 </script>
 
 <div class="item-chat-message">
@@ -28,7 +28,7 @@
       {/if}
 
       <!--Description-->
-      {#if item.description !== '' && item.description !== '<p></p>'}
+      {#if item.description && item.description !== '' && item.description !== '<p></p>'}
          <div class="section rich-text">
             <RichText value={item.description}/>
          </div>

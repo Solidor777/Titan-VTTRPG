@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
@@ -13,7 +13,7 @@
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
-   import {DELETE_ICON} from '~/system/Icons.js';
+   import { DELETE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -170,7 +170,7 @@
    /**
     *
     */
-   function onCheckTypeChange() {
+   function onCheckTypeChange () {
       element.selector = 'any';
 
       onSelectorChange();
@@ -180,7 +180,7 @@
    /**
     *
     */
-   function onSelectorChange() {
+   function onSelectorChange () {
       if ($document?.isOwner) {
          switch (element.selector) {
             case 'any':
@@ -227,7 +227,7 @@
    /**
     *
     */
-   function getSelector() {
+   function getSelector () {
       switch (element.selector) {
          case 'attackTrait': {
             return DocumentAttackTraitSelect;
@@ -266,7 +266,7 @@
             <div class="field select">
                <DocumentSelect
                   options={operationOptions}
-                  bind:value={element.operation}
+                  bind:value={$document.system.rulesElement[idx].operation}
                   on:change={() => {
                      onRulesElementOperationChanged($document, idx);
                   }}
@@ -277,7 +277,7 @@
             <div class="field select">
                <DocumentSelect
                   options={checkTypeOptions}
-                  bind:value={element.checkType}
+                  bind:value={$document.system.rulesElement[idx].checkType}
                   on:change={onCheckTypeChange}
                />
             </div>
@@ -286,7 +286,7 @@
             <div class="field select">
                <DocumentSelect
                   options={selectorOptions[element.checkType]}
-                  bind:value={element.selector}
+                  bind:value={$document.system.rulesElement[idx].selector}
                   on:change={onSelectorChange}
                />
             </div>
@@ -296,7 +296,7 @@
                <div class="field select">
                   <svelte:component
                      this={getSelector()}
-                     bind:value={element.key}
+                     bind:value={$document.system.rulesElement[idx].key}
                   />
                </div>
             {/if}
@@ -314,7 +314,7 @@
       </div>
       <!--Message text-->
       <div class="section" transition:slide|local>
-         <DocumentBoundEditorInput bind:value={element.message}/>
+         <DocumentBoundEditorInput bind:value={$document.system.rulesElement[idx].message}/>
       </div>
    </div>
 {/if}

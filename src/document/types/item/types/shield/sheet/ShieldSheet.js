@@ -1,5 +1,6 @@
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet'
 import ShieldSheetShell from '~/document/types/item/types/shield/sheet/ShieldSheetShell.svelte'
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
 
 /**
  * An Item Sheet class with functionality shared by all Shield Items.

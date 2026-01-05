@@ -16,8 +16,53 @@ export default class TitanItem extends Item {
     * Returns whether the item is marked for deletion.
     * @returns {boolean} Whether the item is marked for deletion.
     */
-   get isMarkedForDeletion() {
+   get isMarkedForDeletion () {
       return (this.flags?.titan?.isMarkedForDeletion === true);
+   }
+
+   /**
+    * Apply transformations of derivations to the values of the source data object.
+    * Compute data fields whose values are not stored to the database.
+    */
+   prepareDerivedData () {
+      // Prepare type specific data
+      if (this.system) {
+         this.system.prepareDerivedData();
+      }
+   }
+
+   /**
+    * Creates a Chat Message containing this item's data and sends it to chat.
+    * @returns {Promise<ChatMessage>} The newly created Chat Message.
+    */
+   async sendToChat () {
+      // Create the context object
+      const messageData = this.getRollData();
+
+      // Create and post the message
+      return ChatMessage.create(
+         ChatMessage.applyRollMode(
+            {
+               user: game.user.id,
+               speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
+               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+               sound: CONFIG.sounds.notification,
+               flags: {
+                  titan: messageData,
+               },
+               classes: ['titan'],
+            },
+            game.settings.get('core', 'rollMode'),
+         ),
+      );
+   }
+
+   /**
+    * Prepares an object containing the data relevant to performing checks.
+    * @returns {object} Object containing the relevant data.
+    */
+   getRollData () {
+      return this.system.getRollData();
    }
 
    /**
@@ -28,7 +73,7 @@ export default class TitanItem extends Item {
     * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
     * @private
     */
-   async _preCreate(data, options, user) {
+   async _preCreate (data, options, user) {
       const retVal = await super._preCreate(data, options, user);
       if (retVal !== false) {
 
@@ -56,55 +101,10 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Apply transformations of derivations to the values of the source data object.
-    * Compute data fields whose values are not stored to the database.
-    */
-   prepareDerivedData() {
-      // Prepare type specific data
-      if (this.system) {
-         this.system.prepareDerivedData();
-      }
-   }
-
-   /**
-    * Creates a Chat Message containing this item's data and sends it to chat.
-    * @returns {Promise<ChatMessage>} The newly created Chat Message.
-    */
-   async sendToChat() {
-      // Create the context object
-      const messageData = this.getRollData();
-
-      // Create and post the message
-      return ChatMessage.create(
-         ChatMessage.applyRollMode(
-            {
-               user: game.user.id,
-               speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
-               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
-               sound: CONFIG.sounds.notification,
-               flags: {
-                  titan: messageData,
-               },
-               classes: ['titan'],
-            },
-            game.settings.get('core', 'rollMode'),
-         ),
-      );
-   }
-
-   /**
-    * Prepares an object containing the data relevant to performing checks.
-    * @returns {object} Object containing the relevant data.
-    */
-   getRollData() {
-      return this.system.getRollData();
-   }
-
-   /**
     * Adds a new Check to this item.
     * @returns {Promise<void>}
     */
-   async addCheck() {
+   async addCheck () {
       if (this.isOwner) {
          // Update document
          this.system.check.push(createItemCheckTemplate());
@@ -127,7 +127,7 @@ export default class TitanItem extends Item {
     * @param {number} idx - The Idx of the Check in this item's Checks array.
     * @returns {Promise<void>}
     */
-   async removeCheck(idx) {
+   async removeCheck (idx) {
       if (this.isOwner) {
          // Update sheet
          const sheet = this._sheet;
@@ -148,7 +148,7 @@ export default class TitanItem extends Item {
    /**
     * Creates a dialog for adding a new Custom Trait to this item.
     */
-   addCustomTrait() {
+   addCustomTrait () {
       if (this.isOwner) {
          const dialog = new AddCustomTraitDialog(this);
          dialog.render(true);
@@ -159,7 +159,7 @@ export default class TitanItem extends Item {
     * Creates a dialog for editing an existing Custom Trait belonging to this item.
     * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
     */
-   editCustomTrait(traitIdx) {
+   editCustomTrait (traitIdx) {
       if (this.isOwner) {
          const dialog = new EditCustomTraitDialog(this, traitIdx);
          dialog.render(true);
@@ -170,7 +170,7 @@ export default class TitanItem extends Item {
     * Removes a Custom Trait from this item.
     * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
     */
-   async deleteCustomTrait(traitIdx) {
+   async deleteCustomTrait (traitIdx) {
       if (this.isOwner) {
          this.system.customTrait.splice(traitIdx, 1);
          await this.update({
@@ -186,7 +186,7 @@ export default class TitanItem extends Item {
     * so that asynchronous update operations will not apply.
     * @returns {Promise<void>}
     */
-   async safeDelete() {
+   async safeDelete () {
       if (this.isOwner && !this.isMarkedForDeletion) {
          await this.update({
             flags: {

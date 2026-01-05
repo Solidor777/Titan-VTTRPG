@@ -2,39 +2,57 @@ import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
 import WeaponSheetShell from '~/document/types/item/types/weapon/sheet/WeaponSheetShell.svelte';
 import createWeaponSheetState from '~/document/types/item/types/weapon/sheet/WeaponSheetState.js';
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
-export default class TitanWeaponSheet extends TitanItemSheet {
-
+/**
+ * An Item Sheet class with functionality shared by all Weapon Items.
+ * @param {TitanItem} sheetDocument - The Document this sheet is for.
+ * @param {object} options - Options object.
+ * @property {WeaponSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.
+ */
+export default class TitanSpellSheet extends TitanItemSheet {
    /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * An Item Sheet class with functionality shared by all Weapon Items.
+    * @param {TitanItem} sheetDocument - The Document this sheet is for.
+    * @param {object} options - Options object.
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         svelte: {
-            props: {
-               shell: WeaponSheetShell
-            }
-         }
-      });
-   }
+   constructor (sheetDocument, options = {}) {
+      // Add sheet classes
+      const classes = ['titan-weapon-sheet'];
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes;
 
-   _getSheetClasses() {
+      // Add Svelte Shell
+      options = foundry.utils.mergeObject(
+         options, {
+            svelte: {
+               props: {
+                  shell: WeaponSheetShell,
+               },
+            },
+         }
+      );
+
+      // Initialize object
+      super(sheetDocument, options);
+   };
+
+   _getSheetClasses () {
       const retVal = super._getSheetClasses();
       retVal.push('titan-weapon-sheet');
 
       return retVal;
    }
 
-   _createReactiveState() {
+   _createReactiveState () {
       return createWeaponSheetState(isHTMLBlank(this.document.system.attackNotes) ? 'itemDescription' : 'attackNotes');
    }
 
    /**
     * Adds an Attack to this sheet's application state.
     */
-   addAttack() {
+   addAttack () {
       this.applicationState.addAttack();
    }
 
@@ -42,7 +60,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
     * Removes the Attack at the provided idx from this sheet's application state.
     * @param {number} idx - The idx of the attack to remove.
     */
-   removeAttack(idx) {
+   removeAttack (idx) {
       this.applicationState.removeAttack(idx);
    }
 }

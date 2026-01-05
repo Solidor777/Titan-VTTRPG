@@ -1,13 +1,13 @@
 <script>
    // Header, sidebar, and tabs to allow this layout to be used by multiple item types
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte'
 
-   export let header = void 0;
-   export let sidebar = void 0;
-   export let tabs = void 0;
+   export let header = void 0
+   export let sidebar = void 0
+   export let tabs = void 0
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document');
+   const document = getContext('document')
 </script>
 {#if $document}
    <div class="titan-sheet">
@@ -35,6 +35,8 @@
    .titan-sheet {
       @include flex-column;
       @include font-size-normal;
+
+      height: 100%;
 
       .body {
          @include flex-row;

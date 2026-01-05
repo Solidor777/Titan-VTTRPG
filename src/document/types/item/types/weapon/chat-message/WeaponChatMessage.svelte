@@ -1,16 +1,17 @@
 <script>
-   import {getContext} from 'svelte';
-   import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
-   import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import { getContext } from 'svelte'
+   import RichText from '~/helpers/svelte-components/RichText.svelte'
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte'
+   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte'
+   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte'
+   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte'
+   import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte'
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte'
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document');
-   const item = $document.flags.titan;
+   const document = getContext('document')
+   const item = $document.flags.titan
+   console.log(item)
 </script>
 
 <div class="item-chat-message">
@@ -26,21 +27,21 @@
       </div>
 
       <!--Attack Notes-->
-      {#if item.system.attackNotes !== '' && item.system.attackNotes !== '<p></p>'}
+      {#if item.attackNotes !== '' && item.attackNotes !== '<p></p>'}
          <div class="section rich-text">
-            <RichText value={item.system.attackNotes}/>
+            <RichText value={item.attackNotes}/>
          </div>
       {/if}
 
       <!--Description-->
-      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      {#if item.description && item.description !== '' && item.description !== '<p></p>'}
          <div class="section rich-text">
-            <RichText value={item.system.description}/>
+            <RichText value={item.description}/>
          </div>
       {/if}
 
       <!--Checks-->
-      {#if item.system.check.length > 0}
+      {#if item.check.length > 0}
          <div class="section">
             <ItemChatChecks {item}/>
          </div>
@@ -50,18 +51,18 @@
       <div class="section tags small-text">
          <!--Rarity-->
          <div class="tag">
-            <RarityTag rarity={item.system.rarity}/>
+            <RarityTag rarity={item.rarity}/>
          </div>
 
          <!--Value-->
-         {#if item.system.value}
+         {#if item.value}
             <div class="tag">
-               <ValueTag value={item.system.value}/>
+               <ValueTag value={item.value}/>
             </div>
          {/if}
 
          <!--Custom Traits-->
-         {#each item.system.customTrait as trait}
+         {#each item.customTrait as trait}
             <div class="tag">
                <Tag tooltip={trait.description}>
                   {trait.name}

@@ -1,13 +1,13 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
-   import {DELETE_ICON} from '~/system/Icons.js';
+   import { DELETE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -39,7 +39,7 @@
             <div class="field select">
                <DocumentSelect
                   options={operationOptions}
-                  bind:value={element.operation}
+                  bind:value={$document.system.rulesElement[idx].operation}
                   on:change={() => {
                      onRulesElementOperationChanged($document, idx);
                   }}
@@ -50,7 +50,7 @@
             <div class="field select">
                <DocumentSelect
                   options={selectorOptions}
-                  bind:value={element.selector}
+                  bind:value={$document.system.rulesElement[idx].selector}
                />
             </div>
          </div>
@@ -67,7 +67,7 @@
       </div>
       <!--Message text-->
       <div class="section">
-         <DocumentBoundEditorInput bind:value={element.message}/>
+         <DocumentBoundEditorInput bind:value={$document.system.rulesElement[idx].message}/>
       </div>
    </div>
 {/if}
