@@ -5,7 +5,7 @@
    border-color: var(--titan-input-color);
    background: var(--titan-input-background);
    font-size: var(--titan-input-font-size);
-   font-family: var(--titan-input-font);
+   font-family: var(--titan-input-font), sans-serif;
    font-weight: var(--titan-input-font-weight);
    height: var(--titan-input-height);
    width: var(--titan-input-width);
@@ -106,6 +106,7 @@
    font-size: var(--titan-button-font-size);
    font-weight: var(--titan-button-font-weight);
    height: var(--titan-button-height);
+   min-height: var(--titan-button-height);
    justify-content: center;
    line-height: var(--titan-button-line-height);
    margin: 0;
@@ -145,6 +146,7 @@
    flex-direction: row;
    font-size: var(--titan-button-font-size);
    height: var(--titan-icon-button-radius);
+   min-height: var(--titan-icon-button-radius);
    justify-content: center;
    line-height: var(--icon-button-line-height);
    margin: 0;

@@ -6,7 +6,7 @@
    --font-size: 16px;
    --font-body: 'Open Sans';
    --titan-font-color: #000;
-   --titan-font-color-dark: rgba(255 255 255 / 0.83);
+   --titan-font-color-dark: rgb(255 255 255 / 0.83);
    --titan-font-normal: 'Lato';
    --titan-font-body: 'Open Sans';
 
@@ -27,7 +27,7 @@
    --titan-border-width-normal: 2px;
    --titan-border-width-thick: 4px;
    --titan-border-color: #000;
-   --titan-border-color-dark: rgba(255 255 255 / 0.83);
+   --titan-border-color-dark: rgb(255 255 255 / 0.83);
 
    // Scrollbar
    --titan-scrollbar-color: #f2b58c;
@@ -57,7 +57,7 @@
    --titan-button-background-dark: #f2b58c;
    --titan-button-background-disabled: #D0D0D0;
    --titan-button-background-highlight: #FFE9AE;
-   --titan-button-background: rgba(255 255 240 / 0.8);
+   --titan-button-background: rgb(255 255 240 / 0.8);
    --titan-button-border-color: #000;
    --titan-button-border-color-dark: #15171b;
    --titan-button-border-radius: 12px;
@@ -144,27 +144,27 @@
    --titan-static-value-background: #D0D0D0;
    --titan-static-value-background-dark: #464646;
    --titan-static-value-color: #000;
-   --titan-static-value-color-dark: rgba(255 255 255 / 0.83);
+   --titan-static-value-color-dark: rgb(255 255 255 / 0.83);
    --titan-static-value-border-color: #000;
-   --titan-static-value-border-color-dark: rgba(170 170 170 / 0.83);
+   --titan-static-value-border-color-dark: rgb(170 170 170 / 0.83);
 
    // Panel 1
    --titan-panel-1-background: #8c8c8c5e;
    --titan-panel-1-background-dark: #373949;
    --titan-panel-1-color: #000;
-   --titan-panel-1-color-dark: rgba(255 255 255 / 0.83);
+   --titan-panel-1-color-dark: rgb(255 255 255 / 0.83);
 
    // Panel 2
    --titan-panel-2-background: #c7c7c75e;
    --titan-panel-2-background-dark: #424557;
-   --titan-panel-2-color-dark: rgba(255 255 255 / 0.83);
+   --titan-panel-2-color-dark: rgb(255 255 255 / 0.83);
    --titan-panel-2-color: #000;
 
    // Panel 3
    --titan-panel-3-background: #eee9e683;
    --titan-panel-3-background-dark: #2e303c;
    --titan-panel-3-color: #000;
-   --titan-panel-3-color-dark: rgba(255 255 255 / 0.83);
+   --titan-panel-3-color-dark: rgb(255 255 255 / 0.83);
 
    // Opacity
    --titan-disabled-opacity: 1;
@@ -183,8 +183,8 @@
    // Meter
    --titan-meter-background: #F5F5F5;
    --titan-meter-background-dark: #1E1E1E;
-   --titan-meter-shadow-1: rgba(255 255 255 / 0.3);
-   --titan-meter-shadow-2: rgba(0 0 0 / 0.4);
+   --titan-meter-shadow-1: rgb(255 255 255 / 0.3);
+   --titan-meter-shadow-2: rgb(0 0 0 / 0.4);
 
    // Gradient
    --titan-gradient-degree: 135deg;
@@ -204,7 +204,7 @@
    --titan-turn-start-effect-secondary: #80ffea;
 
    // Application
-   --titan-app-background: rgba(15 15 15 / 0.80);
+   --titan-app-background: rgb(15 15 15 / 0.80);
 
    // Selection
    --titan-highlight-background: #FFE9AE;
