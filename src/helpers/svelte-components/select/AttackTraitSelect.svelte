@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
-   import {ATTACK_TRAITS} from '~/document/types/item/types/weapon/AttackTraits.js';
+   import { ATTACK_TRAITS } from '~/document/types/item/types/weapon/AttackTraits.js';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -12,7 +12,7 @@
    /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type SelectOption[] Options for the Select. */
+   /** @type StringOption[] Options for the Select svelte component. */
    const options = [];
    for (const trait of ATTACK_TRAITS) {
       options.push({

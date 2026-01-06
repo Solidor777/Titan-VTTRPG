@@ -9,7 +9,7 @@
       from '~/document/types/chat-message/report/types/damage/DamageReportChatMessagePenetratingTag.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -17,10 +17,10 @@
    /** @type object Header svelte-component to use. */
    const header = DamageReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte-components. */
+   /** @type {object|string[]} Calculated section svelte components. */
    const sections = [];
 
-   /** @type object[] Calculated tag svelte-components. */
+   /** @type object[] Calculated tag svelte components. */
    const tags = [];
 
    // If we took damage, conditionally add more information to the messages

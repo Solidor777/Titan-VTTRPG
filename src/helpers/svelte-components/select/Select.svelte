@@ -1,12 +1,26 @@
 <script>
    /**
     * @typedef {object} SelectOption
-    * Object used to store data for an Option within a Select svelte-components.
+    * Object used to store data for an Option within a Select svelte component.
     * @property {*} value The value for this option.
     * @property {string} label The display label for this option.
     */
 
-   /** @type SelectOption[] Options for the Select svelte-components. */
+   /**
+    * @typedef {SelectOption} StringOption
+    * Object used to store data for a String Option within a Select svelte component.
+    * @property {string} value The value for this option.
+    * @property {string} label The display label for this option.
+    */
+
+   /**
+    * @typedef {SelectOption} StringOption
+    * Object used to store data for a Number Option within a Select svelte component.
+    * @property {number} value The value for this option.
+    * @property {string} label The display label for this option.
+    */
+
+   /** @type SelectOption[] Options for the Select svelte component. */
    export let options = void 0;
 
    /** @type * The value that this input should modify. */

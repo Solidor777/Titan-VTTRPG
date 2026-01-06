@@ -14,7 +14,7 @@
    /** @type boolean Whether to allow Opposed Check as an option */
    export let allowOpposedCheck = void 0;
 
-   /** @type SelectOption[] Options for the Select. */
+   /** @type StringOption[] Options for the Select svelte component. */
    const options = [
       {
          label: localize('none'),

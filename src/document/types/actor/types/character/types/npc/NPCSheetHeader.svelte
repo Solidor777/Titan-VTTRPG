@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
@@ -12,7 +12,9 @@
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
-   const options = [
+
+   /** @type StringOption[] Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/
+   const roleOptions = [
       {
          label: localize('minion'),
          value: 'minion',
@@ -65,7 +67,7 @@
 
          <!--Input-->
          <div class="input">
-            <DocumentSelect bind:value={$document.system.role} {options}/>
+            <DocumentSelect bind:value={$document.system.role} options={roleOptions}/>
          </div>
       </div>
 

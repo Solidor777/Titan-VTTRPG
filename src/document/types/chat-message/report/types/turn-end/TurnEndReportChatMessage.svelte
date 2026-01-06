@@ -17,7 +17,7 @@
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import getSetting from '~/helpers/utility-functions/GetSetting.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import TurnEndReportChatMessageHeader
       from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageHeader.svelte';
    import ChatMessageRemoveExpiredEffectsButton
@@ -29,7 +29,7 @@
    /** @type object Header svelte-components to use. */
    const header = TurnEndReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte-components. */
+   /** @type {object|string[]} Calculated section svelte components. */
    const sections = [];
 
    // Add Stamina if appropriate

@@ -1,6 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ModSelect from '~/helpers/svelte-components/select/ModSelect.svelte';
+   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /** @type string The value that this input should modify. */
    export let value;
@@ -13,24 +14,11 @@
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
-
-   /**
-    * Update the document data when the input changes.
-    */
-   async function updateDocument() {
-      if ($document?.isOwner) {
-         await $document.update({
-            system: $document.system,
-            flags: $document.flags,
-         });
-      }
-   }
 </script>
 
 <ModSelect
    {allowNone}
    bind:value
    disabled={disabled || !$document?.isOwner}
-   on:change
-   on:change={()=> updateDocument()}
+   on:change={()=> refreshSystemDocument($document, disabled)}
 />

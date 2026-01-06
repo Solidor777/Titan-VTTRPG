@@ -23,7 +23,7 @@
    import TurnStartReportChatMessageHeader
       from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageHeader.svelte';
    import getSetting from '~/helpers/utility-functions/GetSetting.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ChatMessageRemoveExpiredEffectsButton
       from '~/document/types/chat-message/components/buttons/ChatMessageRemoveExpiredEffectsButton.svelte';
 
@@ -33,7 +33,7 @@
    /** @type object Header svelte-components to use. */
    const header = TurnStartReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte-components. */
+   /** @type {object|string[]} Calculated section svelte components. */
    const sections = [];
 
    // Add Stamina if appropriate

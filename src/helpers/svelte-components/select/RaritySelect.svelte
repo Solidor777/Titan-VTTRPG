@@ -8,7 +8,7 @@
    /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type SelectOption[] Options for the Select. */
+   /** @type SelectOption[] Options for the Select svelte component. */
    const options = [
       {
          label: localize('common'),

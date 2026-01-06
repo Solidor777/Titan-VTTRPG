@@ -1,5 +1,5 @@
 <script>
-   import IntegerSelect from '~/helpers/svelte-components/select/NumberSelect.svelte';
+   import NumberSelect from '~/helpers/svelte-components/select/NumberSelect.svelte';
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
@@ -11,4 +11,4 @@
    const options = [2, 3, 4, 5, 6];
 </script>
 
-<IntegerSelect bind:value {disabled} on:change {options}/>
+<NumberSelect bind:value {disabled} on:change {options}/>

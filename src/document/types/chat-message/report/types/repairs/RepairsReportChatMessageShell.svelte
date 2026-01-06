@@ -7,7 +7,7 @@
    /** @type object Header svelte-components to use. */
    const header = RepairsReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte-components. */
+   /** @type {object|string[]} Calculated section svelte components. */
    const sections = [ChatMessageArmor];
 </script>
 

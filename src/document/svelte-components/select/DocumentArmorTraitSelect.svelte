@@ -1,5 +1,6 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
+   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
    import ArmorTraitSelect from '~/helpers/svelte-components/select/ArmorTraitSelect.svelte';
 
    /** @type string The value that this input should modify. */
@@ -13,24 +14,11 @@
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
-
-   /**
-    * Update the document data when the input changes.
-    */
-   async function updateDocument() {
-      if ($document?.isOwner) {
-         await $document.update({
-            system: $document.system,
-            flags: $document.flags,
-         });
-      }
-   }
 </script>
 
 <ArmorTraitSelect
    {allowNone}
    bind:value
    disabled={disabled || !$document?.isOwner}
-   on:change
-   on:change={()=> updateDocument()}
+   on:change={()=> refreshSystemDocument($document, disabled)}
 />

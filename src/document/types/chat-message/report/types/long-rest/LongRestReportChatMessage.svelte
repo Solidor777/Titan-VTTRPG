@@ -6,7 +6,7 @@
       from '~/document/types/chat-message/components/messages/ChatMessageStaminaRestoredMessage.svelte';
    import LongRestReportChatMessageHeader
       from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageHeader.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
 
@@ -16,7 +16,7 @@
    /** @type object Header svelte-components to use. */
    const header = LongRestReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte-components. */
+   /** @type {object|string[]} Calculated section svelte components. */
    const sections = [
       ChatMessageResolveRestoredMessage,
       ChatMessageStaminaRestoredMessage,

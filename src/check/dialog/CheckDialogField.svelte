@@ -13,7 +13,7 @@
    /** The tooltipAction to display when the label is hovered. */
    export let fieldTooltip = void 0;
 
-   /** Properties for the input svelte-components. */
+   /** Properties for the input svelte components. */
    export let inputProps = void 0;
 </script>
 

@@ -1,31 +1,31 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application'
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document'
-import { writable } from 'svelte/store'
-import localize from '~/helpers/utility-functions/Localize.js'
-import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte'
-import { SETTINGS_ICON } from '~/system/Icons.js'
-import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
-import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js'
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
+import { writable } from 'svelte/store';
+import localize from '~/helpers/utility-functions/Localize.js';
+import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
+import { SETTINGS_ICON } from '~/system/Icons.js';
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
 
 /**
- * A replacement Document Sheet to that supports svelte svelte-components.
+ * A replacement Document Sheet to that supports svelte svelte components.
  * @param {Document} sheetDocument - The Document this sheet is for..
  * @param {object} options - Options object.
  */
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
-    * A replacement Document Sheet to that supports svelte svelte-components.
+    * A replacement Document Sheet to that supports svelte svelte components.
     * @param {Document} sheetDocument - The Document this sheet is for..
     * @param {object} options - Options object.
     */
    constructor (sheetDocument, options = {}) {
-      const classes = ['titan-document-sheet']
+      const classes = ['titan-document-sheet'];
       if (isDarkModeSheetsEnabled()) {
-         classes.push('titan-dark-mode')
+         classes.push('titan-dark-mode');
       }
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
-         : classes
+         : classes;
 
       // Initialize the object with pre-requisite base properties
       super(foundry.utils.mergeObject(
@@ -42,21 +42,21 @@ export default class TitanDocumentSheet extends SvelteApplication {
                },
             },
          },
-      ))
+      ));
 
       // Initialize the reactive  document
-      this.document = sheetDocument
+      this.document = sheetDocument;
       this.options.svelte.props.document = this._createReactiveDocument(
          this.document,
          { delete: this.close.bind(this) }
-      )
+      );
 
       // Initialize the reactive state
-      this.applicationState = this._createReactiveState()
-      this.options.svelte.props.applicationState = this.applicationState
+      this.applicationState = this._createReactiveState();
+      this.options.svelte.props.applicationState = this.applicationState;
 
       // Holds the subscription / unsubscription functions
-      this.documentUnsubscribe = void 0
+      this.documentUnsubscribe = void 0;
    }
 
    /**
@@ -65,7 +65,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions () {
-      let parentOptions = super.defaultOptions
+      let parentOptions = super.defaultOptions;
       return foundry.utils.mergeObject(parentOptions, {
          width: 700,
          height: 'auto',
@@ -74,7 +74,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
          minimizable: true,
          dragDrop: [{ dragSelector: '.directory-list .item', dropSelector: null }],
          classes: ['titan-document-sheet'],
-      })
+      });
    }
 
    /**
@@ -82,7 +82,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @returns {Document} The D.
     */
    get object () {
-      return this.document
+      return this.document;
    }
 
    /**
@@ -98,12 +98,12 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
          // If not in a locked pack
          if (this.document.pack) {
-            const pack = game.packs.get(this.document.pack)
-            return !pack?.locked
+            const pack = game.packs.get(this.document.pack);
+            return !pack?.locked;
          }
-         return true
+         return true;
       }
-      return false
+      return false;
    }
 
    /**
@@ -114,7 +114,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _createReactiveDocument (document, options = {}) {
-      return new TJSDocument(document, options)
+      return new TJSDocument(document, options);
    }
 
    /**
@@ -123,7 +123,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _createReactiveState () {
-      return new writable()
+      return new writable();
    }
 
    /**
@@ -134,10 +134,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
     */
    _onConfigureSheet (event) {
       if (event) {
-         event.preventDefault()
+         event.preventDefault();
       }
 
-      return new DocumentSheetConfig(this.document, this._getDialogOffset()).render(true)
+      return new DocumentSheetConfig(this.document, this._getDialogOffset()).render(true);
    }
 
    /**
@@ -149,7 +149,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
       return {
          top: this.position.top + 40,
          left: this.position.left + (this.position.width - this.options.width) / 2,
-      }
+      };
    }
 
    /**
@@ -161,11 +161,11 @@ export default class TitanDocumentSheet extends SvelteApplication {
     */
    async _onDocumentUpdated (document, options) {
       // If the action was to update or subscribe to this document
-      const { action } = options
+      const { action } = options;
       if ((action === void 0 || action === 'update' || action === 'subscribe') && document) {
 
          // Update the name of this sheet.
-         this.reactive.title = document?.name ?? 'No Document Assigned'
+         this.reactive.title = document?.name ?? 'No Document Assigned';
       }
    }
 
@@ -179,11 +179,11 @@ export default class TitanDocumentSheet extends SvelteApplication {
    render (force = false, options = {}) {
       // Subscribe to the document if not already subscribed
       if (!this.documentUnsubscribe) {
-         this.documentUnsubscribe = this.options.svelte.props.document.subscribe(this._onDocumentUpdated.bind(this))
+         this.documentUnsubscribe = this.options.svelte.props.document.subscribe(this._onDocumentUpdated.bind(this));
       }
 
-      super.render(force, options)
-      return this
+      super.render(force, options);
+      return this;
    }
 
    /**
@@ -192,7 +192,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _getHeaderButtons () {
-      const buttons = super._getHeaderButtons()
+      const buttons = super._getHeaderButtons();
 
       // Sheet configuration button for documents not in a compendium
       if (!this.document.pack) {
@@ -201,10 +201,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
             icon: SETTINGS_ICON,
             title: localize('openSheetConfigurator'),
             onclick: (event) => this._onConfigureSheet(event),
-         })
+         });
       }
 
-      return buttons
+      return buttons;
    }
 
    /**
@@ -215,11 +215,11 @@ export default class TitanDocumentSheet extends SvelteApplication {
    async close (options = {}) {
       // Unsubscribe from the document if still subscribed
       if (this.documentUnsubscribe) {
-         this.documentUnsubscribe()
-         this.documentUnsubscribe = void 0
+         this.documentUnsubscribe();
+         this.documentUnsubscribe = void 0;
       }
 
-      return super.close(options)
+      return super.close(options);
    }
 
    /**
@@ -229,7 +229,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _canDragStart (selector) {
-      return this.isEditable
+      return this.isEditable;
    }
 
    /**
@@ -239,6 +239,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @protected
     */
    _canDragDrop (selector) {
-      return this.isEditable
+      return this.isEditable;
    }
 }
