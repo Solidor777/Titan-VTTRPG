@@ -36,7 +36,7 @@ import TitanChatMessage from '~/document/chat-message/ChatMessage.js';
  * Attached to the Init Hook.
  * Sets up the Titan system once the game is initiated.
  */
-export default function onceInit() {
+export default function onceInit () {
    log('Starting Titan VTTRPG System');
 
    // Initialize titan namespace
@@ -84,70 +84,70 @@ export default function onceInit() {
    CONFIG.Combat.documentClass = TitanCombat;
 
    // Register Sheet Classes
-   Actors.registerSheet(
+   foundry.documents.collections.Actors.registerSheet(
       'titan', TitanNPCSheet, {
          types: ['npc'],
          makeDefault: true,
          label: localize('defaultNpcSheet'),
       },
    );
-   Actors.registerSheet(
+   foundry.documents.collections.Actors.registerSheet(
       'titan', TitanPlayerSheet, {
          types: ['player'],
          makeDefault: true,
          label: localize('defaultPlayerSheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanAbilitySheet, {
          types: ['ability'],
          makeDefault: true,
          label: localize('defaultAbilitySheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanArmorSheet, {
          types: ['armor'],
          makeDefault: true,
          label: localize('defaultArmorSheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanCommoditySheet, {
          types: ['commodity'],
          makeDefault: true,
          label: localize('defaultCommoditySheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanEffectSheet, {
          types: ['effect'],
          makeDefault: true,
          label: localize('defaultEffectSheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanEquipmentSheet, {
          types: ['equipment'],
          makeDefault: true,
          label: localize('defaultEquipmentSheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanShieldSheet, {
          types: ['shield'],
          makeDefault: true,
          label: localize('defaultShieldSheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanSpellSheet, {
          types: ['spell'],
          makeDefault: true,
          label: localize('defaultSpellSheet'),
       },
    );
-   Items.registerSheet(
+   foundry.documents.collections.Items.registerSheet(
       'titan', TitanWeaponSheet, {
          types: ['weapon'],
          makeDefault: true,
@@ -156,6 +156,6 @@ export default function onceInit() {
    );
 
    // Unregister old sheet classes
-   Actors.unregisterSheet('core', ActorSheet);
-   Items.unregisterSheet('core', ItemSheet);
+   foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
+   foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
 }
