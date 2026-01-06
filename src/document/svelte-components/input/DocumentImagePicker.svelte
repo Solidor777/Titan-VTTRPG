@@ -14,18 +14,11 @@
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
-
-   /**
-    * Update the document data when the input changes.
-    */
-   function updateDocument () {
-      refreshSystemDocument($document, disabled);
-   }
 </script>
 
 <ImagePicker
    {alt}
    bind:value
    disabled={disabled || !$document?.isOwner}
-   on:change={updateDocument}
+   on:editor:save={() => refreshSystemDocument($document, disabled)}
 />

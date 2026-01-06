@@ -11,17 +11,11 @@
 
    /** @type boolean Whether editing this input should be disabled. */
    export let disabled = false;
-
-   /**
-    * Update the document data when the input changes.
-    */
-   function updateDocument () {
-      refreshSystemDocument($document, disabled);
-   }
+   
 </script>
 
 <CheckboxInput
    bind:value
    disabled={disabled || !$document?.isOwner}
-   on:change={updateDocument}
+   on:editor:save={() => refreshSystemDocument($document, disabled)}
 />
