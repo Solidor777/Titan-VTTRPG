@@ -1,5 +1,5 @@
 <script>
-   import {createEventDispatcher} from 'svelte';
+   import { createEventDispatcher } from 'svelte';
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
@@ -64,10 +64,10 @@
     * @param {object} event - The input event on the key press.
     */
    function filterInput(event) {
-      if (!/[0-9\.,-]/.test(event.key)) {
+      if (!/[0-9.,-]/.test(event.key)) {
          event.preventDefault();
       }
-      else if (/[\.,]/.test(event.key)) {
+      else if (/[.,]/.test(event.key)) {
          event.preventDefault();
       }
    }
@@ -113,5 +113,7 @@
 <style lang="scss">
    input {
       @include input;
+
+      --titan-input-text-alignment: center;
    }
 </style>

@@ -1,4 +1,4 @@
-import {deepFreeze} from '@typhonjs-fvtt/runtime/util/object';
+import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 export const ACCURACY_ICON = 'fas fa-bow-arrow';
 export const ARMOR_ICON = 'fas fa-helmet-battle';
@@ -143,6 +143,6 @@ const ICON_MAP = deepFreeze({
  * @param {string} concept - The concept to get the icon for.
  * @returns {string} The icon class for the provided constant.
  */
-export function getIcon(concept) {
+export function getIcon (concept) {
    return ICON_MAP[concept];
 }

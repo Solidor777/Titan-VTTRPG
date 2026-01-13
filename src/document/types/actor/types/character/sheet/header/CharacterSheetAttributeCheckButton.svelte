@@ -1,9 +1,9 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
-   import {BODY_ICON, MIND_ICON, SOUL_ICON} from '~/system/Icons.js';
+   import { getIcon } from '~/system/Icons.js';
 
    /** @type string The Attribute that this component represents. */
    export let attribute;
@@ -13,34 +13,20 @@
 
    /** @type AttributeCheckParameters Calculated check parameters. */
    let checkParameters = $document.system.getAttributeCheckParameters(
-      $document.system.initializeAttributeCheckOptions({attribute: attribute}));
+      $document.system.initializeAttributeCheckOptions({ attribute: attribute }));
 
    /** @type string Calculated tooltip. */
    let tooltip = localize(`${checkParameters.attribute}.desc`);
    tooltip += getAttributeCheckParametersTooltip(checkParameters);
 
    /** @type string Calculated icon. */
-   let icon;
-   switch (attribute) {
-      case 'body': {
-         icon = BODY_ICON;
-         break;
-      }
-      case 'mind': {
-         icon = MIND_ICON;
-         break;
-      }
-      default: {
-         icon = SOUL_ICON;
-         break;
-      }
-   }
+   let icon = getIcon(attribute);
 
    // Update data in response to changes.
    $: {
       // Update Check Parameters.
       checkParameters = $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({attribute: attribute}));
+         $document.system.initializeAttributeCheckOptions({ attribute: attribute }));
 
       // Update Tooltip.
       tooltip = localize(`${checkParameters.attribute}.desc`);
