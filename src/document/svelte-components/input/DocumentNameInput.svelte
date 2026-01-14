@@ -1,7 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
-   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -9,15 +8,22 @@
    /** @type boolean Whether editing should be disabled for this component. */
    export let disabled = false;
 
+   let value = $document.name;
+
    /** Update the name when the input changes. */
-   function updateDocument () {
-      refreshSystemDocument($document, disabled);
+   function updateDocument() {
+      if (value.length > 0) {
+         $document.update({
+            name: value,
+         });
+      }
    }
 </script>
 
 <div class="document-name">
    <TextInput
-      bind:value={$document.name}
+      bind:value={value}
+      disabled={disabled || !$document?.isOwner}
       on:change={updateDocument}
       on:keyup={updateDocument}
    />

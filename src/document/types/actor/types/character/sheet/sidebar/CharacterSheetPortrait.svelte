@@ -1,9 +1,9 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
-   import {LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
+   import { LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
    /** @type object Reference to the Document store. */
@@ -11,59 +11,68 @@
 </script>
 
 <div class="portrait">
+   <!--Image Picker-->
    <div class="image">
       <DocumentImagePicker alt={'character portrait'} bind:value={$document.img}/>
    </div>
-   <!--Take a Long Rest Button-->
-   <div
-      class="button long-rest"
-      use:tooltipAction="{localize('longRest.desc')}"
-   >
-      <DocumentOwnerIconButton
-         icon={LONG_REST_ICON}
-         on:click={() => {
+
+   <!--Buttons for managing resources-->
+   <div class="buttons">
+      <!--Take a Long Rest Button-->
+      <div
+         class="button"
+         use:tooltipAction="{localize('longRest.desc')}"
+      >
+         <DocumentOwnerIconButton
+            icon={LONG_REST_ICON}
+            on:click={() => {
             $document.system.longRest();
          }}
-      />
-   </div>
+         />
+      </div>
 
-   <!--Take a Short Rest Button-->
-   <div
-      class="button short-rest"
-      use:tooltipAction="{localize('shortRest.desc')}"
-   >
-      <DocumentOwnerIconButton
-         icon={SHORT_REST_ICON}
-         on:click={() => {
+      <!--Take a Short Rest Button-->
+      <div
+         class="button"
+         use:tooltipAction="{localize('shortRest.desc')}"
+      >
+         <DocumentOwnerIconButton
+            icon={SHORT_REST_ICON}
+            on:click={() => {
             $document.system.shortRest();
          }}
-      />
-   </div>
+         />
+      </div>
 
-   <!--Remove Combat Effects button-->
-   <div
-      class="button clear"
-      use:tooltipAction="{localize('removeCombatEffects')}"
-   >
-      <DocumentOwnerIconButton
-         icon={REMOVE_TEMP_EFFECTS_ICON}
-         on:click={() => {
+      <!--Remove Combat Effects button-->
+      <div
+         class="button"
+         use:tooltipAction="{localize('removeCombatEffects.desc')}"
+      >
+         <DocumentOwnerIconButton
+            icon={REMOVE_TEMP_EFFECTS_ICON}
+            on:click={() => {
             $document.system.removeCombatEffects();
          }}
-      />
-   </div>
+         />
+      </div>
 
-   <!--Spend Resolve button-->
-   <div
-      class="button resolve"
-      use:tooltipAction="{localize('spendX%Resolve').replace('X%', 1)}"
-   >
-      <DocumentOwnerIconButton
-         icon={SPEND_RESOLVE_ICON}
-         on:click={() => {
+      <!--Spend Resolve button-->
+      <div
+         class="button"
+         use:tooltipAction="{localize('spendX%Resolve').replace('X%', 1)}"
+      >
+         <DocumentOwnerIconButton
+            icon={SPEND_RESOLVE_ICON}
+            on:click={() => {
             $document.system.spendResolve(1);
          }}
-      />
+         />
+      </div>
+   </div>
+
+   <div class="actor-link">
+      <DocumentOwnerIconButton icon={SPEND_RESOLVE_ICON}/>
    </div>
 </div>
 
@@ -73,7 +82,7 @@
       @include flex-group-center;
 
       width: 100%;
-      position: relative;
+      height: 100%;
 
       .image {
          width: 160px;
@@ -81,28 +90,26 @@
          --titan-border-style: none;
       }
 
-      .button {
+      .buttons {
+         @include flex-column;
+         @include flex-group-center;
+         @include border-left;
+
+         padding-left: var(--titan-padding-standard);
+         height: 160px;
+
+         .button {
+            @include flex-column;
+
+            height: 100%;
+            flex-grow: 2;
+         }
+      }
+
+      .actor-link {
          position: absolute;
-
-         &.long-rest {
-            top: 0;
-            right: 0;
-         }
-
-         &.short-rest {
-            top: 0;
-            left: 0;
-         }
-
-         &.clear {
-            bottom: 0;
-            left: 0;
-         }
-
-         &.resolve {
-            bottom: 0;
-            right: 0;
-         }
+         top: 0;
+         left: 0;
       }
    }
 </style>

@@ -403,6 +403,7 @@
       "regeneratedUUIDForDocumentX%.label": "Regenerated Unique ID for document: X%",
       "reload.label": "Reload",
       "remaining.label": "Remaining",
+      "removeCombatEffects.desc.label": "Remove temporary <strong>Effects</strong> and fully restore this character's <strong>Resolve</strong>.",
       "removeCombatEffects.label": "Remove Combat Effects",
       "removeCondition.label": "Remove Conditions",
       "removeEffects.label": "Remove Effects",

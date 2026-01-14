@@ -2,6 +2,7 @@ import TitanDocumentSheet from '~/document/sheet/DocumentSheet';
 import localize from '~/helpers/utility-functions/Localize.js';
 import { IMPORT_ICON, LINKED_ICON, UNLINKED_ICON, USER_ICON } from '~/system/Icons.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import ActorSheetToggleLinkedToken from '~/document/types/actor/sheet/ActorSheetToggleLinkedToken.svelte';
 
 /**
  * A Document Sheet class with functionality shared by all Actors.
@@ -32,6 +33,19 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
+    * Default Application options.
+    * @returns {object} Options - Application options.
+    * @see https://foundryvtt.com/api/Application.html#options
+    */
+   static get defaultOptions() {
+      let parentOptions = super.defaultOptions;
+      return foundry.utils.mergeObject(parentOptions, {
+         baseApplication: 'ActorSheet',
+         width: 750,
+      });
+   }
+
+   /**
     * If this Actor Sheet represents a synthetic Token actor, gets a reference to the active Token.
     * @type {TokenDocument|null}
     */
@@ -46,18 +60,15 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @private
     */
    async _onConfigureToken(event) {
-      if (event) {
-         event.preventDefault();
-      }
-
       // If this actor is unlinked, use the token sheet.
       if (this.token) {
-         await this.token.sheet.render(true, this._getDialogOffset());
+         await this.token.sheet.render(this._getDialogRenderOptions());
       }
 
       // If this actor is linked, used the prototype token sheet.
       else {
-         await new CONFIG.Token.prototypeSheetClass(this.actor.prototypeToken).render(true, this._getDialogOffset());
+         await new CONFIG.Token.prototypeSheetClass({ prototype: this.actor.prototypeToken }).render(
+            this._getDialogRenderOptions());
       }
    }
 
@@ -68,28 +79,16 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @private
     */
    async _toggleTokenLink(event) {
-      if (event) {
-         // event.preventDefault();
-      }
-
       const isLinked = this.actor.prototypeToken.actorLink;
-      const button = $(event.currentTarget);
-      console.log(button);
-
-      // If linked, replace the linked icon with the unlinked icon
-      if (isLinked) {
-         button.html(button.html().replace('fa-link', 'fa-unlink'));
-         button.html(button.html().replace(localize('tokenIsLinkedToActor'), localize('tokenIsUnlinkedFromActor')));
-      }
-
-      // If not linked, replaced the unlinked icon with the linked icon
-      else {
-         button.html(button.html().replace('fa-unlink', 'fa-link'));
-         button.html(button.html().replace(localize('tokenIsUnlinkedFromActor'), localize('tokenIsLinkedToActor')));
-      }
+      console.log(event);
 
       // Update the actor
-      await this.actor.update({ 'token.actorLink': !(isLinked) });
+      await this.actor.prototypeToken.update({ actorLink: !(isLinked) });
+
+      // Update the button
+      event.button.title = localize(isLinked ? 'tokenIsLinkedToActor' : 'tokenIsUnlinkedFromActor');
+      event.button.icon = isLinked ? LINKED_ICON : UNLINKED_ICON;
+      return event.button;
    }
 
    /**
@@ -261,19 +260,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       return false;
    }
 
-   /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
-   static get defaultOptions() {
-      let parentOptions = super.defaultOptions;
-      return foundry.utils.mergeObject(parentOptions, {
-         baseApplication: 'ActorSheet',
-         width: 750,
-      });
-   }
-
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
@@ -292,12 +278,10 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
          // Toggle token link for actors still in the directory
          if (token === null) {
-            const tokenLinked = this.actor.prototypeToken?.actorLink;
             buttons.unshift({
-               title: localize(tokenLinked ? 'tokenIsLinkedToActor' : 'tokenIsUnlinkedFromActor'),
-               class: 'token-link',
-               icon: tokenLinked ? LINKED_ICON : UNLINKED_ICON,
-               onclick: (event) => this._toggleTokenLink(event),
+               svelte: {
+                  class: ActorSheetToggleLinkedToken
+               }
             });
          }
 
