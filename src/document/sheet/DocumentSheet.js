@@ -134,7 +134,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
          force: true,
          position: {
             top: this.position.top + 40,
-            left: this.position.left + (this.position.width - this.options.width) / 2,
+            left: this.position.left + ((this.position.width - this.options.width) / 2) + 10,
          },
       };
    }

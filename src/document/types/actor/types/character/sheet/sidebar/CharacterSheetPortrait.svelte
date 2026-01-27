@@ -70,10 +70,6 @@
          />
       </div>
    </div>
-
-   <div class="actor-link">
-      <DocumentOwnerIconButton icon={SPEND_RESOLVE_ICON}/>
-   </div>
 </div>
 
 <style lang="scss">
@@ -104,12 +100,6 @@
             height: 100%;
             flex-grow: 2;
          }
-      }
-
-      .actor-link {
-         position: absolute;
-         top: 0;
-         left: 0;
       }
    }
 </style>

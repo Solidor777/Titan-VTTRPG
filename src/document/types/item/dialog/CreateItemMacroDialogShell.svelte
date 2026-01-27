@@ -70,8 +70,8 @@
                   label: `${attack.label} (${idx + 1})`,
                });
             });
-            break;
          }
+         break;
       }
 
       case 'spell': {
@@ -93,8 +93,9 @@
                label: localize('toggleEffectActive'),
             });
             macroType = 'toggleEffectActive';
-            break;
          }
+
+         break;
       }
       default: {
          break;
@@ -190,16 +191,14 @@
          game.user.assignHotbarMacro(macro, slot);
       }
 
-      application.close();
-      return;
+      return application.close();
    }
 
    /**
     *
     */
    function onCancel() {
-      application.close();
-      return;
+      return application.close();
    }
 </script>
 

@@ -1,6 +1,7 @@
 <script>
    import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
+   import ImageButton from '~/helpers/svelte-components/button/ImageButton.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -23,36 +24,24 @@
    function onEditImage() {
       if (!disabled) {
          const current = value;
-         const filePicker = new FilePicker({
+         const filePicker = new foundry.applications.apps.FilePicker({
             type: 'image',
             current: current,
             callback: async (newPath) => {
                value = newPath;
                eventDispatcher('change');
             },
-            top: application.position.top + 40,
-            left: application.position.left + 10,
+            position: {
+               top: application.position.top + 40,
+               left: application.position.left + (application.position.width - application.options.width) + 10,
+            }
          });
          filePicker.browse();
       }
    }
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<img
-   {alt}
-   class={disabled ? 'disabled' : ''}
+<ImageButton
    on:click={onEditImage}
-   on:keypress={onEditImage}
    src={value}
 />
-
-<style>
-   img {
-      border-style: var(--titan-border-style);
-
-      &:not(.disabled) {
-         cursor: pointer;
-      }
-   }
-</style>

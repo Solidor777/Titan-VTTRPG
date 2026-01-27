@@ -29,16 +29,14 @@
       ui.notifications.info(
          localize('editedUUIDForDocumentX%').replace('X%', document.name),
       );
-      application.close();
-      return;
+      return application.close();
    }
 
    /**
     *
     */
-   function onCancel() {
-      application.close();
-      return;
+   async function onCancel() {
+      return application.close();
    }
 </script>
 

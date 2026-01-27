@@ -44,25 +44,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Creates a dialog for configuring the Token used by this Actor.
-    * @param {DOM Event} event - The Document this sheet is for.OM Event from clicking the button.
-    * @returns {Promise<void>} Returns after the dialog has been created.
-    * @private
-    */
-   async onConfigureToken(event) {
-      // If this actor is unlinked, use the token sheet.
-      if (this.token) {
-         await this.token.sheet.render(this.getDialogRenderOptions());
-      }
-
-      // If this actor is linked, used the prototype token sheet.
-      else {
-         await new CONFIG.Token.prototypeSheetClass({ prototype: this.actor.prototypeToken }).render(
-            this.getDialogRenderOptions());
-      }
-   }
-
-   /**
     * Imports the Actor from a compendium pack.
     * @param {DOM Event} event - The Document this sheet is for.OM Event from clicking the button.
     * @returns {Promise<void>} Returns after the document has been imported.
@@ -93,17 +74,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
       // Add the effect to the actor.
       return this.actor.createEmbeddedDocuments('ActiveEffect', [effect.toObject()]);
-   }   /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
-   static get defaultOptions() {
-      let parentOptions = super.defaultOptions;
-      return foundry.utils.mergeObject(parentOptions, {
-         baseApplication: 'ActorSheet',
-         width: 750,
-      });
    }
 
    /**
@@ -128,6 +98,17 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
       // Otherwise, create a new item
       return this._onDropItemCreate(itemData);
+   }   /**
+    * Default Application options.
+    * @returns {object} Options - Application options.
+    * @see https://foundryvtt.com/api/Application.html#options
+    */
+   static get defaultOptions() {
+      let parentOptions = super.defaultOptions;
+      return foundry.utils.mergeObject(parentOptions, {
+         baseApplication: 'ActorSheet',
+         width: 750,
+      });
    }
 
    /**
