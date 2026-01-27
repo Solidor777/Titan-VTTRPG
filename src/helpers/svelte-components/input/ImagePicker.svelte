@@ -1,5 +1,5 @@
 <script>
-   import {createEventDispatcher} from 'svelte';
+   import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
 
    /** @type string The value that this input should modify. */
@@ -14,7 +14,7 @@
    /** @type EventDispatcher Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    /**

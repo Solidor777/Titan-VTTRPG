@@ -1,21 +1,20 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import { writable } from 'svelte/store';
-import localize from '~/helpers/utility-functions/Localize.js';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
-import { SETTINGS_ICON } from '~/system/Icons.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
+import ConfigureSheetButton from '~/document/sheet/ConfigureSheetButton.svelte';
 
 /**
- * A replacement Document Sheet to that supports svelte svelte components.
- * @param {Document} sheetDocument - The Document this sheet is for..
+ * A replacement Document Sheet to that supports svelte components.
+ * @param {Document} sheetDocument - The Document this sheet is for.
  * @param {object} options - Options object.
  */
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
-    * A replacement Document Sheet to that supports svelte svelte components.
-    * @param {Document} sheetDocument - The Document this sheet is for..
+    * A replacement Document Sheet to that supports svelte components.
+    * @param {Document} sheetDocument - The Document this sheet is for.
     * @param {object} options - Options object.
     */
    constructor(sheetDocument, options = {}) {
@@ -127,21 +126,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Creates a dialog for configuring the sheet.
-    * @param {DOM Event} event - The Document this sheet is for.OM Event from clicking the button.
-    * @returns {Application} The newly created Document Sheet Config dialog.
-    * @protected
-    */
-   _onConfigureSheet(event) {
-      return new DocumentSheetConfig(this.document, this._getDialogRenderOptions()).render(true);
-   }
-
-   /**
     * Overridable function for getting the offset of a dialog created by this sheet.
     * @returns {{top: number, left: number}} The offset from the location of this sheet to create a new dialog at.
-    * @protected
     */
-   _getDialogRenderOptions() {
+   getDialogRenderOptions() {
       return {
          force: true,
          position: {
@@ -196,10 +184,9 @@ export default class TitanDocumentSheet extends SvelteApplication {
       // Sheet configuration button for documents not in a compendium
       if (!this.document.pack) {
          buttons.unshift({
-            class: 'configure-sheet',
-            icon: SETTINGS_ICON,
-            title: localize('openSheetConfigurator'),
-            onclick: (event) => this._onConfigureSheet(event),
+            svelte: {
+               class: ConfigureSheetButton,
+            }
          });
       }
 

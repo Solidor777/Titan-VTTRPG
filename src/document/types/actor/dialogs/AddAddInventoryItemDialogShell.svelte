@@ -9,7 +9,7 @@
    /** @type TitanActor Reference to the Actor this dialog is for. */
    export let actor = void 0;
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    /** @type string The currently selected item type. */

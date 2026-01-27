@@ -16,7 +16,7 @@
    // The trait idx
    export let traitIdx = void 0;
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    const trait = document.system.attack[attackIdx].customTrait[traitIdx];

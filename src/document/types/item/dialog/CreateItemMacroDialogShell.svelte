@@ -16,7 +16,7 @@
    // UUID of the item that was dropped
    export let uuid = void 0;
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    // Macro type

@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {createEventDispatcher} from 'svelte';
+   import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
 
    /** @type {*[]} Components for changing the options and displaying the parameters. */
@@ -10,7 +10,7 @@
    /** @type EventDispatcher Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    /**

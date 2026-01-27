@@ -18,6 +18,7 @@ export const DELETE_ICON = 'fas fa-trash';
 export const DICE_ICON = 'fas fa-dice';
 export const DURATION_ICON = 'fas fa-clock';
 export const EDIT_ICON = 'fas fa-pen-to-square';
+export const EDIT_TOKEN_ICON = 'fas fa-user-circle';
 export const EXPANDED_ICON = 'fas fa-angle-double-down';
 export const EXPERTISE_ICON = 'fas fa-graduation-cap';
 export const EXPIRED_ICON = 'fas fa-trash-clock';
@@ -143,6 +144,6 @@ const ICON_MAP = deepFreeze({
  * @param {string} concept - The concept to get the icon for.
  * @returns {string} The icon class for the provided constant.
  */
-export function getIcon (concept) {
+export function getIcon(concept) {
    return ICON_MAP[concept];
 }

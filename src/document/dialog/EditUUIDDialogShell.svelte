@@ -10,7 +10,7 @@
    // UUID of the document
    let uuid = document.flags?.titan?.uuid;
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    /**

@@ -20,7 +20,7 @@
    /** @type object Object containing a mapping of each trait to its description. */
    export let traitDescriptions = void 0;
 
-   /** @type Application The Svelte Component's Application. */
+   /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
    // Initialize the value of each trait option to the current value of the document's matching trait
@@ -120,7 +120,7 @@
          @include font-size-normal;
 
          font-weight: bold;
-         page-break-inside: avoid;
+         break-inside: avoid;
 
          &:not(:first-child) {
             margin-top: var(--titan-padding-large);
