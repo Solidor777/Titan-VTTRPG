@@ -2,7 +2,7 @@
    border-style: var(--titan-input-border-style);
    border-radius: var(--titan-input-border-radius);
    border-width: var(--titan-input-border-width);
-   border-color: var(--titan-input-color);
+   border-color: var(--titan-input-font-color);
    background: var(--titan-input-background);
    font-size: var(--titan-input-font-size);
    font-family: var(--titan-input-font), sans-serif;
@@ -10,7 +10,7 @@
    height: var(--titan-input-height);
    width: var(--titan-input-width);
    padding: var(--titan-input-padding);
-   color: var(--titan-input-color);
+   color: var(--titan-input-font-color);
    text-align: var(--titan-input-text-alignment);
 
    &:disabled {
@@ -106,6 +106,7 @@
    flex-direction: row;
    font-size: var(--titan-button-font-size);
    font-weight: var(--titan-button-font-weight);
+   font-family: var(--titan-button-font), sans-serif;
    height: var(--titan-button-height);
    min-height: var(--titan-button-height);
    justify-content: center;
@@ -122,7 +123,8 @@
 
    &:hover {
       &:not(:disabled) {
-         background: radial-gradient(ellipse at center, var(--titan-button-background-highlight), var(--titan-button-background));
+         color: var(--titan-button-color-hover);
+         background: radial-gradient(ellipse at center, var(--titan-button-background-hover), var(--titan-button-background));
       }
    }
 }
@@ -163,7 +165,7 @@
    &:hover {
       &:not(:disabled) {
          cursor: pointer;
-         background: radial-gradient(ellipse at center, var(--titan-button-background-highlight), var(--titan-button-background));
+         background: radial-gradient(ellipse at center, var(--titan-button-background-hover), var(--titan-button-background));
       }
    }
 
@@ -355,6 +357,7 @@
 }
 
 @mixin panel-1 {
+   font-family: var(--titan-font-normal), sans-serif;
    background: var(--titan-panel-1-background);
    color: var(--titan-panel-1-color);
 
@@ -362,6 +365,7 @@
 }
 
 @mixin panel-2 {
+   font-family: var(--titan-font-normal), sans-serif;
    background: var(--titan-panel-2-background);
    color: var(--titan-panel-2-color);
 
@@ -369,6 +373,7 @@
 }
 
 @mixin panel-3 {
+   font-family: var(--titan-font-normal), sans-serif;
    background: var(--titan-panel-3-background);
    color: var(--titan-panel-3-color);
 

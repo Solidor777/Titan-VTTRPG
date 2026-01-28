@@ -10,7 +10,7 @@
    // Item to edit
    export let item = void 0;
 
-   // Slot on the hotbar that the macro will be assign to
+   // Slot on the hotbar that the macro will be assigned to
    export let slot = void 0;
 
    // UUID of the item that was dropped

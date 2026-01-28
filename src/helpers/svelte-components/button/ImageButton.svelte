@@ -16,10 +16,7 @@
 </script>
 
 <button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>
-   <img
-      {alt}
-      {src}
-   />
+   <img {alt} {src}/>
 </button>
 
 <style lang="scss">

@@ -20,18 +20,17 @@
 </script>
 
 <div class="header">
-   <!--Name and XP-->
-   <div class="row main-header">
-      <!--Character name Sheet-->
-      <div class="actor-name">
-         <DocumentName/>
-      </div>
+   <!--Name-->
+   <div class="row">
+      <DocumentName/>
    </div>
 
-   <!--Type-->
+   <!--Character Info-->
    <div class="row">
-      <!--Type-->
+
+      <!--Character Type-->
       <div class="stat text">
+
          <!--Label-->
          <div class="label">
             {localize('type')}
@@ -43,8 +42,9 @@
          </div>
       </div>
 
-      <!--Type-->
+      <!--Character Role-->
       <div class="stat">
+
          <!--Label-->
          <div class="label">
             {localize('role')}
@@ -63,14 +63,14 @@
    </div>
 
    <!--Attributes and Resistances-->
-   <div class="row stats">
+   <div class="row">
       <!--Attributes-->
-      <div class="section">
+      <div class="column">
          <CharacterSheetAttributes/>
       </div>
 
       <!--Resistances-->
-      <div class="section">
+      <div class="column">
          <CharacterSheetResistances/>
       </div>
    </div>
@@ -85,9 +85,6 @@
 
       .row {
          @include flex-row;
-         @include flex-space-evenly;
-
-         width: 100%;
 
          &:not(:first-child) {
             @include border-top;
@@ -95,20 +92,19 @@
             margin-top: var(--titan-padding-standard);
             padding-top: var(--titan-padding-standard);
          }
-      }
 
-      .main-header {
-         @include flex-row;
-         @include flex-space-between;
-
-         width: 100%;
-
-         .actor-name {
+         .column {
             @include flex-row;
-            @include flex-group-left;
+            @include flex-group-center;
 
-            flex: auto;
-            margin-right: var(--titan-padding-standard);
+            width: 100%;
+
+            &:not(:first-child) {
+               @include border-left;
+
+               margin-left: var(--titan-padding-standard);
+               padding-left: var(--titan-padding-standard);
+            }
          }
       }
 
@@ -142,30 +138,6 @@
 
       .tag {
          margin-left: var(--titan-padding-standard);
-      }
-
-      .stats {
-         @include flex-row;
-         @include flex-group-center;
-         @include border-top;
-
-         width: 100%;
-         margin-top: var(--titan-padding-standard);
-         padding-top: var(--titan-padding-standard);
-
-         .section {
-            @include flex-row;
-            @include flex-group-center;
-
-            width: 100%;
-
-            &:not(:first-child) {
-               @include border-left;
-
-               margin-left: var(--titan-padding-standard);
-               padding-left: var(--titan-padding-standard);
-            }
-         }
       }
    }
 </style>

@@ -1,265 +1,113 @@
-// Application
-:root {
-   .app {
-      background-color: var(--titan-app-background)
-   }
-}
-
-// Titan application
+// Titan
 .titan {
-   --color-scrollbar: var(--titan-scrollbar-color);
-   --color-scrollbar-track: var(--titan-scrollbar-gutter-color);
-}
+   // Font
+   color: var(--titan-font-color);
+   font-family: var(--titan-font-normal), sans-serif;
+   font-size: var(--titan-font-size-normal);
 
-// Titan sheet
-.titan-document-sheet > * {
-   z-index: var(--z-index-app);
-   transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-}
+   // Scrollbar
+   scrollbar-color: var(--titan-scrollbar-color);
+   scrollbar-track-color: var(--titan-scrollbar-gutter-color);
 
-// Titan dark mode
-.titan-dark-mode {
-   // Font color
-   --color-dark-1: var(--titan-font-color-dark);
-   --color-dark-2: var(--titan-font-color-dark);
-   --color-dark-3: var(--titan-font-color-dark);
-   --color-dark-4: var(--titan-font-color-dark);
-   --color-dark-5: var(--titan-font-color-dark);
-   --color-dark-6: var(--titan-font-color-dark);
-   --titan-font-color: var(--titan-font-color-dark);
-
-   // Panel 1
-   --titan-panel-1-background: var(--titan-panel-1-background-dark);
-   --titan-panel-1-color: var(--titan-panel-1-color-dark);
-
-   // Panel 2
-   --titan-panel-2-background: var(--titan-panel-2-background-dark);
-   --titan-panel-2-color: var(--titan-panel-2-color-dark);
-
-   // Panel 3
-   --titan-panel-3-background: var(--titan-panel-3-background-dark);
-   --titan-panel-3-color: var(--titan-panel-3-color-dark);
-
-   // Dark mode
-   --color-border-highlight: var(--titan-font-color-dark);
-   --color-text-dark-header: var(--titan-font-color-dark);
-   --color-text-dark-inactive: var(--titan-font-color-dark);
-   --color-text-dark-primary: var(--titan-font-color-dark);
-   --color-text-dark-secondary: var(--titan-font-color-dark);
-
-   // Static value
-   --titan-static-value-background: var(--titan-static-value-background-dark);
-   --titan-static-value-border-color: var(--titan-static-value-border-color);
-   --titan-static-value-color: var(--titan-static-value-color-dark);
-
-   // Input
-   --titan-input-background: var(--titan-input-background-dark);
-   --titan-input-color: var(--titan-input-color-dark);
-
-   // Border
-   --titan-border-color: var(--titan-border-color-dark);
-
-   // Button
-   --titan-button-background: var(--titan-button-background-dark);
-   --titan-button-border-color: var(--titan-button-border-color-dark);
-   --titan-button-color: var(--titan-button-color-dark);
-
-   // Labels
-   --titan-label-border-color: var(--titan-label-border-color-dark);
-   --titan-label-background: var(--titan-label-background-dark);
-   --titan-label-color: var(--titan-label-color-dark);
-
-   // Tags
-   --titan-tag-background: var(--titan-tag-background-dark);
-   --titan-tag-border-color: var(--titan-tag-border-color-dark);
-   --titan-tag-color: var(--titan-tag-color-dark);
-
-   // Resource
-   --titan-resolve-background: var(--titan-resolve-background-dark);
-   --titan-stamina-background: var(--titan-stamina-background-dark);
-   --titan-wounds-background: var(--titan-wounds-background-dark);
-
-   // Meter
-   --titan-meter-background: var(--titan-meter-background-dark);
-
-   .content-link {
-      --color-text-dark-primary: var(--titan-content-link-color-dark);
-
-      color: var(--titan-content-link-color-dark);
-
-      i {
-         --color-text-dark-primary: var(--titan-content-link-color-dark);
-
-         color: var(--titan-content-link-color-dark);
-      }
-   }
-
-   .window-content {
-      background: var(--titan-window-content-background-dark);
-      color: var(--color-text-dark-primary);
-
-      .content-link {
-         --color-text-dark-primary: var(--titan-content-link-color-dark);
-
-         color: var(--titan-content-link-color-dark);
-
-         i {
-            --color-text-dark-primary: var(--titan-content-link-color-dark);
-
-            color: var(--titan-content-link-color-dark);
+   // Hide secrets
+   .rich-text {
+      &.not-owner {
+         .secret {
+            display: none;
          }
       }
    }
 
-   select {
-      color: var(--titan-input-color);
-      background: var(--titan-input-background);
+   // Fix the Z Index for applications
+
+   *.application > * {
+      z-index: var(--z-index-app);
+      transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+      .anonymous-replaced {
+         color: #15171b;
+      }
    }
 
 
+   .content-link {
+      color: var(--titan-content-link-color);
+
+      i {
+         color: var(--titan-content-link-color);
+      }
+   }
+
    &.chat-message {
-      background: var(--titan-chat-message-background-dark);
+      background: var(--titan-chat-message-background);
 
       &.whisper {
-         background: var(--titan-chat-message-whisper-background-dark);
+         background: var(--titan-chat-message-whisper-background);
       }
 
       &.blind {
-         background: var(--titan-chat-message-blind-background-dark);
+         background: var(--titan-chat-message-blind-background);
       }
    }
 
-   .svg {
-      filter: brightness(0);
-   }
+   // Dark Mode Colors
+   &.titan-dark-mode {
+      // Font color
+      --titan-font-color: var(--titan-font-color-dark);
 
-   .prosemirror {
-      .editor-menu {
-         --color-text-dark-primary: var(--titan-editor-menu-color-dark);
+      // Panel 1
+      --titan-panel-1-background: var(--titan-panel-1-background-dark);
+      --titan-panel-1-color: var(--titan-panel-1-color-dark);
 
-         button:not(.pm-dropdown) {
-            &:not(.active) {
-               color: var(--titan-font-color-dark);
-            }
+      // Panel 2
+      --titan-panel-2-background: var(--titan-panel-2-background-dark);
+      --titan-panel-2-color: var(--titan-panel-2-color-dark);
 
-            &.active {
-               --color-text-dark-primary: var(--titan-editor-menu-color-dark);
+      // Panel 3
+      --titan-panel-3-background: var(--titan-panel-3-background-dark);
+      --titan-panel-3-color: var(--titan-panel-3-color-dark);
 
-               color: var(--titan-editor-menu-color-dark);
-            }
+      // Static value
+      --titan-static-value-background: var(--titan-static-value-background-dark);
+      --titan-static-value-border-color: var(--titan-static-value-border-color-dark);
+      --titan-static-value-color: var(--titan-static-value-color-dark);
 
-            &:hover {
-               --color-text-dark-primary: var(--titan-editor-menu-color-dark);
+      // Input
+      --titan-input-background: var(--titan-input-background-dark);
+      --titan-input-font-color: var(--titan-input-font-color-dark);
 
-               color: var(--titan-editor-menu-color-dark);
-            }
-         }
-      }
+      // Border
+      --titan-border-color: var(--titan-border-color-dark);
 
-      &.editing-source {
-         textarea {
-            color: var(--titan-font-color-dark);
-         }
-      }
+      // Button
+      --titan-button-background: var(--titan-button-background-dark);
+      --titan-button-border-color: var(--titan-button-border-color-dark);
+      --titan-button-color: var(--titan-button-color-dark);
 
-      --color-hover-bg: var(--titan-highlight-background);
-   }
+      // Labels
+      --titan-label-border-color: var(--titan-label-border-color-dark);
+      --titan-label-background: var(--titan-label-background-dark);
+      --titan-label-color: var(--titan-label-color-dark);
 
-   h1,
-   h2,
-   h3,
-   h4 {
-      border-color: var(--titan-border-color);
-   }
+      // Tags
+      --titan-tag-background: var(--titan-tag-background-dark);
+      --titan-tag-border-color: var(--titan-tag-border-color-dark);
+      --titan-tag-color: var(--titan-tag-color-dark);
 
-   &.window-app {
-      .journal-entry-content {
-         background: #262836;
+      // Resource
+      --titan-resolve-background: var(--titan-resolve-background-dark);
+      --titan-stamina-background: var(--titan-stamina-background-dark);
+      --titan-wounds-background: var(--titan-wounds-background-dark);
 
-         .title {
-            color: var(--titan-input-color);
-            background: var(--titan-input-background);
-         }
-      }
+      // Meter
+      --titan-meter-background: var(--titan-meter-background-dark);
 
-      .journal-header .title {
-         color: var(--titan-input-color);
-         background: var(--titan-input-background);
-      }
-
-      .journal-sidebar {
-         background: #191a21;
-      }
-
-      .directory {
-         input {
-            color: var(--titan-input-color);
-            background: var(--titan-input-background);
-         }
-
-         ::placeholder {
-            color: var(--titan-input-color);
-         }
-
-         .action-buttons {
-            button {
-               border-color: var(--titan-button-border-color);
-               background: var(--titan-button-background);
-               color: var(--titan-button-color);
-               margin: 0;
-
-               &:disabled {
-                  cursor: default;
-                  background: var(--titan-button-background-disabled);
-               }
-
-               &:hover {
-                  &:not(:disabled) {
-                     background: radial-gradient(ellipse at center, var(--titan-button-background-highlight), var(--titan-button-background));
-                  }
-               }
-            }
-         }
+      .svg {
+         filter: brightness(0);
       }
    }
-
-   .anonymous-replaced {
-      color: #15171b;
-   }
-}
-
-.rich-text {
-   &.not-owner {
-      .secret {
-         display: none;
-      }
-   }
-
-   font-family: 'Open Sans', sans-serif;
-}
-
-#chat-log .titan-dark-mode.emote.section .message-content {
-   text-align: center;
-   color: var(--titan-panel-1-color);
-   font-style: italic;
 }
 
 .dark-svg {
    filter: brightness(0);
-}
-
-.message-content {
-   font-family: 'Open Sans', sans-serif;
-}
-
-.editor {
-   font-family: 'Open Sans', sans-serif;
-}
-
-.journal-page-header {
-   font-family: 'Open Sans', sans-serif;
-}
-
-.journal-page-content {
-   font-family: 'Open Sans', sans-serif;
 }
