@@ -1,8 +1,9 @@
 // Titan
 .titan {
    // Font
-   color: var(--titan-font-color);
-   font-family: var(--titan-font-normal), sans-serif;
+   background: var(--titan-app-background);
+   color: var(--titan-app-font-color);
+   font-family: var(--titan-font-family-normal), sans-serif;
    font-size: var(--titan-font-size-normal);
 
    // Scrollbar
@@ -18,8 +19,7 @@
       }
    }
 
-   // Fix the Z Index for applications
-
+   // Fix the Z Index
    *.application > * {
       z-index: var(--z-index-app);
       transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -29,12 +29,12 @@
       }
    }
 
-
+   // Fix content link colors
    .content-link {
-      color: var(--titan-content-link-color);
+      color: var(--titan-content-link-font-color);
 
       i {
-         color: var(--titan-content-link-color);
+         color: var(--titan-content-link-font-color);
       }
    }
 
@@ -50,64 +50,11 @@
       }
    }
 
-   // Dark Mode Colors
-   &.titan-dark-mode {
-      // Font color
-      --titan-font-color: var(--titan-font-color-dark);
-
-      // Panel 1
-      --titan-panel-1-background: var(--titan-panel-1-background-dark);
-      --titan-panel-1-color: var(--titan-panel-1-color-dark);
-
-      // Panel 2
-      --titan-panel-2-background: var(--titan-panel-2-background-dark);
-      --titan-panel-2-color: var(--titan-panel-2-color-dark);
-
-      // Panel 3
-      --titan-panel-3-background: var(--titan-panel-3-background-dark);
-      --titan-panel-3-color: var(--titan-panel-3-color-dark);
-
-      // Static value
-      --titan-static-value-background: var(--titan-static-value-background-dark);
-      --titan-static-value-border-color: var(--titan-static-value-border-color-dark);
-      --titan-static-value-color: var(--titan-static-value-color-dark);
-
-      // Input
-      --titan-input-background: var(--titan-input-background-dark);
-      --titan-input-font-color: var(--titan-input-font-color-dark);
-
-      // Border
-      --titan-border-color: var(--titan-border-color-dark);
-
-      // Button
-      --titan-button-background: var(--titan-button-background-dark);
-      --titan-button-border-color: var(--titan-button-border-color-dark);
-      --titan-button-color: var(--titan-button-color-dark);
-
-      // Labels
-      --titan-label-border-color: var(--titan-label-border-color-dark);
-      --titan-label-background: var(--titan-label-background-dark);
-      --titan-label-color: var(--titan-label-color-dark);
-
-      // Tags
-      --titan-tag-background: var(--titan-tag-background-dark);
-      --titan-tag-border-color: var(--titan-tag-border-color-dark);
-      --titan-tag-color: var(--titan-tag-color-dark);
-
-      // Resource
-      --titan-resolve-background: var(--titan-resolve-background-dark);
-      --titan-stamina-background: var(--titan-stamina-background-dark);
-      --titan-wounds-background: var(--titan-wounds-background-dark);
-
-      // Meter
-      --titan-meter-background: var(--titan-meter-background-dark);
-
-      .svg {
-         filter: brightness(0);
-      }
+   .svg {
+      filter: brightness(0);
    }
-}
 
-.dark-svg {
-   filter: brightness(0);
+   .dark-svg {
+      filter: brightness(0);
+   }
 }

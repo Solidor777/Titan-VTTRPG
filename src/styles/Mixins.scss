@@ -5,7 +5,7 @@
    border-color: var(--titan-input-font-color);
    background: var(--titan-input-background);
    font-size: var(--titan-input-font-size);
-   font-family: var(--titan-input-font), sans-serif;
+   font-family: var(--titan-input-font-family), sans-serif;
    font-weight: var(--titan-input-font-weight);
    height: var(--titan-input-height);
    width: var(--titan-input-width);
@@ -16,7 +16,7 @@
    &:disabled {
       border-style: var(--titan-input-border-style);
       border-width: var(--titan-input-border-width);
-      color: var(--titan-static-value-color);
+      color: var(--titan-static-value-font-color);
       border-color: var(--titan-static-value-border-color);
       background: var(--titan-static-value-background);
       opacity: var(--titan-disabled-opacity);
@@ -101,12 +101,12 @@
    border-style: var(--titan-button-border-style);
    border-width: var(--titan-button-border-width);
    box-sizing: border-box;
-   color: var(--titan-button-color);
+   color: var(--titan-button-font-color);
    display: flex;
    flex-direction: row;
    font-size: var(--titan-button-font-size);
    font-weight: var(--titan-button-font-weight);
-   font-family: var(--titan-button-font), sans-serif;
+   font-family: var(--titan-button-font-family), sans-serif;
    height: var(--titan-button-height);
    min-height: var(--titan-button-height);
    justify-content: center;
@@ -123,7 +123,7 @@
 
    &:hover {
       &:not(:disabled) {
-         color: var(--titan-button-color-hover);
+         color: var(--titan-button-font-color-hover);
          background: radial-gradient(ellipse at center, var(--titan-button-background-hover), var(--titan-button-background));
       }
    }
@@ -144,7 +144,7 @@
    border-style: var(--titan-button-border-style);
    border-width: var(--titan-button-border-width);
    box-sizing: border-box;
-   color: var(--titan-button-color);
+   color: var(--titan-button-font-color);
    display: flex;
    flex-direction: row;
    font-size: var(--titan-button-font-size);
@@ -190,7 +190,7 @@
       cursor: default;
    }
 
-   image {
+   img {
       width: 100%;
       height: 100%;
    }
@@ -338,15 +338,15 @@
 
 @mixin rarity-colors {
    &.uncommon {
-      background: var(--titan-uncommon-color);
+      background: var(--titan-uncommon-background);
    }
 
    &.rare {
-      background: var(--titan-rare-color);
+      background: var(--titan-rare-background);
    }
 
    &.unique {
-      background: var(--titan-unique-color);
+      background: var(--titan-unique-background);
    }
 }
 
@@ -357,7 +357,7 @@
 }
 
 @mixin panel-1 {
-   font-family: var(--titan-font-normal), sans-serif;
+   font-family: var(--titan-font-family-normal), sans-serif;
    background: var(--titan-panel-1-background);
    color: var(--titan-panel-1-color);
 
@@ -365,7 +365,7 @@
 }
 
 @mixin panel-2 {
-   font-family: var(--titan-font-normal), sans-serif;
+   font-family: var(--titan-font-family-normal), sans-serif;
    background: var(--titan-panel-2-background);
    color: var(--titan-panel-2-color);
 
@@ -373,7 +373,7 @@
 }
 
 @mixin panel-3 {
-   font-family: var(--titan-font-normal), sans-serif;
+   font-family: var(--titan-font-family-normal), sans-serif;
    background: var(--titan-panel-3-background);
    color: var(--titan-panel-3-color);
 
@@ -387,7 +387,7 @@
    border-radius: var(--titan-label-border-radius);
    border-style: var(--titan-label-border-style);
    border-width: var(--titan-label-border-width);
-   color: var(--titan-label-color);
+   color: var(--titan-label-font-color);
    height: var(--titan-label-height);
    padding: var(--titan-label-padding);
    width: var(--titan-label-width);
@@ -404,7 +404,7 @@
    border-radius: var(--titan-tag-border-radius);
    border-width: var(--titan-tag-border-width);
    border-color: var(--titan-tag-border-color);
-   color: var(--titan-tag-color);
+   color: var(--titan-tag-font-color);
    padding: var(--titan-tag-padding);
    background: var(--titan-tag-background);
 

@@ -35,12 +35,12 @@
       --titan-label-padding: var(--titan-input-padding);
 
       &.bonus {
-         --titan-label-color: var(--titan-greater-color);
+         --titan-label-font-color: var(--titan-greater-color);
          --titan-label-background: var(--titan-greater-background);
       }
 
       &.penalty {
-         --titan-label-color: var(--titan-lesser-color);
+         --titan-label-font-color: var(--titan-lesser-color);
          --titan-label-background: var(--titan-lesser-background);
       }
    }

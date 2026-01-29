@@ -105,6 +105,7 @@
       "castingCheckNoLongerValid.label": "Casting Check no longer valid.",
       "castingChecks.label": "Casting Checks",
       "champion.label": "Champion",
+      "characterName.desc.label": "The <strong>name</strong> of this character.",
       "check.attackType.desc.label": "The attacker's Melee to use for calculating the Difficulty of the Check.",
       "check.attackerAccuracy.desc.label": "The attacker's Accuracy to use for calculating the Difficulty of the Check.",
       "check.attackerMelee.desc.label": "The attacker's Melee to use for calculating the Difficulty of the Check.",
@@ -439,6 +440,7 @@
       "restrained.label": "Restrained",
       "restraining.label": "Restraining",
       "role.label": "Role",
+      "role.desc.label": "<p>The <strong>Role</strong> of this character</p><p><strong>Minions</strong> are defeated in one hit.</p><p><strong>Warriors</strong> are defeated after they lose all of their <strong>Stamina</strong>.</p><p><strong>Elites</strong> are defeated after they lose all of their <strong>Stamina</strong> and <strong>Wounds</strong>.</p><strong>Champions</strong> are defeated after they lose all of their <strong>Stamina</strong> and <strong>Wounds</strong>. Additionally, they may use and regain <strong>Resolve</strong>.</p>",
       "roll.label": "Roll",
       "rollMessage.label": "Roll Message",
       "rollTheCheck.label": "Roll the Check",
@@ -527,6 +529,7 @@
       "turns.label": "Turns",
       "twoHanded.label": "Two-Handed",
       "type.label": "Type",
+      "type.desc.label": "The <strong>Type</strong> of creature this character is. (Human, Animal, Monster etc).",
       "unEquip.label": "Un-Equip",
       "unarmed.label": "Unarmed",
       "uncommon.label": "Uncommon",
@@ -554,9 +557,10 @@
       "wounds.maxValue.label": "Max Wounds = (Body + Mind + Soul)",
       "woundsTaken.label": "Wounds Taken",
       "xp.label": "XP",
-      "xpAvailable.label": "XP Available",
+      "xpTotalCost.desc.label": "The total <strong>XP</strong> cost of this character's <strong>Attributes</strong>, <strong>Skills</strong>, and <strong>Abilities.</strong>",
+      "xpAvailable.desc.label": "The remaining <strong>XP</strong> available after accounting for the cost of this character's <strong>Attributes</strong>, <strong>Skills</strong>, and <strong>Abilities.</strong>",
       "xpCost.label": "XP Cost",
-      "xpEarned.label": "XP Earned"
+      "xpEarned.desc.label": "The total <strong>XP</strong> earned by this character over the course of their adventures."
    },
    "SETTINGS": {
       "getCheckOptions": {

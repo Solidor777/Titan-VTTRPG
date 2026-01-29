@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import CheckChatResetExpertiseButton from '~/check/chat-message/CheckChatResetExpertiseButton.svelte';
    import {
@@ -173,11 +173,11 @@
          font-weight: bold;
 
          &.succeeded {
-            color: var(--titan-succeeded-color);
+            color: var(--titan-succeeded-font-color);
          }
 
          &.failed {
-            color: var(--titan-failed-color);
+            color: var(--titan-failed-font-color);
          }
       }
 

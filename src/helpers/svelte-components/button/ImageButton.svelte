@@ -22,6 +22,5 @@
 <style lang="scss">
    button {
       @include image-button
-
    }
 </style>

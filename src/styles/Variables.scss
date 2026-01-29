@@ -1,64 +1,63 @@
 :root {
    // Font Families
-   --titan-font-normal: 'Lato';
-   --titan-font-body: 'Open Sans';
+   --titan-font-family-normal: 'Lato';
+   --titan-font-family-body: 'Open Sans';
 
-   // Font color
-   --titan-font-color-dark: rgb(255 255 255 / 0.83);
-
-   // Font size
+   // Font sizes
    --titan-font-size-normal: 16px;
    --titan-font-size-small: 14px;
    --titan-font-size-large: 20px;
    --titan-font-size-extra-large: 24px;
-
+   
    // Border
-   --titan-border-style: solid;
+   --titan-border-color: #d3d3d3;
    --titan-border-radius: 4px;
-   --titan-border-width: 2px;
+   --titan-border-style: solid;
    --titan-border-width-normal: 2px;
    --titan-border-width-thick: 4px;
-   --titan-border-color-dark: rgb(255 255 255 / 0.83);
-
-   // Scrollbar
-   --titan-scrollbar-color-dark: #f2b58c;
-   --titan-scrollbar-gutter-color-dark: #1b1b1b;
+   --titan-border-width: 2px;
 
    // Padding
-   --titan-padding-standard: 4px;
    --titan-padding-large: 8px;
+   --titan-padding-standard: 4px;
+
+   // Application
+   --titan-app-background: #0f0f0fcc;
+   --titan-app-font-color: #d3d3d3;
+
+   // Scrollbar
+   --titan-scrollbar-color: #f2b58c;
+   --titan-scrollbar-gutter-color: #1b1b1b;
 
    // Input
-   --titan-input-border-style: solid;
+   --titan-input-background: #c5bcf8;
    --titan-input-border-radius: 0px;
+   --titan-input-border-style: solid;
    --titan-input-border-width: 2px;
-   --titan-input-font-color-dark: #1d1e26;
+   --titan-input-font-color: #1d1e26;
+   --titan-input-font-size: 16px;
+   --titan-input-font-weight: bold;
+   --titan-input-font-family: 'Lato';
    --titan-input-height: 24px;
-   --titan-input-width: 100%;
-   --titan-input-background: #FFF;
-   --titan-input-background-dark: #c5bcf8;
    --titan-input-padding: 0 4px;
    --titan-input-text-alignment: left;
-   --titan-input-font: 'Lato';
-   --titan-input-font-weight: bold;
-   --titan-input-font-size: 16px;
+   --titan-input-width: 100%;
 
    // Button
-   --titan-button-background-dark: #f2b58c;
+   --titan-button-background: #f2b58c;
    --titan-button-background-disabled: #D0D0D0;
    --titan-button-background-hover: #FFE9AE;
-   --titan-button-background: rgb(255 255 240 / 0.8);
-   --titan-button-border-color-dark: #15171b;
+   --titan-button-border-color: #15171b;
    --titan-button-border-radius: 12px;
    --titan-button-border-style: solid;
    --titan-button-border-width: 2px;
    --titan-button-chat-message-border-radius: 10px;
-   --titan-button-color-disabled: #000;
-   --titan-button-color-hover: #000;
-   --titan-button-color-dark: #15171b;
-   --titan-button-font: 'Lato';
+   --titan-button-font-color: #15171b;
+   --titan-button-font-color-hover: #000;
+   --titan-button-font-color-disabled: #000;
    --titan-button-font-size: 16px;
    --titan-button-font-weight: bold;
+   --titan-button-font-family: 'Lato';
    --titan-button-height: 100%;
    --titan-button-line-height: 20px;
    --titan-button-padding: 4px 8px;
@@ -70,39 +69,30 @@
    --titan-icon-button-radius: 32px;
 
    // Label
-   --titan-label-background: #F5F5F5;
-   --titan-label-background-dark: #a6ccf2;
-   --titan-label-border-color: #000;
-   --titan-label-border-color-dark: #15171b;
+   --titan-label-background: #a6ccf2;
+   --titan-label-border-color: #15171b;
    --titan-label-border-radius: 4px;
    --titan-label-border-style: solid;
    --titan-label-border-width: 2px;
-   --titan-label-color: #000;
-   --titan-label-color-dark: #1d1e26;
+   --titan-label-font-color: #1d1e26;
    --titan-label-padding: 4px;
    --titan-label-width: 100%;
    --titan-label-height: 100%;
 
    // Tag
-   --titan-tag-background: #F5F5F5;
-   --titan-tag-background-dark: #a6ccf2;
-   --titan-tag-border-color: #000;
-   --titan-tag-border-color-dark: #15171b;
+   --titan-tag-background: #a6ccf2;
+   --titan-tag-border-color: #15171b;
    --titan-tag-border-radius: 4px;
    --titan-tag-border-style: solid;
    --titan-tag-border-width: 2px;
-   --titan-tag-color: #000;
-   --titan-tag-color-dark: #1d1e26;
+   --titan-tag-font-color: #1d1e26;
    --titan-tag-font-size: 14px;
    --titan-tag-padding: 4px;
 
    // Resource
-   --titan-resolve-background: #0096c8;
-   --titan-resolve-background-dark: #3fb6dd;
-   --titan-stamina-background: #008442;
-   --titan-stamina-background-dark: #37da88;
-   --titan-wounds-background: #980000;
-   --titan-wounds-background-dark: #c55858;
+   --titan-resolve-background: #3fb6dd;
+   --titan-stamina-background: #37da88;
+   --titan-wounds-background: #c55858;
 
    // Resistance
    --titan-reflexes-background: #eff49a;
@@ -115,36 +105,36 @@
    --titan-soul-background: #b5f2e8;
 
    // Rarity
-   --titan-uncommon-color: #d0ffbb;
-   --titan-rare-color: #ffdeac;
-   --titan-unique-color: #ffcfee;
+   --titan-uncommon-background: #d0ffbb;
+   --titan-rare-background: #ffdeac;
+   --titan-unique-background: #ffcfee;
 
    // Dice result
-   --titan-critical-success-color: #87CEFA;
-   --titan-success-color: #90EE90;
-   --titan-failure-color: #FFD700;
-   --titan-critical-failure-color: #FFA07A;
+   --titan-critical-success-background: #87CEFA;
+   --titan-success-background: #90EE90;
+   --titan-failure-background: #FFD700;
+   --titan-critical-failure-background: #FFA07A;
 
    // Check result
-   --titan-succeeded-color: #00008B;
-   --titan-failed-color: #8B0000;
+   --titan-succeeded-font-color: #00008B;
+   --titan-failed-font-color: #8B0000;
 
    // Static value
-   --titan-static-value-background-dark: #464646;
-   --titan-static-value-color-dark: rgb(255 255 255 / 0.83);
-   --titan-static-value-border-color-dark: rgb(170 170 170 / 0.83);
+   --titan-static-value-background: #464646;
+   --titan-static-value-font-color: #d3d3d3;
+   --titan-static-value-border-color: #8d8d8d;
 
    // Panel 1
-   --titan-panel-1-background-dark: #373949;
-   --titan-panel-1-color-dark: rgb(255 255 255 / 0.83);
+   --titan-panel-1-background: #373949;
+   --titan-panel-1-color: #d3d3d3;
 
    // Panel 2
-   --titan-panel-2-background-dark: #424557;
-   --titan-panel-2-color-dark: rgb(255 255 255 / 0.83);
+   --titan-panel-2-background: #424557;
+   --titan-panel-2-color: #d3d3d3;
 
    // Panel 3
-   --titan-panel-3-background-dark: #2e303c;
-   --titan-panel-3-color-dark: rgb(255 255 255 / 0.83);
+   --titan-panel-3-background: #2e303c;
+   --titan-panel-3-color: #d3d3d3;
 
    // Opacity
    --titan-disabled-opacity: 1;
@@ -156,10 +146,9 @@
    --titan-greater-background: #c5ffeb;
 
    // Meter
-   --titan-meter-background: #F5F5F5;
-   --titan-meter-background-dark: #1E1E1E;
-   --titan-meter-shadow-1: rgb(255 255 255 / 0.3);
-   --titan-meter-shadow-2: rgb(0 0 0 / 0.4);
+   --titan-meter-background: #1E1E1E;
+   --titan-meter-shadow-1: #ffffff4d;
+   --titan-meter-shadow-2: #0006;
 
    // Gradient
    --titan-gradient-degree: 135deg;
@@ -178,9 +167,6 @@
    --titan-turn-start-effect-primary: #9580ff;
    --titan-turn-start-effect-secondary: #80ffea;
 
-   // Application
-   --titan-app-background: rgb(15 15 15 / 0.80);
-
    // Selection
    --titan-highlight-background: #FFE9AE;
    --titan-active-background: #fcdbbf;
@@ -190,14 +176,14 @@
    --titan-line-height-small: 14px;
 
    // Chat Message
-   --titan-chat-message-background-dark: #424557;
-   --titan-chat-message-blind-background-dark: #2e1b2e;
-   --titan-chat-message-whisper-background-dark: #20203e;
+   --titan-chat-message-background: #424557;
+   --titan-chat-message-blind-background: #2e1b2e;
+   --titan-chat-message-whisper-background: #20203e;
 
    // Links
-   --titan-content-link-color-dark: #191813;
+   --titan-content-link-font-color: #191813;
 
    // Editor Menu
-   --titan-editor-menu-color-dark: #191813;
-   --titan-window-content-background-dark: #262836;
+   --titan-editor-menu-color: #191813;
+   --titan-window-content-background: #262836;
 }

@@ -18,15 +18,15 @@
       @include tag;
 
       &.uncommon {
-         --titan-tag-background: var(--titan-uncommon-color);
+         --titan-tag-background: var(--titan-uncommon-background);
       }
 
       &.rare {
-         --titan-tag-background: var(--titan-rare-color);
+         --titan-tag-background: var(--titan-rare-background);
       }
 
       &.unique {
-         --titan-tag-background: var(--titan-unique-color);
+         --titan-tag-background: var(--titan-unique-background);
       }
    }
 </style>

@@ -42,6 +42,7 @@
 </script>
 
 <ImageButton
+   {alt}
    on:click={onEditImage}
    src={value}
 />

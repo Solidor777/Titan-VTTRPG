@@ -1,10 +1,10 @@
 <script>
    import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import {DICE_ICON, EXPERTISE_ICON} from '~/system/Icons.js';
+   import { DICE_ICON, EXPERTISE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -84,23 +84,23 @@
       }
 
       &.critical-success {
-         --titan-button-background: var(--titan-critical-success-color);
-         --titan-button-background-disabled: var(--titan-critical-success-color);
+         --titan-button-background: var(--titan-critical-success-background);
+         --titan-button-background-disabled: var(--titan-critical-success-background);
       }
 
       &.success {
-         --titan-button-background: var(--titan-success-color);
-         --titan-button-background-disabled: var(--titan-success-color);
+         --titan-button-background: var(--titan-success-background);
+         --titan-button-background-disabled: var(--titan-success-background);
       }
 
       &.failure {
-         --titan-button-background: var(--titan-failure-color);
-         --titan-button-background-disabled: var(--titan-failure-color);
+         --titan-button-background: var(--titan-failure-background);
+         --titan-button-background-disabled: var(--titan-failure-background);
       }
 
       &.critical-failure {
-         --titan-button-background: var(--titan-critical-failure-color);
-         --titan-button-background-disabled: var(--titan-critical-failure-color);
+         --titan-button-background: var(--titan-critical-failure-background);
+         --titan-button-background-disabled: var(--titan-critical-failure-background);
       }
    }
 </style>
