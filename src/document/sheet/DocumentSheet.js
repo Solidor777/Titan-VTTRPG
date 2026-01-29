@@ -18,10 +18,15 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * @param {object} options - Options object.
     */
    constructor(sheetDocument, options = {}) {
+      // Add default classes
       const classes = ['titan', 'titan-document-sheet'];
+
+      // Add dark mode class if appropriate
       if (isDarkModeSheetsEnabled()) {
          classes.push('titan-dark-mode');
       }
+
+      // Merge the classes with those provided by the options object
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
          : classes;

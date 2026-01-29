@@ -1,6 +1,5 @@
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
-import AddCustomAttackTraitDialogShell
-   from '~/document/types/item/types/weapon/dialog/AddCustomAttackTraitDialogShell.svelte';
+import AddCustomTraitDialogShell from '~/document/types/item/dialog/AddCustomTraitDialogShell.svelte';
 
 /**
  * Dialog for adding a Custom Trait to an Item.
@@ -16,20 +15,14 @@ export default class AddCustomTraitDialog extends TitanDialog {
    constructor(item) {
       super({
          title: `${item.name}`,
+         classes: ['titan-add-custom-item-trait-dialog'],
          content: {
-            class: AddCustomAttackTraitDialogShell,
+            class: AddCustomTraitDialogShell,
             props: {
                item: item,
             },
          },
          id: `titan-add-custom-trait-dialog-${item._id}`,
       });
-   }
-
-   _getDialogClasses() {
-      const retVal = super._getDialogClasses();
-      retVal.push('titan-add-custom-trait-dialog');
-
-      return retVal;
    }
 }

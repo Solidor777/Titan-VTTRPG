@@ -1,8 +1,8 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ItemSheetSidebarChecks from '~/document/types/item/sheet/check/ItemSheetSidebarChecks.svelte';
-   import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
-   import ItemSheetSidebarBase from '~/document/types/item/sheet/ItemSheetSidebarBase.svelte';
+   import ItemSheetSidebarCustomTraits from '~/document/types/item/sheet/ItemSheetSidebarCustomTraits.svelte';
+   import ItemSheetSidebarSections from '~/document/types/item/sheet/ItemSheetSidebarSections.svelte';
    import SpellSheetSidebarCastingCheck
       from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCastingCheck.svelte';
 
@@ -12,11 +12,11 @@
    $: sections =
       $document.system.check.length > 0
          ? [
-            ItemSheetSidebarTraits,
+            ItemSheetSidebarCustomTraits,
             SpellSheetSidebarCastingCheck,
             ItemSheetSidebarChecks,
          ]
-         : [ItemSheetSidebarTraits, SpellSheetSidebarCastingCheck];
+         : [ItemSheetSidebarCustomTraits, SpellSheetSidebarCastingCheck];
 </script>
 
-<ItemSheetSidebarBase {sections}/>
+<ItemSheetSidebarSections {sections}/>

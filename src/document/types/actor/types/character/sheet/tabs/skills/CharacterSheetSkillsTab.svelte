@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import CharacterSheetSkillsList
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte';
@@ -28,6 +28,7 @@
    .skill-tab {
       @include flex-column;
       @include flex-group-center;
+      @include panel-1;
 
       width: 100%;
       height: 100%;

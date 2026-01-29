@@ -2,9 +2,9 @@
    import CharacterSheetTabs from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabs.svelte';
    import CharacterSheetSidebar
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
-   // Header to allow this sheet to be used with players or NPCs
+   /** @type svelte:component Header Component */
    export let header = void 0;
 
    /** @type object Reference to the Document store. */
@@ -36,14 +36,20 @@
 <style lang="scss">
    .titan-sheet {
       @include flex-row;
-      @include font-size-normal;
+
+      .header {
+         @include panel-1;
+      }
 
       .sidebar {
+         @include panel-1;
+
          margin-right: var(--titan-padding-large);
       }
 
       .body {
          @include flex-column;
+         @include panel-1;
 
          flex-grow: 1;
 

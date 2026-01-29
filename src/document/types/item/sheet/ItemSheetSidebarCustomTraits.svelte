@@ -1,9 +1,9 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {CREATE_ICON} from '~/system/Icons.js';
+   import { CREATE_ICON } from '~/system/Icons.js';
    import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
 
    /** @type object Reference to the Document store. */
@@ -27,10 +27,10 @@
       </Button>
    </div>
 
-   <!--Traits-->
+   <!--Custom Traits-->
    {#if $document.system.customTrait.length > 0}
       <div class="traits-container" transition:slide|local>
-         <!--Custom Traits-->
+         <!--Each Custom Trait-->
          {#each $document.system.customTrait as trait, idx (trait.uuid)}
             <div class="trait" transition:slide|local>
                <ItemSheetCustomTraitTag {idx}/>

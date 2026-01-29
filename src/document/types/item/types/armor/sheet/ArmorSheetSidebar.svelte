@@ -1,8 +1,8 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ItemSheetSidebarChecks from '~/document/types/item/sheet/check/ItemSheetSidebarChecks.svelte';
    import ArmorSheetSidebarTraits from '~/document/types/item/types/armor/sheet/ArmorSheetSidebarTraits.svelte';
-   import ItemSheetSidebarBase from '~/document/types/item/sheet/ItemSheetSidebarBase.svelte';
+   import ItemSheetSidebarSections from '~/document/types/item/sheet/ItemSheetSidebarSections.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -13,4 +13,4 @@
          : [ArmorSheetSidebarTraits];
 </script>
 
-<ItemSheetSidebarBase {sections}/>
+<ItemSheetSidebarSections {sections}/>

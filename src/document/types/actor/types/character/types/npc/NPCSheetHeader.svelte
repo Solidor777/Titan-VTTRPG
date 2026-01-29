@@ -74,7 +74,6 @@
 
 <style lang="scss">
    .header {
-      @include panel-1;
       @include border;
 
       padding: var(--titan-padding-standard);

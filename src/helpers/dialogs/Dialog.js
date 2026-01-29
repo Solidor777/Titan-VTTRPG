@@ -1,7 +1,8 @@
-import {TJSDialog} from '@typhonjs-fvtt/runtime/svelte/application';
-import {Z_INDEX_APP} from '~/system/Constants.js';
+import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { Z_INDEX_APP } from '~/system/Constants.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
-import isDarkModeSheetsEnabled from "~/helpers/Settings/DarkModeSheets.js";
+import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * Base dialog class with system specific functionality.
@@ -16,15 +17,24 @@ export default class TitanDialog extends TJSDialog {
     * @augments TJSDialog
     */
    constructor(options) {
+      // Add default classes
+      const classes = ['titan', 'titan-dialog'];
+
+      // Add dark mode class if appropriate
+      if (isDarkModeSheetsEnabled()) {
+         classes.push('titan-dark-mode');
+      }
+
+      // Merge the classes with those provided by the options object
+      options.classes = options.classes
+         ? mergeArrays(classes, options.classes)
+         : classes;
 
       // Set base properties for the dialog
       options.id = options.id ?
          `${options.id}-${generateUUID()}` :
          `titan-dialog-${generateUUID()}`;
       super(options);
-
-      // Add the sheet classes
-      this.options.classes.push(...this._getDialogClasses());
    }
 
    /**
@@ -38,19 +48,5 @@ export default class TitanDialog extends TJSDialog {
          height: 'auto',
          zIndex: Z_INDEX_APP,
       });
-   }
-
-   /**
-    * Gets a list of classes to add to this dialog for identification purposes.
-    * @returns {string[]} List of classes to add to this dialog.
-    * @protected
-    */
-   _getDialogClasses() {
-      const retVal = ['titan', 'titan-dialog'];
-      if (isDarkModeSheetsEnabled()) {
-         retVal.push('titan-dark-mode');
-      }
-
-      return retVal;
    }
 }

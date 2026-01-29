@@ -1,10 +1,10 @@
 <script>
-   import {EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
+   import { EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import CharacterSheetCondensedSkillCheckButton
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetCondensedSkillCheckButton.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
@@ -17,7 +17,7 @@
 
    /** @type AttributeCheckParameters Calculated check parameters. */
    let checkParameters = $document.system.getAttributeCheckParameters(
-      $document.system.initializeAttributeCheckOptions({skill: key}));
+      $document.system.initializeAttributeCheckOptions({ skill: key }));
 
    /** @type string Tooltip for the total Training value. */
    let totalTrainingTooltip = '';
@@ -62,7 +62,7 @@
    $: {
       // Update check parameters
       checkParameters = $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({skill: key}));
+         $document.system.initializeAttributeCheckOptions({ skill: key }));
 
       // Update total training tooltip
       totalTrainingTooltip = getTotalValueTooltip(
@@ -186,7 +186,7 @@
    .skill {
       @include flex-row;
       @include flex-space-between;
-      @include panel-1;
+      @include panel-2;
 
       width: 100%;
       padding: var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-large);

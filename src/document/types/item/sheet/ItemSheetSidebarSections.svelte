@@ -1,6 +1,6 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
 
    /** @type object Reference to the Application State store. */
@@ -23,7 +23,6 @@
       @include border;
       @include flex-column;
       @include flex-group-top;
-      @include panel-2;
 
       min-width: 208px;
       width: 100%;

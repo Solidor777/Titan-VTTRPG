@@ -41,7 +41,6 @@
       @include border;
       @include flex-column;
       @include flex-group-top;
-      @include panel-1;
 
       padding: var(--titan-padding-standard);
       min-width: 208px;

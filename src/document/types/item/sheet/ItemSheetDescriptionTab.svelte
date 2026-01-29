@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
 
@@ -13,18 +12,7 @@
 
 <div class="tab">
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.description}>
-      <!--Description-->
-      <div class="description">
-         <!--Header-->
-         <h3>
-            {localize('description')}
-         </h3>
-
-         <!--Body-->
-         <div class="body">
-            <DocumentBoundEditorInput bind:value={$document.system.description}/>
-         </div>
-      </div>
+      <DocumentBoundEditorInput bind:value={$document.system.description}/>
    </ScrollingContainer>
 </div>
 
@@ -34,36 +22,8 @@
       @include flex-group-center;
       @include panel-2;
 
+      padding: var(--titan-padding-standard);
       height: 100%;
       width: 100%;
-
-      @include font-size-normal;
-
-      .description {
-         @include flex-column;
-         @include flex-group-top;
-
-         padding: var(--titan-padding-large);
-         width: 100%;
-         height: 100%;
-
-         h3 {
-            @include flex-row;
-            @include flex-group-left;
-
-            width: 100%;
-            margin-bottom: 0;
-         }
-
-         .body {
-            @include flex-row;
-            @include flex-group-left;
-
-            margin-top: var(--titan-padding-standard);
-            flex-wrap: wrap;
-            width: 100%;
-            flex-grow: 2;
-         }
-      }
    }
 </style>

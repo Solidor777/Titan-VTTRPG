@@ -1,15 +1,20 @@
 <script>
-   // Header, sidebar, and tabs to allow this layout to be used by multiple item types
-   import { getContext } from 'svelte'
+   import { getContext } from 'svelte';
 
-   export let header = void 0
-   export let sidebar = void 0
-   export let tabs = void 0
+   /** @type svelte:component Header Component */
+   export let header = void 0;
+
+   /** @type svelte:component Sidebar Component */
+   export let sidebar = void 0;
+
+   /** @type svelte:component Tabs Component */
+   export let tabs = void 0;
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document')
+   const document = getContext('document');
 </script>
 {#if $document}
+   <!--Sheet-->
    <div class="titan-sheet">
       <!--Header-->
       <div class="header">
@@ -18,6 +23,7 @@
 
       <!--Sheet body-->
       <div class="body">
+
          <!--Sidebar-->
          <div class="sidebar">
             <svelte:component this={sidebar}/>
@@ -34,7 +40,6 @@
 <style lang="scss">
    .titan-sheet {
       @include flex-column;
-      @include font-size-normal;
 
       height: 100%;
 
@@ -43,14 +48,17 @@
 
          height: 100%;
          width: 100%;
+         margin-top: var(--titan-padding-large);
 
          .sidebar {
-            margin: var(--titan-padding-large) var(--titan-padding-large) 0 0;
+            @include panel-1;
          }
 
          .tabs {
+            @include panel-1;
+
+            margin-left: var(--titan-padding-large);
             width: 100%;
-            margin-top: var(--titan-padding-large);
          }
       }
    }

@@ -18,9 +18,7 @@
    /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
-   /**
-    * Creates an image picker pointing to the current source path.
-    */
+   /** Creates an image picker pointing to the current source path. */
    function onEditImage() {
       if (!disabled) {
          const current = value;
