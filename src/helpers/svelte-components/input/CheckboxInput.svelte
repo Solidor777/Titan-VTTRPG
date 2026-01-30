@@ -33,28 +33,32 @@
 
 <style lang="scss">
    button {
-      height: var(--titan-input-height);
-      min-height: var(--titan-input-height);
+      background: var(--titan-input-font-color);
+      border-color: var(--titan-input-border-color);
+      border-style: var(--titan-input-border-style);
+      border-width: var(--titan-input-border-width);
+      box-sizing: border-box;
+      color: var(--titan-input-background);
       font-size: var(--titan-input-height);
-      padding: 0;
+      height: var(--titan-input-height);
       margin: 0;
-      border: none;
-
-      &:not(:disabled) {
-         background: var(--titan-input-font-color);
-         color: var(--titan-input-background);
-
-
-         &:hover {
-            cursor: pointer;
-            color: var(--titan-input-hover-background);
-         }
-      }
+      min-height: var(--titan-input-height);
+      min-width: var(--titan-input-min-height);
+      padding: 0;
+      width: var(--titan-input-min-height);
 
       &:disabled {
-         cursor: default;
-         color: var(--titan-input-disabled-background);
+         --titan-input-background: var(--titan-input-disabled-background);
+         --titan-input-border-color: var(--titan-input-disabled-border-color);
+         --titan-input-font-color: var(--titan-input-disabled-font-color);
       }
 
+      &:not(:disabled) {
+         &:hover {
+            --titan-input-border-color: var(--titan-input-hover-border-color);
+            --titan-input-font-color: var(--titan-input-hover-font-color);
+            --titan-input-background: var(--titan-input-hover-background);
+         }
+      }
    }
 </style>

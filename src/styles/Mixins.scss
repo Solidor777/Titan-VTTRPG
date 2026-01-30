@@ -23,11 +23,12 @@
       opacity: 1;
    }
 
-   &:hover {
-      &:not(:disabled) {
+   &:not(:disabled) {
+      &:hover {
+         --titan-input-border-color: var(--titan-input-hover-border-color);
+         --titan-input-font-color: var(--titan-input-hover-font-color);
+
          background: radial-gradient(ellipse at center, var(--titan-input-hover-background), var(--titan-input-background));
-         border-color: var(--titan-input-hover-border-color);
-         color: var(--titan-input-hover-font-color);
       }
    }
 }
@@ -109,14 +110,14 @@
 }
 
 @mixin button {
-   background: var(--titan-button-background);
-   border-color: var(--titan-button-border-color);
-   color: var(--titan-button-font-color);
    align-items: center;
+   background: radial-gradient(var(--titan-button-background));
+   border-color: var(--titan-button-border-color);
    border-radius: var(--titan-button-border-radius);
    border-style: var(--titan-button-border-style);
    border-width: var(--titan-button-border-width);
    box-sizing: border-box;
+   color: var(--titan-button-font-color);
    display: flex;
    flex-direction: row;
    font-family: var(--titan-button-font-family), sans-serif;
@@ -139,11 +140,12 @@
       cursor: default;
    }
 
-   &:hover {
-      &:not(:disabled) {
+   &:not(:disabled) {
+      &:hover {
+         --titan-button-hover-font-color: var(--titan-button-font-color);
+         --titan-button-border-color: var(--titan-button-hover-border-color);
+
          background: radial-gradient(ellipse at center, var(--titan-button-hover-background), var(--titan-button-background));
-         border-color: var(--titan-button-hover-border-color);
-         color: var(--titan-button-hover-font-color);
       }
    }
 }
