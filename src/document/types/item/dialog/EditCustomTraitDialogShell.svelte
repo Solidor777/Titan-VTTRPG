@@ -154,7 +154,7 @@
 
             width: 100%;
 
-            --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
+            --titan-button-border-radius: var(--titan-button-border-radius);
 
             &:not(:first-child) {
                margin-left: var(--titan-padding-standard);

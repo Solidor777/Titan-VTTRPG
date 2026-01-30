@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {CHECKED_ICON, UNCHECKED_ICON} from '~/system/Icons.js';
+   import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
    // Value to toggle
    export let enabled = void 0;
@@ -74,9 +74,8 @@
             @include flex-row;
             @include flex-group-center;
             @include border;
+            @include calculated-value;
 
-            color: var(--titan-font-color);
-            background: var(--titan-static-value-background);
             height: 24px;
             width: 24px;
             margin-left: var(--titan-padding-standard);

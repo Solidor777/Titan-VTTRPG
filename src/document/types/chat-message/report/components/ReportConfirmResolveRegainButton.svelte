@@ -1,9 +1,9 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {REGAIN_RESOLVE_ICON} from '~/system/Icons.js';
+   import { REGAIN_RESOLVE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -56,6 +56,6 @@
 
       width: 100%;
 
-      --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
+      --titan-button-border-radius: var(--titan-button-border-radius);
    }
 </style>

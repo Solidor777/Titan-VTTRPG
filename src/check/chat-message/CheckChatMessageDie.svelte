@@ -85,22 +85,22 @@
 
       &.critical-success {
          --titan-button-background: var(--titan-critical-success-background);
-         --titan-button-background-disabled: var(--titan-critical-success-background);
+         --titan-button-disabled-background: var(--titan-critical-success-background);
       }
 
       &.success {
          --titan-button-background: var(--titan-success-background);
-         --titan-button-background-disabled: var(--titan-success-background);
+         --titan-button-disabled-background: var(--titan-success-background);
       }
 
       &.failure {
          --titan-button-background: var(--titan-failure-background);
-         --titan-button-background-disabled: var(--titan-failure-background);
+         --titan-button-disabled-background: var(--titan-failure-background);
       }
 
       &.critical-failure {
          --titan-button-background: var(--titan-critical-failure-background);
-         --titan-button-background-disabled: var(--titan-critical-failure-background);
+         --titan-button-disabled-background: var(--titan-critical-failure-background);
       }
    }
 </style>

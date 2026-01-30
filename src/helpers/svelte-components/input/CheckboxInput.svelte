@@ -33,24 +33,28 @@
 
 <style lang="scss">
    button {
-      height: var(--titan-button-font-size);
-      min-height: var(--titan-button-font-size);
+      height: var(--titan-input-height);
+      min-height: var(--titan-input-height);
+      font-size: var(--titan-input-height);
       padding: 0;
       margin: 0;
       border: none;
-      background: var(--titan-button-font-color);
-      color: var(--titan-button-background);
+
+      &:not(:disabled) {
+         background: var(--titan-input-font-color);
+         color: var(--titan-input-background);
+
+
+         &:hover {
+            cursor: pointer;
+            color: var(--titan-input-hover-background);
+         }
+      }
 
       &:disabled {
          cursor: default;
-         color: var(--titan-button-background-disabled);
+         color: var(--titan-input-disabled-background);
       }
 
-      &:hover {
-         &:not(:disabled) {
-            cursor: pointer;
-            color: var(--titan-button-background-hover);
-         }
-      }
    }
 </style>

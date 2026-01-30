@@ -31,34 +31,42 @@
 
    // Input
    --titan-input-background: #c5bcf8;
+   --titan-input-border-color: #292929;
    --titan-input-border-radius: 0px;
    --titan-input-border-style: solid;
    --titan-input-border-width: 2px;
-   --titan-input-font-color: #1d1e26;
+   --titan-input-disabled-background: #8d8d8d;
+   --titan-input-disabled-border-color: #464646;
+   --titan-input-disabled-font-color: #292929;
+   --titan-input-font-color: #262626;
+   --titan-input-font-family: 'Lato';
    --titan-input-font-size: 16px;
    --titan-input-font-weight: bold;
-   --titan-input-font-family: 'Lato';
    --titan-input-height: 24px;
+   --titan-input-hover-background: #f7f2ff;
+   --titan-input-hover-border-color: #393939;
+   --titan-input-hover-font-color: #393939;
    --titan-input-padding: 0 4px;
    --titan-input-text-alignment: left;
    --titan-input-width: 100%;
 
    // Button
    --titan-button-background: #f2b58c;
-   --titan-button-background-disabled: #D0D0D0;
-   --titan-button-background-hover: #FFE9AE;
-   --titan-button-border-color: #15171b;
+   --titan-button-border-color: #292929;
    --titan-button-border-radius: 12px;
    --titan-button-border-style: solid;
    --titan-button-border-width: 2px;
-   --titan-button-chat-message-border-radius: 10px;
-   --titan-button-font-color: #15171b;
-   --titan-button-font-color-hover: #000;
-   --titan-button-font-color-disabled: #000;
+   --titan-button-disabled-background: #8d8d8d;
+   --titan-button-disabled-border-color: #464646;
+   --titan-button-disabled-font-color: #292929;
+   --titan-button-font-color: #262626;
+   --titan-button-font-family: 'Lato';
    --titan-button-font-size: 16px;
    --titan-button-font-weight: bold;
-   --titan-button-font-family: 'Lato';
    --titan-button-height: 100%;
+   --titan-button-hover-background: #f8d2bb;
+   --titan-button-hover-border-color: #393939;
+   --titan-button-hover-font-color: #393939;
    --titan-button-line-height: 20px;
    --titan-button-padding: 4px 8px;
    --titan-button-width: 100%;
@@ -67,10 +75,6 @@
    --titan-icon-button-border-radius: 16px;
    --titan-icon-button-padding: 2px;
    --titan-icon-button-radius: 32px;
-
-   // Checkbox
-   --titan-checkbox-background-checked: #f2b58c;
-   --titan-checkbox-background-unchecked: #D0D0D0;
 
    // Label
    --titan-label-background: #a6ccf2;
@@ -124,9 +128,9 @@
    --titan-failed-font-color: #8B0000;
 
    // Static value
-   --titan-static-value-background: #464646;
-   --titan-static-value-font-color: #d3d3d3;
-   --titan-static-value-border-color: #8d8d8d;
+   --titan-calculated-value-background: #464646;
+   --titan-calculated-value-font-color: #d3d3d3;
+   --titan-calculated-value-border-color: #8d8d8d;
 
    // Panel 1
    --titan-panel-1-background: #373949;
@@ -139,9 +143,6 @@
    // Panel 3
    --titan-panel-3-background: #2e303c;
    --titan-panel-3-color: #d3d3d3;
-
-   // Opacity
-   --titan-disabled-opacity: 1;
 
    // Mod
    --titan-lesser-color: #8b0000;

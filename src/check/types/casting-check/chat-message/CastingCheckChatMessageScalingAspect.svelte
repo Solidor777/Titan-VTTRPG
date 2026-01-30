@@ -1,8 +1,8 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON} from '~/system/Icons.js';
+   import { DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON } from '~/system/Icons.js';
 
    /** @type number Index of the Scaling Aspect in the Scaling Aspects array. */
    export let idx = void 0;
@@ -256,7 +256,7 @@
          margin-top: var(--titan-padding-standard);
          width: 100%;
 
-         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-border-radius);
 
          .cost {
             @include flex-row;

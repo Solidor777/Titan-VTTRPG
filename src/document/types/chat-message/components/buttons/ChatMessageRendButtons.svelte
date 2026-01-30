@@ -2,7 +2,7 @@
    import applyRendToTargets from '~/helpers/utility-functions/ApplyRendToTargets.js';
    import applyRepairsToTargets from '~/helpers/utility-functions/ApplyRepairsToTarget.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {REND_ICON, REPAIR_ICON} from '~/system/Icons.js';
+   import { REND_ICON, REPAIR_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
    /** @type isInteger Amount of Rend to apply. */
@@ -47,7 +47,7 @@
 
          width: 100%;
 
-         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-border-radius);
 
          &:not(:first-child) {
             padding-left: var(--titan-padding-standard);

@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {DAMAGE_ICON, HALF_DAMAGE_ICON, HEALING_ICON, IGNORE_ARMOR_ICON} from '~/system/Icons.js';
+   import { DAMAGE_ICON, HALF_DAMAGE_ICON, HEALING_ICON, IGNORE_ARMOR_ICON } from '~/system/Icons.js';
 
    export let damage = void 0;
    export let ineffective = false;
@@ -73,7 +73,7 @@
 
          width: 100%;
 
-         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-border-radius);
 
          &:not(:first-child) {
             padding-left: var(--titan-padding-standard);

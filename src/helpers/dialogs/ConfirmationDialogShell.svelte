@@ -91,7 +91,7 @@
          width: 100%;
          margin-top: var(--titan-padding-standard);
 
-         --titan-button-border-radius: var(--titan-button-chat-message-border-radius);
+         --titan-button-border-radius: var(--titan-button-border-radius);
       }
    }
 </style>
