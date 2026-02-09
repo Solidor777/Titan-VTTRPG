@@ -21,9 +21,7 @@
 
 <style lang="scss">
    .button {
-      --titan-button-font-size: var(--titan-font-size-small);
-      --titan-button-padding: var(--titan-padding-standard);
-      --titan-button-border-radius: var(--titan-button-border-radius);
+      @include mini-button;
 
       .label {
          @include flex-row;

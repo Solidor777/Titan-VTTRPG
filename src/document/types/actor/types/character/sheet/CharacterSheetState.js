@@ -1,7 +1,7 @@
-import { writable } from 'svelte/store'
+import { writable } from 'svelte/store';
 
 /**
- * @typedef {object} CharacterSheetState - Reactive store for managing the state of a Character Sheet.
+ * @typedef {writable<Object>} CharacterSheetState - Reactive store for managing the state of a Character Sheet.
  * @property {string} activeTab - The currently active sheet tab.
  * @property {object} filter - Object containing the current filters, arranged by sheet element.
  * @property {string} filter.abilities - The current filter for the Abilities tab.
@@ -43,7 +43,7 @@ import { writable } from 'svelte/store'
  * Creates a reactive state store for a Character sheet.
  * @returns {CharacterSheetState} A reactive state store for a Character sheet.
  */
-export default function createCharacterSheetState () {
+export default function createCharacterSheetState() {
    const { set, update, subscribe } = writable({
       activeTab: 'skills',
       filter: {
@@ -78,31 +78,31 @@ export default function createCharacterSheetState () {
          skills: 0,
          spells: 0,
       },
-   })
+   });
 
    /**
     * Removes an Item with provided ID from the reactive state store.
     * @param {string} itemId - The ID of the item to remove.
     */
-   function deleteItem (itemId) {
+   function deleteItem(itemId) {
       update((state) => {
          // Remove the item from the inventory tab.
          if (state.isExpanded.inventory[itemId] === false || state.isExpanded.inventory[itemId] === true) {
-            delete state.isExpanded.inventory[itemId]
+            delete state.isExpanded.inventory[itemId];
          }
 
          // Remove the item from the abilities tab.
          if (state.isExpanded.abilities[itemId] === false || state.isExpanded.abilities[itemId] === true) {
-            delete state.isExpanded.abilities[itemId]
+            delete state.isExpanded.abilities[itemId];
          }
 
          // Remove the item from the spells tab.
          if (state.isExpanded.spells[itemId] === false || state.isExpanded.spells[itemId] === true) {
-            delete state.isExpanded.spells[itemId]
+            delete state.isExpanded.spells[itemId];
          }
 
-         return state
-      })
+         return state;
+      });
    }
 
    return {
@@ -110,5 +110,5 @@ export default function createCharacterSheetState () {
       update,
       subscribe,
       deleteItem,
-   }
+   };
 }

@@ -2,22 +2,22 @@
    /**
     * @typedef {object} SelectOption
     * Object used to store data for an Option within a Select svelte component.
-    * @property {*} value The value for this option.
-    * @property {string} label The display label for this option.
+    * @property {*} value - The value for this option.
+    * @property {string} label - The display label for this option.
     */
 
    /**
-    * @typedef {SelectOption} StringOption
+    * @typedef {SelectOption} Number
     * Object used to store data for a String Option within a Select svelte component.
-    * @property {string} value The value for this option.
-    * @property {string} label The display label for this option.
+    * @property {string} value - The value for this option.
+    * @property {number} label - The display label for this option.
     */
 
    /**
     * @typedef {SelectOption} StringOption
     * Object used to store data for a Number Option within a Select svelte component.
-    * @property {number} value The value for this option.
-    * @property {string} label The display label for this option.
+    * @property {number} value - The value for this option.
+    * @property {string} label - The display label for this option.
     */
 
    /** @type SelectOption[] Options for the Select svelte component. */
@@ -30,7 +30,10 @@
    export let disabled = false;
 </script>
 
-<select bind:value {disabled} on:change>
+<select
+   bind:value
+   {disabled}
+   on:change>
    {#each options as option}
       <option value={option.value}>
          {option.label}

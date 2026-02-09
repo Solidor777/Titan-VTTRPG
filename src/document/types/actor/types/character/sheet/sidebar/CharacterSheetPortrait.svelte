@@ -88,18 +88,11 @@
 
       .buttons {
          @include flex-column;
-         @include flex-group-center;
+         @include flex-space-between;
          @include border-left;
 
          padding-left: var(--titan-padding-standard);
          height: 160px;
-
-         .button {
-            @include flex-column;
-
-            height: 100%;
-            flex-grow: 2;
-         }
       }
    }
 </style>

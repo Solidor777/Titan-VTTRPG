@@ -35,16 +35,6 @@
 
 <style lang="scss">
    .rarity-select {
-      &.uncommon {
-         --titan-input-background: var(--titan-uncommon-background);
-      }
-
-      &.rare {
-         --titan-input-background: var(--titan-rare-background);
-      }
-
-      &.unique {
-         --titan-input-background: var(--titan-unique-background);
-      }
+      @include rarity-input;
    }
 </style>

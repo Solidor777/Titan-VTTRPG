@@ -1,8 +1,8 @@
 <script>
-   import {getContext} from 'svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import {DELETE_ICON} from '~/system/Icons.js';
+   import { getContext } from 'svelte';
+   import { DELETE_ICON } from '~/system/Icons.js';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -11,7 +11,7 @@
    export let itemId = void 0;
 </script>
 
-<IconButton
+<DocumentOwnerIconButton
    icon={DELETE_ICON}
    on:click={() => $document.system.requestItemDeletion(itemId)}
    tooltip={localize('deleteItem')}

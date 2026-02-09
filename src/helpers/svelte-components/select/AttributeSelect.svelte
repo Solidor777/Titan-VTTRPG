@@ -1,6 +1,5 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/select/Select.svelte';
 
    /** @type string The value that this input should modify. */
    export let value = void 0;
@@ -36,21 +35,20 @@
    }
 </script>
 
-<div class="{value}">
-   <Select bind:value {disabled} on:change {options}/>
-</div>
-
+<select
+   bind:value
+   class={value}
+   {disabled}
+   on:change>
+   {#each options as option}
+      <option value={option.value}>
+         {option.label}
+      </option>
+   {/each}
+</select>
 <style lang="scss">
-   .body {
-      --titan-input-background: var(--titan-body-background);
-      --titan-static-background: var(--titan-body-background);
-   }
-
-   .mind {
-      --titan-input-background: var(--titan-mind-background);
-   }
-
-   .soul {
-      --titan-input-background: var(--titan-soul-background);
+   select {
+      @include input;
+      @include attribute-input;
    }
 </style>

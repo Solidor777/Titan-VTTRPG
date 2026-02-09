@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
@@ -11,9 +11,9 @@
       from '~/document/types/actor/types/character/sheet/items/ability/CharacterSheetAbility.svelte';
    import CharacterSheetTabHeaderButton
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
-   import {CREATE_ICON, RESET_ICON} from '~/system/Icons.js';
+   import { CREATE_ICON, RESET_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Application State store. */
+   /** @type CharacterSheetState Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    /** @type object Reference to the Document store. */
@@ -41,7 +41,7 @@
          <!--Reset button-->
          <div class="reset">
             <IconButton
-               icon="{RESET_ICON}"
+               icon={RESET_ICON}
                on:click={() => {
                   $appState.filterOptions.abilities.action = false;
                   $appState.filterOptions.abilities.reaction = false;
@@ -101,15 +101,10 @@
                      return false;
                   }
 
-                  if (
-                     $appState.filterOptions.abilities.passive &&
-                     !item.system.passive
-                  ) {
-                     return false;
+                  return !($appState.filterOptions.abilities.passive &&
+                     !item.system.passive);
                   }
-
-                  return true;
-               }}
+               }
                isExpandedMap={$appState.isExpanded.abilities}
                itemComponent={CharacterSheetAbility}
             />

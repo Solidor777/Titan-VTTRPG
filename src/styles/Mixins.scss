@@ -25,10 +25,12 @@
 
    &:not(:disabled) {
       &:hover {
-         --titan-input-border-color: var(--titan-input-hover-border-color);
-         --titan-input-font-color: var(--titan-input-hover-font-color);
+         &:not(:open) {
+            --titan-input-border-color: var(--titan-input-hover-border-color);
+            --titan-input-font-color: var(--titan-input-hover-font-color);
 
-         background: radial-gradient(ellipse at center, var(--titan-input-hover-background), var(--titan-input-background));
+            background: radial-gradient(ellipse at center, var(--titan-input-hover-background), var(--titan-input-background));
+         }
       }
    }
 }
@@ -213,7 +215,9 @@
 
    --titan-button-border-radius: var(--titan-icon-button-border-radius);
    --titan-button-padding: var(--titan-icon-button-padding);
-   --titan-button-radius: var(--titan-icon-button-radius);
+
+   width: var(--titan-icon-button-radius);
+   height: var(--titan-icon-button-radius);
 }
 
 @mixin image-button {
@@ -335,14 +339,52 @@
 @mixin attribute-button {
    &.body {
       --titan-button-background: var(--titan-body-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-body-background);
+      }
    }
 
    &.mind {
       --titan-button-background: var(--titan-mind-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-mind-background);
+      }
    }
 
    &.soul {
       --titan-button-background: var(--titan-soul-background);
+   }
+
+   &:disabled {
+      --titan-button-disabled-background: var(--titan-soul-background);
+   }
+}
+
+@mixin attribute-input {
+   &.body {
+      --titan-input-background: var(--titan-body-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-body-background);
+      }
+   }
+
+   &.mind {
+      --titan-input-background: var(--titan-mind-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-mind-background);
+      }
+   }
+
+   &.soul {
+      --titan-input-background: var(--titan-soul-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-soul-background);
+      }
    }
 }
 
@@ -363,14 +405,52 @@
 @mixin resistance-button {
    &.reflexes {
       --titan-button-background: var(--titan-reflexes-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-reflexes-background);
+      }
    }
 
    &.resilience {
       --titan-button-background: var(--titan-resilience-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-resilience-background);
+      }
    }
 
    &.willpower {
       --titan-button-background: var(--titan-willpower-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-willpower-background);
+      }
+   }
+}
+
+@mixin resistance-input {
+   &.reflexes {
+      --titan-input-background: var(--titan-reflexes-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-reflexes-background);
+      }
+   }
+
+   &.resilience {
+      --titan-input-background: var(--titan-resilience-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-resilience-background);
+      }
+   }
+
+   &.willpower {
+      --titan-input-background: var(--titan-willpower-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-willpower-background);
+      }
    }
 }
 
@@ -385,6 +465,32 @@
 
    &.unique {
       background: var(--titan-unique-background);
+   }
+}
+
+@mixin rarity-input {
+   &.uncommon {
+      --titan-input-background: var(--titan-uncommon-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-uncommon-background);
+      }
+   }
+
+   &.rare {
+      --titan-input-background: var(--titan-rare-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-rare-background);
+      }
+   }
+
+   &.unique {
+      --titan-input-background: var(--titan-rare-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-rare-background);
+      }
    }
 }
 
