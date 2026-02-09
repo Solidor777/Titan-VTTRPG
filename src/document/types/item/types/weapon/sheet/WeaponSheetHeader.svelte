@@ -1,11 +1,11 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import DocumentRaritySelect from '~/document/svelte-components/select/DocumentRaritySelect.svelte';
-   import {CURRENCY_ICON} from '~/system/Icons.js';
+   import { CURRENCY_ICON } from '~/system/Icons.js';
+   import ItemSheetRaritySelect from '~/document/types/item/sheet/ItemSheetRaritySelect.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -35,7 +35,7 @@
 
             <!--Input-->
             <div class="input">
-               <DocumentRaritySelect bind:value={$document.system.rarity}/>
+               <ItemSheetRaritySelect/>
             </div>
          </div>
 

@@ -389,6 +389,7 @@
       "rangedWeapons.label": "Ranged Weapons",
       "rare.label": "Rare",
       "rarity.label": "Rarity",
+      "rarity.desc.label": "<p><strong>Rarity</strong> represents how readily an item, spell, or ability may be found in the world.</p><p><strong>Common</strong> items and abilities are easy to find in places where objects and abilities of this sort exist. Most shops, mages, and temples should have access to them.</p><p><strong>Uncommon</strong> items and abilities can be found by those who know where to look. Characters may need to perform a service or task to gain access.</p><p><strong>Rare</strong> items and abilities are extremely difficult to find. They are almost never readily available, and searching for them can be an adventure in itself.</p><p><strong>Unique</strong> items and abilities are among the most powerful and sought after in the world. Obtaining them may be the goal of an entire adventuring arc.</p>",
       "rating.label": "Rating",
       "reRollFailures.label": "Re-roll Failures",
       "reRollFailuresSpendResolve.label": "Re-roll Failures (Spend 1 Resolve)",
@@ -559,8 +560,13 @@
       "xp.label": "XP",
       "xpTotalCost.desc.label": "The total <strong>XP</strong> cost of this character's <strong>Attributes</strong>, <strong>Skills</strong>, and <strong>Abilities.</strong>",
       "xpAvailable.desc.label": "The remaining <strong>XP</strong> available after accounting for the cost of this character's <strong>Attributes</strong>, <strong>Skills</strong>, and <strong>Abilities.</strong>",
+      "abilityXpCost.desc.label": "The <strong>XP</strong> cost of this <strong>Ability</strong>.",
       "xpCost.label": "XP Cost",
-      "xpEarned.desc.label": "The total <strong>XP</strong> earned by this character over the course of their adventures."
+      "xpEarned.desc.label": "The total <strong>XP</strong> earned by this character over the course of their adventures.",
+      "abilityName.desc.label": "The name of this <strong>Ability</strong>.",
+      "abilityAction.desc.label": "Using this <strong>Ability</strong> is an <strong>Action</strong>.",
+      "abilityReaction.desc.label": "Using this <strong>Ability</strong> is a <strong>Reaction</strong>.",
+      "abilityPassive.desc.label": "This <strong>Ability</strong> is always <strong>active</strong>."
    },
    "SETTINGS": {
       "getCheckOptions": {

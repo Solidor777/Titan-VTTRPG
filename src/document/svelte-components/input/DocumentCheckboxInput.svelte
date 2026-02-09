@@ -6,16 +6,19 @@
    /** @type number The value that this input should modify. */
    export let value = void 0;
 
-   /** @type object Reference to the Document store. */
-   const document = getContext('document');
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 
    /** @type boolean Whether editing this input should be disabled. */
    export let disabled = false;
-   
+
+   /** @type object Reference to the Document store. */
+   const document = getContext('document');
 </script>
 
 <CheckboxInput
    bind:value
    disabled={disabled || !$document?.isOwner}
    on:editor:save={() => refreshSystemDocument($document, disabled)}
+   {tooltip}
 />

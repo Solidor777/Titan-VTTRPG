@@ -109,6 +109,57 @@
    padding: var(--titan-padding-large);
 }
 
+@mixin padded-border-left-large {
+   @include border-left;
+
+   margin-left: var(--titan-padding-large);
+   padding-left: var(--titan-padding-large);
+}
+
+@mixin padding-top-large {
+   padding-top: var(--titan-padding-large);
+}
+
+@mixin padding-left-large {
+   padding-left: var(--titan-padding-large);
+}
+
+@mixin separate-row-child-large {
+   &:not(:first-child) {
+      @include padding-left-large;
+   }
+}
+
+@mixin separate-row-large {
+   > * {
+      @include separate-row-child-large;
+   }
+}
+
+@mixin separate-column-child-large {
+   &:not(:first-child) {
+      @include padding-top-large;
+   }
+}
+
+@mixin separate-column-large {
+   > * {
+      @include separate-column-child-large;
+   }
+}
+
+@mixin border-separate-row-child-large {
+   &:not(:first-child) {
+      @include padded-border-left-large;
+   }
+}
+
+@mixin border-separate-row-large {
+   > * {
+      @include border-separate-row-child-large;
+   }
+}
+
 @mixin button {
    align-items: center;
    background: radial-gradient(var(--titan-button-background));

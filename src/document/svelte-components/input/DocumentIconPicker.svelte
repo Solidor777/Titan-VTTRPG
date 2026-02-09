@@ -1,13 +1,9 @@
 <script>
    import { getContext } from 'svelte';
    import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
-   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
-
-   /** @type string The value that this input should modify. */
-   export let value = void 0;
 
    /** @type string Text to display if the value is not a path to valid image. */
-   export let alt = 'img';
+   export let alt = 'icon';
 
    /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
@@ -17,12 +13,21 @@
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
+
+   /** Updates the document in response to changes. */
+   async function updateDocument() {
+      if (!disabled && $document?.isOwner) {
+         $document.update({
+            img: $document.img,
+         });
+      }
+   }
 </script>
 
 <ImagePicker
    {alt}
-   bind:value
+   bind:value={$document.img}
    disabled={disabled || !$document?.isOwner}
-   on:editor:save={() => refreshSystemDocument($document, disabled)}
+   on:editor:save={() => updateDocument()}
    {tooltip}
 />

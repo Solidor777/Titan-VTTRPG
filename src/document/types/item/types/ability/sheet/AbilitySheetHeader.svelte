@@ -1,11 +1,12 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
-   import DocumentRaritySelect from '~/document/svelte-components/select/DocumentRaritySelect.svelte';
-   import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
+   import DocumentIconPicker from '~/document/svelte-components/input/DocumentIconPicker.svelte';
+   import ItemSheetRaritySelect from '~/document/types/item/sheet/ItemSheetRaritySelect.svelte';
+   import ItemSheetXPCostInput from '~/document/types/item/sheet/ItemSheetXPCostInput.svelte';
+   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -13,81 +14,70 @@
 
 <!--Header-->
 <div class="header">
-   <div class="main-label">
-      <!--Portrait-->
-      <div class="portrait">
-         <DocumentImagePicker alt={'item portrait'} bind:value={$document.img}/>
+   <!--Portrait-->
+   <div class="column icon">
+      <DocumentIconPicker alt={'item icon'}/>
+   </div>
+
+   <!--Middle Label-->
+   <div class="column middle">
+
+      <!--Name-->
+      <div class="input name">
+         <DocumentName tooltip={localize('abilityName.desc')}/>
       </div>
 
-      <!--Label Stats-->
-      <div class="label-stats">
-         <!--Name-->
-         <div class="name">
-            <DocumentName/>
+      <!--Stats-->
+      <div class="row">
+
+         <!--Rarity-->
+         <div class="input">
+            <ItemSheetRaritySelect/>
          </div>
 
-         <!--Secondary Stats-->
-         <div class="secondary-stats">
-            <!--Rarity-->
-            <div class="stat">
-               <!--Label-->
-               <div class="label">
-                  {localize('rarity')}
-               </div>
-
-               <!--Input-->
-               <div class="input">
-                  <DocumentRaritySelect bind:value={$document.system.rarity}/>
-               </div>
-            </div>
-
-            <!--XP Cost-->
-            <div class="stat">
-               <!--Label-->
-               <div class="label">
-                  {localize('xp')}
-               </div>
-
-               <!--Input-->
-               <div class="input number">
-                  <DocumentIntegerInput
-                     bind:value={$document.system.xpCost}
-                     min={0}
-                  />
-               </div>
-            </div>
+         <!--XP Cost-->
+         <div class="input number">
+            <ItemSheetXPCostInput tooltip={localize('abilityXpCost.desc')}/>
          </div>
       </div>
    </div>
 
-   <div class="ability-types">
+   <!--Usage Type-->
+   <div class="column right">
+
       <!--Action-->
-      <div class="checkbox">
-         <div class="label">
-            {localize('action')}
-         </div>
+      <div class="row checkbox">
          <div class="input">
-            <DocumentCheckboxInput bind:value={$document.system.action}/>
+            <LabeledInput tooltip={localize('abilityAction.desc')}>
+               <svelte:fragment slot="label">{localize('action')}</svelte:fragment>
+               <svelte:fragment slot="input">
+                  <DocumentCheckboxInput value={$document.system.action}/>
+               </svelte:fragment>
+            </LabeledInput>
          </div>
       </div>
 
       <!--Reaction-->
-      <div class="checkbox">
-         <div class="label">
-            {localize('reaction')}
-         </div>
+      <div class="row checkbox">
          <div class="input">
-            <DocumentCheckboxInput bind:value={$document.system.reaction}/>
+            <LabeledInput tooltip={localize('abilityReaction.desc')}>
+               <svelte:fragment slot="label">{localize('reaction')}</svelte:fragment>
+               <svelte:fragment slot="input">
+                  <DocumentCheckboxInput value={$document.system.reaction}/>
+               </svelte:fragment>
+            </LabeledInput>
          </div>
       </div>
 
       <!--Passive-->
-      <div class="checkbox">
-         <div class="label">
-            {localize('passive')}
-         </div>
+      <div class="row checkbox">
          <div class="input">
-            <DocumentCheckboxInput bind:value={$document.system.passive}/>
+            <LabeledInput tooltip={localize('abilityPassive.desc')}>
+               <svelte:fragment slot="label">{localize('passive')}</svelte:fragment>
+               <svelte:fragment slot="input">
+                  <DocumentCheckboxInput value={$document.system.reaction}/>
+               </svelte:fragment>
+            </LabeledInput>
          </div>
       </div>
    </div>
@@ -99,101 +89,58 @@
       @include flex-row;
       @include flex-space-between;
       @include panel-1;
+      @include separate-row-large;
 
       width: 100%;
       padding: var(--titan-padding-large);
 
-      .main-label {
-         @include flex-row;
-         @include flex-group-left;
-
-         width: 100%;
-
-         .portrait {
-            width: 80px;
-
-            --titan-border-style: none;
-         }
-
-         .label-stats {
-            @include flex-column;
-            @include flex-group-top-left;
-
-            width: calc(100% - 88px);
-            margin-left: var(--titan-padding-large);
-
-            .name {
-               @include flex-row;
-               @include flex-group-left;
-
-               width: 100%;
-            }
-
-            .secondary-stats {
-               @include flex-row;
-               @include flex-group-left;
-
-               margin-top: var(--titan-padding-large);
-               width: 100%;
-
-               .stat {
-                  @include flex-row;
-                  @include flex-group-left;
-
-                  &:not(:first-child) {
-                     @include border-left;
-
-                     margin-left: var(--titan-padding-large);
-                     padding-left: var(--titan-padding-large);
-                  }
-
-                  .label {
-                     @include flex-row;
-                     @include flex-group-left;
-
-                     font-weight: bold;
-                     margin-right: var(--titan-padding-large);
-                  }
-
-                  .input {
-                     @include flex-row;
-                     @include flex-group-center;
-
-                     &.number {
-                        --titan-input-width: 32px;
-                     }
-                  }
-               }
-            }
-         }
-      }
-
-      .ability-types {
+      .column {
          @include flex-column;
-         @include flex-group-top;
+         @include separate-column-large;
 
-         margin-right: var(--titan-padding-large);
-         margin-left: 24px;
+         &.middle {
+            @include flex-group-left;
 
-         .checkbox {
-            @include flex-row;
+            flex-grow: 2;
+         }
+
+         &.right {
             @include flex-group-right;
+         }
+
+         .row {
+            @include flex-row;
+            @include border-separate-row-large;
 
             width: 100%;
 
-            .label {
-               @include flex-row;
+            &.checkbox {
                @include flex-group-right;
 
-               font-weight: bold;
+               &:not(:first-child) {
+                  padding-top: var(--titan-padding-standard);
+               }
+            }
+         }
+
+         .input {
+            @include flex-row;
+            @include flex-group-center;
+
+            &.name {
+               width: 100%;
+               flex-basis: max-content;
+
+               --titan-input-width: 100%;
             }
 
-            .input {
-               @include flex-row;
-               @include flex-group-left;
-
-               width: 16px;
+            &.number {
+               --titan-input-width: 32px;
             }
+         }
+
+         &.icon {
+            width: 80px;
          }
       }
    }

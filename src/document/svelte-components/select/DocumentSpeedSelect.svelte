@@ -4,7 +4,7 @@
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /** @type string The value that this input should modify. */
-   export let value;
+   export let value = void 0;
 
    /** @type boolean Whether to allow None as an option. */
    export let allowNone = false;
