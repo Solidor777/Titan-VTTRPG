@@ -90,9 +90,9 @@
       @include flex-space-between;
       @include panel-1;
       @include separate-row-large;
+      @include padding-large;
 
       width: 100%;
-      padding: var(--titan-padding-large);
 
       .column {
          @include flex-column;

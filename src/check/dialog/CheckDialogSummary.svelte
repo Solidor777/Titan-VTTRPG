@@ -32,8 +32,8 @@
    .field {
       @include flex-row;
       @include flex-group-center;
+      @include padding-standard;
 
-      padding: var(--titan-padding-standard);
       width: 100%;
 
       .sign {

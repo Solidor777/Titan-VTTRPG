@@ -219,7 +219,9 @@
       @include font-size-small;
 
       font-weight: bold;
-      padding: var(--titan-padding-standard);
+
+      @include padding-standard;
+
       width: 100%;
 
       .label {

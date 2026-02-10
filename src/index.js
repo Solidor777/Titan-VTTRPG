@@ -1,7 +1,8 @@
 import '~/styles/Lato.scss';
 import '~/styles/OpenSans.scss';
 import '~/styles/Global.scss';
-import '~/styles/Mixins.scss';
+import '~/styles/Mixins/MixinsPadding.scss';
+import '~/styles/Mixins/Mixins.scss';
 import '~/styles/Variables.scss';
 import onCombatNextTurn from '~/hooks/OnCombatNextTurn.js';
 import onGetActorDirectoryEntryContext from '~/hooks/OnGetActorDirectoryEntryContext.js';

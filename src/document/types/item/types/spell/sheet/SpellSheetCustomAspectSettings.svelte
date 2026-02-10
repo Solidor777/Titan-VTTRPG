@@ -1,13 +1,13 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import {COLLAPSED_ICON, DAMAGE_ICON, DELETE_ICON, EXPANDED_ICON, HEALING_ICON} from '~/system/Icons.js';
+   import { COLLAPSED_ICON, DAMAGE_ICON, DELETE_ICON, EXPANDED_ICON, HEALING_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -167,8 +167,8 @@
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
+         @include padding-standard;
 
-         padding: var(--titan-padding-standard);
          width: 100%;
 
          .label {
@@ -190,8 +190,8 @@
          @include panel-3;
 
          width: calc(100% - 16px);
-         padding: var(--titan-padding-standard);
 
+         @include padding-standard;
          @include font-size-small;
 
          .row {

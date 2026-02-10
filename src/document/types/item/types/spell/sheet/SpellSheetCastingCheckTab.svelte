@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
@@ -178,8 +178,8 @@
          @include flex-group-top;
          @include border-bottom-sides;
          @include panel-3;
+         @include padding-standard;
 
-         padding: var(--titan-padding-standard);
          width: calc(100% - 16px);
 
          .stat {
@@ -226,8 +226,8 @@
 
       .aspect-costs {
          @include flex-column;
+         @include padding-standard;
 
-         padding: var(--titan-padding-standard);
          height: 100%;
          width: 100%;
 

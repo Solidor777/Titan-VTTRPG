@@ -14,8 +14,7 @@
       @include flex-group-left;
       @include border;
       @include panel-1;
-
-      padding: var(--titan-padding-standard);
+      @include padding-large;
 
       img {
          border: none;

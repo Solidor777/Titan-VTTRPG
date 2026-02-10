@@ -1,11 +1,11 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import {COLLAPSED_ICON, DICE_ICON, EXPANDED_ICON} from '~/system/Icons.js';
+   import { COLLAPSED_ICON, DICE_ICON, EXPANDED_ICON } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    /** @type object Reference to the Document store. */
@@ -77,7 +77,8 @@
             </div>
          </div>
 
-         {#if $appState.isExpanded.sidebar.check[idx] && (check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled === true)}
+         {#if $appState.isExpanded.sidebar.check[idx] &&
+         (check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled === true)}
             <div class="stats" transition:slide|local>
                <!--Resolve Cost-->
                {#if check.resolveCost > 0}
@@ -155,7 +156,8 @@
             @include tag;
 
             width: 100%;
-            padding: var(--titan-padding-standard);
+
+            @include padding-standard;
 
             .label {
                @include flex-row;

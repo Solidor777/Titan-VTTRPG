@@ -111,14 +111,12 @@
          @include flex-row;
          @include flex-group-center;
          @include panel-2;
+         @include padding-standard;
+         @include font-size-normal;
 
          width: 100%;
          height: 40px;
          margin-bottom: var(--titan-padding-large);
-         padding: var(--titan-padding-standard);
-
-         @include font-size-normal;
-
          font-weight: bold;
          break-inside: avoid;
 

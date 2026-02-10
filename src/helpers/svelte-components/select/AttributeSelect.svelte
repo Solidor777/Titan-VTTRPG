@@ -46,6 +46,7 @@
       </option>
    {/each}
 </select>
+
 <style lang="scss">
    select {
       @include input;

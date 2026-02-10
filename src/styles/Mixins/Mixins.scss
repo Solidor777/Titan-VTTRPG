@@ -1,3 +1,5 @@
+@use './MixinsPadding' as padding;
+
 @mixin input {
    background: var(--titan-input-background);
    border-color: var(--titan-input-border-color);
@@ -103,14 +105,6 @@
    border-color: var(--titan-button-border-color);
 }
 
-@mixin padding-standard {
-   padding: var(--titan-padding-standard);
-}
-
-@mixin padding-large {
-   padding: var(--titan-padding-large);
-}
-
 @mixin padded-border-left-large {
    @include border-left;
 
@@ -118,17 +112,9 @@
    padding-left: var(--titan-padding-large);
 }
 
-@mixin padding-top-large {
-   padding-top: var(--titan-padding-large);
-}
-
-@mixin padding-left-large {
-   padding-left: var(--titan-padding-large);
-}
-
 @mixin separate-row-child-large {
    &:not(:first-child) {
-      @include padding-left-large;
+      @include padding.padding-left-large;
    }
 }
 
@@ -140,7 +126,7 @@
 
 @mixin separate-column-child-large {
    &:not(:first-child) {
-      @include padding-top-large;
+      @include padding.padding-top-large;
    }
 }
 

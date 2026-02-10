@@ -20,7 +20,7 @@
    }
 
    // Fix the Z Index
-   *.application > * {
+   *.application * {
       z-index: var(--z-index-app);
       transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 

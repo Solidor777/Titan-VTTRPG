@@ -272,8 +272,7 @@
                   @include border;
                   @include tag;
                   @include font-size-small;
-
-                  padding: var(--titan-padding-standard);
+                  @include padding-standard;
 
                   .label {
                      @include flex-row;

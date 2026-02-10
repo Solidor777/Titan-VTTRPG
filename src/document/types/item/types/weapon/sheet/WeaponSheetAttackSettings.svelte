@@ -1,8 +1,8 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
@@ -264,8 +264,8 @@
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
+         @include padding-standard;
 
-         padding: var(--titan-padding-standard);
          width: 100%;
 
          .label {
@@ -287,8 +287,8 @@
          @include panel-3;
 
          width: calc(100% - 16px);
-         padding: var(--titan-padding-standard);
 
+         @include padding-standard;
          @include font-size-small;
 
          .row {

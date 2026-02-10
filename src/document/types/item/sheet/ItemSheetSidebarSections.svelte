@@ -25,7 +25,7 @@
       @include flex-group-top;
 
       min-width: 208px;
-      width: 100%;
+      width: 208px;
       height: 100%;
 
       .section {

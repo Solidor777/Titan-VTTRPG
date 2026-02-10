@@ -28,8 +28,8 @@
          @include border;
          @include resistance-colors;
          @include font-size-large;
+         @include padding-large;
 
-         padding: var(--titan-padding-large);
          font-weight: bold;
       }
    }

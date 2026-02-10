@@ -1,13 +1,13 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import {COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON} from '~/system/Icons.js';
+   import { COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
@@ -16,7 +16,7 @@
 
    /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
-   
+
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    // Initialize expanded state
@@ -166,7 +166,8 @@
 
             font-weight: bold;
             width: 100%;
-            padding: var(--titan-padding-standard);
+
+            @include padding-standard;
 
             .label {
                @include flex-row;

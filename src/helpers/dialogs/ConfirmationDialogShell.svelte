@@ -80,8 +80,7 @@
          @include flex-row;
          @include flex-group-center;
          @include font-size-normal;
-
-         padding: var(--titan-padding-standard);
+         @include padding-standard;
       }
 
       .button {

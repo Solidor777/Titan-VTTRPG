@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    /** @type object Reference to the Document store. */
@@ -19,6 +19,7 @@
       @include rarity-colors;
 
       font-weight: bold;
-      padding: var(--titan-padding-standard);
+
+      @include padding-large;
    }
 </style>

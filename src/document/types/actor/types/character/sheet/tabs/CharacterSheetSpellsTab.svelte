@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
@@ -9,7 +9,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
    import CharacterSheetTabHeaderButton
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
-   import {CREATE_ICON} from '~/system/Icons.js';
+   import { CREATE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
@@ -77,7 +77,8 @@
          @include panel-1;
 
          width: 100%;
-         padding: var(--titan-padding-standard);
+
+         @include padding-large;
 
          .label {
             font-weight: bold;

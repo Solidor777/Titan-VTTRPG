@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -31,7 +31,10 @@
          </div>
 
          <!--Tradition -->
-         {#if $document.flags.titan.parameters.tradition !== '' && $document.flags.titan.parameters.tradition !== localize('any')}
+         {#if $document.flags.titan.parameters.tradition !==
+         '' &&
+         $document.flags.titan.parameters.tradition !==
+         localize('any')}
             <div class="sub-label">
                {$document.flags.titan.parameters.tradition}
             </div>
@@ -53,8 +56,8 @@
          @include attribute-colors;
          @include border;
          @include tag;
+         @include padding-large;
 
-         padding: var(--titan-padding-large);
          font-weight: bold;
 
          img {

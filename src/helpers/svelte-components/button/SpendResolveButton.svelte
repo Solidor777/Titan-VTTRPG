@@ -30,7 +30,8 @@
          @include font-size-normal;
 
          height: 100%;
-         padding: var(--titan-padding-standard);
+
+         @include padding-standard;
 
          i {
             margin-right: var(--titan-padding-standard);

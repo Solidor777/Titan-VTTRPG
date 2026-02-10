@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
@@ -333,8 +333,8 @@
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
+         @include padding-large;
 
-         padding: var(--titan-padding-standard);
          width: 100%;
 
          .label {
@@ -354,11 +354,11 @@
          @include flex-group-top;
          @include border-bottom-sides;
          @include panel-3;
+         @include padding-standard;
+         @include font-size-small;
 
          width: calc(100% - 16px);
-         padding: var(--titan-padding-standard);
 
-         @include font-size-small;
 
          .row {
             @include flex-row;

@@ -1,18 +1,18 @@
 <script>
-   import {TJSProseMirror} from '@typhonjs-fvtt/svelte-standard/component';
-   import {getContext} from 'svelte';
+   import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
+   import { getContext } from 'svelte';
+
+   /** @type object Reference to the Document store. */
+   const document = getContext('document');
 
    /** @type string Path to the value that this input should modify. */
    export let path = void 0;
 
    /** @type boolean Whether editing this input should be disabled. */
    export let disabled = false;
-
-   /** @type object Reference to the Document store. */
-   const document = getContext('document');
 </script>
 
-<div class="editor">
+<div class={$document.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}>
    <TJSProseMirror options={{
       document: $document,
       fieldName: path,

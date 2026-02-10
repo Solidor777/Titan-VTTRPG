@@ -1,5 +1,5 @@
 <script>
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
@@ -162,8 +162,8 @@
          @include flex-space-between;
          @include border-top-bottom-right;
          @include panel-1;
+         @include padding-large;
 
-         padding: var(--titan-padding-standard);
          width: 100%;
          font-weight: bold;
 

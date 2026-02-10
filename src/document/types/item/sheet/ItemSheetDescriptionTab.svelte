@@ -21,8 +21,8 @@
       @include flex-column;
       @include flex-group-center;
       @include panel-2;
+      @include padding-standard;
 
-      padding: var(--titan-padding-standard);
       height: 100%;
       width: 100%;
    }

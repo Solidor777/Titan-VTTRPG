@@ -63,7 +63,8 @@
          height: 100%;
          width: 100%;
          flex: 0;
-         padding: var(--titan-padding-standard);
+
+         @include padding-large;
 
          .button {
             @include mini-button;

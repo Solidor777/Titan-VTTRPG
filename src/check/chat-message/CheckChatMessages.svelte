@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
 
    /** @type object Reference to the Document store. */
@@ -26,8 +26,7 @@
       @include border;
       @include panel-1;
       @include flex-row;
-
-      padding: var(--titan-padding-standard);
+      @include padding-large;
 
       &:not(:first-child) {
          margin-top: var(--titan-padding-large);

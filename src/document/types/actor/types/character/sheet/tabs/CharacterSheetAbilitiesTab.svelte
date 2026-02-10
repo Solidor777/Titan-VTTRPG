@@ -127,9 +127,9 @@
          @include flex-group-top;
          @include border-bottom;
          @include panel-1;
+         @include padding-standard;
 
          width: 100%;
-         padding: var(--titan-padding-standard);
 
          .row {
             @include flex-row;

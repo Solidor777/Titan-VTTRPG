@@ -159,10 +159,10 @@
       @include flex-group-center;
       @include tag;
       @include font-size-normal;
+      @include padding-large;
 
       font-weight: bold;
       width: 100%;
-      padding: var(--titan-padding-large);
 
       .result {
          @include flex-row;

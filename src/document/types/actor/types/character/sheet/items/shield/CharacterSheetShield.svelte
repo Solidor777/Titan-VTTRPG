@@ -1,6 +1,6 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
@@ -126,8 +126,8 @@
          @include flex-space-between;
          @include border-top-bottom-right;
          @include panel-1;
+         @include padding-large;
 
-         padding: var(--titan-padding-standard);
          width: 100%;
          font-weight: bold;
 

@@ -64,8 +64,7 @@
          @include flex-group-top;
          @include border;
          @include panel-1;
-
-         padding: var(--titan-padding-standard);
+         @include padding-large;
 
          .main {
             @include flex-row;

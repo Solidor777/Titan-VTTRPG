@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -34,7 +34,8 @@
 
 </script>
 
-<div class={textClass}>
+<div
+   class={$document.isOwner ? 'rich-text' : 'rich-text not-owner'}>
    {@html displayText}
 </div>
 

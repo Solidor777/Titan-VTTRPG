@@ -23,8 +23,8 @@
       @include flex-row;
       @include flex-group-center;
       @include border;
+      @include padding-standard;
 
-      padding: var(--titan-padding-standard);
       background: var(--titan-tag-background);
 
       .label {

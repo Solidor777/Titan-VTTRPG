@@ -7,7 +7,11 @@
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   // Only include the Checks section if the Item currently has Checks.
+   /**
+    * Each section of the Sidebar.
+    * Only include Checks section if the item has checks.
+    * Always include Traits since those are added from the Sidebar.
+    */
    $: sections =
       $document.system.check.length > 0
          ? [ItemSheetSidebarCustomTraits, ItemSheetSidebarChecks]

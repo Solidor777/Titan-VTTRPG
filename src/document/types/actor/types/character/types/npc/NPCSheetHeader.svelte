@@ -75,8 +75,7 @@
 <style lang="scss">
    .header {
       @include border;
-
-      padding: var(--titan-padding-standard);
+      @include padding-large;
 
       .row {
          @include flex-row;
