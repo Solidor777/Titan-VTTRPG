@@ -42,7 +42,7 @@
 
          width: 100%;
          font-weight: bold;
-         padding-right: var(--titan-padding-large);
+         padding-right: var(--titan-spacing-large);
       }
 
       .value {
@@ -52,7 +52,7 @@
             @include border;
             @include tag;
 
-            margin-left: var(--titan-padding-large);
+            margin-left: var(--titan-spacing-large);
          }
       }
    }

@@ -67,7 +67,7 @@
          img {
             width: 32px;
             border: none;
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
 
          .labels {

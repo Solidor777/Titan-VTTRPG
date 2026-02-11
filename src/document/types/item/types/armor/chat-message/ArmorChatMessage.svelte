@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
@@ -57,15 +57,15 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--titan-padding-large);
+               padding-bottom: var(--titan-spacing-large);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
             &:last-child {
-               padding-bottom: var(--titan-padding-standard);
+               padding-bottom: var(--titan-spacing-standard);
             }
 
             &:not(:first-child) {

@@ -50,7 +50,7 @@
       flex-wrap: wrap;
 
       .button {
-         @include tag-margin;
+         @include tag-container-child-margin;
 
          --titan-button-border-radius: var(--titan-button-border-radius);
       }

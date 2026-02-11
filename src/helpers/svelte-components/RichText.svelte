@@ -43,6 +43,6 @@
    .rich-text {
       font-weight: normal;
       text-align: left;
-      margin: 0 var(--titan-padding-standard);
+      margin: 0 var(--titan-spacing-standard);
    }
 </style>

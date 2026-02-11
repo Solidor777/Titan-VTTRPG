@@ -89,14 +89,14 @@
       @include flex-row;
       @include flex-space-between;
       @include panel-1;
-      @include separate-row-large;
+      @include separated-row-large;
       @include padding-large;
 
       width: 100%;
 
       .column {
          @include flex-column;
-         @include separate-column-large;
+         @include separated-column-large;
 
          &.middle {
             @include flex-group-left;
@@ -110,7 +110,7 @@
 
          .row {
             @include flex-row;
-            @include border-separate-row-large;
+            @include border-separated-row-large;
 
             width: 100%;
 
@@ -118,7 +118,7 @@
                @include flex-group-right;
 
                &:not(:first-child) {
-                  padding-top: var(--titan-padding-standard);
+                  padding-top: var(--titan-spacing-standard);
                }
             }
          }

@@ -83,8 +83,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--titan-padding-standard);
-            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
+            padding-top: var(--titan-spacing-standard);
          }
 
          .column {
@@ -96,8 +96,8 @@
             &:not(:first-child) {
                @include border-left;
 
-               margin-left: var(--titan-padding-standard);
-               padding-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
+               padding-left: var(--titan-spacing-standard);
             }
          }
 
@@ -108,8 +108,8 @@
             &:not(:first-child) {
                @include border-left;
 
-               margin-left: var(--titan-padding-standard);
-               padding-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
+               padding-left: var(--titan-spacing-standard);
             }
          }
       }

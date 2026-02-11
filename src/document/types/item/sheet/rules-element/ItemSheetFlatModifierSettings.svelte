@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
@@ -14,7 +14,7 @@
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
-   import {DELETE_ICON} from '~/system/Icons.js';
+   import { DELETE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -208,12 +208,12 @@
 
          flex-wrap: wrap;
          width: 100%;
-         margin-bottom: var(--titan-padding-large);
+         margin-bottom: var(--titan-spacing-large);
 
          .field {
             @include flex-row;
 
-            margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
+            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
 
             &.select {
                @include flex-group-left;
@@ -232,7 +232,7 @@
          @include flex-group-top;
 
          height: 100%;
-         margin: var(--titan-padding-large) var(--titan-padding-standard) 0 0;
+         margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 0;
       }
    }
 </style>

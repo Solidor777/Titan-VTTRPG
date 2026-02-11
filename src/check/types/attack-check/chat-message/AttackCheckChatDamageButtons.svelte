@@ -98,11 +98,11 @@
          --titan-button-border-radius: var(--titan-button-border-radius);
 
          &:not(:first-child) {
-            padding-left: var(--titan-padding-standard);
+            padding-left: var(--titan-spacing-standard);
          }
 
          &:not(:last-child) {
-            padding-right: var(--titan-padding-standard);
+            padding-right: var(--titan-spacing-standard);
          }
       }
 

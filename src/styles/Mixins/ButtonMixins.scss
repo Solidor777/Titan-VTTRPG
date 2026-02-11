@@ -1,0 +1,83 @@
+@use './BorderMixins' as border;
+@use './FlexMixins' as flex;
+
+@mixin button {
+   @include border.border;
+   @include flex.flex-group-center;
+   @include flex.flex-row;
+
+   --titan-border-color: var(--titan-button-border-color);
+   --titan-border-radius: var(--titan-button-border-radius);
+   --titan-border-style: var(--titan-button-border-style);
+   --titan-border-width: var(--titan-button-border-width);
+
+   background: radial-gradient(var(--titan-button-background));
+   box-sizing: var(--titan-button-box-sizing);
+   color: var(--titan-button-font-color);
+   font-family: var(--titan-button-font-family), sans-serif;
+   font-size: var(--titan-button-font-size);
+   font-weight: var(--titan-button-font-weight);
+   height: var(--titan-button-height);
+   line-height: var(--titan-button-line-height);
+   margin: var(--titan-button-margin);
+   min-height: var(--titan-button-height);
+   padding: var(--titan-button-padding);
+   width: var(--titan-button-width);
+
+   &:disabled {
+      --titan-button-background: var(--titan-button-disabled-background);
+      --titan-button-border-color: var(--titan-button-disabled-border-color);
+      --titan-button-font-color: var(--titan-button-disabled-font-color);
+
+      cursor: default;
+   }
+
+   &:not(:disabled) {
+      &:hover {
+         --titan-button-hover-font-color: var(--titan-button-font-color);
+         --titan-button-border-color: var(--titan-button-hover-border-color);
+
+         background: radial-gradient(ellipse at center, var(--titan-button-hover-background), var(--titan-button-background));
+      }
+   }
+}
+
+@mixin mini-button {
+   @include button;
+
+   --titan-button-border-radius: var(--titan-border-radius);
+   --titan-button-font-size: var(--titan-font-size-small);
+   --titan-button-font-weight: normal;
+   --titan-button-line-height: var(--titan-line-height-small);
+}
+
+@mixin icon-button {
+   @include button;
+
+   --titan-button-border-radius: var(--titan-icon-button-border-radius);
+   --titan-button-padding: var(--titan-icon-button-padding);
+
+   width: var(--titan-icon-button-radius);
+   height: var(--titan-icon-button-radius);
+}
+
+@mixin image-button {
+   @include flex.flex-row;
+   @include flex.flex-group-center;
+
+   background: none;
+   border-style: none;
+   margin: 0;
+   padding: 0;
+   width: 100%;
+   height: 100%;
+
+   &:disabled {
+      cursor: default;
+   }
+
+   img {
+      width: 100%;
+      height: 100%;
+   }
+}

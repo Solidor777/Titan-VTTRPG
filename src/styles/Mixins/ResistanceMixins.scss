@@ -1,0 +1,65 @@
+@mixin resistance-colors {
+   &.reflexes {
+      background: var(--titan-reflexes-background);
+   }
+
+   &.resilience {
+      background: var(--titan-resilience-background);
+   }
+
+   &.willpower {
+      background: var(--titan-willpower-background);
+   }
+}
+
+@mixin resistance-button {
+   &.reflexes {
+      --titan-button-background: var(--titan-reflexes-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-reflexes-background);
+      }
+   }
+
+   &.resilience {
+      --titan-button-background: var(--titan-resilience-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-resilience-background);
+      }
+   }
+
+   &.willpower {
+      --titan-button-background: var(--titan-willpower-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-willpower-background);
+      }
+   }
+}
+
+@mixin resistance-input {
+   &.reflexes {
+      --titan-input-background: var(--titan-reflexes-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-reflexes-background);
+      }
+   }
+
+   &.resilience {
+      --titan-input-background: var(--titan-resilience-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-resilience-background);
+      }
+   }
+
+   &.willpower {
+      --titan-input-background: var(--titan-willpower-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-willpower-background);
+      }
+   }
+}

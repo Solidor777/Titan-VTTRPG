@@ -273,7 +273,7 @@
             @include flex-group-center;
 
             width: 100%;
-            margin: 0 var(--titan-padding-large);
+            margin: 0 var(--titan-spacing-large);
 
             --input-font-size: var(--titan-font-size-large);
             --titan-input-height: 32px;
@@ -295,13 +295,13 @@
             @include flex-row;
             @include flex-group-center;
 
-            padding-top: var(--titan-padding-large);
+            padding-top: var(--titan-spacing-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
 
             .field {
@@ -311,12 +311,12 @@
                &:not(:first-child) {
                   @include border-left;
 
-                  margin-left: var(--titan-padding-large);
-                  padding-left: var(--titan-padding-large);
+                  margin-left: var(--titan-spacing-large);
+                  padding-left: var(--titan-spacing-large);
                }
 
                i {
-                  margin-right: var(--titan-padding-standard);
+                  margin-right: var(--titan-spacing-standard);
                }
 
                .label {
@@ -330,7 +330,7 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-left: var(--titan-padding-standard);
+                  margin-left: var(--titan-spacing-standard);
 
                   @include font-size-normal;
 
@@ -345,8 +345,8 @@
             @include border-top;
 
             width: 100%;
-            margin-top: var(--titan-padding-standard);
-            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
+            padding-top: var(--titan-spacing-standard);
 
             .traits-header {
                @include flex-row;
@@ -357,7 +357,7 @@
                   --titan-button-line-height: 20px;
 
                   &:not(:first-child) {
-                     margin-left: var(--titan-padding-standard);
+                     margin-left: var(--titan-spacing-standard);
                   }
                }
             }
@@ -368,10 +368,10 @@
 
                flex-wrap: wrap;
                width: 100%;
-               margin-bottom: var(--titan-padding-standard);
+               margin-bottom: var(--titan-spacing-standard);
 
                .trait {
-                  margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
+                  margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
                }
             }
          }

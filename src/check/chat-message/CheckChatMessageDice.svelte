@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CheckChatMessageDie from '~/check/chat-message/CheckChatMessageDie.svelte';
 
    /** @type object Reference to the Document store. */
@@ -31,7 +31,7 @@
       flex-wrap: wrap;
 
       .dice {
-         @include tag-margin;
+         @include tag-container-child-margin;
       }
    }
 </style>

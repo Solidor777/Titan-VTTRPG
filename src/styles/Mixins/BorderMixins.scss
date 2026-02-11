@@ -1,0 +1,62 @@
+@mixin border-base {
+   border-color: var(--titan-border-color);
+   border-width: var(--titan-border-width);
+}
+
+@mixin border {
+   @include border-base;
+
+   border-radius: var(--titan-border-radius);
+   border-style: var(--titan-border-style);
+}
+
+@mixin border-top {
+   @include border-base;
+
+   border-top: var(--titan-border-style);
+}
+
+@mixin border-top-bottom {
+   @include border-base;
+
+   border-bottom: var(--titan-border-style);
+   border-top: var(--titan-border-style);
+}
+
+@mixin border-top-bottom-right {
+   @include border-base;
+
+   border-bottom-right-radius: var(--titan-border-radius);
+   border-bottom: var(--titan-border-style);
+   border-right: var(--titan-border-style);
+   border-top-right-radius: var(--titan-border-radius);
+   border-top: var(--titan-border-style);
+}
+
+@mixin border-bottom {
+   @include border-base;
+
+   border-bottom: var(--titan-border-style);
+}
+
+@mixin border-bottom-sides {
+   @include border-base;
+
+   border-bottom-left-radius: var(--titan-border-radius);
+   border-bottom-right-radius: var(--titan-border-radius);
+   border-bottom: var(--titan-border-style);
+   border-left: var(--titan-border-style);
+   border-right: var(--titan-border-style);
+}
+
+@mixin border-left {
+   @include border-base;
+
+   border-left: var(--titan-border-style);
+}
+
+@mixin border-right {
+   @include border-base;
+
+   border-right: var(--titan-border-style);
+}

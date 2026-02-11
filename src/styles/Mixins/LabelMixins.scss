@@ -1,0 +1,17 @@
+@use './BorderMixins' as border;
+
+@mixin label {
+   @include border.border;
+
+   --titan-border-color: var(--titan-label-border-color);
+   --titan-border-radius: var(--titan-label-border-radius);
+   --titan-border-style: var(--titan-label-border-style);
+   --titan-border-width: var(--titan-label-border-width);
+
+   background: var(--titan-label-background);
+   color: var(--titan-label-font-color);
+   font-weight: var(--titan-label-font-weight);
+   height: var(--titan-label-height);
+   padding: var(--titan-label-padding);
+   width: var(--titan-label-width);
+}

@@ -32,7 +32,7 @@
 
       .input {
          flex-grow: 1;
-         margin-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
       }
    }
 </style>

@@ -186,15 +186,15 @@
          @include flex-group-center;
 
          &:not(:first-child) {
-            margin-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
          }
 
          i {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
 
          .button {
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
 
             --titan-icon-button-radius: 24px;
             --titan-button-font-size: 14px;
@@ -203,8 +203,8 @@
          .border-right {
             @include border-right;
 
-            margin-right: var(--titan-padding-large);
-            padding-right: var(--titan-padding-large);
+            margin-right: var(--titan-spacing-large);
+            padding-right: var(--titan-spacing-large);
          }
       }
    }

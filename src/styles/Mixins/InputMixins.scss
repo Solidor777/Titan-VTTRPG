@@ -1,0 +1,43 @@
+@use './BorderMixins' as border;
+@use './FlexMixins' as flex;
+
+@mixin input {
+   @include border.border;
+   @include flex.flex-group-center;
+   @include flex.flex-row;
+
+   --titan-border-color: var(--titan-input-border-color);
+   --titan-border-radius: var(--titan-input-border-radius);
+   --titan-border-style: var(--titan-input-border-style);
+   --titan-border-width: var(--titan-input-border-width);
+
+   color: var(--titan-input-font-color);
+   font-family: var(--titan-input-font-family), sans-serif;
+   font-size: var(--titan-input-font-size);
+   font-weight: var(--titan-input-font-weight);
+   height: var(--titan-input-height);
+   padding: var(--titan-input-padding);
+   text-align: var(--titan-input-text-alignment);
+   width: var(--titan-input-width);
+
+   &:disabled {
+      --titan-input-background: var(--titan-input-disabled-background);
+      --titan-input-border-color: var(--titan-input-disabled-border-color);
+      --titan-input-font-color: var(--titan-input-disabled-font-color);
+
+      border-style: var(--titan-input-border-style);
+      border-width: var(--titan-input-border-width);
+      opacity: 1;
+   }
+
+   &:not(:disabled) {
+      &:hover {
+         &:not(:open) {
+            --titan-input-border-color: var(--titan-input-hover-border-color);
+            --titan-input-font-color: var(--titan-input-hover-font-color);
+
+            background: radial-gradient(ellipse at center, var(--titan-input-hover-background), var(--titan-input-background));
+         }
+      }
+   }
+}

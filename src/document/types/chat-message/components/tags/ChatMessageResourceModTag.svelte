@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -72,14 +72,14 @@
       }
 
       i {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
 
       .label {
          @include border-right;
 
-         padding-right: var(--titan-padding-standard);
-         margin-right: var(--titan-padding-standard);
+         padding-right: var(--titan-spacing-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 </style>

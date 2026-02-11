@@ -143,8 +143,8 @@
          @include flex-group-top;
 
          width: 100%;
-         margin-left: var(--titan-padding-standard);
-         margin-top: var(--titan-padding-large);
+         margin-left: var(--titan-spacing-standard);
+         margin-top: var(--titan-spacing-large);
 
          --titan-border-color: var(--titan-button-border-color);
 
@@ -182,7 +182,7 @@
                      @include flex-row;
                      @include flex-group-center;
 
-                     margin-right: var(--titan-padding-standard);
+                     margin-right: var(--titan-spacing-standard);
                   }
                }
 
@@ -195,7 +195,7 @@
             }
 
             .value {
-               margin-top: var(--titan-padding-standard);
+               margin-top: var(--titan-spacing-standard);
             }
          }
 
@@ -205,22 +205,22 @@
             @include border-bottom-sides;
             @include panel-3;
 
-            width: calc(100% - var(--titan-padding-large));
+            width: calc(100% - var(--titan-spacing-large));
             flex-wrap: wrap;
-            padding: 0 var(--titan-padding-large) var(--titan-padding-large) var(--titan-padding-large);
+            padding: 0 var(--titan-spacing-large) var(--titan-spacing-large) var(--titan-spacing-large);
 
             .stat {
                @include flex-row;
                @include flex-group-center;
 
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
 
             .labeled-stat {
                @include flex-column;
                @include flex-group-top;
 
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
 
                .label {
                   @include flex-row;
@@ -234,7 +234,7 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-top: var(--titan-padding-standard);
+                  margin-top: var(--titan-spacing-standard);
                }
             }
          }

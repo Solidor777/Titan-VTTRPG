@@ -34,8 +34,8 @@
       &:not(:first-child) {
          @include border-left;
 
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
+         padding-left: var(--titan-spacing-standard);
       }
 
       &.main {

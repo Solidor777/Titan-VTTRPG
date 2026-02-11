@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -15,7 +15,7 @@
       @include flex-row;
       @include flex-group-left;
 
-      padding: 0 var(--titan-padding-large) 0 var(--titan-padding-large);
+      padding: 0 var(--titan-spacing-large) 0 var(--titan-spacing-large);
 
       @include font-size-normal;
 

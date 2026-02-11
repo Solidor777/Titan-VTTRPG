@@ -1,6 +1,6 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {CHECKED_ICON, UNCHECKED_ICON} from '~/system/Icons.js';
+   import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
    /** @type boolean The label to display for the option. */
    export let label = void 0;
@@ -32,7 +32,7 @@
       height: 100%;
 
       :not(:first-child) {
-         margin-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
       }
    }
 </style>

@@ -38,10 +38,10 @@
 <style lang="scss">
    .toggle {
       --titan-button-font-size: var(--titan-font-size-small);
-      --titan-button-padding: 0 var(--titan-padding-standard);
+      --titan-button-padding: 0 var(--titan-spacing-standard);
       --titan-button-border-radius: var(--titan-button-border-radius);
 
-      margin: var(--titan-padding-standard);
+      margin: var(--titan-spacing-standard);
 
       &.enabled-true {
          --titan-button-background: var(--titan-active-background);

@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
@@ -118,7 +118,7 @@
       @include panel-1;
 
       width: 100%;
-      padding: var(--titan-padding-standard) var(--titan-padding-large);
+      padding: var(--titan-spacing-standard) var(--titan-spacing-large);
 
       .portrait {
          width: 80px;
@@ -131,7 +131,7 @@
          @include flex-group-top-left;
 
          width: calc(100% - 88px);
-         margin-left: var(--titan-padding-large);
+         margin-left: var(--titan-spacing-large);
 
          .name {
             @include flex-row;
@@ -144,7 +144,7 @@
             @include flex-row;
             @include flex-group-left;
 
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
             width: 100%;
 
             .stat {
@@ -154,8 +154,8 @@
                &:not(:first-child) {
                   @include border-left;
 
-                  margin-left: var(--titan-padding-large);
-                  padding-left: var(--titan-padding-large);
+                  margin-left: var(--titan-spacing-large);
+                  padding-left: var(--titan-spacing-large);
                }
 
                &.text {
@@ -172,7 +172,7 @@
                   @include flex-group-left;
 
                   font-weight: bold;
-                  margin-right: var(--titan-padding-standard);
+                  margin-right: var(--titan-spacing-standard);
                }
 
                .input {

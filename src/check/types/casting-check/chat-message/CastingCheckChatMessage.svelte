@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatMessageDice.svelte';
    import CastingCheckChatHeader from '~/check/types/casting-check/chat-message/CastingCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
@@ -44,7 +44,11 @@
    {/if}
 
    <!--Description-->
-   {#if $document.flags.titan.results.succeeded && $document.flags.titan.parameters.itemDescription !== '' && $document.flags.titan.parameters.itemDescription !== '<p></p>'}
+   {#if $document.flags.titan.results.succeeded &&
+   $document.flags.titan.parameters.itemDescription !==
+   '' &&
+   $document.flags.titan.parameters.itemDescription !==
+   '<p></p>'}
       <div class="section rich-text">
          <RichText value={$document.flags.titan.parameters.itemDescription}/>
       </div>
@@ -113,7 +117,7 @@
          width: 100%;
 
          &:not(:first-child, .tags) {
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

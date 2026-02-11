@@ -53,13 +53,13 @@
          @include flex-row;
          @include flex-group-left;
 
-         margin-left: var(--titan-padding-large);
+         margin-left: var(--titan-spacing-large);
 
          .icon {
             @include flex-row;
             @include flex-group-right;
 
-            margin-left: var(--titan-padding-large);
+            margin-left: var(--titan-spacing-large);
          }
       }
 
@@ -68,7 +68,7 @@
          @include flex-group-right;
 
          font-weight: bold;
-         margin-right: var(--titan-padding-large);
+         margin-right: var(--titan-spacing-large);
 
          .value {
             @include flex-row;
@@ -78,7 +78,7 @@
 
             height: 24px;
             width: 24px;
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
          }
       }
    }

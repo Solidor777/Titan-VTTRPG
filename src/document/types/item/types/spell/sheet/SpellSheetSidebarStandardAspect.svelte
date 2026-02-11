@@ -1,5 +1,5 @@
 <script>
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
@@ -149,7 +149,7 @@
       @include flex-group-top;
 
       width: 100%;
-      margin: var(--titan-padding-standard) 0;
+      margin: var(--titan-spacing-standard) 0;
 
       .label {
          @include flex-row;
@@ -159,7 +159,7 @@
          font-weight: bold;
 
          i {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 
@@ -171,7 +171,7 @@
          width: 100%;
 
          .option {
-            @include tag-margin;
+            @include tag-container-child-margin;
             @include font-size-small;
          }
       }
@@ -181,7 +181,7 @@
          @include flex-group-top;
          @include font-size-small;
 
-         margin-top: var(--titan-padding-large);
+         margin-top: var(--titan-spacing-large);
 
          .label {
             @include flex-row;
@@ -194,7 +194,7 @@
             @include flex-row;
             @include flex-group-center;
 
-            margin-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
          }
       }
    }

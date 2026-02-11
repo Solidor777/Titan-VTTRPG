@@ -42,7 +42,7 @@
          @include border;
 
          width: 80px;
-         margin-bottom: var(--titan-padding-large);
+         margin-bottom: var(--titan-spacing-large);
       }
 
       .label {
@@ -61,11 +61,11 @@
             @include font-size-large;
 
             width: 100%;
-            margin: var(--titan-padding-standard) 0 var(--titan-padding-standard);
+            margin: var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
             flex-wrap: wrap;
 
             i {
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
             }
          }
 

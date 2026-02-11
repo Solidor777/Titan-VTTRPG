@@ -1,5 +1,5 @@
 <script>
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import MiniButton from '~/helpers/svelte-components/button/MiniButton.svelte';
 
    /** @type boolean Whether this Option is currently enabled. */
    export let enabled = void 0;
@@ -14,18 +14,14 @@
    export let tooltip = void 0;
 </script>
 
-<div class="toggle enabled-{enabled === true}">
-   <Button {disabled} on:click {tooltip}>
+<div class="toggle {enabled ? 'enabled' : 'disabled'}">
+   <MiniButton {disabled} on:click {tooltip}>
       {label}
-   </Button>
+   </MiniButton>
 </div>
 
 <style lang="scss">
-   .toggle {
-      @include mini-button;
-
-      &.enabled-true {
-         --titan-button-background: var(--titan-active-background);
-      }
+   .enabled {
+      --titan-button-background: var(--titan-highlighted-background);
    }
 </style>

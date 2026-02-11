@@ -1,11 +1,11 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
+   import { SHIELD_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/shield/ShieldTraits.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
-   import {DEFENSE_ICON} from '~/system/Icons.js';
+   import { DEFENSE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    // Item reference
@@ -72,7 +72,7 @@
       flex-wrap: wrap;
 
       .stat {
-         @include tag-margin;
+         @include tag-container-child-margin;
       }
    }
 </style>

@@ -1,16 +1,16 @@
 <script>
-   import { getContext } from 'svelte'
-   import localize from '~/helpers/utility-functions/Localize.js'
-   import RichText from '~/helpers/svelte-components/RichText.svelte'
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte'
-   import ItemChatMessageItemChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte'
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte'
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte'
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte'
+   import { getContext } from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import ItemChatMessageItemChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
+   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document')
-   const item = $document.flags.titan
+   const document = getContext('document');
+   const item = $document.flags.titan;
 </script>
 
 <div class="item-chat-message">
@@ -103,15 +103,15 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--titan-padding-large);
+               padding-bottom: var(--titan-spacing-large);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
             &:last-child {
-               padding-bottom: var(--titan-padding-standard);
+               padding-bottom: var(--titan-spacing-standard);
             }
 
             &:not(:first-child) {
@@ -125,7 +125,7 @@
                flex-wrap: wrap;
 
                .tag {
-                  @include tag-margin;
+                  @include tag-container-child-margin;
                }
             }
 

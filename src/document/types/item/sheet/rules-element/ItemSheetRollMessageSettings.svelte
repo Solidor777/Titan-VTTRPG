@@ -170,7 +170,7 @@
    /**
     *
     */
-   function onCheckTypeChange () {
+   function onCheckTypeChange() {
       element.selector = 'any';
 
       onSelectorChange();
@@ -180,7 +180,7 @@
    /**
     *
     */
-   function onSelectorChange () {
+   function onSelectorChange() {
       if ($document?.isOwner) {
          switch (element.selector) {
             case 'any':
@@ -227,7 +227,7 @@
    /**
     *
     */
-   function getSelector () {
+   function getSelector() {
       switch (element.selector) {
          case 'attackTrait': {
             return DocumentAttackTraitSelect;
@@ -339,13 +339,13 @@
             @include flex-group-left;
 
             width: 100%;
-            margin-bottom: var(--titan-padding-large);
+            margin-bottom: var(--titan-spacing-large);
             flex-wrap: wrap;
 
             .field {
                @include flex-row;
 
-               margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
+               margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
 
                &.select {
                   @include flex-group-left;
@@ -357,14 +357,14 @@
             @include flex-column;
             @include flex-group-top;
 
-            margin: var(--titan-padding-standard) var(--titan-padding-standard) 0 0;
+            margin: var(--titan-spacing-standard) var(--titan-spacing-standard) 0 0;
          }
       }
 
       .section {
          @include flex-column;
 
-         margin-top: var(--titan-padding-standard);
+         margin-top: var(--titan-spacing-standard);
          width: 100%;
          min-height: 160px;
          height: 100%;

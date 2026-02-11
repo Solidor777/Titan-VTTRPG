@@ -160,16 +160,16 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--titan-padding-large);
+         margin-top: var(--titan-spacing-large);
 
          &:not(:first-child) {
             @include border-top;
 
-            padding-top: var(--titan-padding-large);
+            padding-top: var(--titan-spacing-large);
          }
 
          &:last-child {
-            margin-bottom: var(--titan-padding-large);
+            margin-bottom: var(--titan-spacing-large);
          }
       }
 
@@ -194,7 +194,7 @@
 
                height: 100%;
                font-weight: bold;
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
 
                @include font-size-small;
             }
@@ -219,8 +219,8 @@
             @include border-left;
 
             height: 100%;
-            margin-left: var(--titan-padding-large);
-            padding-right: var(--titan-padding-large);
+            margin-left: var(--titan-spacing-large);
+            padding-right: var(--titan-spacing-large);
          }
       }
 
@@ -236,8 +236,8 @@
             @include flex-group-center;
             @include border-bottom;
 
-            padding-bottom: var(--titan-padding-standard);
-            margin-top: var(--titan-padding-large);
+            padding-bottom: var(--titan-spacing-standard);
+            margin-top: var(--titan-spacing-large);
             width: 100%;
             font-weight: bold;
          }
@@ -250,7 +250,7 @@
             flex-wrap: wrap;
 
             .cost {
-               @include tag-margin;
+               @include tag-container-child-margin;
                @include font-size-small;
             }
          }

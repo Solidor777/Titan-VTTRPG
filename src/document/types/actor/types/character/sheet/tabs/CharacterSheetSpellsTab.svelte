@@ -82,7 +82,7 @@
 
          .label {
             font-weight: bold;
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
 
          .input {
@@ -90,7 +90,7 @@
          }
 
          .button {
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
          }
       }
 
@@ -106,7 +106,7 @@
             @include flex-group-top;
 
             width: 100%;
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

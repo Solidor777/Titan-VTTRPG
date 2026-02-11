@@ -73,18 +73,18 @@
 
             &:not(.tags) {
                &:not(.rich-text) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
 
             .tag {
-               @include tag-margin;
+               @include tag-container-child-margin;
             }
          }
       }

@@ -1,0 +1,23 @@
+@mixin padding-standard {
+   padding: var(--titan-spacing-standard);
+}
+
+@mixin padding-large {
+   padding: var(--titan-spacing-large);
+}
+
+@mixin padding-top-standard {
+   padding-top: var(--titan-spacing-standard);
+}
+
+@mixin padding-top-large {
+   padding-top: var(--titan-spacing-large);
+}
+
+@mixin padding-left-standard {
+   padding-left: var(--titan-spacing-standard);
+}
+
+@mixin padding-left-large {
+   padding-left: var(--titan-spacing-large);
+}

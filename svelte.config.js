@@ -1,5 +1,5 @@
 import autoprefixer from 'autoprefixer';
-import {sveltePreprocess} from 'svelte-preprocess';
+import { sveltePreprocess } from 'svelte-preprocess';
 
 const config = {
    preprocess: sveltePreprocess({
@@ -10,7 +10,7 @@ const config = {
       postcss: {
          plugins: [autoprefixer()]
       }
-   })
+   }),
 };
 
 export default config;

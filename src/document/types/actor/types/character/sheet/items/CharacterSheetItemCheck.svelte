@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import getSetting from '~/helpers/utility-functions/GetSetting.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
@@ -7,7 +7,7 @@
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON} from '~/system/Icons.js';
+   import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    /** @type object Reference to the Document store. */
@@ -182,7 +182,7 @@
          @include flex-row;
 
          .resolve-cost-button {
-            margin-left: var(--titan-padding-large);
+            margin-left: var(--titan-spacing-large);
          }
       }
 
@@ -194,7 +194,7 @@
          flex-wrap: wrap;
 
          .stat {
-            @include tag-margin;
+            @include tag-container-child-margin;
          }
       }
    }

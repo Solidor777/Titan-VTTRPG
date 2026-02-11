@@ -102,12 +102,12 @@
       &:not(:first-child) {
          @include border-left;
 
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
+         padding-left: var(--titan-spacing-standard);
       }
 
       i {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 

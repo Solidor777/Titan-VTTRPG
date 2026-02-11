@@ -27,7 +27,7 @@
          @include flex-group-center;
          @include font-size-large;
 
-         margin: 0 var(--titan-padding-standard);
+         margin: 0 var(--titan-spacing-standard);
          height: 100%;
          font-weight: bold;
       }

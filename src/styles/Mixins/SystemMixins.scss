@@ -1,0 +1,23 @@
+@mixin list {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+
+@mixin calculated-value {
+   background: var(--titan-calculated-value-background);
+   border-color: var(--titan-calculated-value-border-color);
+   color: var(--titan-calculated-value-font-color);
+}
+
+@mixin fast-healing-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-green), var(--titan-yellow) 100%);
+}
+
+@mixin persistent-damage-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-maroon), var(--titan-orange) 100%);
+}
+
+@mixin resolve-regain-tag {
+   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-blue), var(--titan-cyan) 100%);
+}

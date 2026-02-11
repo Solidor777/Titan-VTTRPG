@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatMessageDice.svelte';
    import ItemCheckChatHeader from '~/check/types/item-check/chat-message/ItemCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
@@ -117,7 +117,7 @@
          width: 100%;
 
          &:not(:first-child, .tags) {
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

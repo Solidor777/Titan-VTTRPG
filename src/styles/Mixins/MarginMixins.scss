@@ -1,0 +1,39 @@
+@mixin margin-standard {
+   margin: var(--titan-spacing-standard);
+}
+
+@mixin margin-large {
+   margin: var(--titan-spacing-large);
+}
+
+@mixin margin-top-standard {
+   margin-top: var(--titan-spacing-standard);
+}
+
+@mixin margin-top-large {
+   margin-top: var(--titan-spacing-large);
+}
+
+@mixin margin-left-standard {
+   margin-left: var(--titan-spacing-standard);
+}
+
+@mixin margin-left-large {
+   margin-left: var(--titan-spacing-large);
+}
+
+@mixin margin-right-standard {
+   margin-right: var(--titan-spacing-standard);
+}
+
+@mixin margin-right-large {
+   margin-right: var(--titan-spacing-large);
+}
+
+@mixin margin-bottom-standard {
+   margin-left: var(--titan-spacing-standard);
+}
+
+@mixin margin-botton-large {
+   margin-top: var(--titan-spacing-large);
+}

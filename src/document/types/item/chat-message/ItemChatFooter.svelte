@@ -9,7 +9,7 @@
 
       flex-wrap: wrap;
       width: 100%;
-      padding: 0 var(--titan-padding-large) 0 var(--titan-padding-large);
+      padding: 0 var(--titan-spacing-large) 0 var(--titan-spacing-large);
 
       @include font-size-small;
    }

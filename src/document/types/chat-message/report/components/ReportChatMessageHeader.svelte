@@ -52,10 +52,10 @@
          @include panel-1;
 
          width: 80px;
-         margin-bottom: var(--titan-padding-standard);
+         margin-bottom: var(--titan-spacing-standard);
 
          &:not(:first-child) {
-            margin-left: var(--titan-padding-large);
+            margin-left: var(--titan-spacing-large);
          }
       }
 
@@ -72,11 +72,11 @@
             @include font-size-large;
 
             width: 100%;
-            margin: var(--titan-padding-standard) 0 var(--titan-padding-standard);
+            margin: var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
             flex-wrap: wrap;
 
             i {
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
             }
          }
 
@@ -88,7 +88,7 @@
             flex-wrap: wrap;
 
             &:not(:first-child) {
-               margin-top: var(--titan-padding-standard);
+               margin-top: var(--titan-spacing-standard);
             }
          }
       }

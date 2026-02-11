@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {REFLEXES_ICON, RESILIENCE_ICON, WILLPOWER_ICON} from '~/system/Icons.js';
+   import { REFLEXES_ICON, RESILIENCE_ICON, WILLPOWER_ICON } from '~/system/Icons.js';
    import DocumentOwnerResistanceButton from '~/document/svelte-components/DocumentOwnerResistanceButton.svelte';
    import getResistanceCheckParametersTooltip from '~/helpers/utility-functions/GetResistanceCheckParametersTooltip.js';
 
@@ -13,7 +13,7 @@
 
    /** @type ResistanceCheckParameters Calculated check parameters. */
    let checkParameters = $document.system.getResistanceCheckParameters(
-      $document.system.initializeResistanceCheckOptions({resistance: resistance}));
+      $document.system.initializeResistanceCheckOptions({ resistance: resistance }));
 
    /** @type string Calculated tooltip. */
    let tooltip = localize(`${checkParameters.resistance}.desc`);
@@ -40,7 +40,7 @@
    $: {
       // Update Check Parameters.
       checkParameters = $document.system.getResistanceCheckParameters(
-         $document.system.initializeResistanceCheckOptions({resistance: resistance}));
+         $document.system.initializeResistanceCheckOptions({ resistance: resistance }));
 
       // Update Tooltip.
       tooltip = localize(`${checkParameters.resistance}.desc`);
@@ -71,7 +71,7 @@
       @include flex-group-center;
 
       i {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 </style>

@@ -6,7 +6,7 @@
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import {RESOLVE_ICON} from '~/system/Icons.js';
+   import { RESOLVE_ICON } from '~/system/Icons.js';
    import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
@@ -153,8 +153,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--titan-padding-large);
-            padding-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
+            padding-top: var(--titan-spacing-large);
          }
 
          .button {
@@ -162,7 +162,7 @@
             @include flex-group-center;
 
             &:not(:first-child) {
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
          }
 
@@ -174,7 +174,7 @@
             flex-wrap: wrap;
 
             .tag {
-               margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
+               margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
             }
          }
       }

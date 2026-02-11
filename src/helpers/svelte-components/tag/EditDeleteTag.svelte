@@ -1,6 +1,6 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import {DELETE_ICON, EDIT_ICON} from '~/system/Icons.js';
+   import { DELETE_ICON, EDIT_ICON } from '~/system/Icons.js';
 
    /** @type function Callback for when the Delete icon is pressed. */
    export let deleteFunction = void 0;
@@ -67,8 +67,8 @@
       :not(:first-child) {
          @include border-left;
 
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
+         padding-left: var(--titan-spacing-standard);
       }
    }
 </style>

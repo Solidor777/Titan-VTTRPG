@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
@@ -89,7 +89,7 @@
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
          }
       }

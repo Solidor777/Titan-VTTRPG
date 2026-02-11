@@ -231,15 +231,15 @@
          height: 100%;
 
          i {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 
       .value {
          @include border-left;
 
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
+         padding-left: var(--titan-spacing-standard);
       }
 
       .header {
@@ -248,14 +248,14 @@
 
          width: 100%;
          flex-wrap: wrap;
-         margin-right: var(--titan-padding-large);
+         margin-right: var(--titan-spacing-large);
       }
 
       .controls {
          @include flex-row;
          @include flex-group-center;
 
-         margin-top: var(--titan-padding-standard);
+         margin-top: var(--titan-spacing-standard);
          width: 100%;
 
          --titan-button-border-radius: var(--titan-button-border-radius);
@@ -265,14 +265,14 @@
             @include flex-group-center;
 
             height: 100%;
-            margin-right: var(--titan-padding-large);
+            margin-right: var(--titan-spacing-large);
          }
 
          .control {
             @include flex-row;
             @include flex-group-center;
 
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
 
             .button-inner {
                @include flex-row;

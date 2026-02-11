@@ -1,17 +1,17 @@
 <script>
-   import { getContext } from 'svelte'
-   import RichText from '~/helpers/svelte-components/RichText.svelte'
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte'
-   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte'
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte'
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte'
-   import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte'
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte'
+   import { getContext } from 'svelte';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
+   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
+   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
+   import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document')
-   const item = $document.flags.titan
-   console.log(item)
+   const document = getContext('document');
+   const item = $document.flags.titan;
+   console.log(item);
 </script>
 
 <div class="item-chat-message">
@@ -92,15 +92,15 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--titan-padding-large);
+               padding-bottom: var(--titan-spacing-large);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
             &:last-child {
-               padding-bottom: var(--titan-padding-standard);
+               padding-bottom: var(--titan-spacing-standard);
             }
 
             &:not(:first-child) {
@@ -114,7 +114,7 @@
                flex-wrap: wrap;
 
                .tag {
-                  @include tag-margin;
+                  @include tag-container-child-margin;
                }
             }
 

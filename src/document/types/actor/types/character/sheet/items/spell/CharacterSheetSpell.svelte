@@ -172,7 +172,7 @@
             @include flex-group-center;
 
             .button {
-               margin-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
             }
          }
 
@@ -184,7 +184,7 @@
 
             .button {
                &:not(:first-child) {
-                  margin-left: var(--titan-padding-standard);
+                  margin-left: var(--titan-spacing-standard);
                }
             }
          }
@@ -197,16 +197,16 @@
          @include border-bottom-sides;
 
          width: calc(100% - 16px);
-         padding: 0 var(--titan-padding-standard);
+         padding: 0 var(--titan-spacing-standard);
 
          .section {
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--titan-padding-large);
+               padding-bottom: var(--titan-spacing-large);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
@@ -221,7 +221,7 @@
                flex-wrap: wrap;
 
                .tag {
-                  @include tag-margin;
+                  @include tag-container-child-margin;
                }
             }
 

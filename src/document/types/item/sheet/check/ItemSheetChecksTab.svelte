@@ -117,7 +117,7 @@
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
          }
 
@@ -126,14 +126,14 @@
             @include flex-group-center;
 
             width: 100%;
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
 
             .button-content {
                @include flex-row;
                @include flex-group-center;
 
                i {
-                  margin-right: var(--titan-padding-standard);
+                  margin-right: var(--titan-spacing-standard);
                }
             }
          }

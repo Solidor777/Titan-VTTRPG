@@ -91,7 +91,7 @@
          @include flex-space-between;
          @include border-left;
 
-         padding-left: var(--titan-padding-standard);
+         padding-left: var(--titan-spacing-standard);
          height: 160px;
       }
    }

@@ -1,6 +1,6 @@
 <script>
-   import {DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
-   import {getContext} from 'svelte';
+   import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
+   import { getContext } from 'svelte';
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
 
    /** @type object Reference to the Document store. */
@@ -108,14 +108,13 @@
 
             &:not(:first-child) {
                @include border-left;
-               @include border-color-button;
 
-               padding-left: var(--titan-padding-standard);
-               margin-left: var(--titan-padding-standard);
+               padding-left: var(--titan-spacing-standard);
+               margin-left: var(--titan-spacing-standard);
             }
 
             i {
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
             }
          }
       }

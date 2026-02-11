@@ -1,5 +1,5 @@
 <script>
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import MiniButton from '~/helpers/svelte-components/button/MiniButton.svelte';
 
    /**
     * Object for storing tab information.
@@ -25,9 +25,9 @@
       <!--For each tab-->
       {#each tabs as tab}
          <div class={`button${activeTab === tab.id ? ' active' : ''}`}>
-            <Button on:click={() => activeTab = tab.id}>
+            <MiniButton on:click={() => activeTab = tab.id}>
                {tab.label}
-            </Button>
+            </MiniButton>
          </div>
       {/each}
    </div>
@@ -67,23 +67,21 @@
          @include padding-large;
 
          .button {
-            @include mini-button;
-
             width: 100%;
             height: 100%;
 
             &.active {
-               --titan-button-background: var(--titan-highlight-background);
+               --titan-button-background: var(--titan-highlighted-background);
             }
          }
-      }
 
-      .tab-content {
-         @include flex-column;
-         @include flex-group-top;
+         .tab-content {
+            @include flex-column;
+            @include flex-group-top;
 
-         width: 100%;
-         flex: 2;
+            width: 100%;
+            flex: 2;
+         }
       }
    }
 </style>

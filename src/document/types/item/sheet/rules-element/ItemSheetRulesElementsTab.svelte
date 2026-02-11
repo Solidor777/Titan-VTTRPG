@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
@@ -22,7 +22,7 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte';
    import ItemSheetInvalidRulesElement
       from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
-   import {CREATE_ICON} from '~/system/Icons.js';
+   import { CREATE_ICON } from '~/system/Icons.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -188,7 +188,7 @@
             @include flex-group-center;
 
             width: 100%;
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
 
@@ -197,14 +197,14 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--titan-padding-large);
+         margin-top: var(--titan-spacing-large);
 
          .button-content {
             @include flex-row;
             @include flex-group-center;
 
             i {
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
             }
          }
       }

@@ -176,7 +176,7 @@
             @include flex-group-center;
 
             width: 100%;
-            margin: 0 var(--titan-padding-large);
+            margin: 0 var(--titan-spacing-large);
 
             --input-font-size: var(--titan-font-size-large);
             --titan-input-height: 32px;
@@ -198,13 +198,13 @@
             @include flex-row;
             @include flex-group-center;
 
-            padding-top: var(--titan-padding-large);
+            padding-top: var(--titan-spacing-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--titan-padding-large);
+               margin-top: var(--titan-spacing-large);
             }
 
             .field {
@@ -214,12 +214,12 @@
                &:not(:first-child) {
                   @include border-left;
 
-                  margin-left: var(--titan-padding-large);
-                  padding-left: var(--titan-padding-large);
+                  margin-left: var(--titan-spacing-large);
+                  padding-left: var(--titan-spacing-large);
                }
 
                i {
-                  margin-right: var(--titan-padding-standard);
+                  margin-right: var(--titan-spacing-standard);
                }
 
                .label {
@@ -235,7 +235,7 @@
                   @include font-size-normal;
 
                   &:not(.checkbox) {
-                     margin-left: var(--titan-padding-standard);
+                     margin-left: var(--titan-spacing-standard);
                   }
 
                   &.number {

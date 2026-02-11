@@ -1,0 +1,63 @@
+@use './BorderMixins' as border;
+@use './MarginMixins' as margin;
+@use './PaddingMixins' as padding;
+
+@mixin separator-left-standard {
+   @include border.border-left;
+   @include padding.padding-left-standard;
+   @include margin.margin-left-standard;
+}
+
+@mixin separator-left-large {
+   @include border.border-left;
+   @include padding.padding-left-large;
+   @include margin.margin-left-large;
+}
+
+@mixin separator-top-standard {
+   @include border.border-top;
+   @include padding.padding-top-standard;
+   @include margin.margin-top-standard;
+}
+
+@mixin separator-top-large {
+   @include border.border-top;
+   @include padding.padding-top-large;
+   @include margin.margin-top-large;
+}
+
+@mixin separated-row-child-large {
+   &:not(:first-child) {
+      @include padding.padding-left-large;
+   }
+}
+
+@mixin separated-row-large {
+   > * {
+      @include separated-row-child-large;
+   }
+}
+
+@mixin separated-column-child-large {
+   &:not(:first-child) {
+      @include padding.padding-top-large;
+   }
+}
+
+@mixin separated-column-large {
+   > * {
+      @include separated-column-child-large;
+   }
+}
+
+@mixin border-separated-row-child-large {
+   &:not(:first-child) {
+      @include separator-left-large;
+   }
+}
+
+@mixin border-separated-row-large {
+   > * {
+      @include border-separated-row-child-large;
+   }
+}

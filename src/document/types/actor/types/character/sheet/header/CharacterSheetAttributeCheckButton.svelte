@@ -57,7 +57,7 @@
       @include flex-group-center;
 
       i {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 </style>

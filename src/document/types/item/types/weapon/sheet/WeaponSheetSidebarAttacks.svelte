@@ -155,7 +155,7 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
 
          .header {
@@ -184,7 +184,7 @@
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-right: var(--titan-padding-standard);
+                  margin-right: var(--titan-spacing-standard);
                }
             }
 
@@ -203,12 +203,12 @@
             @include panel-3;
             @include font-size-small;
 
-            width: calc(100% - var(--titan-padding-large));
+            width: calc(100% - var(--titan-spacing-large));
             flex-wrap: wrap;
-            padding: 0 var(--titan-padding-standard) var(--titan-padding-large) var(--titan-padding-standard);
+            padding: 0 var(--titan-spacing-standard) var(--titan-spacing-large) var(--titan-spacing-standard);
 
             .stat {
-               margin: var(--titan-padding-large) var(--titan-padding-standard) 0 var(--titan-padding-standard);
+               margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
             }
          }
       }

@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import CharacterSheetCondensedAttributeCheckButton
@@ -71,10 +71,10 @@
          @include flex-group-center;
 
          height: 100%;
-         margin-left: var(--titan-padding-large);
+         margin-left: var(--titan-spacing-large);
 
          :not(:first-child) {
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
          }
 
          .input {

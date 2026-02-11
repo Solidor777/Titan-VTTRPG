@@ -1,7 +1,7 @@
 :root {
    // Font Families
    --titan-font-family-normal: 'Lato';
-   --titan-font-family-body: 'Open Sans';
+   --titan-font-family-rich-text: 'Open Sans';
 
    // Font sizes
    --titan-font-size-normal: 16px;
@@ -17,9 +17,9 @@
    --titan-border-width-thick: 4px;
    --titan-border-width: 2px;
 
-   // Padding
-   --titan-padding-large: 8px;
-   --titan-padding-standard: 4px;
+   // Spacing
+   --titan-spacing-large: 8px;
+   --titan-spacing-standard: 4px;
 
    // Application
    --titan-app-background: #0f0f0fcc;
@@ -56,6 +56,7 @@
    --titan-button-border-radius: 12px;
    --titan-button-border-style: solid;
    --titan-button-border-width: 2px;
+   --titan-button-box-sizing: border-box;
    --titan-button-disabled-background: #8d8d8d;
    --titan-button-disabled-border-color: #464646;
    --titan-button-disabled-font-color: #292929;
@@ -68,6 +69,7 @@
    --titan-button-hover-border-color: #393939;
    --titan-button-hover-font-color: #393939;
    --titan-button-line-height: 20px;
+   --titan-button-margin: 0;
    --titan-button-padding: 4px 8px;
    --titan-button-width: 100%;
 
@@ -83,6 +85,7 @@
    --titan-label-border-style: solid;
    --titan-label-border-width: 2px;
    --titan-label-font-color: #1d1e26;
+   --titan-label-font-weight: bold;
    --titan-label-padding: 4px;
    --titan-label-width: 100%;
    --titan-label-height: 100%;
@@ -95,6 +98,7 @@
    --titan-tag-border-width: 2px;
    --titan-tag-font-color: #1d1e26;
    --titan-tag-font-size: 14px;
+   --titan-tag-font-weight: bold;
    --titan-tag-padding: 4px;
 
    // Resource
@@ -172,9 +176,8 @@
    --titan-turn-start-effect-primary: #9580ff;
    --titan-turn-start-effect-secondary: #80ffea;
 
-   // Selection
-   --titan-highlight-background: #FFE9AE;
-   --titan-active-background: #fcdbbf;
+   // Highlighted
+   --titan-highlighted-background: #ffe9ae;
 
    // Line height
    --titan-line-height-normal: 16px;

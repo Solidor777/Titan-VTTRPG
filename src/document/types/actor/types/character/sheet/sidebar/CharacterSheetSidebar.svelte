@@ -51,8 +51,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--titan-padding-standard);
-            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
+            padding-top: var(--titan-spacing-standard);
          }
       }
    }

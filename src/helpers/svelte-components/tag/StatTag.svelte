@@ -31,8 +31,8 @@
          @include border-right;
 
          font-weight: bold;
-         padding-right: var(--titan-padding-standard);
-         margin: 0 var(--titan-padding-standard);
+         padding-right: var(--titan-spacing-standard);
+         margin: 0 var(--titan-spacing-standard);
       }
    }
 </style>

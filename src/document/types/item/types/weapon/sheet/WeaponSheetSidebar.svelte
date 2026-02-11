@@ -53,7 +53,7 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

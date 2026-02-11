@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CheckChatScalingAspect
       from '~/check/types/casting-check/chat-message/CastingCheckChatMessageScalingAspect.svelte';
 
@@ -32,7 +32,7 @@
          width: 100%;
 
          &:not(:first-child) {
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

@@ -1,9 +1,9 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import {getIcon} from '~/system/Icons.js';
+   import { getIcon } from '~/system/Icons.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
    /** @type string The Mod that this component represents. */
@@ -75,7 +75,7 @@
          height: 100%;
 
          .fas {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 
@@ -86,7 +86,7 @@
          height: 100%;
 
          :not(:first-child) {
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
          }
 
          .input {

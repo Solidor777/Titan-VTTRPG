@@ -189,7 +189,7 @@
       @include panel-2;
 
       width: 100%;
-      padding: var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-standard) var(--titan-padding-large);
+      padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-large);
 
       .label-button {
          @include flex-column;
@@ -209,7 +209,7 @@
             @include flex-group-top;
 
             &:not(:first-child) {
-               margin-left: var(--titan-padding-large);
+               margin-left: var(--titan-spacing-large);
 
                .row {
                   @include flex-row;
@@ -220,8 +220,8 @@
                   &:not(:first-child) {
                      @include border-top;
 
-                     padding-top: var(--titan-padding-standard);
-                     margin-top: var(--titan-padding-standard);
+                     padding-top: var(--titan-spacing-standard);
+                     margin-top: var(--titan-spacing-standard);
                   }
 
                   .label {
@@ -231,10 +231,10 @@
 
                      height: 100%;
                      font-weight: bold;
-                     margin-right: var(--titan-padding-standard);
+                     margin-right: var(--titan-spacing-standard);
 
                      i {
-                        margin-right: var(--titan-padding-standard);
+                        margin-right: var(--titan-spacing-standard);
                      }
                   }
 
@@ -244,7 +244,7 @@
 
                      height: 100%;
                      width: 28px;
-                     margin-left: var(--titan-padding-standard);
+                     margin-left: var(--titan-spacing-standard);
                   }
 
                   .value {
@@ -254,7 +254,7 @@
                      font-weight: normal;
                      height: 100%;
                      width: 28px;
-                     margin-left: var(--titan-padding-standard);
+                     margin-left: var(--titan-spacing-standard);
                   }
 
                   .symbol {
@@ -262,7 +262,7 @@
                      @include flex-group-center;
 
                      height: 100%;
-                     margin-left: var(--titan-padding-standard);
+                     margin-left: var(--titan-spacing-standard);
                   }
                }
 
@@ -282,7 +282,7 @@
                      font-weight: bold;
 
                      i {
-                        margin-right: var(--titan-padding-standard);
+                        margin-right: var(--titan-spacing-standard);
                      }
                   }
 

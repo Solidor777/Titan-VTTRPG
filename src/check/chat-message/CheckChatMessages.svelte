@@ -29,7 +29,7 @@
       @include padding-large;
 
       &:not(:first-child) {
-         margin-top: var(--titan-padding-large);
+         margin-top: var(--titan-spacing-large);
       }
    }
 </style>

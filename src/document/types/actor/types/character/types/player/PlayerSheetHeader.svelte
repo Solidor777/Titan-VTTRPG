@@ -80,8 +80,8 @@
          &:not(:first-child) {
             @include border-top;
 
-            margin-top: var(--titan-padding-standard);
-            padding-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
+            padding-top: var(--titan-spacing-standard);
          }
 
          .column {
@@ -93,13 +93,13 @@
             &:not(:first-child) {
                @include border-left;
 
-               margin-left: var(--titan-padding-standard);
-               padding-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
+               padding-left: var(--titan-spacing-standard);
             }
          }
 
          .stat {
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
 
             &.text {
                flex-grow: 1;
@@ -109,7 +109,7 @@
                @include flex-row;
                @include flex-group-center;
 
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
 
                .available {
                   @include flex-row;
@@ -122,14 +122,14 @@
                .symbol {
                   @include flex-row;
 
-                  margin: var(--titan-padding-standard);
+                  margin: var(--titan-spacing-standard);
                }
 
                .earned {
                   @include flex-row;
                   @include flex-group-center;
 
-                  margin-right: var(--titan-padding-large);
+                  margin-right: var(--titan-spacing-large);
                   width: 40px;
                }
 

@@ -35,7 +35,7 @@
          @include flex-group-center;
          @include border;
 
-         margin: var(--titan-padding-standard);
+         margin: var(--titan-spacing-standard);
 
          @include padding-large;
 

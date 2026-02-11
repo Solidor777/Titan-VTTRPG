@@ -27,7 +27,7 @@
 
       .label {
          font-weight: bold;
-         margin-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
       }
    }
 

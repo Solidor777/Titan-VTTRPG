@@ -1,10 +1,10 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {SHIELD_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/shield/ShieldTraits.js';
+   import { SHIELD_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/shield/ShieldTraits.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {CREATE_ICON, EDIT_ICON} from '~/system/Icons.js';
+   import { CREATE_ICON, EDIT_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
 
@@ -79,13 +79,13 @@
          @include flex-row;
          @include flex-group-center;
 
-         margin-top: var(--titan-padding-large);
+         margin-top: var(--titan-spacing-large);
 
          --titan-button-font-size: var(--titan-font-size-small);
          --titan-button-line-height: 20px;
 
          &:not(:first-child) {
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
          }
 
          .button-contents {
@@ -98,7 +98,7 @@
             }
 
             i {
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
             }
          }
       }
@@ -114,7 +114,7 @@
       .trait {
          @include flex-row;
          @include flex-group-center;
-         @include tag-margin;
+         @include tag-container-child-margin;
          @include font-size-small;
       }
    }

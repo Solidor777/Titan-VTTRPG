@@ -1,7 +1,7 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {slide} from 'svelte/transition';
+   import { slide } from 'svelte/transition';
    import SpellSheetEnableAspectButton
       from '~/document/types/item/types/spell/sheet/SpellSheetEnableAspectButton.svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
@@ -186,7 +186,7 @@
          @include font-size-small;
          @include panel-3;
 
-         padding: 0 var(--titan-padding-standard) var(--titan-padding-standard);
+         padding: 0 var(--titan-spacing-standard) var(--titan-spacing-standard);
          width: calc(100% - 30px);
 
          .row {
@@ -197,16 +197,16 @@
             width: 100%;
 
             &:first-child:not(.tags) {
-               margin-top: var(--titan-padding-standard);
+               margin-top: var(--titan-spacing-standard);
             }
 
             &:not(:first-child) {
                @include border-top;
 
-               margin-top: var(--titan-padding-standard);
+               margin-top: var(--titan-spacing-standard);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-standard);
+                  padding-top: var(--titan-spacing-standard);
                }
             }
 
@@ -221,12 +221,12 @@
                }
 
                .input {
-                  margin-left: var(--titan-padding-standard);
+                  margin-left: var(--titan-spacing-standard);
                }
             }
 
             .option {
-               @include tag-margin;
+               @include tag-container-child-margin;
             }
          }
       }

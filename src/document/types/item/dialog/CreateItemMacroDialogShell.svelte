@@ -300,8 +300,8 @@
 
          &:not(:first-child) {
             border-top: solid;
-            padding-top: var(--titan-padding-standard);
-            margin-top: var(--titan-padding-standard);
+            padding-top: var(--titan-spacing-standard);
+            margin-top: var(--titan-spacing-standard);
             border-width: var(--titan-border-width-normal);
          }
 
@@ -317,13 +317,13 @@
             font-weight: bold;
             height: 100%;
             width: 100%;
-            margin-right: var(--titan-padding-large);
+            margin-right: var(--titan-spacing-large);
          }
 
          .input {
             @include flex-group-left;
 
-            margin-left: var(--titan-padding-large);
+            margin-left: var(--titan-spacing-large);
             height: 100%;
             width: 100%;
 
@@ -335,10 +335,10 @@
             @include flex-row;
 
             width: 100%;
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
 
             &:not(:first-child) {
-               margin-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
             }
          }
       }

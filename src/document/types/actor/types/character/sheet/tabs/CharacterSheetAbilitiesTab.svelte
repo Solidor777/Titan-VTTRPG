@@ -138,19 +138,19 @@
             width: 100%;
 
             &:not(:first-child) {
-               margin-top: var(--titan-padding-standard);
+               margin-top: var(--titan-spacing-standard);
             }
 
             .reset {
                --titan-button-font-size: var(--titan-font-size-small);
                --titan-icon-button-radius: 28px;
 
-               margin-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
             }
 
             .label {
                font-weight: bold;
-               margin-right: var(--titan-padding-standard);
+               margin-right: var(--titan-spacing-standard);
             }
 
             .input {
@@ -159,18 +159,18 @@
 
             .option {
                &:not(:first-child) {
-                  margin-left: var(--titan-padding-standard);
+                  margin-left: var(--titan-spacing-standard);
                }
             }
 
             .add-entry-button {
-               margin-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
             }
          }
 
          .option {
             &:not(:first-child) {
-               margin-left: var(--titan-padding-standard);
+               margin-left: var(--titan-spacing-standard);
             }
          }
       }
@@ -187,7 +187,7 @@
             @include flex-group-top;
 
             width: 100%;
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

@@ -1,6 +1,6 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {COLLAPSED_ICON, EXPANDED_ICON} from '~/system/Icons.js';
+   import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
    /** @type boolean Whether this Item is currently expanded. */
    export let isExpanded = void 0;
@@ -32,7 +32,7 @@
    .button {
       @include flex-row;
 
-      margin-right: var(--titan-padding-large);
+      margin-right: var(--titan-spacing-large);
 
       .button-inner {
          @include flex-row;
@@ -48,7 +48,7 @@
 
          i {
             width: 20px;
-            margin-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
          }
       }
    }

@@ -43,8 +43,8 @@
       .value {
          @include border-left;
 
-         padding-left: var(--titan-padding-standard);
-         margin-left: var(--titan-padding-standard);
+         padding-left: var(--titan-spacing-standard);
+         margin-left: var(--titan-spacing-standard);
       }
    }
 </style>

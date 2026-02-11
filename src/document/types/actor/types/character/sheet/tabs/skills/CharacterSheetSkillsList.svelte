@@ -1,9 +1,9 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import CharacterSheetSkill
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkill.svelte';
-   import {slideFade} from '@typhonjs-fvtt/runtime/svelte/transition';
+   import { slideFade } from '@typhonjs-fvtt/runtime/svelte/transition';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -21,8 +21,8 @@
 
       // If no skill names match, look for skills with matching default attributes.
       if (filteredList.length === 0) {
-         filteredList = skillList.filter(([key, value]) =>
-            localize(value.defaultAttribute).toLowerCase().includes(filter));
+         filteredList = skillList.filter((skill) =>
+            localize(skill.defaultAttribute).toLowerCase().includes(filter));
       }
    }
 </script>
@@ -45,7 +45,7 @@
 
       height: 100%;
       width: 100%;
-      margin-bottom: var(--titan-padding-standard);
+      margin-bottom: var(--titan-spacing-standard);
 
       li {
          @include flex-row;
@@ -60,7 +60,7 @@
          &:not(:last-child) {
             @include border-bottom;
 
-            margin-bottom: var(--titan-padding-large);
+            margin-bottom: var(--titan-spacing-large);
          }
       }
    }

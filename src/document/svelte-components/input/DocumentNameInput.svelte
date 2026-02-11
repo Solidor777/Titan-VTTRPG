@@ -39,7 +39,7 @@
       height: 100%;
 
       --titan-input-height: 32px;
-      --titan-input-padding: var(--titan-padding-standard);
+      --titan-input-padding: var(--titan-spacing-standard);
       --font-size: var(--titan-font-size-extra-large);
    }
 </style>

@@ -1,0 +1,23 @@
+@mixin panel-1 {
+   font-family: var(--titan-font-family-normal), sans-serif;
+   background: var(--titan-panel-1-background);
+   color: var(--titan-panel-1-color);
+
+   --titan-border-color: var(--titan-panel-1-color);
+}
+
+@mixin panel-2 {
+   font-family: var(--titan-font-family-normal), sans-serif;
+   background: var(--titan-panel-2-background);
+   color: var(--titan-panel-2-color);
+
+   --titan-border-color: var(--titan-panel-2-color);
+}
+
+@mixin panel-3 {
+   font-family: var(--titan-font-family-normal), sans-serif;
+   background: var(--titan-panel-3-background);
+   color: var(--titan-panel-3-color);
+
+   --titan-border-color: var(--titan-panel-3-color);
+}

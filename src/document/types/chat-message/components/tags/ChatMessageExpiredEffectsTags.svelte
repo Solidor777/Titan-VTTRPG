@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ChatExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
 
    /** @type object Reference to the Document store. */
@@ -27,7 +27,7 @@
       flex-wrap: wrap;
 
       .effect {
-         @include tag-margin;
+         @include tag-container-child-margin;
       }
    }
 </style>

@@ -26,7 +26,7 @@
       @include border-right;
 
       font-weight: bold;
-      padding-right: var(--titan-padding-standard);
-      margin-right: var(--titan-padding-standard);
+      padding-right: var(--titan-spacing-standard);
+      margin-right: var(--titan-spacing-standard);
    }
 </style>

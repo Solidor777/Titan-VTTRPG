@@ -1,0 +1,39 @@
+@mixin rarity-colors {
+   &.uncommon {
+      background: var(--titan-uncommon-background);
+   }
+
+   &.rare {
+      background: var(--titan-rare-background);
+   }
+
+   &.unique {
+      background: var(--titan-unique-background);
+   }
+}
+
+@mixin rarity-input {
+   &.uncommon {
+      --titan-input-background: var(--titan-uncommon-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-uncommon-background);
+      }
+   }
+
+   &.rare {
+      --titan-input-background: var(--titan-rare-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-rare-background);
+      }
+   }
+
+   &.unique {
+      --titan-input-background: var(--titan-rare-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-rare-background);
+      }
+   }
+}

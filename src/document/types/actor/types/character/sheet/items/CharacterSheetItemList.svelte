@@ -1,6 +1,6 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Component class for the item
@@ -29,9 +29,8 @@
    /**
     * @param event
     * @param id
-    * @param type
     */
-   function onDragStart(event, id, type) {
+   function onDragStart(event, id) {
       const item = $document.items.get(id);
       const dragData = item.toDragData();
 
@@ -43,16 +42,13 @@
       isDragHovering = true;
 
       event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-
-      return;
    }
 
    // Drag item hovered
    /**
     * @param id
-    * @param type
     */
-   function onDragEnter(id, type) {
+   function onDragEnter(id) {
       if (isDragHovering) {
          hoveredItemId = id;
       }
@@ -134,11 +130,11 @@
          width: 100%;
 
          &.drag-hovered {
-            background: var(--titan-highlight-background);
+            background: var(--titan-highlighted-background);
          }
 
          &:not(:first-child) {
-            margin-top: var(--titan-padding-large);
+            margin-top: var(--titan-spacing-large);
          }
       }
    }

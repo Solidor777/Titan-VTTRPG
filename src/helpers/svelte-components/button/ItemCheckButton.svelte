@@ -1,6 +1,6 @@
 <script>
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import {DICE_ICON, SPEND_RESOLVE_ICON} from '~/system/Icons.js';
+   import { DICE_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
 
    /** @type string The Label for the check. */
    export let label = void 0;
@@ -46,7 +46,7 @@
          @include font-size-normal;
 
          i {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
 
          .resolve {
@@ -55,8 +55,8 @@
             @include flex-group-center;
 
             border-color: var(--titan-button-border-color);
-            margin-left: var(--titan-padding-standard);
-            padding-left: var(--titan-padding-standard);
+            margin-left: var(--titan-spacing-standard);
+            padding-left: var(--titan-spacing-standard);
          }
       }
    }

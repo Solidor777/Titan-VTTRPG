@@ -1,0 +1,65 @@
+@mixin attribute-colors {
+   &.body {
+      background: var(--titan-body-background);
+   }
+
+   &.mind {
+      background: var(--titan-mind-background);
+   }
+
+   &.soul {
+      background: var(--titan-soul-background);
+   }
+}
+
+@mixin attribute-button {
+   &.body {
+      --titan-button-background: var(--titan-body-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-body-background);
+      }
+   }
+
+   &.mind {
+      --titan-button-background: var(--titan-mind-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-mind-background);
+      }
+   }
+
+   &.soul {
+      --titan-button-background: var(--titan-soul-background);
+
+      &:disabled {
+         --titan-button-disabled-background: var(--titan-soul-background);
+      }
+   }
+}
+
+@mixin attribute-input {
+   &.body {
+      --titan-input-background: var(--titan-body-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-body-background);
+      }
+   }
+
+   &.mind {
+      --titan-input-background: var(--titan-mind-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-mind-background);
+      }
+   }
+
+   &.soul {
+      --titan-input-background: var(--titan-soul-background);
+
+      &:disabled {
+         --titan-input-disabled-background: var(--titan-soul-background);
+      }
+   }
+}

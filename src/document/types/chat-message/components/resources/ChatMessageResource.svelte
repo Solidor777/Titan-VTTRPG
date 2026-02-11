@@ -23,12 +23,12 @@
       .label {
          @include border-right;
 
-         margin-right: var(--titan-padding-large);
-         padding-right: var(--titan-padding-large);
+         margin-right: var(--titan-spacing-large);
+         padding-right: var(--titan-spacing-large);
       }
 
       i {
-         margin-right: var(--titan-padding-large);
+         margin-right: var(--titan-spacing-large);
       }
    }
 </style>

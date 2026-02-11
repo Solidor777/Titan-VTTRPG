@@ -28,7 +28,7 @@
       background: var(--titan-tag-background);
 
       .label {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 </style>

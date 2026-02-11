@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
@@ -88,15 +88,15 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--titan-padding-large);
+               padding-bottom: var(--titan-spacing-large);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
             &:last-child {
-               padding-bottom: var(--titan-padding-standard);
+               padding-bottom: var(--titan-spacing-standard);
             }
 
             &:not(:first-child) {
@@ -110,7 +110,7 @@
                flex-wrap: wrap;
 
                .tag {
-                  @include tag-margin;
+                  @include tag-container-child-margin;
                }
             }
 

@@ -1,21 +1,21 @@
 <script>
-   import { getContext } from 'svelte'
-   import localize from '~/helpers/utility-functions/Localize.js'
-   import RichText from '~/helpers/svelte-components/RichText.svelte'
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte'
-   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte'
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte'
-   import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte'
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte'
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte'
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte'
+   import { getContext } from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import RichText from '~/helpers/svelte-components/RichText.svelte';
+   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+   import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
+   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
+   import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
+   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    /** @type object Reference to the Document store. */
-   const document = getContext('document')
-   const item = $document.flags.titan
+   const document = getContext('document');
+   const item = $document.flags.titan;
 
    /** @type SpellAspect[] List of enabled Spell Aspects. */
-   const enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled)
+   const enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
 </script>
 
 <div class="item-chat-message">
@@ -112,15 +112,15 @@
             width: 100%;
 
             &:not(.rich-text) {
-               padding-bottom: var(--titan-padding-large);
+               padding-bottom: var(--titan-spacing-large);
 
                &:not(.tags) {
-                  padding-top: var(--titan-padding-large);
+                  padding-top: var(--titan-spacing-large);
                }
             }
 
             &:last-child {
-               padding-bottom: var(--titan-padding-standard);
+               padding-bottom: var(--titan-spacing-standard);
             }
 
             &:not(:first-child) {
@@ -134,7 +134,7 @@
                flex-wrap: wrap;
 
                .tag {
-                  @include tag-margin;
+                  @include tag-container-child-margin;
                }
             }
 

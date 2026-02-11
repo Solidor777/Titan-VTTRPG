@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type object Reference to the Document store. */
@@ -26,7 +26,7 @@
       flex-wrap: wrap;
 
       .stat {
-         @include tag-margin;
+         @include tag-container-child-margin;
       }
    }
 </style>

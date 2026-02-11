@@ -1,11 +1,11 @@
 <script>
-   import {getContext} from 'svelte';
-   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits.js';
+   import { getContext } from 'svelte';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import {ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON} from '~/system/Icons.js';
+   import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type object Reference to the Document store. */
@@ -83,7 +83,7 @@
       flex-wrap: wrap;
 
       .stat {
-         @include tag-margin;
+         @include tag-container-child-margin;
       }
    }
 </style>

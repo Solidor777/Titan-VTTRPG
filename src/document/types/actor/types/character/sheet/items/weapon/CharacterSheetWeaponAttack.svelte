@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
-   import {ATTACK_TRAIT_DESCRIPTIONS} from '~/document/types/item/types/weapon/AttackTraits';
+   import { getContext } from 'svelte';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
@@ -235,7 +235,7 @@
          }
 
          i {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 
@@ -248,7 +248,7 @@
          flex-wrap: wrap;
 
          .stat {
-            @include tag-margin;
+            @include tag-container-child-margin;
          }
       }
    }

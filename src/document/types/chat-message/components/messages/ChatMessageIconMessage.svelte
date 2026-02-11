@@ -20,7 +20,7 @@
       width: 100%;
 
       i {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 </style>

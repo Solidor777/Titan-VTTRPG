@@ -105,24 +105,23 @@
 
 <style lang="scss">
    .tag {
-      @include tag;
       @include large-tag;
 
       .time {
          @include border-left;
 
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
+         padding-left: var(--titan-spacing-standard);
       }
 
       img {
          width: 24px;
          border: none;
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
 
       i {
-         margin-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
       }
    }
 </style>

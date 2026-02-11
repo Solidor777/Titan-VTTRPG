@@ -1,11 +1,11 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
-   import {getIcon} from '~/system/Icons.js';
+   import { getIcon } from '~/system/Icons.js';
 
    /** @type string The Resource that this component represents. */
    export let resource = void 0;
@@ -100,7 +100,7 @@
          height: 100%;
 
          &:not(:first-child) {
-            margin-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
          }
 
          .side {

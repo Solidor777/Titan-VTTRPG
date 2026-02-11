@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {DAMAGE_ICON, HEALING_ICON} from '~/system/Icons.js';
+   import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
    /** @type SpellCustomAspect The Spell Custom Aspect represented by this element. */
@@ -69,12 +69,12 @@
       &:not(:first-child) {
          @include border-left;
 
-         margin-left: var(--titan-padding-standard);
-         padding-left: var(--titan-padding-standard);
+         margin-left: var(--titan-spacing-standard);
+         padding-left: var(--titan-spacing-standard);
       }
 
       i {
-         margin-right: var(--titan-padding-standard);
+         margin-right: var(--titan-spacing-standard);
       }
    }
 </style>

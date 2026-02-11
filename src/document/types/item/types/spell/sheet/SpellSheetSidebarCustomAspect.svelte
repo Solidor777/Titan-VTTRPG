@@ -1,9 +1,9 @@
 <script>
-   import {getContext} from 'svelte';
-   import {slide} from 'svelte/transition';
+   import { getContext } from 'svelte';
+   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
-   import {DAMAGE_ICON, HEALING_ICON} from '~/system/Icons.js';
+   import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
 
    export let idx = 0;
 
@@ -68,7 +68,7 @@
       @include flex-group-top;
 
       width: 100%;
-      margin: var(--titan-padding-standard) 0;
+      margin: var(--titan-spacing-standard) 0;
 
       .aspect-label {
          @include flex-row;
@@ -78,7 +78,7 @@
          font-weight: bold;
 
          i {
-            margin-right: var(--titan-padding-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 
@@ -87,7 +87,7 @@
          @include flex-group-top;
          @include font-size-small;
 
-         margin-top: var(--titan-padding-large);
+         margin-top: var(--titan-spacing-large);
 
          .label {
             @include flex-row;
@@ -100,7 +100,7 @@
             @include flex-row;
             @include flex-group-center;
 
-            margin-top: var(--titan-padding-standard);
+            margin-top: var(--titan-spacing-standard);
          }
       }
    }
