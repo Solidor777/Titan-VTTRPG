@@ -29,7 +29,6 @@
    /**
     * @param event
     * @param id
-    * @param type
     */
    function onDragStart(event, id) {
       const item = $document.items.get(id);
@@ -48,7 +47,6 @@
    // Drag item hovered
    /**
     * @param id
-    * @param type
     */
    function onDragEnter(id) {
       if (isDragHovering) {

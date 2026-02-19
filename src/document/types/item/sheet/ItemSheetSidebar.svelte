@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import ItemSheetSidebarChecks from '~/document/types/item/sheet/check/ItemSheetSidebarChecks.svelte';
    import ItemSheetSidebarCustomTraits from '~/document/types/item/sheet/ItemSheetSidebarCustomTraits.svelte';
-   import ItemSheetSidebarSections from '~/document/types/item/sheet/ItemSheetSidebarSections.svelte';
+   import DocumentSheetScrollingSidebar from '~/document/sheet/DocumentSheetScrollingSidebar.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -18,4 +18,4 @@
          : [ItemSheetSidebarCustomTraits];
 </script>
 
-<ItemSheetSidebarSections {sections}/>
+<DocumentSheetScrollingSidebar {sections}/>

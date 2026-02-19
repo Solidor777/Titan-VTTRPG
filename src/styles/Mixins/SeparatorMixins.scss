@@ -1,63 +1,127 @@
 @use './BorderMixins' as border;
-@use './MarginMixins' as margin;
-@use './PaddingMixins' as padding;
+@use './FlexMixins' as flex;
 
-@mixin separator-left-standard {
+// Separators
+@mixin separator-left($spacing: var(--titan-spacing-standard)) {
    @include border.border-left;
-   @include padding.padding-left-standard;
-   @include margin.margin-left-standard;
+
+   padding-left: $spacing;
+   margin-left: $spacing;
+}
+
+
+@mixin separator-top($spacing: var(--titan-spacing-standard)) {
+   @include border.border-top;
+
+   padding-top: $spacing;
+   margin-top: $spacing;
+}
+
+// Large Separators
+@mixin separator-top-large {
+   @include separator-top(var(--titan-spacing-large));
 }
 
 @mixin separator-left-large {
-   @include border.border-left;
-   @include padding.padding-left-large;
-   @include margin.margin-left-large;
+   @include separator-left(var(--titan-spacing-large));
 }
 
-@mixin separator-top-standard {
-   @include border.border-top;
-   @include padding.padding-top-standard;
-   @include margin.margin-top-standard;
-}
+// Separated Rows
+@mixin separated-row-child($spacing: var(--titan-spacing-standard)) {
+   height: 100%;
 
-@mixin separator-top-large {
-   @include border.border-top;
-   @include padding.padding-top-large;
-   @include margin.margin-top-large;
-}
-
-@mixin separated-row-child-large {
    &:not(:first-child) {
-      @include padding.padding-left-large;
+      padding-left: $spacing;
    }
+}
+
+@mixin separated-row($spacing: var(--titan-spacing-standard)) {
+   @include flex.flex-row;
+
+   > * {
+      @include separated-row-child($spacing);
+   }
+}
+
+// Large Separated Rows
+@mixin separated-row-child-large {
+   @include separated-row-child(var(--titan-spacing-large));
 }
 
 @mixin separated-row-large {
-   > * {
-      @include separated-row-child-large;
-   }
+   @include separated-row(var(--titan-spacing-large));
 }
 
-@mixin separated-column-child-large {
+// Border Separated Rows
+@mixin border-separated-row-child($spacing: var(--titan-spacing-standard)) {
+   height: 100%;
+
    &:not(:first-child) {
-      @include padding.padding-top-large;
+      @include separator-left($spacing);
    }
 }
 
-@mixin separated-column-large {
+@mixin border-separated-row($spacing: var(--titan-spacing-standard)) {
    > * {
-      @include separated-column-child-large;
+      @include border-separated-row-child($spacing);
    }
 }
 
+// Large Border Separated Rows
 @mixin border-separated-row-child-large {
-   &:not(:first-child) {
-      @include separator-left-large;
-   }
+   @include border-separated-row-child(var(--titan-spacing-large));
 }
 
 @mixin border-separated-row-large {
-   > * {
-      @include border-separated-row-child-large;
+   @include border-separated-row(var(--titan-spacing-large));
+}
+
+// Separated Columns
+@mixin separated-column-child($spacing: var(--titan-spacing-standard)) {
+   width: 100%;
+
+   &:not(:first-child) {
+      padding-top: $spacing;
    }
+}
+
+@mixin separated-column($spacing: var(--titan-spacing-standard)) {
+   > * {
+      @include separated-column-child($spacing);
+   }
+}
+
+// Large Separated Columns
+@mixin separated-column-child-large {
+   @include separated-column-child(var(--titan-spacing-large));
+}
+
+@mixin separated-column-large {
+   @include separated-column(var(--titan-spacing-large));
+}
+
+
+// Border Separated Columns
+@mixin border-separated-column-child($spacing: var(--titan-spacing-standard)) {
+   width: 100%;
+
+   &:not(:first-child) {
+      @include separator-top($spacing);
+   }
+}
+
+@mixin border-separated-column($spacing: var(--titan-spacing-standard)) {
+   > * {
+      @include border-separated-column-child($spacing);
+   }
+}
+
+
+// Large Border Separated Columns
+@mixin border-separated-column-child-large() {
+   @include border-separated-column-child(var(--titan-spacing-large));
+}
+
+@mixin border-separated-column-large() {
+   @include border-separated-column(var(--titan-spacing-large));
 }
