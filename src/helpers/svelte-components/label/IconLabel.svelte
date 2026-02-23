@@ -1,10 +1,10 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type string The text to display for this element. */
+   /** @type string The text label to display for this element. */
    export let label = void 0;
 
-   /** @type string The Icon to display for this Stat. */
+   /** @type string The Icon to display for this element. */
    export let icon = void 0;
 
    /** @type string The Tooltip to display for this element, if any. */
@@ -25,7 +25,7 @@
    .label {
       @include flex-row;
       @include flex-group-center;
-      
+
       width: 100%;
 
       .text {

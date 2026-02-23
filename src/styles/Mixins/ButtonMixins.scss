@@ -1,13 +1,16 @@
 @use './FlexMixins' as flex;
+@use './BorderMixins' as border;
 
 @mixin button {
+   @include border.border;
    @include flex.flex-group-center;
    @include flex.flex-row;
 
-   border-style: var(--titan-button-border-top-style) var(--titan-button-border-right-style) var(--titan-button-border-bottom-style) var(--titan-button-border-left-style);
-   border-color: var(--titan-button-border-color);
-   border-radius: var(--titan-button-border-radius);
-   border-width: var(--titan-button-border-width);
+   --titan-border-style: var(--titan-button-border-style);
+   --titan-border-color: var(--titan-button-border-color);
+   --titan-border-radius: var(--titan-button-border-radius);
+   --titan-border-width: var(--titan-button-border-width);
+
    background: radial-gradient(var(--titan-button-background));
    box-sizing: var(--titan-button-box-sizing);
    color: var(--titan-button-font-color);

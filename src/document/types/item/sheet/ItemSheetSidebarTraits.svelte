@@ -1,11 +1,11 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { CREATE_ICON, EDIT_ICON } from '~/system/Icons.js';
    import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
    import TagContainer from '~/helpers/svelte-components/tag/TagContainer.svelte';
    import { slide } from 'svelte/transition';
+   import IconLabelButton from '~/helpers/svelte-components/button/IconLabelButton.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -34,30 +34,20 @@
 <div class="traits">
    <!--Edit Traits Button-->
    <div class="button">
-      <Button
-         on:click={() => {
-            $document.system.editArmorTraits();
-         }}
-      >
-         <div class="button-contents">
-            <i class="{EDIT_ICON}"/>
-            <div class="label">
-               {localize('editTraits')}
-            </div>
-         </div>
-      </Button>
+      <IconLabelButton
+         icon={EDIT_ICON}
+         label={localize('editTraits')}
+         on:click={() => {$document.system.editArmorTraits()}}
+      />
    </div>
 
    <!--Add Custom Trait Button-->
    <div class="button">
-      <Button on:click={() => {$document.addCustomTrait()}}>
-         <div class="button-contents">
-            <i class="{CREATE_ICON}"/>
-            <div class="label">
-               {localize('addCustomTrait')}
-            </div>
-         </div>
-      </Button>
+      <IconLabelButton
+         icon={CREATE_ICON}
+         label={localize('addCustomTrait')}
+         on:click={() => {$document.addCustomTrait()}}
+      />
    </div>
 
    <!--Traits-->
@@ -87,20 +77,6 @@
 
          &:not(:first-child) {
             margin-left: var(--titan-spacing-standard);
-         }
-
-         .button-contents {
-            @include flex-row;
-            @include flex-group-center;
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-            }
-
-            i {
-               margin-right: var(--titan-spacing-standard);
-            }
          }
       }
 
