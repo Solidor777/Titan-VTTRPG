@@ -1,0 +1,28 @@
+@use './FlexMixins' as flex;
+@use './SeparatorMixins' as separator;
+
+@mixin list-base {
+   @include flex.flex-column;
+   @include flex.flex-group-top;
+
+   list-style: var(--titan-list-style);
+   padding: var(--titan-list-padding);
+   margin: 0;
+
+   li {
+      @include flex.flex-column;
+      @include flex.flex-group-top;
+      
+      width: 100%;
+   }
+}
+
+@mixin list($spacing: var(--titan-list-spacing)) {
+   @include list-base;
+   @include separator.separated-column($spacing);
+}
+
+@mixin border-separated-list($spacing: var(--titan-list-spacing)) {
+   @include list-base;
+   @include separator.border-separated-column($spacing);
+}

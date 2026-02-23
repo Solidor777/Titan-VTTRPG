@@ -13,13 +13,11 @@
    --titan-border-color: #d3d3d3;
    --titan-border-radius: 4px;
    --titan-border-style: solid;
-   --titan-border-width-normal: 2px;
-   --titan-border-width-thick: 4px;
    --titan-border-width: 2px;
 
    // Spacing
-   --titan-spacing-large: 8px;
    --titan-spacing-standard: 4px;
+   --titan-spacing-large: 8px;
 
    // Application
    --titan-app-background: #0f0f0fcc;
@@ -52,9 +50,12 @@
 
    // Button
    --titan-button-background: #f2b58c;
+   --titan-button-border-bottom-style: solid;
    --titan-button-border-color: #292929;
+   --titan-button-border-left-style: solid;
    --titan-button-border-radius: 12px;
-   --titan-button-border-style: solid;
+   --titan-button-border-right-style: solid;
+   --titan-button-border-top-style: solid;
    --titan-button-border-width: 2px;
    --titan-button-box-sizing: border-box;
    --titan-button-disabled-background: #8d8d8d;
@@ -199,4 +200,8 @@
    --titan-sidebar-width: 208px;
    --titan-sidebar-padding: 4px;
    --titan-sidebar-spacing: 4px;
+
+   // Lists
+   --titan-list-style: none;
+   --titan-list-padding: 0px;
 }

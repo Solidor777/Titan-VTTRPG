@@ -71,7 +71,7 @@
             border-top: solid;
             padding-top: var(--titan-spacing-standard);
             margin-top: var(--titan-spacing-standard);
-            border-width: var(--titan-border-width-normal);
+            border-width: var(--titan-border-width);
          }
 
          .button {

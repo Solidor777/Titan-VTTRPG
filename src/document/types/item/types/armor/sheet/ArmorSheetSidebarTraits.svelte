@@ -1,16 +1,45 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { ARMOR_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/armor/ArmorTraits.js';
+   import { getArmorTraitDescription } from '~/document/types/item/types/armor/ArmorTraits.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { CREATE_ICON, EDIT_ICON } from '~/system/Icons.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
+   import LabelTag from '~/helpers/svelte-components/tag/LabelTag.svelte';
+   import TagContainer from '~/helpers/svelte-components/tag/TagContainer.svelte';
+   import { slide } from 'svelte/transition';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
-   const traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
+
+   /** @type Tag[] List of traits converted into tags. */
+   export let tags = [];
+
+   // Populate the tags list
+   $: {
+      // Add Armor Traits.
+      for (const [idx] in $document.system.trait) {
+         tags.push({
+            id: $document.system.trait[idx].name,
+            component: LabelTag,
+            props: {
+               tooltip: getArmorTraitDescription($document.system.trait[idx].name),
+               label: localize($document.system.trait[idx].name),
+            }
+         });
+      }
+
+      // Add Custom Traits
+      for (const [idx] in $document.system.customTrait) {
+         tags.push({
+            id: $document.system.customTrait[idx].uuid,
+            component: ItemSheetCustomTraitTag,
+            props: {
+               idx: idx
+            }
+         });
+      }
+   }
 </script>
 
 <div class="traits">
@@ -32,10 +61,7 @@
 
    <!--Add Custom Trait Button-->
    <div class="button">
-      <Button
-         on:click={() => {
-            $document.addCustomTrait()}}
-      >
+      <Button on:click={() => {$document.addCustomTrait()}}>
          <div class="button-contents">
             <i class="{CREATE_ICON}"/>
             <div class="label">
@@ -47,21 +73,8 @@
 
    <!--Traits-->
    {#if $document.system.trait.length > 0 || $document.system.customTrait.length > 0}
-      <div class="traits-container" transition:slide|local>
-         {#each $document.system.trait as trait (trait.name)}
-            <div class="trait" transition:slide|local>
-               <Tag tooltip={localize(traitDescriptions[trait.name])}>
-                  {localize(trait.name)}
-               </Tag>
-            </div>
-         {/each}
-
-         <!--Custom Traits-->
-         {#each $document.system.customTrait as trait, idx (trait.uuid)}
-            <div class="trait" transition:slide|local>
-               <ItemSheetCustomTraitTag {idx}/>
-            </div>
-         {/each}
+      <div class="tags" transition:slide|local>
+         <TagContainer {tags}/>
       </div>
    {/if}
 </div>
@@ -101,20 +114,12 @@
             }
          }
       }
-   }
 
-   .traits-container {
-      @include list;
-      @include flex-row;
-      @include flex-group-center;
-
-      flex-wrap: wrap;
-
-      .trait {
+      .tags {
          @include flex-row;
          @include flex-group-center;
-         @include tag-container-child-margin;
-         @include font-size-small;
+
+         width: 100%;
       }
    }
 </style>

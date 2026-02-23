@@ -1,17 +1,14 @@
-@use './BorderMixins' as border;
 @use './FlexMixins' as flex;
 @use './FontMixins' as font;
 
 @mixin tag {
-   @include border.border;
    @include flex.flex-group-center;
    @include flex.flex-row;
 
-   --titan-border-color: var(--titan-tag-border-color);
-   --titan-border-radius: var(--titan-tag-border-radius);
-   --titan-border-style: var(--titan-tag-border-style);
-   --titan-border-width: var(--titan-tag-border-width);
-
+   border-style: var(--titan-tag-border-style);
+   border-color: var(--titan-tag-border-color);
+   border-radius: var(--titan-tag-border-radius);
+   border-width: var(--titan-tag-border-width);
    background: var(--titan-tag-background);
    color: var(--titan-tag-font-color);
    font-size: var(--titan-tag-font-size);
@@ -32,11 +29,10 @@
 @mixin tag-container {
    @include flex.flex-row;
    @include flex.flex-group-center;
-   @include font.font-size-small;
 
    flex-wrap: wrap;
 
-   .tag {
+   > * {
       @include tag-container-child-margin;
    }
 }

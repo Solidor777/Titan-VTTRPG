@@ -63,10 +63,11 @@
          height: 100%;
          width: 100%;
          flex: 0;
-
-         @include padding-large;
+         padding: 0;
 
          .button {
+            @include flex-row;
+
             width: 100%;
             height: 100%;
 
@@ -74,14 +75,15 @@
                --titan-button-background: var(--titan-highlighted-background);
             }
          }
+      }
 
-         .tab-content {
-            @include flex-column;
-            @include flex-group-top;
+      .tab-content {
+         @include flex-column;
+         @include flex-group-top;
 
-            width: 100%;
-            flex: 2;
-         }
+         width: 100%;
+         height: 100%;
+         flex: 2;
       }
    }
 </style>

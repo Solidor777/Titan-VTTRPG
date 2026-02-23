@@ -1,9 +1,4 @@
 <script>
-   import { getContext } from 'svelte';
-
-   /** @type object Reference to the Application State store. */
-   const appState = getContext('applicationState');
-
    /** @type SvelteComponent[] List of Svelte Components that make up the sections of the sidebar. */
    export let sections = void 0;
 </script>

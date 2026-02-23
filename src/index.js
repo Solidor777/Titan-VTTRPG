@@ -6,6 +6,7 @@ import '~/styles/Mixins/ButtonMixins.scss';
 import '~/styles/Mixins/FlexMixins.scss';
 import '~/styles/Mixins/FontMixins.scss';
 import '~/styles/Mixins/InputMixins.scss';
+import '~/styles/Mixins/ListMixins.scss';
 import '~/styles/Mixins/LabelMixins.scss';
 import '~/styles/Mixins/MarginMixins.scss';
 import '~/styles/Mixins/PaddingMixins.scss';

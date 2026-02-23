@@ -79,7 +79,7 @@
 
 <style lang="scss">
    .label {
-      @include label;
+      @include bordered-label;
 
       --titan-label-height: var(--titan-input-height);
       --titan-label-padding: var(--titan-input-padding);

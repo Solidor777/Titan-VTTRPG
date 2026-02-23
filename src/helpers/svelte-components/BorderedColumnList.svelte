@@ -37,6 +37,7 @@
          &:not(:first-child) {
             @include border-top;
 
+            // border-width: var(--titan-border-width);
             margin-top: var(--titan-spacing-standard);
             padding-top: var(--titan-spacing-standard);
          }

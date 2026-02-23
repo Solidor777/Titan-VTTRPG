@@ -1,6 +1,12 @@
 @use './BorderMixins' as border;
 
 @mixin label {
+   font-weight: var(--titan-label-font-weight);
+   height: var(--titan-label-height);
+}
+
+@mixin bordered-label {
+   @include label;
    @include border.border;
 
    --titan-border-color: var(--titan-label-border-color);
@@ -10,8 +16,6 @@
 
    background: var(--titan-label-background);
    color: var(--titan-label-font-color);
-   font-weight: var(--titan-label-font-weight);
-   height: var(--titan-label-height);
    padding: var(--titan-label-padding);
    width: var(--titan-label-width);
 }

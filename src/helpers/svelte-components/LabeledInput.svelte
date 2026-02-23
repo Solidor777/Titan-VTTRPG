@@ -27,7 +27,7 @@
       width: 100%;
 
       .label {
-         font-weight: bold;
+         @include label;
       }
 
       .input {

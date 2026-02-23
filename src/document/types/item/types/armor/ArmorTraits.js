@@ -40,3 +40,12 @@ export const ARMOR_TRAIT_DESCRIPTIONS = deepFreeze({
    encumbering: 'armor.encumbering.desc',
    heavy: 'armor.heavy.desc',
 });
+
+/**
+ * Gets the localized description string for an Armor Trait.
+ * @param {string} traitName - Name of the trait to get the description for.
+ * @returns {string} The localized description strings for the trait.
+ */
+export function getArmorTraitDescription(traitName) {
+   return ARMOR_TRAIT_DESCRIPTIONS[traitName];
+}

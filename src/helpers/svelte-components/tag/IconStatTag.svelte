@@ -1,7 +1,7 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type string The Label to display for this element. */
+   /** @type string The text to display for this element. */
    export let label = void 0;
 
    /** @type {string|number} The Value of this Stat. */

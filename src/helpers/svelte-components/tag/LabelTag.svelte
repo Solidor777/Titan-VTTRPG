@@ -4,7 +4,7 @@
    /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
-   /** @type string The Label to display for this element. */
+   /** @type string The text to display for this element. */
    export let label = void 0;
 </script>
 

@@ -11,24 +11,26 @@
    export let tooltip = void 0;
 </script>
 
-<div class="tag" use:tooltipAction={tooltip}>
+<div class="label" use:tooltipAction={tooltip}>
    <!--Icon-->
    <i class={icon}/>
 
-   <!--Label-->
-   <div class="label">
+   <!--Text-->
+   <div class="text">
       {label}
    </div>
 </div>
 
 <style lang="scss">
-   .tag {
-      @include tag;
+   .label {
+      @include flex-row;
+      @include flex-group-center;
+      
+      width: 100%;
 
-      .label {
+      .text {
          font-weight: bold;
          margin-left: var(--titan-spacing-standard);
       }
    }
-
 </style>

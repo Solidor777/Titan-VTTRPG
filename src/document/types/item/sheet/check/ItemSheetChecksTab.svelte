@@ -44,7 +44,7 @@
       </div>
    {/if}
 
-   <!--Scroling Content-->
+   <!--Scrolling Content-->
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
       <div class="scrolling-content">
          <!--Checks List-->

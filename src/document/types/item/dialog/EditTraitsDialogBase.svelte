@@ -48,7 +48,7 @@
 
          // Update the document
          item.update({
-            system: item.system
+            system: structuredClone(item.system),
          });
       }
 
