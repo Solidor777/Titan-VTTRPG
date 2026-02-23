@@ -11,14 +11,17 @@
    const document = getContext('document');
 
    /** @type Tag[] Optional input array of traits converted into Tags.*/
-   export let inTags = [];
+   export let itemTypeTraits = [];
+
+   /** @type function Optional function to start editing item-type specific traits. */
+   export let editTraits = void 0;
 
    /** @type Tag[] List of traits converted into tags. */
    let tags;
 
    // Add Custom Traits to the tags list.
    $: {
-      tags = [...inTags];
+      tags = [...itemTypeTraits];
       for (const [idx] in $document.system.customTrait) {
          tags.push({
             id: $document.system.customTrait[idx].uuid,
@@ -32,14 +35,16 @@
 </script>
 
 <div class="traits">
-   <!--Edit Traits Button-->
-   <div class="button">
-      <IconLabelButton
-         icon={EDIT_ICON}
-         label={localize('editTraits')}
-         on:click={() => {$document.system.editArmorTraits()}}
-      />
-   </div>
+   {#if editTraits}
+      <!--Edit Traits Button-->
+      <div class="button">
+         <IconLabelButton
+            icon={EDIT_ICON}
+            label={localize('editTraits')}
+            on:click={() => {editTraits()}}
+         />
+      </div>
+   {/if}
 
    <!--Add Custom Trait Button-->
    <div class="button">

@@ -9,13 +9,13 @@
    const document = getContext('document');
 
    /** @type Tag[] List of traits converted into tags. */
-   let tags;
+   let itemTypeTraits;
 
    // Populate the tags list
    $: {
-      tags = [];
+      itemTypeTraits = [];
       for (const [idx] in $document.system.trait) {
-         tags.push({
+         itemTypeTraits.push({
             id: $document.system.trait[idx].name,
             component: LabelTag,
             props: {
@@ -27,4 +27,7 @@
    }
 </script>
 
-<ItemSheetSidebarTraits inTags={tags}/>
+<ItemSheetSidebarTraits
+   editTraits={() => $document.system.editShieldTraits()}
+   {itemTypeTraits}
+/>
