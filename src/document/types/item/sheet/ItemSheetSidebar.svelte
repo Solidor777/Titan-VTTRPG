@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import ItemSheetSidebarChecks from '~/document/types/item/sheet/check/ItemSheetSidebarChecks.svelte';
-   import ItemSheetSidebarCustomTraits from '~/document/types/item/sheet/ItemSheetSidebarCustomTraits.svelte';
+   import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
    import DocumentSheetScrollingSidebar from '~/document/sheet/DocumentSheetScrollingSidebar.svelte';
 
    /** @type object Reference to the Document store. */
@@ -14,8 +14,8 @@
     */
    $: sections =
       $document.system.check.length > 0
-         ? [ItemSheetSidebarCustomTraits, ItemSheetSidebarChecks]
-         : [ItemSheetSidebarCustomTraits];
+         ? [ItemSheetSidebarTraits, ItemSheetSidebarChecks]
+         : [ItemSheetSidebarTraits];
 </script>
 
 <DocumentSheetScrollingSidebar {sections}/>

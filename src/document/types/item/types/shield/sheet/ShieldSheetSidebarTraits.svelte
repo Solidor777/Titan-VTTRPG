@@ -1,121 +1,30 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { SHIELD_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/shield/ShieldTraits.js';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { CREATE_ICON, EDIT_ICON } from '~/system/Icons.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
+   import LabelTag from '~/helpers/svelte-components/tag/LabelTag.svelte';
+   import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
+   import { getShieldTraitDescription } from '~/document/types/item/types/shield/ShieldTraits.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
-   const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
+
+   /** @type Tag[] List of traits converted into tags. */
+   let tags;
+
+   // Populate the tags list
+   $: {
+      tags = [];
+      for (const [idx] in $document.system.trait) {
+         tags.push({
+            id: $document.system.trait[idx].name,
+            component: LabelTag,
+            props: {
+               tooltip: getShieldTraitDescription($document.system.trait[idx].name),
+               label: localize($document.system.trait[idx].name),
+            }
+         });
+      }
+   }
 </script>
 
-<div class="traits">
-   <!--Edit Traits Button-->
-   <div class="button">
-      <Button
-         on:click={() => {
-            $document.system.editShieldTraits();
-         }}
-      >
-         <div class="button-contents">
-            <i class="{EDIT_ICON}"/>
-            <div class="label">
-               {localize('editTraits')}
-            </div>
-         </div>
-      </Button>
-   </div>
-
-   <!--Add Custom Trait Button-->
-   <div class="button">
-      <Button
-         on:click={() => {
-            $document.addCustomTrait();
-         }}
-      >
-         <div class="button-contents">
-            <i class="{CREATE_ICON}"/>
-            <div class="label">
-               {localize('addCustomTrait')}
-            </div>
-         </div>
-      </Button>
-   </div>
-
-   <!--Traits-->
-   <div class="traits-container" transition:slide|local>
-      {#if $document.system.trait.length > 0 || $document.system.customTrait.length > 0}
-         {#each $document.system.trait as trait (trait.name)}
-            <div class="trait" transition:slide|local>
-               <Tag tooltip={localize(traitDescriptions[trait.name])}>
-                  {localize(trait.name)}
-               </Tag>
-            </div>
-         {/each}
-
-         <!--Custom Traits-->
-         {#each $document.system.customTrait as trait, idx (trait.uuid)}
-            <div class="trait" transition:slide|local>
-               <ItemSheetCustomTraitTag {idx}/>
-            </div>
-         {/each}
-      {/if}
-   </div>
-</div>
-
-<style lang="scss">
-   .traits {
-      @include flex-column;
-      @include flex-group-top;
-
-      width: 100%;
-      height: 100%;
-
-      .button {
-         @include flex-row;
-         @include flex-group-center;
-
-         margin-top: var(--titan-spacing-large);
-
-         --titan-button-font-size: var(--titan-font-size-small);
-         --titan-button-line-height: 20px;
-
-         &:not(:first-child) {
-            margin-left: var(--titan-spacing-standard);
-         }
-
-         .button-contents {
-            @include flex-row;
-            @include flex-group-center;
-
-            .label {
-               @include flex-row;
-               @include flex-group-center;
-            }
-
-            i {
-               margin-right: var(--titan-spacing-standard);
-            }
-         }
-      }
-   }
-
-   .traits-container {
-      @include list;
-      @include flex-row;
-      @include flex-group-center;
-
-      flex-wrap: wrap;
-
-      .trait {
-         @include flex-row;
-         @include flex-group-center;
-         @include tag-container-child-margin;
-         @include font-size-small;
-      }
-   }
-</style>
+<ItemSheetSidebarTraits inTags={tags}/>

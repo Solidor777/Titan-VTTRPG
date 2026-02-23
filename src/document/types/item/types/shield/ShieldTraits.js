@@ -18,3 +18,12 @@ export const SHIELD_TRAITS = deepFreeze([
 export const SHIELD_TRAIT_DESCRIPTIONS = deepFreeze({
    magical: 'armor.magical.desc'
 });
+
+/**
+ * Gets the localized description string for a shield Trait.
+ * @param {string} traitName - Name of the trait to get the description for.
+ * @returns {string} The localized description strings for the trait.
+ */
+export function getShieldTraitDescription(traitName) {
+   return SHIELD_TRAIT_DESCRIPTIONS[traitName];
+}
