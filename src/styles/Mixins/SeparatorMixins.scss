@@ -100,7 +100,6 @@
    @include separated-column(var(--titan-spacing-large));
 }
 
-
 // Border Separated Columns
 @mixin border-separated-column-child($spacing: var(--titan-spacing-standard)) {
    width: 100%;
@@ -115,7 +114,6 @@
       @include border-separated-column-child($spacing);
    }
 }
-
 
 // Large Border Separated Columns
 @mixin border-separated-column-child-large() {

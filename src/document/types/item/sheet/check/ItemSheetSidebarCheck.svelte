@@ -4,10 +4,10 @@
    import { slide } from 'svelte/transition';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { COLLAPSED_ICON, DICE_ICON, EXPANDED_ICON } from '~/system/Icons.js';
+   import { DICE_ICON } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
    import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
+   import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -43,33 +43,20 @@
          </div>
       </div>
 
+      <!--Expand Button if there is anything to expand-->
       {#if $document.system.check[idx].resolveCost > 0
       || $document.system.check[idx].resistanceCheck !== 'none'
       || $document.system.check[idx].opposedCheck.enabled === true}
-         {#if $appState.isExpanded.sidebar.check[idx]}
-            <!--Collapse button-->
-            <IconButton
-               icon="{EXPANDED_ICON}"
-               on:click={() => {
-                              $appState.isExpanded.sidebar.check[idx] = false;
-                           }}
-            />
-         {:else}
-            <!--Expand button-->
-            <IconButton
-               icon="{COLLAPSED_ICON}"
-               on:click={() => {
-                              $appState.isExpanded.sidebar.check[idx] = true;
-                           }}
-            />
-         {/if}
+         <ExpandButton bind:expanded={$appState.isExpanded.sidebar.check[idx]}/>
       {/if}
 
+      <!--Advanced Details-->
       {#if $appState.isExpanded.sidebar.check[idx]
       && ($document.system.check[idx].resolveCost > 0
          || $document.system.check[idx].resistanceCheck !== 'none'
          || $document.system.check[idx].opposedCheck.enabled === true)}
-         <div class="advanced-stats" transition:slide|local>
+         <div class="advanced-details" transition:slide|local>
+
             <!--Resolve Cost-->
             {#if $document.system.check[idx].resolveCost > 0}
                <div class="stat" transition:slide|local>
@@ -83,8 +70,9 @@
             <!--Resistance Check-->
             {#if $document.system.check[idx].resistanceCheck !== 'none'}
                <div class="labeled-stat" transition:slide|local>
+
                   <!--Label-->
-                  <div class="label">
+                  <div class="stat-label">
                      {localize('resistedBy')}
                   </div>
 
@@ -101,7 +89,7 @@
             {#if $document.system.check[idx].opposedCheck.enabled === true}
                <div class="labeled-stat" transition:slide|local>
                   <!--Label-->
-                  <div class="label">
+                  <div class="stat-label">
                      {localize('opposedBy')}
                   </div>
 
@@ -136,14 +124,24 @@
          }
       }
 
-      .advanced-stats {
-         @include border-bottom-sides;
-         @include panel-2;
+      .advanced-details {
+         @include border-bottom;
          @include flex-column;
          @include flex-group-top;
+         @include padding-standard;
+         @include separated-column;
 
          width: 100%;
-         margin: var(--titan-spacing-large);
+
+         .stat {
+            @include flex-row;
+            @include flex-group-center;
+         }
+
+         .labeled-stat {
+            @include flex-column;
+            @include flex-group-top;
+         }
       }
    }
 </style>
