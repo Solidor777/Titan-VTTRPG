@@ -1,6 +1,7 @@
 <script>
    import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
    import { getContext } from 'svelte';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -10,9 +11,15 @@
 
    /** @type boolean Whether editing this input should be disabled. */
    export let disabled = false;
+
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 </script>
 
-<div class={$document.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}>
+<div
+   class={$document.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}
+   use:tooltipAction={tooltip}
+>
    <TJSProseMirror options={{
       document: $document,
       fieldName: path,

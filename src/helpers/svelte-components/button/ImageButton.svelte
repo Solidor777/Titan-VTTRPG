@@ -15,7 +15,12 @@
    export let tooltip = void 0;
 </script>
 
-<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>
+<button
+   {disabled}
+   on:click
+   on:mousedown={preventDefault}
+   use:tooltipAction={tooltip}
+>
    <img {alt} {src}/>
 </button>
 

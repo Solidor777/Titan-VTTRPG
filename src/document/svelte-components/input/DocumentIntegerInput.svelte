@@ -18,10 +18,13 @@
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
+
    /**
     * Update the document data when the input changes.
     */
-   function updateDocument () {
+   function updateDocument() {
       refreshSystemDocument($document, disabled);
    }
 </script>
@@ -33,4 +36,5 @@
    {min}
    on:change={updateDocument}
    on:keyup={updateDocument}
+   {tooltip}
 />

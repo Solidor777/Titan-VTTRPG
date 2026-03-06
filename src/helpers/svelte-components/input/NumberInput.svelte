@@ -1,5 +1,6 @@
 <script>
    import { createEventDispatcher } from 'svelte';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
@@ -15,6 +16,9 @@
 
    /** @type boolean Whether the input should be an Integer. If False, it will be a Float. */
    export let isInteger = false;
+
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 
    /** @type boolean Whether editing is currently active for the input. */
    let editingActive = false;
@@ -108,6 +112,7 @@
    on:keyup={parseInput}
    on:keyup
    type="number"
+   use:tooltipAction={tooltip}
 />
 
 <style lang="scss">

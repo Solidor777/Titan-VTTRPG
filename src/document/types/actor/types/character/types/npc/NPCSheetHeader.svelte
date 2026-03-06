@@ -31,21 +31,21 @@
 
       <!--Character Type-->
       <div class="stat text">
-         <LabeledInput tooltip={localize('type.desc')}>
-            <svelte:fragment slot="label">{localize('type')}</svelte:fragment>
-            <svelte:fragment slot="input">
-               <DocumentTextInput bind:value={$document.system.bio.type}/>
-            </svelte:fragment>
+         <LabeledInput
+            label={localize('type')}
+            tooltip={localize('type.desc')}
+         >
+            <DocumentTextInput bind:value={$document.system.bio.type}/>
          </LabeledInput>
       </div>
 
       <!--Character Role-->
       <div class="stat">
-         <LabeledInput tooltip={localize('role.desc')}>
-            <svelte:fragment slot="label">{localize('role')}</svelte:fragment>
-            <svelte:fragment slot="input">
-               <DocumentSelect bind:value={$document.system.role} options={roleOptions}/>
-            </svelte:fragment>
+         <LabeledInput
+            label={localize('role')}
+            tooltip={localize('role.desc')}
+         >
+            <DocumentSelect bind:value={$document.system.role} options={roleOptions}/>
          </LabeledInput>
       </div>
 

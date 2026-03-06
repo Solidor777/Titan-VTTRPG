@@ -1,20 +1,36 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
+   import Label from '~/helpers/svelte-components/label/Label.svelte';
+
+   /** @type string Label to display. */
+   export let label = void 0;
+
+   /** @type string Optional Icon to display. */
+   export let icon = void 0;
 
    /** @type string The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
-
 </script>
 
 <div class="labeled-input" use:tooltipAction={tooltip}>
-   <!--Label Slot-->
+   <!--Label-->
    <div class="label">
-      <slot name="label"></slot>
+      {#if (icon)}
+         <IconLabel
+            {icon}
+            {label}
+         />
+      {:else}
+         <Label>
+            {label}
+         </Label>
+      {/if}
    </div>
 
-   <!--Input Slot-->
+   <!--Input-->
    <div class="input">
-      <slot name="input"></slot>
+      <slot></slot>
    </div>
 </div>
 
@@ -23,12 +39,6 @@
    .labeled-input {
       @include flex-row;
       @include flex-group-left;
-
-      width: 100%;
-
-      .label {
-         @include label;
-      }
 
       .input {
          flex-grow: 1;

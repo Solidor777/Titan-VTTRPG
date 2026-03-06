@@ -21,3 +21,19 @@
 @mixin padding-left-large {
    padding-left: var(--titan-spacing-large);
 }
+
+@mixin padding-right-standard {
+   padding-right: var(--titan-spacing-standard);
+}
+
+@mixin padding-right-large {
+   padding-right: var(--titan-spacing-large);
+}
+
+@mixin padding-bottom-standard {
+   padding-bottom: var(--titan-spacing-standard);
+}
+
+@mixin padding-bottom-large {
+   padding-bottom: var(--titan-spacing-large);
+}

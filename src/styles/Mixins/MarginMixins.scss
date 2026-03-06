@@ -31,9 +31,9 @@
 }
 
 @mixin margin-bottom-standard {
-   margin-left: var(--titan-spacing-standard);
+   margin-bottom: var(--titan-spacing-standard);
 }
 
-@mixin margin-botton-large {
-   margin-top: var(--titan-spacing-large);
+@mixin margin-bottom-large {
+   margin-bottom: var(--titan-spacing-large);
 }

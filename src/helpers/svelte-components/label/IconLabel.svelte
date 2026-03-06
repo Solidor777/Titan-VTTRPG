@@ -1,5 +1,5 @@
 <script>
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import Label from '~/helpers/svelte-components/label/Label.svelte';
 
    /** @type string The text label to display for this element. */
    export let label = void 0;
@@ -11,7 +11,7 @@
    export let tooltip = void 0;
 </script>
 
-<div class="label" use:tooltipAction={tooltip}>
+<Label {tooltip}>
    <!--Icon-->
    <i class={icon}/>
 
@@ -19,18 +19,10 @@
    <div class="text">
       {label}
    </div>
-</div>
+</Label>
 
 <style lang="scss">
-   .label {
-      @include flex-row;
-      @include flex-group-center;
-
-      width: 100%;
-
-      .text {
-         font-weight: bold;
-         margin-left: var(--titan-spacing-standard);
-      }
+   i {
+      @include margin-right-standard;
    }
 </style>

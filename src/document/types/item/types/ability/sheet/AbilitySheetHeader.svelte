@@ -48,11 +48,11 @@
       <!--Action-->
       <div class="row checkbox">
          <div class="input">
-            <LabeledInput tooltip={localize('abilityAction.desc')}>
-               <svelte:fragment slot="label">{localize('action')}</svelte:fragment>
-               <svelte:fragment slot="input">
-                  <DocumentCheckboxInput value={$document.system.action}/>
-               </svelte:fragment>
+            <LabeledInput
+               label={localize('action')}
+               tooltip={localize('abilityAction.desc')}
+            >
+               <DocumentCheckboxInput value={$document.system.action}/>
             </LabeledInput>
          </div>
       </div>
@@ -60,11 +60,11 @@
       <!--Reaction-->
       <div class="row checkbox">
          <div class="input">
-            <LabeledInput tooltip={localize('abilityReaction.desc')}>
-               <svelte:fragment slot="label">{localize('reaction')}</svelte:fragment>
-               <svelte:fragment slot="input">
-                  <DocumentCheckboxInput value={$document.system.reaction}/>
-               </svelte:fragment>
+            <LabeledInput
+               label={localize('reaction')}
+               tooltip={localize('abilityReaction.desc')}
+            >
+               <DocumentCheckboxInput value={$document.system.reaction}/>
             </LabeledInput>
          </div>
       </div>
@@ -72,11 +72,11 @@
       <!--Passive-->
       <div class="row checkbox">
          <div class="input">
-            <LabeledInput tooltip={localize('abilityPassive.desc')}>
-               <svelte:fragment slot="label">{localize('passive')}</svelte:fragment>
-               <svelte:fragment slot="input">
-                  <DocumentCheckboxInput value={$document.system.reaction}/>
-               </svelte:fragment>
+            <LabeledInput
+               label={localize('passive')}
+               tooltip={localize('abilityPassive.desc')}
+            >
+               <DocumentCheckboxInput value={$document.system.passive}/>
             </LabeledInput>
          </div>
       </div>

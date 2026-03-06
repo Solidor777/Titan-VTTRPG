@@ -1,10 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-
-   /** @type string The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -12,6 +8,10 @@
    /** @type boolean Whether editing should be disabled for this component. */
    export let disabled = false;
 
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
+
+   /** The name of the document. */
    let value = $document.name;
 
    /** Update the name when the input changes. */
@@ -24,12 +24,13 @@
    }
 </script>
 
-<div class="document-name" use:tooltipAction={tooltip}>
+<div class="document-name">
    <TextInput
       bind:value={value}
       disabled={disabled || !$document?.isOwner}
       on:change={updateDocument}
       on:keyup={updateDocument}
+      {tooltip}
    />
 </div>
 

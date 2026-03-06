@@ -1,6 +1,12 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
+   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+
+   /** @type string Label to display. */
+   export let label = localize('filter');
+
+   /** @type string Optional Icon to display. */
+   export let icon = void 0;
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
@@ -8,10 +14,10 @@
 
 <!--Filter-->
 <div class="filter">
-   <div class="label">{localize('filter')}</div>
-   <div class="input">
-      <TextInput bind:value/>
-   </div>
+   <LabeledInput
+      bind:value
+      {icon}
+      {label}/>
 </div>
 
 <style lang="scss">
@@ -21,14 +27,8 @@
       @include border-bottom;
       @include panel-1;
       @include font-size-normal;
-
-      width: 100%;
-
       @include padding-standard;
 
-      .label {
-         font-weight: bold;
-         margin-right: var(--titan-spacing-standard);
-      }
+      width: 100%;
    }
 </style>

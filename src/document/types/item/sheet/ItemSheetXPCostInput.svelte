@@ -14,14 +14,14 @@
    export let tooltip = void 0;
 </script>
 
-<LabeledInput {tooltip}>
-   <svelte:fragment slot="label">{localize('xp')}</svelte:fragment>
-   <svelte:fragment slot="input">
-      <IntegerInput
-         bind:value={$document.system.xpCost}
-         disabled={disabled || !$document?.isOwner}
-         on:change={()=> $document.update({system: {xpCost: $document.system.xpCost}})}
-      />
-   </svelte:fragment>
+<LabeledInput
+   label={localize('xp')}
+   {tooltip}
+>
+   <IntegerInput
+      bind:value={$document.system.xpCost}
+      disabled={disabled || !$document?.isOwner}
+      on:change={()=> $document.update({system: {xpCost: $document.system.xpCost}})}
+   />
 </LabeledInput>
 

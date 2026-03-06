@@ -1,8 +1,9 @@
 <script>
    import isModifierActive from '~/helpers/utility-functions/IsModifierActive.js';
    import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
-   import {DECREMENT_ICON, INCREMENT_ICON} from '~/system/icons.js';
+   import { DECREMENT_ICON, INCREMENT_ICON } from '~/system/icons.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
@@ -15,6 +16,9 @@
 
    /** @type boolean Whether the input should currently be disabled. */
    export let disabled = false;
+
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 
    /**
     * @type number
@@ -44,7 +48,7 @@
    }
 </script>
 
-<div class="input">
+<div class="input" use:tooltipAction={tooltip}>
    <div class="decrement">
       <MiniIconButton
          {disabled}
