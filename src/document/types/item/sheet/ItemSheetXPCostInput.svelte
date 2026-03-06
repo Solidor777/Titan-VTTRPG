@@ -1,6 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 
@@ -14,7 +14,7 @@
    export let tooltip = void 0;
 </script>
 
-<LabeledInput
+<LabeledElement
    label={localize('xp')}
    {tooltip}
 >
@@ -23,5 +23,5 @@
       disabled={disabled || !$document?.isOwner}
       on:change={()=> $document.update({system: {xpCost: $document.system.xpCost}})}
    />
-</LabeledInput>
+</LabeledElement>
 

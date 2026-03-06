@@ -1,5 +1,5 @@
 <script>
-   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
    /** @type string The value that this input should modify. */
@@ -18,10 +18,10 @@
    export let tooltip = void 0;
 </script>
 
-<LabeledInput
+<LabeledElement
    {icon}
    {label}
    {tooltip}
 >
    <TextInput bind:value {disabled}/>
-</LabeledInput>
+</LabeledElement>

@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
    /** @type string Label to display. */
    export let label = localize('filter');
@@ -17,7 +17,7 @@
 
 <!--Filter-->
 <div class="filter">
-   <LabeledInput
+   <LabeledElement
       bind:value
       {icon}
       {label}

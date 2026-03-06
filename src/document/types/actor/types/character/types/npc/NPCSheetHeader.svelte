@@ -11,7 +11,7 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import createLocalizedOptions from '~/helpers/utility-functions/CreateLocalizedOptions.js';
    import { ROLES } from '~/system/Roles.js';
-   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -31,22 +31,22 @@
 
       <!--Character Type-->
       <div class="stat text">
-         <LabeledInput
+         <LabeledElement
             label={localize('type')}
             tooltip={localize('type.desc')}
          >
             <DocumentTextInput bind:value={$document.system.bio.type}/>
-         </LabeledInput>
+         </LabeledElement>
       </div>
 
       <!--Character Role-->
       <div class="stat">
-         <LabeledInput
+         <LabeledElement
             label={localize('role')}
             tooltip={localize('role.desc')}
          >
             <DocumentSelect bind:value={$document.system.role} options={roleOptions}/>
-         </LabeledInput>
+         </LabeledElement>
       </div>
 
       <!--Exp-->

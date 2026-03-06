@@ -6,7 +6,7 @@
    import DocumentIconPicker from '~/document/svelte-components/input/DocumentIconPicker.svelte';
    import ItemSheetRaritySelect from '~/document/types/item/sheet/ItemSheetRaritySelect.svelte';
    import ItemSheetXPCostInput from '~/document/types/item/sheet/ItemSheetXPCostInput.svelte';
-   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -48,36 +48,36 @@
       <!--Action-->
       <div class="row checkbox">
          <div class="input">
-            <LabeledInput
+            <LabeledElement
                label={localize('action')}
                tooltip={localize('abilityAction.desc')}
             >
                <DocumentCheckboxInput value={$document.system.action}/>
-            </LabeledInput>
+            </LabeledElement>
          </div>
       </div>
 
       <!--Reaction-->
       <div class="row checkbox">
          <div class="input">
-            <LabeledInput
+            <LabeledElement
                label={localize('reaction')}
                tooltip={localize('abilityReaction.desc')}
             >
                <DocumentCheckboxInput value={$document.system.reaction}/>
-            </LabeledInput>
+            </LabeledElement>
          </div>
       </div>
 
       <!--Passive-->
       <div class="row checkbox">
          <div class="input">
-            <LabeledInput
+            <LabeledElement
                label={localize('passive')}
                tooltip={localize('abilityPassive.desc')}
             >
                <DocumentCheckboxInput value={$document.system.passive}/>
-            </LabeledInput>
+            </LabeledElement>
          </div>
       </div>
    </div>

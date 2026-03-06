@@ -13,7 +13,7 @@
    export let tooltip = void 0;
 </script>
 
-<div class="labeled-input" use:tooltipAction={tooltip}>
+<div class="labeled-element" use:tooltipAction={tooltip}>
    <!--Label-->
    <div class="label">
       {#if (icon)}
@@ -28,8 +28,8 @@
       {/if}
    </div>
 
-   <!--Input-->
-   <div class="input">
+   <!--Element-->
+   <div class="element">
       <slot></slot>
    </div>
 </div>
@@ -40,7 +40,7 @@
       @include flex-row;
       @include flex-group-left;
 
-      .input {
+      .element {
          flex-grow: 1;
          margin-left: var(--titan-spacing-standard);
       }

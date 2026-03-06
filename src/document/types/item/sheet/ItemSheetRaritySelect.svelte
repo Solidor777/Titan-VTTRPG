@@ -1,7 +1,7 @@
 <script>
    import RaritySelect from '~/helpers/svelte-components/select/RaritySelect.svelte';
    import { getContext } from 'svelte';
-   import LabeledInput from '~/helpers/svelte-components/LabeledInput.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    /** @type object Reference to the Document store. */
@@ -11,7 +11,7 @@
    export let disabled = false;
 </script>
 
-<LabeledInput tooltip={localize('rarity.desc')}>
+<LabeledElement tooltip={localize('rarity.desc')}>
    <svelte:fragment slot="label">{localize('rarity')}</svelte:fragment>
    <svelte:fragment slot="input">
       <RaritySelect
@@ -20,5 +20,5 @@
          on:change={()=> $document.update({system: {rarity: $document.system.rarity}})}
       />
    </svelte:fragment>
-</LabeledInput>
+</LabeledElement>
 
