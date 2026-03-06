@@ -10,6 +10,9 @@
 
    /** @type number The value that this input should modify. */
    export let value = void 0;
+
+   /** @type string The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
 </script>
 
 <!--Filter-->
@@ -17,7 +20,9 @@
    <LabeledInput
       bind:value
       {icon}
-      {label}/>
+      {label}
+      {tooltip}
+   />
 </div>
 
 <style lang="scss">
