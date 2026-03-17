@@ -5,8 +5,9 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
-   import ItemSheetCheckSettings from '~/document/types/item/sheet/check/ItemSheetCheckSettings.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
+   import FiltereedList from '~/helpers/svelte-components/FiltereedList.svelte';
+   import ItemSheetCheckSettings from '~/document/types/item/sheet/check/ItemSheetCheckSettings.svelte';
 
    /** @type object Reference to the Document store. */
    const document = getContext('document');
@@ -48,16 +49,16 @@
    <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
       <div class="scrolling-content">
          <!--Checks List-->
-         {#if $document.system.check.length > 0}
-            <ol out:slide|local>
-               <!--Each check-->
-               {#each filteredEntries as idx ($document.system.check[idx].uuid)}
-                  <li out:slide|local>
-                     <ItemSheetCheckSettings {idx}/>
-                  </li>
-               {/each}
-            </ol>
-         {/if}
+         <FiltereedList
+            componentFunction={() => ItemSheetCheckSettings}
+            entries={$document.system.check}
+            filterFunction={(entry) => entry.label.toLowerCase().includes($appState.filter.checks.toLowerCase())}
+            idFunction={(entry) => entry.uuid}
+            mapFunction={(entry, idx) => idx}
+            propsFunction={(entry, idx) => {
+              return {idx}
+            }}
+         />
 
          <!--Add check Button-->
          <div class="add-entry-button">

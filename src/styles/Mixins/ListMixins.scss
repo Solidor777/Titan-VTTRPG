@@ -8,11 +8,12 @@
    list-style: var(--titan-list-style);
    padding: var(--titan-list-padding);
    margin: 0;
+   width: 100%;
 
    li {
       @include flex.flex-column;
       @include flex.flex-group-top;
-      
+
       width: 100%;
    }
 }

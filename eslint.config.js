@@ -1,5 +1,5 @@
-import eslintPluginSvelte from 'eslint-plugin-svelte'
-import jsdoc from 'eslint-plugin-jsdoc'
+import eslintPluginSvelte from 'eslint-plugin-svelte';
+import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [
    // add more generic rule sets here, such as:
@@ -11,6 +11,7 @@ export default [
       },
       rules: {
          'svelte/no-at-html-tags': 'off',
+         'svelte/html-quotes/dynamic/quoted': 'false',
          'svelte/no-unused-svelte-ignore': 'off',
          'jsdoc/check-access': 1, // Recommended
          'jsdoc/check-alignment': 1, // Recommended
@@ -79,4 +80,4 @@ export default [
          'node_modules/',
       ],
    },
-]
+];
