@@ -1,6 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
+   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
    /** @type string Label to display. */
    export let label = localize('filter');
@@ -18,11 +19,11 @@
 <!--Filter-->
 <div class="filter">
    <LabeledElement
-      bind:value
       {icon}
       {label}
-      {tooltip}
-   />
+      {tooltip}>
+      <TextInput bind:value/>
+   </LabeledElement>
 </div>
 
 <style lang="scss">

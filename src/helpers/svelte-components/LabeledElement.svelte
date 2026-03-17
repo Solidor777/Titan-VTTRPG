@@ -36,7 +36,7 @@
 
 
 <style lang="scss">
-   .labeled-input {
+   .labeled-element {
       @include flex-row;
       @include flex-group-left;
 
