@@ -74,6 +74,10 @@
             &.active {
                --titan-button-background: var(--titan-highlighted-background);
             }
+
+            &:not(:first-child) {
+               @include border-left;
+            }
          }
       }
 

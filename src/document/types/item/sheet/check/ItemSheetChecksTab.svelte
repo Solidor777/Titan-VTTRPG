@@ -15,16 +15,16 @@
    const appState = getContext('applicationState');
 
    // Initialize expanded state
-   $document.system.check.forEach((entry, idx) => {
+   for (const idx of $document.system.check.keys()) {
       $appState.isExpanded.checks[idx] =
          $appState.isExpanded.checks[idx] ?? true;
-   });
+   }
 
    // Initialize filtered entries
-   let filteredEntries = [];
+   let filteredEntries;
    $: {
       filteredEntries = [];
-      $document.system.check.forEach((entry, idx) => {
+      for (const [idx, entry] of $document.system.check.entries()) {
          if (
             entry.label
                .toLowerCase()
@@ -32,7 +32,7 @@
          ) {
             filteredEntries.push(idx);
          }
-      });
+      }
    }
 </script>
 
