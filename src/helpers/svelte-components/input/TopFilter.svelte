@@ -32,7 +32,6 @@
       @include flex-group-center;
       @include border-bottom;
       @include panel-1;
-      @include font-size-normal;
       @include padding-standard;
 
       width: 100%;

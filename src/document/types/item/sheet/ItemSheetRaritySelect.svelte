@@ -11,14 +11,14 @@
    export let disabled = false;
 </script>
 
-<LabeledElement tooltip={localize('rarity.desc')}>
-   <svelte:fragment slot="label">{localize('rarity')}</svelte:fragment>
-   <svelte:fragment slot="input">
-      <RaritySelect
-         bind:value={$document.system.rarity}
-         disabled={disabled || !$document?.isOwner}
-         on:change={()=> $document.update({system: {rarity: $document.system.rarity}})}
-      />
-   </svelte:fragment>
+<LabeledElement
+   label={localize('rarity')}
+   tooltip={localize('rarity.desc')}
+>
+   <RaritySelect
+      bind:value={$document.system.rarity}
+      disabled={disabled || !$document?.isOwner}
+      on:change={()=> $document.update({system: {rarity: $document.system.rarity}})}
+   />
 </LabeledElement>
 

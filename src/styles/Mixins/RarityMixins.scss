@@ -30,10 +30,10 @@
    }
 
    &.unique {
-      --titan-input-background: var(--titan-rare-background);
+      --titan-input-background: var(--titan-unique-background);
 
       &:disabled {
-         --titan-input-disabled-background: var(--titan-rare-background);
+         --titan-input-disabled-background: var(--titan-unique-background);
       }
    }
 }
