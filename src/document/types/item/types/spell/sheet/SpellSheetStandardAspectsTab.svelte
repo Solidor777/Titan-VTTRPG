@@ -37,17 +37,17 @@
 
 <div class="standard-aspects-tab">
    <!--Filter-->
-   <TopFilter bind:value={$appState.filter.standardAspects}/>
+   <TopFilter bind:value={$appState.tabs.standardAspects.filter}/>
 
    <!--Scrolling aspects list-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.standardAspects}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.standardAspects.scrollTop}>
          <ol>
             <!--Each Aspect-->
             {#each Object.values(aspectOptions) as aspectOptions}
                {#if localize(aspectOptions.template.label)
                   .toLowerCase()
-                  .indexOf($appState.filter.standardAspects.toLowerCase()) !== -1}
+                  .indexOf($appState.tabs.standardAspects.filter.toLowerCase()) !== -1}
                   <!--Filter the Aspects-->
                   <li>
                      <SpellSheetStandardAspectSettings {aspectOptions}/>

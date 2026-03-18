@@ -47,11 +47,11 @@
       {#if $document.system.check[idx].resolveCost > 0
       || $document.system.check[idx].resistanceCheck !== 'none'
       || $document.system.check[idx].opposedCheck.enabled === true}
-         <ExpandButton bind:expanded={$appState.isExpanded.sidebar.check[idx]}/>
+         <ExpandButton bind:expanded={$appState.sidebar.checks.isExpanded[idx]}/>
       {/if}
 
       <!--Advanced Details-->
-      {#if $appState.isExpanded.sidebar.check[idx]
+      {#if $appState.sidebar.checks.isExpanded[idx]
       && ($document.system.check[idx].resolveCost > 0
          || $document.system.check[idx].resistanceCheck !== 'none'
          || $document.system.check[idx].opposedCheck.enabled === true)}

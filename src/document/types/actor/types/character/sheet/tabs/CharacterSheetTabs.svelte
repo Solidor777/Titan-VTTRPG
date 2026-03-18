@@ -11,7 +11,7 @@
    import CharacterSheetSpellsTab
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';
 
    /** @type object Reference to the Application State store. */
@@ -52,4 +52,4 @@
    ];
 </script>
 
-<Tabs bind:activeTab={$appState.activeTab} border={true} {tabs}/>
+<Tabs bind:activeTab={$appState.tabs.activeTab} border={true} {tabs}/>

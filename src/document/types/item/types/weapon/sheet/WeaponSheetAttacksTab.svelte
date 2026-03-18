@@ -16,8 +16,8 @@
 
    // Initialize expanded state
    $document.system.attack.forEach((entry, idx) => {
-      $appState.isExpanded.attacks[idx] =
-         $appState.isExpanded.attacks[idx] ?? true;
+      $appState.attacks.isExpanded[idx] =
+         $appState.attacks.isExpanded[idx] ?? true;
    });
 
    // Initialize filtered entries
@@ -28,7 +28,7 @@
          if (
             entry.label
                .toLowerCase()
-               .indexOf($appState.filter.attacks.toLowerCase()) !== -1
+               .indexOf($appState.tabs.attacks.filter.toLowerCase()) !== -1
          ) {
             filteredEntries.push(idx);
          }
@@ -40,12 +40,12 @@
    <!--Filter-->
    {#if $document.system.attack.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:value={$appState.filter.attacks}/>
+         <TopFilter bind:value={$appState.tabs.attacks.filter}/>
       </div>
    {/if}
 
    <!--Scroling Content-->
-   <ScrollingContainer bind:scrollTop={$appState.scrollTop.attacks}>
+   <ScrollingContainer bind:scrollTop={$appState.tabs.attacks.scrollTop}>
       <div class="scrolling-content">
          <!--Attacks List-->
          {#if $document.system.attack.length > 0}

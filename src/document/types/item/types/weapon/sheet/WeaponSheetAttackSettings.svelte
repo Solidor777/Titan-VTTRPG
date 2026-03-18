@@ -37,7 +37,7 @@
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    $: attack = $document.system.attack[idx];
-   $: isExpanded = $appState.isExpanded.attacks[idx];
+   $: isExpanded = $appState.attacks.isExpanded[idx];
 
    /**
     *
@@ -77,7 +77,7 @@
                <IconButton
                   icon="{EXPANDED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.attacks[idx] = false;
+                     $appState.attacks.isExpanded[idx] = false;
                   }}
                />
             {:else}
@@ -85,7 +85,7 @@
                <IconButton
                   icon="{COLLAPSED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.attacks[idx] = true;
+                     $appState.attacks.isExpanded[idx] = true;
                   }}
                />
             {/if}

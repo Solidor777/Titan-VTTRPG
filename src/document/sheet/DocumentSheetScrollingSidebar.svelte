@@ -11,7 +11,7 @@
 </script>
 
 <div class="sidebar">
-   <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+   <ScrollingContainer bind:scrollTop={$appState.sidebar.scrollTop}>
       {#each sections as section}
          <div class="section" transition:slide|local>
             <svelte:component this={section}/>

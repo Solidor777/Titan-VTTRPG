@@ -30,7 +30,7 @@
    const appState = getContext('applicationState');
 
    $: check = $document.system.check[idx];
-   $: isExpanded = $appState.isExpanded.checks[idx];
+   $: isExpanded = $appState.tabs.checks.isExpanded[idx];
 </script>
 
 {#if check}
@@ -44,7 +44,7 @@
                <IconButton
                   icon="{EXPANDED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.checks[idx] = false;
+                     $appState.tabs.checks.isExpanded[idx] = false;
                   }}
                />
             {:else}
@@ -52,7 +52,7 @@
                <IconButton
                   icon="{COLLAPSED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.checks[idx] = true;
+                     $appState.tabs.checks.isExpanded[idx] = true;
                   }}
                />
             {/if}

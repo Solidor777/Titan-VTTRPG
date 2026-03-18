@@ -19,7 +19,7 @@
    export let idx = void 0;
 
    $: aspect = $document.system.customAspect[idx];
-   $: isExpanded = $appState.isExpanded.customAspects[idx];
+   $: isExpanded = $appState.tabs.customAspects.isExpanded[idx];
 </script>
 
 {#if aspect}
@@ -33,7 +33,7 @@
                <IconButton
                   icon="{EXPANDED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.customAspects[idx] = false;
+                     $appState.tabs.customAspects.isExpanded[idx] = false;
                   }}
                />
             {:else}
@@ -41,7 +41,7 @@
                <IconButton
                   icon="{COLLAPSED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.customAspects[idx] = true;
+                     $appState.tabs.customAspects.isExpanded[idx] = true;
                   }}
                />
             {/if}

@@ -4,7 +4,7 @@
  * @returns {object} The updated state.
  */
 export default function itemSheetStateAddCheck(state) {
-   state.isExpanded.checks.push(true);
-   state.isExpanded.sidebar.check.push(true);
+   state.checks.isExpanded.push(true);
+   state.sidebar.checks.isExpanded.push(true);
    return state;
 }

@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
 
@@ -11,7 +11,7 @@
 </script>
 
 <div class="tab">
-   <ScrollingContainer bind:scrollTop={$appState.scrollTop.description}>
+   <ScrollingContainer bind:scrollTop={$appState.tabs.description.scrollTop}>
       <DocumentBoundEditorInput bind:value={$document.system.description}/>
    </ScrollingContainer>
 </div>

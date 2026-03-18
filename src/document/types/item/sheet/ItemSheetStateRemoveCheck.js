@@ -5,7 +5,7 @@
  * @returns {object} The updated state.
  */
 export default function itemSheetStateRemoveCheck(state, idx) {
-   state.isExpanded.checks.splice(idx, 1);
-   state.isExpanded.sidebar.check.splice(idx, 1);
+   state.checks.isExpanded.splice(idx, 1);
+   state.sidebar.checks.isExpanded.splice(idx, 1);
    return state;
 }

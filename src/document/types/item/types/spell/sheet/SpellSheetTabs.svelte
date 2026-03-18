@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ItemSheetChecksTab from '~/document/types/item/sheet/check/ItemSheetChecksTab.svelte';
    import SpellSheetCastingCheckTab from '~/document/types/item/types/spell/sheet/SpellSheetCastingCheckTab.svelte';
@@ -42,4 +42,4 @@
    ];
 </script>
 
-<Tabs bind:activeTab={$appState.activeTab} border={true} {tabs}/>
+<Tabs bind:activeTab={$appState.tabs.activeTab} border={true} {tabs}/>

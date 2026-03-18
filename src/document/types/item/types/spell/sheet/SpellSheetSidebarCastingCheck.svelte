@@ -43,12 +43,12 @@
          </div>
          <!--Expand button-->
          <div class="spacer">
-            {#if $appState.isExpanded.sidebar.castingCheck}
+            {#if $appState.sidebar.castingCheck.isExpanded}
                <!--Collapse button-->
                <IconButton
                   icon="{EXPANDED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.sidebar.castingCheck = false;
+                     $appState.sidebar.castingCheck.isExpanded = false;
                   }}
                />
             {:else}
@@ -56,7 +56,7 @@
                <IconButton
                   icon="{COLLAPSED_ICON}"
                   on:click={() => {
-                     $appState.isExpanded.sidebar.castingCheck = true;
+                     $appState.sidebar.castingCheck.isExpanded = true;
                   }}
                />
             {/if}
@@ -73,7 +73,7 @@
    </div>
 
    <!--Aspects-->
-   {#if $appState.isExpanded.sidebar.castingCheck === true && aspectsEnabled}
+   {#if $appState.sidebar.castingCheck.isExpanded === true && aspectsEnabled}
       <div class="checks" transition:slide|local>
          <SpellSheetSidebarAspects/>
       </div>

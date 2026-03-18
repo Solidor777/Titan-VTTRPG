@@ -1,60 +1,39 @@
-import {writable} from 'svelte/store';
-import itemSheetStateAddCheck from '~/document/types/item/sheet/ItemSheetStateAddCheck.js';
-import itemSheetStateRemoveCheck from '~/document/types/item/sheet/ItemSheetStateRemoveCheck.js';
+import createWeaponSheetData from '~/document/types/item/types/weapon/sheet/WeaponSheetData.js';
+import createItemSheetState from '~/document/types/item/sheet/ItemSheetState.js';
 
 /**
- * Creates a reactive state store for a Weapon sheet.
- * @param {string} activeDescriptionTab - Which description tab should be active to start.
- * @returns {object} A reactive state store for a Weapon sheet.
+ * @typedef {ItemSheetState} WeaponSheetState - A custom reactive store for managing a Weapon Sheet.
+ * @property {import('svelte/store').Writable<WeaponSheetData>['set']} set
+ * @property {import('svelte/store').Writable<WeaponSheetData>['update']} update
+ * @property {import('svelte/store').Writable<WeaponSheetData>['subscribe']} subscribe
+ * @property {Function} addAttack - Adds an Attack to the reactive application state.
+ * @property {Function} removeAttack - Removes the Attack at the provided idx from the reactive application state.
+ * @property {Function} addCheck - Adds a Check to the reactive application state.
+ * @property {Function} removeCheck - Removes the Check at the provided idx from the reactive application state.
  */
-export default function createWeaponSheetState(activeDescriptionTab) {
-   const {set, update, subscribe} = writable({
-      activeTab: 'description',
-      activeDescriptionTab: activeDescriptionTab,
-      isExpanded: {
-         attacks: [],
-         checks: [],
-         sidebar: {
-            attack: [],
-            check: [],
-         },
-      },
-      scrollTop: {
-         attacks: 0,
-         checks: 0,
-         description: 0,
-         rulesElements: 0,
-         sidebar: 0,
-      },
-      filter: {
-         attacks: '',
-         checks: '',
-         rulesElements: ''
-      }
-   });
 
-   /**
-    * Adds a Check to the reactive application state.
-    */
-   function addCheck() {
-      update((state) => itemSheetStateAddCheck(state));
-   }
-
-   /**
-    * Removes the Check at the provided idx from the reactive application state.
-    * @param {number} idx - The idx of the Check to remove.
-    */
-   function removeCheck(idx) {
-      update((state) => itemSheetStateRemoveCheck(state, idx));
-   }
+/**
+ * Creates a reactive state store for a Weapon Sheet.
+ * @param {TitanItem} item - The item we are creating the sheet state for.
+ * @returns {WeaponSheetState} The newly created Weapon Sheet State.
+ */
+export default function createWeaponSheetState(item) {
+   /** @type {import('svelte/store').Writable<WeaponSheetData>} */
+   const {
+            set,
+            update,
+            subscribe,
+            addCheck,
+            removeCheck
+         } = createItemSheetState(item, createWeaponSheetData(item));
 
    /**
     * Adds an Attack to the reactive application state.
     */
    function addAttack() {
       update((state) => {
-         state.isExpanded.attacks.push(true);
-         state.isExpanded.sidebar.attack.push(true);
+         state.tabs.attacks.isExpanded.push(true);
+         state.sidebar.attacks.isExpanded.push(true);
          return state;
       });
    }
@@ -65,8 +44,8 @@ export default function createWeaponSheetState(activeDescriptionTab) {
     */
    function removeAttack(idx) {
       update((state) => {
-         state.isExpanded.attacks.splice(idx, 1);
-         state.isExpanded.sidebar.attack.splice(idx, 1);
+         state.tabs.attacks.isExpanded.splice(idx, 1);
+         state.sidebar.attacks.isExpanded.splice(idx, 1);
          return state;
       });
    }

@@ -131,7 +131,7 @@
             {localize('aspectCosts')}
          </div>
 
-         <ScrollingContainer bind:scrollTop={$appState.scrollTop.castingCheck}>
+         <ScrollingContainer bind:scrollTop={$appState.tabs.castingCheck.ScrollTop}>
             <!--Container-->
             <div class="costs-container" transition:slide|local>
                <!--Each Cost-->

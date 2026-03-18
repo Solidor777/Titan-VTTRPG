@@ -1,68 +1,46 @@
-import { writable } from 'svelte/store'
-import itemSheetStateAddCheck from '~/document/types/item/sheet/ItemSheetStateAddCheck.js'
-import itemSheetStateRemoveCheck from '~/document/types/item/sheet/ItemSheetStateRemoveCheck.js'
+import { writable } from 'svelte/store';
+import createItemSheetData from '~/document/types/item/sheet/ItemSheetData.js';
 
 /**
- * @typedef {object} ItemSheetState - Reactive store for managing the state of an Item Sheet.
- * @property {string} activeTab - The currently active sheet tab.
- * @property {object} filter - Object containing the current filters, arranged by sheet element.
- * @property {string} filter.checks - The current filter for the Checks tab.
- * @property {string} filter.rulesElements - The current filter for the Rules Elements tab.
- * @property {object} isExpanded - Object containing the expanded state of the sheet, arranged by sheet element.
- * @property {bool[]} isExpanded.check - Array of booleans representing whether an Item Check in the Checks tab is
- * expanded.
- * @property {object} isExpanded.sidebar - Object containing the expanded state of the sidebar, arranged by sidebar
- * element.
- * @property {bool[]} isExpanded.sidebar.checks - Array of booleans representing whether an Item Check in the sidebar
- * is expanded.
- * @property {object} scrollTop - Object containing the top of the scrollbar for each sheet element, arranged by
- * element.
- * @property {number} scrollTop.checks - The current top of the scrollbar for the Checks tab.
- * @property {number} scrollTop.description - The current top of the scrollbar for the Description tab.
- * @property {number} scrollTop.rulesElements - The current top of the scrollbar for the Rules Elements tab.
- * @property {number} scrollTop.sidebar - The current top of the scrollbar for the sidebar.
+ * @typedef {object} ItemSheetState - A custom reactive store for managing an Item Sheet.
+ * @property {import('svelte/store').Writable<ItemSheetData>['set']} set
+ * @property {import('svelte/store').Writable<ItemSheetData>['update']} update
+ * @property {import('svelte/store').Writable<ItemSheetData>['subscribe']} subscribe
  * @property {Function} addCheck - Adds an Item Check to the reactive application state.
  * @property {Function} removeCheck - Removes the Item Check at the provided idx from the reactive application state.
  */
 
 /**
- * Creates a reactive state store for an Item sheet.
+ * Creates a reactive state store for an Item Sheet.
+ * @param {TitanItem} item - The item we are creating the sheet state for.
+ * @param {ItemSheetData?} overrideData - Override for initializing the writable.
  * @returns {ItemSheetState} The newly created Item Sheet State.
  */
-export default function createItemSheetState () {
-   const { set, update, subscribe } = writable({
-      activeTab: 'description',
-      filter: {
-         checks: '',
-         rulesElements: ''
-      },
-      isExpanded: {
-         checks: [],
-         sidebar: {
-            check: []
-         }
-      },
-      scrollTop: {
-         checks: 0,
-         description: 0,
-         rulesElements: 0,
-         sidebar: 0,
-      },
-   })
+export default function createItemSheetState(item, overrideData) {
+   /** @type {import('svelte/store').Writable<ItemSheetData>} */
+   const { set, update, subscribe } = writable(overrideData ?? createItemSheetData(item));
 
    /**
     * Adds an Item Check to the reactive application state.
     */
-   function addCheck () {
-      update((state) => itemSheetStateAddCheck(state))
+   function addCheck() {
+      update((state) => {
+         state.checks.isExpanded.push(true);
+         state.sidebar.checks.isExpanded.push(true);
+         return state;
+      });
    }
 
    /**
     * Removes the Item Check at the provided idx from the reactive application state.
     * @param {number} idx - The idx of the Check to remove.
     */
-   function removeCheck (idx) {
-      update((state) => itemSheetStateRemoveCheck(state, idx))
+   function removeCheck(idx) {
+      update((state) => {
+         state.checks.isExpanded.splice(idx, 1);
+         state.sidebar.checks.isExpanded.splice(idx, 1);
+         return state;
+      });
    }
 
    return {
@@ -71,5 +49,5 @@ export default function createItemSheetState () {
       subscribe,
       addCheck,
       removeCheck,
-   }
+   };
 }

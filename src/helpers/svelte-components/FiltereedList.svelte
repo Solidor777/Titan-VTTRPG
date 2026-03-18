@@ -10,8 +10,8 @@
 
    // Initialize expanded state
    for (const idx of $document.system.check.keys()) {
-      $appState.isExpanded.checks[idx] =
-         $appState.isExpanded.checks[idx] ?? true;
+      $appState.tabs.checks.isExpanded[idx] =
+         $appState.tabs.checks.isExpanded[idx] ?? true;
    }
 
    export let entries = void 0;

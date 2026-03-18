@@ -17,8 +17,8 @@
 
    // Initialize expanded state
    for (const idx of $document.system.check.keys()) {
-      $appState.isExpanded.checks[idx] =
-         $appState.isExpanded.checks[idx] ?? true;
+      $appState.tabs.checks.isExpanded[idx] =
+         $appState.tabs.checks.isExpanded[idx] ?? true;
    }
 
    // Initialize filtered entries
@@ -46,7 +46,7 @@
    {/if}
 
    <!--Scrolling Content-->
-   <ScrollingContainer bind:scrollTop={$appState.scrollTop.checks}>
+   <ScrollingContainer bind:scrollTop={$appState.tabs.checks.scrollTop}>
       <div class="scrolling-content">
          <!--Checks List-->
          <FiltereedList

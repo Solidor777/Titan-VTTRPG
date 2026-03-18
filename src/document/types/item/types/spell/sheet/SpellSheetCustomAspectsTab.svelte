@@ -17,8 +17,8 @@
 
    // Initialize expanded state
    $document.system.customAspect.forEach((entry, idx) => {
-      $appState.isExpanded.customAspects[idx] =
-         $appState.isExpanded.customAspects[idx] ?? true;
+      $appState.tabs.customAspects.isExpanded[idx] =
+         $appState.tabs.customAspects.isExpanded[idx] ?? true;
    });
 
    // Initialize filtered entries
@@ -29,7 +29,7 @@
          if (
             entry.label
                .toLowerCase()
-               .indexOf($appState.filter.customAspects.toLowerCase()) !== -1
+               .indexOf($appState.tabs.customAspects.filter.toLowerCase()) !== -1
          ) {
             filteredEntries.push(idx);
          }
@@ -41,12 +41,12 @@
    <!--Filter-->
    {#if $document.system.customAspect && $document.system.customAspect.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:value={$appState.filter.customAspects}/>
+         <TopFilter bind:value={$appState.tabs.customAspects.filter}/>
       </div>
    {/if}
 
    <!--Scrolling Aspects list-->
-   <ScrollingContainer bind:scrollTop={$appState.scrollTop.customAspect}>
+   <ScrollingContainer bind:scrollTop={$appState.tabs.customAspects.scrollTop}>
       <div class="scrolling-content">
          <!--Aspects List-->
          {#if $document.system.customAspect.length > 0}

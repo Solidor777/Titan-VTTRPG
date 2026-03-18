@@ -11,8 +11,8 @@
 
    // Initialize expanded state
    $document.system.check.forEach((entry, idx) => {
-      $appState.isExpanded.sidebar.check[idx] =
-         $appState.isExpanded.sidebar.check[idx] ?? true;
+      $appState.sidebar.checks.isExpanded[idx] =
+         $appState.sidebar.checks.isExpanded[idx] ?? true;
    });
 </script>
 <ol class="checks">

@@ -21,8 +21,8 @@
 
    // Initialize expanded state
    $document.system.attack.forEach((entry, idx) => {
-      $appState.isExpanded.sidebar.attack[idx] =
-         $appState.isExpanded.sidebar.attack[idx] ?? true;
+      $appState.sidebar.attacks.isExpanded[idx] =
+         $appState.sidebar.attacks.isExpanded[idx] ?? true;
    });
 </script>
 
@@ -45,12 +45,12 @@
 
             <!--Expand Toggle-->
             <div class="spacer">
-               {#if $appState.isExpanded.sidebar.attack[idx]}
+               {#if $appState.sidebar.attacks.isExpanded[idx]}
                   <!--Collapse button-->
                   <IconButton
                      icon="{EXPANDED_ICON}"
                      on:click={() => {
-                        $appState.isExpanded.sidebar.attack[idx] = false;
+                        $appState.sidebar.attacks.isExpanded[idx] = false;
                      }}
                   />
                {:else}
@@ -58,14 +58,14 @@
                   <IconButton
                      icon="{COLLAPSED_ICON}"
                      on:click={() => {
-                        $appState.isExpanded.sidebar.attack[idx] = true;
+                        $appState.sidebar.attacks.isExpanded[idx] = true;
                      }}
                   />
                {/if}
             </div>
          </div>
 
-         {#if $appState.isExpanded.sidebar.attack[idx]}
+         {#if $appState.sidebar.attacks.isExpanded[idx]}
             <div class="stats" transition:slide|local>
                <!--Attack Type-->
                <div class="stat">

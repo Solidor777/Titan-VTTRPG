@@ -15,7 +15,7 @@
 
 <div class="sidebar">
    <!--Attacks-->
-   <ScrollingContainer bind:scrollTop={$appState.scrollTop.sidebar}>
+   <ScrollingContainer bind:scrollTop={$appState.sidebar.scrollTop}>
       <!--Custom Traits-->
       <div class="section">
          <ItemSheetSidebarTraits/>

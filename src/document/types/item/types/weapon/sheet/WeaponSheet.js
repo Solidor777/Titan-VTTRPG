@@ -1,4 +1,3 @@
-import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import TitanItemSheet from '~/document/types/item/sheet/ItemSheet.js';
 import WeaponSheetShell from '~/document/types/item/types/weapon/sheet/WeaponSheetShell.svelte';
 import createWeaponSheetState from '~/document/types/item/types/weapon/sheet/WeaponSheetState.js';
@@ -16,7 +15,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
     * @param {TitanItem} sheetDocument - The Document this sheet is for.
     * @param {object} options - Options object.
     */
-   constructor (sheetDocument, options = {}) {
+   constructor(sheetDocument, options = {}) {
       // Add sheet classes
       const classes = ['titan-weapon-sheet'];
       options.classes = options.classes
@@ -38,21 +37,21 @@ export default class TitanSpellSheet extends TitanItemSheet {
       super(sheetDocument, options);
    };
 
-   _getSheetClasses () {
+   _getSheetClasses() {
       const retVal = super._getSheetClasses();
       retVal.push('titan-weapon-sheet');
 
       return retVal;
    }
 
-   _createReactiveState () {
-      return createWeaponSheetState(isHTMLBlank(this.document.system.attackNotes) ? 'itemDescription' : 'attackNotes');
+   _createReactiveState() {
+      return createWeaponSheetState();
    }
 
    /**
     * Adds an Attack to this sheet's application state.
     */
-   addAttack () {
+   addAttack() {
       this.applicationState.addAttack();
    }
 
@@ -60,7 +59,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
     * Removes the Attack at the provided idx from this sheet's application state.
     * @param {number} idx - The idx of the attack to remove.
     */
-   removeAttack (idx) {
+   removeAttack(idx) {
       this.applicationState.removeAttack(idx);
    }
 }
