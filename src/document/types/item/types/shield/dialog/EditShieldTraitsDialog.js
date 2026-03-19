@@ -5,14 +5,14 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 /**
  * Dialog for editing the Traits of a Shield item.
  * @param {TitanItem} item - The Item to edit the Traits of.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class EditShieldTraitsDialog extends TitanDialog {
 
    /**
     * Dialog for editing the Traits of a Shield item.
     * @param {TitanItem} item - The Item to edit the Traits of.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(item) {
       super({

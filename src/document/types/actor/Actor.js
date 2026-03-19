@@ -6,7 +6,7 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
  * @param {object} data - The initial data object provided to the document creation request.
  * @param {object} options - Additional options which modify the creation request.
  * @param {documents.BaseUser} user - The User requesting the document creation.
- * @augments Actor
+ * @extends Actor
  */
 export default class TitanActor extends Actor {
 
@@ -96,7 +96,7 @@ export default class TitanActor extends Actor {
 
          // If this Character is a combatant, then roll initiative as per normal
          if (this.getCombatant()) {
-            await this.rollInitiative({rerollInitiative: true});
+            await this.rollInitiative({ rerollInitiative: true });
 
             return;
          }
@@ -108,12 +108,12 @@ export default class TitanActor extends Actor {
             // Get the message data
             const messageData = {
                speaker: this.getSpeaker(),
-               flavor: game.i18n.format('COMBAT.RollsInitiative', {name: this.name}),
-               flags: {'core.initiativeRoll': true},
+               flavor: game.i18n.format('COMBAT.RollsInitiative', { name: this.name }),
+               flags: { 'core.initiativeRoll': true },
             };
 
             // Create a chat message from the roll and send it to chat
-            const chatData = await roll.toMessage(messageData, {create: false});
+            const chatData = await roll.toMessage(messageData, { create: false });
             chatData.rollMode = game.settings.get('core', 'rollMode');
 
             await ChatMessage.create(chatData);

@@ -7,7 +7,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Equipment.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class EquipmentDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
@@ -25,6 +25,14 @@ export default class EquipmentDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return EQUIPMENT_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newEquipment');
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -32,13 +40,5 @@ export default class EquipmentDataModel extends RulesElementItemDataModel {
       retVal.equipped = this.equipped;
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return EQUIPMENT_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newEquipment');
    }
 }

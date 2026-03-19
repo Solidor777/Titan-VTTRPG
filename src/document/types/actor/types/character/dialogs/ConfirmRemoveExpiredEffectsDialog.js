@@ -4,13 +4,13 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
 /**
  * Creates a confirmation dialog for confirming removing expired Effects from the Actor.
  * @param {TitanActor} actor - The Actor to remove expired Effects from.
- * @augments ConfirmationDialog
+ * @extends ConfirmationDialog
  */
 export default class ConfirmRemoveExpiredEffectsDialog extends ConfirmationDialog {
    /**
     * Creates a confirmation dialog for confirming removing expired Effects from the Actor.
     * @param {TitanActor} actor - The Actor to remove expired Effects from.
-    * @augments ConfirmationDialog
+    * @extends ConfirmationDialog
     */
    constructor(actor) {
       super(

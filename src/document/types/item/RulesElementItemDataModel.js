@@ -5,7 +5,7 @@ import createFlatModifierElement from '~/document/types/item/rules-element/FlatM
 
 /**
  * Data model with extra functionality for items that can contain Rules Elements.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class RulesElementItemDataModel extends ItemDataModel {
    static _defineDocumentSchema() {
@@ -15,6 +15,13 @@ export default class RulesElementItemDataModel extends ItemDataModel {
       schema.rulesElement = createArrayField(createObjectField());
 
       return schema;
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.rulesElement = foundry.utils.deepClone(this.rulesElement);
+
+      return retVal;
    }
 
    /**
@@ -51,12 +58,5 @@ export default class RulesElementItemDataModel extends ItemDataModel {
             },
          });
       }
-   }
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.rulesElement = foundry.utils.deepClone(this.rulesElement);
-
-      return retVal;
    }
 }

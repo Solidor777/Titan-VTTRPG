@@ -4,15 +4,19 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import {ARMOR_IMAGE} from '~/system/DefaultImages.js';
+import { ARMOR_IMAGE } from '~/system/DefaultImages.js';
 import EditArmorTraitsDialog from '~/document/types/item/types/armor/dialog/EditArmorTraitsDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Armor items.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class ArmorDataModel extends RulesElementItemDataModel {
+   _getDefaultName() {
+      return localize('newArmor');
+   }
+
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -34,6 +38,10 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return ARMOR_IMAGE;
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -42,14 +50,6 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
       retVal.trait = foundry.utils.deepClone(this.trait);
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return ARMOR_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newArmor');
    }
 
    /**

@@ -9,7 +9,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
  * @param {string} confirmLabel - Label for the confirmation button.
  * @param {Function} confirmationCallback - Callback function.
  * @param {object?} confirmationContext - Optional context to bind for the callback function.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class ConfirmationDialog extends TitanDialog {
    /**

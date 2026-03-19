@@ -4,14 +4,18 @@ import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.j
 import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import EditShieldTraitsDialog from '~/document/types/item/types/shield/dialog/EditShieldTraitsDialog.js';
-import {SHIELD_IMAGE} from '~/system/DefaultImages.js';
+import { SHIELD_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Shields.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class ShieldDataModel extends RulesElementItemDataModel {
+   _getDefaultName() {
+      return localize('newShield');
+   }
+
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -30,6 +34,10 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return SHIELD_IMAGE;
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -38,14 +46,6 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
       retVal.trait = foundry.utils.deepClone(this.trait);
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return SHIELD_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newShield');
    }
 
    /**

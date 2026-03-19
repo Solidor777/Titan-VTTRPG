@@ -5,7 +5,7 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
  * A confirmation dialog for deleting an Item from the Actor.
  * @param {TitanActor} actor - The Actor to delete the Item from.
  * @param {TitanItem} item - The Item to from the Actor.
- * @augments ConfirmationDialog
+ * @extends ConfirmationDialog
  */
 export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
 

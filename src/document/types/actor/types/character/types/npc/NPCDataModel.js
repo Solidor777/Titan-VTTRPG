@@ -4,7 +4,7 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
  * Data model for NPC actors.
- * @augments CharacterDataModel
+ * @extends CharacterDataModel
  */
 export default class NPCDataModel extends CharacterDataModel {
    static _defineDocumentSchema() {

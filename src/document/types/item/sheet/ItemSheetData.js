@@ -14,9 +14,6 @@
  * @property {boolean[]} tabs.checks.isExpanded - Array of booleans representing whether an Item Check in the Checks
  *    tab is expanded.
  * @property {number} tabs.checks.scrollTop - The current top of the scrollbar for the Checks tab.
- * @property {object} tabs.rulesElements - State for the Rules Elements tab.
- * @property {string} tabs.rulesElements.filter - The current filter text for the Rules Elements tab.
- * @property {number} tabs.rulesElements.scrollTop - The current top of the scrollbar for the Rules Elements tab.
  */
 
 /**
@@ -28,25 +25,21 @@ export default function createItemSheetData(item) {
    // Initialize return data.
    const retVal = {
       sidebar: {
-         isExpanded: {
-            checks: []
+         checks: {
+            isExpanded: [],
          },
          scrollTop: 0
       },
       tabs: {
          activeTab: 'description',
          description: {
-            scrollTop: 0``
+            scrollTop: 0,
          },
          checks: {
             filter: '',
             isExpanded: [],
-            scrollTop: 0
+            scrollTop: 0,
          },
-         rulesElements: {
-            filter: '',
-            scrollTop: 0
-         }
       }
    };
 

@@ -3,7 +3,7 @@ import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js'
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import {EFFECT_IMAGE} from '~/system/DefaultImages.js';
+import { EFFECT_IMAGE } from '~/system/DefaultImages.js';
 import isCurrentUserBestOwner from '~/helpers/utility-functions/IsCurrentUserBestOwner.js';
 import ActionQueue from '~/helpers/ActionQueue.js';
 import localize from '~/helpers/utility-functions/Localize.js';
@@ -11,7 +11,7 @@ import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 
 /**
  * Data model with extra functionality for Effects.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class EffectDataModel extends RulesElementItemDataModel {
    /**
@@ -52,6 +52,26 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return this.parent.actionQueue;
    }
 
+   prepareDerivedData() {
+      // If we are the best first owner of this document, and this document is not in a compendium
+      if (isCurrentUserBestOwner(this.parent) &&
+         !this.parent.pack && this.parent._id &&
+         !this.parent.isMarkedForDeletion) {
+
+         // Ensure the action queue is initialized
+         if (!this.parent.actionQueue) {
+            this.parent.actionQueue = new ActionQueue();
+         }
+
+         // Queue the latent data preparation
+         this.actionQueue.enqueue({
+            callback: this._updateActiveEffects,
+            thisArg: this,
+            key: 'prepareLatentData',
+         });
+      }
+   }
+
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -67,22 +87,6 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       schema.active = createBooleanField(true);
 
       return schema;
-   }
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.duration = foundry.utils.deepClone(this.duration);
-      retVal.active = this.active;
-
-      return retVal;
-   }
-
-   _getDefaultImage() {
-      return EFFECT_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newEffect');
    }
 
    _getInitialDocumentData(data) {
@@ -109,24 +113,20 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return retVal;
    }
 
-   prepareDerivedData() {
-      // If we are the best first owner of this document, and this document is not in a compendium
-      if (isCurrentUserBestOwner(this.parent) &&
-         !this.parent.pack && this.parent._id &&
-         !this.parent.isMarkedForDeletion) {
+   _getDefaultImage() {
+      return EFFECT_IMAGE;
+   }
 
-         // Ensure the action queue is initialized
-         if (!this.parent.actionQueue) {
-            this.parent.actionQueue = new ActionQueue();
-         }
+   _getDefaultName() {
+      return localize('newEffect');
+   }
 
-         // Queue the latent data preparation
-         this.actionQueue.enqueue({
-            callback: this._updateActiveEffects,
-            thisArg: this,
-            key: 'prepareLatentData',
-         });
-      }
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.duration = foundry.utils.deepClone(this.duration);
+      retVal.active = this.active;
+
+      return retVal;
    }
 
    /**

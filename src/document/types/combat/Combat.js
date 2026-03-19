@@ -1,6 +1,6 @@
 /**
  * A class for extending a Combat Encounter with system-specific logic.
- * @augments Combat
+ * @extends Combat
  */
 export default class TitanCombat extends Combat {
    /**

@@ -5,14 +5,14 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 /**
  * Dialog for editing the UUID used by Titan Macros for identifying a Document.
  * @param {TitanItem|TitanActor} document - The Document this sheet is for.ocument to regenerate the UUID for.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class EditUUIDDialog extends TitanDialog {
 
    /**
     * Dialog for editing the UUID used by Titan Macros for identifying a Document.
     * @param {TitanItem|TitanActor} document - The Document this sheet is for.ocument to regenerate the UUID for.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(document) {
       super({

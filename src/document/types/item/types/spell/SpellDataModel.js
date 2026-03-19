@@ -8,67 +8,15 @@ import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createCustomAspectTemplate from '~/document/types/item/types/spell/SpellCustomAspect.js';
 import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
-import {SPELL_IMAGE} from '~/system/DefaultImages.js';
+import { SPELL_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
 /**
  * Data model with extra functionality for Spells.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class SpellDataModel extends ItemDataModel {
-   static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity
-      schema.rarity = createStringField('common');
-
-      // XP Cost
-      schema.xpCost = createIntegerField(getSetting('defaultXpCost.spell'));
-
-      // Tradition
-      schema.tradition = createStringField('');
-
-      // Casting Check
-      schema.castingCheck = createSchemaField({
-         attribute: createStringField('mind'),
-         skill: createStringField('arcana'),
-         difficulty: createIntegerField(4),
-         complexity: createIntegerField(1),
-         autoCalculateDC: createBooleanField(true),
-      });
-
-      // Quantity
-      schema.quantity = createIntegerField(1);
-
-      // Aspects
-      schema.aspect = createArrayField(createObjectField());
-
-      // Custom Aspects
-      schema.customAspect = createArrayField(
-         createObjectField(() => createCustomAspectTemplate()),
-      );
-
-      return schema;
-   }
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.xpCost = this.xpCost;
-      retVal.tradition = this.tradition;
-      retVal.castingCheck = foundry.utils.deepClone(this.castingCheck);
-      retVal.quantity = this.quantity;
-      retVal.aspect = foundry.utils.deepClone(this.aspect);
-      retVal.customAspect = foundry.utils.deepClone(this.customAspect);
-      retVal.rarity = this.rarity;
-
-      return retVal;
-   }
-
-   _getDefaultImage() {
-      return SPELL_IMAGE;
-   }
-
    _getDefaultName() {
       return localize('newSpell');
    }
@@ -168,6 +116,58 @@ export default class SpellDataModel extends ItemDataModel {
          this.castingCheck.difficulty = suggestedDifficulty;
          this.castingCheck.complexity = suggestedComplexity;
       }
+   }
+
+   static _defineDocumentSchema() {
+      const schema = super._defineDocumentSchema();
+
+      // Rarity
+      schema.rarity = createStringField('common');
+
+      // XP Cost
+      schema.xpCost = createIntegerField(getSetting('defaultXpCost.spell'));
+
+      // Tradition
+      schema.tradition = createStringField('');
+
+      // Casting Check
+      schema.castingCheck = createSchemaField({
+         attribute: createStringField('mind'),
+         skill: createStringField('arcana'),
+         difficulty: createIntegerField(4),
+         complexity: createIntegerField(1),
+         autoCalculateDC: createBooleanField(true),
+      });
+
+      // Quantity
+      schema.quantity = createIntegerField(1);
+
+      // Aspects
+      schema.aspect = createArrayField(createObjectField());
+
+      // Custom Aspects
+      schema.customAspect = createArrayField(
+         createObjectField(() => createCustomAspectTemplate()),
+      );
+
+      return schema;
+   }
+
+   _getDefaultImage() {
+      return SPELL_IMAGE;
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.xpCost = this.xpCost;
+      retVal.tradition = this.tradition;
+      retVal.castingCheck = foundry.utils.deepClone(this.castingCheck);
+      retVal.quantity = this.quantity;
+      retVal.aspect = foundry.utils.deepClone(this.aspect);
+      retVal.customAspect = foundry.utils.deepClone(this.customAspect);
+      retVal.rarity = this.rarity;
+
+      return retVal;
    }
 
    /**

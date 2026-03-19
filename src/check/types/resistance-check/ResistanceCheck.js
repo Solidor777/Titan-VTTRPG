@@ -4,7 +4,7 @@ import calculateResistanceCheckResults from '~/check/types/resistance-check/Resi
 /**
  * Class for creating and calculating the result of a Resistance Check.
  * @param {ResistanceCheckParameters} parameters - Parameters for the Check.
- * @augments TitanCheck
+ * @extends TitanCheck
  */
 export default class ResistanceCheck extends TitanCheck {
    /**

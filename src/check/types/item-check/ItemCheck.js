@@ -4,7 +4,7 @@ import TitanCheck from '~/check/Check.js';
 /**
  * Class for creating and calculating the result of an item check.
  * @param {ItemCheckParameters} parameters - Parameters for the Check.
- * @augments TitanCheck
+ * @extends TitanCheck
  */
 export default class ItemCheck extends TitanCheck {
    /**

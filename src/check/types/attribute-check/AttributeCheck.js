@@ -4,7 +4,7 @@ import calculateAttributeCheckResults from '~/check/types/attribute-check/Attrib
 /**
  * Class for creating and calculating the result of an Attribute Check.
  * @param {AttributeCheckParameters} parameters - Parameters for the Check.
- * @augments TitanCheck
+ * @extends TitanCheck
  */
 export default class AttributeCheck extends TitanCheck {
    /**

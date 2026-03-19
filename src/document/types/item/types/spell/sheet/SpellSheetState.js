@@ -1,8 +1,6 @@
 /**
  * @typedef {ItemSheetState} SpellSheetState - A custom reactive store for managing a Spell Sheet.
- * @property {import('svelte/store').Writable<SpellSheetData>['set']} set
- * @property {import('svelte/store').Writable<SpellSheetData>['update']} update
- * @property {import('svelte/store').Writable<SpellSheetData>['subscribe']} subscribe
+ * @extends {ItemSheetState}
  * @property {Function} addCustomAspect - Adds a Custom Aspect to the reactive application state.
  * @property {Function} removeCustomAspect - Removes the Custom Aspect at the provided idx from the reactive
  *    application state.
@@ -26,7 +24,7 @@ export default function createSpellSheetState(item) {
             subscribe,
             addCheck,
             removeCheck
-         } = createItemSheetState(item, createSpellSheetData(item));
+         } = createItemSheetState(item, /** @type ItemSheetData */ createSpellSheetData(item));
 
    /**
     * Adds a Custom Aspect to the reactive application state.

@@ -5,7 +5,7 @@ import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createWeaponAttackTemplate from '~/document/types/item/types/weapon/WeaponAttack.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import {WEAPON_IMAGE} from '~/system/DefaultImages.js';
+import { WEAPON_IMAGE } from '~/system/DefaultImages.js';
 import EditAttackTraitsDialog from '~/document/types/item/types/weapon/dialog/EditAttackTraitsDialog.js';
 import AddCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/AddCustomAttackTraitDialog.js';
 import EditCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/EditCustomAttackTraitDialog.js';
@@ -13,7 +13,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Weapons.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class WeaponDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
@@ -43,6 +43,14 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return WEAPON_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newWeapon');
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -53,14 +61,6 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       retVal.trait = foundry.utils.deepClone(this.trait);
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return WEAPON_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newWeapon');
    }
 
    /**

@@ -4,7 +4,7 @@ import calculateAttackCheckResults from '~/check/types/attack-check/AttackCheckR
 /**
  * Class for creating and calculating the result of an Attack Check.
  * @param {AttackCheckParameters} parameters - Parameters for the Check.
- * @augments TitanCheck
+ * @extends TitanCheck
  */
 export default class AttackCheck extends TitanCheck {
 

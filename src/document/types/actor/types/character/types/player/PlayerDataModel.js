@@ -5,10 +5,13 @@ import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.j
 
 /**
  * Data model for player actors.
- * @augments CharacterDataModel
+ * @extends CharacterDataModel
  */
 export default class PlayerDataModel extends CharacterDataModel {
-   static _defineDocumentSchema() {
+   prepareDerivedData() {
+      super.prepareDerivedData();
+      this.xp.available = this.xp.earned - this._getSpentXP();
+   }   static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
       schema.xp = createSchemaField({
          earned: createNumberField(),
@@ -16,14 +19,6 @@ export default class PlayerDataModel extends CharacterDataModel {
       schema.inspiration = createBooleanField(false);
 
       return schema;
-   }
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.xp = foundry.utils.deepClone(this.xp);
-      retVal.inspiration = this.inspiration;
-
-      return retVal;
    }
 
    _getInitialPrototypeTokenData(data) {
@@ -35,11 +30,12 @@ export default class PlayerDataModel extends CharacterDataModel {
       };
 
       return retVal;
-   }
+   }   getRollData() {
+      const retVal = super.getRollData();
+      retVal.xp = foundry.utils.deepClone(this.xp);
+      retVal.inspiration = this.inspiration;
 
-   prepareDerivedData() {
-      super.prepareDerivedData();
-      this.xp.available = this.xp.earned - this._getSpentXP();
+      return retVal;
    }
 
    /**
@@ -56,4 +52,8 @@ export default class PlayerDataModel extends CharacterDataModel {
          });
       }
    }
+
+
+
+
 }

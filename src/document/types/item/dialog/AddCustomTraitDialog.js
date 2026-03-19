@@ -4,13 +4,13 @@ import AddCustomTraitDialogShell from '~/document/types/item/dialog/AddCustomTra
 /**
  * Dialog for adding a Custom Trait to an Item.
  * @param {TitanItem} item - The Item to add the Trait to.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class AddCustomTraitDialog extends TitanDialog {
    /**
     * Dialog for adding a Custom Trait to an Item.
     * @param {TitanItem} item - The Item to add the Trait to.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(item) {
       super({

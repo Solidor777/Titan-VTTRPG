@@ -50,7 +50,7 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 
 /**
  * Actor data model with extra functionality for Characters.
- * @augments ActorDataModel
+ * @extends ActorDataModel
  */
 export default class CharacterDataModel extends ActorDataModel {
 
@@ -120,7 +120,8 @@ export default class CharacterDataModel extends ActorDataModel {
 
       /**
        * Creates a schema field formatted as a Character Akill (Athletics, Perception, etc.).
-       * @param {string} defaultAttribute - The Document this sheet is for.efault Attribute to be used when rolling the Skill.
+       * @param {string} defaultAttribute - The Document this sheet is for.efault Attribute to be used when rolling the
+       *    Skill.
        * @returns {SchemaField} A schema field formatted as a Character Skill.
        */
       function createSkillSchema(defaultAttribute) {
@@ -227,12 +228,45 @@ export default class CharacterDataModel extends ActorDataModel {
       return schema;
    }
 
+   prepareDerivedData() {
+      super.prepareDerivedData();
+      this._calculateBaseRatings();
+      this._calculateBaseResistances();
+      this._calculateBaseResources();
+      this._resetDynamicMods();
+      this._applyRulesElements();
+      this._applyConditions();
+      this._applyArmorAndShields();
+      this._applyMods();
+      this._clampResources();
+
+      // Ensure the action queue is initialized
+      if (isCurrentUserBestOwner(this.parent) && !this.parent.actionQueue) {
+         this.parent.actionQueue = new ActionQueue();
+      }
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.attribute = foundry.utils.deepClone(this.attribute);
+      retVal.resistance = foundry.utils.deepClone(this.resistance);
+      retVal.skill = foundry.utils.deepClone(this.skill);
+      retVal.rating = foundry.utils.deepClone(this.rating);
+      retVal.resource = foundry.utils.deepClone(this.resource);
+      retVal.speed = foundry.utils.deepClone(this.speed);
+      retVal.mod = foundry.utils.deepClone(this.mod);
+      retVal.equipped = foundry.utils.deepClone(this.equipped);
+      retVal.bio = foundry.utils.deepClone(this.bio);
+
+      return retVal;
+   }
+
    _getInitialPrototypeTokenData(data) {
       return {
          displayName: data.prototypeToken?.displayName ?? CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
          displayBars: data.prototypeToken?.displayBars ?? CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
-         bar1: data.prototypeToken?.bar1 ?? {attribute: 'resource.stamina'},
-         bar2: data.prototypeToken?.bar2 ?? {attribute: 'resource.resolve'},
+         bar1: data.prototypeToken?.bar1 ?? { attribute: 'resource.stamina' },
+         bar2: data.prototypeToken?.bar2 ?? { attribute: 'resource.resolve' },
       };
    }
 
@@ -244,6 +278,8 @@ export default class CharacterDataModel extends ActorDataModel {
       const conditions = this.parent.effects.filter((effect) => effect.flags.titan?.type === 'condition');
       return conditions.length > 0 ? conditions : null;
    }
+
+   /* === Data Preparation === */
 
    /**
     * Gets all the Effect items affecting this Character that have Expired.
@@ -268,41 +304,6 @@ export default class CharacterDataModel extends ActorDataModel {
       }
 
       return false;
-   }
-
-   /* === Data Preparation === */
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.attribute = foundry.utils.deepClone(this.attribute);
-      retVal.resistance = foundry.utils.deepClone(this.resistance);
-      retVal.skill = foundry.utils.deepClone(this.skill);
-      retVal.rating = foundry.utils.deepClone(this.rating);
-      retVal.resource = foundry.utils.deepClone(this.resource);
-      retVal.speed = foundry.utils.deepClone(this.speed);
-      retVal.mod = foundry.utils.deepClone(this.mod);
-      retVal.equipped = foundry.utils.deepClone(this.equipped);
-      retVal.bio = foundry.utils.deepClone(this.bio);
-
-      return retVal;
-   }
-
-   prepareDerivedData() {
-      super.prepareDerivedData();
-      this._calculateBaseRatings();
-      this._calculateBaseResistances();
-      this._calculateBaseResources();
-      this._resetDynamicMods();
-      this._applyRulesElements();
-      this._applyConditions();
-      this._applyArmorAndShields();
-      this._applyMods();
-      this._clampResources();
-
-      // Ensure the action queue is initialized
-      if (isCurrentUserBestOwner(this.parent) && !this.parent.actionQueue) {
-         this.parent.actionQueue = new ActionQueue();
-      }
    }
 
    /**
@@ -344,9 +345,9 @@ export default class CharacterDataModel extends ActorDataModel {
     */
    _calculateBaseResources() {
       const totalBaseAttributeValue =
-         this.attribute.body.baseValue +
-         this.attribute.mind.baseValue +
-         this.attribute.soul.baseValue;
+               this.attribute.body.baseValue +
+               this.attribute.mind.baseValue +
+               this.attribute.soul.baseValue;
 
       // Calculate base resource values
       // Stamina = Total Attribute Mod
@@ -447,7 +448,8 @@ export default class CharacterDataModel extends ActorDataModel {
       /**
        * Copies the Rules Elements from an item to the Rules Elements array.
        * @param {TitanItem} item - The Item to copy the Rules Elements from.
-       * @param {string} type - The type by which to categorize the items Rules Elements (ability, equipment, or effect).
+       * @param {string} type - The type by which to categorize the items Rules Elements (ability, equipment, or
+       *    effect).
        */
       function processItemElements(item, type) {
          const copiedElements = foundry.utils.deepClone(item.system.rulesElement);
@@ -459,7 +461,6 @@ export default class CharacterDataModel extends ActorDataModel {
 
       this.parent.items.forEach((item) => {
          if (item.system.rulesElement && item.system.rulesElement.length > 0) {
-
 
             // Equipment, armor, shields, and weapons only apply elements if they are equipped.
             // Abilities and effects should apply their Rules Elements as normal.
@@ -1361,7 +1362,6 @@ export default class CharacterDataModel extends ActorDataModel {
 
       // Resistances
       applyModsDeep(systemData.resistance);
-
 
       // Ratings
       applyModsDeep(systemData.rating);
@@ -3720,7 +3720,7 @@ export default class CharacterDataModel extends ActorDataModel {
 
       // Spend resolve is any resolve was used
       if (resolveSpent > 0) {
-         return this.spendResolve(resolveSpent, {playSound: false});
+         return this.spendResolve(resolveSpent, { playSound: false });
       }
    }
 
@@ -3790,7 +3790,6 @@ export default class CharacterDataModel extends ActorDataModel {
          // If the damage ignores armor then no damage is resisted.
          // Otherwise, resist damage equal to the Characters armor.
          let damageResistance = options?.ignoreArmor ? 0 : this.mod.armor.value;
-
 
          // If damage would be resisted and there are options to apply
          if (damageResistance > 0 && options) {
@@ -4671,7 +4670,6 @@ export default class CharacterDataModel extends ActorDataModel {
                      // Process the expired effects
                      await this._processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData);
 
-
                      // Send the report to chat if appropriate
                      if (shouldSendReport) {
 
@@ -4833,7 +4831,6 @@ export default class CharacterDataModel extends ActorDataModel {
          // Process expired effects
          await this._processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData);
 
-
          // Send a report if appropriate
          if (Object.keys(reportData).length > 0) {
 
@@ -4952,7 +4949,6 @@ export default class CharacterDataModel extends ActorDataModel {
          }
       }
    }
-
 
    /**
     * Report Data for a Turn Effect item.
@@ -5155,14 +5151,14 @@ export default class CharacterDataModel extends ActorDataModel {
 
             // Apply healing if appropriate
             if (turnStaminaMod > 0 && this.resource.stamina.value < this.resource.stamina.max) {
-               await this.applyHealing(turnStaminaMod, {updateActor: false, report: false});
+               await this.applyHealing(turnStaminaMod, { updateActor: false, report: false });
                shouldUpdateActor = true;
             }
 
             // Otherwise, apply damage if appropriate
             else if (turnStaminaMod < 0) {
                await this.applyDamage(-turnStaminaMod,
-                  {updateActor: false, ignoreArmor: true, report: false});
+                  { updateActor: false, ignoreArmor: true, report: false });
                shouldUpdateActor = true;
             }
 
@@ -5262,7 +5258,7 @@ export default class CharacterDataModel extends ActorDataModel {
     * @param {string} userId - The ID of the user sending the message.
     * @param {boolean} [playSound] - Whether to play a sound when sending the message.
     * @returns {Promise<void>}
-    * @private
+    * @protected
     */
    async _whisperOwners(messageData, userId, playSound = true) {
       // Initialize message

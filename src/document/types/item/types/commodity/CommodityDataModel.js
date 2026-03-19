@@ -6,9 +6,13 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Commodities.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class CommodityDataModel extends ItemDataModel {
+   _getDefaultName() {
+      return localize('newCommodity');
+   }
+
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -24,6 +28,10 @@ export default class CommodityDataModel extends ItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return COMMODITY_IMAGE;
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -31,13 +39,5 @@ export default class CommodityDataModel extends ItemDataModel {
       retVal.quantity = this.quantity;
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return COMMODITY_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newCommodity');
    }
 }

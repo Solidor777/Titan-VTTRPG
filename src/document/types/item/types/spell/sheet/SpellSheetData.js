@@ -2,7 +2,7 @@ import createItemSheetData from '~/document/types/item/sheet/ItemSheetData.js';
 
 /**
  * @typedef {ItemSheetData} SpellSheetData - The data held inside the reactive store, organized by tab.
- * @augments {ItemSheetData}
+ * @extends {ItemSheetData}
  * @property {object} sidebar.castingCheck - State for the Casting Check sidebar section.
  * @property {boolean} sidebar.castingCheck.isExpanded - Whether the Casting Check in the sidebar is expanded.
  * @property {object} tabs.castingCheck - State for the Casting Check tab.

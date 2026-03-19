@@ -6,7 +6,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
  * @param {TitanItem} item - The Item to edit the Traits of.
  * @param {number} attackIdx - The idx of the Attack in the attacks array.
  * @param {number} traitIdx - The idx of the Trait in the traits array.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class EditCustomAttackTraitDialog extends TitanDialog {
 
@@ -15,7 +15,7 @@ export default class EditCustomAttackTraitDialog extends TitanDialog {
     * @param {TitanItem} item - The Item to edit the Traits of.
     * @param {number} attackIdx - The idx of the Attack in the attacks array.
     * @param {number} traitIdx - The idx of the Trait in the traits array.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(item, attackIdx, traitIdx) {
       super({

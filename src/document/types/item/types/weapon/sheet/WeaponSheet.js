@@ -5,6 +5,7 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Item Sheet class with functionality shared by all Weapon Items.
+ * @extends TitanItemSheet
  * @param {TitanItem} sheetDocument - The Document this sheet is for.
  * @param {object} options - Options object.
  * @property {WeaponSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.

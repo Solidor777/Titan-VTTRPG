@@ -1,4 +1,4 @@
-import {writable} from 'svelte/store';
+import { writable } from 'svelte/store';
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
 import CheckDialogShell from '~/check/dialog/CheckDialogShell.svelte';
@@ -10,7 +10,7 @@ import AttributeCheckDialogShell from '~/check/types/attribute-check/dialog/Attr
  * @param {AttributeCheckParameters} checkParameters - The initial parameters for the check,
  * calculated from the options.
  * @param {TitanActor} actor - The Actor that will roll the check.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class AttributeCheckDialog extends TitanDialog {
 
@@ -20,7 +20,7 @@ export default class AttributeCheckDialog extends TitanDialog {
     * @param {AttributeCheckParameters} checkParameters - The initial parameters for the check,
     * calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(checkOptions, checkParameters, actor) {
       super({

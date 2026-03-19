@@ -1,8 +1,8 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDocumentSheet from '~/document/sheet/DocumentSheet';
 import { IMPORT_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
-import createItemSheetState from '~/document/types/item/sheet/ItemSheetState.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
 
 /**
  * A Document Sheet class with functionality shared by all Items.
@@ -47,7 +47,8 @@ export default class TitanItemSheet extends TitanDocumentSheet {
     * @protected
     */
    _createReactiveState() {
-      return createItemSheetState(this.item);
+      // By default, assume we have rules elements since only spells do not
+      return createRulesElementItemSheetState(this.item);
    }
 
    _getHeaderButtons() {

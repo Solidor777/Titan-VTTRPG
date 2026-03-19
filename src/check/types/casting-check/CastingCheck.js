@@ -4,7 +4,7 @@ import calculateCastingCheckResults from '~/check/types/casting-check/CastingChe
 /**
  * Class for creating and calculating the result of a Casting Check.
  * @param {CastingCheckParameters} parameters - Parameters for the Check.
- * @augments TitanCheck
+ * @extends TitanCheck
  */
 export default class CastingCheck extends TitanCheck {
 

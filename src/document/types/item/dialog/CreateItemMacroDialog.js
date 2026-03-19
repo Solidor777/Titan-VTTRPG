@@ -7,7 +7,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
  * @param {TitanItem} item - The Item to create the macro for.
  * @param {number} slot - The hotbar slot to assign the macro to after creation.
  * @param {uuid} uuid - The unique identifier of the object.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class CreateItemMacroDialog extends TitanDialog {
 
@@ -16,7 +16,7 @@ export default class CreateItemMacroDialog extends TitanDialog {
     * @param {TitanItem} item - The Item to create the macro for.
     * @param {number} slot - The hotbar slot to assign the macro to after creation.
     * @param {uuid} uuid - The unique identifier of the object.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(item, slot, uuid) {
       super({

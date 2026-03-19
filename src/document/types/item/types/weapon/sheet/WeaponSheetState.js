@@ -1,11 +1,9 @@
 import createWeaponSheetData from '~/document/types/item/types/weapon/sheet/WeaponSheetData.js';
-import createItemSheetState from '~/document/types/item/sheet/ItemSheetState.js';
+import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
 
 /**
- * @typedef {ItemSheetState} WeaponSheetState - A custom reactive store for managing a Weapon Sheet.
- * @property {import('svelte/store').Writable<WeaponSheetData>['set']} set
- * @property {import('svelte/store').Writable<WeaponSheetData>['update']} update
- * @property {import('svelte/store').Writable<WeaponSheetData>['subscribe']} subscribe
+ * @typedef {RulesElementItemSheetState} WeaponSheetState - A custom reactive store for managing a Weapon Sheet.
+ * @extends {RulesElementItemSheetState}
  * @property {Function} addAttack - Adds an Attack to the reactive application state.
  * @property {Function} removeAttack - Removes the Attack at the provided idx from the reactive application state.
  * @property {Function} addCheck - Adds a Check to the reactive application state.
@@ -25,7 +23,7 @@ export default function createWeaponSheetState(item) {
             subscribe,
             addCheck,
             removeCheck
-         } = createItemSheetState(item, createWeaponSheetData(item));
+         } = createRulesElementItemSheetState(item, /** @type RulesElementItemSheetData */ createWeaponSheetData(item));
 
    /**
     * Adds an Attack to the reactive application state.

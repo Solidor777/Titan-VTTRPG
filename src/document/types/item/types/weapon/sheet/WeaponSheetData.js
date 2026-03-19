@@ -1,9 +1,9 @@
-import createItemSheetData from '~/document/types/item/sheet/ItemSheetData.js';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
+import createRulesElementItemSheetData from '~/document/types/item/sheet/RulesElementItemSheetData.js';
 
 /**
- * @typedef {object} WeaponSheetData - Data representing the state of a Weapon Sheet.
- * @augments {ItemSheetData}
+ * @typedef {RulesElementItemSheetData} WeaponSheetData - Data representing the state of a Weapon Sheet.
+ * @extends {RulesElementItemSheetData}
  * @property {object} sidebar.attacks - State for the Attacks sidebar section.
  * @property {boolean[]} sidebar.attacks.isExpanded - Array of booleans representing whether an Attack in the sidebar.
  * @property {object} tabs.attacks - State for the Attacks tab.
@@ -21,7 +21,7 @@ import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
  */
 export default function createWeaponSheetData(item) {
    // Initialize return data.
-   const retVal = createItemSheetData(item);
+   const retVal = createRulesElementItemSheetData(item);
    retVal.sidebar.attacks = {
       isExpanded: [],
    };

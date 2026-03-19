@@ -5,11 +5,11 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
 import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 import localize from '~/helpers/utility-functions/Localize.js';
-import {ITEM_IMAGE} from '~/system/DefaultImages.js';
+import { ITEM_IMAGE } from '~/system/DefaultImages.js';
 
 /**
  * Data model with extra functionality for Items.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class ItemDataModel extends TitanDataModel {
    static _defineDocumentSchema() {
@@ -53,6 +53,14 @@ export default class ItemDataModel extends TitanDataModel {
       }
    }
 
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.check = foundry.utils.deepClone(this.check);
+      retVal.customTrait = foundry.utils.deepClone(this.customTrait);
+
+      return retVal;
+   }
+
    /**
     * Gets the default image for this document type.
     * @returns {string} The default image for this document type.
@@ -69,13 +77,5 @@ export default class ItemDataModel extends TitanDataModel {
     */
    _getDefaultName() {
       return localize('newItem');
-   }
-
-   getRollData() {
-      const retVal = super.getRollData();
-      retVal.check = foundry.utils.deepClone(this.check);
-      retVal.customTrait = foundry.utils.deepClone(this.customTrait);
-
-      return retVal;
    }
 }

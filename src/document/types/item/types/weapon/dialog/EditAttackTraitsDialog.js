@@ -5,7 +5,7 @@ import EditAttackTraitsDialogShell from '~/document/types/item/types/weapon/dial
  * Dialog for editing the Traits of an Attack.
  * @param {TitanItem} item - The Item to edit the Traits of.
  * @param {number} attackIdx - The idx of the Attack in the attacks array.
- * @augments TitanDialog
+ * @extends TitanDialog
  */
 export default class EditAttackTraitsDialog extends TitanDialog {
 
@@ -13,7 +13,7 @@ export default class EditAttackTraitsDialog extends TitanDialog {
     * Dialog for editing the Traits of an Attack.
     * @param {TitanItem} item - The Item to edit the Traits of.
     * @param {number} attackIdx - The idx of the Attack in the attacks array.
-    * @augments TitanDialog
+    * @extends TitanDialog
     */
    constructor(item, attackIdx) {
       super({

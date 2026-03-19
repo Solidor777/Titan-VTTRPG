@@ -3,12 +3,12 @@ import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.j
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
-import {ABILITY_IMAGE} from '~/system/DefaultImages.js';
+import { ABILITY_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Ability items.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class AbilityDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
@@ -32,6 +32,14 @@ export default class AbilityDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return ABILITY_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newAbility');
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.xpCost = this.xpCost;
@@ -41,13 +49,5 @@ export default class AbilityDataModel extends RulesElementItemDataModel {
       retVal.passive = this.passive;
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return ABILITY_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newAbility');
    }
 }

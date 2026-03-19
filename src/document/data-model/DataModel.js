@@ -3,7 +3,7 @@ import createNumberField from '~/helpers/utility-functions/CreateNumberField.js'
 /**
  * A specialized subclass of TypeDataModel,
  * with extra functionality to support data model svelte-components and version migrations.
- * @augments TypeDataModel
+ * @extends TypeDataModel
  */
 export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
@@ -13,7 +13,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     */
    #components;
 
-   constructor (data, options) {
+   constructor(data, options) {
       super(data, options);
 
       // Construct the document svelte-components
@@ -21,7 +21,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
       for (const [key, component] of Object.entries(this.constructor._prototypeComponents)) {
          components[key] = new component(this);
          Object.defineProperty(this, key, {
-            get () {
+            get() {
                return this.#components[key];
             },
          });
@@ -33,7 +33,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * Static getter for the data model's latest version number.
     * @type {number}
     */
-   static get latestVersion () {
+   static get latestVersion() {
       return 0;
    }
 
@@ -42,7 +42,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @type {object}
     * @protected
     */
-   static get _prototypeComponents () {
+   static get _prototypeComponents() {
       return {};
    }
 
@@ -50,11 +50,11 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * Getter for the map of the data model's svelte components.
     * @returns {object} The map of the data model's svelte components.
     */
-   get components () {
+   get components() {
       return this.#components;
    }
 
-   static defineSchema () {
+   static defineSchema() {
       // Define the document schema
       const documentSchema = this._defineDocumentSchema();
 
@@ -73,13 +73,13 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @returns {object} The document schema, minus the svelte-components schemas.
     * @protected
     */
-   static _defineDocumentSchema () {
+   static _defineDocumentSchema() {
       return {
          documentVersion: createNumberField(this.latestVersion),
       };
    }
 
-   static migrateData (source) {
+   static migrateData(source) {
       return super.migrateData(this._migrateComponentData(source));
    }
 
@@ -89,7 +89,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @returns {object} The migrated data.
     * @protected
     */
-   static _migrateComponentData (source) {
+   static _migrateComponentData(source) {
       for (const component of Object.entries(this._prototypeComponents)) {
          if (typeof component.migrateData === 'function') {
             component.migrateData(source);
@@ -104,7 +104,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * Modifications to the pending document before it is persisted should be performed with this.parent.updateSource().
     * @param {object} data - The initial data object provided to the document creation request.
     */
-   onPreCreate (data) {
+   onPreCreate(data) {
       // Initialize document data
       const documentData = this._getInitialDocumentData(data);
       if (documentData) {
@@ -118,14 +118,14 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @returns {object|void} The initial data to update the document with.
     * @protected
     */
-   _getInitialDocumentData (data) {
+   _getInitialDocumentData(data) {
    }
 
    /**
     * Apply transformations of derivations to the values of the source data object.
     * Compute data fields whose values are not stored to the database.
     */
-   prepareDerivedData () {
+   prepareDerivedData() {
       this._prepareComponentDerivedData();
       super.prepareDerivedData();
    }
@@ -134,7 +134,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * Prepares the data for each data model svelte components.
     * @protected
     */
-   _prepareComponentDerivedData () {
+   _prepareComponentDerivedData() {
       for (const component of Object.entries(this.components)) {
          if (typeof component.prepareDerivedData === 'function') {
             component.prepareDerivedData();
@@ -146,7 +146,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * Gets the type specific Roll Data for this document.
     * @returns {object} Type specific Roll Data for this document.
     */
-   getRollData () {
+   getRollData() {
       return {
          id: this.parent.id,
          name: this.parent.name,

@@ -2,7 +2,7 @@ import TitanDataModel from '~/document/data-model/DataModel.js';
 
 /**
  * Data model with extra functionality for Actors.
- * @augments TitanDataModel
+ * @extends TitanDataModel
  */
 export default class ActorDataModel extends TitanDataModel {
    onPreCreate(data) {
