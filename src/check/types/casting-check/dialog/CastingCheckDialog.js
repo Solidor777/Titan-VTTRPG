@@ -34,7 +34,7 @@ export default class CastingCheckDialog extends TitanDialog {
                checkParameters: writable(checkParameters),
             },
          },
-         id: `titan-casting-check-dialog-${actor._id}`,
+         id: `titan-casting-check-dialog-${actor.id}`,
       });
    }
 

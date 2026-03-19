@@ -13,13 +13,7 @@
 
    /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-   // Initialize expanded state
-   $document.system.attack.forEach((entry, idx) => {
-      $appState.attacks.isExpanded[idx] =
-         $appState.attacks.isExpanded[idx] ?? true;
-   });
-
+   
    // Initialize filtered entries
    let filteredEntries = [];
    $: {

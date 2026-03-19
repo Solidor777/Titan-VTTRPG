@@ -25,7 +25,7 @@ export default class EditCustomTraitDialog extends TitanDialog {
                traitIdx: traitIdx
             },
          },
-         id: `titan-edit-custom-trait-dialog-${item._id}`,
+         id: `titan-edit-custom-trait-dialog-${item.id}`,
       });
    }
 

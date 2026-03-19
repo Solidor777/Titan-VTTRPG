@@ -23,7 +23,7 @@ export default function getBestPlayerOwner(document) {
             if (activeOwners.length > 1) {
 
                // Check if one of the players has this document set to their character
-               const mainCharacterPlayers = activeOwners.filter((owner) => owner.character._id === document._id);
+               const mainCharacterPlayers = activeOwners.filter((owner) => owner.character.id === document.id);
                if (mainCharacterPlayers.length > 0) {
                   return mainCharacterPlayers[0];
                }
@@ -40,7 +40,7 @@ export default function getBestPlayerOwner(document) {
       }
 
       // Otherwise, check if one of the players has this document set to their character
-      const mainCharacterPlayers = activeOwners.filter((owner) => owner.character._id === document._id);
+      const mainCharacterPlayers = activeOwners.filter((owner) => owner.character.id === document.id);
       if (mainCharacterPlayers.length > 0) {
          return mainCharacterPlayers[0];
       }

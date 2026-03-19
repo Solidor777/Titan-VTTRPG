@@ -52,26 +52,6 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return this.parent.actionQueue;
    }
 
-   prepareDerivedData() {
-      // If we are the best first owner of this document, and this document is not in a compendium
-      if (isCurrentUserBestOwner(this.parent) &&
-         !this.parent.pack && this.parent._id &&
-         !this.parent.isMarkedForDeletion) {
-
-         // Ensure the action queue is initialized
-         if (!this.parent.actionQueue) {
-            this.parent.actionQueue = new ActionQueue();
-         }
-
-         // Queue the latent data preparation
-         this.actionQueue.enqueue({
-            callback: this._updateActiveEffects,
-            thisArg: this,
-            key: 'prepareLatentData',
-         });
-      }
-   }
-
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -93,7 +73,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       let retVal = super._getInitialDocumentData(data);
 
       // Check if we have a valid actor owner
-      if (this.parent && !this.parent.pack && this.parent._id && typeof data?.system?.initiative !== 'number') {
+      if (this.parent && !this.parent.pack && this.parent.id && typeof data?.system?.initiative !== 'number') {
          const actor = this.parent.parent;
          if (actor) {
 
@@ -113,12 +93,24 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return retVal;
    }
 
-   _getDefaultImage() {
-      return EFFECT_IMAGE;
-   }
+   prepareDerivedData() {
+      // If we are the best first owner of this document, and this document is not in a compendium
+      if (isCurrentUserBestOwner(this.parent) &&
+         !this.parent.pack && this.parent.id &&
+         !this.parent.isMarkedForDeletion) {
 
-   _getDefaultName() {
-      return localize('newEffect');
+         // Ensure the action queue is initialized
+         if (!this.parent.actionQueue) {
+            this.parent.actionQueue = new ActionQueue();
+         }
+
+         // Queue the latent data preparation
+         this.actionQueue.enqueue({
+            callback: this._updateActiveEffects,
+            thisArg: this,
+            key: 'prepareLatentData',
+         });
+      }
    }
 
    getRollData() {
@@ -127,6 +119,14 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       retVal.active = this.active;
 
       return retVal;
+   }
+
+   _getDefaultImage() {
+      return EFFECT_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newEffect');
    }
 
    /**
@@ -153,13 +153,13 @@ export default class EffectDataModel extends RulesElementItemDataModel {
                         turns: this.duration.turns,
                      },
                      statuses: [
-                        `${this.parent._id}`,
+                        `${this.parent.id}`,
                      ],
                      origin: this.parent.uuid,
                      flags: {
                         titan: {
                            type: 'effect',
-                           origin: this.parent._id,
+                           origin: this.parent.id,
                         },
                         'visual-active-effects.data.content': TextEditor.enrichHTML(
                            this.description, {

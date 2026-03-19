@@ -15,12 +15,6 @@
    /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Initialize expanded state
-   $document.system.customAspect.forEach((entry, idx) => {
-      $appState.tabs.customAspects.isExpanded[idx] =
-         $appState.tabs.customAspects.isExpanded[idx] ?? true;
-   });
-
    // Initialize filtered entries
    let filteredEntries = [];
    $: {

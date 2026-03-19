@@ -23,7 +23,7 @@ export default class EditUUIDDialog extends TitanDialog {
                document: document
             },
          },
-         id: `edit-uuid-dialog-${document._id}`,
+         id: `edit-uuid-dialog-${document.id}`,
       });
    }
 

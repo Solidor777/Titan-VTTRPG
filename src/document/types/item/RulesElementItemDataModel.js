@@ -1,4 +1,4 @@
-import ItemDataModel from '~/document/types/item/ItemDataModel.js';
+import TitanItemDataModel from '~/document/types/item/TitanItemDataModel.js';
 import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
@@ -7,7 +7,7 @@ import createFlatModifierElement from '~/document/types/item/rules-element/FlatM
  * Data model with extra functionality for items that can contain Rules Elements.
  * @extends TitanDataModel
  */
-export default class RulesElementItemDataModel extends ItemDataModel {
+export default class RulesElementItemDataModel extends TitanItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 

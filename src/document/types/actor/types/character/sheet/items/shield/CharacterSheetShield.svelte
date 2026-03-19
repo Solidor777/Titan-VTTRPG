@@ -21,7 +21,7 @@
    import CharacterSheetCondensedItemCheckButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type Item Reference to the Item document. */
    export let item = void 0;
 
    /** @type boolean Whether this Item is currently expanded. */
@@ -49,16 +49,16 @@
       <!--Controls-->
       <div class="controls">
          <!--Toggle Equipped button-->
-         {#if $document.system.equipped.shield !== item._id || item.system.check.length === 0}
+         {#if $document.system.equipped.shield !== item.id || item.system.check.length === 0}
             <div class="button">
                <CharacterSheetItemEquipButton
                   {item}
-                  equipped={$document.system.equipped.shield === item._id}
+                  equipped={$document.system.equipped.shield === item.id}
                />
             </div>
          {:else if item.system.check.length > 0}
             <div class="button">
-               <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+               <CharacterSheetCondensedItemCheckButton itemId={item.id}/>
             </div>
          {/if}
 
@@ -74,7 +74,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
+            <CharacterSheetItemDeleteButton itemId={item.id}/>
          </div>
       </div>
    </div>
@@ -87,7 +87,7 @@
             <div class="section">
                <CharacterSheetItemEquipButton
                   {item}
-                  equipped={$document.system.equipped.shield === item._id}
+                  equipped={$document.system.equipped.shield === item.id}
                />
             </div>
          {/if}

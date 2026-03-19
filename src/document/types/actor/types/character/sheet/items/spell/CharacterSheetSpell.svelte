@@ -23,7 +23,7 @@
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type Item Reference to the Item document. */
    export let item = void 0;
 
    /** @type boolean Whether this Item is currently expanded. */
@@ -60,7 +60,7 @@
       <div class="controls">
          <!--Cast Spell-->
          <div>
-            <CharacterSheetCondensedCastingCheckButton itemId={item._id}/>
+            <CharacterSheetCondensedCastingCheckButton itemId={item.id}/>
          </div>
 
          <!--Send to Chat button-->
@@ -75,7 +75,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
+            <CharacterSheetItemDeleteButton itemId={item.id}/>
          </div>
       </div>
    </div>

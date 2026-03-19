@@ -25,7 +25,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type Item Reference to the Item document. */
    export let item = void 0;
 
    // Expanded object
@@ -57,7 +57,7 @@
                   equipped={item.system.equipped}
                />
             {:else if item.system.attack.length > 0}
-               <CharacterSheetCondensedAttackCheckButton itemId={item._id}/>
+               <CharacterSheetCondensedAttackCheckButton itemId={item.id}/>
             {/if}
          </div>
 
@@ -73,7 +73,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
+            <CharacterSheetItemDeleteButton itemId={item.id}/>
          </div>
       </div>
    </div>

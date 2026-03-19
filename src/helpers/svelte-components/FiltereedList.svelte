@@ -8,12 +8,6 @@
    /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Initialize expanded state
-   for (const idx of $document.system.check.keys()) {
-      $appState.tabs.checks.isExpanded[idx] =
-         $appState.tabs.checks.isExpanded[idx] ?? true;
-   }
-
    export let entries = void 0;
 
    export let filterFunction = void 0;

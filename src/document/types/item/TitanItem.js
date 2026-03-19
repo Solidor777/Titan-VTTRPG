@@ -4,17 +4,14 @@ import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
- * Extends the base Item class to implement additional system-specific logic.
- * @param {object} data - The initial data object provided to the document creation request.
- * @param {object} options - Additional options which modify the creation request.
- * @param {documents.BaseUser} user - The User requesting the document creation.
- * @extends documents.Item
+ * Extends the base Item class to implement additional system-specific logic for Titan.
+ * @extends {Item}
  */
 export default class TitanItem extends Item {
 
    /**
     * Returns whether the item is marked for deletion.
-    * @returns {boolean} Whether the item is marked for deletion.
+    * @type {boolean}
     */
    get isMarkedForDeletion() {
       return (this.flags?.titan?.isMarkedForDeletion === true);
@@ -23,12 +20,49 @@ export default class TitanItem extends Item {
    /**
     * Apply transformations of derivations to the values of the source data object.
     * Compute data fields whose values are not stored to the database.
+    * @override
     */
    prepareDerivedData() {
       // Prepare type specific data
       if (this.system) {
          this.system.prepareDerivedData();
       }
+   }
+
+   /**
+    * Performs initialization logic before document creation.
+    * @override
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
+    * @param {User} user - The User requesting the document creation.
+    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
+    * @protected
+    */
+   async _preCreate(data, options, user) {
+      const retVal = await super._preCreate(data, options, user);
+      if (retVal !== false) {
+
+         // Initialize the document's uuid
+         const uuid = this.flags?.titan?.uuid;
+         if (!uuid) {
+            const initialData = {
+               flags: {
+                  titan: {
+                     uuid: generateUUID(),
+                  },
+               },
+            };
+
+            this.updateSource(initialData);
+         }
+
+         // Update initial data if provided by the data model
+         if (retVal !== false && typeof this.system.onPreCreate === 'function') {
+            this.system.onPreCreate(data);
+         }
+      }
+
+      return retVal;
    }
 
    /**
@@ -59,45 +93,11 @@ export default class TitanItem extends Item {
 
    /**
     * Prepares an object containing the data relevant to performing checks.
+    * @override
     * @returns {object} Object containing the relevant data.
     */
    getRollData() {
       return this.system.getRollData();
-   }
-
-   /**
-    * Performs initialization logic before document creation.
-    * @param {object} data - The initial data object provided to the document creation request.
-    * @param {object} options - Additional options which modify the creation request.
-    * @param {documents.BaseUser} user - The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
-    * @private
-    */
-   async _preCreate(data, options, user) {
-      const retVal = await super._preCreate(data, options, user);
-      if (retVal !== false) {
-
-         // Initialize the document's uuid
-         const uuid = this.flags?.titan?.uuid;
-         if (!uuid) {
-            const initialData = {
-               flags: {
-                  titan: {
-                     uuid: generateUUID(),
-                  },
-               },
-            };
-
-            this.updateSource(initialData);
-         }
-
-         // Update initial data if provided by the data model
-         if (retVal !== false && typeof this.system.onPreCreate === 'function') {
-            this.system.onPreCreate(data);
-         }
-      }
-
-      return retVal;
    }
 
    /**
@@ -147,6 +147,7 @@ export default class TitanItem extends Item {
 
    /**
     * Creates a dialog for adding a new Custom Trait to this item.
+    * @returns {void}
     */
    addCustomTrait() {
       if (this.isOwner) {
@@ -158,6 +159,7 @@ export default class TitanItem extends Item {
    /**
     * Creates a dialog for editing an existing Custom Trait belonging to this item.
     * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
+    * @returns {void}
     */
    editCustomTrait(traitIdx) {
       if (this.isOwner) {
@@ -169,6 +171,7 @@ export default class TitanItem extends Item {
    /**
     * Removes a Custom Trait from this item.
     * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
+    * @returns {Promise<void>}
     */
    async deleteCustomTrait(traitIdx) {
       if (this.isOwner) {

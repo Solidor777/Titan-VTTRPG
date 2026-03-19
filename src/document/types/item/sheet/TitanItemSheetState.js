@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import createItemSheetData from '~/document/types/item/sheet/ItemSheetData.js';
+import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheetData.js';
 
 /**
  * @typedef {import('svelte/store').Writable<ItemSheetData>} ItemSheetState - A custom reactive store for managing an
@@ -18,18 +18,18 @@ import createItemSheetData from '~/document/types/item/sheet/ItemSheetData.js';
  * @param {ItemSheetData} [overrideData] - Option override data for initializing the writable.
  * @returns {ItemSheetState} The newly created Item Sheet State.
  */
-export default function createItemSheetState(item, overrideData) {
+export default function createTitanItemSheetState(item, overrideData) {
    /** @type {import('svelte/store').Writable<ItemSheetData>} */
-   const { set, update, subscribe } = writable(overrideData ?? createItemSheetData(item));
+   const { set, update, subscribe } = writable(overrideData ?? createTitanItemSheetData(item));
 
    /**
     * Adds an Item Check to the reactive application state.
     */
    function addCheck() {
-      update((state) => {
-         state.checks.isExpanded.push(true);
-         state.sidebar.checks.isExpanded.push(true);
-         return state;
+      update((data) => {
+         data.checks.isExpanded.push(true);
+         data.sidebar.checks.isExpanded.push(true);
+         return data;
       });
    }
 
@@ -38,10 +38,10 @@ export default function createItemSheetState(item, overrideData) {
     * @param {number} idx - The idx of the Check to remove.
     */
    function removeCheck(idx) {
-      update((state) => {
-         state.checks.isExpanded.splice(idx, 1);
-         state.sidebar.checks.isExpanded.splice(idx, 1);
-         return state;
+      update((data) => {
+         data.checks.isExpanded.splice(idx, 1);
+         data.sidebar.checks.isExpanded.splice(idx, 1);
+         return data;
       });
    }
 

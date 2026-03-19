@@ -9,7 +9,7 @@
  */
 
 import createSpellSheetData from '~/document/types/item/types/spell/sheet/SpellSheetData.js';
-import createItemSheetState from '~/document/types/item/sheet/ItemSheetState.js';
+import createTitanItemSheetState from '~/document/types/item/sheet/TitanItemSheetState.js';
 
 /**
  * Creates a reactive state store for a spell Sheet.
@@ -24,16 +24,16 @@ export default function createSpellSheetState(item) {
             subscribe,
             addCheck,
             removeCheck
-         } = createItemSheetState(item, /** @type ItemSheetData */ createSpellSheetData(item));
+         } = createTitanItemSheetState(item, /** @type ItemSheetData */ createSpellSheetData(item));
 
    /**
     * Adds a Custom Aspect to the reactive application state.
     */
    function addCustomAspect() {
-      update((state) => {
+      update((data) => {
          // Updated to use the new tab-based structure
-         state.tabs.customAspects.isExpanded.push(true);
-         return state;
+         data.tabs.customAspects.isExpanded.push(true);
+         return data;
       });
    }
 
@@ -42,10 +42,10 @@ export default function createSpellSheetState(item) {
     * @param {number} idx - The idx of the Custom Aspect to remove.
     */
    function removeCustomAspect(idx) {
-      update((state) => {
+      update((data) => {
          // Updated to use the new tab-based structure
-         state.tabs.customAspects.isExpanded.splice(idx, 1);
-         return state;
+         data.tabs.customAspects.isExpanded.splice(idx, 1);
+         return data;
       });
    }
 

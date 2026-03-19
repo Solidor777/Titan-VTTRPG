@@ -9,15 +9,12 @@ import ActorSheetEditTokenButton from '~/document/types/actor/sheet/ActorSheetEd
 
 /**
  * A Document Sheet class with functionality shared by all Actors.
- * @param {TitanActor} sheetDocument - The Document this sheet is for.
- * @param {object} options - Options object.
- * @property {TitanActor} actor - The Actor this sheet is for.
+ * @extends {TitanDocumentSheet}
  */
 export default class TitanActorSheet extends TitanDocumentSheet {
    /**
-    * A Document Sheet class with functionality shared by all Actors.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
-    * @param {object} options - Options object.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Calculate whether this actor is a token or a proxy
@@ -30,9 +27,25 @@ export default class TitanActorSheet extends TitanDocumentSheet {
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Initialize object
+      // Initialize self object.
       super(actor, options);
+
+      /** @type {TitanActor} The Actor this sheet belongs to. */
       this.actor = actor;
+   }
+
+   /**
+    * Default Application options.
+    * @override
+    * @returns {object} Application options.
+    * @see https://foundryvtt.com/api/Application.html#options
+    */
+   static get defaultOptions() {
+      let parentOptions = super.defaultOptions;
+      return foundry.utils.mergeObject(parentOptions, {
+         baseApplication: 'ActorSheet',
+         width: 750,
+      });
    }
 
    /**
@@ -45,7 +58,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Imports the Actor from a compendium pack.
-    * @param {DOM Event} event - The Document this sheet is for.OM Event from clicking the button.
+    * @param {Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the document has been imported.
     * @private
     */
@@ -59,7 +72,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    /**
     * Handles the dropping of ActiveEffect data onto an Actor Sheet.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
-    * @param {object} data - The Document this sheet is for.ata transfer extracted from the event.
+    * @param {object} data - The data transfer extracted from the event.
     * @returns {Promise<ActiveEffect[]|boolean>} The created ActiveEffect object or false if it couldn't be created.
     * @protected
     */
@@ -79,12 +92,13 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    /**
     * Handle dropping of an item reference or item data onto an Actor Sheet.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
-    * @param {object} data - The Document this sheet is for.ata transfer extracted from the event.
+    * @param {object} data - The data transfer extracted from the event.
     * @returns {Promise<Item[]|boolean>} The created or updated Item instances, or false if the drop was not permitted.
     * @protected
     */
    async _onDropItem(event, data) {
       // Create an item from the drag data
+      /** @type {TitanItem} */
       const item = await Item.implementation.fromDropData(data);
       if (!item) {
          return false;
@@ -98,17 +112,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
       // Otherwise, create a new item
       return this._onDropItemCreate(itemData);
-   }   /**
-    * Default Application options.
-    * @returns {object} Options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
-   static get defaultOptions() {
-      let parentOptions = super.defaultOptions;
-      return foundry.utils.mergeObject(parentOptions, {
-         baseApplication: 'ActorSheet',
-         width: 750,
-      });
    }
 
    /**
@@ -128,13 +131,13 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * Handle a drop event for an existing embedded Item to sort that Item relative to its siblings.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} itemData - The item data requested for sorting.
-    * @returns {Promise<Item[]|false>} The the updated item instances, or false if the data was invalid.
+    * @returns {Promise<Item[]|boolean>} The updated item instances, or false if the data was invalid.
     * @private
     */
    async _onSortItem(event, itemData) {
       // Get the drag source and drop target
       const items = this.actor.items;
-      const source = items.get(itemData._id);
+      const source = items.get(itemData.id);
       const dropTarget = event.target.closest('[data-item-id]');
 
       // If the drop target is valid
@@ -157,7 +160,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
             const sortUpdates = SortingHelpers.performIntegerSort(source, { target, siblings });
             const updateData = sortUpdates.map((entry) => {
                const update = entry.update;
-               update._id = entry.target._id;
+               update.id = entry.target.id;
                return update;
             });
 
@@ -173,8 +176,8 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * Handle dropping of a Folder on an Actor Sheet.
     * The core sheet currently supports dropping a Folder of Items to create all items as owned items.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
-    * @param {object} data - The Document this sheet is for.ata transfer extracted from the event.
-    * @returns {Promise<Item[]|false>} The created Item instances.
+    * @param {object} data - The data transfer extracted from the event.
+    * @returns {Promise<Item[]|boolean>} The created Item instances.
     * @protected
     */
    async _onDropFolder(event, data) {
@@ -197,8 +200,12 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       return false;
    }
 
-
-
+   /**
+    * Get the header buttons for the sheet.
+    * @override
+    * @returns {object[]} Array of button configuration objects.
+    * @protected
+    */
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
@@ -257,6 +264,12 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       return buttons;
    }
 
+   /**
+    * Closes the sheet.
+    * @override
+    * @param {object} [options={}] - Close options.
+    * @returns {Promise<void>}
+    */
    async close(options = {}) {
       this.options.token = null;
       return super.close(options);
@@ -264,9 +277,10 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Processes data when dropped onto this sheet.
-    * @param {DragEvent} event - The Document this sheet is for.OM Event from dropping the button.
-    * @returns {Promise<Item[]|ActiveEffect[]|boolean} The newly created embedded documents, or false if the drop was
-    * not allowed.
+    * @override
+    * @param {DragEvent} event - The DOM Event from dropping the button.
+    * @returns {Promise<Item[]|ActiveEffect[]|boolean>} The newly created embedded documents, or false if the drop was
+    *    not allowed.
     * @private
     */
    async _onDrop(event) {
@@ -278,7 +292,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
        * A hook event that fires when some useful data is dropped onto an ActorSheet.
        * @param {Actor} actor - The Actor that the data was droped onto.
        * @param {ActorSheet} sheet - The ActorSheet application.
-       * @param {object} data - The Document this sheet is for.ata that has been dropped onto the sheet.
+       * @param {object} data - The data that has been dropped onto the sheet.
        */
       const allowed = Hooks.call('dropActorSheetData', this.actor, this, data);
       if (allowed === false) {
@@ -304,5 +318,4 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
       return false;
    }
-
 }

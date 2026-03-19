@@ -11,7 +11,7 @@ import { ITEM_IMAGE } from '~/system/DefaultImages.js';
  * Data model with extra functionality for Items.
  * @extends TitanDataModel
  */
-export default class ItemDataModel extends TitanDataModel {
+export default class TitanItemDataModel extends TitanDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 

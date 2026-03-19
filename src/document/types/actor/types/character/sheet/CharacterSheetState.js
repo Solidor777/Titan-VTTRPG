@@ -1,107 +1,84 @@
 import { writable } from 'svelte/store';
+import createCharacterSheetData from '~/document/types/actor/types/character/sheet/CharacterSheetData.js';
 
 /**
- * @typedef {writable<Object>} CharacterSheetState - Reactive store for managing the state of a Character Sheet.
- * @property {string} activeTab - The currently active sheet tab.
- * @property {object} filter - Object containing the current filters, arranged by sheet element.
- * @property {string} filter.abilities - The current filter for the Abilities tab.
- * @property {string} filter.inventory - The current filter for the Inventory tab.
- * @property {string} filter.skills - The current filter for the Skills tab.
- * @property {string} filter.spells - The current filter for the Spells tab.
- * @property {object} filterOptions - Object containing the state of the filter options, arranged by sheet element.
- * @property {object} filterOptions.abilities - Object containing the state of the filter options for the Abilities
- * tab.
- * @property {boolean} filterOptions.abilities.action - Whether to filter the Abilities tab for Action abilities.
- * @property {boolean} filterOptions.abilities.reaction - Whether to filter the Abilities tab for Reaction abilities.
- * @property {boolean} filterOptions.abilities.passive - Whether to filter the Abilities tab for Passive abilities.
- * @property {object} filterOptions.inventory - Object containing the state of the filter options for the Inventory
- * tab.
- * @property {boolean} filterOptions.inventory.armor - Whether to filter the Inventory Tab for Armor items.
- * @property {boolean} filterOptions.inventory.commodity - Whether to filter the Inventory Tab for Commodity items.
- * @property {boolean} filterOptions.inventory.equipment - Whether to filter the Inventory Tab for Equipment items.
- * @property {boolean} filterOptions.inventory.shield - Whether to filter the Inventory Tab for Shield items.
- * @property {boolean} filterOptions.inventory.weapon - Whether to filter the Inventory Tab for Weapon items.
- * @property {object} isExpanded - Object containing the expanded state of the sheet, arranged by sheet element.
- * @property {object} isExpanded.abilities - Object of Booleans representing whether an Ability in the Abilities tab is
- * expanded, arranged by Item ID.
- * @property {object} isExpanded.inventory - Object of booleans representing whether an item in the Inventory tab is
- * expanded, arranged by Item ID.
- * @property {object} isExpanded.spells - Object of booleans representing whether a Spell in the Spells tab is
- * expanded, arranged by Item ID.
- * @property {object} scrollTop - Object containing the top of the scrollbar for each sheet element, arranged by
- * element.
- * @property {number} scrollTop.abilities - The current top of the scrollbar for the Abilities tab.
- * @property {number} scrollTop.inventory - The current top of the scrollbar for the Inventory tab.
- * @property {number} scrollTop.notes - The current top of the scrollbar for the Notes tab.
- * @property {number} scrollTop.skills - The current top of the scrollbar for the Skills tab.
- * @property {number} scrollTop.spells - The current top of the scrollbar for the Spells tab.
- * @property {Function} deleteItem - Removes an Item with provided ID from the reactive state store.
- * state.
+ * @typedef {object} CharacterSheetState - The custom reactive store for managing a Character Sheet.
+ * @property {import('svelte/store').Writable<CharacterSheetData>['set']} set
+ * @property {import('svelte/store').Writable<CharacterSheetData>['update']} update
+ * @property {import('svelte/store').Writable<CharacterSheetData>['subscribe']} subscribe
+ * @property {Function} deleteItem - Removes an Item with the provided ID from the reactive state store.
  */
 
 /**
  * Creates a reactive state store for a Character sheet.
- * @returns {CharacterSheetState} A reactive state store for a Character sheet.
+ * @param {TitanActor} actor - The Actor this sheet belongs to.
+ * @returns {CharacterSheetState} The newly created Character Sheet Store.
  */
-export default function createCharacterSheetState() {
-   const { set, update, subscribe } = writable({
-      activeTab: 'skills',
-      filter: {
-         abilities: '',
-         inventory: '',
-         skills: '',
-         spells: '',
-      },
-      filterOptions: {
-         abilities: {
-            action: false,
-            reaction: false,
-            passive: false,
-         },
-         inventory: {
-            armor: false,
-            commodity: false,
-            equipment: false,
-            shield: false,
-            weapon: false,
-         },
-      },
-      isExpanded: {
-         abilities: {},
-         inventory: {},
-         spells: {},
-      },
-      scrollTop: {
-         abilities: 0,
-         inventory: 0,
-         notes: 0,
-         skills: 0,
-         spells: 0,
-      },
-   });
+export default function createCharacterSheetState(actor) {
+   /** @type {import('svelte/store').Writable<CharacterSheetData>} */
+   const { set, update, subscribe } = writable(createCharacterSheetData(actor));
 
    /**
-    * Removes an Item with provided ID from the reactive state store.
-    * @param {string} itemId - The ID of the item to remove.
+    * Adds an Item to the reactive state store tracking.
+    * @param {TitanItem} item - The Item to add.
     */
-   function deleteItem(itemId) {
-      update((state) => {
-         // Remove the item from the inventory tab.
-         if (state.isExpanded.inventory[itemId] === false || state.isExpanded.inventory[itemId] === true) {
-            delete state.isExpanded.inventory[itemId];
+   function addItem(item) {
+      update((data) => {
+         switch (item.type) {
+            case 'ability' : {
+               data.tabs.abilities.isExpanded[item.id] = false;
+               break;
+            }
+            case 'armor':
+            case 'commodity':
+            case 'equipment':
+            case 'shield':
+            case 'weapon': {
+               data.tabs.inventory.isExpanded[item.id] = false;
+               break;
+            }
+            case 'spell': {
+               data.tabs.spells.isExpanded[item.id] = false;
+               break;
+            }
+            default: {
+               break;
+            }
          }
 
-         // Remove the item from the abilities tab.
-         if (state.isExpanded.abilities[itemId] === false || state.isExpanded.abilities[itemId] === true) {
-            delete state.isExpanded.abilities[itemId];
+         return data;
+      });
+   }
+
+   /**
+    * Removes an Item from the reactive state store tracking.
+    * @param {TitanItem} item - The Item to remove.
+    */
+   function deleteItem(item) {
+      update((data) => {
+         switch (item.type) {
+            case 'ability' : {
+               delete data.tabs.abilities.isExpanded[item.id];
+               break;
+            }
+            case 'armor':
+            case 'commodity':
+            case 'equipment':
+            case 'shield':
+            case 'weapon': {
+               delete data.tabs.inventory.isExpanded[item.id];
+               break;
+            }
+            case 'spell': {
+               delete data.tabs.spells.isExpanded[item.id];
+               break;
+            }
+            default: {
+               break;
+            }
          }
 
-         // Remove the item from the spells tab.
-         if (state.isExpanded.spells[itemId] === false || state.isExpanded.spells[itemId] === true) {
-            delete state.isExpanded.spells[itemId];
-         }
-
-         return state;
+         return data;
       });
    }
 
@@ -109,6 +86,7 @@ export default function createCharacterSheetState() {
       set,
       update,
       subscribe,
+      addItem,
       deleteItem,
    };
 }

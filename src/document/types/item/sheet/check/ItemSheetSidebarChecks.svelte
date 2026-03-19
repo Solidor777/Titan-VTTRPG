@@ -8,12 +8,6 @@
 
    /** @type object Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-   // Initialize expanded state
-   $document.system.check.forEach((entry, idx) => {
-      $appState.sidebar.checks.isExpanded[idx] =
-         $appState.sidebar.checks.isExpanded[idx] ?? true;
-   });
 </script>
 <ol class="checks">
    {#each $document.system.check as check, idx (check.uuid)}

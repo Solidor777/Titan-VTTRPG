@@ -1,4 +1,4 @@
-import ItemDataModel from '~/document/types/item/ItemDataModel.js';
+import TitanItemDataModel from '~/document/types/item/TitanItemDataModel.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
@@ -16,9 +16,44 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
  * Data model with extra functionality for Spells.
  * @extends TitanDataModel
  */
-export default class SpellDataModel extends ItemDataModel {
+export default class SpellDataModel extends TitanItemDataModel {
    _getDefaultName() {
       return localize('newSpell');
+   }
+
+   static _defineDocumentSchema() {
+      const schema = super._defineDocumentSchema();
+
+      // Rarity
+      schema.rarity = createStringField('common');
+
+      // XP Cost
+      schema.xpCost = createIntegerField(getSetting('defaultXpCost.spell'));
+
+      // Tradition
+      schema.tradition = createStringField('');
+
+      // Casting Check
+      schema.castingCheck = createSchemaField({
+         attribute: createStringField('mind'),
+         skill: createStringField('arcana'),
+         difficulty: createIntegerField(4),
+         complexity: createIntegerField(1),
+         autoCalculateDC: createBooleanField(true),
+      });
+
+      // Quantity
+      schema.quantity = createIntegerField(1);
+
+      // Aspects
+      schema.aspect = createArrayField(createObjectField());
+
+      // Custom Aspects
+      schema.customAspect = createArrayField(
+         createObjectField(() => createCustomAspectTemplate()),
+      );
+
+      return schema;
    }
 
    prepareDerivedData() {
@@ -116,41 +151,6 @@ export default class SpellDataModel extends ItemDataModel {
          this.castingCheck.difficulty = suggestedDifficulty;
          this.castingCheck.complexity = suggestedComplexity;
       }
-   }
-
-   static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity
-      schema.rarity = createStringField('common');
-
-      // XP Cost
-      schema.xpCost = createIntegerField(getSetting('defaultXpCost.spell'));
-
-      // Tradition
-      schema.tradition = createStringField('');
-
-      // Casting Check
-      schema.castingCheck = createSchemaField({
-         attribute: createStringField('mind'),
-         skill: createStringField('arcana'),
-         difficulty: createIntegerField(4),
-         complexity: createIntegerField(1),
-         autoCalculateDC: createBooleanField(true),
-      });
-
-      // Quantity
-      schema.quantity = createIntegerField(1);
-
-      // Aspects
-      schema.aspect = createArrayField(createObjectField());
-
-      // Custom Aspects
-      schema.customAspect = createArrayField(
-         createObjectField(() => createCustomAspectTemplate()),
-      );
-
-      return schema;
    }
 
    _getDefaultImage() {

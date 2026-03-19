@@ -88,7 +88,7 @@
       {#if item.system.equipped}
          <Button
             on:click={() =>
-               $document.system.requestAttackCheck({ itemId: item._id, attackIdx: attackIdx })}
+               $document.system.requestAttackCheck({ itemId: item.id, attackIdx: attackIdx })}
          >
             <i
                class="{attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}"

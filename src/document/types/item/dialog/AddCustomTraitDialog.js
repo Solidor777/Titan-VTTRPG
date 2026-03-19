@@ -22,7 +22,7 @@ export default class AddCustomTraitDialog extends TitanDialog {
                item: item,
             },
          },
-         id: `titan-add-custom-trait-dialog-${item._id}`,
+         id: `titan-add-custom-trait-dialog-${item.id}`,
       });
    }
 }

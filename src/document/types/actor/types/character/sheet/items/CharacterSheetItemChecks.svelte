@@ -3,7 +3,7 @@
    import CharacterSheetItemCheck
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type Item Reference to the Item document. */
    export let item = void 0;
 </script>
 
@@ -13,7 +13,7 @@
    <!--Each Check-->
    {#each item.system.check as check, checkIdx (check.uuid)}
       <div class="check">
-         <CharacterSheetItemCheck itemId={item._id} {checkIdx}/>
+         <CharacterSheetItemCheck itemId={item.id} {checkIdx}/>
       </div>
    {/each}
 

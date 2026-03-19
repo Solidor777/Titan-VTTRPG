@@ -21,7 +21,7 @@
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type Item Reference to the Item document. */
    export let item = void 0;
 
    /** @type boolean Whether this Item is currently expanded. */
@@ -113,7 +113,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
+            <CharacterSheetItemDeleteButton itemId={item.id}/>
          </div>
       </div>
    </div>

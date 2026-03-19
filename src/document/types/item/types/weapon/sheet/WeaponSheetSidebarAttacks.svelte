@@ -18,12 +18,6 @@
    const appState = getContext('applicationState');
 
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
-
-   // Initialize expanded state
-   $document.system.attack.forEach((entry, idx) => {
-      $appState.sidebar.attacks.isExpanded[idx] =
-         $appState.sidebar.attacks.isExpanded[idx] ?? true;
-   });
 </script>
 
 <ol>

@@ -1,5 +1,5 @@
 /**
- * @typedef {object} ItemSheetData - Data representing the state of an Item Sheet.
+ * @typedef {object} TitanItemSheetData - Data representing the state of an Item Sheet.
  * @property {object} sidebar - State for the persistent sidebar.
  * @property {object} sidebar.checks - State for the Checks sidebar section.
  * @property {boolean[]} sidebar.checks.isExpanded - Array of booleans representing whether an Item Check in the
@@ -17,11 +17,11 @@
  */
 
 /**
- * Initializes data for an Item Sheet.
+ * Initializes the data for an Item Sheet.
  * @param {TitanItem} item - The Item this sheet belongs to.
- * @returns {ItemSheetData} The newly created Item Sheet Data.
+ * @returns {TitanItemSheetData} The newly created Item Sheet Data.
  */
-export default function createItemSheetData(item) {
+export default function createTitanItemSheetData(item) {
    // Initialize return data.
    const retVal = {
       sidebar: {

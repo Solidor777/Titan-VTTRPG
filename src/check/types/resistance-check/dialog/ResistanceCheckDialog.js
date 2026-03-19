@@ -34,7 +34,7 @@ export default class ResistanceCheckDialog extends TitanDialog {
                checkParameters: writable(checkParameters),
             },
          },
-         id: `titan-resistance-check-dialog-${actor._id}`,
+         id: `titan-resistance-check-dialog-${actor.id}`,
       });
    }
 

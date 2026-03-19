@@ -28,6 +28,6 @@ export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
       );
 
       this.actor = actor;
-      this.itemId = item._id;
+      this.itemId = item.id;
    }
 }

@@ -15,7 +15,7 @@ export default class AddInventoryItemDialog extends TitanDialog {
                actor: actor,
             },
          },
-         id: `add-inventory-item-dialog-${actor._id}`,
+         id: `add-inventory-item-dialog-${actor.id}`,
       });
    }
 

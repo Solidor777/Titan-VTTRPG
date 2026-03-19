@@ -1,5 +1,5 @@
 import ActionQueue from '~/helpers/ActionQueue.js';
-import ActorDataModel from '~/document/types/actor/ActorDataModel.js';
+import TitanActorDataModel from '~/document/types/actor/TitanActorDataModel.js';
 import AttackCheck from '~/check/types/attack-check/AttackCheck.js';
 import AttackCheckDialog from '~/check/types/attack-check/dialog/AttackCheckDialog.js';
 import AttributeCheck from '~/check/types/attribute-check/AttributeCheck.js';
@@ -50,9 +50,9 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 
 /**
  * Actor data model with extra functionality for Characters.
- * @extends ActorDataModel
+ * @extends TitanActorDataModel
  */
-export default class CharacterDataModel extends ActorDataModel {
+export default class CharacterDataModel extends TitanActorDataModel {
 
    /* === Construction === */
 
@@ -470,13 +470,13 @@ export default class CharacterDataModel extends ActorDataModel {
                   break;
                }
                case 'armor': {
-                  if (this.equipped.armor === item._id) {
+                  if (this.equipped.armor === item.id) {
                      processItemElements(item, 'equipment');
                   }
                   break;
                }
                case 'shield': {
-                  if (this.equipped.shield === item._id) {
+                  if (this.equipped.shield === item.id) {
                      processItemElements(item, 'equipment');
                   }
                   break;
@@ -5564,7 +5564,7 @@ export default class CharacterDataModel extends ActorDataModel {
                }
             }
 
-            await this._deleteItem(item);
+            return this._deleteItem(item);
          }
       }
    }
@@ -5582,7 +5582,7 @@ export default class CharacterDataModel extends ActorDataModel {
       // Delete the item from the sheet state if appropriate
       const sheet = this.parent._sheet;
       if (sheet) {
-         sheet.deleteItem(item._id);
+         sheet.deleteItem(item.id);
       }
    }
 

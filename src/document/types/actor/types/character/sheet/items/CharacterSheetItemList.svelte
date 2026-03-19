@@ -63,15 +63,6 @@
       isDragHovering = false;
    }
 
-   // Initialize expanded object
-   $document.items
-      .filter((item) => {
-         return filterFunction(item);
-      })
-      .forEach((item) => {
-         isExpandedMap[item._id] = isExpandedMap[item._id] ?? isExpandedDefault;
-      });
-
    // Sort and filter items
    let items = [];
    $: {
@@ -88,16 +79,16 @@
 {#if items.length > 0}
    <ol transition:slide|local>
       <!--Each Item-->
-      {#each items as item (item._id)}
+      {#each items as item (item.id)}
          <li
-            class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
-            data-item-id={item._id}
+            class="item{hoveredItemId === item.id ? ' drag-hovered' : ''}"
+            data-item-id={item.id}
             draggable={true}
             on:dragstart={(event) => {
-               onDragStart(event, item._id, 'item');
+               onDragStart(event, item.id, 'item');
             }}
             on:dragenter={() => {
-               onDragEnter(item._id, 'item');
+               onDragEnter(item.id, 'item');
             }}
             on:dragend={() => {
                onDragEnd();
@@ -107,7 +98,7 @@
             <svelte:component
                this={itemComponent}
                {item}
-               bind:isExpanded={isExpandedMap[item._id]}
+               bind:isExpanded={isExpandedMap[item.id]}
             />
          </li>
       {/each}

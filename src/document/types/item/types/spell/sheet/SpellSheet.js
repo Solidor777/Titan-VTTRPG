@@ -1,4 +1,4 @@
-import TitanItemSheet from '~/document/types/item/sheet/ItemSheet';
+import TitanItemSheet from '~/document/types/item/sheet/TitanItemSheet.js';
 import SpellSheetShell from '~/document/types/item/types/spell/sheet/SpellSheetShell.svelte';
 import createSpellSheetState from '~/document/types/item/types/spell/sheet/SpellSheetState';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
@@ -33,7 +33,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
          }
       );
 
-      // Initialize object
+      // Initialize self object.
       super(sheetDocument, options);
    };
 

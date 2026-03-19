@@ -1,6 +1,6 @@
 import NPCSheetShell from '~/document/types/actor/types/character/types/npc/NPCSheetShell.svelte';
 import TitanCharacterSheet from '~/document/types/actor/types/character/sheet/CharacterSheet.js';
-import mergeArrays from "~/helpers/utility-functions/MergeArrays.js";
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * A Character Sheet class with functionality shared by all NPCs.
@@ -31,7 +31,7 @@ export default class TitanNPCSheet extends TitanCharacterSheet {
          }
       );
 
-      // Initialize object
+      // Initialize self object.
       super(sheetDocument, options);
    }
 }

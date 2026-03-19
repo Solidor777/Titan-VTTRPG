@@ -29,10 +29,10 @@ export default function createWeaponSheetState(item) {
     * Adds an Attack to the reactive application state.
     */
    function addAttack() {
-      update((state) => {
-         state.tabs.attacks.isExpanded.push(true);
-         state.sidebar.attacks.isExpanded.push(true);
-         return state;
+      update((data) => {
+         data.tabs.attacks.isExpanded.push(true);
+         data.sidebar.attacks.isExpanded.push(true);
+         return data;
       });
    }
 
@@ -41,10 +41,10 @@ export default function createWeaponSheetState(item) {
     * @param {number} idx - The idx of the Attack to remove.
     */
    function removeAttack(idx) {
-      update((state) => {
-         state.tabs.attacks.isExpanded.splice(idx, 1);
-         state.sidebar.attacks.isExpanded.splice(idx, 1);
-         return state;
+      update((data) => {
+         data.tabs.attacks.isExpanded.splice(idx, 1);
+         data.sidebar.attacks.isExpanded.splice(idx, 1);
+         return data;
       });
    }
 

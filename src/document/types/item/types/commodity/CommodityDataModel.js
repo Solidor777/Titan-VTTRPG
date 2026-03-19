@@ -1,4 +1,4 @@
-import ItemDataModel from '~/document/types/item/ItemDataModel.js';
+import TitanItemDataModel from '~/document/types/item/TitanItemDataModel.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import { COMMODITY_IMAGE } from '~/system/DefaultImages.js';
@@ -8,7 +8,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * Data model with extra functionality for Commodities.
  * @extends TitanDataModel
  */
-export default class CommodityDataModel extends ItemDataModel {
+export default class CommodityDataModel extends TitanItemDataModel {
    _getDefaultName() {
       return localize('newCommodity');
    }

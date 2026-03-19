@@ -7,7 +7,7 @@
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type TitanItem The Item this button is for. */
+   /** @type Item The Item this button is for. */
    export let item = void 0;
 </script>
 

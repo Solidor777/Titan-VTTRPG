@@ -15,16 +15,18 @@ import createRulesElementItemSheetData from '~/document/types/item/sheet/RulesEl
  */
 
 /**
- * Initializes data for a Weapon Sheet.
+ * Initializes the data for a Weapon Sheet.
  * @param {TitanItem} item - The Item this sheet belongs to.
  * @returns {WeaponSheetData} The newly created Weapon Sheet Data.
  */
 export default function createWeaponSheetData(item) {
-   // Initialize return data.
+   /** @type {WeaponSheetData} Return Data. */
    const retVal = createRulesElementItemSheetData(item);
+
    retVal.sidebar.attacks = {
       isExpanded: [],
    };
+
    retVal.tabs.attacks = {
       isExpanded: [],
       scrollTop: 0,
@@ -32,8 +34,9 @@ export default function createWeaponSheetData(item) {
    };
 
    // Set description tab based on whether this weapon has any attack notes.
+   // FIX: Changed 'this.document' to 'item'
    retVal.tabs.description.activeDescriptionTab =
-      isHTMLBlank(this.document.system.attackNotes) ? 'itemDescription' : 'attackNotes';
+      isHTMLBlank(item.system.attackNotes) ? 'itemDescription' : 'attackNotes';
 
    // Initialize expanded state for attacks.
    for (let idx = 0; idx < item.system.attack.length; idx++) {

@@ -8,7 +8,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   /** @type TitanItem The Item to edit the Traits of. */
+   /** @type Item The Item to edit the Traits of. */
    export let item = void 0;
 
    /** @type object[] The traits to be edited. */

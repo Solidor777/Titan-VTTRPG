@@ -6,16 +6,13 @@ import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesE
 
 /**
  * A Document Sheet class with functionality shared by all Items.
- * @param {TitanItem} sheetDocument - The Document this sheet is for.
- * @param {object} options - Options object.
- * @property {TitanItem} item - The Item this sheet is for.
- * @property {ItemSheetState} applicationState - Reactive store for managing the state of the Item Sheet.
+ * @extends {TitanDocumentSheet}
+ * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
    /**
-    * A Document Sheet class with functionality shared by all Items.
-    * @param {TitanItem} sheetDocument - The Document this sheet is for.
-    * @param {object} options - Options object.
+    * @param {TitanItem} sheetDocument - The Document this sheet represents.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add sheet classes
@@ -24,14 +21,28 @@ export default class TitanItemSheet extends TitanDocumentSheet {
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Initialize object
-      super(sheetDocument, options);
+      // Initialize self object.
+      super(/** @type foundry.abstract.Document */ sheetDocument, options);
+
+      /** @type {TitanItem} The Item this sheet represents.*/
       this.item = sheetDocument;
    }
 
    /**
+    * Overridable function for creating the reactive state store for this sheet.
+    * @override
+    * @returns {ItemSheetState} The newly created state store.
+    * @protected
+    */
+   _createReactiveState() {
+      // By default, assume we have rules elements since only spells do not
+      return createRulesElementItemSheetState(this.item);
+   }
+
+   /**
     * Default Application options.
-    * @returns {object} Options - Application options.
+    * @override
+    * @returns {object} Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {
@@ -42,15 +53,11 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Overridable function for creating the reactive state store for this sheet.
-    * @returns {ItemSheetState} The newly created state store.
+    * Get the header buttons for the sheet.
+    * @override
+    * @returns {object[]} Array of button configuration objects.
     * @protected
     */
-   _createReactiveState() {
-      // By default, assume we have rules elements since only spells do not
-      return createRulesElementItemSheetState(this.item);
-   }
-
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
@@ -77,7 +84,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
    /**
     * Imports the Item from a compendium pack.
-    * @param {DOM Event} event - The Document this sheet is for.OM Event from clicking the button.
+    * @param {Event} event - The DOM Event from clicking the button.
     * @returns {Promise<void>} Returns after the document has been imported.
     * @private
     */
@@ -90,6 +97,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
    /**
     * Adds an Item Check to this sheet's application state.
+    * @returns {void}
     */
    addCheck() {
       this.applicationState.addCheck();
@@ -98,6 +106,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    /**
     * Removes the Check at the provided idx from this sheet's application state.
     * @param {number} idx - The idx of the check to remove.
+    * @returns {void}
     */
    removeCheck(idx) {
       this.applicationState.removeCheck(idx);

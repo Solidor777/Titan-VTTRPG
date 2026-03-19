@@ -34,7 +34,7 @@ export default class AttributeCheckDialog extends TitanDialog {
                checkParameters: writable(checkParameters),
             },
          },
-         id: `titan-attribute-check-dialog-${actor._id}`,
+         id: `titan-attribute-check-dialog-${actor.id}`,
       });
    }
 

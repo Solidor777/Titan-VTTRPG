@@ -19,7 +19,7 @@ export default class AddCustomAttackTraitDialog extends TitanDialog {
                document: document,
             },
          },
-         id: `add-custom-attack-trait-dialog-${document._id}`,
+         id: `add-custom-attack-trait-dialog-${document.id}`,
       });
    }
 

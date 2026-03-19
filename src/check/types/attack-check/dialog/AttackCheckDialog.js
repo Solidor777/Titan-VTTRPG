@@ -34,7 +34,7 @@ export default class AttackCheckDialog extends TitanDialog {
                checkParameters: writable(checkParameters),
             },
          },
-         id: `titan-attack-check-dialog-${actor._id}`,
+         id: `titan-attack-check-dialog-${actor.id}`,
       });
    }
 

@@ -1,6 +1,6 @@
-import TitanActorSheet from '~/document/types/actor/sheet/ActorSheet'
-import createCharacterSheetState from '~/document/types/actor/types/character/sheet/CharacterSheetState.js'
-import mergeArrays from '~/helpers/utility-functions/MergeArrays.js'
+import TitanActorSheet from '~/document/types/actor/sheet/ActorSheet';
+import createCharacterSheetState from '~/document/types/actor/types/character/sheet/CharacterSheetState.js';
+import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Actor Sheet class with functionality shared by all Characters.
@@ -14,23 +14,23 @@ export default class TitanCharacterSheet extends TitanActorSheet {
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
     * @param {object} options - Options object.
     */
-   constructor (sheetDocument, options = {}) {
+   constructor(sheetDocument, options = {}) {
       // Add sheet classes
-      const classes = ['titan-character-sheet']
+      const classes = ['titan-character-sheet'];
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
-         : classes
+         : classes;
 
-      // Initialize object
-      super(sheetDocument, options)
+      // Initialize self object.
+      super(sheetDocument, options);
    };
 
    /**
     * Handles removing an Item from the application state's item collection.
     * @param {string} itemId - ID of the Item deleted to remove.
     */
-   deleteItem (itemId) {
-      this.applicationState.deleteItem(itemId)
+   deleteItem(itemId) {
+      this.applicationState.deleteItem(itemId);
    }
 
    /**
@@ -38,7 +38,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
     * @returns {CharacterSheetState} The newly created state store.
     * @protected
     */
-   _createReactiveState () {
-      return createCharacterSheetState()
+   _createReactiveState() {
+      return createCharacterSheetState();
    }
 }

@@ -1,5 +1,5 @@
-import TitanActor from '~/document/types/actor/Actor.js';
-import TitanItem from '~/document/types/item/Item.js';
+import TitanActor from '~/document/types/actor/TitanActor.js';
+import Item from '~/document/types/item/TitanItem.js';
 import TitanPlayerSheet from '~/document/types/actor/types/character/types/player/PlayerSheet.js';
 import TitanNPCSheet from '~/document/types/actor/types/character/types/npc/NPCSheet.js';
 import TitanAbilitySheet from '~/document/types/item/types/ability/sheet/AbilitySheet.js';
@@ -36,7 +36,7 @@ import TitanChatMessage from '~/document/chat-message/ChatMessage.js';
  * Attached to the Init Hook.
  * Sets up the Titan system once the game is initiated.
  */
-export default function onceInit () {
+export default function onceInit() {
    log('Starting Titan VTTRPG System');
 
    // Initialize titan namespace
@@ -63,7 +63,7 @@ export default function onceInit () {
    CONFIG.Actor.trackableAttributes = getTrackableAttributes();
 
    // Configure Items
-   CONFIG.Item.documentClass = TitanItem;
+   CONFIG.Item.documentClass = Item;
    CONFIG.Item.dataModels = {
       ability: AbilityDataModel,
       armor: ArmorDataModel,
