@@ -3,7 +3,6 @@ import createTitanItemSheetState from '~/document/types/item/sheet/TitanItemShee
 
 /**
  * @typedef {ItemSheetState} RulesElementItemSheetState - A custom reactive store for managing an Item Sheet.
- * @extends {ItemSheetState}
  */
 
 /**

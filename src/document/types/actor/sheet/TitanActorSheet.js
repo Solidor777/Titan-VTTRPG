@@ -1,4 +1,4 @@
-import TitanDocumentSheet from '~/document/sheet/DocumentSheet';
+import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import { IMPORT_ICON } from '~/system/Icons.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
@@ -10,6 +10,7 @@ import ActorSheetEditTokenButton from '~/document/types/actor/sheet/ActorSheetEd
 /**
  * A Document Sheet class with functionality shared by all Actors.
  * @extends {TitanDocumentSheet}
+ * @property {TitanActor} - The Actor this sheet belongs to.
  */
 export default class TitanActorSheet extends TitanDocumentSheet {
    /**
@@ -17,7 +18,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
-      // Calculate whether this actor is a token or a proxy
+      // Calculate whether this sheet's Actor is a token or a proxy
       const actor = sheetDocument.isToken ? sheetDocument.parent.actor : sheetDocument;
       options.token ??= null;
 
@@ -30,7 +31,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       // Initialize self object.
       super(actor, options);
 
-      /** @type {TitanActor} The Actor this sheet belongs to. */
+      // Initialize actor properties.
       this.actor = actor;
    }
 
@@ -49,7 +50,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * If this Actor Sheet represents a synthetic Token actor, gets a reference to the active Token.
+    * If this sheet's Actor Sheet represents a synthetic Token actor, gets a reference to the active Token.
     * @type {TokenDocument|null}
     */
    get token() {
@@ -80,13 +81,16 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       // Create an effect from the drag data.
       const effect = await ActiveEffect.implementation.fromDropData(data);
 
-      // Don't create new effect is this actor is the origin.
+      // Don't create new effect is this sheet's Actor is the origin.
       if (!effect || this.actor.uuid === effect.parent?.uuid) {
          return false;
       }
 
       // Add the effect to the actor.
-      return this.actor.createEmbeddedDocuments('ActiveEffect', [effect.toObject()]);
+      return /** @type {Promise<ActiveEffect[]|boolean>} */ this.actor.createEmbeddedDocuments(
+         'ActiveEffect',
+         [effect.toObject()]
+      );
    }
 
    /**
@@ -105,33 +109,20 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       }
       const itemData = item.toObject();
 
-      // If this item is from this actor, sort the item rather than creating a new one
+      // If this item is from this sheet's Actor, sort the item rather than creating a new one
       if (this.actor.uuid === item.parent?.uuid) {
          return this._onSortItem(event, itemData);
       }
 
       // Otherwise, create a new item
-      return this._onDropItemCreate(itemData);
-   }
-
-   /**
-    * Handle the final creation of dropped Item data on the Actor.
-    * This method is factored out to allow downstream classes the opportunity to override item creation behavior.
-    * @param {object[]|object} itemData - The item data requested for creation.
-    * @returns {Promise<Item[]>} The created or updated Item instances.
-    * @private
-    */
-   async _onDropItemCreate(itemData) {
-      // Ensure the item data is in an array
-      itemData = itemData instanceof Array ? itemData : [itemData];
-      return this.actor.createEmbeddedDocuments('Item', itemData);
+      return this.actor.addItem(itemData);
    }
 
    /**
     * Handle a drop event for an existing embedded Item to sort that Item relative to its siblings.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} itemData - The item data requested for sorting.
-    * @returns {Promise<Item[]|boolean>} The updated item instances, or false if the data was invalid.
+    * @returns {Promise<TitanItem[]|boolean>} The updated item instances, or false if the data was invalid.
     * @private
     */
    async _onSortItem(event, itemData) {
@@ -165,7 +156,10 @@ export default class TitanActorSheet extends TitanDocumentSheet {
             });
 
             // Perform the update
-            return this.actor.updateEmbeddedDocuments('Item', updateData);
+            return /** @type Promise<TitanItem[]> */ this.actor.updateEmbeddedDocuments(
+               'Item',
+               updateData
+            );
          }
       }
 
@@ -194,10 +188,32 @@ export default class TitanActorSheet extends TitanDocumentSheet {
          }));
 
          // Add the folder contents to the actor
-         return this._onDropItemCreate(droppedItemData);
+         return this.actor.addItem(droppedItemData);
       }
 
       return false;
+   }
+
+   /**
+    * Called after an Item is added to this Sheet's Actor.
+    * @param {TitanItem} item - The Item that was just created.
+    */
+   postAddItem(item) {
+   }
+
+   /**
+    * Called before an Item is removed from this Sheet's Actor.
+    * @param {TitanItem} item - The Item being deleted.
+    */
+   preDeleteItem(item) {
+   }
+
+   /**
+    * Called after an Item is removed from this Sheet's Actor.
+    * @param {string} id - The ID of the item that was deleted.
+    * @param {string} type - The Type of the item that was deleted.
+    */
+   postDeleteItem(id, type) {
    }
 
    /**
@@ -209,7 +225,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
-      // If the active user can edit this actor's tokens...
+      // If the active user can edit this sheet's Actor's tokens...
       const canEditToken = game.user.isGM || (this.actor.isOwner && game.user.can('TOKEN_CONFIGURE'));
       if (canEditToken) {
          const token = this.token;
@@ -284,13 +300,12 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @private
     */
    async _onDrop(event) {
-
       // Get the data from the drag event
       const data = TextEditor.getDragEventData(event);
 
       /**
        * A hook event that fires when some useful data is dropped onto an ActorSheet.
-       * @param {Actor} actor - The Actor that the data was droped onto.
+       * @param {Actor} actor - The Actor that the data was dropped onto.
        * @param {ActorSheet} sheet - The ActorSheet application.
        * @param {object} data - The data that has been dropped onto the sheet.
        */

@@ -2,7 +2,8 @@ import { writable } from 'svelte/store';
 import createCharacterSheetData from '~/document/types/actor/types/character/sheet/CharacterSheetData.js';
 
 /**
- * @typedef {object} CharacterSheetState - The custom reactive store for managing a Character Sheet.
+ * @typedef {import('svelte/store').Writable<CharacterSheetData>} CharacterSheetState - The custom reactive store for
+ *    managing a Character Sheet.
  * @property {import('svelte/store').Writable<CharacterSheetData>['set']} set
  * @property {import('svelte/store').Writable<CharacterSheetData>['update']} update
  * @property {import('svelte/store').Writable<CharacterSheetData>['subscribe']} subscribe
@@ -22,11 +23,11 @@ export default function createCharacterSheetState(actor) {
     * Adds an Item to the reactive state store tracking.
     * @param {TitanItem} item - The Item to add.
     */
-   function addItem(item) {
+   function postAddItem(item) {
       update((data) => {
          switch (item.type) {
             case 'ability' : {
-               data.tabs.abilities.isExpanded[item.id] = false;
+               data.tabs.abilities.isExpanded[item._id] = false;
                break;
             }
             case 'armor':
@@ -34,11 +35,11 @@ export default function createCharacterSheetState(actor) {
             case 'equipment':
             case 'shield':
             case 'weapon': {
-               data.tabs.inventory.isExpanded[item.id] = false;
+               data.tabs.inventory.isExpanded[item._id] = false;
                break;
             }
             case 'spell': {
-               data.tabs.spells.isExpanded[item.id] = false;
+               data.tabs.spells.isExpanded[item._id] = false;
                break;
             }
             default: {
@@ -54,11 +55,11 @@ export default function createCharacterSheetState(actor) {
     * Removes an Item from the reactive state store tracking.
     * @param {TitanItem} item - The Item to remove.
     */
-   function deleteItem(item) {
+   function preDeleteItem(item) {
       update((data) => {
          switch (item.type) {
             case 'ability' : {
-               delete data.tabs.abilities.isExpanded[item.id];
+               delete data.tabs.abilities.isExpanded[item._id];
                break;
             }
             case 'armor':
@@ -66,11 +67,11 @@ export default function createCharacterSheetState(actor) {
             case 'equipment':
             case 'shield':
             case 'weapon': {
-               delete data.tabs.inventory.isExpanded[item.id];
+               delete data.tabs.inventory.isExpanded[item._id];
                break;
             }
             case 'spell': {
-               delete data.tabs.spells.isExpanded[item.id];
+               delete data.tabs.spells.isExpanded[item._id];
                break;
             }
             default: {
@@ -86,7 +87,7 @@ export default function createCharacterSheetState(actor) {
       set,
       update,
       subscribe,
-      addItem,
-      deleteItem,
+      postAddItem,
+      preDeleteItem,
    };
 }

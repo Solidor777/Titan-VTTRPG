@@ -49,16 +49,16 @@
       <!--Controls-->
       <div class="controls">
          <!--Toggle Equipped button-->
-         {#if $document.system.equipped.shield !== item.id || item.system.check.length === 0}
+         {#if $document.system.equipped.shield !== item._id || item.system.check.length === 0}
             <div class="button">
                <CharacterSheetItemEquipButton
                   {item}
-                  equipped={$document.system.equipped.shield === item.id}
+                  equipped={$document.system.equipped.shield === item._id}
                />
             </div>
          {:else if item.system.check.length > 0}
             <div class="button">
-               <CharacterSheetCondensedItemCheckButton itemId={item.id}/>
+               <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
             </div>
          {/if}
 
@@ -74,7 +74,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item.id}/>
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>
    </div>
@@ -87,7 +87,7 @@
             <div class="section">
                <CharacterSheetItemEquipButton
                   {item}
-                  equipped={$document.system.equipped.shield === item.id}
+                  equipped={$document.system.equipped.shield === item._id}
                />
             </div>
          {/if}

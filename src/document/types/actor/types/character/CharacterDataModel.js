@@ -51,6 +51,7 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 /**
  * Actor data model with extra functionality for Characters.
  * @extends TitanActorDataModel
+ * @property {TitanActor} parent - The Actor that owns this data model.
  */
 export default class CharacterDataModel extends TitanActorDataModel {
 
@@ -261,6 +262,41 @@ export default class CharacterDataModel extends TitanActorDataModel {
       return retVal;
    }
 
+   /**
+    * Called before an Item is removed from this Actor.
+    * @param {TitanItem} item - The Item being deleted.
+    * @override
+    */
+   async preDeleteItem(item) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)
+         && game.titan.assert(!this.parent.uuid === item.parent?.uuid,
+            'Item is already owned by actor', this.parent.name, item.name)) {
+
+         // Perform type specific deletion operations.
+         switch (item.type) {
+
+            // Un-equip armor before deletion
+            case 'armor': {
+               if (this.equipped.armor === itemId) {
+                  return this.unEquipArmor();
+               }
+               break;
+            }
+
+            // Un-equip should before deletion
+            case 'shield': {
+               if (this.equipped.armor === itemId) {
+                  return this.unEquipShield();
+               }
+               break;
+            }
+            default: {
+               break;
+            }
+         }
+      }
+   }
+
    _getInitialPrototypeTokenData(data) {
       return {
          displayName: data.prototypeToken?.displayName ?? CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
@@ -270,6 +306,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
       };
    }
 
+   /* === Data Preparation === */
+
    /**
     * Gets all the standard conditions affecting this Character.
     * @returns {ActiveEffect[]|boolean} Array of standard conditions affecting this actor, or false if there are none.
@@ -278,8 +316,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const conditions = this.parent.effects.filter((effect) => effect.flags.titan?.type === 'condition');
       return conditions.length > 0 ? conditions : null;
    }
-
-   /* === Data Preparation === */
 
    /**
     * Gets all the Effect items affecting this Character that have Expired.
@@ -470,13 +506,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   break;
                }
                case 'armor': {
-                  if (this.equipped.armor === item.id) {
+                  if (this.equipped.armor === item._id) {
                      processItemElements(item, 'equipment');
                   }
                   break;
                }
                case 'shield': {
-                  if (this.equipped.shield === item.id) {
+                  if (this.equipped.shield === item._id) {
                      processItemElements(item, 'equipment');
                   }
                   break;
@@ -1315,6 +1351,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
    }
 
+   /* === Conditional rating modifiers === */
+
    /**
     * Applies all stat modifiers.
     * @private
@@ -1387,8 +1425,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
    }
 
-   /* === Conditional rating modifiers === */
-
    /**
     * Triggered at the end of data preparation to ensure that
     * all resources remain within minimum and maximum bounds.
@@ -1399,6 +1435,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          resource.value = clamp(resource.value, 0, resource.max);
       }
    }
+
+   /* === Checks === */
 
    /**
     * Helper function for getting the sum conditional rating modifiers for the inputted selector and an array of keys.
@@ -1435,8 +1473,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       return Object.keys(retVal).length > 0 ? retVal : false;
    }
-
-   /* === Checks === */
 
    /**
     * Helper function for getting the conditional rating modifiers for the inputted selector and key pair.
@@ -1546,7 +1582,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options) {
          game.titan.error(
             'Attribute Check failed before construction. No Check Options were provided.',
-            true,
             this);
       }
 
@@ -1555,7 +1590,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
          (!options.skill || options.skill === 'none')) {
          game.titan.error(
             'Attribute Check failed before construction. No Attribute or Skill provided.',
-            true,
             options,
             this);
 
@@ -1782,7 +1816,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options) {
          game.titan.error(
             'Resistance Check failed before construction. No Check Options were provided.',
-            true,
             this);
       }
 
@@ -1790,7 +1823,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options.resistance) {
          game.titan.error(
             'Resistance Check failed before construction. No Resistance provided.',
-            true,
             options,
             this);
 
@@ -1948,7 +1980,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options) {
          game.titan.error(
             'Attack Check failed before construction. No Check Options were provided.',
-            true,
             this);
       }
 
@@ -1956,7 +1987,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options.itemId) {
          game.titan.error(
             'Attack Check failed before construction. No Item ID was provided.',
-            true,
             options,
             this);
 
@@ -1968,7 +1998,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!item) {
          game.titan.error(
             'Attack Check failed before construction. Item ID was invalid.',
-            true,
             options,
             this);
 
@@ -1981,7 +2010,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
          numAttacks === 0) {
          game.titan.error(
             'Attack Check failed before construction. Attack Idx was out of range.',
-            true,
             options,
             this);
 
@@ -2549,7 +2577,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options) {
          game.titan.error(
             'Casting Check failed before construction. No Check Options were provided.',
-            true,
             this);
       }
 
@@ -2557,7 +2584,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options.itemId) {
          game.titan.error(
             'Casting Check failed before construction. No Item ID was provided.',
-            true,
             options,
             this);
 
@@ -2569,7 +2595,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!item) {
          game.titan.error(
             'Casting Check failed before construction. Item ID was invalid.',
-            true,
             options,
             this);
 
@@ -2985,7 +3010,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!options) {
          game.titan.error(
             'Item Check failed before construction. No Check Options were provided.',
-            true,
             this);
       }
 
@@ -2994,7 +3018,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (!itemRollData) {
          game.titan.error(
             'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
-            true,
             options,
             this);
          return false;
@@ -3006,7 +3029,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
          numChecks === 0) {
          game.titan.error(
             'Item Check failed before construction. Check Idx was out of range.',
-            true,
             options,
             this);
          return false;
@@ -3695,6 +3717,20 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Options for applying Damage to a Character.
+    * @typedef {object} DamageOptions
+    * @property {boolean?} [ignoreArmor = false] Whether to Ignore Armor when applying the Damage.
+    * @property {boolean?} [ineffective = false] Whether the Attack had the Ineffective trait.
+    * @property {boolean?} [penetrating = false] Whether the Attack had the Penetrating trait.
+    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Damage.
+    * When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    */
+
+   /**
     * Handles automatically expending Resolve for a Check.
     * @param {ItemCheckParameters} parameters - Parameters for the Check.
     * @returns {Promise<void>} Returns after the Resolve has been expended.
@@ -3725,17 +3761,25 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Options for applying Damage to a Character.
-    * @typedef {object} DamageOptions
-    * @property {boolean?} [ignoreArmor = false] Whether to Ignore Armor when applying the Damage.
-    * @property {boolean?} [ineffective = false] Whether the Attack had the Ineffective trait.
-    * @property {boolean?} [penetrating = false] Whether the Attack had the Penetrating trait.
-    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Damage.
-    * When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
-    * enabled. When sending multiple reports, it is useful to set this to
-    * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * Data for a report detailing the Damage applied to a character.
+    * @typedef {object} DamageReport
+    * @property {string} type The Chat Message type (damageReport).
+    * @property {boolean?} ignoreArmor Whether to the attack Ignored Armor.
+    * @property {number?} damageResisted The amount of Damage resisted.
+    * @property {number?} damageTaken The amount of Damage taken.
+    * @property {number?} staminaLost The amount of Stamina lost.
+    * @property {object?} wounds The character's Wounds, if any.
+    * @property {number?} wounds.max The character's maximum Wounds, if any.
+    * @property {number?} wounds.value The character's current Wounds, if any.
+    * @property {number?} woundsSuffered The number of Wounds suffered, if any.
+    * @property {object?} stamina The character's Stamina.
+    * @property {number} stamina.max The character's maximum Stamina.
+    * @property {number} stamina.value The character's current Stamina.
+    * @property {object?} tags Tags applied to the damage.
+    * @property {boolean?} tags.ineffective Whether the Attack had the Ineffective trait.
+    * @property {boolean?} tags.penetrating Whether the Attack had the Penetrating trait.
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
     */
 
    /**
@@ -3757,25 +3801,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Data for a report detailing the Damage applied to a character.
-    * @typedef {object} DamageReport
-    * @property {string} type The Chat Message type (damageReport).
-    * @property {boolean?} ignoreArmor Whether to the attack Ignored Armor.
-    * @property {number?} damageResisted The amount of Damage resisted.
-    * @property {number?} damageTaken The amount of Damage taken.
-    * @property {number?} staminaLost The amount of Stamina lost.
-    * @property {object?} wounds The character's Wounds, if any.
-    * @property {number?} wounds.max The character's maximum Wounds, if any.
-    * @property {number?} wounds.value The character's current Wounds, if any.
-    * @property {number?} woundsSuffered The number of Wounds suffered, if any.
-    * @property {object?} stamina The character's Stamina.
-    * @property {number} stamina.max The character's maximum Stamina.
-    * @property {number} stamina.value The character's current Stamina.
-    * @property {object?} tags Tags applied to the damage.
-    * @property {boolean?} tags.ineffective Whether the Attack had the Ineffective trait.
-    * @property {boolean?} tags.penetrating Whether the Attack had the Penetrating trait.
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
+    * Options for applying Healing to a Character.
+    * @typedef {object} HealingOptions
+    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Healing. When
+    * updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
@@ -3882,14 +3915,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Options for applying Healing to a Character.
-    * @typedef {object} HealingOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Healing. When
-    * updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
-    * enabled. When sending multiple reports, it is useful to set this to
-    * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * Data for a report detailing the Healing applied to a character.
+    * @typedef {object} HealingReport
+    * @property {string} type The Chat Message type (healingReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {number} staminaRestored The amount of Stamina healed.
+    * @property {object} stamina The character's Stamina.
+    * @property {number} stamina.value The character's current Stamina.
+    * @property {number} stamina.max The character's maximum Stamina.
+    * @property {object?} wounds The character's Wounds, if any.
+    * @property {number?} wounds.value The character's current Wounds, if any.
+    * @property {number?} wounds.max The character's maximum Wounds, if any.
     */
 
    /**
@@ -3976,18 +4013,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Data for a report detailing the Healing applied to a character.
-    * @typedef {object} HealingReport
-    * @property {string} type The Chat Message type (healingReport).
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
-    * @property {number} staminaRestored The amount of Stamina healed.
-    * @property {object} stamina The character's Stamina.
-    * @property {number} stamina.value The character's current Stamina.
-    * @property {number} stamina.max The character's maximum Stamina.
-    * @property {object?} wounds The character's Wounds, if any.
-    * @property {number?} wounds.value The character's current Wounds, if any.
-    * @property {number?} wounds.max The character's maximum Wounds, if any.
+    * Options for restoring a Character's Resolve.
+    * @typedef {object} RestoreResolveOptions
+    * @property {boolean?} [updateActor = true] Whether to update the Character after restoring the Resolve.
+    * When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
+    * is enabled. When sending multiple reports, it is useful to set this
+    * to false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
@@ -4036,13 +4069,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Options for restoring a Character's Resolve.
-    * @typedef {object} RestoreResolveOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after restoring the Resolve.
-    * When updating multiple values, it is useful to set this to false.
+    * Options for spending a Character's Resolve.
+    * @typedef {object} SpendResolveOptions
+    * @property {boolean?} [updateActor = true] Whether to update the Character after spending the Resolve.
+    * When updating multiple values, it is useful to set this to
+    * false.
     * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
-    * is enabled. When sending multiple reports, it is useful to set this
-    * to false.
+    * is enabled. When sending multiple reports, it is useful to set
+    * this to false.
     * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
@@ -4077,15 +4111,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Options for spending a Character's Resolve.
-    * @typedef {object} SpendResolveOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after spending the Resolve.
-    * When updating multiple values, it is useful to set this to
-    * false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
-    * is enabled. When sending multiple reports, it is useful to set
-    * this to false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * Data for a report detailing Resolve spent by the character.
+    * @typedef {object} SpendResolveReport
+    * @property {string} type The Chat Message type (spendResolveReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {number} resolveSpent The amount of Resolve spent.
+    * @property {number?} resolveShortage How much the character overspent their Resolve.
     */
 
    /**
@@ -4118,13 +4150,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Data for a report detailing Resolve spent by the character.
-    * @typedef {object} SpendResolveReport
-    * @property {string} type The Chat Message type (spendResolveReport).
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
-    * @property {number} resolveSpent The amount of Resolve spent.
-    * @property {number?} resolveShortage How much the character overspent their Resolve.
+    * Options for Rending the character's Armor.
+    * @typedef {object} RendOptions
+    * @property {boolean?} [magical = false] Whether the rending Attack was magical.
+    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the Rend. When updating
+    * multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
@@ -4170,15 +4204,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Options for Rending the character's Armor.
-    * @typedef {object} RendOptions
-    * @property {boolean?} [magical = false] Whether the rending Attack was magical.
-    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the Rend. When updating
-    * multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
-    * enabled. When sending multiple reports, it is useful to set this to
-    * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * Data for a report detailing Rend applied to the character's Armor.
+    * @typedef {object} RendReport
+    * @property {string} type The Chat Message type (rendReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {string} armorImg The armor's image.
+    * @property {string} armorName The armor's display name.
+    * @property {number?} armorLost The amount of Armor lost.
     */
 
    /**
@@ -4210,14 +4243,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Data for a report detailing Rend applied to the character's Armor.
-    * @typedef {object} RendReport
-    * @property {string} type The Chat Message type (rendReport).
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
-    * @property {string} armorImg The armor's image.
-    * @property {string} armorName The armor's display name.
-    * @property {number?} armorLost The amount of Armor lost.
+    * Options for Repairing the character's Armor.
+    * @typedef {object} RepairsOptions
+    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the repairs.
+    * When updating multiple values, it is useful to set this to false.
+    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * enabled. When sending multiple reports, it is useful to set this to
+    * false.
+    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
@@ -4279,14 +4312,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Options for Repairing the character's Armor.
-    * @typedef {object} RepairsOptions
-    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the repairs.
-    * When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
-    * enabled. When sending multiple reports, it is useful to set this to
-    * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * Data for a report detailing Repairs made to the character's Armor.
+    * @typedef {object} RepairsReport
+    * @property {string} type The Chat Message type (repairsReport).
+    * @property {string} actorImg The character's image.
+    * @property {string} actorName The character's name.
+    * @property {string} armorImg The armor's image.
+    * @property {string} armorName The armor's display name.
+    * @property {number} armorRepaired The amount of Armor repaired.
     */
 
    /**
@@ -4317,17 +4350,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       return retVal;
    }
-
-   /**
-    * Data for a report detailing Repairs made to the character's Armor.
-    * @typedef {object} RepairsReport
-    * @property {string} type The Chat Message type (repairsReport).
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
-    * @property {string} armorImg The armor's image.
-    * @property {string} armorName The armor's display name.
-    * @property {number} armorRepaired The amount of Armor repaired.
-    */
 
    /**
     * Repairs the Character's Armor.
@@ -4424,7 +4446,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const expiredEffects = this.getExpiredEffectItems();
          if (expiredEffects) {
             for (const effect of expiredEffects) {
-               await this._deleteItem(effect);
+               await this.parent.deleteItem(effect._id);
             }
          }
       }
@@ -4443,7 +4465,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Delete all combat effect items
          const combatEffects = this.parent.items.filter((item) => item.system.isCombatEffect);
          for (const effect of combatEffects) {
-            await this._deleteItem(effect);
+            await this.parent.deleteItem(effect._id);
          }
 
          // Reset static mods
@@ -4847,6 +4869,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Base report Data for an Effect item.
+    * @typedef {object} EffectReportData
+    * @property {string} label The name of the Effect item.
+    * @property {string} img The image used by the Effect item.
+    * @property {string?} description The description of the Effect item, if appropriate.
+    */
+
+   /**
     * Called at the End of this Character's Turn in combat to update Turn-End effects, and send Turn end messages,
     * if appropriate.
     * @returns {Promise<void>}
@@ -4914,11 +4944,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Base report Data for an Effect item.
-    * @typedef {object} EffectReportData
+    * Report Data for a Turn Effect item.
+    * @typedef {object} TurnEffectReportData
     * @property {string} label The name of the Effect item.
     * @property {string} img The image used by the Effect item.
     * @property {string?} description The description of the Effect item, if appropriate.
+    * @property {number} remaining The remaining turns for the Effect item.
     */
 
    /**
@@ -4952,11 +4983,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Report Data for a Turn Effect item.
-    * @typedef {object} TurnEffectReportData
+    * @typedef {object} InitiativeEffectReportData
     * @property {string} label The name of the Effect item.
     * @property {string} img The image used by the Effect item.
     * @property {string?} description The description of the Effect item, if appropriate.
     * @property {number} remaining The remaining turns for the Effect item.
+    * @property {float} initiative The initiative count on which the Effect duration is reduced.
     */
 
    /**
@@ -4981,13 +5013,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Report Data for a Turn Effect item.
-    * @typedef {object} InitiativeEffectReportData
+    * Report Data for a Custom Effect item.
+    * @typedef {object} CustomEffectReportData
     * @property {string} label The name of the Effect item.
     * @property {string} img The image used by the Effect item.
     * @property {string?} description The description of the Effect item, if appropriate.
     * @property {number} remaining The remaining turns for the Effect item.
-    * @property {float} initiative The initiative count on which the Effect duration is reduced.
+    * @property {string} custom Custom duration of the Effect item.
     */
 
    /**
@@ -5011,16 +5043,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
          return retVal;
       });
    }
-
-   /**
-    * Report Data for a Custom Effect item.
-    * @typedef {object} CustomEffectReportData
-    * @property {string} label The name of the Effect item.
-    * @property {string} img The image used by the Effect item.
-    * @property {string?} description The description of the Effect item, if appropriate.
-    * @property {number} remaining The remaining turns for the Effect item.
-    * @property {string} custom Custom duration of the Effect item.
-    */
 
    /**
     * Retrieves the Effect Report Data for an array of Initiative Effect items.
@@ -5085,7 +5107,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             case 'enabled': {
                reportData.expiredEffectsRemoved = true;
                for (const effect of expiredEffects) {
-                  await this._deleteItem(effect);
+                  await this.parent.deleteItem(effect.id);
                }
                break;
             }
@@ -5486,10 +5508,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Adds an item of the inputted type to the Character.
+    * Creates an item of the provided type to the Character.
     * @param {string} type - The type of item to add.
     */
-   async addItem(type) {
+   async createItem(type) {
       if (this.parent.isOwner) {
          // Get the desired name
          let desiredName = localize(`new${capitalize(type)}`);
@@ -5530,60 +5552,51 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Deletes an item from the Character, while ensuring that this is a valid operation, and un-equipping the item
-    * if appropriate.
-    * @param {string} itemId - The ID of the item to delete.
+    * Rolls initiative for this Character.
+    * If the Character is in combat, the initiative tracker will be updated accordingly.
+    * Otherwise, a chat card will be sent without update combat.
     * @returns {Promise<void>}
     */
-   async safeDeleteItem(itemId) {
+   async requestInitiativeRoll() {
       if (this.parent.isOwner) {
-         // Ensure the item is valid
-         const item = this.parent.items.get(itemId);
-         if (item) {
 
-            // Perform type specific deleting
-            switch (item.type) {
+         // If this Character is a combatant, then roll initiative as per normal
+         if (this.parent.getCombatant()) {
+            return this.parent.rollInitiative({ rerollInitiative: true });
+         }
 
-               // Un-equip armor before deletion
-               case 'armor': {
-                  if (this.equipped.armor === itemId) {
-                     await this.unEquipArmor();
-                  }
-                  break;
-               }
+         // If this character is not a combatant, get and evaluate the roll
+         const roll = await this.getInitiativeRoll();
+         if (roll) {
 
-               // Un-equip should before deletion
-               case 'shield': {
-                  if (this.equipped.armor === itemId) {
-                     await this.unEquipShield();
-                  }
-                  break;
-               }
-               default: {
-                  break;
-               }
-            }
+            // Get the message data
+            const messageData = {
+               speaker: this.getSpeaker(),
+               flavor: game.i18n.format('COMBAT.RollsInitiative', { name: this.name }),
+               flags: { 'core.initiativeRoll': true },
+            };
 
-            return this._deleteItem(item);
+            // Create a chat message from the roll and send it to chat
+            const chatData = await roll.toMessage(messageData, { create: false });
+            chatData.rollMode = game.settings.get('core', 'rollMode');
+
+            await ChatMessage.create(chatData);
          }
       }
    }
 
    /**
-    * Deletes the given item.
-    * Assumes the item is still valid when the deletion is called.
-    * @param {TitanItem} item - The item to be deleted.
-    * @private
+    * Gets an Initiative roll for this character.
+    * @returns {Promise<Roll>} The Initiative roll for this actor.
     */
-   async _deleteItem(item) {
-      // Delete the item
-      await item.safeDelete();
+   async getInitiativeRoll() {
+      // Calculate the initiative value
+      const initiative = this.rating.initiative.value;
 
-      // Delete the item from the sheet state if appropriate
-      const sheet = this.parent._sheet;
-      if (sheet) {
-         sheet.deleteItem(item.id);
-      }
+      // Get the initiative formula
+      const initiativeFormula = getSetting('initiativeFormula');
+
+      return new Roll(`${initiative}${initiativeFormula}`);
    }
 
    /**

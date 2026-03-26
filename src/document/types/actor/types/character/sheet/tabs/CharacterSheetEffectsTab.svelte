@@ -28,7 +28,7 @@
                icon={CREATE_ICON}
                label={localize('addNewEffect')}
                on:click={() => {
-                  $document.system.addItem('effect');
+                  $document.system.createItem('effect');
                }}
             />
          </div>
@@ -53,22 +53,22 @@
 
          <!--Input-->
          <div class="input">
-            <TextInput bind:value={$appState.filter.abilities}/>
+            <TextInput bind:value={$appState.tabs.abilities.filter}/>
          </div>
       </div>
    </div>
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.abilities}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.abilities.scrollTop}>
          <!--Abilities List-->
          <div class="list">
             <CharacterSheetItemList
-               filter={$appState.filter.abilities}
+               filter={$appState.tabs.abilities.filter}
                filterFunction={(item) => {
                   return item.type === 'effect';
                }}
-               isExpandedMap={$appState.isExpanded.abilities}
+               isExpandedMap={$appState.tabs.abilities.isExpanded}
                itemComponent={CharacterSheetEffect}
             />
          </div>

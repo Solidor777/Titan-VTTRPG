@@ -26,7 +26,7 @@ export default class TitanMacros {
          if (item?.system.attack?.length > attackIdx) {
 
             // Roll the check
-            actor.system.requestAttackCheck({ itemId: item.id, attackIdx: attackIdx });
+            actor.system.requestAttackCheck({ itemId: item._id, attackIdx: attackIdx });
          }
       }
    }
@@ -46,7 +46,7 @@ export default class TitanMacros {
          if (item?.type === 'spell') {
 
             // Roll the check
-            actor.system.requestCastingCheck({ itemId: item.id });
+            actor.system.requestCastingCheck({ itemId: item._id });
          }
       }
    }
@@ -67,7 +67,7 @@ export default class TitanMacros {
          if (item?.system.check.length > 0) {
 
             // Roll the check
-            actor.system.requestItemCheck({ itemId: item.id, checkIdx: checkIdx });
+            actor.system.requestItemCheck({ itemId: item._id, checkIdx: checkIdx });
          }
       }
    }
@@ -87,7 +87,7 @@ export default class TitanMacros {
          if (item?.system.duration?.type === 'permanent') {
 
             // Toggle active
-            actor.system.toggleEffectActive(item.id);
+            actor.system.toggleEffectActive(item._id);
          }
       }
    }

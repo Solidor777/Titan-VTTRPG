@@ -3,7 +3,6 @@ import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesE
 
 /**
  * @typedef {RulesElementItemSheetState} WeaponSheetState - A custom reactive store for managing a Weapon Sheet.
- * @extends {RulesElementItemSheetState}
  * @property {Function} addAttack - Adds an Attack to the reactive application state.
  * @property {Function} removeAttack - Removes the Attack at the provided idx from the reactive application state.
  * @property {Function} addCheck - Adds a Check to the reactive application state.

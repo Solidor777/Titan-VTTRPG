@@ -2,8 +2,8 @@ import { writable } from 'svelte/store';
 import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheetData.js';
 
 /**
- * @typedef {import('svelte/store').Writable<ItemSheetData>} ItemSheetState - A custom reactive store for managing an
- *    Item Sheet.
+ * @typedef {import('svelte/store').Writable<TitanItemSheetData>} ItemSheetState - A custom reactive store for managing
+ *    an Item Sheet.
  * @extends {import('svelte/store').Writable<ItemSheetData>}
  * @property {import('svelte/store').Writable<ItemSheetData>['set']} set
  * @property {import('svelte/store').Writable<ItemSheetData>['update']} update
@@ -15,7 +15,7 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
 /**
  * Creates a reactive state store for an Item Sheet.
  * @param {TitanItem} item - The item we are creating the sheet state for.
- * @param {ItemSheetData} [overrideData] - Option override data for initializing the writable.
+ * @param {TitanItemSheetData} [overrideData] - Option override data for initializing the writable.
  * @returns {ItemSheetState} The newly created Item Sheet State.
  */
 export default function createTitanItemSheetState(item, overrideData) {

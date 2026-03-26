@@ -15,6 +15,7 @@ import PlayerDataModel from '~/document/types/actor/types/character/types/player
 import NPCDataModel from '~/document/types/actor/types/character/types/npc/NPCDataModel.js';
 import log from '~/helpers/utility-functions/Log';
 import warn from '~/helpers/utility-functions/Warn.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 import error from '~/helpers/utility-functions/Error.js';
 import getTrackableAttributes from '~/system/TrackableAttributes.js';
 import registerSystemSettings from '~/system/SystemSettings.js';
@@ -42,9 +43,10 @@ export default function onceInit() {
    // Initialize titan namespace
    game.titan = {
       macros: new TitanMacros(),
-      warn: warn,
-      log: log,
-      error: error,
+      assert,
+      warn,
+      log,
+      error,
       socketManager: new SocketManager(),
    };
 

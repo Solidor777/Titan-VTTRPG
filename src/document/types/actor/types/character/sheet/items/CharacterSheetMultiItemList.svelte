@@ -78,16 +78,16 @@
 {#if items.length > 0}
    <ol transition:slide|local>
       <!--Each Item-->
-      {#each items as item (item.id)}
+      {#each items as item (item._id)}
          <li
-            class="item{hoveredItemId === item.id ? ' drag-hovered' : ''}"
-            data-item-id={item.id}
+            class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
+            data-item-id={item._id}
             draggable={true}
             on:dragstart={(event) => {
-               onDragStart(event, item.id, 'item');
+               onDragStart(event, item._id, 'item');
             }}
             on:dragenter={() => {
-               onDragEnter(item.id, 'item');
+               onDragEnter(item._id, 'item');
             }}
             on:dragend={() => {
                onDragEnd();
@@ -97,7 +97,7 @@
             <svelte:component
                this={itemComponents[item.type]}
                {item}
-               bind:isExpanded={isExpandedMap[item.id]}
+               bind:isExpanded={isExpandedMap[item._id]}
             />
          </li>
       {/each}

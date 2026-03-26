@@ -60,7 +60,7 @@
       <div class="controls">
          <!--Cast Spell-->
          <div>
-            <CharacterSheetCondensedCastingCheckButton itemId={item.id}/>
+            <CharacterSheetCondensedCastingCheckButton itemId={item._id}/>
          </div>
 
          <!--Send to Chat button-->
@@ -75,7 +75,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item.id}/>
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>
    </div>

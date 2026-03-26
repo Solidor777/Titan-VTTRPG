@@ -36,11 +36,11 @@
    };
 
    $: noOptions =
-      $appState.filterOptions.inventory.weapon === false &&
-      $appState.filterOptions.inventory.armor === false &&
-      $appState.filterOptions.inventory.shield === false &&
-      $appState.filterOptions.inventory.equipment === false &&
-      $appState.filterOptions.inventory.commodity === false;
+      $appState.tabs.inventory.filterOptions.weapon === false &&
+      $appState.tabs.inventory.filterOptions.armor === false &&
+      $appState.tabs.inventory.filterOptions.shield === false &&
+      $appState.tabs.inventory.filterOptions.equipment === false &&
+      $appState.tabs.inventory.filterOptions.commodity === false;
 </script>
 
 <div class="tab">
@@ -48,14 +48,14 @@
    <div class="header">
       <!--Filter Options-->
       <div class="row">
-         {#each Object.keys($appState.filterOptions.inventory) as key}
+         {#each Object.keys($appState.tabs.inventory.filterOptions) as key}
             <div class="option">
                <ToggleOptionButton
                   label={localize(key)}
-                  enabled={$appState.filterOptions.inventory[key]}
+                  enabled={$appState.tabs.inventory.filterOptions[key]}
                   on:click={() => {
-                     $appState.filterOptions.inventory[key] =
-                        !$appState.filterOptions.inventory[key];
+                     $appState.tabs.inventory.filterOptions[key] =
+                        !$appState.tabs.inventory.filterOptions[key];
                   }}
                />
             </div>
@@ -66,11 +66,11 @@
             <IconButton
                icon="{RESET_ICON}"
                on:click={() => {
-                  $appState.filterOptions.inventory.weapon = false;
-                  $appState.filterOptions.inventory.armor = false;
-                  $appState.filterOptions.inventory.shield = false;
-                  $appState.filterOptions.inventory.equipment = false;
-                  $appState.filterOptions.inventory.commodity = false;
+                  $appState.tabs.inventory.filterOptions.weapon = false;
+                  $appState.tabs.inventory.filterOptions.armor = false;
+                  $appState.tabs.inventory.filterOptions.shield = false;
+                  $appState.tabs.inventory.filterOptions.equipment = false;
+                  $appState.tabs.inventory.filterOptions.commodity = false;
                }}
             />
          </div>
@@ -85,7 +85,7 @@
 
          <!--Input-->
          <div class="input">
-            <TextInput bind:value={$appState.filter.inventory}/>
+            <TextInput bind:value={$appState.tabs.inventory.filter}/>
          </div>
 
          <!--Add Item Button-->
@@ -104,39 +104,39 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.inventory}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.inventory.scrollTop}>
          <CharacterSheetMultiItemList
-            filter={$appState.filter.inventory}
+            filter={$appState.tabs.inventory.filter}
             filterFunction={(item) => {
                switch (item.type) {
                   case 'armor': {
                      return (
                         noOptions ||
-                        $appState.filterOptions.inventory.armor === true
+                        $appState.tabs.inventory.filterOptions.armor === true
                      );
                   }
                   case 'commodity': {
                      return (
                         noOptions ||
-                        $appState.filterOptions.inventory.commodity === true
+                        $appState.tabs.inventory.filterOptions.commodity === true
                      );
                   }
                   case 'equipment': {
                      return (
                         noOptions ||
-                        $appState.filterOptions.inventory.equipment === true
+                        $appState.tabs.inventory.filterOptions.equipment === true
                      );
                   }
                   case 'shield': {
                      return (
                         noOptions ||
-                        $appState.filterOptions.inventory.shield === true
+                        $appState.tabs.inventory.filterOptions.shield === true
                      );
                   }
                   case 'weapon': {
                      return (
                         noOptions ||
-                        $appState.filterOptions.inventory.weapon === true
+                        $appState.tabs.inventory.filterOptions.weapon === true
                      );
                   }
                   default: {
@@ -144,7 +144,7 @@
                   }
                }
             }}
-            isExpandedMap={$appState.isExpanded.inventory}
+            isExpandedMap={$appState.tabs.inventory.isExpanded}
             {itemComponents}
          />
       </ScrollingContainer>

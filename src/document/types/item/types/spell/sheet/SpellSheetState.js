@@ -1,6 +1,5 @@
 /**
  * @typedef {ItemSheetState} SpellSheetState - A custom reactive store for managing a Spell Sheet.
- * @extends {ItemSheetState}
  * @property {Function} addCustomAspect - Adds a Custom Aspect to the reactive application state.
  * @property {Function} removeCustomAspect - Removes the Custom Aspect at the provided idx from the reactive
  *    application state.

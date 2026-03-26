@@ -5,7 +5,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Extends the base Item class to implement additional system-specific logic for Titan.
- * @extends {Item}
+ * @extends {BaseItem}
  */
 export default class TitanItem extends Item {
 
@@ -27,6 +27,41 @@ export default class TitanItem extends Item {
       if (this.system) {
          this.system.prepareDerivedData();
       }
+   }
+
+   /**
+    * Creates a Chat Message containing this item's data and sends it to chat.
+    * @returns {Promise<ChatMessage>} The newly created Chat Message.
+    */
+   async sendToChat() {
+      // Create the context object
+      const messageData = this.getRollData();
+
+      // Create and post the message
+      return ChatMessage.create(
+         ChatMessage.applyRollMode(
+            {
+               user: game.user.id,
+               speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
+               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+               sound: CONFIG.sounds.notification,
+               flags: {
+                  titan: messageData,
+               },
+               classes: ['titan'],
+            },
+            game.settings.get('core', 'rollMode'),
+         ),
+      );
+   }
+
+   /**
+    * Prepares an object containing the data relevant to performing checks.
+    * @override
+    * @returns {object} Object containing the relevant data.
+    */
+   getRollData() {
+      return this.system.getRollData();
    }
 
    /**
@@ -66,46 +101,11 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Creates a Chat Message containing this item's data and sends it to chat.
-    * @returns {Promise<ChatMessage>} The newly created Chat Message.
-    */
-   async sendToChat() {
-      // Create the context object
-      const messageData = this.getRollData();
-
-      // Create and post the message
-      return ChatMessage.create(
-         ChatMessage.applyRollMode(
-            {
-               user: game.user.id,
-               speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
-               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
-               sound: CONFIG.sounds.notification,
-               flags: {
-                  titan: messageData,
-               },
-               classes: ['titan'],
-            },
-            game.settings.get('core', 'rollMode'),
-         ),
-      );
-   }
-
-   /**
-    * Prepares an object containing the data relevant to performing checks.
-    * @override
-    * @returns {object} Object containing the relevant data.
-    */
-   getRollData() {
-      return this.system.getRollData();
-   }
-
-   /**
     * Adds a new Check to this item.
     * @returns {Promise<void>}
     */
    async addCheck() {
-      if (this.isOwner) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Update document
          this.system.check.push(createItemCheckTemplate());
          await this.update({
@@ -128,7 +128,7 @@ export default class TitanItem extends Item {
     * @returns {Promise<void>}
     */
    async removeCheck(idx) {
-      if (this.isOwner) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Update sheet
          const sheet = this._sheet;
          if (sheet) {
@@ -150,7 +150,7 @@ export default class TitanItem extends Item {
     * @returns {void}
     */
    addCustomTrait() {
-      if (this.isOwner) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          const dialog = new AddCustomTraitDialog(this);
          dialog.render(true);
       }
@@ -162,7 +162,7 @@ export default class TitanItem extends Item {
     * @returns {void}
     */
    editCustomTrait(traitIdx) {
-      if (this.isOwner) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          const dialog = new EditCustomTraitDialog(this, traitIdx);
          dialog.render(true);
       }
@@ -174,7 +174,7 @@ export default class TitanItem extends Item {
     * @returns {Promise<void>}
     */
    async deleteCustomTrait(traitIdx) {
-      if (this.isOwner) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          this.system.customTrait.splice(traitIdx, 1);
          await this.update({
             system: {
@@ -187,7 +187,7 @@ export default class TitanItem extends Item {
    /**
     * Marks the item as being deleted before actually deleting the item
     * so that asynchronous update operations will not apply.
-    * @returns {Promise<void>}
+    * @returns {Promise<void|boolean>} Returns false if the deletion failed.
     */
    async safeDelete() {
       if (this.isOwner && !this.isMarkedForDeletion) {
@@ -199,7 +199,11 @@ export default class TitanItem extends Item {
             },
          });
 
-         await this.delete();
+         return this.delete();
+      }
+      else {
+         game.titan.warn(`Item ${this.name} is already marked for deletion.`);
+         return false;
       }
    }
 }

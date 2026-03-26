@@ -1,9 +1,8 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
- * @property {Scene} [scene] The Scene in which the speaker resides.
+ * @property {string} [scene] The Scene in which the speaker resides.
  * @property {string} [actor] The ID of the speaker's actor.
  * @property {string} [alias] The name of the speaker to display.
  * @property {string} [token] The ID of the speaker's Token.
@@ -11,10 +10,12 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
  * Extends the base Actor class to implement additional system-specific logic for Titan.
- * @extends {Actor}
+ * @extends {BaseActor}
+ * @property {TitanItem[]} items - A collection of embedded Item documents.
  */
 export default class TitanActor extends Actor {
 
+   // noinspection JSUnusedGlobalSymbols
    /**
     * Performs initialization logic before document creation.
     * @override
@@ -72,56 +73,6 @@ export default class TitanActor extends Actor {
    }
 
    /**
-    * Gets an Initiative roll for this actor.
-    * @returns {Promise<Roll>} The Initiative roll for this actor.
-    */
-   async getInitiativeRoll() {
-      // Calculate the initiative value
-      const initiative = this.system.rating.initiative.value;
-
-      // Get the initiative formula
-      const initiativeFormula = getSetting('initiativeFormula');
-
-      return new Roll(`${initiative}${initiativeFormula}`);
-   }
-
-   /**
-    * Rolls initiative for this Character.
-    * If the Character is in combat, the initiative tracker will be updated accordingly.
-    * Otherwise, a chat card will be sent without update combat.
-    * @returns {Promise<void>}
-    */
-   async requestInitiativeRoll() {
-      if (this.isOwner) {
-
-         // If this Character is a combatant, then roll initiative as per normal
-         if (this.getCombatant()) {
-            await this.rollInitiative({ rerollInitiative: true });
-
-            return;
-         }
-
-         // Get and evaluate the roll
-         const roll = await this.getInitiativeRoll();
-         if (roll) {
-
-            // Get the message data
-            const messageData = {
-               speaker: this.getSpeaker(),
-               flavor: game.i18n.format('COMBAT.RollsInitiative', { name: this.name }),
-               flags: { 'core.initiativeRoll': true },
-            };
-
-            // Create a chat message from the roll and send it to chat
-            const chatData = await roll.toMessage(messageData, { create: false });
-            chatData.rollMode = game.settings.get('core', 'rollMode');
-
-            await ChatMessage.create(chatData);
-         }
-      }
-   }
-
-   /**
     * Gets this actor's Combatant in the active combat (if any).
     * Otherwise, returns undefined.
     * @returns {Combatant|undefined} This Character's combatant in combat.
@@ -131,12 +82,69 @@ export default class TitanActor extends Actor {
    }
 
    /**
+    * Adds an Item to the Actor, created from the item data.
+    * This method is factored out to allow downstream classes the opportunity to override item creation behavior.
+    * @param {object[]|object} itemData - The Item data requested for creation.
+    * @returns {Promise<Item[]|void>} The created or updated Item instances.
+    */
+   async addItem(itemData) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+         // Ensure the item data is in an array
+         itemData = itemData instanceof Array ? itemData : [itemData];
+
+         // Create the item or items.
+         const retVal = /** @type Item[] */ await this.createEmbeddedDocuments('Item', itemData);
+
+         // Broadcast downstream functions
+         for (const item of retVal) {
+            this.system.postAddItem(item);
+            if (this._sheet) {
+               this.sheet.postAddItem(item);
+            }
+         }
+
+         return retVal;
+      }
+   }
+
+   /** Deletes the item with the specified ID from the actor.
+    * @param {string} id - The ID of the item to delete.
+    * @returns {Promise<void>} Returns after the item has been deleted.
+    * */
+   async deleteItem(id) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+         const item = this.items.get(id);
+         if (game.titan.assert(item !== undefined, '' +
+               'Item was not valid.',
+               this.name, id)
+            && game.titan.assert(!item.isMarkedForDeletion,
+               'Item is already marked for deletion.', this.name, item.name)) {
+
+            // Execute pre-delete operations.
+            this.system.preDeleteItem(item);
+            this.sheet.preDeleteItem(item);
+
+            // Cache the item type.
+            const type = item.type;
+
+            // Delete the item.
+            if (await item.safeDelete() !== false) {
+
+               // Execute post delete operations.
+               this.system.postDeleteItem(id, type);
+               this.sheet.postDeleteItem(id, type);
+            }
+         }
+      }
+   }
+
+   /**
     * Gets all items of the provided Type.
     * @param {string} type - The Type of Item to search for.
     * @returns {TitanItem[]} - List of all Items of the provided type owned by this Actor.
     */
    getItemsOfType(type) {
-      return this.items.filter(item => item.type === type);
+      return /** @type TitanItem[] */ this.items.filter(item => item.type === type);
    }
 
    /**
@@ -145,6 +153,6 @@ export default class TitanActor extends Actor {
     * @returns {TitanItem[]} - List of all Items of the provided type owned by this Actor.
     */
    getItemsOfTypes(types) {
-      return this.items.filter(item => types.includes(item.type));
+      return /** @type TitanItem[] */ this.items.filter(item => types.includes(item.type));
    }
 }

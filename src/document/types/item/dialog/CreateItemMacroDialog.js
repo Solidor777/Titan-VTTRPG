@@ -29,7 +29,7 @@ export default class CreateItemMacroDialog extends TitanDialog {
                uuid: uuid
             },
          },
-         id: `titan-create-macro-dialog-${item.id}`,
+         id: `titan-create-macro-dialog-${item._id}`,
       });
    }
 

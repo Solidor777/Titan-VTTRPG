@@ -1,5 +1,5 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CharacterSheetRating from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetRating.svelte';
    import BorderedColumnList from '~/helpers/svelte-components/BorderedColumnList.svelte';
 
@@ -10,7 +10,7 @@
 
 <BorderedColumnList
    entries={[
-      {rating: 'initiative', onClick: () => $document.requestInitiativeRoll()},
+      {rating: 'initiative', onClick: () => $document.system.requestInitiativeRoll()},
       {rating: 'awareness'},
       {rating: 'defense'},
       {rating: 'melee'},

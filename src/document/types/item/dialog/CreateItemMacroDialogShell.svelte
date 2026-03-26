@@ -7,7 +7,7 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import Select from '~/helpers/svelte-components/select/Select.svelte';
 
-   // Item to edit
+   /** @type TitanItem The Item being edited. */
    export let item = void 0;
 
    // Slot on the hotbar that the macro will be assigned to

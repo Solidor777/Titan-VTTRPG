@@ -1,7 +1,7 @@
 <script>
    import CheckDialogAttributeField from '~/check/dialog/CheckDialogAttributeField.svelte';
    import CheckDialogBase from '~/check/dialog/CheckDialogBase.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CheckDialogSkillField from '~/check/dialog/CheckDialogSkillField.svelte';
    import CheckDialogDiceModField from '~/check/dialog/CheckDialogDiceModField.svelte';
    import CheckDialogTrainingModField from '~/check/dialog/CheckDialogTrainingModField.svelte';
@@ -56,7 +56,6 @@
       ui.notifications.info(localize('attackCheckNoLongerValid'));
       game.titan.warn(
          localize('attackCheckNoLongerValid'),
-         true,
          checkOptions,
          actor,
       );

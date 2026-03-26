@@ -22,12 +22,12 @@ export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
          localize('deleteItem'),
          () => {
             if (this.actor) {
-               this.actor.system.safeDeleteItem(this.itemId);
+               this.actor.deleteItem(this.itemId);
             }
          },
       );
 
       this.actor = actor;
-      this.itemId = item.id;
+      this.itemId = item._id;
    }
 }

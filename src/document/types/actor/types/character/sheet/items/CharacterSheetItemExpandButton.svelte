@@ -5,7 +5,7 @@
    /** @type boolean Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   // Item
+   /** @type TitanItem The Item this component belongs to. */
    export let item = void 0;
 
    // Optional override for the name text
@@ -14,16 +14,18 @@
 
 <div class="button">
    <Button
-      on:click={() => isExpanded = !isExpanded}
+      on:click={() => {
+         if (item && !item.isMarkedForDeletion) {
+            isExpanded = !isExpanded;
+         }
+      }}
    >
       <div class="button-inner">
          <!--Name-->
          <div class="name">{name === false ? item.name : name}</div>
 
          <!--Icon-->
-         <i
-            class="{isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}"
-         />
+         <i class={isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}/>
       </div>
    </Button>
 </div>

@@ -113,7 +113,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item.id}/>
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>
    </div>

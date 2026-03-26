@@ -13,7 +13,7 @@
    <!--Each Check-->
    {#each item.system.check as check, checkIdx (check.uuid)}
       <div class="check">
-         <CharacterSheetItemCheck itemId={item.id} {checkIdx}/>
+         <CharacterSheetItemCheck itemId={item._id} {checkIdx}/>
       </div>
    {/each}
 

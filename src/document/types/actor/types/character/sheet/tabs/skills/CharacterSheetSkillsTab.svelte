@@ -12,11 +12,11 @@
 <div class="skill-tab">
    <!--Filter-->
    <div class="header">
-      <TopFilter bind:value={$appState.filter.skills}/>
+      <TopFilter bind:value={$appState.tabs.skills.filter}/>
    </div>
 
    <div class="scrolling-container">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.skills}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.skills.scrollTop}>
          <CharacterSheetSkillsList/>
       </ScrollingContainer>
    </div>

@@ -23,7 +23,7 @@ export default class EditShieldTraitsDialog extends TitanDialog {
                item: item,
             },
          },
-         id: `edit-shield-traits-dialog-${item.id}`,
+         id: `edit-shield-traits-dialog-${item._id}`,
       });
    }
 

@@ -13,7 +13,7 @@
 
    /** @type CastingCheckOptions Base options for the Casting Check. */
    const checkOptions = {
-      itemId: item.id,
+      itemId: item._id,
    };
 
    /** @type CastingCheckParameters Calculated check parameters. */
@@ -22,7 +22,7 @@
    // Update the svelte-components in response to changes
    $: {
       // Ensure the item is still valid
-      if ($document.items.get(item.id)) {
+      if ($document.items.get(item._id)) {
 
          // Update the parameters
          checkParameters = $document.system.getCastingCheckParameters(

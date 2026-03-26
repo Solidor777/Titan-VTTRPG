@@ -25,14 +25,14 @@
    <div class="header">
       <!--Filter Options-->
       <div class="row">
-         {#each Object.keys($appState.filterOptions.abilities) as key}
+         {#each Object.keys($appState.tabs.abilities.filterOptions) as key}
             <div class="option">
                <ToggleOptionButton
                   label={localize(key)}
-                  enabled={$appState.filterOptions.abilities[key]}
+                  enabled={$appState.tabs.abilities.filterOptions[key]}
                   on:click={() => {
-                     $appState.filterOptions.abilities[key] =
-                        !$appState.filterOptions.abilities[key];
+                     $appState.tabs.abilities.filterOptions[key] =
+                        !$appState.tabs.abilities.filterOptions[key];
                   }}
                />
             </div>
@@ -43,9 +43,9 @@
             <IconButton
                icon={RESET_ICON}
                on:click={() => {
-                  $appState.filterOptions.abilities.action = false;
-                  $appState.filterOptions.abilities.reaction = false;
-                  $appState.filterOptions.abilities.passive = false;
+                  $appState.tabs.abilities.filterOptions.action = false;
+                  $appState.tabs.abilities.filterOptions.reaction = false;
+                  $appState.tabs.abilities.filterOptions.passive = false;
                }}
             />
          </div>
@@ -60,7 +60,7 @@
 
          <!--Input-->
          <div class="input">
-            <TextInput bind:value={$appState.filter.abilities}/>
+            <TextInput bind:value={$appState.tabs.abilities.filter}/>
          </div>
 
          <!--Add Item Button-->
@@ -69,7 +69,7 @@
                icon={CREATE_ICON}
                label={localize('addNewAbility')}
                on:click={() => {
-                  $document.system.addItem('ability');
+                  $document.system.createItem('ability');
                }}
             />
          </div>
@@ -78,34 +78,34 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.abilities}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.abilities.scrollTop}>
          <!--Abilities List-->
          <div class="list">
             <CharacterSheetItemList
-               filter={$appState.filter.abilities}
+               filter={$appState.tabs.abilities.filter}
                filterFunction={(item) => {
                   if (item.type !== 'ability') {
                      return false;
                   }
                   if (
-                     $appState.filterOptions.abilities.action &&
+                     $appState.tabs.abilities.filterOptions.action &&
                      !item.system.action
                   ) {
                      return false;
                   }
 
                   if (
-                     $appState.filterOptions.abilities.reaction &&
+                     $appState.tabs.abilities.filterOptions.reaction &&
                      !item.system.reaction
                   ) {
                      return false;
                   }
 
-                  return !($appState.filterOptions.abilities.passive &&
+                  return !($appState.tabs.abilities.filterOptions.passive &&
                      !item.system.passive);
                   }
                }
-               isExpandedMap={$appState.isExpanded.abilities}
+               isExpandedMap={$appState.tabs.abilities.isExpanded}
                itemComponent={CharacterSheetAbility}
             />
          </div>

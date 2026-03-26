@@ -13,7 +13,7 @@
    import CheckDialogTrainingModField from '~/check/dialog/CheckDialogTrainingModField.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
 
    /** @type TitanActor The Actor that will roll the Check. */
    export let actor = void 0;
@@ -47,7 +47,6 @@
       ui.notifications.info(localize('itemCheckNoLongerValid'));
       game.titan.warn(
          localize('itemCheckNoLongerValid'),
-         true,
          checkOptions,
          actor,
       );

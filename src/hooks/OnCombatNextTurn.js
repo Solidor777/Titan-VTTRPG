@@ -14,7 +14,6 @@ export default async function onCombatNextTurn(currentCombatant, previousCombata
       if (currentInitiative === null || previousInitiative === null) {
          game.titan.warn(
             'Current or Previous combatant had an Initiative of null. Initiative based effects will not function.',
-            false,
             currentCombatant,
             previousCombatant,
          );

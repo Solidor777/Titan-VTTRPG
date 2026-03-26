@@ -1,6 +1,6 @@
 <script>
    import CheckDialogBase from '~/check/dialog/CheckDialogBase.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import CheckDialogComplexityField from '~/check/dialog/CheckDialogComplexityField.svelte';
    import CheckDialogDifficultyField from '~/check/dialog/CheckDialogDifficultyField.svelte';
    import CheckDialogDiceModField from '~/check/dialog/CheckDialogDiceModField.svelte';
@@ -42,7 +42,6 @@
       ui.notifications.info(localize('resistanceCheckNoLongerValid'));
       game.titan.warn(
          localize('resistanceCheckNoLongerValid'),
-         true,
          checkOptions,
          actor,
       );

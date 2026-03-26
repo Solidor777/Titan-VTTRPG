@@ -57,7 +57,7 @@
                   equipped={item.system.equipped}
                />
             {:else if item.system.attack.length > 0}
-               <CharacterSheetCondensedAttackCheckButton itemId={item.id}/>
+               <CharacterSheetCondensedAttackCheckButton itemId={item._id}/>
             {/if}
          </div>
 
@@ -73,7 +73,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item.id}/>
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>
    </div>

@@ -55,7 +55,7 @@
             </div>
          {:else if (item.system.check.length > 0)}
             <div class="button">
-               <CharacterSheetCondensedItemCheckButton itemId={item.id}/>
+               <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
             </div>
          {/if}
 
@@ -71,7 +71,7 @@
 
          <!--Delete Button-->
          <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item.id}/>
+            <CharacterSheetItemDeleteButton itemId={item._id}/>
          </div>
       </div>
    </div>

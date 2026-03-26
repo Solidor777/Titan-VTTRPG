@@ -1,7 +1,7 @@
 import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheetData.js';
 
 /**
- * @typedef {ItemSheetData} SpellSheetData - Data representing the state of a Spell Sheet.
+ * @typedef {TitanItemSheetData} SpellSheetData - Data representing the state of a Spell Sheet.
  * @property {object} sidebar.castingCheck - State for the Casting Check sidebar section.
  * @property {boolean} sidebar.castingCheck.isExpanded - Whether the Casting Check in the sidebar is expanded.
  * @property {object} tabs.castingCheck - State for the Casting Check tab.

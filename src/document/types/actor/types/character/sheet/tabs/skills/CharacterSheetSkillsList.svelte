@@ -16,7 +16,7 @@
    $: {
       // Get skills whose name matches the filter
       const skillList = Object.entries($document.system.skill);
-      const filter = $appState.filter.skills.toLowerCase();
+      const filter = $appState.tabs.skills.filter.toLowerCase();
       filteredList = skillList.filter(([key]) => localize(key).toLowerCase().includes(filter));
 
       // If no skill names match, look for skills with matching default attributes.

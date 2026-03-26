@@ -28,7 +28,7 @@
 
       <!--Input-->
       <div class="input">
-         <TextInput bind:value={$appState.filter.abilities}/>
+         <TextInput bind:value={$appState.tabs.abilities.filter}/>
       </div>
 
       <!--Add Item Button-->
@@ -37,7 +37,7 @@
             icon={CREATE_ICON}
             label={localize('addNewSpell')}
             on:click={() => {
-               $document.system.addItem('spell');
+               $document.system.createItem('spell');
             }}
          />
       </div>
@@ -45,15 +45,15 @@
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.scrollTop.spells}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.spells.scrollTop}>
          <!--Spell List-->
          <div class="list">
             <CharacterSheetItemList
-               filter={$appState.filter.spells}
+               filter={$appState.tabs.spells.filter}
                filterFunction={(item) => {
                   return item.type === 'spell';
                }}
-               isExpandedMap={$appState.isExpanded.spells}
+               isExpandedMap={$appState.tabs.spells.isExpanded}
                itemComponent={CharacterSheetSpell}
             />
          </div>

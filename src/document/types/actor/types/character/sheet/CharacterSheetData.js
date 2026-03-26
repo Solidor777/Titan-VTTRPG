@@ -46,8 +46,7 @@
  * @returns {CharacterSheetData} The newly created Character Sheet Data.
  */
 export default function createCharacterSheetData(actor) {
-   // Initialize return data.
-   /** @type {CharacterSheetData} */
+   /** @type {CharacterSheetData} Return Data */
    const retVal = {
       tabs: {
          activeTab: 'skills',
@@ -92,7 +91,7 @@ export default function createCharacterSheetData(actor) {
    for (const item of actor.items) {
       switch (item.type) {
          case 'ability' : {
-            retVal.tabs.abilities.isExpanded[item.id] = false;
+            retVal.tabs.abilities.isExpanded[item._id] = false;
             break;
          }
          case 'armor':
@@ -100,11 +99,11 @@ export default function createCharacterSheetData(actor) {
          case 'equipment':
          case 'shield':
          case 'weapon': {
-            retVal.tabs.inventory.isExpanded[item.id] = false;
+            retVal.tabs.inventory.isExpanded[item._id] = false;
             break;
          }
          case 'spell': {
-            retVal.tabs.spells.isExpanded[item.id] = false;
+            retVal.tabs.spells.isExpanded[item._id] = false;
             break;
          }
          default: {
