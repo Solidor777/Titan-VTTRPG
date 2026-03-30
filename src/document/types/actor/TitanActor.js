@@ -1,4 +1,6 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
+import localize from '~/helpers/utility-functions/Localize.js';
+import capitalize from '~/helpers/utility-functions/Capitalize.js';
 
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
@@ -83,14 +85,15 @@ export default class TitanActor extends Actor {
 
    /**
     * Adds an Item to the Actor, created from the item data.
-    * This method is factored out to allow downstream classes the opportunity to override item creation behavior.
     * @param {object[]|object} itemData - The Item data requested for creation.
     * @returns {Promise<Item[]|void>} The created or updated Item instances.
     */
    async addItem(itemData) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
-         // Ensure the item data is in an array
-         itemData = itemData instanceof Array ? itemData : [itemData];
+         // Ensure the item data is in an array.
+         if (!itemData instanceof Array) {
+            itemData = [itemData];
+         }
 
          // Create the item or items.
          const retVal = /** @type Item[] */ await this.createEmbeddedDocuments('Item', itemData);
@@ -104,6 +107,50 @@ export default class TitanActor extends Actor {
          }
 
          return retVal;
+      }
+   }
+
+   /**
+    * Creates an item of the provided type, and adds it to the actor.
+    * @param {string} type - The type of item to add.
+    */
+   async createItemFromType(type) {
+      if (this.parent.isOwner) {
+         // Get the desired name
+         let itemName = localize(`new${capitalize(type)}`);
+
+         // Add a number if necessary
+         const duplicateNames = this.parent.items.filter((item) => item.name.includes(itemName));
+         if (duplicateNames.length > 0) {
+            itemName += ` (${duplicateNames.length})`;
+         }
+
+         return this.addItem([
+            {
+               name: itemName,
+               type: type,
+            },
+         ]);
+      }
+   }
+
+   /**
+    * Adds an Active Effect to the Actor, created from the active effect data.
+    * @param {object[]|object} activeEffectData - The Item data requested for creation.
+    * @returns {Promise<ActiveEffect[]|void>} The created or updated Active Effect instances.
+    */
+   async addActiveEffect(activeEffectData) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+         // Ensure the active effect data is in an array.
+         if (!activeEffectData instanceof Array) {
+            activeEffectData = [activeEffectData];
+         }
+         // Create the item or items.
+         return  /** @type ActiveEffect[] */ this.createEmbeddedDocuments(
+            'ActiveEffect',
+            activeEffectData
+         );
+
       }
    }
 

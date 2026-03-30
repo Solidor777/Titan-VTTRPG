@@ -4,5 +4,5 @@
  * @returns {string} Localized string.
  */
 export default function localize(string) {
-   return game.i18n.localize(`LOCAL.${string}.label`);
+   return game.i18n.localize(`LOCAL.${string}.text`);
 }

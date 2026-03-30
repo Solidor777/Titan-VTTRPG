@@ -19,7 +19,7 @@
     * Called when the selection is confirmed.
     */
    function onConfirmed() {
-      actor.system.createItem(value);
+      actor.createItemFromType(value);
       application.close();
    }
 

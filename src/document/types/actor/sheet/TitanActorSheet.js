@@ -1,11 +1,10 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
-import localize from '~/helpers/utility-functions/Localize.js';
-import { IMPORT_ICON } from '~/system/Icons.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import ActorSheetToggleLinkedTokenButton from '~/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte';
 import ActorSheetUnlinkTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkTokenButton.svelte';
 import ActorSheetUnlinkedTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkedTokenButton.svelte';
 import ActorSheetEditTokenButton from '~/document/types/actor/sheet/ActorSheetEditTokenButton.svelte';
+import ActorSheetImportActorButton from '~/document/types/actor/sheet/ActorSheetImportActorButton.svelte';
 
 /**
  * A Document Sheet class with functionality shared by all Actors.
@@ -58,19 +57,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Imports the Actor from a compendium pack.
-    * @param {Event} event - The DOM Event from clicking the button.
-    * @returns {Promise<void>} Returns after the document has been imported.
-    * @private
-    */
-   async _onImport(event) {
-      if (event) {
-         event.preventDefault();
-      }
-      await this.actor.collection.importFromCompendium(this.actor.compendium, this.actor.id);
-   }
-
-   /**
     * Handles the dropping of ActiveEffect data onto an Actor Sheet.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
@@ -79,18 +65,15 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     */
    async _onDropActiveEffect(event, data) {
       // Create an effect from the drag data.
-      const effect = await ActiveEffect.implementation.fromDropData(data);
+      const activeEffect = await ActiveEffect.implementation.fromDropData(data);
 
-      // Don't create new effect is this sheet's Actor is the origin.
-      if (!effect || this.actor.uuid === effect.parent?.uuid) {
+      // Don't create new effect if this sheet's Actor is the origin.
+      if (!activeEffect || this.actor.uuid === activeEffect.parent?.uuid) {
          return false;
       }
 
       // Add the effect to the actor.
-      return /** @type {Promise<ActiveEffect[]|boolean>} */ this.actor.createEmbeddedDocuments(
-         'ActiveEffect',
-         [effect.toObject()]
-      );
+      return this.actor.addActiveEffect(activeEffect.toObject());
    }
 
    /**
@@ -107,6 +90,8 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       if (!item) {
          return false;
       }
+
+      // Make the item data into an object
       const itemData = item.toObject();
 
       // If this item is from this sheet's Actor, sort the item rather than creating a new one
@@ -271,10 +256,9 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       // Import button for actors that can be imported
       if (game.user.isGM && this.actor.pack) {
          buttons.unshift({
-            class: 'import',
-            icon: IMPORT_ICON,
-            label: localize('import'),
-            onclick: (event) => this._onImport(event),
+            svelte: {
+               class: ActorSheetImportActorButton,
+            }
          });
       }
       return buttons;

@@ -16,7 +16,6 @@ import ResistanceCheckDialog from '~/check/types/resistance-check/dialog/Resista
 import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
 import appendUniqueByFunctionValue from '~/helpers/utility-functions/appendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
-import capitalize from '~/helpers/utility-functions/Capitalize.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttackCheckParameters from '~/check/types/attack-check/AttackCheckParameters.js';
@@ -5504,30 +5503,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
                },
             },
          });
-      }
-   }
-
-   /**
-    * Creates an item of the provided type to the Character.
-    * @param {string} type - The type of item to add.
-    */
-   async createItem(type) {
-      if (this.parent.isOwner) {
-         // Get the desired name
-         let desiredName = localize(`new${capitalize(type)}`);
-
-         // Add a number if necessary
-         const duplicateNames = this.parent.items.filter((item) => item.name.includes(desiredName));
-         if (duplicateNames.length > 0) {
-            desiredName += ` (${duplicateNames.length})`;
-         }
-
-         await this.parent.createEmbeddedDocuments('Item', [
-            {
-               name: desiredName,
-               type: type,
-            },
-         ]);
       }
    }
 

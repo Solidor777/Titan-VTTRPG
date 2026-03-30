@@ -142,7 +142,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
 
          // Add the first effect if necessary
          if (effects.length < 1) {
-            await this.parent.createEmbeddedDocuments('ActiveEffect',
+            await this.parent.addActiveEffect(
                [
                   {
                      label: this.parent.name,

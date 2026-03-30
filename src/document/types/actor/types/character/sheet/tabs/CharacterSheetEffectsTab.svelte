@@ -28,7 +28,7 @@
                icon={CREATE_ICON}
                label={localize('addNewEffect')}
                on:click={() => {
-                  $document.system.createItem('effect');
+                  $document.createItemFromType('effect');
                }}
             />
          </div>

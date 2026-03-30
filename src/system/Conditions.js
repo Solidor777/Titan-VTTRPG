@@ -10,57 +10,57 @@ export default function setupConditions() {
    const conditions = [
       {
          id: 'blinded',
-         name: 'LOCAL.blinded.label',
+         name: 'LOCAL.blinded.text',
          icon: 'icons/svg/blind.svg',
       },
       {
          id: 'contaminated',
-         name: 'LOCAL.contaminated.label',
+         name: 'LOCAL.contaminated.text',
          icon: 'icons/svg/poison.svg',
       },
       {
          id: 'dead',
-         name: 'LOCAL.dead.label',
+         name: 'LOCAL.dead.text',
          icon: 'icons/svg/skull.svg',
       },
       {
          id: 'deafened',
-         name: 'LOCAL.deafened.label',
+         name: 'LOCAL.deafened.text',
          icon: 'icons/svg/deaf.svg',
       },
       {
          id: 'frightened',
-         name: 'LOCAL.frightened.label',
+         name: 'LOCAL.frightened.text',
          icon: 'icons/svg/terror.svg',
       },
       {
          id: 'incapacitated',
-         name: 'LOCAL.incapacitated.label',
+         name: 'LOCAL.incapacitated.text',
          icon: 'icons/svg/paralysis.svg',
       },
       {
          id: 'prone',
-         name: 'LOCAL.prone.label',
+         name: 'LOCAL.prone.text',
          icon: 'icons/svg/falling.svg',
       },
       {
          id: 'restrained',
-         name: 'LOCAL.restrained.label',
+         name: 'LOCAL.restrained.text',
          icon: 'icons/svg/net.svg',
       },
       {
          id: 'stunned',
-         name: 'LOCAL.stunned.label',
+         name: 'LOCAL.stunned.text',
          icon: 'icons/svg/stoned.svg',
       },
       {
          id: 'sleeping',
-         name: 'LOCAL.sleeping.label',
+         name: 'LOCAL.sleeping.text',
          icon: 'icons/svg/sleep.svg',
       },
       {
          id: 'unconscious',
-         name: 'LOCAL.unconscious.label',
+         name: 'LOCAL.unconscious.text',
          icon: 'icons/svg/unconscious.svg',
       },
    ];
