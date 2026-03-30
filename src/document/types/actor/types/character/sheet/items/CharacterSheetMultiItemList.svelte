@@ -15,9 +15,6 @@
    // Is expanded map
    export let isExpandedMap = void 0;
 
-   // Whether the object should be expanded by default
-   export let isExpandedDefault = false;
-
    /** @type object Reference to the Document store. */
    const document = getContext('document');
 

@@ -3,7 +3,7 @@
    import CharacterSheetItemCheck
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
 
-   /** @type Item Reference to the Item document. */
+   /** @type TitanItem Reference to the Item document. */
    export let item = void 0;
 </script>
 

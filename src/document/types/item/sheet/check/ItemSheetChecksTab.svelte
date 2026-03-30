@@ -100,22 +100,6 @@
          width: 100%;
          height: 100%;
 
-         ol {
-            @include flex-column;
-            @include flex-group-top;
-            @include list;
-
-            width: 100%;
-
-            li {
-               @include flex-row;
-               @include flex-group-center;
-
-               width: 100%;
-               margin-top: var(--titan-spacing-large);
-            }
-         }
-
          .add-entry-button {
             @include flex-row;
             @include flex-group-center;
