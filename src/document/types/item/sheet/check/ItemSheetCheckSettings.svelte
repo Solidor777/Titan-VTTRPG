@@ -68,7 +68,7 @@
             <IconButton
                icon={DELETE_ICON}
                on:click={async () => {
-                  $document.removeCheck(idx);
+                  $document.deleteCheck(idx);
                }}
             />
          </div>

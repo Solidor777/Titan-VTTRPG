@@ -1,13 +1,14 @@
-import localize from '~/helpers/utility-functions/Localize.js';
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
-import { IMPORT_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
+import ItemSheetSendToChatButton from '~/document/types/item/sheet/ItemSheetSendToChatButton.svelte';
+import ItemSheetImportItemButton from '~/document/types/item/sheet/ItemSheetImportItemButton.svelte';
 
 /**
  * A Document Sheet class with functionality shared by all Items.
  * @extends {TitanDocumentSheet}
  * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
+ * @property {TitanItem} item - The Item this sheet represents.
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
    /**
@@ -22,9 +23,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
          : classes;
 
       // Initialize self object.
-      super(/** @type foundry.abstract.Document */ sheetDocument, options);
-
-      /** @type {TitanItem} The Item this sheet represents.*/
+      super(/** @type foundry.abstract.document */ sheetDocument, options);
       this.item = sheetDocument;
    }
 
@@ -63,52 +62,35 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
       // Button for sending the item to chat
       buttons.unshift({
-         class: 'send-to-chat',
-         icon: SEND_TO_CHAT_ICON,
-         label: localize('sendToChat'),
-         onclick: () => this.item.sendToChat(),
+         svelte: {
+            class: ItemSheetSendToChatButton,
+         }
       });
 
       // Button for importing the item from a compendium pack
       if (this.item.pack) {
          buttons.unshift({
-            class: 'import',
-            icon: IMPORT_ICON,
-            label: localize('import'),
-            onclick: (event) => this._onImport(event),
+            svelte: {
+               class: ItemSheetImportItemButton,
+            },
          });
       }
 
       return buttons;
    }
-
+   
    /**
-    * Imports the Item from a compendium pack.
-    * @param {Event} event - The DOM Event from clicking the button.
-    * @returns {Promise<void>} Returns after the document has been imported.
-    * @private
+    * Called after an Item Check is added to this Sheet's Item.
     */
-   _onImport(event) {
-      if (event) {
-         event.preventDefault();
-      }
-      return this.item.collection.importFromCompendium(this.item.compendium, this.item._id);
+   postAddCheck() {
+      this.applicationState.postAddCheck();
    }
 
    /**
-    * Adds an Item Check to this sheet's application state.
-    * @returns {void}
+    * Called after an Item Check is deleted from to this Sheet's Item.
+    * @param {number} idx - The idx of the Check to about to be deleted.
     */
-   addCheck() {
-      this.applicationState.addCheck();
-   }
-
-   /**
-    * Removes the Check at the provided idx from this sheet's application state.
-    * @param {number} idx - The idx of the check to remove.
-    * @returns {void}
-    */
-   removeCheck(idx) {
-      this.applicationState.removeCheck(idx);
+   preDeleteCheck(idx) {
+      this.applicationState.preDeleteCheck(idx);
    }
 }

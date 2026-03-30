@@ -102,7 +102,7 @@
             <IconButton
                icon={DELETE_ICON}
                on:click={() => {
-                  $document.system.removeAttack(idx);
+                  $document.system.deleteAttack(idx);
                }}
             />
          </div>

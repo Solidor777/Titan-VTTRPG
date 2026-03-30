@@ -8,8 +8,9 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
  * @property {import('svelte/store').Writable<ItemSheetData>['set']} set
  * @property {import('svelte/store').Writable<ItemSheetData>['update']} update
  * @property {import('svelte/store').Writable<ItemSheetData>['subscribe']} subscribe
- * @property {Function} addCheck - Adds an Item Check to the reactive application state.
- * @property {Function} removeCheck - Removes the Item Check at the provided idx from the reactive application state.
+ * @property {Function} postAddCheck - Updates the reactive state store in response to an Item Check being added.
+ * @property {Function} preDeleteCheck - Updates the reactive state store in response to an Item Check being deleted.
+ *    state.
  */
 
 /**
@@ -23,9 +24,9 @@ export default function createTitanItemSheetState(item, overrideData) {
    const { set, update, subscribe } = writable(overrideData ?? createTitanItemSheetData(item));
 
    /**
-    * Adds an Item Check to the reactive application state.
+    * Updates the reactive state store in response to an Item Check being added.
     */
-   function addCheck() {
+   function postAddCheck() {
       update((data) => {
          data.checks.isExpanded.push(true);
          data.sidebar.checks.isExpanded.push(true);
@@ -34,10 +35,10 @@ export default function createTitanItemSheetState(item, overrideData) {
    }
 
    /**
-    * Removes the Item Check at the provided idx from the reactive application state.
-    * @param {number} idx - The idx of the Check to remove.
+    * Updates the reactive state store in response to an Item Check being deleted.
+    * @param {number} idx - The idx of the Check about to be deleted.
     */
-   function removeCheck(idx) {
+   function preDeleteCheck(idx) {
       update((data) => {
          data.checks.isExpanded.splice(idx, 1);
          data.sidebar.checks.isExpanded.splice(idx, 1);
@@ -49,7 +50,7 @@ export default function createTitanItemSheetState(item, overrideData) {
       set,
       update,
       subscribe,
-      addCheck,
-      removeCheck,
+      postAddCheck,
+      preDeleteCheck,
    };
 }

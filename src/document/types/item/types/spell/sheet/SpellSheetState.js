@@ -3,8 +3,6 @@
  * @property {Function} addCustomAspect - Adds a Custom Aspect to the reactive application state.
  * @property {Function} removeCustomAspect - Removes the Custom Aspect at the provided idx from the reactive
  *    application state.
- * @property {Function} addCheck - Adds a Check to the reactive application state.
- * @property {Function} removeCheck - Removes the Check at the provided idx from the reactive application state.
  */
 
 import createSpellSheetData from '~/document/types/item/types/spell/sheet/SpellSheetData.js';
@@ -21,9 +19,9 @@ export default function createSpellSheetState(item) {
             set,
             update,
             subscribe,
-            addCheck,
-            removeCheck
-         } = createTitanItemSheetState(item, /** @type ItemSheetData */ createSpellSheetData(item));
+            postAddCheck,
+            preDeleteCheck
+         } = createTitanItemSheetState(item, /** @type TitanItemSheetData */ createSpellSheetData(item));
 
    /**
     * Adds a Custom Aspect to the reactive application state.
@@ -54,7 +52,7 @@ export default function createSpellSheetState(item) {
       subscribe,
       addCustomAspect,
       removeCustomAspect,
-      addCheck,
-      removeCheck,
+      postAddCheck,
+      preDeleteCheck,
    };
 }

@@ -1,6 +1,5 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
-import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 /**
  * Sets up the system conditions.
@@ -82,8 +81,6 @@ export default function setupConditions() {
          },
          'visual-active-effects.data.content': description,
       };
+      CONFIG.statusEffects.push(condition);
    }
-
-   // Update the conditions
-   CONFIG.statusEffects = deepFreeze(conditions);
 }

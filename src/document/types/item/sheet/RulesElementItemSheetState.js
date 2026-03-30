@@ -13,16 +13,16 @@ import createTitanItemSheetState from '~/document/types/item/sheet/TitanItemShee
  */
 export default function createRulesElementItemSheetState(item, overrideData) {
    /** @type {import('svelte/store').Writable<RulesElementItemSheetData>} */
-   const { set, update, subscribe, addCheck, removeCheck } = createTitanItemSheetState(
+   const { set, update, subscribe, postAddCheck, preDeleteCheck } = createTitanItemSheetState(
       item,
-      overrideData ?? createRulesElementItemSheetData(item)
+      overrideData ?? /**@type TitanItemSheetData */ createRulesElementItemSheetData(item)
    );
 
    return {
       set,
       update,
       subscribe,
-      addCheck,
-      removeCheck,
+      postAddCheck,
+      preDeleteCheck,
    };
 }

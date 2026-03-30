@@ -60,7 +60,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
     * Removes the Attack at the provided idx from this sheet's application state.
     * @param {number} idx - The idx of the attack to remove.
     */
-   removeAttack(idx) {
-      this.applicationState.removeAttack(idx);
+   postDeleteAttack(idx) {
+      this.applicationState.postDeleteAttack(idx);
    }
 }

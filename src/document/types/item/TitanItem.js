@@ -6,6 +6,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Extends the base Item class to implement additional system-specific logic for Titan.
  * @extends {BaseItem}
+ * @property {TitanItemSheet} sheet - The Sheet that represents this Item.
  */
 export default class TitanItem extends Item {
 
@@ -114,10 +115,9 @@ export default class TitanItem extends Item {
             }
          });
 
-         // Update Sheet
-         const sheet = this._sheet;
-         if (sheet) {
-            sheet.addCheck();
+         // Broadcast delegates
+         if (this.sheet) {
+            this.sheet.postAddCheck();
          }
       }
    }
@@ -127,12 +127,11 @@ export default class TitanItem extends Item {
     * @param {number} idx - The Idx of the Check in this item's Checks array.
     * @returns {Promise<void>}
     */
-   async removeCheck(idx) {
+   async deleteCheck(idx) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Update sheet
-         const sheet = this._sheet;
-         if (sheet) {
-            sheet.removeCheck(idx);
+         if (this.sheet) {
+            this.sheet.preDeleteCheck(idx);
          }
 
          // Update document

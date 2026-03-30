@@ -3,10 +3,8 @@ import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesE
 
 /**
  * @typedef {RulesElementItemSheetState} WeaponSheetState - A custom reactive store for managing a Weapon Sheet.
- * @property {Function} addAttack - Adds an Attack to the reactive application state.
- * @property {Function} removeAttack - Removes the Attack at the provided idx from the reactive application state.
- * @property {Function} addCheck - Adds a Check to the reactive application state.
- * @property {Function} removeCheck - Removes the Check at the provided idx from the reactive application state.
+ * @property {Function} postAddAttack - Updates the reactive state store in response to an Attack being added.
+ * @property {Function} postDeleteAttack - Updates the reactive state store in response to an Attack being deleted.
  */
 
 /**
@@ -20,12 +18,12 @@ export default function createWeaponSheetState(item) {
             set,
             update,
             subscribe,
-            addCheck,
-            removeCheck
+            postAddCheck,
+            preDeleteCheck,
          } = createRulesElementItemSheetState(item, /** @type RulesElementItemSheetData */ createWeaponSheetData(item));
 
    /**
-    * Adds an Attack to the reactive application state.
+    * Updates the reactive state store in response to an Attack being added.
     */
    function addAttack() {
       update((data) => {
@@ -36,10 +34,10 @@ export default function createWeaponSheetState(item) {
    }
 
    /**
-    * Removes the attack at the provided idx from the reactive application state.
-    * @param {number} idx - The idx of the Attack to remove.
+    * Updates the reactive state store in response to an Attack being deleted.
+    * @param {number} idx - The idx of the Attack that is about to be deleted.
     */
-   function removeAttack(idx) {
+   function postDeleteAttack(idx) {
       update((data) => {
          data.tabs.attacks.isExpanded.splice(idx, 1);
          data.sidebar.attacks.isExpanded.splice(idx, 1);
@@ -52,8 +50,8 @@ export default function createWeaponSheetState(item) {
       update,
       subscribe,
       addAttack,
-      removeAttack,
-      addCheck,
-      removeCheck
+      postDeleteAttack,
+      postAddCheck,
+      preDeleteCheck
    };
 }

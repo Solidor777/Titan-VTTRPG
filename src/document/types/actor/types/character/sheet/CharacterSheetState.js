@@ -7,7 +7,8 @@ import createCharacterSheetData from '~/document/types/actor/types/character/she
  * @property {import('svelte/store').Writable<CharacterSheetData>['set']} set
  * @property {import('svelte/store').Writable<CharacterSheetData>['update']} update
  * @property {import('svelte/store').Writable<CharacterSheetData>['subscribe']} subscribe
- * @property {Function} deleteItem - Removes an Item with the provided ID from the reactive state store.
+ * @property {Function} postAddItem - Updates the reactive state store in response to an Item being added.
+ * @property {Function} preDeleteItem - Updates the reactive state store in response to an Item being deleted.
  */
 
 /**
@@ -20,8 +21,8 @@ export default function createCharacterSheetState(actor) {
    const { set, update, subscribe } = writable(createCharacterSheetData(actor));
 
    /**
-    * Adds an Item to the reactive state store tracking.
-    * @param {TitanItem} item - The Item to add.
+    * Updates the reactive state store in response to an Item being added.
+    * @param {TitanItem} item - The Item that was added.
     */
    function postAddItem(item) {
       update((data) => {
@@ -52,8 +53,8 @@ export default function createCharacterSheetState(actor) {
    }
 
    /**
-    * Removes an Item from the reactive state store tracking.
-    * @param {TitanItem} item - The Item to remove.
+    * Updates the reactive state store in response to an Item being deleted.
+    * @param {TitanItem} item - The Item about to be deleted.
     */
    function preDeleteItem(item) {
       update((data) => {

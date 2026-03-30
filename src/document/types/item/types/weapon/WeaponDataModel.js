@@ -43,14 +43,6 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
-   _getDefaultImage() {
-      return WEAPON_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newWeapon');
-   }
-
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -61,6 +53,14 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       retVal.trait = foundry.utils.deepClone(this.trait);
 
       return retVal;
+   }
+
+   _getDefaultImage() {
+      return WEAPON_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newWeapon');
    }
 
    /**
@@ -130,7 +130,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          // Update Sheet
          const sheet = this.parent._sheet;
          if (this._sheet) {
-            sheet.addCheck();
+            sheet.postAddCheck();
          }
       }
    }
@@ -140,12 +140,12 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @param {number} idx - The Idx of the Check in this item's Checks array.
     * @returns {Promise<void>}
     */
-   async removeAttack(idx) {
+   async deleteAttack(idx) {
       if (this.parent.isOwner) {
          // Update sheet
          const sheet = this.parent._sheet;
          if (sheet) {
-            sheet.removeCheck(idx);
+            sheet.postDeleteAttack(idx);
          }
 
          // Update document

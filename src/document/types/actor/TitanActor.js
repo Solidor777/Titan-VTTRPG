@@ -14,6 +14,7 @@ import capitalize from '~/helpers/utility-functions/Capitalize.js';
  * Extends the base Actor class to implement additional system-specific logic for Titan.
  * @extends {BaseActor}
  * @property {TitanItem[]} items - A collection of embedded Item documents.
+ * @property {TitanActorSheet} sheet - The Sheet that represents this Actor.
  */
 export default class TitanActor extends Actor {
 
@@ -101,7 +102,7 @@ export default class TitanActor extends Actor {
          // Broadcast downstream functions
          for (const item of retVal) {
             this.system.postAddItem(item);
-            if (this._sheet) {
+            if (this.sheet) {
                this.sheet.postAddItem(item);
             }
          }
