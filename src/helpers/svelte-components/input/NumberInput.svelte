@@ -11,7 +11,7 @@
    /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
 
-   /** @type {number|boolean} The maximum digits of the input. */
+   /** @type {number|boolean} The value digits this input can be. */
    export let maxDigits = false;
 
    /** @type {boolean} Whether the input should currently be disabled. */
@@ -32,14 +32,9 @@
    /** @type EventDispatcher Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   /** @type {number|boolean} The calculated maximum value of the input, accounting for max and maxDigits. */
-   let calculatedMox = false;
-
    // Update the input if the value changes
    $: if (!editingActive) {
       input = value.toString();
-
-      if (calculatedMax )
    }
 
    /**
@@ -66,9 +61,11 @@
 
       // Ensure the value is <= the maximum digits if appropriate.
       if (maxDigits !== false) {
-         const maxDigits = '';
-         for (let i = 1; i <= maxDigits; i++) {}
-         newValue = Math.min(newValue, Number());
+         let stringValue = newValue.toString();
+         let maxStringLength = stringValue.includes('.') ? maxDigits + 1 : maxDigits;
+         if (stringValue.length > maxStringLength) {
+            newValue = Number(stringValue.substring(0, maxStringLength));
+         }
       }
 
       // If the value changed, broadcast the changed event.
@@ -115,25 +112,30 @@
    }
 </script>
 
-<input
-   bind:value={input}
-   {disabled}
-   on:blur={onBlur}
-   on:blur
-   on:change={onChange}
-   on:focus={onFocus}
-   on:focus
-   on:keypress={(event) => filterInput(event)}
-   on:keyup={parseInput}
-   on:keyup
-   type="number"
-   use:tooltipAction={tooltip}
+<input bind:value={input}
+       class={`${maxDigits ? 'max-digits' : ''}`}
+       {disabled}
+       on:blur={onBlur}
+       on:blur
+       on:change={onChange}
+       on:focus={onFocus}
+       on:focus
+       on:keypress={(event) => filterInput(event)}
+       on:keyup={parseInput}
+       on:keyup
+       style:--titan-max-digits={maxDigits ? maxDigits : 15}
+       type="number"
+       use:tooltipAction={tooltip}
 />
 
 <style lang="scss">
    input {
-      @include input;
-
       --titan-input-text-alignment: center;
+
+      &.max-digits {
+         --titan-input-width: calc(var(--titan-input-digit-width) * var(--titan-max-digits) + 12px);
+      }
+
+      @include input;
    }
 </style>

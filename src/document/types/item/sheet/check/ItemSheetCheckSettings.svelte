@@ -125,6 +125,7 @@
                      <DocumentIntegerInput
                         bind:value={check.complexity}
                         min={1}
+                        maxDigits={2}
                      />
                   </LabeledElement>
                </div>

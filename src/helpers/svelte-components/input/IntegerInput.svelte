@@ -10,6 +10,9 @@
    /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
 
+   /** @type {number|boolean} The value digits this input can be. */
+   export let maxDigits = false;
+
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
@@ -22,6 +25,7 @@
    {disabled}
    isInteger={true}
    {max}
+   {maxDigits}
    {min}
    on:change
    {tooltip}

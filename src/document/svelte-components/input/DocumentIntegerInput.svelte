@@ -12,6 +12,9 @@
    /** @type {number|boolean} The maximum value for this input, or false if there is none. */
    export let max = false;
 
+   /** @type {number|boolean} The value digits this input can be. */
+   export let maxDigits = false;
+
    /** @type {boolean} Whether editing this input should be disabled. */
    export let disabled = false;
 
@@ -33,9 +36,9 @@
    bind:value
    disabled={disabled || !$document?.isOwner}
    {max}
+   {maxDigits}
    {min}
    on:change={updateDocument}
    on:keyup={updateDocument}
-   style:width
    {tooltip}
 />
