@@ -49,8 +49,8 @@
       <div class="row checkbox">
          <div class="input">
             <LabeledElement
-               label={localize('action')}
-               tooltip={localize('abilityAction.desc')}
+               label={'action'}
+               tooltip={'abilityAction.desc'}
             >
                <DocumentCheckboxInput value={$document.system.action}/>
             </LabeledElement>
@@ -61,8 +61,8 @@
       <div class="row checkbox">
          <div class="input">
             <LabeledElement
-               label={localize('reaction')}
-               tooltip={localize('abilityReaction.desc')}
+               label={'reaction'}
+               tooltip={'abilityReaction.desc'}
             >
                <DocumentCheckboxInput value={$document.system.reaction}/>
             </LabeledElement>
@@ -73,8 +73,8 @@
       <div class="row checkbox">
          <div class="input">
             <LabeledElement
-               label={localize('passive')}
-               tooltip={localize('abilityPassive.desc')}
+               label={'passive'}
+               tooltip={'abilityPassive.desc'}
             >
                <DocumentCheckboxInput value={$document.system.passive}/>
             </LabeledElement>

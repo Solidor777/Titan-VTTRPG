@@ -1,7 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 
    /** @type {object} Reference to the Document store. */
@@ -15,7 +14,7 @@
 </script>
 
 <LabeledElement
-   label={localize('xp')}
+   label={'xp'}
    {tooltip}
 >
    <IntegerInput

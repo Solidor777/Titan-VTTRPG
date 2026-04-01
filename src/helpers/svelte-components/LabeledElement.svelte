@@ -2,6 +2,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
    import Label from '~/helpers/svelte-components/label/Label.svelte';
+   import Text from '~/helpers/svelte-components/Text.svelte';
 
    /** @type {string} Label to display. */
    export let label = void 0;
@@ -26,7 +27,7 @@
          />
       {:else}
          <Label>
-            {label}
+            <Text text={label}/>
          </Label>
       {/if}
    </div>

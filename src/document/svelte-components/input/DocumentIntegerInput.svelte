@@ -36,5 +36,6 @@
    {min}
    on:change={updateDocument}
    on:keyup={updateDocument}
+   style:width
    {tooltip}
 />

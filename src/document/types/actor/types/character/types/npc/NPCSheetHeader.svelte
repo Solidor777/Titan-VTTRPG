@@ -32,8 +32,8 @@
       <!--Character Type-->
       <div class="stat text">
          <LabeledElement
-            label={localize('type')}
-            tooltip={localize('type.desc')}
+            label={'type'}
+            tooltip={'type.desc'}
          >
             <DocumentTextInput bind:value={$document.system.bio.type}/>
          </LabeledElement>
@@ -42,8 +42,8 @@
       <!--Character Role-->
       <div class="stat">
          <LabeledElement
-            label={localize('role')}
-            tooltip={localize('role.desc')}
+            label={'role'}
+            tooltip={'role.desc'}
          >
             <DocumentSelect bind:value={$document.system.role} options={roleOptions}/>
          </LabeledElement>
@@ -52,8 +52,8 @@
       <!--Exp-->
       <div class="stat">
          <StatTag
-            label={localize('xp')}
-            tooltip={localize('xpTotalCost.desc')}
+            label={'xp'}
+            tooltip={'xpTotalCost.desc'}
             value={$document.system.xp}/>
       </div>
    </div>

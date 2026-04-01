@@ -11,6 +11,9 @@
    /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
 
+   /** @type {number|boolean} The maximum digits of the input. */
+   export let maxDigits = false;
+
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
@@ -29,9 +32,14 @@
    /** @type EventDispatcher Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
+   /** @type {number|boolean} The calculated maximum value of the input, accounting for max and maxDigits. */
+   let calculatedMox = false;
+
    // Update the input if the value changes
    $: if (!editingActive) {
       input = value.toString();
+
+      if (calculatedMax )
    }
 
    /**
@@ -54,6 +62,13 @@
       // Ensure the value is <= the maximum, if appropriate.
       if (max !== false) {
          newValue = Math.min(newValue, max);
+      }
+
+      // Ensure the value is <= the maximum digits if appropriate.
+      if (maxDigits !== false) {
+         const maxDigits = '';
+         for (let i = 1; i <= maxDigits; i++) {}
+         newValue = Math.min(newValue, Number());
       }
 
       // If the value changed, broadcast the changed event.

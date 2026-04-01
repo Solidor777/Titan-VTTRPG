@@ -2,7 +2,6 @@
    import RaritySelect from '~/helpers/svelte-components/select/RaritySelect.svelte';
    import { getContext } from 'svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
 
    /** @type {object} Reference to the Document store. */
    const document = getContext('document');
@@ -12,8 +11,8 @@
 </script>
 
 <LabeledElement
-   label={localize('rarity')}
-   tooltip={localize('rarity.desc')}
+   label={'rarity'}
+   tooltip={'rarity.desc'}
 >
    <RaritySelect
       bind:value={$document.system.rarity}

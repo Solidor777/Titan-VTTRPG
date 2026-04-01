@@ -84,8 +84,8 @@
                <!--Attribute Select-->
                <div class="field">
                   <LabeledElement
-                     label={localize('attribute')}
-                     tooltip={localize('check.attribute.desc')}
+                     label={'attribute'}
+                     tooltip={'check.attribute.desc'}
                   >
                      <DocumentAttributeSelect bind:value={check.attribute}/>
                   </LabeledElement>
@@ -94,8 +94,8 @@
                <!--Skill Select-->
                <div class="field">
                   <LabeledElement
-                     label={localize('skill')}
-                     tooltip={localize('check.skill.desc')}
+                     label={'skill'}
+                     tooltip={'check.skill.desc'}
                   >
                      <DocumentSkillSelect
                         bind:value={check.skill}
@@ -109,8 +109,8 @@
                <!--Difficulty Select-->
                <div class="field">
                   <LabeledElement
-                     label={localize('difficulty')}
-                     tooltip={localize('check.difficulty.desc')}
+                     label={'difficulty'}
+                     tooltip={'check.difficulty.desc'}
                   >
                      <DocumentCheckDifficultySelect bind:value={check.difficulty}/>
                   </LabeledElement>
@@ -119,8 +119,8 @@
                <!--Complexity Input-->
                <div class="field">
                   <LabeledElement
-                     label={localize('complexity')}
-                     tooltip={localize('check.complexity.desc')}
+                     label={'complexity'}
+                     tooltip={'check.complexity.desc'}
                   >
                      <DocumentIntegerInput
                         bind:value={check.complexity}
@@ -353,6 +353,7 @@
          .row {
             @include flex-row;
             @include flex-group-center;
+            @include border-separated-row;
 
             padding-top: var(--titan-spacing-large);
             width: 100%;
@@ -366,7 +367,6 @@
             .field {
                @include flex-row;
                @include flex-group-center;
-               @include separated-row;
             }
          }
       }
