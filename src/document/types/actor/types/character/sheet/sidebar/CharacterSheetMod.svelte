@@ -6,19 +6,22 @@
    import { getIcon } from '~/system/Icons.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
-   /** @type string The Mod that this component represents. */
+   /** @type {string} The Mod that this component represents. */
    export let mod = void 0;
 
-   /** @type string The Icon that represents this stat. */
+   /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(mod);
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
 <div class="container">
    <!--Label-->
-   <div class="label" use:tooltipAction="{localize(`${mod}.desc`)}">
+   <div
+      class="label"
+      use:tooltipAction={`${mod}.desc`}
+   >
       <!--Icon-->
       <i class="{icon}"/>
 

@@ -1,12 +1,12 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';
    import WeaponSheetAttackNotesTab from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackNotesTab.svelte';
    import WeaponSheetItemDescriptionTab
       from '~/document/types/item/types/weapon/sheet/WeaponSheetItemDescriptionTab.svelte';
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Tabs

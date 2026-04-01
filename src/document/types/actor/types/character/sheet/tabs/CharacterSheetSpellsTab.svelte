@@ -11,10 +11,10 @@
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

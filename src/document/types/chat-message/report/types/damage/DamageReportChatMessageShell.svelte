@@ -11,16 +11,16 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Header svelte-component to use. */
+   /** @type {object} Header svelte-component to use. */
    const header = DamageReportChatMessageHeader;
 
    /** @type {object|string[]} Calculated section svelte components. */
    const sections = [];
 
-   /** @type object[] Calculated tag svelte components. */
+   /** @type {object[]} Calculated tag svelte components. */
    const tags = [];
 
    // If we took damage, conditionally add more information to the messages

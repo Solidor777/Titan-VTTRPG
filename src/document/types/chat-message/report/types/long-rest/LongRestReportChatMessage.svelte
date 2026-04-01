@@ -10,10 +10,10 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Header svelte-components to use. */
+   /** @type {object} Header svelte-components to use. */
    const header = LongRestReportChatMessageHeader;
 
    /** @type {object|string[]} Calculated section svelte components. */

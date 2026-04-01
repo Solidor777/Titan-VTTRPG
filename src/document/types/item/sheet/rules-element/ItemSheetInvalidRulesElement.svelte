@@ -5,7 +5,7 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
    export let idx = void 0;
    export let element = void 0;

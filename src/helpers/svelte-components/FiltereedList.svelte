@@ -2,10 +2,10 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    export let entries = void 0;

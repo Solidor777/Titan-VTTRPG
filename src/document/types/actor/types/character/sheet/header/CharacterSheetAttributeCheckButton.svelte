@@ -5,21 +5,21 @@
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type string The Attribute that this component represents. */
+   /** @type {string} The Attribute that this component represents. */
    export let attribute;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type AttributeCheckParameters Calculated check parameters. */
    let checkParameters = $document.system.getAttributeCheckParameters(
       $document.system.initializeAttributeCheckOptions({ attribute: attribute }));
 
-   /** @type string Calculated tooltip. */
+   /** @type {string} Calculated tooltip. */
    let tooltip = localize(`${checkParameters.attribute}.desc`);
    tooltip += getAttributeCheckParametersTooltip(checkParameters);
 
-   /** @type string Calculated icon. */
+   /** @type {string} Calculated icon. */
    let icon = getIcon(attribute);
 
    // Update data in response to changes.

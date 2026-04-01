@@ -1,13 +1,13 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type string The value that this input should modify. */
+   /** @type {string} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type boolean Whether to allow None as an option. */
+   /** @type {boolean} Whether to allow None as an option. */
    export let allowNone = false;
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
    /** @type SelectOption[] Options for the Select svelte component. */

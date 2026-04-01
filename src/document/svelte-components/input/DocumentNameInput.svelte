@@ -2,13 +2,13 @@
    import { getContext } from 'svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type boolean Whether editing should be disabled for this component. */
+   /** @type {boolean} Whether editing should be disabled for this component. */
    export let disabled = false;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** The name of the document. */

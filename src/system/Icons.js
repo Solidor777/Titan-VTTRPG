@@ -72,7 +72,7 @@ export const WILLPOWER_ICON = 'fas fa-solar-system';
 
 /**
  * Mapping of concepts to their particular icon.
- * @type object
+ * @type {object}
  */
 const ICON_MAP = deepFreeze({
    accuracy: ACCURACY_ICON,

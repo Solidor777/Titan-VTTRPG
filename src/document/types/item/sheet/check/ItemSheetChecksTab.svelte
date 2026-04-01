@@ -9,10 +9,10 @@
    import FiltereedList from '~/helpers/svelte-components/FiltereedList.svelte';
    import ItemSheetCheckSettings from '~/document/types/item/sheet/check/ItemSheetCheckSettings.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Initialize filtered entries
@@ -23,7 +23,7 @@
          if (
             entry.label
                .toLowerCase()
-               .indexOf($appState.filter.checks.toLowerCase()) !== -1
+               .indexOf($appState.tabs.checks.filter.toLowerCase()) !== -1
          ) {
             filteredEntries.push(idx);
          }
@@ -35,7 +35,7 @@
    <!--Filter-->
    {#if $document.system.check.length > 0}
       <div class="filter" transition:slide|local>
-         <TopFilter bind:value={$appState.filter.checks}/>
+         <TopFilter bind:value={$appState.tabs.checks.filter}/>
       </div>
    {/if}
 
@@ -46,7 +46,7 @@
          <FiltereedList
             componentFunction={() => ItemSheetCheckSettings}
             entries={$document.system.check}
-            filterFunction={(entry) => entry.label.toLowerCase().includes($appState.filter.checks.toLowerCase())}
+            filterFunction={(entry) => entry.label.toLowerCase().includes($appState.tabs.checks.filter.toLowerCase())}
             idFunction={(entry) => entry.uuid}
             mapFunction={(entry, idx) => idx}
             propsFunction={(entry, idx) => {

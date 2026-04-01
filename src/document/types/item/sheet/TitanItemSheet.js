@@ -24,6 +24,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
       // Initialize self object.
       super(/** @type foundry.abstract.document */ sheetDocument, options);
+      console.log(sheetDocument);
       this.item = sheetDocument;
    }
 
@@ -48,7 +49,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
     */
    _createReactiveState() {
       // By default, assume we have rules elements since only spells do not
-      return createRulesElementItemSheetState(this.item);
+      return createRulesElementItemSheetState(/** @type {TitanItem} */ this.document);
    }
 
    /**
@@ -78,7 +79,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
       return buttons;
    }
-   
+
    /**
     * Called after an Item Check is added to this Sheet's Item.
     */

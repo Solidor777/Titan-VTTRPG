@@ -1,12 +1,11 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import { LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -21,7 +20,7 @@
       <!--Take a Long Rest Button-->
       <div
          class="button"
-         use:tooltipAction="{localize('longRest.desc')}"
+         use:tooltipAction={'longRest.desc'}
       >
          <DocumentOwnerIconButton
             icon={LONG_REST_ICON}
@@ -34,7 +33,7 @@
       <!--Take a Short Rest Button-->
       <div
          class="button"
-         use:tooltipAction="{localize('shortRest.desc')}"
+         use:tooltipAction="{'shortRest.desc'}"
       >
          <DocumentOwnerIconButton
             icon={SHORT_REST_ICON}
@@ -47,7 +46,7 @@
       <!--Remove Combat Effects button-->
       <div
          class="button"
-         use:tooltipAction="{localize('removeCombatEffects.desc')}"
+         use:tooltipAction="{'removeCombatEffects.desc'}"
       >
          <DocumentOwnerIconButton
             icon={REMOVE_TEMP_EFFECTS_ICON}
@@ -60,7 +59,10 @@
       <!--Spend Resolve button-->
       <div
          class="button"
-         use:tooltipAction="{localize('spendX%Resolve').replace('X%', 1)}"
+         use:tooltipAction={{
+            text: 'spend{x}Resolve',
+            format: {x: 1}
+         }}
       >
          <DocumentOwnerIconButton
             icon={SPEND_RESOLVE_ICON}

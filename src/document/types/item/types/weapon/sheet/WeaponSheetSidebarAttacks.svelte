@@ -11,10 +11,10 @@
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
@@ -102,7 +102,7 @@
                {#each attack.trait as trait (trait.name)}
                   <div
                      class="stat"
-                     use:tooltipAction="{localize(traitDescriptions[trait.name])}"
+                     use:tooltipAction={traitDescriptions[trait.name]}
                      transition:slide|local
                   >
                      {#if typeof (trait.value) === 'number'}

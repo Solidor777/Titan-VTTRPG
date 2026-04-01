@@ -14,7 +14,7 @@
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    export let operationOptions = void 0;

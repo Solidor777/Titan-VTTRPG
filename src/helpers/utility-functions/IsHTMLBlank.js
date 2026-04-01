@@ -4,5 +4,5 @@
  * @returns {boolean} Whether the HTML is blank, empty, or null.
  */
 export default function isHTMLBlank(html) {
-   return (!html || html === '' || html === '<p></p>');
+   return (!html || html.length <= 0 || html === '<p></p>');
 }

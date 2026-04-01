@@ -4,16 +4,16 @@
    import updateDocumentPathData from '~/helpers/utility-functions/UpdateDocumentPathData.js';
    import resolveObjectPath from '~/helpers/utility-functions/ResolveObjectPath.js';
 
-   /** @type string Path to the value that this input should modify. */
+   /** @type {string} Path to the value that this input should modify. */
    export let path = 'system.rarity';
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type string Input value. */
+   /** @type {string} Input value. */
    let value = resolveObjectPath($document, path);
 </script>
 

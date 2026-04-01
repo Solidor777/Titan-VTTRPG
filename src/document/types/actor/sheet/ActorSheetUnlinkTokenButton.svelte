@@ -2,7 +2,6 @@
    import { LINKED_ICON } from '~/system/Icons.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
 
    /** @type TitanActorSheet Actor Sheet Reference. */
    const application = getApplication();
@@ -23,7 +22,7 @@
 <!--Unlink Button-->
 <button class="header-control icon unlink-token-button"
         on:click={() => unlinkToken()}
-        use:tooltipAction={localize('unlinkTokenButton.desc')}>
+        use:tooltipAction={'unlinkTokenButton.desc'}>
    <i class="linked {LINKED_ICON}"/>
 </button>
 

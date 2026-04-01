@@ -9,20 +9,20 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 
-   /** @type string Key for the Skill to show stats for. */
+   /** @type {string} Key for the Skill to show stats for. */
    export let key;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type AttributeCheckParameters Calculated check parameters. */
    let checkParameters = $document.system.getAttributeCheckParameters(
       $document.system.initializeAttributeCheckOptions({ skill: key }));
 
-   /** @type string Tooltip for the total Training value. */
+   /** @type {string} Tooltip for the total Training value. */
    let totalTrainingTooltip = '';
 
-   /** @type string Tooltip for the total Expertise value. */
+   /** @type {string} Tooltip for the total Expertise value. */
    let totalExpertiseTooltip = '';
 
    /**
@@ -86,7 +86,7 @@
 
    <div class="columns">
       <!--Default Attribute-->
-      <div class="column" use:tooltipAction={localize('defaultAttribute.desc')}>
+      <div class="column" use:tooltipAction={'defaultAttribute.desc'}>
          <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute}/>
       </div>
 
@@ -97,7 +97,7 @@
          <div class="row">
 
             <!--Label-->
-            <div class="label" use:tooltipAction={localize('training.desc')}>
+            <div class="label" use:tooltipAction={'training.desc'}>
 
                <!--Icon-->
                <i class="{EXPERTISE_ICON}"/>
@@ -138,7 +138,7 @@
          <!--Expertise row-->
          <div class="row">
             <!--Label-->
-            <div class="label" use:tooltipAction="{localize('expertise.desc')}">
+            <div class="label" use:tooltipAction={'expertise.desc'}>
 
                <!--Icon-->
                <i class="{TRAINING_ICON}"/>

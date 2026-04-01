@@ -7,7 +7,6 @@
 
    font-weight: var(--titan-label-font-weight);
    font-size: var(--titan-label-font-size);
-   height: var(--titan-label-height);
 }
 
 @mixin bordered-label {
@@ -23,4 +22,5 @@
    color: var(--titan-label-font-color);
    padding: var(--titan-label-padding);
    width: var(--titan-label-width);
+   height: var(--titan-label-height);
 }

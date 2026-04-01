@@ -1,14 +1,14 @@
 <script>
-   /** @type string Main label for the header. */
+   /** @type {string} Main label for the header. */
    export let headerLabel = void 0;
 
-   /** @type string Icon for the header. */
+   /** @type {string} Icon for the header. */
    export let headerIcon = void 0;
 
-   /** @type string[] Labels for the sub-headers. */
+   /** @type {string[]} Labels for the sub-headers. */
    export let subHeaderLabels = void 0;
 
-   /** @type string[] Images to display. */
+   /** @type {string[]} Images to display. */
    export let images = void 0;
 </script>
 

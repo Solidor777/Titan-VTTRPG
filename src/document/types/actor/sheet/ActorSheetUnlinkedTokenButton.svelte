@@ -1,11 +1,10 @@
 <script>
    import { UNLINKED_ICON } from '~/system/Icons.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
 </script>
 
 <!--Unlink Button-->
-<div class="inactive-button" use:tooltipAction={localize('unlinkedTokenButton.desc')}>
+<div class="inactive-button" use:tooltipAction={'unlinkedTokenButton.desc'}>
    <button class="header-control icon" disabled="{true}">
       <i class="unlinked {UNLINKED_ICON}"/>
    </button>

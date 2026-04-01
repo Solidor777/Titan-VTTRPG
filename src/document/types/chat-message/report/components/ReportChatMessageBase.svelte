@@ -6,7 +6,7 @@
    /** @type {object[]|string[]} Array of sections to include in the report. */
    export let sections = void 0;
 
-   /** @type object[] Array of tags svelte-components to append to the report. */
+   /** @type {object[]} Array of tags svelte-components to append to the report. */
    export let tags = void 0;
 </script>
 

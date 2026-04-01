@@ -1,6 +1,5 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
-import { writable } from 'svelte/store';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
@@ -126,11 +125,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @returns {import('svelte/store').Writable<any>} The newly created state store.
+    * @returns {import('svelte/store').Writable<any>|void} The newly created state store.
     * @protected
     */
    _createReactiveState() {
-      return writable();
    }
 
    /**

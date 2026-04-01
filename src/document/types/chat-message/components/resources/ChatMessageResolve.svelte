@@ -1,10 +1,10 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ChatResource from '~/document/types/chat-message/components/resources/ChatMessageResource.svelte';
-   import {RESOLVE_ICON} from '~/system/Icons.js';
+   import { RESOLVE_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

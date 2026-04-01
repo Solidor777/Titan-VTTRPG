@@ -3,16 +3,16 @@
    import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type string Path to the value that this input should modify. */
+   /** @type {string} Path to the value that this input should modify. */
    export let path = void 0;
 
-   /** @type boolean Whether editing this input should be disabled. */
+   /** @type {boolean} Whether editing this input should be disabled. */
    export let disabled = false;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

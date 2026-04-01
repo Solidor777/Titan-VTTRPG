@@ -42,7 +42,7 @@
    }
 
    /**
-    * @type object[]
+    * @type {object[]}
     * List of all Aspects with a mapping of their index in their corresponding array, sorted from
     * smallest to largest.
     */

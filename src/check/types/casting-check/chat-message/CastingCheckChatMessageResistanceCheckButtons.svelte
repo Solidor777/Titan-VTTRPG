@@ -2,10 +2,10 @@
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
    import { getContext } from 'svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type number Calculated Complexity of the Resistance checks. */
+   /** @type {number} Calculated Complexity of the Resistance checks. */
    const complexity = $document.flags.titan.results.extraSuccesses + 1;
 </script>
 

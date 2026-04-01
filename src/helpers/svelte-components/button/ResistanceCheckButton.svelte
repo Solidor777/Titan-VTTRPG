@@ -3,19 +3,19 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharactersToUpdate.js';
 
-   /** @type string The Resistance to roll. */
+   /** @type {string} The Resistance to roll. */
    export let resistance = void 0;
 
-   /** @type string The Difficulty of the Check. */
+   /** @type {string} The Difficulty of the Check. */
    export let difficulty = 4;
 
-   /** @type number The Complexity of the Check. */
+   /** @type {number} The Complexity of the Check. */
    export let complexity = 1;
 
-   /** @type number Damage to be reduced by the check, if any. */
+   /** @type {number} Damage to be reduced by the check, if any. */
    export let damageToReduce = 0;
 
-   /** @type boolean The Complexity of the Check. */
+   /** @type {boolean} The Complexity of the Check. */
    export let disabled = false;
 
    /**

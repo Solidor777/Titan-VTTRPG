@@ -7,7 +7,7 @@
    import CustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

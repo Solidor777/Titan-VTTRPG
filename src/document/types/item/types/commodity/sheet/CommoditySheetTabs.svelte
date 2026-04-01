@@ -5,7 +5,7 @@
    import ItemSheetDescriptionTab from '~/document/types/item/sheet/ItemSheetDescriptionTab.svelte';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Tabs

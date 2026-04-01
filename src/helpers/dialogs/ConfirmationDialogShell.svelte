@@ -5,13 +5,13 @@
    import getApplication from '~/helpers/utility-functions/GetApplication';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   /** @type string[] Header lines. */
+   /** @type {string[]} Header lines. */
    export let headers = void 0;
 
-   /** @type string Message explaining the dialog. */
+   /** @type {string} Message explaining the dialog. */
    export let message = void 0;
 
-   /** @type string Label for the confirmation button. */
+   /** @type {string} Label for the confirmation button. */
    export let confirmLabel = void 0;
 
    /** @type ConfirmationDialog The Svelte Component's Application. */

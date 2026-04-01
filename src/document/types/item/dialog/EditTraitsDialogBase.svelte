@@ -11,13 +11,13 @@
    /** @type Item The Item to edit the Traits of. */
    export let item = void 0;
 
-   /** @type object[] The traits to be edited. */
+   /** @type {object[]} The traits to be edited. */
    export let documentTraits = void 0;
 
-   /** @type object[] The traits to select from. */
+   /** @type {object[]} The traits to select from. */
    export let traitOptions = void 0;
 
-   /** @type object Object containing a mapping of each trait to its description. */
+   /** @type {object} Object containing a mapping of each trait to its description. */
    export let traitDescriptions = void 0;
 
    /** @type SvelteApp The Svelte Component's Application. */
@@ -60,7 +60,7 @@
 <ol>
    {#each traitOptions as trait, idx}
       <!--Trait-->
-      <li use:tooltipAction="{localize(traitDescriptions[trait.name])}">
+      <li use:tooltipAction={traitDescriptions[trait.name]}>
 
          <!--Label-->
          <div class="label">

@@ -29,10 +29,10 @@
    // Attack idx
    export let idx = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
@@ -223,7 +223,7 @@
                      {#each attack.trait as trait (trait.name)}
                         <div
                            class="trait"
-                           use:tooltipAction="{localize(traitDescriptions[trait.name])}"
+                           use:tooltipAction={traitDescriptions[trait.name]}
                         >
                            {#if typeof (trait.value) === 'number'}
                               <!--Number Trait-->

@@ -1,10 +1,9 @@
 <script>
    import { getContext } from 'svelte';
    import { LINKED_ICON, UNLINKED_ICON } from '~/system/Icons.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** Toggles whether this Actor is linked to their Token. */
@@ -18,10 +17,9 @@
 <!--Toggle Linked Button-->
 <button class="header-control icon toggle-token-linked-button"
         on:click={toggleLinkedToken}
-        use:tooltipAction={localize(
-           $document?.prototypeToken?.actorLink
+        use:tooltipAction={ $document?.prototypeToken?.actorLink
            ? 'toggleTokenUnlinkedButton.desc'
-           : 'toggleTokenLinkedButton.desc')}
+           : 'toggleTokenLinkedButton.desc'}
 >
    <i
       class="{

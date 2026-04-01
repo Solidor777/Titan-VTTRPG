@@ -11,10 +11,10 @@
    /** @type Tab[] Array of Tab objects. */
    export let tabs = [];
 
-   /** @type string The ID of the active Tab object. */
+   /** @type {string} The ID of the active Tab object. */
    export let activeTab = void 0;
 
-   /** @type boolean Whether the tabs should be bordered. */
+   /** @type {boolean} Whether the tabs should be bordered. */
    export let border = false;
 </script>
 

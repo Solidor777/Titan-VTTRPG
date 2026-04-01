@@ -12,7 +12,7 @@
    /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type string The currently selected item type. */
+   /** @type {string} The currently selected item type. */
    let value = 'armor';
 
    /**

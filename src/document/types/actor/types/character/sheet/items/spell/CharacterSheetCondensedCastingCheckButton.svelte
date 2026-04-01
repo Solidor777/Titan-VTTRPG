@@ -1,12 +1,12 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
 
-   /** @type string The ID of the Item to get the check from. */
+   /** @type {string} The ID of the Item to get the check from. */
    export let itemId = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type CastingCheckOptions Base options for the Check. */
@@ -17,7 +17,7 @@
    /** @type CastingCheckParameters Calculated check parameters. */
    let checkParameters;
 
-   /** @type string Calculated tooltipAction. */
+   /** @type {string} Calculated tooltipAction. */
    let tooltip;
 
    // Update the svelte-components in response to changes

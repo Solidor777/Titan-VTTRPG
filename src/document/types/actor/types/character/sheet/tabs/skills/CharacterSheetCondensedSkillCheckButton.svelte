@@ -1,16 +1,16 @@
 <script>
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    /** @type AttributeCheckParameters The Parameters of the Check this component represents. */
    export let checkParameters = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type string Calculated tooltip. */
+   /** @type {string} Calculated tooltip. */
    let tooltip = localize(`${checkParameters.skill}.desc`);
    tooltip += getAttributeCheckParametersTooltip(checkParameters);
 </script>

@@ -4,19 +4,19 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON } from '~/system/Icons.js';
 
-   /** @type number Index of the Scaling Aspect in the Scaling Aspects array. */
+   /** @type {number} Index of the Scaling Aspect in the Scaling Aspects array. */
    export let idx = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type ScalingAspect Reference to the scaling aspect. */
    let aspect = $document.flags.titan.results.scalingAspect[idx];
 
-   /** @type number Calculated scaling cost of the aspect. */
+   /** @type {number} Calculated scaling cost of the aspect. */
    const aspectIncrement = Math.max(aspect.initialValue, 1);
 
-   /** @type string[] Calculated aspect icons */
+   /** @type {string[]} Calculated aspect icons */
    const icons = [];
 
    // Add damage icon if appropriate

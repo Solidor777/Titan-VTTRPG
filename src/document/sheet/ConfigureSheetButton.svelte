@@ -2,7 +2,6 @@
    import { SETTINGS_ICON } from '~/system/Icons.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
 
    /** @type TitanDocumentSheet Document Sheet Reference. */
    const application = getApplication();
@@ -18,6 +17,6 @@
 <!--Edit Token Button-->
 <button class="header-control icon configure-sheet-button"
         on:click={() => configureSheet()}
-        use:tooltipAction={localize('openSheetConfigurator')}>
+        use:tooltipAction={'openSheetConfigurator'}>
    <i class="{SETTINGS_ICON}"/>
 </button>

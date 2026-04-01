@@ -6,7 +6,7 @@
    import SpellSheetSidebarCastingCheck
       from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCastingCheck.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    $: sections =

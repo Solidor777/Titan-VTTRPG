@@ -9,10 +9,10 @@
    /** @type SelectOption[] Options for the Select svelte component. */
    export let options = void 0;
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

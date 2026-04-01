@@ -12,7 +12,7 @@
       from '~/document/types/actor/types/character/types/player/PlayerSheetInspiration.svelte';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -21,7 +21,7 @@
    <div class="row">
       <!--Character name Sheet-->
       <div class="stat text">
-         <DocumentNameInput tooltip={localize('characterName.desc')}/>
+         <DocumentNameInput tooltip={'characterName.desc'}/>
       </div>
 
       <!--Inspiration Toggle-->
@@ -34,7 +34,7 @@
          <!--XP Available-->
          <div
             class="available"
-            use:tooltipAction="{localize('xpAvailable.desc')}"
+            use:tooltipAction={'xpAvailable.desc'}
          >
             <ModifiedValueLabel
                baseValue={0}
@@ -46,7 +46,7 @@
          <div class="symbol">/</div>
 
          <!--XP Earned-->
-         <div class="earned" use:tooltipAction="{localize('xpEarned.desc')}">
+         <div class="earned" use:tooltipAction={'xpEarned.desc'}>
             <DocumentIntegerInput bind:value={$document.system.xp.earned}/>
          </div>
 

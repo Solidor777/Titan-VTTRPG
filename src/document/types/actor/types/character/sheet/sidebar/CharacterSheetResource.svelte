@@ -7,13 +7,13 @@
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type string The Resource that this component represents. */
+   /** @type {string} The Resource that this component represents. */
    export let resource = void 0;
 
-   /** @type string The Icon that represents this stat. */
+   /** @type {string} The Icon that represents this stat. */
    export let icon = getIcon(resource);
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -25,7 +25,7 @@
       <i class={`${icon} side`}/>
 
       <!--Label-->
-      <div class="middle" use:tooltipAction="{localize(`${resource}.desc`)}">
+      <div class="middle" use:tooltipAction={`${resource}.desc`}>
 
          <!--Spacer to center the label-->
          <div class="side"/>
@@ -60,7 +60,7 @@
       <!--Meter-->
       <div
          class="middle {resource} "
-         use:tooltipAction="{localize(`${resource}.desc`)}"
+         use:tooltipAction={`${resource}.desc`}
       >
          <Meter
             max={$document.system.resource[resource].max}
@@ -87,7 +87,7 @@
    .container {
       @include flex-column;
       @include flex-group-top;
-      
+
       width: 100%;
       height: 100%;
 

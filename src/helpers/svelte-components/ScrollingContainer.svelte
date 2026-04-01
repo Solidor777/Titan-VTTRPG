@@ -1,15 +1,15 @@
 <script>
 
-   /** @type number Initial scroll top of this container. */
+   /** @type {number} Initial scroll top of this container. */
    export let scrollTop = 0;
 
-   /** @type boolean Whether the container is overflowing its top. */
+   /** @type {boolean} Whether the container is overflowing its top. */
    let isOverflowingTop = false;
 
-   /** @type boolean Whether the container is overflowing its bottom. */
+   /** @type {boolean} Whether the container is overflowing its bottom. */
    let isOverflowingBottom = false;
 
-   /** @type number The length of the scroll fade in pixels, if any. */
+   /** @type {number} The length of the scroll fade in pixels, if any. */
    const fadeLength = 12;
 
    /**

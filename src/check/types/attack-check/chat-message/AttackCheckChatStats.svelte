@@ -8,7 +8,7 @@
    import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
@@ -61,12 +61,12 @@
       >
          {#if typeof (trait.value) === 'number'}
             <StatTag
-               tooltip={localize(traitDescriptions[trait.name])}
+               tooltip={traitDescriptions[trait.name]}
                label={localize(trait.name)}
                value={trait.value}
             />
          {:else}
-            <Tag tooltip={localize(traitDescriptions[trait.name])}>
+            <Tag tooltip={traitDescriptions[trait.name]}>
                {localize(trait.name)}
             </Tag>
          {/if}

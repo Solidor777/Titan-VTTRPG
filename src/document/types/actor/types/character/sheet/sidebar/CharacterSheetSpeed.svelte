@@ -6,19 +6,19 @@
    import { getIcon } from '~/system/Icons.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
-   /** @type string The Speed that this component represents. */
+   /** @type {string} The Speed that this component represents. */
    export let speed;
 
-   /** @type string The Icon that represents this stat. */
+   /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(speed);
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
 <div class="container">
    <!--Label-->
-   <div class="label" use:tooltipAction="{localize(`${speed}.desc`)}">
+   <div class="label" use:tooltipAction={`${speed}.desc`}>
       <!--Icon-->
       {localize(speed)}
    </div>

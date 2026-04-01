@@ -1,19 +1,19 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** The label for the summary. */
+   /** @type {string} The label for the element. */
    export let label = void 0;
 
-   /** The value to display. */
+   /** @type {*} The value to display. */
    export let value = void 0;
 
-   /** The tooltipAction to display when the label is hovered. */
+   /** @type {string|TooltipData} The tooltip to display when the element is hovered. */
    export let fieldTooltip = void 0;
 
 </script>
 
 <!--Field-->
-<div class="field" use:tooltipAction="{fieldTooltip}">
+<div class="field" use:tooltipAction={fieldTooltip}>
 
    <!--Label-->
    <div class="sign">

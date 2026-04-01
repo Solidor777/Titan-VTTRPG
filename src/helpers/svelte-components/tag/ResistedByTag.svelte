@@ -2,10 +2,10 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
-   /** @type string The Resistance to associate with the tag. */
+   /** @type {string} The Resistance to associate with the tag. */
    export let resistance = void 0;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

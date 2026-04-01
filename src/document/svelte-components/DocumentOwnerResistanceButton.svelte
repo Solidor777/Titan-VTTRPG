@@ -1,17 +1,17 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import ResistanceButton from '~/helpers/svelte-components/button/ResistanceButton.svelte';
 
-   /** @type string The Resistance that this component represents. */
+   /** @type {string} The Resistance that this component represents. */
    export let resistance;
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
 </script>

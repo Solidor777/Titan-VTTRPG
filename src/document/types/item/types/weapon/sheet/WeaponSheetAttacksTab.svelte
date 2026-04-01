@@ -8,12 +8,12 @@
    import WeaponSheetAttackSettings from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackSettings.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-   
+
    // Initialize filtered entries
    let filteredEntries = [];
    $: {

@@ -1,11 +1,11 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {HEALING_ICON} from '~/system/Icons.js';
+   import { HEALING_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    // Calculate the tooltipAction for the resource mod
@@ -48,7 +48,7 @@
             // Update the actor
             await actor.system.applyHealing(
                $document.flags.titan.fastHealing.total,
-               {report: false},
+               { report: false },
             );
 
             // Update the chat message

@@ -14,7 +14,7 @@
    import DocumentShieldTraitSelect from '~/document/svelte-components/select/DocumentShieldTraitSelect.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    export let operationOptions = void 0;

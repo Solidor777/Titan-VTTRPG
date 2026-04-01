@@ -13,7 +13,7 @@
       TRAINING_ICON,
    } from '~/system/Icons.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -97,7 +97,7 @@
       {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
-            use:tooltipAction="{localize('attack.rend.desc')}"
+            use:tooltipAction={'attack.rend.desc'}
          >
             <i class={REND_ICON}/>
             {localize('rend')}:
@@ -109,7 +109,7 @@
       {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
          <div
             class="stat"
-            use:tooltipAction="{localize('attack.cleave.desc')}"
+            use:tooltipAction={'attack.cleave.desc'}
          >
             <i class={CLEAVE_ICON}/>
             {localize('cleave')}:

@@ -4,10 +4,10 @@
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 </script>
 

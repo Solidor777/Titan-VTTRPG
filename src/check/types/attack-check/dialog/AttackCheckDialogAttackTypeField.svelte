@@ -1,18 +1,18 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import AttackTypeSelect from '~/helpers/svelte-components/select/AttackTypeSelect.svelte';
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type object Reference to the Check Options store. */
+   /** @type {object} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
 </script>
 
 <CheckDialogField
    bind:value={$checkOptions.type}
-   fieldTooltip="{localize('check.attackType.desc')}"
+   fieldTooltip={'check.attackType.desc'}
    input={AttackTypeSelect}
-   label="{localize('type')}"
+   label={localize('type')}
    on:change
 />

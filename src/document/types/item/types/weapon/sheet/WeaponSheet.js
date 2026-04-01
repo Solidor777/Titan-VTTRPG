@@ -46,7 +46,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    _createReactiveState() {
-      return createWeaponSheetState();
+      return createWeaponSheetState(/** @type {TitanItem} */ this.document);
    }
 
    /**

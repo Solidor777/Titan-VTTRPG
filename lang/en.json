@@ -479,7 +479,7 @@
       "spellTradition.text": "Spell Tradition",
       "spells.text": "Spells",
       "spendResolve.text": "Spend Resolve",
-      "spendX%Resolve.text": "Spend X% Resolve",
+      "spend{x}Resolve.text": "Spend {x} Resolve",
       "spentResolve.text": "Spent Resolve",
       "spentX%Resolve.text": "Spent X% Resolve",
       "splash.text": "Splash",

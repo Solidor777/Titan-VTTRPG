@@ -4,10 +4,10 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type string The ID of the item this button is for. */
+   /** @type {string} The ID of the item this button is for. */
    export let itemId = void 0;
 </script>
 

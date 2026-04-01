@@ -16,7 +16,7 @@
    import { DELETE_ICON } from '~/system/Icons.js';
    import DocumentNumberInput from '~/document/svelte-components/input/DocumentNumberInput.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    export let operationOptions = void 0;

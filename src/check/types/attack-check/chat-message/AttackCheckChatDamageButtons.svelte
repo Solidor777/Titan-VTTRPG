@@ -3,7 +3,6 @@
    import applyHealingToTargets from '~/helpers/utility-functions/ApplyHealingToTargets.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { CLEAVE_ICON, DAMAGE_ICON, HALF_DAMAGE_ICON, HEALING_ICON, IGNORE_ARMOR_ICON } from '~/system/Icons';
 
    export let damage = void 0;
@@ -14,7 +13,7 @@
 
 <div class="damage-buttons">
    <!--Apply damage button-->
-   <div class="button" use:tooltipAction="{localize('applyDamage')}">
+   <div class="button" use:tooltipAction={'applyDamage'}>
       <Button
          on:click={() => {
             applyDamageToTargets(damage, {
@@ -30,7 +29,7 @@
    {#if cleave > 0}
       <div
          class="button"
-         use:tooltipAction="{localize('applyCleaveDamage')}"
+         use:tooltipAction={'applyCleaveDamage'}
       >
          <Button
             on:click={() => {
@@ -48,7 +47,7 @@
    <!--Apply damage ignore armor button-->
    <div
       class="button"
-      use:tooltipAction="{localize('applyDamageIgnoreArmor')}"
+      use:tooltipAction={'applyDamageIgnoreArmor'}
    >
       <Button
          on:click={() => {
@@ -63,7 +62,7 @@
    </div>
 
    <!--Apply half damage button-->
-   <div class="button" use:tooltipAction="{localize('applyHalfDamage')}">
+   <div class="button" use:tooltipAction={'applyHalfDamage'}>
       <Button
          on:click={() => {
             applyDamageToTargets(Math.max(Math.floor(damage / 2), 1), {
@@ -77,7 +76,7 @@
    </div>
 
    <!--Apply healing button-->
-   <div class="button" use:tooltipAction="{localize('applyHealing')}">
+   <div class="button" use:tooltipAction={'applyHealing'}>
       <Button on:click={() => applyHealingToTargets(damage)}>
          <i class="{HEALING_ICON}"/>
       </Button>

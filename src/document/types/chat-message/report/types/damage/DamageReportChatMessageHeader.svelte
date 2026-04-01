@@ -1,16 +1,16 @@
 <script>
    import ReportChatMessageHeader from '~/document/types/chat-message/report/components/ReportChatMessageHeader.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {ARMOR_ICON, DAMAGE_ICON} from '~/system/Icons.js';
-   import {getContext} from 'svelte';
+   import { ARMOR_ICON, DAMAGE_ICON } from '~/system/Icons.js';
+   import { getContext } from 'svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type string Calculated header label. */
+   /** @type {string} Calculated header label. */
    let headerLabel;
 
-   /** @type string Calculated header icon. */
+   /** @type {string} Calculated header icon. */
    let headerIcon;
 
    // If we tool damage, use that as the main header

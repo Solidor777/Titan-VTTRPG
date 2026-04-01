@@ -58,6 +58,6 @@ export default class TitanSpellSheet extends TitanItemSheet {
     * @protected
     */
    _createReactiveState() {
-      return createSpellSheetState();
+      return createSpellSheetState(/** @type {TitanItem} */ this.document);
    }
 }

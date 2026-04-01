@@ -258,7 +258,7 @@
    {/if}
 
    <!--ID Method-->
-   <div class="row" use:tooltipAction="{localize(`idMethod.desc`)}">
+   <div class="row" use:tooltipAction={`idMethod.desc`}>
       <!--Label-->
       <div class="label">
          {localize('idMethod')}

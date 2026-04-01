@@ -18,10 +18,10 @@
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type string The ID of the item to get the check from. */
+   /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
    // Reference to the attack idx

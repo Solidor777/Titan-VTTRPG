@@ -1,24 +1,24 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** The label for the field. */
+   /** @type {string} - The label for the element. */
    export let label = void 0;
 
-   /** The value that this input should modify. */
+   /** @type {*} The value that this input should modify. */
    export let value = void 0;
 
-   /** The input svelte-components to bind to the value. */
+   /** @type {SvelteComponent} -The input svelte component to bind the value to. */
    export let input = void 0;
 
-   /** The tooltipAction to display when the label is hovered. */
+   /** @type {string|TooltipData} - The tooltip to display when the element is hovered. */
    export let fieldTooltip = void 0;
 
-   /** Properties for the input svelte components. */
+   /** @type {*} - Properties for the input svelte components. */
    export let inputProps = void 0;
 </script>
 
 <!--Field-->
-<div class="field" on:change use:tooltipAction="{fieldTooltip}">
+<div class="field" on:change use:tooltipAction={fieldTooltip}>
 
    <!--Label-->
    <div class="sign">

@@ -3,17 +3,20 @@
    import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
    import Label from '~/helpers/svelte-components/label/Label.svelte';
 
-   /** @type string Label to display. */
+   /** @type {string} Label to display. */
    export let label = void 0;
 
-   /** @type string Optional Icon to display. */
+   /** @type {string} Optional Icon to display. */
    export let icon = void 0;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 
-<div class="labeled-element" use:tooltipAction={tooltip}>
+<div
+   class="labeled-element"
+   use:tooltipAction={tooltip}
+>
    <!--Label-->
    <div class="label">
       {#if (icon)}

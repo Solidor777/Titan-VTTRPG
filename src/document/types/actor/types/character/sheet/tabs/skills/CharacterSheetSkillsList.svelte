@@ -5,10 +5,10 @@
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkill.svelte';
    import { slideFade } from '@typhonjs-fvtt/runtime/svelte/transition';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
    // Filtered Skill list

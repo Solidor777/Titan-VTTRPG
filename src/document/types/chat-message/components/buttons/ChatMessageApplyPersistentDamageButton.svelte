@@ -1,11 +1,11 @@
 <script>
-   import {getContext} from 'svelte';
+   import { getContext } from 'svelte';
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {PERSISTENT_DAMAGE_ICON} from '~/system/Icons.js';
+   import { PERSISTENT_DAMAGE_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    // Calculate the tooltipAction for the resource mod

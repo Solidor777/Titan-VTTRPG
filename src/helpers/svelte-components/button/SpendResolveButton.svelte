@@ -2,10 +2,10 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   /** @type number The amount of resolve to spend. */
+   /** @type {number} The amount of resolve to spend. */
    export let resolveCost = void 0;
 
-   /** @type boolean Whether the button should be disabled. */
+   /** @type {boolean} Whether the button should be disabled. */
    export let disabled = void 0;
 </script>
 

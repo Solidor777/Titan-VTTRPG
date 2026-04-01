@@ -70,9 +70,7 @@
             {#each attack.trait as trait}
                <div
                   class="stat"
-                  use:tooltipAction="{{
-                     content: localize(traitDescriptions[trait.name]),
-                  }}"
+                  use:tooltipAction={traitDescriptions[trait.name]}
                >
                   {#if typeof (trait.value) === 'number'}
                      <StatTag

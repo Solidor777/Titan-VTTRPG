@@ -63,10 +63,10 @@
     */
    export let effect = void 0;
 
-   /** @type string The icon to show for the Effect. */
+   /** @type {string} The icon to show for the Effect. */
    export let icon = void 0;
 
-   /** @type string Calculated tooltipAction depending on whether the effect has a description */
+   /** @type {string} Calculated tooltipAction depending on whether the effect has a description */
    const tooltip = !isHTMLBlank(effect.description) ?
       `${localize('effect.custom.desc')}${effect.description}` :
       localize('effect.custom.desc');

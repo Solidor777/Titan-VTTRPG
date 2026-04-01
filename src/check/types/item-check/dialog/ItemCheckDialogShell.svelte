@@ -18,10 +18,10 @@
    /** @type TitanActor The Actor that will roll the Check. */
    export let actor = void 0;
 
-   /** @type object Reference to the Check Options store. */
+   /** @type {object} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type object Reference to calculated Check Parameters. */
+   /** @type {object} Reference to calculated Check Parameters. */
    const checkParameters = getContext('checkParameters');
 
    /** @type ItemCheckDialog The Svelte Component's Application. */

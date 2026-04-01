@@ -8,7 +8,7 @@
    import ItemSheetXPCostInput from '~/document/types/item/sheet/ItemSheetXPCostInput.svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

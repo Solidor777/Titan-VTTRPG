@@ -81,7 +81,7 @@ export const ATTACK_TRAITS = deepFreeze([
 
 /**
  * Keys for the localized description strings for Attack Traits, mapped to the Trait name.
- * @type object
+ * @type {object}
  */
 export const ATTACK_TRAIT_DESCRIPTIONS = deepFreeze({
    blast: 'attack.blast.desc',

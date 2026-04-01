@@ -1,11 +1,11 @@
 <script>
-   /** @type number[] Options for the Select svelte component. */
+   /** @type {number[]} Options for the Select svelte component. */
    export let options = void 0;
 
-   /** @type number The value that this input should modify. */
+   /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 </script>
 

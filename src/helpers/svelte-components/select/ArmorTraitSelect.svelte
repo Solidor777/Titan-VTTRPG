@@ -3,16 +3,16 @@
    import Select from '~/helpers/svelte-components/select/Select.svelte';
    import { ARMOR_TRAITS } from '~/document/types/item/types/armor/ArmorTraits.js';
 
-   /** @type string The value that this input should modify. */
+   /** @type {string} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type boolean Whether to allow None as an option. */
+   /** @type {boolean} Whether to allow None as an option. */
    export let allowNone = false;
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type StringOptions[] Options for the Select svelte component. */
+   /** @type {string}Options[] Options for the Select svelte component. */
    const options = [];
    for (const trait of ARMOR_TRAITS) {
       options.push({

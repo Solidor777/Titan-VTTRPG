@@ -2,10 +2,9 @@
    import { EDIT_TOKEN_ICON } from '~/system/Icons.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type TitanActorSheet Actor Sheet Reference. */
@@ -29,10 +28,10 @@
 <!--Edit Token Button-->
 <button class="header-control icon edit-token-button"
         on:click={() => editToken()}
-        use:tooltipAction={localize((
-           application.token?.actorLink
+        use:tooltipAction={
+           (application.token?.actorLink
            || application.token === null && $document.prototypeToken?.actorLink)
         ? 'editLinkedToken.desc'
-        : 'editUnlinkedToken.desc')}>
+        : 'editUnlinkedToken.desc'}>
    <i class="{EDIT_TOKEN_ICON}"/>
 </button>

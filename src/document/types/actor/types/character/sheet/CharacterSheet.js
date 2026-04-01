@@ -51,7 +51,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
     * @protected
     */
    _createReactiveState() {
-      return createCharacterSheetState();
+      return createCharacterSheetState(/** @type {TitanActor} */ this.document);
    }
 
 }

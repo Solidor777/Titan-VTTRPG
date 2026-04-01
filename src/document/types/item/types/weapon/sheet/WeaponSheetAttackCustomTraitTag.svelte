@@ -1,15 +1,14 @@
 <script>
-   import {getContext} from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import { getContext } from 'svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
-   /** @type number The idx of the Attack in the Attacks array. */
+   /** @type {number} The idx of the Attack in the Attacks array. */
    export let attackIdx = void 0;
 
-   /** @type number The idx of the Trait in the Custom Traits array. */
+   /** @type {number} The idx of the Trait in the Custom Traits array. */
    export let traitIdx = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /**
@@ -29,9 +28,9 @@
 
 <EditDeleteTag
    {deleteFunction}
-   deleteTooltip={localize('deleteTrait')}
+   deleteTooltip={'deleteTrait'}
    {editFunction}
-   editTooltip={localize('editTrait')}
+   editTooltip={'editTrait'}
    label={$document.system.attack[attackIdx].customTrait[traitIdx].name}
    labelTooltip={$document.system.attack[attackIdx].customTrait[traitIdx].description}
 />

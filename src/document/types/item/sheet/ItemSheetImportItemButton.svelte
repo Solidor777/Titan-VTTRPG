@@ -1,10 +1,9 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { IMPORT_ICON } from '~/system/Icons.js';
    import { getContext } from 'svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
    /** Imports the actor from a compendium sheet.. */
@@ -16,6 +15,6 @@
 <!--Import Actor Button-->
 <button class="header-control icon edit-token-button"
         on:click={() => importItem()}
-        use:tooltipAction={localize('importItemToWorld')}>
+        use:tooltipAction={'importItemToWorld'}>
    <i class="{IMPORT_ICON}"/>
 </button>

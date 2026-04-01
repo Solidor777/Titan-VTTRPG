@@ -5,7 +5,7 @@
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type number The value that this input should modify. */
+   /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
    /** @type {number|boolean} The minimum value of the input. */
@@ -14,21 +14,21 @@
    /** @type {number|boolean} The maximum value of the input. */
    export let max = false;
 
-   /** @type boolean Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /**
-    * @type number
+    * @type {number}
     * How much to increment or decrement the value when the increase or decrease buttons are pressed while the modifier
     * is NOT active.
     */
    export let increment = 1;
 
    /**
-    * @type number
+    * @type {number}
     * How much to increment or decrement the value when the increase or decrease buttons while the modifier IS active.
     */
    export let modifierIncrement = 10;

@@ -19,17 +19,21 @@
       HEALING_ICON,
       SPEND_RESOLVE_ICON,
    } from '~/system/Icons.js';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
    // Check idx
    export let idx = void 0;
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type object Reference to the Application State store. */
+   /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
+   /** @type ItemCheck The Check this component represents. */
    $: check = $document.system.check[idx];
+
+   /** @type {boolean} Whether this component is currently expanded. */
    $: isExpanded = $appState.tabs.checks.isExpanded[idx];
 </script>
 
@@ -42,7 +46,7 @@
             {#if isExpanded}
                <!--Collapse button-->
                <IconButton
-                  icon="{EXPANDED_ICON}"
+                  icon={EXPANDED_ICON}
                   on:click={() => {
                      $appState.tabs.checks.isExpanded[idx] = false;
                   }}
@@ -50,7 +54,7 @@
             {:else}
                <!--Expand button-->
                <IconButton
-                  icon="{COLLAPSED_ICON}"
+                  icon={COLLAPSED_ICON}
                   on:click={() => {
                      $appState.tabs.checks.isExpanded[idx] = true;
                   }}
@@ -79,64 +83,50 @@
             <div class="row">
                <!--Attribute Select-->
                <div class="field">
-                  <!--Label-->
-                  <div class="label">
-                     {localize('attribute')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input">
+                  <LabeledElement
+                     label={localize('attribute')}
+                     tooltip={localize('check.attribute.desc')}
+                  >
                      <DocumentAttributeSelect bind:value={check.attribute}/>
-                  </div>
+                  </LabeledElement>
                </div>
 
                <!--Skill Select-->
                <div class="field">
-                  <!--Label-->
-                  <div class="label">
-                     {localize('skill')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input">
+                  <LabeledElement
+                     label={localize('skill')}
+                     tooltip={localize('check.skill.desc')}
+                  >
                      <DocumentSkillSelect
                         bind:value={check.skill}
                         allowNone={true}
                      />
-                  </div>
+                  </LabeledElement>
                </div>
             </div>
 
             <div class="row">
                <!--Difficulty Select-->
                <div class="field">
-                  <!--Label-->
-                  <div class="label">
-                     {localize('difficulty')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input">
-                     <DocumentCheckDifficultySelect
-                        bind:value={check.difficulty}
-                     />
-                  </div>
+                  <LabeledElement
+                     label={localize('difficulty')}
+                     tooltip={localize('check.difficulty.desc')}
+                  >
+                     <DocumentCheckDifficultySelect bind:value={check.difficulty}/>
+                  </LabeledElement>
                </div>
 
-               <!--Skill Select-->
+               <!--Complexity Input-->
                <div class="field">
-                  <!--Label-->
-                  <div class="label">
-                     {localize('complexity')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input number">
+                  <LabeledElement
+                     label={localize('complexity')}
+                     tooltip={localize('check.complexity.desc')}
+                  >
                      <DocumentIntegerInput
                         bind:value={check.complexity}
                         min={1}
                      />
-                  </div>
+                  </LabeledElement>
                </div>
             </div>
 
@@ -376,38 +366,7 @@
             .field {
                @include flex-row;
                @include flex-group-center;
-
-               &:not(:first-child) {
-                  @include border-left;
-
-                  margin-left: var(--titan-spacing-large);
-                  padding-left: var(--titan-spacing-large);
-               }
-
-               i {
-                  margin-right: var(--titan-spacing-standard);
-               }
-
-               .label {
-                  @include flex-row;
-                  @include flex-group-center;
-
-                  font-weight: bold;
-               }
-
-               .input {
-                  @include flex-row;
-                  @include flex-group-center;
-                  @include font-size-normal;
-
-                  &:not(.checkbox) {
-                     margin-left: var(--titan-spacing-large);
-                  }
-
-                  &.number {
-                     width: 32px;
-                  }
-               }
+               @include separated-row;
             }
          }
       }

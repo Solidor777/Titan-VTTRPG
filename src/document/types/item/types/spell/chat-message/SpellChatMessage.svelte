@@ -10,7 +10,7 @@
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type object Reference to the Document store. */
+   /** @type {object} Reference to the Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
 

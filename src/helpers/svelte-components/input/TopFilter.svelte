@@ -3,16 +3,16 @@
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
-   /** @type string Label to display. */
+   /** @type {string} Label to display. */
    export let label = localize('filter');
 
-   /** @type string Optional Icon to display. */
+   /** @type {string} Optional Icon to display. */
    export let icon = void 0;
 
-   /** @type number The value that this input should modify. */
+   /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type string The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 
