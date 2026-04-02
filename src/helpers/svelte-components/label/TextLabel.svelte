@@ -14,9 +14,3 @@
       <Text text={label}></Text>
    </div>
 </Label>
-
-<style lang="scss">
-   i {
-      @include margin-right-standard;
-   }
-</style>

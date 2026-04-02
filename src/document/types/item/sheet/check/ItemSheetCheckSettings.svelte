@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
@@ -166,65 +165,52 @@
             <div class="row">
                <!--Damage-->
                <div class="field">
-                  <!--Icon-->
-                  <i class={DAMAGE_ICON}/>
-
-                  <!--Label-->
-                  <div class="label">
-                     {localize('damage')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input checkbox">
+                  <LabeledElement
+                     label={'damage'}
+                     icon={DAMAGE_ICON}
+                     tooltip={'check.isDamage.desc'}
+                  >
                      <DocumentCheckboxInput bind:value={check.isDamage}/>
-                  </div>
+                  </LabeledElement>
                </div>
 
                <!--Healing-->
                <div class="field">
-                  <!--Icon-->
-                  <i class={HEALING_ICON}/>
-
-                  <!--Label-->
-                  <div class="label">
-                     {localize('healing')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input checkbox">
+                  <LabeledElement
+                     label={'healing'}
+                     icon={HEALING_ICON}
+                     tooltip={'check.isHealing.desc'}
+                  >
                      <DocumentCheckboxInput bind:value={check.isHealing}/>
-                  </div>
+                  </LabeledElement>
                </div>
             </div>
 
-            <!--Initial value-->
+            <!--Healing and Damage specific data-->
             {#if check.isDamage || check.isHealing}
                <div class="row" transition:slide|local>
+                  <!--Initial value-->
                   <div class="field">
-                     <!--Label-->
-                     <div class="label">
-                        {localize('initialValue')}
-                     </div>
-
-                     <!--Value-->
-                     <div class="input number">
+                     <LabeledElement
+                        label={'initialValue'}
+                        tooltip={'check.initialValue.desc'}
+                     >
                         <DocumentIntegerInput
                            bind:value={check.initialValue}
                            min={1}
                         />
-                     </div>
+                     </LabeledElement>
                   </div>
 
                   <!--Scaling-->
                   <div class="field">
-                     <!--Label-->
-                     <div class="label">
-                        {localize('scaling')}
-                     </div>
-
-                     <!--Value-->
-                     <div class="input checkbox">
-                        <DocumentCheckboxInput bind:value={check.scaling}/>
+                     <div class="field">
+                        <LabeledElement
+                           label={'scaling'}
+                           tooltip={'check.scaling.desc'}
+                        >
+                           <DocumentCheckboxInput bind:value={check.scaling}/>
+                        </LabeledElement>
                      </div>
                   </div>
                </div>
@@ -233,73 +219,53 @@
                   <!--Damage reduced by-->
                   <div class="row" transition:slide|local>
                      <div class="field">
-                        <!--Label-->
-                        <div class="label">
-                           {localize('damageReducedBy')}
-                        </div>
-
-                        <!--Value-->
-                        <div class="input">
+                        <LabeledElement
+                           label={'damageReducedBy'}
+                           tooltip={'check.damageReducedBy.desc'}
+                        >
                            <DocumentDamageReducedBySelect
                               bind:value={check.damageReducedBy}
                               allowResistanceCheck={check.resistanceCheck !== 'none'}
                               allowOpposedCheck={check.opposedCheck.enabled}
                            />
-                        </div>
+                        </LabeledElement>
                      </div>
                   </div>
                {/if}
             {/if}
 
+            <!--Opposed Check Enabled-->
             <div class="row">
-               <!--Opposed Check-->
                <div class="field">
-                  <!--Label-->
-                  <div class="label">
-                     {localize('opposedCheck')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input checkbox">
-                     <DocumentCheckboxInput
-                        bind:value={check.opposedCheck.enabled}
-                     />
-                  </div>
+                  <LabeledElement
+                     label={'opposedCheck'}
+                     tooltip={'check.opposedCheck.enabled.desc'}
+                  >
+                     <DocumentCheckboxInput bind:value={check.opposedCheck.enabled}/>
+                  </LabeledElement>
                </div>
             </div>
 
             {#if check.opposedCheck.enabled}
                <div class="row" transition:slide|local>
-                  <!--Attribute Select-->
-                  <div class="field">
-                     <!--Label-->
-                     <div class="label">
-                        {localize('attribute')}
-                     </div>
+                  <!--Opposed Check Attribute Select-->
+                  <LabeledElement
+                     label={'attribute'}
+                     tooltip={'check.opposedCheck.attribute.desc.text'}
+                  >
+                     <DocumentAttributeSelect bind:value={check.opposedCheck.attribute}/>
+                  </LabeledElement>
 
-                     <!--Value-->
-                     <div class="input">
-                        <DocumentAttributeSelect
-                           bind:value={check.opposedCheck.attribute}
-                        />
-                     </div>
-                  </div>
-
-                  <!--Skill Select-->
-                  <div class="field">
-                     <!--Label-->
-                     <div class="label">
-                        {localize('skill')}
-                     </div>
-
-                     <!--Value-->
-                     <div class="input">
-                        <DocumentSkillSelect
-                           bind:value={check.opposedCheck.skill}
-                           allowNone={true}
-                        />
-                     </div>
-                  </div>
+                  <!--Opposed Check Skill Select-->
+                  <LabeledElement
+                     label={'skill'}
+                     tooltip={'check.opposedCheck.skill.desc.text'}
+                  >
+                     <DocumentSkillSelect
+                        bind:value={check.opposedCheck.skill}
+                        allowNone={true}
+                     />
+                  </LabeledElement>
                </div>
             {/if}
          </div>
