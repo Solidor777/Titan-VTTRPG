@@ -1,7 +1,7 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import calculateText from '~/helpers/Text.json.js';
 
-   /** @type {string} The Text to display. */
+   /** @type {string|TextData} The Text to display. */
    export let text = void 0;
 </script>
-{localize(text)}
+{calculateText(text)}

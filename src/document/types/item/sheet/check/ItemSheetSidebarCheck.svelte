@@ -26,7 +26,7 @@
 
          <!--Name-->
          <div class="name">
-            <IconLabel icon={DICE_ICON} label={$document.system.check[idx].label}/>
+            <IconLabel icon={DICE_ICON} label={{text:$document.system.check[idx].label, localize: false}}/>
          </div>
 
          <!--Rolled Stats-->
@@ -118,6 +118,8 @@
 
       .label {
          @include bordered-label;
+         @include flex-column;
+         @include flex-group-top;
 
          .rolled-stats {
             font-weight: normal;

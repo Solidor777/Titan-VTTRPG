@@ -1,8 +1,7 @@
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
-import localize from '~/helpers/utility-functions/Localize.js';
-import formatString from '~/helpers/utility-functions/FormatString.js';
+import calculateText from '~/helpers/Text.json.js';
 
 /**
  * @type {number[]} The delay in milliseconds before showing and hiding a tooltip.
@@ -19,13 +18,6 @@ const TOOLTIP_DELAY = [1000, 250];
 const TOOLTIP_DURATION = [400, 250];
 
 /**
- * @typedef TooltipData Object containing the data for a tooltip.
- * @property {string} text - Text to display. May be formatted as HTML.
- * @property {boolean} [localize] - Whether to localize the tooltip text. Assumed to be true if not provided.
- * @property {object|[string|number]} [format] - Arguments for formatting the string if appropriate.
- * */
-
-/**
  * @typedef {object} TooltipAction - Svelte action for adding a hovering tooltip to an element.
  * @property {Function} update - Updates the content in response to changes.
  * @property {Function} destroy - Destroys the action when no longer needed.
@@ -35,36 +27,36 @@ const TOOLTIP_DURATION = [400, 250];
 /**
  * Svelte action for adding a hovering tooltip to an element.
  * @param {Element} element - The node to add the tooltip to.
- * @param {string|TooltipData} content - The data for the tooltip.
+ * @param {string|TextData} textData - The data for the tooltip.
  * @returns {TooltipAction} - The newly created tooltip.
  */
-export default function tooltipAction(element, content) {
+export default function tooltipAction(element, textData) {
    // Calculate the initial content.
-   let initialContent = calculateTooltipContent(content);
+   let initialContent = calculateText(textData);
 
    // Initialize a tippy object if the content is valid.
-   let tippyTooltip = initialContent
-      ? initializeTippy(element, initialContent)
-      : false;
+   let tippyTooltip = isHTMLBlank(initialContent)
+      ? false
+      : initializeTippy(element, initialContent);
 
    return {
       /**
        * Updates the content in response to changes.
-       * @param {string|TooltipData} newContent - The updated content of the tooltip. May be formatted as HTML. Will
+       * @param {string|TextData} newTextData - The updated content of the tooltip. May be formatted as HTML. Will
        *    be localized if provided as a string, or if the TooltipAction's localize boolean is not False.
        * */
-      update: (newContent) => {
+      update: (newTextData) => {
 
          // If the new content is valid...
-         let updatedContent = calculateTooltipContent(newContent);
-         if (updatedContent) {
+         let updatedTextData = calculateText(newTextData);
+         if (!isHTMLBlank(updatedTextData)) {
 
             // If the tippy object already exists, update it with the new content.
             if (tippyTooltip) {
 
                // Update the tooltipAction object
                tippyTooltip.setProps({
-                  content: updatedContent,
+                  content: updatedTextData,
                   allowHTML: true,
                   duration: TOOLTIP_DURATION,
                   delay: TOOLTIP_DELAY
@@ -73,7 +65,7 @@ export default function tooltipAction(element, content) {
 
             // Otherwise, create a new tippy object.
             else {
-               tippyTooltip = initializeTippy(element, updatedContent);
+               tippyTooltip = initializeTippy(element, updatedTextData);
             }
          }
 
@@ -111,52 +103,4 @@ function initializeTippy(element, content) {
          delay: TOOLTIP_DELAY
       }
    );
-}
-
-/**
- * Converts a tooltip content object into the string to be display.
- * @param {string|TooltipData} content - The data for the tooltip.
- * @returns {string|boolean} - The processed content string, or false if there is no content to display.
- */
-
-function calculateTooltipContent(content) {
-   // If the content is valid
-   if (content) {
-      // If the content is a string...
-      if (typeof content === 'string' && content.length > 0) {
-
-         // Localize the string.
-         let retVal = localize(content);
-
-         // Return the string if not blank.
-         if (!isHTMLBlank(retVal)) {
-            return retVal;
-         }
-
-      }
-
-      // If the content is an object...
-      else if (typeof content.text === 'string' && content.text.length > 0) {
-         // Initialize the return value.
-         let retVal = content.text;
-
-         // Localize the string if not explicitly told otherwise.
-         if (content.localize !== false) {
-            retVal = localize(retVal);
-         }
-
-         // Format the string if formatting arguments were provided.
-         if (content.format) {
-            retVal = formatString(retVal, content.format);
-         }
-
-         // Return the string if not blank.
-         if (!isHTMLBlank(retVal)) {
-            return retVal;
-         }
-      }
-   }
-
-   // Return false if we could not retrieve a string.
-   return false;
 }

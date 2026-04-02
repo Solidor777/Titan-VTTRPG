@@ -50,7 +50,7 @@
    <div class="button">
       <IconLabelButton
          icon={CREATE_ICON}
-         label={localize('addCustomTrait')}
+         label={'addCustomTrait'}
          on:click={() => {$document.addCustomTrait()}}
       />
    </div>
