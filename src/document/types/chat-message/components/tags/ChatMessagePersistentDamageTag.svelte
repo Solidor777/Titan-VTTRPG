@@ -4,4 +4,4 @@
       from '~/document/types/chat-message/components/tags/ChatMessageResourceModTag.svelte';
 </script>
 
-<ChatMessageResourceModTag key="persistentDamage" icon="{PERSISTENT_DAMAGE_ICON}" styleClass="persistent-damage"/>
+<ChatMessageResourceModTag icon={PERSISTENT_DAMAGE_ICON} key="persistentDamage" styleClass="persistent-damage"/>

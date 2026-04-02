@@ -26,7 +26,7 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
-      class="{EDIT_ICON}"
+      class={EDIT_ICON}
       on:click={() => {
          editFunction();
       }}
@@ -47,7 +47,7 @@
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
    <a
-      class="{DELETE_ICON}"
+      class={DELETE_ICON}
       on:click={() => {
          deleteFunction();
       }}

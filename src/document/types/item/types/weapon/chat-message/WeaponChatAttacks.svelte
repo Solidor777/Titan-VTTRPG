@@ -20,7 +20,7 @@
          <div class="row header">
             <!--Attack Button-->
             <div class="attack-name">
-               <i class="{attack.type === 'melee'? MELEE_ICON: ACCURACY_ICON}"/>
+               <i class={attack.type === 'melee'? MELEE_ICON: ACCURACY_ICON}/>
                {attack.label}
             </div>
          </div>

@@ -12,8 +12,8 @@
 </script>
 
 <ChatReportHeader
-   headerIcon="{HEALING_ICON}"
-   headerLabel="{headerLabel}"
-   images="{[$document.flags.titan.actorImg]}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerIcon={HEALING_ICON}
+   headerlabel={headerLabel}
+   images={[$document.flags.titan.actorImg]}
+   subHeaderLabels={[$document.flags.titan.actorName]}
 />

@@ -1,5 +1,6 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
 
    /** @type {string} - The label for the element. */
    export let label = void 0;
@@ -11,18 +12,18 @@
    export let input = void 0;
 
    /** @type {string|TooltipData} - The tooltip to display when the element is hovered. */
-   export let fieldTooltip = void 0;
+   export let tooltip = void 0;
 
    /** @type {*} - Properties for the input svelte components. */
    export let inputProps = void 0;
 </script>
 
 <!--Field-->
-<div class="field" on:change use:tooltipAction={fieldTooltip}>
+<div class="field" on:change use:tooltipAction={tooltip}>
 
    <!--Label-->
-   <div class="sign">
-      {label}
+   <div class="label">
+      <Text text={label}/>
    </div>
 
    <!--Input-->
@@ -39,7 +40,7 @@
       width: 100%;
       height: 100%;
 
-      .sign {
+      .label {
          @include flex-group-right;
 
          width: 100%;

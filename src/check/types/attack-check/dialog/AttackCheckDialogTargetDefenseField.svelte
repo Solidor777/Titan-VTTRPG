@@ -13,9 +13,9 @@
 
 <CheckDialogField
    bind:value={$checkOptions.targetDefense}
-   fieldTooltip={'check.targetDefense.desc'}
    input={IntegerInput}
    {inputProps}
-   label="{localize('targetDefense')}"
+   label={localize('targetDefense')}
    on:change
+   tooltip={'check.targetDefense.desc'}
 />

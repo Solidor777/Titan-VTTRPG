@@ -37,6 +37,6 @@
 </script>
 
 <ChatMessageButton on:click={() => removeExpiredEffects()}>
-   <i class="{REMOVE_TEMP_EFFECTS_ICON}"/>
+   <i class={REMOVE_TEMP_EFFECTS_ICON}/>
    {localize('removeExpiredEffects')}
 </ChatMessageButton>

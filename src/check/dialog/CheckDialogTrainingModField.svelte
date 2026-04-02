@@ -11,8 +11,8 @@
 
 <CheckDialogField
    bind:value={$checkOptions.trainingMod}
-   fieldTooltip={'check.trainingMod.desc'}
    input={IntegerInput}
    label={localize('trainingMod')}
    on:change
+   tooltip={'check.trainingMod.desc'}
 />

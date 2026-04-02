@@ -46,7 +46,7 @@
             {#if $appState.sidebar.castingCheck.isExpanded}
                <!--Collapse button-->
                <IconButton
-                  icon="{EXPANDED_ICON}"
+                  icon={EXPANDED_ICON}
                   on:click={() => {
                      $appState.sidebar.castingCheck.isExpanded = false;
                   }}
@@ -54,7 +54,7 @@
             {:else}
                <!--Expand button-->
                <IconButton
-                  icon="{COLLAPSED_ICON}"
+                  icon={COLLAPSED_ICON}
                   on:click={() => {
                      $appState.sidebar.castingCheck.isExpanded = true;
                   }}

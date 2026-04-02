@@ -31,7 +31,7 @@
             {#if isExpanded}
                <!--Collapse button-->
                <IconButton
-                  icon="{EXPANDED_ICON}"
+                  icon={EXPANDED_ICON}
                   on:click={() => {
                      $appState.tabs.customAspects.isExpanded[idx] = false;
                   }}
@@ -39,7 +39,7 @@
             {:else}
                <!--Expand button-->
                <IconButton
-                  icon="{COLLAPSED_ICON}"
+                  icon={COLLAPSED_ICON}
                   on:click={() => {
                      $appState.tabs.customAspects.isExpanded[idx] = true;
                   }}
@@ -98,7 +98,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class="{DAMAGE_ICON}"/>
+                  <i class={DAMAGE_ICON}/>
 
                   <!--Label-->
                   <div class="label">{localize('damage')}</div>
@@ -112,7 +112,7 @@
                <!--Healing-->
                <div class="field">
                   <!--Icon-->
-                  <i class="{HEALING_ICON}"/>
+                  <i class={HEALING_ICON}/>
 
                   <!--Label-->
                   <div class="label">{localize('healing')}</div>

@@ -30,7 +30,7 @@
             <!--Label-->
             <div class="label">
                <!--Icon-->
-               <i class="{attack.type === 'melee' ? MELEE_ICON : RANGE_ICON}"/>
+               <i class={attack.type === 'melee' ? MELEE_ICON : RANGE_ICON}/>
                <!-- Text-->
                <div class="text">
                   {attack.label}
@@ -42,7 +42,7 @@
                {#if $appState.sidebar.attacks.isExpanded[idx]}
                   <!--Collapse button-->
                   <IconButton
-                     icon="{EXPANDED_ICON}"
+                     icon={EXPANDED_ICON}
                      on:click={() => {
                         $appState.sidebar.attacks.isExpanded[idx] = false;
                      }}
@@ -50,7 +50,7 @@
                {:else}
                   <!--Expand button-->
                   <IconButton
-                     icon="{COLLAPSED_ICON}"
+                     icon={COLLAPSED_ICON}
                      on:click={() => {
                         $appState.sidebar.attacks.isExpanded[idx] = true;
                      }}

@@ -11,8 +11,8 @@
 
 <CheckDialogField
    bind:value={$checkOptions.type}
-   fieldTooltip={'check.attackType.desc'}
    input={AttackTypeSelect}
    label={localize('type')}
    on:change
+   tooltip={'check.attackType.desc'}
 />

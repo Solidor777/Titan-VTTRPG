@@ -38,12 +38,12 @@
    }
 </script>
 <CondensedCheckButton
-   attribute="{checkParameters.attribute}"
-   complexity="{checkParameters.complexity}"
-   difficulty="{checkParameters.difficulty}"
+   attribute={checkParameters.attribute}
+   complexity={checkParameters.complexity}
+   difficulty={checkParameters.difficulty}
    on:click={() => $document.system.requestItemCheck(checkOptions)}
-   resolveCost="{checkParameters.resolveCost}"
+   resolveCost={checkParameters.resolveCost}
    {tooltip}
-   totalDice="{checkParameters.totalDice}"
-   totalExpertise="{checkParameters.totalExpertise}"
+   totalDice={checkParameters.totalDice}
+   totalExpertise={checkParameters.totalExpertise}
 />

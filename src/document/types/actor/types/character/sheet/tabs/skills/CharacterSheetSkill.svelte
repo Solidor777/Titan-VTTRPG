@@ -100,7 +100,7 @@
             <div class="label" use:tooltipAction={'training.desc'}>
 
                <!--Icon-->
-               <i class="{EXPERTISE_ICON}"/>
+               <i class={EXPERTISE_ICON}/>
 
                <!--Inner Label-->
                <div class="inner-label">
@@ -141,7 +141,7 @@
             <div class="label" use:tooltipAction={'expertise.desc'}>
 
                <!--Icon-->
-               <i class="{TRAINING_ICON}"/>
+               <i class={TRAINING_ICON}/>
 
                <!--Inner Label-->
                <div class="inner-label">

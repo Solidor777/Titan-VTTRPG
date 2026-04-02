@@ -15,7 +15,7 @@
 </script>
 
 <div class="stats">
-   <div class="stat" use:tooltipAction="{'armor.desc'}">
+   <div class="stat" use:tooltipAction={'armor.desc'}>
       <IconStatTag
          icon={ARMOR_ICON}
          stat={localize('armor')}

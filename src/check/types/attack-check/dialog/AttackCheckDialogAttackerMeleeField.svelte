@@ -13,9 +13,9 @@
 
 <CheckDialogField
    bind:value={$checkOptions.attackerMelee}
-   fieldTooltip={'check.attackerMelee.desc'}
    input={IntegerInput}
    {inputProps}
    label={localize('attackerMelee')}
    on:change
+   tooltip={'check.attackerMelee.desc'}
 />

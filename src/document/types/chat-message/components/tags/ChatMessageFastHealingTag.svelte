@@ -4,4 +4,4 @@
       from '~/document/types/chat-message/components/tags/ChatMessageResourceModTag.svelte';
 </script>
 
-<ChatMessageResourceModTag key="fastHealing" icon="{FAST_HEALING_ICON}" styleClass="fast-healing"/>
+<ChatMessageResourceModTag icon={FAST_HEALING_ICON} key="fastHealing" styleClass="fast-healing"/>

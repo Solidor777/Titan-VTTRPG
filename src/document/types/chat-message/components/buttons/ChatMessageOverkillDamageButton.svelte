@@ -1,7 +1,7 @@
 <script>
    import applyDamageToTargets from '~/helpers/utility-functions/ApplyDamageToTargets.js';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import {OVERKILL_ICON} from '~/system/Icons.js';
+   import { OVERKILL_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
    /** @type isInteger Amount of Damage to apply. */
@@ -10,8 +10,8 @@
 
 <ChatMessageButton
    on:click={() =>applyDamageToTargets(damage, {ignoreArmor: true})}
-   tooltip="{localize('applyOverkillDamage')}"
+   tooltip={localize('applyOverkillDamage')}
 >
-   <i class="{OVERKILL_ICON}"/>
+   <i class={OVERKILL_ICON}/>
    {localize('X%OverkillDamage').replace('X%', damage)}
 </ChatMessageButton>

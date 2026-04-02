@@ -18,7 +18,7 @@
 <div class="item-check-button {attribute}">
    <Button {disabled} on:click>
       <div class="button-inner">
-         <i class="{DICE_ICON}"/>
+         <i class={DICE_ICON}/>
          <div>
             {label}
          </div>

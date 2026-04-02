@@ -21,7 +21,7 @@
    } from '~/system/Icons.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   // Check idx
+   /** @type {number} The index of the Check in the item's item checks array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the Document store. */
@@ -125,6 +125,7 @@
                      <DocumentIntegerInput
                         bind:value={check.complexity}
                         min={1}
+                        max={99}
                         maxDigits={2}
                      />
                   </LabeledElement>
@@ -132,39 +133,33 @@
             </div>
 
             <div class="row">
-               <!--Resistance Check-->
+               <!--Resistance Check Select-->
                <div class="field">
-                  <!--Label-->
-                  <div class="label">
-                     {localize('resistanceCheck')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input">
+                  <LabeledElement
+                     label={'resistanceCheck'}
+                     tooltip={'check.resistance.desc'}
+                  >
                      <DocumentResistanceSelect
                         bind:value={check.resistanceCheck}
                         allowNone={true}
                      />
-                  </div>
+                  </LabeledElement>
                </div>
 
-               <!--Resolve Cost-->
+               <!--Resolve Cost Input-->
                <div class="field">
-                  <!--Icon-->
-                  <i class="{SPEND_RESOLVE_ICON}"/>
-
-                  <!--Label-->
-                  <div class="label">
-                     {localize('resolveCost')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="input number">
+                  <LabeledElement
+                     label={'resolveCost'}
+                     icon={SPEND_RESOLVE_ICON}
+                     tooltip={'check.resolveCost.desc'}
+                  >
                      <DocumentIntegerInput
                         bind:value={check.resolveCost}
+                        max={99}
                         min={0}
+                        maxDigits={2}
                      />
-                  </div>
+                  </LabeledElement>
                </div>
             </div>
 
@@ -172,7 +167,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class="{DAMAGE_ICON}"/>
+                  <i class={DAMAGE_ICON}/>
 
                   <!--Label-->
                   <div class="label">
@@ -188,7 +183,7 @@
                <!--Healing-->
                <div class="field">
                   <!--Icon-->
-                  <i class="{HEALING_ICON}"/>
+                  <i class={HEALING_ICON}/>
 
                   <!--Label-->
                   <div class="label">

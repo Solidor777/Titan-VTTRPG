@@ -70,7 +70,7 @@
 </script>
 
 <ChatMessageButton on:click={() => confirmFastHealing()} tooltip={getTooltip()}>
-   <i class="{HEALING_ICON}"/>
+   <i class={HEALING_ICON}/>
    {localize('healX%Damage').replace(
       'X%',
       $document.flags.titan.fastHealing.total,

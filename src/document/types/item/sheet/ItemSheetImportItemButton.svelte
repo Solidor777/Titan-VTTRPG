@@ -16,5 +16,5 @@
 <button class="header-control icon edit-token-button"
         on:click={() => importItem()}
         use:tooltipAction={'importItemToWorld'}>
-   <i class="{IMPORT_ICON}"/>
+   <i class={IMPORT_ICON}/>
 </button>

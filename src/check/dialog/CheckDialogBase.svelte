@@ -35,7 +35,7 @@
    {#each rows as row }
       <div class="row">
          <svelte:component
-            this="{row}"
+            this={row}
             on:change
          />
       </div>

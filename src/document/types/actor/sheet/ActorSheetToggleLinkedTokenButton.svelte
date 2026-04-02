@@ -22,11 +22,11 @@
            : 'toggleTokenLinkedButton.desc'}
 >
    <i
-      class="{
+      class={
             $document?.prototypeToken?.actorLink
             ? `linked ${LINKED_ICON}`
             : `unlinked ${UNLINKED_ICON}`
-         }"
+         }
    />
 </button>
 

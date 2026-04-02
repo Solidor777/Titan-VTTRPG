@@ -10,8 +10,8 @@
 </script>
 
 <ReportChatMessageHeader
-   headerIcon="{DURATION_ICON}"
-   headerLabel="{localize('effectsExpired')}"
-   images="{[$document.flags.titan.actorImg]}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerIcon={DURATION_ICON}
+   headerlabel={localize('effectsExpired')}
+   images={[$document.flags.titan.actorImg]}
+   subHeaderLabels={[$document.flags.titan.actorName]}
 />

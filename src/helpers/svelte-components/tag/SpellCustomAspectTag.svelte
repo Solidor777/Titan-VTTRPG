@@ -12,12 +12,12 @@
    <div class="stat label">
       <!--Damage Icon-->
       {#if aspect.isDamage}
-         <i class="{DAMAGE_ICON}"/>
+         <i class={DAMAGE_ICON}/>
       {/if}
 
       <!--Healing Icon-->
       {#if aspect.isHealing}
-         <i class="{HEALING_ICON}"/>
+         <i class={HEALING_ICON}/>
       {/if}
 
       <!--Label-->

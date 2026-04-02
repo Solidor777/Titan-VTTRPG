@@ -12,7 +12,7 @@
 
 <div class="report">
    <!--Header-->
-   <svelte:component this="{header}"/>
+   <svelte:component this={header}/>
 
    <!--Sections-->
    <div class="sections">
@@ -20,13 +20,13 @@
       <!--Messages-->
       {#if sections && sections.length > 0}
          {#each sections as section}
-            <div class="{`section${section.isTags ? ' tags' : ''}${section.isRichText ? ' rich-text' : ''}`}">
+            <div class={`section${section.isTags ? ' tags' : ''}${section.isRichText ? ' rich-text' : ''}`}>
                {#if typeof section === 'string'}
                   <!--String Message-->
                   {section}
                {:else}
                   <!--Component Message-->
-                  <svelte:component this="{section.component ?? section}" {...section.props}/>
+                  <svelte:component this={section.component ?? section} {...section.props}/>
                {/if}
             </div>
          {/each}
@@ -39,9 +39,9 @@
                <!--For tags that can disappear-->
                <div class="tag">
                   {#if tag.component}
-                     <svelte:component this="{tag.component}" {...tag.props}/>
+                     <svelte:component this={tag.component} {...tag.props}/>
                   {:else}
-                     <svelte:component this="{tag}"/>
+                     <svelte:component this={tag}/>
                   {/if}
                </div>
             {/each}

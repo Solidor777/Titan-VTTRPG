@@ -9,7 +9,7 @@
 <div class="messages">
    {#each $document.flags.titan.message as message}
       <div class="message">
-         <RichText text="{message}"/>
+         <RichText text={message}/>
       </div>
    {/each}
 </div>

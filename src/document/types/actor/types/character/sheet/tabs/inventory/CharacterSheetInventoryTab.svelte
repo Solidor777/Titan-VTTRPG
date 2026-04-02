@@ -64,7 +64,7 @@
          <!--Reset button-->
          <div class="reset">
             <IconButton
-               icon="{RESET_ICON}"
+               icon={RESET_ICON}
                on:click={() => {
                   $appState.tabs.inventory.filterOptions.weapon = false;
                   $appState.tabs.inventory.filterOptions.armor = false;

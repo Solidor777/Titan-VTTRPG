@@ -71,14 +71,14 @@
             });
          }}
       >
-         <i class="{HALF_DAMAGE_ICON}"/>
+         <i class={HALF_DAMAGE_ICON}/>
       </Button>
    </div>
 
    <!--Apply healing button-->
    <div class="button" use:tooltipAction={'applyHealing'}>
       <Button on:click={() => applyHealingToTargets(damage)}>
-         <i class="{HEALING_ICON}"/>
+         <i class={HEALING_ICON}/>
       </Button>
    </div>
 </div>

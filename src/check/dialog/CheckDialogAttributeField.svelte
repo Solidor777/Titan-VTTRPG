@@ -1,7 +1,6 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
    import AttributeSelect from '~/helpers/svelte-components/select/AttributeSelect.svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
 
    /** @type {object} Reference to the Check Options store. */
@@ -11,8 +10,8 @@
 
 <CheckDialogField
    bind:value={$checkOptions.attribute}
-   fieldTooltip={'check.attribute.desc'}
    input={AttributeSelect}
-   label={localize('attribute')}
+   label={'attribute'}
    on:change
+   tooltip={'check.attribute.desc'}
 />

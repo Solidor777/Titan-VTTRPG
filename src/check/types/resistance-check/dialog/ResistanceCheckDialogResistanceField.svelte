@@ -12,6 +12,6 @@
 <CheckDialogField
    bind:value={$checkOptions.resistance}
    input={ResistanceSelect}
-   label="{localize('resistance')}"
+   label={localize('resistance')}
    on:change
 />

@@ -23,7 +23,7 @@
       use:tooltipAction={`${mod}.desc`}
    >
       <!--Icon-->
-      <i class="{icon}"/>
+      <i class={icon}/>
 
       <!--Label Text-->
       {localize(mod)}

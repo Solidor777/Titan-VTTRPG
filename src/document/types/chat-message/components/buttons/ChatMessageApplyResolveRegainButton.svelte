@@ -72,7 +72,7 @@
 </script>
 
 <ChatMessageButton on:click={() => confirmResolveRegain()} tooltip={getTooltip()}>
-   <i class="{REGAIN_RESOLVE_ICON}"/>
+   <i class={REGAIN_RESOLVE_ICON}/>
    {localize('regainX%Resolve').replace(
       'X%',
       $document.flags.titan.resolveRegain.total,

@@ -18,5 +18,5 @@
 <button class="header-control icon configure-sheet-button"
         on:click={() => configureSheet()}
         use:tooltipAction={'openSheetConfigurator'}>
-   <i class="{SETTINGS_ICON}"/>
+   <i class={SETTINGS_ICON}/>
 </button>

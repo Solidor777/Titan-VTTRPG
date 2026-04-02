@@ -9,6 +9,6 @@
 </script>
 
 <ReportChatMessageIconMessage
-   icon="{STAMINA_ICON}"
+   icon={STAMINA_ICON}
    {message}
 />

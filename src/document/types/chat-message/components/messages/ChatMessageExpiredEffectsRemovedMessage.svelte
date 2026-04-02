@@ -9,6 +9,6 @@
 </script>
 
 <ReportChatMessageIconMessage
-   icon="{REMOVE_TEMP_EFFECTS_ICON}"
+   icon={REMOVE_TEMP_EFFECTS_ICON}
    {message}
 />

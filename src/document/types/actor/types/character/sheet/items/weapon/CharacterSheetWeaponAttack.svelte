@@ -91,14 +91,14 @@
                $document.system.requestAttackCheck({ itemId: item._id, attackIdx: attackIdx })}
          >
             <i
-               class="{attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}"
+               class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
             />
             {attack.label}
          </Button>
       {:else}
          <div class="label">
             <i
-               class="{attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}"
+               class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
             />
             <div>{attack.label}</div>
          </div>

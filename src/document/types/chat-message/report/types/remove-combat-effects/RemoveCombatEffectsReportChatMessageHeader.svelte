@@ -13,8 +13,8 @@
 </script>
 
 <ReportChatMessageHeader
-   headerIcon="{REMOVE_TEMP_EFFECTS_ICON}"
+   headerIcon={REMOVE_TEMP_EFFECTS_ICON}
    {headerLabel}
-   images="{[$document.flags.titan.actorImg]}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   images={[$document.flags.titan.actorImg]}
+   subHeaderLabels={[$document.flags.titan.actorName]}
 />

@@ -47,7 +47,7 @@
    localize: false,
 }}>
    <!--Icon-->
-   <i class="{icon}"/>
+   <i class={icon}/>
 
    <!--Label-->
    <div class="label">

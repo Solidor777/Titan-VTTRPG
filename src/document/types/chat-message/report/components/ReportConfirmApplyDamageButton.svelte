@@ -47,7 +47,7 @@
 <!--Regain resolve button-->
 <div class="button">
    <Button on:click={() => confirmdamageApplied()}>
-      <i class="{REGAIN_RESOLVE_ICON}"/>
+      <i class={REGAIN_RESOLVE_ICON}/>
       {localize('applyX%Damage').replace(
          'X%',
          $document.flags.titan.damageApplied.total,

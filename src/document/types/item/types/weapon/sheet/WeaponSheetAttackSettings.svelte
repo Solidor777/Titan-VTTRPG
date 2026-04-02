@@ -75,7 +75,7 @@
             {#if isExpanded}
                <!--Collapse button-->
                <IconButton
-                  icon="{EXPANDED_ICON}"
+                  icon={EXPANDED_ICON}
                   on:click={() => {
                      $appState.attacks.isExpanded[idx] = false;
                   }}
@@ -83,7 +83,7 @@
             {:else}
                <!--Expand button-->
                <IconButton
-                  icon="{COLLAPSED_ICON}"
+                  icon={COLLAPSED_ICON}
                   on:click={() => {
                      $appState.attacks.isExpanded[idx] = true;
                   }}
@@ -129,7 +129,7 @@
                <!--Range-->
                <div class="field">
                   <!--Icon-->
-                  <i class="{RANGE_ICON}"/>
+                  <i class={RANGE_ICON}/>
 
                   <!--Label-->
                   <div class="label">{localize('range')}</div>
@@ -200,7 +200,7 @@
                            $document.system.editAttackTraits(idx);
                         }}
                      >
-                        <i class="{EDIT_ICON}"/>
+                        <i class={EDIT_ICON}/>
                         {localize('editTraits')}
                      </Button>
                   </div>
@@ -212,7 +212,7 @@
                            $document.system.addCustomAttackTrait(idx);
                         }}
                      >
-                        <i class="{CREATE_ICON}"/>
+                        <i class={CREATE_ICON}/>
                         {localize('addCustomTrait')}
                      </Button>
                   </div>

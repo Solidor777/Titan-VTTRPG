@@ -20,7 +20,7 @@
                penetrating: penetrating,
             });
          }}
-      ><i class="{DAMAGE_ICON}"/>
+      ><i class={DAMAGE_ICON}/>
       </Button>
    </div>
 
@@ -36,7 +36,7 @@
                ineffective: ineffective,
                penetrating: penetrating,
             })}
-      ><i class="{IGNORE_ARMOR_ICON}"/>
+      ><i class={IGNORE_ARMOR_ICON}/>
       </Button>
    </div>
 
@@ -49,14 +49,14 @@
                penetrating: penetrating,
             })}
       >
-         <i class="{HALF_DAMAGE_ICON}"/>
+         <i class={HALF_DAMAGE_ICON}/>
       </Button>
    </div>
 
    <!--Apply healing button-->
    <div class="button" use:tooltipAction={'applyHealing'}>
       <Button on:click={() => applyHealingToTargets(damage)}>
-         <i class="{HEALING_ICON}"/>
+         <i class={HEALING_ICON}/>
       </Button>
    </div>
 </div>

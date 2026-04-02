@@ -10,8 +10,8 @@
 </script>
 
 <ReportChatMessageHeader
-   headerIcon="{TURN_START_ICON}"
-   headerLabel="{localize('turnStart')}"
-   images="{[$document.flags.titan.actorImg]}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerIcon={TURN_START_ICON}
+   headerlabel={localize('turnStart')}
+   images={[$document.flags.titan.actorImg]}
+   subHeaderLabels={[$document.flags.titan.actorName]}
 />

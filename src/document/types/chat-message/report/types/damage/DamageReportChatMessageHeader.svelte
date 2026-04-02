@@ -28,8 +28,8 @@
 </script>
 
 <ReportChatMessageHeader
-   headerIcon="{headerIcon}"
-   headerLabel="{headerLabel}"
-   images="{[$document.flags.titan.actorImg]}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerIcon={headerIcon}
+   headerlabel={headerLabel}
+   images={[$document.flags.titan.actorImg]}
+   subHeaderLabels={[$document.flags.titan.actorName]}
 />

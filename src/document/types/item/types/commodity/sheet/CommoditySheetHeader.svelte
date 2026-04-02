@@ -43,7 +43,7 @@
          <!--Value-->
          <div class="stat">
             <!--Icon-->
-            <i class="{CURRENCY_ICON}"/>
+            <i class={CURRENCY_ICON}/>
 
             <!--Label-->
             <div class="label">

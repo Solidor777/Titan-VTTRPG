@@ -87,7 +87,7 @@
       <!--Healing-->
       {#if $document.flags.titan.results.healing > 0}
          <div class="stat">
-            <i class="{HEALING_ICON}"/>
+            <i class={HEALING_ICON}/>
             {localize('healing')}:
             {$document.flags.titan.results.healing}
          </div>

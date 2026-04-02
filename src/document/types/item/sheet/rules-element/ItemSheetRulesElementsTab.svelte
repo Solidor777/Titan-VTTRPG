@@ -148,7 +148,7 @@
             <!--Button Content-->
             <div class="button-content">
                <!--Icon-->
-               <i class="{CREATE_ICON}"/>
+               <i class={CREATE_ICON}/>
 
                <!--Label-->
                <div class="label">

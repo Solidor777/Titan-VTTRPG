@@ -9,6 +9,6 @@
 </script>
 
 <ReportChatMessageIconMessage
-   icon="{RESOLVE_ICON}"
+   icon={RESOLVE_ICON}
    {message}
 />

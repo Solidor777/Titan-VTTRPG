@@ -17,9 +17,9 @@
    <div class="button">
       <ChatMessageButton
          on:click={() => applyRendToTargets(rend, {magical: magical})}
-         tooltip="{localize('rendArmor')}"
+         tooltip={localize('rendArmor')}
       >
-         <i class="{REND_ICON}"/>
+         <i class={REND_ICON}/>
          <div>{localize('rend')}</div>
       </ChatMessageButton>
    </div>
@@ -28,9 +28,9 @@
    <div class="button">
       <ChatMessageButton
          on:click={() => applyRepairsToTargets(rend)}
-         tooltip="{localize('repairArmor')}"
+         tooltip={localize('repairArmor')}
       >
-         <i class="{REPAIR_ICON}"/>
+         <i class={REPAIR_ICON}/>
          <div>{localize('repair')}</div>
       </ChatMessageButton>
    </div>

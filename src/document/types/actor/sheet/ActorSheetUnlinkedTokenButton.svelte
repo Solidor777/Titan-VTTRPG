@@ -5,7 +5,7 @@
 
 <!--Unlink Button-->
 <div class="inactive-button" use:tooltipAction={'unlinkedTokenButton.desc'}>
-   <button class="header-control icon" disabled="{true}">
+   <button class="header-control icon" disabled={true}>
       <i class="unlinked {UNLINKED_ICON}"/>
    </button>
 </div>

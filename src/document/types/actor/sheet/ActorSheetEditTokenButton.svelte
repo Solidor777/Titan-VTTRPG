@@ -33,5 +33,5 @@
            || application.token === null && $document.prototypeToken?.actorLink)
         ? 'editLinkedToken.desc'
         : 'editUnlinkedToken.desc'}>
-   <i class="{EDIT_TOKEN_ICON}"/>
+   <i class={EDIT_TOKEN_ICON}/>
 </button>

@@ -125,6 +125,7 @@
       "check.healingMod.desc.text": "Bonuses / Penalties to the amount of Healing to apply.",
       "check.text": "Check",
       "check.resistance.desc.text": "The Resistance to roll for the Check.",
+      "check.resolveCost.desc.text": "The Resolve that must be spent to roll this Check.",
       "check.skill.desc.text": "The Skill to use for the Check.",
       "check.targetDefense.desc.text": "The defender's Defense to use for calculating the Difficulty of the Check.",
       "check.totalDice.desc.text": "The total number of dice to be rolled.",

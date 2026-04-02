@@ -45,10 +45,10 @@
    }
 </script>
 <CondensedCheckButton
-   attribute="{checkParameters.attribute}"
-   checkIcon="{icon}"
+   attribute={checkParameters.attribute}
+   checkIcon={icon}
    on:click={() => $document.system.requestAttackCheck(checkOptions)}
    {tooltip}
-   totalDice="{checkParameters.totalDice}"
-   totalExpertise="{checkParameters.totalExpertise}"
+   totalDice={checkParameters.totalDice}
+   totalExpertise={checkParameters.totalExpertise}
 />

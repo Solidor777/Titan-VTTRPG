@@ -4,4 +4,4 @@
    import { REGAIN_RESOLVE_ICON } from '~/system/Icons';
 </script>
 
-<ChatMessageResourceModTag key="resolveRegain" icon="{REGAIN_RESOLVE_ICON}" styleClass="resolve-regain"/>
+<ChatMessageResourceModTag icon={REGAIN_RESOLVE_ICON} key="resolveRegain" styleClass="resolve-regain"/>

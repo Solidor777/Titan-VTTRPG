@@ -8,7 +8,7 @@
 </script>
 
 <div class="message">
-   <i class="{icon}"/>
+   <i class={icon}/>
    <div>{message}</div>
 </div>
 

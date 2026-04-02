@@ -19,7 +19,7 @@
 </script>
 
 <ChatReportHeader
-   headerIcon="{REPAIR_ICON}"
+   headerIcon={REPAIR_ICON}
    {headerLabel}
    {images}
    {subHeaderLabels}

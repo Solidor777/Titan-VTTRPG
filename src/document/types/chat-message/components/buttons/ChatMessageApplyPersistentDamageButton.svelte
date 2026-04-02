@@ -82,7 +82,7 @@
 </script>
 
 <ChatMessageButton on:click={() => confirmPersistentDamage()} tooltip={getTooltip()}>
-   <i class="{PERSISTENT_DAMAGE_ICON}"/>
+   <i class={PERSISTENT_DAMAGE_ICON}/>
    {localize('applyX%Damage').replace(
       'X%',
       $document.flags.titan.persistentDamage.total,

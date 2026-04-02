@@ -17,8 +17,8 @@
 </script>
 
 <ReportChatMessageHeader
-   headerIcon="{SPEND_RESOLVE_ICON}"
-   headerLabel="{headerLabel}"
-   images="{[$document.flags.titan.actorImg]}"
-   subHeaderLabels="{[$document.flags.titan.actorName]}"
+   headerIcon={SPEND_RESOLVE_ICON}
+   headerlabel={headerLabel}
+   images={[$document.flags.titan.actorImg]}
+   subHeaderLabels={[$document.flags.titan.actorName]}
 />

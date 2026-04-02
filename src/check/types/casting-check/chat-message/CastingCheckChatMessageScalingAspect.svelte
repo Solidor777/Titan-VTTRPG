@@ -178,7 +178,7 @@
             on:click={resetAspect}
          >
             <div class="button-inner">
-               <i class="{RESET_ICON}"/>
+               <i class={RESET_ICON}/>
             </div>
          </Button>
       </div>
@@ -190,7 +190,7 @@
             on:click={decreaseAspect}
          >
             <div class="button-inner">
-               <i class="{DECREMENT_ICON}"/>
+               <i class={DECREMENT_ICON}/>
             </div>
          </Button>
       </div>
@@ -203,7 +203,7 @@
             on:click={increaseAspect}
          >
             <div class="button-inner">
-               <i class="{INCREMENT_ICON}"/>
+               <i class={INCREMENT_ICON}/>
             </div>
          </Button>
       </div>

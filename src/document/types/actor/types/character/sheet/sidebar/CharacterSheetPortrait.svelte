@@ -33,7 +33,7 @@
       <!--Take a Short Rest Button-->
       <div
          class="button"
-         use:tooltipAction="{'shortRest.desc'}"
+         use:tooltipAction={'shortRest.desc'}
       >
          <DocumentOwnerIconButton
             icon={SHORT_REST_ICON}
@@ -46,7 +46,7 @@
       <!--Remove Combat Effects button-->
       <div
          class="button"
-         use:tooltipAction="{'removeCombatEffects.desc'}"
+         use:tooltipAction={'removeCombatEffects.desc'}
       >
          <DocumentOwnerIconButton
             icon={REMOVE_TEMP_EFFECTS_ICON}

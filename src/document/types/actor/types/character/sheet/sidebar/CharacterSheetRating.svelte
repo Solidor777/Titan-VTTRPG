@@ -27,7 +27,7 @@
       <div class="button">
          <DocumentOwnerButton on:click={onClick} tooltip={`${rating}.desc`}>
             <!--Icon-->
-            <i class="{icon}"/>
+            <i class={icon}/>
 
             <!--Label-->
             <div class="label">
@@ -40,7 +40,7 @@
       <!--Otherwise, display a label.-->
       <div class="label" use:tooltipAction={`${rating}.desc`}>
          <!--Icon-->
-         <i class="{icon}"/>
+         <i class={icon}/>
 
          {localize(rating)}
       </div>
