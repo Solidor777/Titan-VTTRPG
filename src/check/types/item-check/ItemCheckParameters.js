@@ -45,7 +45,7 @@
 /**
  * Creates a Casting Check Options object, based off the provided input.
  * @param {ItemCheckOptions} options - Fully populated Item Check Options.
- * @returns {ItemCheckParameters} The new Item Check Parameters.
+ * @returns {ItemCheckParameters} - The new Item Check Parameters.
  */
 export default function createItemCheckParameters(options) {
    return {

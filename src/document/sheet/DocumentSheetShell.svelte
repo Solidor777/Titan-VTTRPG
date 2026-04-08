@@ -4,7 +4,7 @@
    import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/application';
    import { setContext } from 'svelte';
 
-   /** @type {object} The root element of the application. */
+   /** @type {object} - The root element of the application. */
    export let elementRoot;
 
    /** @type Document The Document that this sheet is for. */

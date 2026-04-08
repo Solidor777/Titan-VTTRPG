@@ -28,7 +28,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     * Returns whether this Effect item is currently Active.
     * Permanent Effects can be toggled Active and Inactive.
     * Non-permanent Effects are always Active.
-    * @returns {boolean} Whether this Effect item is currently Active.
+    * @returns {boolean} - Whether this Effect item is currently Active.
     */
    get isActive() {
       return this.active || this.duration.type !== 'permanent';
@@ -38,7 +38,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     * Returns whether Effect item is a Combat Effect.
     * Permanent Effects and effects with a custom Duration are considered non-Combat Effects.
     * Effects with a duration measured in turns are considered Combat Effects.
-    * @returns {boolean} Whether this Effect item is a Combat Effect.
+    * @returns {boolean} - Whether this Effect item is a Combat Effect.
     */
    get isCombatEffect() {
       return this.duration.type !== 'permanent' && this.duration.type !== 'custom';
@@ -46,10 +46,30 @@ export default class EffectDataModel extends RulesElementItemDataModel {
 
    /**
     * Gets the parent document's Action Queue object.
-    * @returns {ActionQueue} The parent actor's Action Queue.
+    * @returns {ActionQueue} - The parent actor's Action Queue.
     */
    get actionQueue() {
       return this.parent.actionQueue;
+   }
+
+   prepareDerivedData() {
+      // If we are the best first owner of this document, and this document is not in a compendium
+      if (isCurrentUserBestOwner(this.parent) &&
+         !this.parent.pack && this.parent.id &&
+         !this.parent.isMarkedForDeletion) {
+
+         // Ensure the action queue is initialized
+         if (!this.parent.actionQueue) {
+            this.parent.actionQueue = new ActionQueue();
+         }
+
+         // Queue the latent data preparation
+         this.actionQueue.enqueue({
+            callback: this._updateActiveEffects,
+            thisArg: this,
+            key: 'prepareLatentData',
+         });
+      }
    }
 
    static _defineDocumentSchema() {
@@ -91,26 +111,6 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       }
 
       return retVal;
-   }
-
-   prepareDerivedData() {
-      // If we are the best first owner of this document, and this document is not in a compendium
-      if (isCurrentUserBestOwner(this.parent) &&
-         !this.parent.pack && this.parent.id &&
-         !this.parent.isMarkedForDeletion) {
-
-         // Ensure the action queue is initialized
-         if (!this.parent.actionQueue) {
-            this.parent.actionQueue = new ActionQueue();
-         }
-
-         // Queue the latent data preparation
-         this.actionQueue.enqueue({
-            callback: this._updateActiveEffects,
-            thisArg: this,
-            key: 'prepareLatentData',
-         });
-      }
    }
 
    getRollData() {

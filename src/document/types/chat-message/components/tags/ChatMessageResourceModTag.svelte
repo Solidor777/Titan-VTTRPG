@@ -3,16 +3,16 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The Key of the resource to display information for. */
+   /** @type {string} - The Key of the resource to display information for. */
    export let key = void 0;
 
-   /** @type {string} The Icon to use for the tag.. */
+   /** @type {string} - The Icon to use for the tag.. */
    export let icon = void 0;
 
-   /** @type {string} The ctyle class to use for the tag.. */
+   /** @type {string} - The ctyle class to use for the tag.. */
    export let styleClass = void 0;
 
    // Calculate the tooltipAction for the resource mod

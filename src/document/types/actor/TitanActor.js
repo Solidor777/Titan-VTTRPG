@@ -66,7 +66,7 @@ export default class TitanActor extends Actor {
 
    /**
     * A helper to get a speaker from this actor.
-    * @returns {SpeakerData} The identified speaker data.
+    * @returns {SpeakerData} - The identified speaker data.
     */
    getSpeaker() {
       return ChatMessage.getSpeaker({
@@ -87,7 +87,7 @@ export default class TitanActor extends Actor {
    /**
     * Adds an Item to the Actor, created from the item data.
     * @param {object[]|object} itemData - The Item data requested for creation.
-    * @returns {Promise<Item[]|void>} The created or updated Item instances.
+    * @returns {Promise<Item[]|void>} - The created or updated Item instances.
     */
    async addItem(itemData) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
@@ -138,7 +138,7 @@ export default class TitanActor extends Actor {
    /**
     * Adds an Active Effect to the Actor, created from the active effect data.
     * @param {object[]|object} activeEffectData - The Item data requested for creation.
-    * @returns {Promise<ActiveEffect[]|void>} The created or updated Active Effect instances.
+    * @returns {Promise<ActiveEffect[]|void>} - The created or updated Active Effect instances.
     */
    async addActiveEffect(activeEffectData) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {

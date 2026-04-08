@@ -2,16 +2,16 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { DICE_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
 
-   /** @type {string} The Label for the check. */
+   /** @type {string} - The Label for the check. */
    export let label = void 0;
 
-   /** @type {string} The Attribute to use for the check. */
+   /** @type {string} - The Attribute to use for the check. */
    export let attribute = void 0;
 
-   /** @type {number} The Resolve cost of rolling the check, if any. */
+   /** @type {number} - The Resolve cost of rolling the check, if any. */
    export let resolveCost = void 0;
 
-   /** @type {boolean} Whether the button should be disabled. */
+   /** @type {boolean} - Whether the button should be disabled. */
    export let disabled = void 0;
 </script>
 

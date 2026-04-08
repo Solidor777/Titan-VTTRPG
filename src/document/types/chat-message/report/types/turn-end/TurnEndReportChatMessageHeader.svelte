@@ -4,7 +4,7 @@
    import { TURN_END_ICON } from '~/system/Icons.js';
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
 </script>

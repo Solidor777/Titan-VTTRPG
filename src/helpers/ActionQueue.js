@@ -37,7 +37,7 @@ export default class ActionQueue {
     * in the queue, then it will be ignored.
     * If the previous action is already being performed,
     * then the duplicate action will be called again.
-    * @returns {Promise<*>} The return value of the action being queued.
+    * @returns {Promise<*>} - The return value of the action being queued.
     */
    async enqueue(action) {
       // If the action is not already in the queue

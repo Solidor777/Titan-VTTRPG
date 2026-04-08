@@ -7,7 +7,7 @@
    import { CURRENCY_ICON, DEFENSE_ICON } from '~/system/Icons.js';
    import ItemSheetRaritySelect from '~/document/types/item/sheet/ItemSheetRaritySelect.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

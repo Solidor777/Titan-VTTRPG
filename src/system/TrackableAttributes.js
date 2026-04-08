@@ -1,6 +1,6 @@
 /**
  * Gets the trackable attributes for the Titan system.
- * @returns {object} The trackable attributes for the Titan system..
+ * @returns {object} - The trackable attributes for the Titan system..
  */
 export default function getTrackableAttributes() {
    return {
@@ -11,7 +11,7 @@ export default function getTrackableAttributes() {
 
 /**
  * Creates a trackable attributes object for a Character.
- * @returns {object} The newly created trackable attributes object for a Character.
+ * @returns {object} - The newly created trackable attributes object for a Character.
  */
 function getCharacterTrackableAttributes() {
    return {

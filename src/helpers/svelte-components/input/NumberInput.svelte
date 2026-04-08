@@ -2,31 +2,31 @@
    import { createEventDispatcher } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {number} The value that this input should modify. */
+   /** @type {number} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value of the input. */
+   /** @type {number|boolean} - The minimum value of the input. */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value of the input. */
+   /** @type {number|boolean} - The maximum value of the input. */
    export let max = false;
 
-   /** @type {number|boolean} The value digits this input can be. */
+   /** @type {number|boolean} - The value digits this input can be. */
    export let maxDigits = false;
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */
+   /** @type {boolean} - Whether the input should be an Integer. If False, it will be a Float. */
    export let isInteger = false;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
-   /** @type {boolean} Whether editing is currently active for the input. */
+   /** @type {boolean} - Whether editing is currently active for the input. */
    let editingActive = false;
 
-   /** @type {string} The actual input from the user. */
+   /** @type {string} - The actual input from the user. */
    let input = value.toString();
 
    /** @type EventDispatcher Dispatcher for component Events. */

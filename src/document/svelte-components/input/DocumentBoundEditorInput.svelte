@@ -4,16 +4,16 @@
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The value that this input should modify. */
+   /** @type {string} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {boolean} Whether editing should be disabled for this component. */
+   /** @type {boolean} - Whether editing should be disabled for this component. */
    export let disabled = false;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

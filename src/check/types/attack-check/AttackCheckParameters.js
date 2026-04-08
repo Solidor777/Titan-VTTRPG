@@ -45,7 +45,7 @@
 /**
  * Creates an Attribute Check Parameters object, based off the provided input.
  * @param {AttackCheckOptions} options - Fully populated Attack Check Options.
- * @returns {AttackCheckParameters} The new Attack Check Parameters.
+ * @returns {AttackCheckParameters} - The new Attack Check Parameters.
  */
 export default function createAttackCheckParameters(options) {
    return {

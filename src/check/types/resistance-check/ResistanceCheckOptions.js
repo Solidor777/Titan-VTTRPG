@@ -15,7 +15,7 @@
 /**
  * Creates a Resistance Check Options object, based off the provided input.
  * @param {object} options - Object containing the initial options.
- * @returns {ResistanceCheckOptions} The new, fully-populated Resistance Check Options.
+ * @returns {ResistanceCheckOptions} - The new, fully-populated Resistance Check Options.
  */
 export default function createResistanceCheckOptions(options) {
    return {

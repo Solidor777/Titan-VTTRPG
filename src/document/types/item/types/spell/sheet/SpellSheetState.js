@@ -11,7 +11,7 @@ import createTitanItemSheetState from '~/document/types/item/sheet/TitanItemShee
 /**
  * Creates a reactive state store for a spell Sheet.
  * @param {TitanItem} item - The item we are creating the sheet state for.
- * @returns {SpellSheetState} The newly created Spell Sheet State.
+ * @returns {SpellSheetState} - The newly created Spell Sheet State.
  */
 export default function createSpellSheetState(item) {
    /** @type {import('svelte/store').Writable<WeaponSheetData>} */

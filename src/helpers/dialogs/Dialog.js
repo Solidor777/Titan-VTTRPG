@@ -39,7 +39,7 @@ export default class TitanDialog extends TJSDialog {
 
    /**
     * Default Application options.
-    * @returns {object} Options - Application options.
+    * @returns {object} - Options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {

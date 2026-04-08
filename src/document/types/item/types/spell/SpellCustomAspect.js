@@ -16,7 +16,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a new Custom Aspect for spells.
- * @returns {SpellCustomAspect} The Custom Aspect with the default options sat.
+ * @returns {SpellCustomAspect} - The Custom Aspect with the default options sat.
  */
 export default function createCustomAspectTemplate() {
    return {

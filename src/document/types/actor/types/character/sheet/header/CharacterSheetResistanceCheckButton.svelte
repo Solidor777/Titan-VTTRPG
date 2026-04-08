@@ -5,10 +5,10 @@
    import DocumentOwnerResistanceButton from '~/document/svelte-components/DocumentOwnerResistanceButton.svelte';
    import getResistanceCheckParametersTooltip from '~/helpers/utility-functions/GetResistanceCheckParametersTooltip.js';
 
-   /** @type {string} The Attribute that this component represents. */
+   /** @type {string} - The Attribute that this component represents. */
    export let resistance;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type ResistanceCheckParameters Calculated check parameters. */

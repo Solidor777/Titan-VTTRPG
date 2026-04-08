@@ -10,7 +10,7 @@ import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesE
 /**
  * Creates a reactive state store for a Weapon Sheet.
  * @param {TitanItem} item - The item we are creating the sheet state for.
- * @returns {WeaponSheetState} The newly created Weapon Sheet State.
+ * @returns {WeaponSheetState} - The newly created Weapon Sheet State.
  */
 export default function createWeaponSheetState(item) {
    /** @type {import('svelte/store').Writable<WeaponSheetData>} */

@@ -19,7 +19,7 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
 /**
  * Initializes the data for a Spell Sheet.
  * @param {TitanItem} item - The Item this sheet belongs to.
- * @returns {SpellSheetData} The newly created Spell Sheet Data.
+ * @returns {SpellSheetData} - The newly created Spell Sheet Data.
  */
 export default function createSpellSheetData(item) {
    /** @type {SpellSheetData} Return data. */

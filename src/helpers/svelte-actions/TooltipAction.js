@@ -1,17 +1,17 @@
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
-import calculateText from '~/helpers/Text.json.js';
+import processTextData from '~/helpers/ProcessTextData.js';
 
 /**
- * @type {number[]} The delay in milliseconds before showing and hiding a tooltip.
+ * @type {number[]} - The delay in milliseconds before showing and hiding a tooltip.
  * [0] = Delay before showing a tooltip.
  * [1] = Delay before hiding a tooltip.
  * */
 const TOOLTIP_DELAY = [1000, 250];
 
 /**
- * @type {number[]} The time in milliseconds it takes to show or hide a tooltip after the delay has expired.
+ * @type {number[]} - The time in milliseconds it takes to show or hide a tooltip after the delay has expired.
  * [0] = Time to show a tooltip.
  * [1] = Time to hide a tooltip.
  * */
@@ -32,7 +32,7 @@ const TOOLTIP_DURATION = [400, 250];
  */
 export default function tooltipAction(element, textData) {
    // Calculate the initial content.
-   let initialContent = calculateText(textData);
+   let initialContent = processTextData(textData);
 
    // Initialize a tippy object if the content is valid.
    let tippyTooltip = isHTMLBlank(initialContent)
@@ -48,7 +48,7 @@ export default function tooltipAction(element, textData) {
       update: (newTextData) => {
 
          // If the new content is valid...
-         let updatedTextData = calculateText(newTextData);
+         let updatedTextData = processTextData(newTextData);
          if (!isHTMLBlank(updatedTextData)) {
 
             // If the tippy object already exists, update it with the new content.

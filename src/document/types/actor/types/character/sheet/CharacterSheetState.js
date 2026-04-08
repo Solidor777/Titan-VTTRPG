@@ -14,7 +14,7 @@ import createCharacterSheetData from '~/document/types/actor/types/character/she
 /**
  * Creates a reactive state store for a Character sheet.
  * @param {TitanActor} actor - The Actor this sheet belongs to.
- * @returns {CharacterSheetState} The newly created Character Sheet Store.
+ * @returns {CharacterSheetState} - The newly created Character Sheet Store.
  */
 export default function createCharacterSheetState(actor) {
    /** @type {import('svelte/store').Writable<CharacterSheetData>} */

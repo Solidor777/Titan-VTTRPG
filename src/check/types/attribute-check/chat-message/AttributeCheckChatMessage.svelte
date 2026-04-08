@@ -6,7 +6,7 @@
    import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ChatDamageButtons from '~/document/types/chat-message/components/buttons/ChatMessageDamageButtons.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

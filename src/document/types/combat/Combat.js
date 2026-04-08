@@ -5,7 +5,7 @@
 export default class TitanCombat extends Combat {
    /**
     * Gets the Initiative of the current combat turn.
-    * @returns {number} The Initiative of the current combat turn.
+    * @returns {number} - The Initiative of the current combat turn.
     */
    get initiative() {
       return this.turn !== null ? this.turns[this.turn].initiative : null;

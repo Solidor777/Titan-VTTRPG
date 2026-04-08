@@ -19,7 +19,7 @@
 /**
  * Initializes the data for an Item Sheet.
  * @param {TitanItem} item - The Item this sheet belongs to.
- * @returns {TitanItemSheetData} The newly created Item Sheet Data.
+ * @returns {TitanItemSheetData} - The newly created Item Sheet Data.
  */
 export default function createTitanItemSheetData(item) {
    // Initialize return data.

@@ -15,7 +15,7 @@
  * the dice rolled on the check, and the expertise that was applied.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
  * @param {CheckParameters} parameters - Object containing the parameters of the check.
- * @returns {CheckResults} The final results of the check.
+ * @returns {CheckResults} - The final results of the check.
  */
 export default function calculateCheckResults(diceResults, parameters) {
    // Initialize return value

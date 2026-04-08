@@ -8,10 +8,10 @@
    /** @type {string} Optional Icon to display. */
    export let icon = void 0;
 
-   /** @type {number} The value that this input should modify. */
+   /** @type {number} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

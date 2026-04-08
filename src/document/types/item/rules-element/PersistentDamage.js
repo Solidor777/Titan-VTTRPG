@@ -13,7 +13,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Creates a Rules Element for dealing damage to a Character every turn.
  * @param {object?} options - Options for the rules element.
- * @returns {PersistentDamageElement} The new Rules Element.
+ * @returns {PersistentDamageElement} - The new Rules Element.
  */
 export default function createPersistentDamageElement(options) {
    return {

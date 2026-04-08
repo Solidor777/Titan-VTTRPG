@@ -48,7 +48,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Getter for the map of the data model's svelte components.
-    * @returns {object} The map of the data model's svelte components.
+    * @returns {object} - The map of the data model's svelte components.
     */
    get components() {
       return this.#components;
@@ -70,7 +70,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
     * Defines the schema for the document, minus the svelte-components schemas.
     * Component schemas are added later.
-    * @returns {object} The document schema, minus the svelte-components schemas.
+    * @returns {object} - The document schema, minus the svelte-components schemas.
     * @protected
     */
    static _defineDocumentSchema() {
@@ -86,7 +86,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
     * Migrates the data for each svelte components.
     * @param {object} source - The source data for the document.
-    * @returns {object} The migrated data.
+    * @returns {object} - The migrated data.
     * @protected
     */
    static _migrateComponentData(source) {
@@ -115,7 +115,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
     * Gets the initial data for this document.
     * @param {object} data - The initial data object provided to the document creation request.
-    * @returns {object|void} The initial data to update the document with.
+    * @returns {object|void} - The initial data to update the document with.
     * @protected
     */
    _getInitialDocumentData(data) {

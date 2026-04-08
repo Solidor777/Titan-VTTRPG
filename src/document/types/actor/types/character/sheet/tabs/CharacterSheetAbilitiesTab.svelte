@@ -16,7 +16,7 @@
    /** @type CharacterSheetState Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

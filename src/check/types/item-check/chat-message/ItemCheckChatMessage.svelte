@@ -11,7 +11,7 @@
    import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

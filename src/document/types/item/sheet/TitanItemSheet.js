@@ -43,7 +43,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    /**
     * Overridable function for creating the reactive state store for this sheet.
     * @override
-    * @returns {ItemSheetState} The newly created state store.
+    * @returns {ItemSheetState} - The newly created state store.
     * @protected
     */
    _createReactiveState() {

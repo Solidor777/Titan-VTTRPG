@@ -4,7 +4,7 @@
    import { HEALING_ICON } from '~/system/Icons.js';
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type {string} Main label for the header. */

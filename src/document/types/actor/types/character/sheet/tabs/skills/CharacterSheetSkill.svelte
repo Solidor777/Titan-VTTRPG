@@ -12,7 +12,7 @@
    /** @type {string} Key for the Skill to show stats for. */
    export let key;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type AttributeCheckParameters Calculated check parameters. */
@@ -29,7 +29,7 @@
     * Calculates the tooltipAction for the total Training or Expertise value.
     * @param {object} valueObject - The Training or Expertise object.
     * @param {number} mod - Modifier for the total value or expertise.
-    * @returns {string} The tooltipAction for the total Training or Expertise value.
+    * @returns {string} - The tooltipAction for the total Training or Expertise value.
     */
    function getTotalValueTooltip(valueObject, mod) {
       // Base value label

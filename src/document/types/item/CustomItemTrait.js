@@ -11,7 +11,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
  * Creates a Custom Item Trait object.
- * @returns {CustomItemTrait} The new Trait object.
+ * @returns {CustomItemTrait} - The new Trait object.
  */
 export default function createCustomItemTraitTemplate() {
    return {

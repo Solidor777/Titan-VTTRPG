@@ -6,7 +6,7 @@
    /** @type TitanItem The Item this component belongs to. */
    export let item = void 0;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

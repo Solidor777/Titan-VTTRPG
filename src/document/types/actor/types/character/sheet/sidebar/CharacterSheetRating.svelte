@@ -7,16 +7,16 @@
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Rating that this component represents. */
+   /** @type {string} - The Rating that this component represents. */
    export let rating = void 0;
 
    /** @type Function Callback for when the rating button is clicked. */
    export let onClick = void 0;
 
-   /** @type {string} The Icon that represents this stat. */
+   /** @type {string} - The Icon that represents this stat. */
    const icon = getIcon(rating);
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

@@ -3,10 +3,10 @@
    import { getContext } from 'svelte';
    import getItemCheckParametersTooltip from '~/helpers/utility-functions/GetItemCheckParametersTooltip.js';
 
-   /** @type {string} The ID of the Item to get the check from. */
+   /** @type {string} - The ID of the Item to get the check from. */
    export let itemId = void 0;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type ItemCheckOptions Base options for the Item Check. */

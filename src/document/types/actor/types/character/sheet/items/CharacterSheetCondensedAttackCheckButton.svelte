@@ -4,10 +4,10 @@
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
 
-   /** @type {string} The ID of the Item to get the check from. */
+   /** @type {string} - The ID of the Item to get the check from. */
    export let itemId = void 0;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type AttackCheckOptions Base options for the Check. */

@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import InventoryItemTypeSelect from '~/helpers/svelte-components/select/InventoryItemTypeSelect.svelte';
+   import InventoryItemTypeSelect from '~/helpers/svelte-components/input/select/InventoryItemTypeSelect.svelte';
 
    /** @type TitanActor Reference to the Actor this dialog is for. */
    export let actor = void 0;
@@ -12,7 +12,7 @@
    /** @type SvelteApp The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {string} The currently selected item type. */
+   /** @type {string} - The currently selected item type. */
    let value = 'armor';
 
    /**

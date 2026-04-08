@@ -14,7 +14,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Creates a Rules Element for conditionally modifying a Character's Rating.
  * @param {object?} options - Options for the rules element.
- * @returns {ConditionalRatingModifierElement} The new Rules Element.
+ * @returns {ConditionalRatingModifierElement} - The new Rules Element.
  */
 export default function createConditionalRatingModifierElement(options) {
    return {

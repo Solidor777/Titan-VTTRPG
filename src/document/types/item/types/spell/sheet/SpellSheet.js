@@ -54,7 +54,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
 
    /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @returns {SpellSheetState} The newly created state store.
+    * @returns {SpellSheetState} - The newly created state store.
     * @protected
     */
    _createReactiveState() {

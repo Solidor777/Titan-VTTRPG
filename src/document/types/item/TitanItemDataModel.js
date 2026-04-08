@@ -64,7 +64,7 @@ export default class TitanItemDataModel extends TitanDataModel {
 
    /**
     * Gets the default image for this document type.
-    * @returns {string} The default image for this document type.
+    * @returns {string} - The default image for this document type.
     * @private
     */
    _getDefaultImage() {
@@ -73,7 +73,7 @@ export default class TitanItemDataModel extends TitanDataModel {
 
    /**
     * Gets the default name for this document type.
-    * @returns {string} The default name for this document type.
+    * @returns {string} - The default name for this document type.
     * @private
     */
    _getDefaultName() {

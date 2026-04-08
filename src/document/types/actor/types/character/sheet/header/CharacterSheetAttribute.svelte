@@ -5,10 +5,10 @@
    import CharacterSheetCondensedAttributeCheckButton
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributeCheckButton.svelte';
 
-   /** @type {string} The Attribute that this component represents. */
+   /** @type {string} - The Attribute that this component represents. */
    export let attribute;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 

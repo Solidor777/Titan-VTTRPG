@@ -31,7 +31,7 @@
 /**
  * Creates an Attack Check Options object, based off the provided input.
  * @param {object} options - Object containing the initial options.
- * @returns {AttackCheckOptions} The new, fully-populated Attack Check Options.
+ * @returns {AttackCheckOptions} - The new, fully-populated Attack Check Options.
  */
 export default function createAttackCheckOptions(options) {
    return {

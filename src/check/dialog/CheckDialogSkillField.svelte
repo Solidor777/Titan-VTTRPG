@@ -1,6 +1,6 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
-   import SkillSelect from '~/helpers/svelte-components/select/SkillSelect.svelte';
+   import SkillSelect from '~/helpers/svelte-components/input/select/SkillSelect.svelte';
    import { getContext } from 'svelte';
 
    /** @type {object} Reference to the Check Options store. */

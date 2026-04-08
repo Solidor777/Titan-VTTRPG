@@ -43,7 +43,7 @@
 /**
  * Initializes data for a Character Sheet.
  * @param {TitanActor} actor - The Actor this sheet belongs to.
- * @returns {CharacterSheetData} The newly created Character Sheet Data.
+ * @returns {CharacterSheetData} - The newly created Character Sheet Data.
  */
 export default function createCharacterSheetData(actor) {
    /** @type {CharacterSheetData} Return Data */

@@ -18,7 +18,7 @@
 /**
  * Creates an Attribute Check Options object, based off the provided input.
  * @param {object} options - Object containing the initial options.
- * @returns {AttributeCheckOptions} The new, fully-populated Attribute Check Options.
+ * @returns {AttributeCheckOptions} - The new, fully-populated Attribute Check Options.
  */
 export default function createAttributeCheckOptions(options) {
    return {

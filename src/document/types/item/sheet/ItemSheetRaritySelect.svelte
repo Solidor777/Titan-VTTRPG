@@ -1,12 +1,12 @@
 <script>
-   import RaritySelect from '~/helpers/svelte-components/select/RaritySelect.svelte';
+   import RaritySelect from '~/helpers/svelte-components/input/select/RaritySelect.svelte';
    import { getContext } from 'svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 </script>
 

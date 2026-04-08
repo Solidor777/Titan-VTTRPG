@@ -1,22 +1,22 @@
 <script>
    import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 
-   /** @type {number} The value that this input should modify. */
+   /** @type {number} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value of the input. */
+   /** @type {number|boolean} - The minimum value of the input. */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value of the input. */
+   /** @type {number|boolean} - The maximum value of the input. */
    export let max = false;
 
-   /** @type {number|boolean} The value digits this input can be. */
+   /** @type {number|boolean} - The value digits this input can be. */
    export let maxDigits = false;
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

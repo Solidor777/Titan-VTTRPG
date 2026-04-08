@@ -17,7 +17,7 @@ import createRulesElementItemSheetData from '~/document/types/item/sheet/RulesEl
 /**
  * Initializes the data for a Weapon Sheet.
  * @param {TitanItem} item - The Item this sheet belongs to.
- * @returns {WeaponSheetData} The newly created Weapon Sheet Data.
+ * @returns {WeaponSheetData} - The newly created Weapon Sheet Data.
  */
 export default function createWeaponSheetData(item) {
    /** @type {WeaponSheetData} Return Data. */

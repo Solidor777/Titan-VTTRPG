@@ -13,10 +13,10 @@
    import { ROLES } from '~/system/Roles.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {SelectOption<string>[]} Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/
+   /** @type {SelectOption<string>[]} - Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/
    const roleOptions = createLocalizedOptions(ROLES);
 </script>
 

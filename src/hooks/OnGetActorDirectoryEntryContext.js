@@ -1,7 +1,7 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import onRegenerateDocumentUUID from '~/helpers/utility-functions/OnRegenerateDocumentUUID.js';
 import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.js';
-import {ID_ICON} from '~/system/Icons.js';
+import { ID_ICON } from '~/system/Icons.js';
 
 /**
  * Generates contextual options when right-clicking on an Actor in the Actors directory.
@@ -30,7 +30,7 @@ export default function onGetActorDirectoryEntryContext(element, options) {
 /**
  * Gets the Actor from an Entry in the Actors directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {TitanActor} The Document from the Entry in the directory.
+ * @returns {TitanActor} - The Document from the Entry in the directory.
  */
 function getActorFromDirectoryEntry(element) {
    return game.actors.get(element.data('document-id'));
@@ -39,7 +39,7 @@ function getActorFromDirectoryEntry(element) {
 /**
  * Determines whether the current user owns the Actor for an Entry in the Actors directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
+ * @returns {boolean} - Whether the current user owns the Document for an Entry in the directory.
  */
 function isActorOwner(element) {
    return getActorFromDirectoryEntry(element)?.isOwner;

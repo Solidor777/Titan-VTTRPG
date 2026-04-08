@@ -1,28 +1,29 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
 
    /**
     * Object used to store data for an Option within a Select Svelte component.
     * @template T
     * @typedef {object} SelectOption
     * @property {T} value - The value for this option.
-    * @property {string|TextData} [label] - The display label for this option.
-    * @property {string|TooltipAction} [tooltip] - Tooltip to display for this option.
+    * @property {string | number|TextData} [label] - The label to display for this option.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this option, if any.
     */
 
    /**
     * Options for the Select Svelte component.
     * @template T
-    * @type SelectOption<T>[]  */
+    * @type {(SelectOption<T> | string | number)[]} */
    export let options = void 0;
 
-   /** @type * The value that this input should modify. */
+   /** @type {*} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 
@@ -34,10 +35,10 @@
 >
    {#each options as option}
       <option
-         value={option.value}
+         value={option.value ?? option}
          use:tooltipAction={option.tooltip}
       >
-         <Text
+         <Text text={option.label ?? option.value ?? option}/>
       </option>
    {/each}
 </select>

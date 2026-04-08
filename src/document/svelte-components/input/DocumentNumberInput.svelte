@@ -3,25 +3,25 @@
    import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {number} The value that this input should modify. */
+   /** @type {number} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value of the input. */
+   /** @type {number|boolean} - The minimum value of the input. */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value of the input. */
+   /** @type {number|boolean} - The maximum value of the input. */
    export let max = false;
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */
+   /** @type {boolean} - Whether the input should be an Integer. If False, it will be a Float. */
    export let isInteger = false;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /**

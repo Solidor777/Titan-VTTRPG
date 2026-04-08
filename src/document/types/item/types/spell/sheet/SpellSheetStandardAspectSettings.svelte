@@ -12,7 +12,7 @@
    export let aspectOptions = void 0;
    let idx = 0;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    // Determines whether an aspect should have a details div

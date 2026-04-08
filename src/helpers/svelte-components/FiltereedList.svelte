@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

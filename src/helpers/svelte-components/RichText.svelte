@@ -1,10 +1,10 @@
 <script>
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The raw html to display. */
+   /** @type {string} - The raw html to display. */
    export let value = void 0;
 
    /** @type {string} Enriched HTMl to display. */

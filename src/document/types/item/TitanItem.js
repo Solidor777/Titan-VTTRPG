@@ -32,7 +32,7 @@ export default class TitanItem extends Item {
 
    /**
     * Creates a Chat Message containing this item's data and sends it to chat.
-    * @returns {Promise<ChatMessage>} The newly created Chat Message.
+    * @returns {Promise<ChatMessage>} - The newly created Chat Message.
     */
    async sendToChat() {
       // Create the context object

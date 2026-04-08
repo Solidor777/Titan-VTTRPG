@@ -15,7 +15,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Creates a Rules Element for conditionally displaying a message when a Character rolls a check.
  * @param {object?} options - Options for the rules element.
- * @returns {RollMessageElement} The new Rules Element.
+ * @returns {RollMessageElement} - The new Rules Element.
  */
 export default function createRollMessageElement(options) {
    return {

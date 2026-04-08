@@ -46,7 +46,7 @@
 /**
  * Creates a Casting Check Parameters object, based off the provided input.
  * @param {CastingCheckOptions} options - Fully populated Casting Check Options.
- * @returns {CastingCheckParameters} The new Casting Check Parameters.
+ * @returns {CastingCheckParameters} - The new Casting Check Parameters.
  */
 export default function createCastingCheckParameters(options) {
    return {

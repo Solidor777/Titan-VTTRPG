@@ -3,7 +3,7 @@
    import CharacterSheetRating from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetRating.svelte';
    import BorderedColumnList from '~/helpers/svelte-components/BorderedColumnList.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
 </script>

@@ -1,18 +1,21 @@
 <script>
    import { getContext } from 'svelte';
-   import Select from '~/helpers/svelte-components/select/Select.svelte';
+   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /** @type * The value that this input should modify. */
    export let value = void 0;
 
-   /** @type SelectOption[] Options for the Select svelte component. */
+   /** @type SelectOption[] Options for the Select Svelte component. */
    export let options = void 0;
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
+
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -21,4 +24,5 @@
    disabled={disabled || !$document?.isOwner}
    on:change={()=> refreshSystemDocument($document, disabled)}
    {options}
+   {tooltip}
 />

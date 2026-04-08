@@ -17,7 +17,7 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
  * Creates a reactive state store for an Item Sheet.
  * @param {TitanItem} item - The item we are creating the sheet state for.
  * @param {TitanItemSheetData} [overrideData] - Option override data for initializing the writable.
- * @returns {ItemSheetState} The newly created Item Sheet State.
+ * @returns {ItemSheetState} - The newly created Item Sheet State.
  */
 export default function createTitanItemSheetState(item, overrideData) {
    /** @type {import('svelte/store').Writable<ItemSheetData>} */

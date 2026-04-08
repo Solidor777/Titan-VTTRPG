@@ -13,7 +13,7 @@ export default class AttackCheck extends TitanCheck {
     * Makes a call to the parent function, but has some additional functionality for spending expertise to
     * maximize the benefits of attack traits.
     * @param {number[]} sortedDice - Results of the dice roll, sorted from largest to smallest.
-    * @returns {CheckDiceResults} The dice results after Expertise is applied,
+    * @returns {CheckDiceResults} - The dice results after Expertise is applied,
     * along with the expertise remaining.
     * @protected
     */
@@ -61,7 +61,7 @@ export default class AttackCheck extends TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttackCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @returns {AttackCheckResults} The final results of the check.
+    * @returns {AttackCheckResults} - The final results of the check.
     * @protected
     */
    _calculateResults(diceResults) {

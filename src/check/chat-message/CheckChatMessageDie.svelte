@@ -6,16 +6,16 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { DICE_ICON, EXPERTISE_ICON } from '~/system/Icons.js';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type CheckDie The individual die being display. */
    export let die = void 0;
 
-   /** @type {string} The label to display for the die. */
+   /** @type {string} - The label to display for the die. */
    const label = die.expertiseApplied > 0 ? `${die.base} + ${die.expertiseApplied}` : die.base.toString();
 
-   /** @type {string} The class to affect the appearance of the die. */
+   /** @type {string} - The class to affect the appearance of the die. */
    const result = die.final >= 6 ? 'critical-success' :
       die.final >= $document.flags.titan.parameters.difficulty ? 'success' :
          die.final <= 1 ? 'critical-failure' :
@@ -50,7 +50,7 @@
       }
    }
 
-   /** @type {boolean} Whether applying Expertise to the die should be disabled. */
+   /** @type {boolean} - Whether applying Expertise to the die should be disabled. */
    const disabled = !$document.isOwner ||
       $document.flags.titan.results.expertiseRemaining === 0 ||
       die.final >= 6;

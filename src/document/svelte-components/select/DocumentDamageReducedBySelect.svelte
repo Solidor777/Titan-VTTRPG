@@ -1,21 +1,24 @@
 <script>
    import { getContext } from 'svelte';
-   import DamageReducedBySelect from '~/helpers/svelte-components/select/DamageReducedBySelect.svelte';
+   import DamageReducedBySelect from '~/helpers/svelte-components/input/select/DamageReducedBySelect.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {string} The value that this input should modify. */
+   /** @type {string} - The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {boolean} Whether the input should currently be disabled. */
+   /** @type {boolean} - Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {boolean} Whether to allow Resistance Check as an option */
+   /** @type {boolean} - Whether to allow Resistance Check as an option */
    export let allowResistanceCheck = true;
 
-   /** @type {boolean} Whether to allow Opposed Check as an option */
+   /** @type {boolean} - Whether to allow Opposed Check as an option */
    export let allowOpposedCheck = true;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
+   export let tooltip = void 0;
+
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 </script>
 
@@ -25,4 +28,5 @@
    bind:value
    disabled={disabled || !$document?.isOwner}
    on:change={()=> refreshSystemDocument($document, disabled)}
+   {tooltip}
 />

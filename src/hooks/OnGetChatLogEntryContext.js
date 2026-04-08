@@ -2,7 +2,7 @@ import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker
 import localize from '~/helpers/utility-functions/Localize.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
-import {DICE_ICON, EXPERTISE_ICON, TRAINING_ICON} from '~/system/Icons.js';
+import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
 import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 
 /**
@@ -84,7 +84,7 @@ export default function onGetChatLogEntryContext(element, options) {
 /**
  * Gets the Titan flags from the Entry for a Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {object} The Titan flags from the Entry for a Chat Message in the Chat Log.
+ * @returns {object} - The Titan flags from the Entry for a Chat Message in the Chat Log.
  */
 function getTitanFlags(element) {
    // Get the message from the list item
@@ -106,7 +106,7 @@ function getTitanFlags(element) {
 /**
  * Determines whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {boolean} Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
+ * @returns {boolean} - Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
  */
 function canReRollFailures(element) {
    // Get the Titan Flags
@@ -175,18 +175,18 @@ async function reRollFailures(element, spendResolve) {
       if (spendResolve) {
          const actor = getActorFromSpeaker(message.speaker);
          if (actor && actor.system.isCharacter) {
-            await actor.system.spendResolve(1, {playSound: false});
+            await actor.system.spendResolve(1, { playSound: false });
          }
       }
 
-      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false}, true);
+      foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice, loop: false }, true);
    }
 }
 
 /**
  * Determines whether to display the Double Training contextual option for a Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {boolean} Whether to display the Double Training contextual option for a Chat Message in the Chat Log.
+ * @returns {boolean} - Whether to display the Double Training contextual option for a Chat Message in the Chat Log.
  */
 function canDoubleTraining(element) {
    // Return true if the message is a check with Training that has not yet been doubled.
@@ -227,18 +227,18 @@ async function doubleTraining(element, spendResolve) {
       if (spendResolve) {
          const actor = getActorFromSpeaker(message.speaker);
          if (actor && actor.system.isCharacter) {
-            await actor.system.spendResolve(1, {playSound: false});
+            await actor.system.spendResolve(1, { playSound: false });
          }
       }
 
-      foundry.audio.AudioHelper.play({src: CONFIG.sounds.dice, loop: false}, true);
+      foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice, loop: false }, true);
    }
 }
 
 /**
  * Determines whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {boolean} Whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
+ * @returns {boolean} - Whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
  */
 function canDoubleExpertise(element) {
    // Return true if the message is a check with Expertise that has not yet been doubled.
@@ -285,7 +285,7 @@ async function doubleExpertise(element, spendResolve) {
 /**
  * Returns whether the provided chat message type is a Check Chat Message.
  * @param {string} chatMessageType - The chat message type to check.
- * @returns {boolean} Whether the provided chat message type is a Check Chat Message.
+ * @returns {boolean} - Whether the provided chat message type is a Check Chat Message.
  */
 function isCheck(chatMessageType) {
    switch (chatMessageType) {

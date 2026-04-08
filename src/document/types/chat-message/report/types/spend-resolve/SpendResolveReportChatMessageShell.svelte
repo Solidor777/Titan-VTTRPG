@@ -6,7 +6,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type {object} Header svelte-components to use. */

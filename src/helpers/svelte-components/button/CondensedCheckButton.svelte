@@ -3,10 +3,10 @@
    import { getContext } from 'svelte';
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The Attribute to be used for the check. */
+   /** @type {string} - The Attribute to be used for the check. */
    export let attribute = void 0;
 
    /** @type isInteger The Difficulty of the check. */
@@ -27,10 +27,10 @@
    /** @type {string} Icon to show in front of the check. */
    export let checkIcon = void 0;
 
-   /** @type {string} The display Label of the check. */
+   /** @type {string} - The display Label of the check. */
    export let label = void 0;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

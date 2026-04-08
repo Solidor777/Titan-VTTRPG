@@ -11,7 +11,7 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
 /**
  * Initializes the data for a Rules Element Item Sheet.
  * @param {TitanItem} item - The Item this sheet belongs to.
- * @returns {RulesElementItemSheetData} The newly created a Rules Element Item Sheet Data.
+ * @returns {RulesElementItemSheetData} - The newly created a Rules Element Item Sheet Data.
  */
 export default function createRulesElementItemSheetData(item) {
    /** @type {RulesElementItemSheetData} Return data. */

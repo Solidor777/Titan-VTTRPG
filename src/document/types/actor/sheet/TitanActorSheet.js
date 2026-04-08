@@ -35,20 +35,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Default Application options.
-    * @override
-    * @returns {object} Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
-   static get defaultOptions() {
-      let parentOptions = super.defaultOptions;
-      return foundry.utils.mergeObject(parentOptions, {
-         baseApplication: 'ActorSheet',
-         width: 750,
-      });
-   }
-
-   /**
     * If this sheet's Actor Sheet represents a synthetic Token actor, gets a reference to the active Token.
     * @type {TokenDocument|null}
     */
@@ -60,7 +46,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * Handles the dropping of ActiveEffect data onto an Actor Sheet.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<ActiveEffect[]|boolean>} The created ActiveEffect object or false if it couldn't be created.
+    * @returns {Promise<ActiveEffect[]|boolean>} - The created ActiveEffect object or false if it couldn't be created.
     * @protected
     */
    async _onDropActiveEffect(event, data) {
@@ -80,7 +66,8 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * Handle dropping of an item reference or item data onto an Actor Sheet.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<Item[]|boolean>} The created or updated Item instances, or false if the drop was not permitted.
+    * @returns {Promise<Item[]|boolean>} - The created or updated Item instances, or false if the drop was not
+    *    permitted.
     * @protected
     */
    async _onDropItem(event, data) {
@@ -107,7 +94,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * Handle a drop event for an existing embedded Item to sort that Item relative to its siblings.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} itemData - The item data requested for sorting.
-    * @returns {Promise<TitanItem[]|boolean>} The updated item instances, or false if the data was invalid.
+    * @returns {Promise<TitanItem[]|boolean>} - The updated item instances, or false if the data was invalid.
     * @private
     */
    async _onSortItem(event, itemData) {
@@ -156,7 +143,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * The core sheet currently supports dropping a Folder of Items to create all items as owned items.
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<Item[]|boolean>} The created Item instances.
+    * @returns {Promise<Item[]|boolean>} - The created Item instances.
     * @protected
     */
    async _onDropFolder(event, data) {
@@ -199,6 +186,31 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {string} type - The Type of the item that was deleted.
     */
    postDeleteItem(id, type) {
+   }
+
+   /**
+    * Closes the sheet.
+    * @override
+    * @param {object} [options={}] - Close options.
+    * @returns {Promise<void>}
+    */
+   async close(options = {}) {
+      this.options.token = null;
+      return super.close(options);
+   }
+
+   /**
+    * Default Application options.
+    * @override
+    * @returns {object} Application options.
+    * @see https://foundryvtt.com/api/Application.html#options
+    */
+   static get defaultOptions() {
+      let parentOptions = super.defaultOptions;
+      return foundry.utils.mergeObject(parentOptions, {
+         baseApplication: 'ActorSheet',
+         width: 750,
+      });
    }
 
    /**
@@ -265,21 +277,10 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Closes the sheet.
-    * @override
-    * @param {object} [options={}] - Close options.
-    * @returns {Promise<void>}
-    */
-   async close(options = {}) {
-      this.options.token = null;
-      return super.close(options);
-   }
-
-   /**
     * Processes data when dropped onto this sheet.
     * @override
     * @param {DragEvent} event - The DOM Event from dropping the button.
-    * @returns {Promise<Item[]|ActiveEffect[]|boolean>} The newly created embedded documents, or false if the drop was
+    * @returns {Promise<Item[]|ActiveEffect[]|boolean>} - The newly created embedded documents, or false if the drop was
     *    not allowed.
     * @private
     */

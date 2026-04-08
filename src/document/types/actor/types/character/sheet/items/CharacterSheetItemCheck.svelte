@@ -10,13 +10,13 @@
    import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item to get the check from. */
+   /** @type {string} - The ID of the item to get the check from. */
    export let itemId = void 0;
 
-   /** @type {number} The index of the check in the checks array. */
+   /** @type {number} - The index of the check in the checks array. */
    export let checkIdx = void 0;
 
    /** @type ItemCheckOptions Options for the check. */
@@ -25,7 +25,7 @@
       checkIdx: checkIdx
    };
 
-   /** @type {boolean} Whether to automatically spend the resolve for checks. */
+   /** @type {boolean} - Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    /** @type ItemCheckParameters Calculated item check parameters. */

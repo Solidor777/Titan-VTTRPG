@@ -23,7 +23,7 @@
 /**
  * Creates a Casting Check Options object, based off the provided input.
  * @param {object} options - Object containing the initial options.
- * @returns {ItemCheckOptions} The new, fully-populated Item Check Options.
+ * @returns {ItemCheckOptions} - The new, fully-populated Item Check Options.
  */
 export default function createItemCheckOptions(options) {
    return {

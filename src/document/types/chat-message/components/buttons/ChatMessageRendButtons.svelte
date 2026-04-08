@@ -8,7 +8,7 @@
    /** @type isInteger Amount of Rend to apply. */
    export let rend = void 0;
 
-   /** @type {boolean} Whether the attack inflicting the Rend is Magical. */
+   /** @type {boolean} - Whether the attack inflicting the Rend is Magical. */
    export let magical = false;
 </script>
 

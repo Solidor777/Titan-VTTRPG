@@ -2,10 +2,10 @@
    import { getContext } from 'svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
-   /** @type {number} The idx of the Trait in the item's Custom Traits array. */
+   /** @type {number} - The idx of the Trait in the item's Custom Traits array. */
    export let idx = void 0;
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /**

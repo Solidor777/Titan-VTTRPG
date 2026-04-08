@@ -5,7 +5,7 @@
    import LabelTag from '~/helpers/svelte-components/tag/LabelTag.svelte';
    import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /** @type {getContext<Document>} Reference to the Document store. */
    const document = getContext('document');
 
    /** @type Tag[] List of traits converted into tags. */
