@@ -8,10 +8,7 @@ import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.j
  * @extends CharacterDataModel
  */
 export default class PlayerDataModel extends CharacterDataModel {
-   prepareDerivedData() {
-      super.prepareDerivedData();
-      this.xp.available = this.xp.earned - this._getSpentXP();
-   }   static _defineDocumentSchema() {
+   static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
       schema.xp = createSchemaField({
          earned: createNumberField(),
@@ -19,6 +16,19 @@ export default class PlayerDataModel extends CharacterDataModel {
       schema.inspiration = createBooleanField(false);
 
       return schema;
+   }
+
+   prepareDerivedData() {
+      super.prepareDerivedData();
+      this.xp.available = this.xp.earned - this._getSpentXP();
+   }
+
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.xp = foundry.utils.deepClone(this.xp);
+      retVal.inspiration = this.inspiration;
+
+      return retVal;
    }
 
    _getInitialPrototypeTokenData(data) {
@@ -30,12 +40,6 @@ export default class PlayerDataModel extends CharacterDataModel {
       };
 
       return retVal;
-   }   getRollData() {
-      const retVal = super.getRollData();
-      retVal.xp = foundry.utils.deepClone(this.xp);
-      retVal.inspiration = this.inspiration;
-
-      return retVal;
    }
 
    /**
@@ -43,7 +47,7 @@ export default class PlayerDataModel extends CharacterDataModel {
     * @returns {Promise<void>}
     */
    async toggleInspiration() {
-      if (this.parent.isOwner) {
+      if (game.titan.assert(this.parent.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)) {
          this.inspiration = !this.inspiration;
          await this.parent.update({
             system: {
@@ -52,8 +56,5 @@ export default class PlayerDataModel extends CharacterDataModel {
          });
       }
    }
-
-
-
 
 }

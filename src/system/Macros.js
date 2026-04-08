@@ -229,7 +229,7 @@ export default class TitanMacros {
     * @param {Document} actor - The Actor to retrieve the Item from.
     * @param {string} id - The ID to be used with the provided ID method to retrieve the item.
     * @param {string} idMethod - The method that will be used to get the Item from the ID (uuid, name, or document ID).
-    * @returns {TitanItem?} The retrieved Item from the provided Actor using the provided ID and ID method, if any.
+    * @returns {TitanItem|void} The retrieved Item from the provided Actor using the provided ID and ID method, if any.
     */
    getMacroItemFromID(actor, id, idMethod) {
       switch (idMethod) {

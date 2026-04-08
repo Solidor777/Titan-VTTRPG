@@ -80,7 +80,7 @@
     *
     */
    function onSelectorChange() {
-      if ($document?.isOwner) {
+      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          switch (element.selector) {
             case 'armorTrait':
             case 'shieldTrait': {

@@ -24,7 +24,6 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
       // Initialize self object.
       super(/** @type foundry.abstract.document */ sheetDocument, options);
-      console.log(sheetDocument);
       this.item = sheetDocument;
    }
 

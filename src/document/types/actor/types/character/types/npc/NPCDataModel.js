@@ -7,7 +7,68 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
  * @extends CharacterDataModel
  */
 export default class NPCDataModel extends CharacterDataModel {
-   static _defineDocumentSchema() {
+   /**
+    * Applies Damage to the Character.
+    * Override for handling Minions dying in 1 hit and overkill damage;.
+    * @param {number} damage - Amount of Damage to apply.
+    * @param {DamageOptions} [options] - Options for applying the Damage.
+    * @returns {Promise<DamageReport|void>} Results of applying the Damage.
+    */
+   async applyDamage(damage, options) {
+      // If we are a minion and not already dead
+      if (this.role === 'minion' && this.resource.stamina.value > 0) {
+
+         // Call the parent version of the function without updating the actor or starting a report.
+         const superOptions = options ? foundry.utils.deepClone(options) : {};
+         superOptions.updateActor = false;
+         superOptions.report = false;
+         const reportData = await super.applyDamage(damage, options);
+
+         // If we took any damage
+         if (reportData.damageTaken) {
+
+            // Set stamina to 0
+            this.resource.stamina.value = 0;
+
+            // Calculate overkill damage
+            const overkillDamage = reportData.damageTaken - this.resource.stamina.max;
+            if (overkillDamage > 0) {
+               reportData.overkillDamage = overkillDamage;
+            }
+
+            // Update the actor document unless explicitly instructed otherwise
+            if (options?.updateActor !== false) {
+
+               await this.parent.update({
+                  system: {
+                     resource: {
+                        stamina: {
+                           value: this.stamina.value,
+                        },
+                        wounds: {
+                           value: this.wounds.value,
+                        },
+                     },
+                  },
+               });
+            }
+         }
+
+         // Report taking and resisting damage if appropriate
+         if (options?.report !== false && getSetting('reportTakingDamage')) {
+
+            // Send the report to chat
+            await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
+         }
+
+         return reportData;
+      }
+
+      // Otherwise, apply damage as normal
+      else {
+         return super.applyDamage(damage, options);
+      }
+   }   static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
       schema.bio.type = createStringField();
       schema.role = createStringField('warrior');
@@ -65,66 +126,5 @@ export default class NPCDataModel extends CharacterDataModel {
       }
    }
 
-   /**
-    * Applies Damage to the Character.
-    * Override for handling Minions dying in 1 hit and overkill damage;.
-    * @param {number} damage - Amount of Damage to apply.
-    * @param {DamageOptions?} options - Options for applying the Damage.
-    * @returns {Promise<DamageReport|void>} Results of applying the Damage.
-    */
-   async applyDamage(damage, options) {
-      // If we are a minion and not already dead
-      if (this.role === 'minion' && this.resource.stamina.value > 0) {
 
-         // Call the parent version of the function without updating the actor or starting a report.
-         const superOptions = options ? foundry.utils.deepClone(options) : {};
-         superOptions.updateActor = false;
-         superOptions.report = false;
-         const reportData = await super.applyDamage(damage, options);
-
-         // If we took any damage
-         if (reportData.damageTaken) {
-
-            // Set stamina to 0
-            this.resource.stamina.value = 0;
-
-            // Calculate overkill damage
-            const overkillDamage = reportData.damageTaken - this.resource.stamina.max;
-            if (overkillDamage > 0) {
-               reportData.overkillDamage = overkillDamage;
-            }
-
-            // Update the actor document unless explicitly instructed otherwise
-            if (options?.updateActor !== false) {
-
-               await this.parent.update({
-                  system: {
-                     resource: {
-                        stamina: {
-                           value: this.stamina.value,
-                        },
-                        wounds: {
-                           value: this.wounds.value,
-                        },
-                     },
-                  },
-               });
-            }
-         }
-
-         // Report taking and resisting damage if appropriate
-         if (options?.report !== false && getSetting('reportTakingDamage')) {
-
-            // Send the report to chat
-            await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
-         }
-
-         return reportData;
-      }
-
-      // Otherwise, apply damage as normal
-      else {
-         return super.applyDamage(damage, options);
-      }
-   }
 }

@@ -162,6 +162,41 @@
                </div>
             </div>
 
+            <!--Opposed Check Enabled-->
+            <div class="row">
+               <div class="field">
+                  <LabeledElement
+                     label={'opposedCheck'}
+                     tooltip={'check.opposedCheck.enabled.desc'}
+                  >
+                     <DocumentCheckboxInput bind:value={check.opposedCheck.enabled}/>
+                  </LabeledElement>
+               </div>
+            </div>
+
+            {#if check.opposedCheck.enabled}
+               <div class="row" transition:slide|local>
+                  <!--Opposed Check Attribute Select-->
+                  <LabeledElement
+                     label={'attribute'}
+                     tooltip={'check.opposedCheck.attribute.desc.text'}
+                  >
+                     <DocumentAttributeSelect bind:value={check.opposedCheck.attribute}/>
+                  </LabeledElement>
+
+                  <!--Opposed Check Skill Select-->
+                  <LabeledElement
+                     label={'skill'}
+                     tooltip={'check.opposedCheck.skill.desc.text'}
+                  >
+                     <DocumentSkillSelect
+                        bind:value={check.opposedCheck.skill}
+                        allowNone={true}
+                     />
+                  </LabeledElement>
+               </div>
+            {/if}
+
             <div class="row">
                <!--Damage-->
                <div class="field">
@@ -233,41 +268,6 @@
                   </div>
                {/if}
             {/if}
-
-            <!--Opposed Check Enabled-->
-            <div class="row">
-               <div class="field">
-                  <LabeledElement
-                     label={'opposedCheck'}
-                     tooltip={'check.opposedCheck.enabled.desc'}
-                  >
-                     <DocumentCheckboxInput bind:value={check.opposedCheck.enabled}/>
-                  </LabeledElement>
-               </div>
-            </div>
-
-            {#if check.opposedCheck.enabled}
-               <div class="row" transition:slide|local>
-                  <!--Opposed Check Attribute Select-->
-                  <LabeledElement
-                     label={'attribute'}
-                     tooltip={'check.opposedCheck.attribute.desc.text'}
-                  >
-                     <DocumentAttributeSelect bind:value={check.opposedCheck.attribute}/>
-                  </LabeledElement>
-
-                  <!--Opposed Check Skill Select-->
-                  <LabeledElement
-                     label={'skill'}
-                     tooltip={'check.opposedCheck.skill.desc.text'}
-                  >
-                     <DocumentSkillSelect
-                        bind:value={check.opposedCheck.skill}
-                        allowNone={true}
-                     />
-                  </LabeledElement>
-               </div>
-            {/if}
          </div>
       {/if}
    </div>
@@ -307,7 +307,9 @@
          @include border-bottom-sides;
          @include panel-3;
          @include padding-standard;
-         @include font-size-small;
+
+         --titan-label-font-size: var(--titan-font-size-small);
+         --titan-input-font-size: var(--titan-font-size-small);
 
          width: calc(100% - 16px);
 

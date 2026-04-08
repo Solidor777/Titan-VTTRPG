@@ -3,7 +3,6 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import onRulesElementOperationChanged
       from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
@@ -13,6 +12,7 @@
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
    /** @type {object} Reference to the Document store. */
    const document = getContext('document');
@@ -178,17 +178,15 @@
     *
     */
    function onModifierTypeChanged() {
-      if ($document?.isOwner) {
-         if (
-            element.modifierType === 'healing' &&
-            element.checkType === 'attack'
-         ) {
-            element.checkType = 'any';
-            if (onCheckTypeChange() !== true) {
-               $document.update({
-                  system: $document.system,
-               });
-            }
+      if (
+         element.modifierType === 'healing' &&
+         element.checkType === 'attack'
+      ) {
+         element.checkType = 'any';
+         if (onCheckTypeChange() !== true) {
+            $document.update({
+               system: $document.system,
+            });
          }
       }
    }
@@ -346,7 +344,7 @@
 
       <!--Delete Element-->
       <div class="delete-button">
-         <IconButton
+         <DocumentOwnerIconButton
             icon={DELETE_ICON}
             on:click={() => {
                $document.system.removeRulesElement(idx);

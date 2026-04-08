@@ -98,7 +98,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       /**
        * Creates a schema field formatted as a base stat for the Character (Attributes, Speeds, etc.).
-       * @param {number?} initial - The initial value of the schema field.
+       * @param {number} [initial] - The initial value of the schema field.
        * @returns {SchemaField} A schema field formatted as a base stat for the Character.
        */
       function createBaseStatField(initial) {
@@ -3718,15 +3718,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Options for applying Damage to a Character.
     * @typedef {object} DamageOptions
-    * @property {boolean?} [ignoreArmor = false] Whether to Ignore Armor when applying the Damage.
-    * @property {boolean?} [ineffective = false] Whether the Attack had the Ineffective trait.
-    * @property {boolean?} [penetrating = false] Whether the Attack had the Penetrating trait.
-    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Damage.
+    * @property {boolean} [ignoreArmor = false] - Whether to Ignore Armor when applying the Damage.
+    * @property {boolean} [ineffective = false] - Whether the Attack had the Ineffective trait.
+    * @property {boolean} [penetrating = false] - Whether the Attack had the Penetrating trait.
+    * @property {boolean} [updateActor = true] - Whether to update the Character after applying the Damage.
     * When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is
     * enabled. When sending multiple reports, it is useful to set this to
     * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
     */
 
    /**
@@ -3762,23 +3762,23 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Data for a report detailing the Damage applied to a character.
     * @typedef {object} DamageReport
-    * @property {string} type The Chat Message type (damageReport).
-    * @property {boolean?} ignoreArmor Whether to the attack Ignored Armor.
-    * @property {number?} damageResisted The amount of Damage resisted.
-    * @property {number?} damageTaken The amount of Damage taken.
-    * @property {number?} staminaLost The amount of Stamina lost.
-    * @property {object?} wounds The character's Wounds, if any.
-    * @property {number?} wounds.max The character's maximum Wounds, if any.
-    * @property {number?} wounds.value The character's current Wounds, if any.
-    * @property {number?} woundsSuffered The number of Wounds suffered, if any.
-    * @property {object?} stamina The character's Stamina.
-    * @property {number} stamina.max The character's maximum Stamina.
-    * @property {number} stamina.value The character's current Stamina.
-    * @property {object?} tags Tags applied to the damage.
-    * @property {boolean?} tags.ineffective Whether the Attack had the Ineffective trait.
-    * @property {boolean?} tags.penetrating Whether the Attack had the Penetrating trait.
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
+    * @property {string} type - The Chat Message type (damageReport).
+    * @property {boolean} [ignoreArmor] - Whether to the attack Ignored Armor.
+    * @property {number} [damageResisted] - The amount of Damage resisted.
+    * @property {number} [damageTaken] - The amount of Damage taken.
+    * @property {number} [staminaLost] - The amount of Stamina lost.
+    * @property {object} [wounds] - The character's Wounds, if any.
+    * @property {number} [wounds.max] - The character's maximum Wounds, if any.
+    * @property {number} [wounds.value] - The character's current Wounds, if any.
+    * @property {number} [woundsSuffered] - The number of Wounds suffered, if any.
+    * @property {object} [stamina] - The character's Stamina.
+    * @property {number} [stamina.max] - The character's maximum Stamina.
+    * @property {number} [stamina.value] - The character's current Stamina.
+    * @property {object} [tags] - Tags applied to the damage.
+    * @property {boolean} [tags.ineffective] - Whether the Attack had the Ineffective trait.
+    * @property {boolean} [tags.penetrating] - Whether the Attack had the Penetrating trait.
+    * @property {string} actorImg - The character's image.
+    * @property {string} actorName - The character's name.
     */
 
    /**
@@ -3802,18 +3802,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Options for applying Healing to a Character.
     * @typedef {object} HealingOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after applying the Healing. When
+    * @property {boolean} [updateActor = true] Whether to update the Character after applying the Healing. When
     * updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
+    * @property {boolean} [report = true] Whether to send a Chat Message report, provided this setting is
     * enabled. When sending multiple reports, it is useful to set this to
     * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * @property {boolean} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Applies Damage to the Character.
     * @param {number} damage - Amount of Damage to apply.
-    * @param {DamageOptions?} options - Options for applying the Damage.
+    * @param {DamageOptions} [options] - Options for applying the Damage.
     * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
@@ -3916,16 +3916,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Data for a report detailing the Healing applied to a character.
     * @typedef {object} HealingReport
-    * @property {string} type The Chat Message type (healingReport).
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
-    * @property {number} staminaRestored The amount of Stamina healed.
-    * @property {object} stamina The character's Stamina.
-    * @property {number} stamina.value The character's current Stamina.
-    * @property {number} stamina.max The character's maximum Stamina.
-    * @property {object?} wounds The character's Wounds, if any.
-    * @property {number?} wounds.value The character's current Wounds, if any.
-    * @property {number?} wounds.max The character's maximum Wounds, if any.
+    * @property {string} type - The Chat Message type (healingReport).
+    * @property {string} actorImg - The character's image.
+    * @property {string} actorName - The character's name.
+    * @property {number} staminaRestored - The amount of Stamina healed.
+    * @property {object} stamina - The character's Stamina.
+    * @property {number} stamina.value - The character's current Stamina.
+    * @property {number} stamina.max - The character's maximum Stamina.
+    * @property {object} [wounds] - The character's Wounds, if any.
+    * @property {number} [wounds.value] - The character's current Wounds, if any.
+    * @property {number} [wounds.max] - The character's maximum Wounds, if any.
     */
 
    /**
@@ -3933,9 +3933,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {number} damageTaken - The amount of Damage taken.
     * @param {number} damageResisted - The amount of Damage resisted.
     * @param {number} staminaLost - The amount of Stamina lost.
-    * @param {number?} woundsSuffered - The number of Wounds suffered, if any.
-    * @param {object?} options - The options for the Damage.
-    * @returns {DamageReport} Populated data for the report.
+    * @param {number} [woundsSuffered] - The number of Wounds suffered, if any.
+    * @param {object} [options] - The options for the Damage.
+    * @returns {DamageReport} - Populated data for the report.
     * @private
     */
    _createDamageReportData(
@@ -4014,18 +4014,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Options for restoring a Character's Resolve.
     * @typedef {object} RestoreResolveOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after restoring the Resolve.
+    * @property {boolean} [updateActor = true] Whether to update the Character after restoring the Resolve.
     * When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
+    * @property {boolean} [report = true] Whether to send a Chat Message report, provided this setting
     * is enabled. When sending multiple reports, it is useful to set this
     * to false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * @property {boolean} [playSound = true] Whether to play a sound when sending the report.
     */
 
    /**
     * Applies Healing to the character.
     * @param {number} healing - Amount of Healing to apply.
-    * @param {HealingOptions?} options - Options for restoring the Stamina.
+    * @param {HealingOptions} [options] - Options for restoring the Stamina.
     * @returns {Promise<HealingReport|void>} Results of applying the Healing.
     */
    async applyHealing(healing, options) {
@@ -4070,13 +4070,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Options for spending a Character's Resolve.
     * @typedef {object} SpendResolveOptions
-    * @property {boolean?} [updateActor = true] Whether to update the Character after spending the Resolve.
-    * When updating multiple values, it is useful to set this to
-    * false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting
-    * is enabled. When sending multiple reports, it is useful to set
-    * this to false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * @property {boolean} [updateActor = true] - Whether to update the Character after spending the Resolve. When
+    *    updating multiple values, it is useful to set this to false.
+    * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
+    *    When sending multiple reports, it is useful to set this to false.
+    * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
     */
 
    /**
@@ -4112,18 +4110,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Data for a report detailing Resolve spent by the character.
     * @typedef {object} SpendResolveReport
-    * @property {string} type The Chat Message type (spendResolveReport).
-    * @property {string} actorImg The character's image.
-    * @property {string} actorName The character's name.
-    * @property {number} resolveSpent The amount of Resolve spent.
-    * @property {number?} resolveShortage How much the character overspent their Resolve.
+    * @property {string} type - The Chat Message type (spendResolveReport).
+    * @property {string} actorImg - The character's image.
+    * @property {string} actorName - The character's name.
+    * @property {number} resolveSpent - The amount of Resolve spent.
+    * @property {number} [resolveShortage] - How much the character overspent their Resolve.
     */
 
    /**
     * Restores the Character's Resolve.
     * @param {number} resolveRestored - Amount of Resolve to restore.
-    * @param {RestoreResolveOptions?} options - Options for restoring the Resolve.
-    * @returns {Promise<void>} Returns after the Resolve has been restored.
+    * @param {RestoreResolveOptions} [options] - Options for restoring the Resolve.
+    * @returns {Promise<void>} - Returns after the Resolve has been restored.
     */
    async regainResolve(resolveRestored, options) {
       if (resolveRestored > 0 && this.parent.isOwner) {
@@ -4151,20 +4149,19 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Options for Rending the character's Armor.
     * @typedef {object} RendOptions
-    * @property {boolean?} [magical = false] Whether the rending Attack was magical.
-    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the Rend. When updating
-    * multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
-    * enabled. When sending multiple reports, it is useful to set this to
-    * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * @property {boolean} [magical = false] - Whether the rending Attack was magical.
+    * @property {boolean} [updateArmor = true] - Whether to update the Armor after applying the Rend. When updating
+    *    multiple values, it is useful to set this to false.
+    * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
+    *    When sending multiple reports, it is useful to set this to false.
+    * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
     */
 
    /**
     * Spends the Character's Resolve.
     * @param {number} resolveSpent - Amount of Resolve to spend.
-    * @param {SpendResolveOptions?} options - Options for restoring the Resolve.
-    * @returns {Promise<SpendResolveReport|void>} Results of spending Resolve.
+    * @param {SpendResolveOptions} [options] - Options for restoring the Resolve.
+    * @returns {Promise<SpendResolveReport|void>} - Results of spending Resolve, or void if none was spent.
     */
    async spendResolve(resolveSpent, options) {
       if (resolveSpent > 0 && this.parent.isOwner) {
@@ -4210,7 +4207,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @property {string} actorName The character's name.
     * @property {string} armorImg The armor's image.
     * @property {string} armorName The armor's display name.
-    * @property {number?} armorLost The amount of Armor lost.
+    * @property {number} [armorLost] The amount of Armor lost, if any.
     */
 
    /**
@@ -4244,19 +4241,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Options for Repairing the character's Armor.
     * @typedef {object} RepairsOptions
-    * @property {boolean?} [updateArmor = true] Whether to update the Armor after applying the repairs.
-    * When updating multiple values, it is useful to set this to false.
-    * @property {boolean?} [report = true] Whether to send a Chat Message report, provided this setting is
-    * enabled. When sending multiple reports, it is useful to set this to
-    * false.
-    * @property {boolean?} [playSound = true] Whether to play a sound when sending the report.
+    * @property {boolean} [updateArmor = true] - Whether to update the Armor after applying the repairs. When updating
+    *    multiple values, it is useful to set this to false.
+    * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
+    *    When sending multiple reports, it is useful to set this to false.
+    * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
     */
 
    /**
     * Rends the Character's Armor.
     * @param {number} rend - Amount of Rend to apply.
-    * @param {RendOptions?} options - Options for applying the Rend.
-    * @returns {Promise<RendReport|void>} Resolves of Rending the Armor.
+    * @param {RendOptions} [options] - Options for applying the Rend.
+    * @returns {Promise<RendReport|void>} -The result of Rending the Armor, or void if no rend was applied.
     */
    async applyRend(rend, options) {
       if (rend > 0 && this.parent.isOwner) {
@@ -4353,8 +4349,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Repairs the Character's Armor.
     * @param {number} repairs - Amount of repairs to apply.
-    * @param {RepairsOptions?} options - Options for applying the repairs.
-    * @returns {Promise<RepairsReport|void>} Returns after the repairs have been applied.
+    * @param {RepairsOptions} [options] - Options for applying the repairs.
+    * @returns {Promise<RepairsReport|void>} - The result of Repairing the Armor, or void if no repairs were applied.
     */
    async applyRepairs(repairs, options) {
       if (repairs > 0 && this.parent.isOwner) {
@@ -4454,9 +4450,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Removes all combat effects from the Character, including Effect items and Static Mods, while also restoring
     * Resolve to its maximum value.
-    * @param {object?} options - Options for the operation.
-    * @param {boolean?} options.updateActor - Whether to update the actor after performing the operation.
-    * @param {boolean?} options.report - Whether to send a Chat Message report after performing the operation.
+    * @param {object} [options] - Options for the operation.
+    * @param {boolean} [options.updateActor] - Whether to update the actor after performing the operation.
+    * @param {boolean} [options.report] - Whether to send a Chat Message report after performing the operation.
     * @returns {Promise<void>}
     */
    async removeCombatEffects(options) {
@@ -4534,9 +4530,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Performs a Short Rest.
     * Removes all combat effects from the Character, including Effect items and Static Mods.
     * Restores Stamina and Resolve to their maximum value.
-    * @param {object?} options - Options for the operation.
-    * @param {boolean?} options.updateActor - Whether to update the actor after performing the operation.
-    * @param {boolean?} options.report - Whether to send a Chat Message report after performing the operation.
+    * @param {object} [options] - Options for the operation.
+    * @param {boolean} [options.updateActor] - Whether to update the actor after performing the operation.
+    * @param {boolean} [options.report] - Whether to send a Chat Message report after performing the operation.
     * @returns {Promise<void>}
     */
    async shortRest(options) {
@@ -4568,9 +4564,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Removes all combat effects from the Character, including Effect items and Static Mods.
     * Restores Stamina and Resolve to their maximum value.
     * Restores Wounds equal to the character's Wound Regain.
-    * @param {object?} options - Options for the operation.
-    * @param {boolean?} options.updateActor - Whether to update the actor after performing the operation.
-    * @param {boolean?} options.report - Whether to send a Chat Message report after performing the operation.
+    * @param {object} [options] - Options for the operation.
+    * @param {boolean?} [options.updateActor] - Whether to update the actor after performing the operation.
+    * @param {boolean?} [options.report] - Whether to send a Chat Message report after performing the operation.
     * @returns {Promise<void>}
     */
    async longRest(options) {
@@ -4870,9 +4866,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Base report Data for an Effect item.
     * @typedef {object} EffectReportData
-    * @property {string} label The name of the Effect item.
-    * @property {string} img The image used by the Effect item.
-    * @property {string?} description The description of the Effect item, if appropriate.
+    * @property {string} label - The name of the Effect item.
+    * @property {string} img - The image used by the Effect item.
+    * @property {string} [description] - The description of the Effect item, if any.
     */
 
    /**
@@ -4945,10 +4941,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Report Data for a Turn Effect item.
     * @typedef {object} TurnEffectReportData
-    * @property {string} label The name of the Effect item.
-    * @property {string} img The image used by the Effect item.
-    * @property {string?} description The description of the Effect item, if appropriate.
-    * @property {number} remaining The remaining turns for the Effect item.
+    * @property {string} label - The name of the Effect item.
+    * @property {string} img - The image used by the Effect item.
+    * @property {string} [description] - The description of the Effect item, if any.
+    * @property {number} remaining - The remaining turns for the Effect item.
     */
 
    /**
@@ -4983,11 +4979,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Report Data for a Turn Effect item.
     * @typedef {object} InitiativeEffectReportData
-    * @property {string} label The name of the Effect item.
-    * @property {string} img The image used by the Effect item.
-    * @property {string?} description The description of the Effect item, if appropriate.
-    * @property {number} remaining The remaining turns for the Effect item.
-    * @property {float} initiative The initiative count on which the Effect duration is reduced.
+    * @property {string} label-  The name of the Effect item.
+    * @property {string} img - The image used by the Effect item.
+    * @property {string} [description] - The description of the Effect item, if appropriate.
+    * @property {number} remaining-  The remaining turns for the Effect item.
+    * @property {float} initiative-  The initiative count on which the Effect duration is reduced.
     */
 
    /**
@@ -5014,11 +5010,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Report Data for a Custom Effect item.
     * @typedef {object} CustomEffectReportData
-    * @property {string} label The name of the Effect item.
-    * @property {string} img The image used by the Effect item.
-    * @property {string?} description The description of the Effect item, if appropriate.
-    * @property {number} remaining The remaining turns for the Effect item.
-    * @property {string} custom Custom duration of the Effect item.
+    * @property {string} label - The name of the Effect item.
+    * @property {string} img - The image used by the Effect item.
+    * @property {string} [description] The description of the Effect item, if appropriate.
+    * @property {number} remaining - The remaining turns for the Effect item.
+    * @property {string} custom - Custom duration of the Effect item.
     */
 
    /**

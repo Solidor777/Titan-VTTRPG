@@ -189,7 +189,8 @@ export default class TitanItem extends Item {
     * @returns {Promise<void|boolean>} Returns false if the deletion failed.
     */
    async safeDelete() {
-      if (this.isOwner && !this.isMarkedForDeletion) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)
+         && game.titan.assert(!this.isMarkedForDeletion, 'Item already marked for deletion.', this.name)) {
          await this.update({
             flags: {
                titan: {
@@ -200,9 +201,7 @@ export default class TitanItem extends Item {
 
          return this.delete();
       }
-      else {
-         game.titan.warn(`Item ${this.name} is already marked for deletion.`);
-         return false;
-      }
+
+      return false;
    }
 }

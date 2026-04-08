@@ -9,7 +9,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @param {number} equipmentMod - Sum bonuses and penalties from Equipment.
  * @param {number} staticMod - Sum bonuses and penalties from Static modifiers.
  * @param {number} extraMod - Sum bonuses and penalties from additional modifiers.
- * @param {string?} baseTooltip - Label for the base value of the stat in the tooltip.
+ * @param {string} [baseTooltip] - Label for the base value of the stat in the tooltip.
  * @returns {string} Tooltip for the stat with a breakdown of any bonuses or penalties from item or effect modifiers.
  */
 export default function createModifiableStatTooltip(

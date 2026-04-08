@@ -4,10 +4,10 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
 /**
  * @typedef {import('svelte/store').Writable<TitanItemSheetData>} ItemSheetState - A custom reactive store for managing
  *    an Item Sheet.
- * @extends {import('svelte/store').Writable<ItemSheetData>}
- * @property {import('svelte/store').Writable<ItemSheetData>['set']} set
- * @property {import('svelte/store').Writable<ItemSheetData>['update']} update
- * @property {import('svelte/store').Writable<ItemSheetData>['subscribe']} subscribe
+ * @extends {import('svelte/store').Writable<TitanItemSheetData>}
+ * @property {import('svelte/store').Writable<TitanItemSheetData>['set']} set
+ * @property {import('svelte/store').Writable<TitanItemSheetData>['update']} update
+ * @property {import('svelte/store').Writable<TitanItemSheetData>['subscribe']} subscribe
  * @property {Function} postAddCheck - Updates the reactive state store in response to an Item Check being added.
  * @property {Function} preDeleteCheck - Updates the reactive state store in response to an Item Check being deleted.
  *    state.

@@ -39,9 +39,8 @@
     *
     */
    async function confirmResolveRegain() {
-
       // If we own this chat message and the associated actor
-      if ($document?.isOwner) {
+      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 

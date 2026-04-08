@@ -37,7 +37,9 @@ export default class RulesElementItemDataModel extends TitanItemDataModel {
          // Add the Element to the Rules Elements array
          this.rulesElement.push(newElement);
          await this.parent.update({
-            system: this.parent.system,
+            system: {
+               rulesElement: this.rulesElement,
+            }
          });
       }
    }

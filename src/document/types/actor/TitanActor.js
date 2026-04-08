@@ -116,7 +116,7 @@ export default class TitanActor extends Actor {
     * @param {string} type - The type of item to add.
     */
    async createItemFromType(type) {
-      if (this.parent.isOwner) {
+      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Get the desired name
          let itemName = localize(`new${capitalize(type)}`);
 

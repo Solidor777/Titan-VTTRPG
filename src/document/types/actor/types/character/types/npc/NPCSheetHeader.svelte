@@ -16,7 +16,7 @@
    /** @type {object} Reference to the Document store. */
    const document = getContext('document');
 
-   /** @type {string}Option[] Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/
+   /** @type {SelectOption<string>[]} Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/
    const roleOptions = createLocalizedOptions(ROLES);
 </script>
 

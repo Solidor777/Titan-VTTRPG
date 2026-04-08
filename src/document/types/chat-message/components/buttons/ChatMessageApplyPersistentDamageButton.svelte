@@ -34,14 +34,13 @@
       return retVal;
    }
 
-   // Applies damage to the character that owns this chat message and updates the message accordingly
    /**
-    *
+    * Applies damage to the character that owns this chat message and updates the message accordingly
     */
    async function confirmPersistentDamage() {
 
       // If we own this chat message and the associated actor
-      if ($document?.isOwner) {
+      if (game.titan.assert($document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 

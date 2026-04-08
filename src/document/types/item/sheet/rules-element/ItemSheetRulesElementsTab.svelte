@@ -166,6 +166,8 @@
       @include flex-group-top;
       @include panel-2;
 
+      --titan-input-font-size: var(--titan-input-font-size-small);
+
       height: 100%;
       width: 100%;
 

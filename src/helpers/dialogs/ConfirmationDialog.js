@@ -3,23 +3,20 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 
 /**
  * Generic class for creating a confirmation dialog.
- * @param {string} title - Dialog title.
- * @param {string[]} headers - Header lines.
- * @param {string} message - Message explaining the dialog.
- * @param {string} confirmLabel - Label for the confirmation button.
- * @param {Function} confirmationCallback - Callback function.
- * @param {object?} confirmationContext - Optional context to bind for the callback function.
  * @extends TitanDialog
+ * @property {Function} confirmationCallback - Callback function to execute on confirmation.
+ * @property {object} [confirmationContext] - Optional context to bind to the callback function.
  */
 export default class ConfirmationDialog extends TitanDialog {
    /**
-    * Generic class for creating a confirmation dialog.
+    * Creates an instance of ConfirmationDialog.
+    * @constructor
     * @param {string} title - The title for the Dialog.
-    * @param {string[]} headers - Header lines.
-    * @param {string} message - Message explaining the dialog.
-    * @param {string} confirmLabel - Label for the confirmation button.
-    * @param {Function} confirmationCallback - Callback function.
-    * @param {object?} confirmationContext - Optional context to bind for the callback function.
+    * @param {string[]} headers - Header lines to display at the top of the dialog.
+    * @param {string} message - Message explaining the purpose of the dialog.
+    * @param {string} confirmLabel - Label text for the confirmation button.
+    * @param {Function} confirmationCallback - Callback function to execute on confirmation.
+    * @param {object} [confirmationContext] - Optional context to bind to the callback function.
     */
    constructor(
       title,

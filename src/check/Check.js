@@ -4,27 +4,27 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 /**
  * Options for a check in the Titan system.
  * @typedef {object} CheckOptions
- * @property {boolean?} doubleExpertise Whether to double the Expertise applied.
- * @property {boolean?} extraFailureOnCritical Whether a roll of 1 equals a negative success.
- * @property {boolean?} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
- * @property {number?} complexity The minimum number of Successes needed to succeed at the Check.
- * @property {number?} diceMod Modifier for the number of Dice being rolled.
- * @property {number?} difficulty The minimum roll on a die to achieve a Success.
- * @property {number?} expertiseMod Modifier for the amount of Expertise to be applied.
+ * @property {boolean} [doubleExpertise] - Whether to double the Expertise applied.
+ * @property {boolean} [extraFailureOnCritical] - Whether a roll of 1 equals a negative success.
+ * @property {boolean} [extraSuccessOnCritical] - Whether a roll of 6 equals an extra success.
+ * @property {number} [complexity] - The minimum number of Successes needed to succeed at the Check.
+ * @property {number} [diceMod] - Modifier for the number of Dice being rolled.
+ * @property {number} [difficulty] - The minimum roll on a die to achieve a Success.
+ * @property {number} [expertiseMod] - Modifier for the amount of Expertise to be applied.
  */
 
 /**
  * Base parameters of a check in the Titan system.
  * @typedef {object} CheckParameters
- * @property {boolean} doubleExpertise Whether to double the Expertise applied.
- * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
- * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
- * @property {number} complexity The minimum number of Successes needed to succeed at the Check.
- * @property {number} diceMod Modifier for the number of Dice being rolled.
- * @property {number} difficulty The minimum roll on a die to achieve a Success.
- * @property {number} expertiseMod Modifier for the amount of Expertise to be applied.
- * @property {number} totalDice The total number of dice to be rolled.
- * @property {number} totalExpertise The total amount of expertise to apply.
+ * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
+ * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a negative success.
+ * @property {boolean} extraSuccessOnCritical - Whether a roll of 6 equals an extra success.
+ * @property {number} complexity - The minimum number of Successes needed to succeed at the Check.
+ * @property {number} diceMod - Modifier for the number of Dice being rolled.
+ * @property {number} difficulty - The minimum roll on a die to achieve a Success.
+ * @property {number} expertiseMod - Modifier for the amount of Expertise to be applied.
+ * @property {number} totalDice - The total number of dice to be rolled.
+ * @property {number} totalExpertise - The total amount of expertise to apply.
  */
 
 /**
@@ -180,9 +180,9 @@ export default class TitanCheck {
    /**
     * Sends the results of the check to chat.
     * Waits for the check to evaluate if it has not already been evaluated.
-    * @param {object?} options - Options for the chat message.
-    * @param {string[]?} options.message - Messages to attach to the check.
-    * @param {object?} options.speaker - The speaker for the chat message.
+    * @param {object} [options] - Options for the chat message.
+    * @param {string[]} [options.message] - Messages to attach to the check.
+    * @param {object} [options.speaker] - The speaker for the chat message.
     * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat(options) {
