@@ -18,7 +18,7 @@
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} - The ID of the item to get the check from. */

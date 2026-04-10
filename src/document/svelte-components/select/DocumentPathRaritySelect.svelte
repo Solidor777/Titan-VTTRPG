@@ -13,7 +13,7 @@
    /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} Input value. */

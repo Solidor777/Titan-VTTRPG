@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {boolean} - Whether editing should be disabled for this component. */

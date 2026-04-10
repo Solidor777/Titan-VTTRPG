@@ -9,7 +9,7 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import DocumentIntegerIncrementInput from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    const durationOptions = [

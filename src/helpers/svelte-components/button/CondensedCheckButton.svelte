@@ -3,7 +3,7 @@
    import { getContext } from 'svelte';
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} - The Attribute to be used for the check. */

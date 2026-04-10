@@ -10,6 +10,8 @@
    "include": [
       "**/*.js",
       "**/*.mjs",
+      "../../../../foundry/common/**/*.mjs",
+      "../../../../foundry/common/**/*.js",
       "../../../../foundry/public/scripts/**/*.mjs",
       "../../../../foundry/public/scripts/**/*.js"
    ]

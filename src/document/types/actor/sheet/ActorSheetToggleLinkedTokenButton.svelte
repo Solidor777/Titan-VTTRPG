@@ -3,7 +3,7 @@
    import { LINKED_ICON, UNLINKED_ICON } from '~/system/Icons.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** Toggles whether this Actor is linked to their Token. */

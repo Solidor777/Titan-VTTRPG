@@ -24,7 +24,7 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

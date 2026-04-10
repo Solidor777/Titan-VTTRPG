@@ -5,7 +5,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { REGAIN_RESOLVE_ICON } from '~/system/Icons.js';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**

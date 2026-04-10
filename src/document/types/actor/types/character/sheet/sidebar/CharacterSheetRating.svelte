@@ -16,7 +16,7 @@
    /** @type {string} - The Icon that represents this stat. */
    const icon = getIcon(rating);
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

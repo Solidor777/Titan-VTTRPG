@@ -9,7 +9,7 @@
       from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

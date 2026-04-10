@@ -18,7 +18,7 @@
    /** @type {boolean} - Whether editing this input should be disabled. */
    export let disabled = false;
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */

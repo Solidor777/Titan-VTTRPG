@@ -3,9 +3,6 @@
    import { getContext } from 'svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
-   const document = getContext('document');
-
    /** @type {string} - The value that this input should modify. */
    export let value = void 0;
 
@@ -14,6 +11,9 @@
 
    /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
+
+   /**@type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
 </script>
 
 <RaritySelect

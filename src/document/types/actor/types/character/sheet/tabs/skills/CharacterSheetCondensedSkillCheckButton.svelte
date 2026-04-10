@@ -7,7 +7,7 @@
    /** @type AttributeCheckParameters The Parameters of the Check this component represents. */
    export let checkParameters = void 0;
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} Calculated tooltip. */

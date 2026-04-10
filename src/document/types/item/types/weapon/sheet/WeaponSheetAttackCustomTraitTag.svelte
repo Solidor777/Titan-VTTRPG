@@ -8,7 +8,7 @@
    /** @type {number} - The idx of the Trait in the Custom Traits array. */
    export let traitIdx = void 0;
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**

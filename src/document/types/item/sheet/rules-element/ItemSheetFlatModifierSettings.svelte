@@ -12,11 +12,11 @@
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
-   import onRulesElementOperationChanged
-      from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import ItemSheetRulesElementOperationSelect
+      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    export let operationOptions = void 0;
@@ -149,15 +149,7 @@
       <!--Element Operation-->
       <div class="settings">
          <div class="field select">
-            <DocumentSelect
-               options={operationOptions}
-               bind:value={element.operation}
-               on:change={() => {
-                  if ($document.isOwner) {
-                     onRulesElementOperationChanged($document, idx);
-                  }
-               }}
-            />
+            <ItemSheetRulesElementOperationSelect {idx}/>
          </div>
 
          <!--Selector-->

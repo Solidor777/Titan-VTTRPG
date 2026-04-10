@@ -5,7 +5,7 @@
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import ArmorChatStats from '~/document/types/item/types/armor/chat-message/ArmorChatStats.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
 </script>

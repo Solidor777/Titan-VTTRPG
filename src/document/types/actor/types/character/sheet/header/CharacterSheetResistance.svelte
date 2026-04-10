@@ -10,7 +10,7 @@
    /** @type {string} - The Resistance that this component represents. */
    export let resistance;
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

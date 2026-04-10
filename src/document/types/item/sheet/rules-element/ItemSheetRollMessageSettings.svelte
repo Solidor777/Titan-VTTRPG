@@ -7,15 +7,15 @@
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
-   import onRulesElementOperationChanged
-      from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import ItemSheetRulesElementOperationSelect
+      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    export let operationOptions = void 0;
@@ -264,13 +264,7 @@
          <!--Element Operation-->
          <div class="settings">
             <div class="field select">
-               <DocumentSelect
-                  options={operationOptions}
-                  bind:value={$document.system.rulesElement[idx].operation}
-                  on:change={() => {
-                     onRulesElementOperationChanged($document, idx);
-                  }}
-               />
+               <ItemSheetRulesElementOperationSelect {idx}/>
             </div>
 
             <!--Type-->

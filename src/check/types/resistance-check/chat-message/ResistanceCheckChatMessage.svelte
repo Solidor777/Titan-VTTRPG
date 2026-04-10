@@ -6,7 +6,7 @@
    import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
    import ChatDamageButtons from '~/document/types/chat-message/components/buttons/ChatMessageDamageButtons.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
    const check = $document.flags.titan;
 </script>

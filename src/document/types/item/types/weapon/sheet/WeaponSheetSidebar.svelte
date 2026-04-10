@@ -6,7 +6,7 @@
    import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
    import WeaponSheetSidebarAttacks from '~/document/types/item/types/weapon/sheet/WeaponSheetSidebarAttacks.svelte';
 
-   /** @type {object} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const appState = getContext('applicationState');
 
    /** @type {object} Reference to the Application State store. */

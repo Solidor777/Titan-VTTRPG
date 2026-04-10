@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    // Chat context reference

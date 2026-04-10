@@ -6,18 +6,19 @@ import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
 import ConfigureSheetButton from '~/document/sheet/ConfigureSheetButton.svelte';
 
 /**
+ * @class TitanDocumentSheet
+ * @extends SvelteApp<Options>
  * A replacement Document Sheet that supports Svelte components.
- * @template {foundry.abstract.Document} TDocument
- * @extends {SvelteApplication}
+ * @template {import('svelte/store').Writable<any>} TApplicationState
  */
 export default class TitanDocumentSheet extends SvelteApplication {
    /**
-    * @param {TDocument} sheetDocument - The Document this sheet represents.
-    * @param {foundry.applications.api.ApplicationConfiguration} [options={}] - Application configuration options.
+    * @param {Document} sheetDocument - The Document this sheet represents.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add default classes
-      const classes = ['titan', 'titan-document-sh`eet'];
+      const classes = ['titan', 'titan-document-sheet'];
 
       // Add dark mode class if appropriate
       if (isDarkModeSheetsEnabled()) {
@@ -46,24 +47,21 @@ export default class TitanDocumentSheet extends SvelteApplication {
          },
       ));
 
-      /** @type {foundry.abstract.Document} - The Document this sheet represents. */
+      /** @type {Document} document - The Document this sheet represents. */
       this.document = sheetDocument;
-      this.options.svelte.props.document = this._createReactiveDocument(
+
+      /** @type {TJSDocument<Document>} document - The Document this sheet represents. */
+      this.options.svelte.props.document = new TJSDocument(
          this.document,
          { delete: this.close.bind(this) }
       );
 
-      /**
-       * The reactive application state store.
-       * @type {import('svelte/store').Writable<any>}
-       */
+      /** @type {TApplicationState} applicationState - The reactive application state store. */
       this.applicationState = this._createReactiveState();
       this.options.svelte.props.applicationState = this.applicationState;
 
-      /**
-       * Holds the subscription / unsubscription functions.
-       * @type {Function|undefined}
-       */
+      // Initialize unsubscribe.
+      /** @type {Function|undefined} documentUnsubscribe - Holds the subscription / unsubscription functions. */
       this.documentUnsubscribe = void 0;
    }
 
@@ -114,19 +112,8 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Overridable function for creating the reactive document store for this sheet.
-    * @param {Document} document - The Document being stored.
-    * @param {object} [options={}] - Options for the reactive document store.
-    * @returns {TJSDocument} - The newly created document store.
-    * @protected
-    */
-   _createReactiveDocument(document, options = {}) {
-      return new TJSDocument(document, options);
-   }
-
-   /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @returns {import('svelte/store').Writable<any>|void} - The newly created state store.
+    * @returns {TApplicationState} - The newly created state store.
     * @protected
     */
    _createReactiveState() {
@@ -204,22 +191,6 @@ export default class TitanDocumentSheet extends SvelteApplication {
    }
 
    /**
-    * Closes the sheet and unsubscribes from changes to the reactive stores.
-    * @override
-    * @param {object} [options={}] - Options which affect how the Application is closed.
-    * @returns {Promise<void>} A Promise which resolves once the application is closed.
-    */
-   async close(options = {}) {
-      // Unsubscribe from the document if still subscribed
-      if (this.documentUnsubscribe) {
-         this.documentUnsubscribe();
-         this.documentUnsubscribe = void 0;
-      }
-
-      return super.close(options);
-   }
-
-   /**
     * Define whether a user is able to begin a dragstart workflow for a given drag selector.
     * @override
     * @param {string} selector - The candidate HTML selector for dragging.
@@ -239,5 +210,21 @@ export default class TitanDocumentSheet extends SvelteApplication {
     */
    _canDragDrop(selector) {
       return this.isEditable;
+   }
+
+   /**
+    * Closes the sheet and unsubscribes from changes to the reactive stores.
+    * @override
+    * @param {object} [options={}] - Options which affect how the Application is closed.
+    * @returns {Promise<void>} A Promise which resolves once the application is closed.
+    */
+   async close(options = {}) {
+      // Unsubscribe from the document if still subscribed
+      if (this.documentUnsubscribe) {
+         this.documentUnsubscribe();
+         this.documentUnsubscribe = void 0;
+      }
+
+      return super.close(options);
    }
 }

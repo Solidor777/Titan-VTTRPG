@@ -7,7 +7,7 @@
    import { slide } from 'svelte/transition';
    import IconLabelButton from '~/helpers/svelte-components/button/IconLabelButton.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type Tag[] Optional input array of traits converted into Tags.*/

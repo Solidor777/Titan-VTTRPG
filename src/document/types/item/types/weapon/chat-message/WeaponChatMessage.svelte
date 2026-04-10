@@ -8,7 +8,7 @@
    import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
    console.log(item);

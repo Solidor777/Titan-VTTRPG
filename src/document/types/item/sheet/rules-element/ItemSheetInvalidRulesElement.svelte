@@ -4,19 +4,25 @@
    import { slide } from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import ItemSheetRulesElementOperationSelect
+      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
    export let idx = void 0;
    export let element = void 0;
 
 </script>
 
-{#if element && element.operation === 'flatModifier'}
+{#if element}
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="title">
          {localize('invalidRulesElement')}
+      </div>
+
+      <div class="field select">
+         <ItemSheetRulesElementOperationSelect {idx}/>
       </div>
 
       <!--Delete Element-->

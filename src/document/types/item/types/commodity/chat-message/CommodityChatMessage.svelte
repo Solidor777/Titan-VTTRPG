@@ -9,7 +9,7 @@
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
    const item = $document.flags.titan;
 </script>

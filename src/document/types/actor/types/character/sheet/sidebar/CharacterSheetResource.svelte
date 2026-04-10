@@ -13,7 +13,7 @@
    /** @type {string} - The Icon that represents this stat. */
    export let icon = getIcon(resource);
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

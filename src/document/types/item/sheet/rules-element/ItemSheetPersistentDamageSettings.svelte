@@ -4,12 +4,12 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import onRulesElementOperationChanged
-      from '~/document/types/item/sheet/rules-element/OnRulesElementOperationChanged.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import ItemSheetRulesElementOperationSelect
+      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    export let operationOptions = void 0;
@@ -33,13 +33,7 @@
       <!--Element Operation-->
       <div class="settings">
          <div class="field select">
-            <DocumentSelect
-               options={operationOptions}
-               bind:value={element.operation}
-               on:change={() => {
-                  onRulesElementOperationChanged($document, idx);
-               }}
-            />
+            <ItemSheetRulesElementOperationSelect {idx}/>
          </div>
 
          <!--Selector-->

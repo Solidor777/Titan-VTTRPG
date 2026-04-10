@@ -4,7 +4,7 @@
    import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
    import DocumentSheetScrollingSidebar from '~/document/sheet/DocumentSheetScrollingSidebar.svelte';
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**

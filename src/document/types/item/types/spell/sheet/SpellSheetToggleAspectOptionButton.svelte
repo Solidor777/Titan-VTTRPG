@@ -5,7 +5,7 @@
    export let enabled = void 0;
    export let label = void 0;
 
-   /** @type {getContext<Document>} Reference to the Document store. */
+   /**@type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    // Copy of the document data

@@ -1,7 +1,8 @@
 <script>
    import { getContext } from 'svelte';
-   import ModSelect from '~/helpers/svelte-components/input/select/ModSelect.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
+   import RulesElementOperationSelect
+      from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
 
    /** @type {string} - The value that this input should modify. */
    export let value = void 0;
@@ -19,7 +20,7 @@
    const document = getContext('document');
 </script>
 
-<ModSelect
+<RulesElementOperationSelect
    {allowNone}
    bind:value
    disabled={disabled || !$document?.isOwner}
