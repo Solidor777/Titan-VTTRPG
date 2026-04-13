@@ -49,7 +49,7 @@ export default class RulesElementItemDataModel extends TitanItemDataModel {
     * @param {number} idx - The index of the Rules Element in the Rules Elements array.
     * @returns {Promise<void>}
     */
-   async removeRulesElement(idx) {
+   async deleteRulesElement(idx) {
       if (this.parent.isOwner) {
 
          // Remove the Element from the Rules Elements array
