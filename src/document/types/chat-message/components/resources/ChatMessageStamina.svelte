@@ -4,7 +4,7 @@
    import ChatResource from '~/document/types/chat-message/components/resources/ChatMessageResource.svelte';
    import { STAMINA_ICON } from '~/system/Icons.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

@@ -10,7 +10,7 @@
    /** @type svelte:component Tabs Component */
    export let tabs = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 {#if $document}

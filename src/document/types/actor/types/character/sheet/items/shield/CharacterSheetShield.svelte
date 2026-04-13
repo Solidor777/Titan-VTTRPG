@@ -27,7 +27,7 @@
    /** @type {boolean} - Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

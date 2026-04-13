@@ -12,7 +12,7 @@
    /** @type {string} Key for the Skill to show stats for. */
    export let key;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type AttributeCheckParameters Calculated check parameters. */

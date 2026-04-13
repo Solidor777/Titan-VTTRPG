@@ -1,8 +1,8 @@
 <script>
-   import {INITIATIVE_ICON} from '~/system/Icons.js';
+   import { INITIATIVE_ICON } from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /**@type InitiativeEffectData Data for this tag's Effect. */
+   /** @type InitiativeEffectData Data for this tag's Effect. */
    export let effect = void 0;
 
 </script>
@@ -14,7 +14,7 @@
 <style lang="scss">
    .tag {
       --titan-tag-background: linear-gradient(
-            var(--titan-gradient-degree), var(--titan-initiative-effect-primary), var(--titan-initiative-effect-secondary) 100%
+         var(--titan-gradient-degree), var(--titan-initiative-effect-primary), var(--titan-initiative-effect-secondary) 100%
       );
    }
 </style>

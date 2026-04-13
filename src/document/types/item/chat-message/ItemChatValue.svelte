@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

@@ -7,10 +7,14 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
-   const document = getContext('document');
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
-   export let element = void 0;
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /** @type {object} Reference to the Rules Element object. */
+   $: element = $document?.rulesElement[idx];
 
 </script>
 
@@ -30,7 +34,7 @@
          <IconButton
             icon={DELETE_ICON}
             on:click={() => {
-               $document.system.removeRulesElement(idx);
+               $document.system.deleteRulesElement(idx);
             }}
          />
       </div>

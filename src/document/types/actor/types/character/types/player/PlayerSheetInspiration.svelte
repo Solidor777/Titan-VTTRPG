@@ -4,7 +4,7 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { INSPIRATION_ICON } from '~/system/Icons.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

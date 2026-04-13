@@ -14,12 +14,14 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
+   export let idx = void 0;
+
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   export let operationOptions = void 0;
-   export let idx = void 0;
-   export let element = void 0;
+   /** @type {object} Reference to the Rules Element object. */
+   $: element = $document?.rulesElement[idx];
 
    // Modifier type options
    const modifierTypeOptions = [
@@ -173,9 +175,10 @@
       ],
    };
 
-   // Update the check type if necessary when modifier type changes
    /**
-    *
+    * Updates the check type if necessary when the modifier type changes.
+    * If the modifier type is 'healing' and the check type is 'attack', resets the check type to 'any'
+    * and cascades the change to the selector.
     */
    function onModifierTypeChanged() {
       if (
@@ -191,10 +194,10 @@
       }
    }
 
-   // Update the selector when the check type changes
-   // Returns whether an update was triggered
    /**
-    *
+    * Updates the selector when the check type changes.
+    * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a valid 'skill' selector.
+    * @returns {boolean} Whether a document update was triggered.
     */
    function onCheckTypeChange() {
       if (
@@ -212,9 +215,9 @@
       return false;
    }
 
-   // Updates the key when the selector changes
    /**
-    *
+    * Updates the element key to a default value when the selector changes,
+    * then triggers a document update.
     */
    function onSelectorChange() {
       switch (element.selector) {
@@ -254,7 +257,8 @@
    }
 
    /**
-    *
+    * Returns the appropriate Svelte component for the current selector type.
+    * @returns {typeof import('svelte').SvelteComponent | undefined} The selector input component, or undefined if no specific component is needed.
     */
    function getSelector() {
       switch (element.selector) {
@@ -341,7 +345,7 @@
          <DocumentOwnerIconButton
             icon={DELETE_ICON}
             on:click={() => {
-               $document.system.removeRulesElement(idx);
+               $document.system.deleteRulesElement(idx);
             }}
          />
       </div>

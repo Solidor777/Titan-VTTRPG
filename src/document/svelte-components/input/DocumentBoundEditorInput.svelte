@@ -4,7 +4,7 @@
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} - The value that this input should modify. */

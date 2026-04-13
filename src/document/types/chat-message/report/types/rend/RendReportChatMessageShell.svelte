@@ -5,7 +5,7 @@
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import { getContext } from 'svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Header svelte-components to use. */

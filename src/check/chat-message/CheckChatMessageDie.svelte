@@ -6,7 +6,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { DICE_ICON, EXPERTISE_ICON } from '~/system/Icons.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type CheckDie The individual die being display. */

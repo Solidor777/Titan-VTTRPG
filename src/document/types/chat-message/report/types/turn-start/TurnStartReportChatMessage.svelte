@@ -27,7 +27,7 @@
    import ChatMessageRemoveExpiredEffectsButton
       from '~/document/types/chat-message/components/buttons/ChatMessageRemoveExpiredEffectsButton.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Header svelte-components to use. */

@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
    const titanFlags = $document.flags.titan;
 </script>

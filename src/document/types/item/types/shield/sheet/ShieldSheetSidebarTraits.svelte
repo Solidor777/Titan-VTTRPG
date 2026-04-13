@@ -5,7 +5,7 @@
    import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
    import { getShieldTraitDescription } from '~/document/types/item/types/shield/ShieldTraits.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type Tag[] List of traits converted into tags. */

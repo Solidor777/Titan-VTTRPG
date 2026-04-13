@@ -15,7 +15,7 @@ export default function createRulesElementItemSheetState(item, overrideData) {
    /** @type {import('svelte/store').Writable<RulesElementItemSheetData>} */
    const { set, update, subscribe, postAddCheck, preDeleteCheck } = createTitanItemSheetState(
       item,
-      overrideData ?? /**@type TitanItemSheetData */ createRulesElementItemSheetData(item)
+      overrideData ?? /** @type TitanItemSheetData */ createRulesElementItemSheetData(item)
    );
 
    return {

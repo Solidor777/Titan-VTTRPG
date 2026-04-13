@@ -12,7 +12,7 @@
       from '~/document/types/actor/types/character/types/player/PlayerSheetInspiration.svelte';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

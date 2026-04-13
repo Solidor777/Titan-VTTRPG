@@ -7,7 +7,7 @@
    /** @type {string} - The ID of the Item to get the check from. */
    export let itemId = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type AttackCheckOptions Base options for the Check. */

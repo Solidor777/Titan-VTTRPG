@@ -4,7 +4,7 @@
    import { DURATION_ICON } from '~/system/Icons.js';
    import { getContext } from 'svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
 </script>

@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    export let icon = void 0;

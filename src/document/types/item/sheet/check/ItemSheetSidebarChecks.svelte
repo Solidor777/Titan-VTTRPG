@@ -3,7 +3,7 @@
    import { slide } from 'svelte/transition';
    import ItemSheetSidebarCheck from '~/document/types/item/sheet/check/ItemSheetSidebarCheck.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

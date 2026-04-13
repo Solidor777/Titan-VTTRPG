@@ -15,7 +15,7 @@
    // Is expanded map
    export let isExpandedMap = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    // Currently drag hovered state

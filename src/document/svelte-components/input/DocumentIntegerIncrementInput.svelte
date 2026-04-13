@@ -24,7 +24,7 @@
     */
    export let modifierIncrement = 10;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */

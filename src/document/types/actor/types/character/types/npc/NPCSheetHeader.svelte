@@ -13,7 +13,7 @@
    import { ROLES } from '~/system/Roles.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {SelectOption<string>[]} - Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/

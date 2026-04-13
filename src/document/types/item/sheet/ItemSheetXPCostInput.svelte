@@ -3,7 +3,7 @@
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {boolean} - Whether the input should currently be disabled. */

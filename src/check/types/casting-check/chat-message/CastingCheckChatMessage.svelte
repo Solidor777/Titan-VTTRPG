@@ -12,7 +12,7 @@
    import CastingCheckChatMessageResistanceCheckButtons
       from '~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    // Scaling aspects list

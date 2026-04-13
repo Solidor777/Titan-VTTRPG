@@ -3,7 +3,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { getContext } from 'svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} - The Key of the resource to display information for. */

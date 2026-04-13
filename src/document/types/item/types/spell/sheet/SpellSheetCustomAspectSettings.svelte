@@ -9,7 +9,7 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { COLLAPSED_ICON, DAMAGE_ICON, DELETE_ICON, EXPANDED_ICON, HEALING_ICON } from '~/system/Icons.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

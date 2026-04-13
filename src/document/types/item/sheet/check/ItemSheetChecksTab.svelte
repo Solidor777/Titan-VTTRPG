@@ -9,7 +9,7 @@
    import FiltereedList from '~/helpers/svelte-components/FiltereedList.svelte';
    import ItemSheetCheckSettings from '~/document/types/item/sheet/check/ItemSheetCheckSettings.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

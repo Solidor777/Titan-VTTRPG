@@ -10,7 +10,7 @@
    import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} - The ID of the item to get the check from. */

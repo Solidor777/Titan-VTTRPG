@@ -8,7 +8,7 @@
    /** @type {string} - The Attribute that this component represents. */
    export let attribute;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type AttributeCheckParameters Calculated check parameters. */

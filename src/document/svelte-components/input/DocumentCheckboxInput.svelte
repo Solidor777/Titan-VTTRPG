@@ -12,7 +12,7 @@
    /** @type {boolean} - Whether editing this input should be disabled. */
    export let disabled = false;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 

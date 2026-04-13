@@ -3,7 +3,7 @@
    import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} Path to the value that this input should modify. */

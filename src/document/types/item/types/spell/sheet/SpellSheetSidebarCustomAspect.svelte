@@ -7,7 +7,7 @@
 
    export let idx = 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    $: aspect = $document.system.customAspect[idx];

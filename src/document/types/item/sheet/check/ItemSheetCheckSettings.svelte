@@ -23,7 +23,7 @@
    /** @type {number} - The index of the Check in the item's item checks array. */
    export let idx = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */

@@ -25,7 +25,7 @@
    /** @type {number} - The idx of the Rules Element in the rules elements array. */
    export let idx = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
