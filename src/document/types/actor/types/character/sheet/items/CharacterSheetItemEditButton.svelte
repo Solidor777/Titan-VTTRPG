@@ -7,7 +7,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type Item The Item this button is for. */
+   /** @type {Item} The Item this button is for. */
    export let item = void 0;
 </script>
 

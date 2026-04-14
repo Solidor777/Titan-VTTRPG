@@ -1,19 +1,19 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
-   /** @type {string} - The value that this input should modify. */
+   /** @type {string} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {boolean} - Whether to allow None as an option. */
+   /** @type {boolean} Whether to allow None as an option. */
    export let allowNone = false;
 
-   /** @type {boolean} - Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
-   /** @type SelectOption[] Options for the Select Svelte component. */
+   /** @type {SelectOption}[] Options for the Select Svelte component. */
    const options = [
       'armor',
       'commodity',

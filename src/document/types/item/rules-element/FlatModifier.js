@@ -1,9 +1,9 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
- * A Rules Element for add a simple bonus or penalty to the value of a Character's stat.
+ * A Rules Element for adding a simple bonus or penalty to the value of a Character's stat.
  * @typedef {object} FlatModifierElement
- * @property {string} operation The operation to be performed by the Rules Element (flatModfier).
+ * @property {string} operation The operation to be performed by the Rules Element (flatModifier).
  * @property {string} selector The type of stat being modified (attribute, rating, training, expertise, resistance, or
  *    mod).
  * @property {string} key The Key of the stat being multiplied (body, willpower, etc.).
@@ -13,9 +13,9 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  */
 
 /**
- * Creates a Rules Element for add a simple bonus or penalty to the value of a Character's stat.
+ * Creates a Rules Element for adding a simple bonus or penalty to the value of a Character's stat.
  * @param {object?} options - Options for the rules element.
- * @returns {FlatModifierElement} - The new Rules Element.
+ * @returns {FlatModifierElement} The new Rules Element.
  */
 export default function createFlatModifierElement(options) {
    return {

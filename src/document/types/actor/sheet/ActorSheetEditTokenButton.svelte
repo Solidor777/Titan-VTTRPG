@@ -7,7 +7,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type TitanActorSheet Actor Sheet Reference. */
+   /** @type {TitanActorSheet} Actor Sheet Reference. */
    const application = getApplication();
 
    /** Opens a dialog to edit this sheet's Token. */

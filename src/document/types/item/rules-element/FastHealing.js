@@ -13,7 +13,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Creates a Rules Element for healing a Character every turn.
  * @param {object?} options - Options for the rules element.
- * @returns {FastHealingElement} - The new Rules Element.
+ * @returns {FastHealingElement} The new Rules Element.
  */
 export default function createFastHealingElement(options) {
    return {

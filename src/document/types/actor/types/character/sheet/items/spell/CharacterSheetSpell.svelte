@@ -23,13 +23,13 @@
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type {TitanItem} Reference to the Item document. */
    export let item = void 0;
 
-   /** @type {boolean} - Whether this Item is currently expanded. */
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   /** @type SpellAspect[] List of enabled Spell Aspects. */
+   /** @type {SpellAspect}[] List of enabled Spell Aspects. */
    let enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
 
    // Update enabled aspects in response to changes

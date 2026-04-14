@@ -3,19 +3,19 @@
    import DamageReducedBySelect from '~/helpers/svelte-components/input/select/DamageReducedBySelect.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {string} - The value that this input should modify. */
+   /** @type {string} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {boolean} - Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {boolean} - Whether to allow Resistance Check as an option */
+   /** @type {boolean} Whether to allow Resistance Check as an option */
    export let allowResistanceCheck = true;
 
-   /** @type {boolean} - Whether to allow Opposed Check as an option */
+   /** @type {boolean} Whether to allow Opposed Check as an option */
    export let allowOpposedCheck = true;
 
-   /** @type {string | TooltipAction} - The Tooltip to display for this element, if any. */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

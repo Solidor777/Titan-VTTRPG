@@ -8,7 +8,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Ability items.
- * @extends TitanDataModel
+ * @extends {RulesElementItemDataModel}
  */
 export default class AbilityDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {

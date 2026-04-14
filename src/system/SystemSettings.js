@@ -400,7 +400,7 @@ export default function registerSystemSettings() {
    /**
     * Creates the settings data for the default Attribute of a Skill Check.
     * @param {string} skill - The Skill to create the settings data for.
-    * @param {string }defaultAttribute - The Document this sheet is for.efault Attribute for this Skill.
+    * @param {string} defaultAttribute - The default Attribute for this Skill.
     */
    function createDefaultSkillAttributeSettings(skill, defaultAttribute) {
       game.settings.register('titan', `defaultAttribute.${skill}`, {

@@ -27,7 +27,7 @@
  * @property {number} expertiseMod Modifier for the amount of Expertise to be applied.
  * @property {number} healing The minimum Healing to apply on a successful check.
  * @property {number} healingMod Modifier for the amount of healing to be applied.
- * @property {number} skillExpertise The minimum healing to apply on a successful check.
+ * @property {number} skillExpertise The amount of expertise granted by the skill.
  * @property {number} skillTrainingDice The number of dice granted by the skill.
  * @property {number} totalDice The total number of dice to be rolled.
  * @property {number} totalExpertise The total amount of expertise to apply.
@@ -46,7 +46,7 @@
 /**
  * Creates a Casting Check Parameters object, based off the provided input.
  * @param {CastingCheckOptions} options - Fully populated Casting Check Options.
- * @returns {CastingCheckParameters} - The new Casting Check Parameters.
+ * @returns {CastingCheckParameters} The new Casting Check Parameters.
  */
 export default function createCastingCheckParameters(options) {
    return {

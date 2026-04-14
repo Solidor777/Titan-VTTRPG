@@ -2,19 +2,19 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Text from '~/helpers/svelte-components/Text.svelte';
 
-   /** @type {string|TextData} - The text label to display for this element. */
+   /** @type {string|TextData} The text label to display for this element. */
    export let label = void 0;
 
-   /** @type {*} - The value that this input should modify. */
+   /** @type {*} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {SvelteComponent} -The input svelte component to bind the value to. */
+   /** @type {SvelteComponent} The input svelte component to bind the value to. */
    export let input = void 0;
 
-   /** @type {string|TextData} - The tooltip to display when the element is hovered. */
+   /** @type {string|TextData} The tooltip to display when the element is hovered. */
    export let tooltip = void 0;
 
-   /** @type {*} - Properties for the input svelte components. */
+   /** @type {*} Properties for the input svelte components. */
    export let inputProps = void 0;
 </script>
 

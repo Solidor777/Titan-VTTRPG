@@ -8,19 +8,19 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   /** @type Item The Item to edit the Traits of. */
+   /** @type {Item} The Item to edit the Traits of. */
    export let item = void 0;
 
-   /** @type {object[]} - The traits to be edited. */
+   /** @type {object[]} The traits to be edited. */
    export let documentTraits = void 0;
 
-   /** @type {object[]} - The traits to select from. */
+   /** @type {object[]} The traits to select from. */
    export let traitOptions = void 0;
 
    /** @type {object} Object containing a mapping of each trait to its description. */
    export let traitDescriptions = void 0;
 
-   /** @type SvelteApp The Svelte Component's Application. */
+   /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    // Initialize the value of each trait option to the current value of the document's matching trait

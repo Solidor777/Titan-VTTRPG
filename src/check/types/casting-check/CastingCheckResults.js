@@ -1,4 +1,5 @@
 import calculateCheckResults from '~/check/CheckResults.js';
+
 /**
  * Data for a scaling aspect used in the check.
  * @typedef {object} ScalingAspect
@@ -33,7 +34,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
  * @param {CastingCheckParameters} parameters - Object containing the parameters of the check.
- * @returns {CastingCheckResults} - The final results of the check.
+ * @returns {CastingCheckResults} The final results of the check.
  */
 export default function calculateCastingCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);

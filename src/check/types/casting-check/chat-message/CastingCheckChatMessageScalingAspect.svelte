@@ -10,7 +10,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type ScalingAspect Reference to the scaling aspect. */
+   /** @type {ScalingAspect} Reference to the scaling aspect. */
    let aspect = $document.flags.titan.results.scalingAspect[idx];
 
    /** @type {number} Calculated scaling cost of the aspect. */

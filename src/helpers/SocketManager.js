@@ -2,9 +2,6 @@
  * Class for managing Socket Events sent by this system.
  */
 export default class SocketManager {
-   /**
-    * Class for managing Socket Events sent by this system.
-    */
    constructor() {
       // Bind the received function to the socket for this system.
       game.socket.on(SOCKET_NAME, this._onSocketReceived.bind(this));

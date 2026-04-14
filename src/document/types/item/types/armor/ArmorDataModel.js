@@ -10,7 +10,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Armor items.
- * @extends TitanDataModel
+ * @extends {RulesElementItemDataModel}
  */
 export default class ArmorDataModel extends RulesElementItemDataModel {
    _getDefaultName() {

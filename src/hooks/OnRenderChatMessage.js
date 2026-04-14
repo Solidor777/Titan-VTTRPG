@@ -4,7 +4,7 @@ import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.sve
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze';
 
 /**
- * List if Titan Chat Message types.
+ * List of Titan Chat Message types.
  * @type Set<string>
  */
 const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
@@ -36,7 +36,7 @@ const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
 ]));
 
 /**
- * Called efore a Chat Message is rendered to attach svelte svelte-components and the dark mode class if appropriate.
+ * Called before a Chat Message is rendered to attach Svelte components and the dark mode class if appropriate.
  * @param {Element} element - The Element of the Chat Message being rendered.
  * @param {ChatMessage} message - The Chat Message being rendered.
  */
@@ -48,7 +48,7 @@ export default function onRenderChatMessage(message, element) {
       const content = element.find('.chat-message').prevObject;
       content.addClass('titan');
 
-      // Adder the owner class if the current user owns the message
+      // Add the owner class if the current user owns the message
       if (message.isOwner) {
          content.addClass('owner');
       }
@@ -58,7 +58,7 @@ export default function onRenderChatMessage(message, element) {
          content.addClass('titan-dark-mode');
       }
 
-      // Add the svelte svelte-components
+      // Add the Svelte components
       const document = new TJSDocument(message);
       message._svelteComponent = new ChatMessageShell({
          target: $(element).find('.message-content')[0],

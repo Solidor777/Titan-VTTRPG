@@ -25,7 +25,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type TitanItem Reference to the Item document. */
+   /** @type {TitanItem} Reference to the Item document. */
    export let item = void 0;
 
    // Expanded object

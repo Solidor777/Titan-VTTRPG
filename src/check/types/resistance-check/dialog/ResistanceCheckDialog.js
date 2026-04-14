@@ -5,22 +5,16 @@ import CheckDialogShell from '~/check/dialog/CheckDialogShell.svelte';
 import ResistanceCheckDialogShell from '~/check/types/resistance-check/dialog/ResistanceCheckDialogShell.svelte';
 
 /**
- * Creates a dialog window for setting the Options of a Resistance Check.
- * @param {ResistanceCheckOptions} checkOptions - The initial options for the check to be adjusted.
- * @param {ResistanceCheckParameters} checkParameters - The initial parameters for the check,
- * calculated from the options.
- * @param {TitanActor} actor - The Actor that will roll the check.
- * @extends TitanDialog
+ * Dialog window for setting the Options of a Resistance Check.
+ * @extends {TitanDialog}
  */
 export default class ResistanceCheckDialog extends TitanDialog {
 
    /**
-    * Creates a dialog window for setting the Options of a Resistance Check.
     * @param {ResistanceCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {ResistanceCheckParameters} checkParameters - The initial parameters for the check,
     * calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
-    * @extends TitanDialog
     */
    constructor(checkOptions, checkParameters, actor) {
       super({
@@ -38,6 +32,11 @@ export default class ResistanceCheckDialog extends TitanDialog {
       });
    }
 
+   /**
+    * @returns {string[]} Array of CSS classes to apply to the dialog element.
+    * @protected
+    * @override
+    */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();
       retVal.push('titan-check-dialog', 'titan-resistance-check-dialog');

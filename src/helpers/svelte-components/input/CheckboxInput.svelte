@@ -3,16 +3,16 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type EventDispatcher Dispatcher for component Events. */
+   /** @type {EventDispatcher} Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   /** @type {boolean} - The value that this input should modify. */
+   /** @type {boolean} The value that this input should modify. */
    export let value;
 
-   /** @type {boolean} - Whether the input should currently be disabled. */
+   /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** Toggles the value and broadcasts the change event. */

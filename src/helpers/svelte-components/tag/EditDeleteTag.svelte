@@ -2,22 +2,22 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { DELETE_ICON, EDIT_ICON } from '~/system/Icons.js';
 
-   /** @type function Callback for when the Delete icon is pressed. */
+   /** @type {function} Callback for when the Delete icon is pressed. */
    export let deleteFunction = void 0;
 
-   /** @type function Callback for when the Edit icon is pressed. */
+   /** @type {function} Callback for when the Edit icon is pressed. */
    export let editFunction = void 0;
 
-   /** @type {string} - The text to display for this element. */
+   /** @type {string} The text to display for this element. */
    export let label = void 0;
 
-   /** @type {string} - The Tooltip to display when the Label is hovered. */
+   /** @type {string} The Tooltip to display when the Label is hovered. */
    export let labelTooltip = void 0;
 
-   /** @type {string} - The Tooltip to display when the Delete Icon is hovered. */
+   /** @type {string} The Tooltip to display when the Delete Icon is hovered. */
    export let deleteTooltip = void 0;
 
-   /** @type {string} - The Tooltip to display when the Edit Icon is hovered. */
+   /** @type {string} The Tooltip to display when the Edit Icon is hovered. */
    export let editTooltip = void 0;
 </script>
 

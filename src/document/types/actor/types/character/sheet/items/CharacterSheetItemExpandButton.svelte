@@ -2,10 +2,10 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
-   /** @type {boolean} - Whether this Item is currently expanded. */
+   /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   /** @type TitanItem The Item this component belongs to. */
+   /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
 
    // Optional override for the name text

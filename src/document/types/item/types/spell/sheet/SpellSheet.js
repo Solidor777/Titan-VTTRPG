@@ -5,15 +5,13 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Item Sheet class with functionality shared by all Spell Items.
- * @param {TitanItem} sheetDocument - The Document this sheet is for.
- * @param {object} options - Options object.
- * @property {SpellSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.
+ * @extends {TitanItemSheet}
+ * @property {SpellSheetState} applicationState Reactive store for managing the state of the Spell Sheet.
  */
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
-    * An Item Sheet class with functionality shared by all Spell Items.
     * @param {TitanItem} sheetDocument - The Document this sheet is for.
-    * @param {object} options - Options object.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add sheet classes
@@ -33,9 +31,8 @@ export default class TitanSpellSheet extends TitanItemSheet {
          }
       );
 
-      // Initialize self object.
       super(sheetDocument, options);
-   };
+   }
 
    /**
     * Adds a Custom Aspect to this sheet's application state.
@@ -45,8 +42,8 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    /**
-    * Removes the Custom Aspect at the provided idx from this sheet's application state.
-    * @param {number} idx - The idx of the aspect to remove.
+    * Removes the Custom Aspect at the provided index from this sheet's application state.
+    * @param {number} idx - The index of the aspect to remove.
     */
    removeCustomAspect(idx) {
       this.applicationState.removeCustomAspect(idx);
@@ -54,7 +51,8 @@ export default class TitanSpellSheet extends TitanItemSheet {
 
    /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @returns {SpellSheetState} - The newly created state store.
+    * @override
+    * @returns {typeof SpellSheetState} The newly created state store.
     * @protected
     */
    _createReactiveState() {

@@ -20,7 +20,7 @@
    } from '~/system/Icons.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type {number} - The index of the Check in the item's item checks array. */
+   /** @type {number} The index of the Check in the item's item checks array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -29,10 +29,10 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   /** @type ItemCheck The Check this component represents. */
+   /** @type {ItemCheck} The Check this component represents. */
    $: check = $document.system.check[idx];
 
-   /** @type {boolean} - Whether this component is currently expanded. */
+   /** @type {boolean} Whether this component is currently expanded. */
    $: isExpanded = $appState.tabs.checks.isExpanded[idx];
 </script>
 

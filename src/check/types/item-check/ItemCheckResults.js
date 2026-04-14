@@ -1,7 +1,7 @@
 import calculateCheckResults from '~/check/CheckResults.js';
 
 /**
- * Results of an item check.
+ * Results of an Item Check.
  * @typedef {CheckResults} ItemCheckResults
  * @property {boolean} succeeded Whether the Check Succeeded.
  * @property {CheckDie[]} dice The sorted dice rolled for the check, after Expertise is applied.
@@ -16,13 +16,13 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
- * Calculates the results of an item check, based on the inputted parameters,
+ * Calculates the results of an Item Check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
  * @param {ItemCheckParameters} parameters - Object containing the parameters of the check.
- * @returns {ItemCheckResults} - The final results of the check.
+ * @returns {ItemCheckResults} The final results of the check.
  */
 export default function calculateItemCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);

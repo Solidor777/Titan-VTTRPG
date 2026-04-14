@@ -24,7 +24,7 @@
 /**
  * Creates an Attribute Check Parameters object, based off the provided input.
  * @param {AttributeCheckOptions} options - Fully populated Attribute Check Options.
- * @returns {AttributeCheckParameters} - The new Attribute Check Parameters.
+ * @returns {AttributeCheckParameters} The new Attribute Check Parameters.
  */
 export default function createAttributeCheckParameters(options) {
    return {

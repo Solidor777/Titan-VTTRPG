@@ -4,15 +4,13 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Actor Sheet class with functionality shared by all Characters.
- * @param {TitanActor} sheetDocument - The Document this sheet is for.
- * @param {object} options - Options object.
- * @property {CharacterSheetState} applicationState - Reactive store for managing the state of the Character Sheet.
+ * @extends {TitanActorSheet}
+ * @property {CharacterSheetState} applicationState Reactive store for managing the state of the Character Sheet.
  */
 export default class TitanCharacterSheet extends TitanActorSheet {
    /**
-    * An Actor Sheet class with functionality shared by all Characters.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
-    * @param {object} options - Options object.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add sheet classes
@@ -21,33 +19,31 @@ export default class TitanCharacterSheet extends TitanActorSheet {
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Initialize self object.
       super(sheetDocument, options);
-   };
+   }
 
    /**
     * Called after an Item is added to this Actor.
-    * @param {TitanItem} item - The Item that was just created.
     * @override
+    * @param {TitanItem} item - The Item that was just created.
     */
    postAddItem(item) {
-      // Update the application state.
       this.applicationState.postAddItem(item);
    }
 
    /**
     * Called before an Item is removed from this Actor.
-    * @param {TitanItem} item - The Item being deleted.
     * @override
+    * @param {TitanItem} item - The Item being deleted.
     */
    preDeleteItem(item) {
-      // Update the application state.
       this.applicationState.preDeleteItem(item);
    }
 
    /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @returns {CharacterSheetState} - The newly created state store.
+    * @override
+    * @returns {typeof CharacterSheetState} The newly created state store.
     * @protected
     */
    _createReactiveState() {

@@ -30,7 +30,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Creates a new object for storing an Item Check.
- * @returns {ItemCheckTemplate} - The new Item Check Template with the default options.
+ * @returns {ItemCheckTemplate} The new Item Check Template with the default options.
  */
 export default function createItemCheckTemplate() {
    return {

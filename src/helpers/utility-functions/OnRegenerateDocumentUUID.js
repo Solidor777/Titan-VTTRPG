@@ -8,7 +8,7 @@ import regenerateDocumentUUID from '~/helpers/utility-functions/RegenerateDocume
  * but when duplicating an item, it can be useful to change the UUID.
  * If the Confirm Regenerate UUID is true in the game settings, will bring up a dialog to confirm regeneration.
  * @param {TitanActor|TitanItem} document - The Actor or Item to generate a new UUID for.
- * @returns {Application|void} - The rendered dialog instance, if a valid document was provided.
+ * @returns {Application|void} The rendered dialog instance, if a valid document was provided.
  */
 export default function onRegenerateDocumentUUID(document) {
    if (document) {

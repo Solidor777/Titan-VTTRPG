@@ -4,7 +4,7 @@
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type AttackCheckOptions Reference to the Check Options. */
+   /** @type {AttackCheckOptions} Reference to the Check Options. */
    const checkOptions = getContext('checkOptions');
 
    // Set the floor for the rating at 0.

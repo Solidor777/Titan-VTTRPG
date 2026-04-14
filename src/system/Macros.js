@@ -95,11 +95,11 @@ export default class TitanMacros {
    /**
     * Creates Macro for rolling an Attack Check using provided Weapon Item and Attack idx.
     * @param {TitanItem} item - The Item to create the Macro for.
-    * @param {string} name - The Document this sheet is for.isplay name for the Macro.
+    * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
     * @param {number} attackIdx - The idx of the Attack in the item's Attack array.
-    * @returns {Macro} - The newly created Macro.
+    * @returns {Macro} The newly created Macro.
     */
    async getAttackCheckMacro(item, name, img, idMethod, attackIdx) {
       // Check if the input is valid
@@ -119,10 +119,10 @@ export default class TitanMacros {
    /**
     * Creates a Macro for rolling a Casting Check using the provided Spell Item.
     * @param {TitanItem} item - The Item to create the Macro for.
-    * @param {string} name - The Document this sheet is for.isplay name for the Macro.
+    * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
-    * @returns {Macro} - The newly created Macro.
+    * @returns {Macro} The newly created Macro.
     */
    async getCastingCheckMacro(item, name, img, idMethod) {
       // Check if the input is valid
@@ -142,11 +142,11 @@ export default class TitanMacros {
    /**
     * Creates a Macro for rolling an Item Check using the provided Item and Check idx.
     * @param {TitanItem} item - The Item to create the Macro for.
-    * @param {string} name - The Document this sheet is for.isplay name for the Macro.
+    * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
     * @param {number} checkIdx - The idx of the Check in the Item's Check array.
-    * @returns {Macro} - The newly created Macro.
+    * @returns {Macro} The newly created Macro.
     */
    async getItemCheckMacro(item, name, img, idMethod, checkIdx) {
       // Check if the input is valid
@@ -166,10 +166,10 @@ export default class TitanMacros {
    /**
     * Creates a Macro for toggling whether the provided Effect is active on a Character.
     * @param {TitanItem} item - The Item to create the Macro for.
-    * @param {string} name - The Document this sheet is for.isplay name for the Macro.
+    * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
-    * @returns {Macro} - The newly created Macro.
+    * @returns {Macro} The newly created Macro.
     */
    async getToggleEffectActiveMacro(item, name, img, idMethod) {
       // Check if the input is valid
@@ -189,10 +189,10 @@ export default class TitanMacros {
 
    /**
     * Creates a Macro for toggling the sheet for a provided Document.
-    * @param {string} name - The Document this sheet is for.isplay name for the Macro.
+    * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} uuid - The unique identifier for the Document to toggle the sheet for.
-    * @returns {Macro} - The newly created Macro.
+    * @returns {Macro} The newly created Macro.
     */
    async getToggleDocumentSheetMacro(name, img, uuid) {
       // Create the command
@@ -205,10 +205,10 @@ export default class TitanMacros {
 
    /**
     * Gets the ID to be used with the provided ID method to retrieve the document when executing the macro.
-    * @param {Document} document - The Document this sheet is for.ocument to get the ID for.
+    * @param {Document} document - The Document to get the ID for.
     * @param {string} idMethod - The method that will be used to get the Document from the ID (uuid, name, or document
     * ID).
-    * @returns {string} - The ID to be used with the provided ID method to retrieve the document when executing the
+    * @returns {string} The ID to be used with the provided ID method to retrieve the document when executing the
     *    macro.
     */
    getMacroID(document, idMethod) {
@@ -230,7 +230,7 @@ export default class TitanMacros {
     * @param {Document} actor - The Actor to retrieve the Item from.
     * @param {string} id - The ID to be used with the provided ID method to retrieve the item.
     * @param {string} idMethod - The method that will be used to get the Item from the ID (uuid, name, or document ID).
-    * @returns {TitanItem|void} - The retrieved Item from the provided Actor using the provided ID and ID method, if
+    * @returns {TitanItem|void} The retrieved Item from the provided Actor using the provided ID and ID method, if
     *    any.
     */
    getMacroItemFromID(actor, id, idMethod) {
@@ -268,12 +268,12 @@ export default class TitanMacros {
     * Checks if a Macro with a matching name, image, and command already exists.
     * If so, gets and returns that Macro.
     * If not creates a new Macro with the name, image, command, and the provided type.
-    * @param {string} name - The Document this sheet is for.isplay name for the Macro.
+    * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} command - The command for the Macro to execute.
     * @param {string} macroType - The Macro's command type.
     * @param {number} macroVersion - The current version of the Macro.
-    * @returns {Macro} - The newly created or already existing Macro.
+    * @returns {Macro} The newly created or already existing Macro.
     */
    async getOrCreateMacro(name, img, command, macroType, macroVersion) {
       // Get this macro if it already exists

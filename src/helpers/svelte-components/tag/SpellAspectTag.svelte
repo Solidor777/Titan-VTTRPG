@@ -19,7 +19,7 @@
       increaseSpeed: DECREASE_SPEED_ICON,
    };
 
-   /** @type SpellAspect The Spell Aspect represented by this element. */
+   /** @type {SpellAspect} The Spell Aspect represented by this element. */
    export let aspect = void 0;
 </script>
 

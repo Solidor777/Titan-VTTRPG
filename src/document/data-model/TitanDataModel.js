@@ -3,7 +3,7 @@ import createNumberField from '~/helpers/utility-functions/CreateNumberField.js'
 /**
  * A specialized subclass of TypeDataModel,
  * with extra functionality to support data model svelte-components and version migrations.
- * @extends TypeDataModel
+ * @extends {foundry.abstract.TypeDataModel}
  */
 export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
@@ -13,10 +13,14 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     */
    #components;
 
+   /**
+    * @param {object} data - The initial data for this data model.
+    * @param {object} options - Options passed to the parent TypeDataModel.
+    */
    constructor(data, options) {
       super(data, options);
 
-      // Construct the document svelte-components
+      // Construct and freeze the svelte-components map.
       const components = {};
       for (const [key, component] of Object.entries(this.constructor._prototypeComponents)) {
          components[key] = new component(this);
@@ -48,17 +52,21 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Getter for the map of the data model's svelte components.
-    * @returns {object} - The map of the data model's svelte components.
+    * @returns {object} The map of the data model's svelte components.
     */
    get components() {
       return this.#components;
    }
 
+   /**
+    * Defines the full schema for this document, including all svelte-component schemas.
+    * @override
+    * @returns {object} The complete document schema.
+    */
    static defineSchema() {
-      // Define the document schema
       const documentSchema = this._defineDocumentSchema();
 
-      // Add each svelte-components's schema to the document schema
+      // Add each svelte-component's schema to the document schema.
       for (const [key, component] of Object.entries(this._prototypeComponents)) {
          if (component.defineSchema !== undefined) {
             documentSchema[key] = component.defineSchema();
@@ -68,9 +76,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Defines the schema for the document, minus the svelte-components schemas.
-    * Component schemas are added later.
-    * @returns {object} - The document schema, minus the svelte-components schemas.
+    * Defines the schema for the document, excluding svelte-component schemas which are added by defineSchema.
+    * @returns {object} The document schema, excluding svelte-component schemas.
     * @protected
     */
    static _defineDocumentSchema() {
@@ -79,14 +86,20 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
       };
    }
 
+   /**
+    * Migrates the source data for this document and all its svelte-components.
+    * @override
+    * @param {object} source - The source data for the document.
+    * @returns {object} The migrated data.
+    */
    static migrateData(source) {
       return super.migrateData(this._migrateComponentData(source));
    }
 
    /**
-    * Migrates the data for each svelte components.
+    * Migrates the data for each svelte-component.
     * @param {object} source - The source data for the document.
-    * @returns {object} - The migrated data.
+    * @returns {object} The migrated data.
     * @protected
     */
    static _migrateComponentData(source) {
@@ -115,7 +128,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
     * Gets the initial data for this document.
     * @param {object} data - The initial data object provided to the document creation request.
-    * @returns {object|void} - The initial data to update the document with.
+    * @returns {object|void} The initial data to update the document with.
     * @protected
     */
    _getInitialDocumentData(data) {
@@ -131,7 +144,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Prepares the data for each data model svelte components.
+    * Prepares the derived data for each svelte-component.
     * @protected
     */
    _prepareComponentDerivedData() {

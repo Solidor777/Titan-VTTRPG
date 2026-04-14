@@ -5,16 +5,13 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Item Sheet class with functionality shared by all Weapon Items.
- * @extends TitanItemSheet
- * @param {TitanItem} sheetDocument - The Document this sheet is for.
- * @param {object} options - Options object.
- * @property {WeaponSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.
+ * @extends {TitanItemSheet}
+ * @property {WeaponSheetState} applicationState Reactive store for managing the state of the Weapon Sheet.
  */
-export default class TitanSpellSheet extends TitanItemSheet {
+export default class TitanWeaponSheet extends TitanItemSheet {
    /**
-    * An Item Sheet class with functionality shared by all Weapon Items.
     * @param {TitanItem} sheetDocument - The Document this sheet is for.
-    * @param {object} options - Options object.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add sheet classes
@@ -34,17 +31,15 @@ export default class TitanSpellSheet extends TitanItemSheet {
          }
       );
 
-      // Initialize self object.
       super(sheetDocument, options);
-   };
-
-   _getSheetClasses() {
-      const retVal = super._getSheetClasses();
-      retVal.push('titan-weapon-sheet');
-
-      return retVal;
    }
 
+   /**
+    * Overridable function for creating the reactive state store for this sheet.
+    * @override
+    * @returns {typeof WeaponSheetState} The newly created state store.
+    * @protected
+    */
    _createReactiveState() {
       return createWeaponSheetState(/** @type {TitanItem} */ this.document);
    }

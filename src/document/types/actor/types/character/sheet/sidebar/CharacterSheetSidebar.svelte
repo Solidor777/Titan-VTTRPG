@@ -9,7 +9,7 @@
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetPortrait.svelte';
    import DocumentSheetSidebar from '~/document/sheet/DocumentSheetSidebar.svelte';
 
-   /** @type SvelteComponent[] List of Svelte Components that make up the sections of the sidebar. */
+   /** @type {SvelteComponent}[] List of Svelte Components that make up the sections of the sidebar. */
    const sections = [
       CharacterSheetPortrait,
       CharacterSheetResources,

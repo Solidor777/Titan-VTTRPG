@@ -4,7 +4,7 @@
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
    import { getContext } from 'svelte';
 
-   /** @type svelte:component Header Component */
+   /** @type {svelte}:component Header Component */
    export let header = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

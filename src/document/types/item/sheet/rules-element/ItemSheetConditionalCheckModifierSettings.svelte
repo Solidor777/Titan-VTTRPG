@@ -258,7 +258,7 @@
 
    /**
     * Returns the appropriate Svelte component for the current selector type.
-    * @returns {typeof import('svelte').SvelteComponent | undefined} The selector input component, or undefined if no specific component is needed.
+    * @returns {object | undefined} The selector input component, or undefined if there is no valid case.
     */
    function getSelector() {
       switch (element.selector) {

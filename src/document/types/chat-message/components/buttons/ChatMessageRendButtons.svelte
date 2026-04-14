@@ -5,10 +5,10 @@
    import { REND_ICON, REPAIR_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type isInteger Amount of Rend to apply. */
+   /** @type {isInteger} Amount of Rend to apply. */
    export let rend = void 0;
 
-   /** @type {boolean} - Whether the attack inflicting the Rend is Magical. */
+   /** @type {boolean} Whether the attack inflicting the Rend is Magical. */
    export let magical = false;
 </script>
 

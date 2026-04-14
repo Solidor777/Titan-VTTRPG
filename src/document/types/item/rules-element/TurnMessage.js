@@ -13,7 +13,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Creates a Rules Element for displaying a message on a Character's turn.
  * @param {object?} options - Options for the rules element.
- * @returns {TurnMessageElement} - The new Rules Element.
+ * @returns {TurnMessageElement} The new Rules Element.
  */
 export default function createTurnMessageElement(options) {
    return {

@@ -2,7 +2,7 @@
  * Calculated parameters for the creation of a new Attack Check, based off an Actor's data.
  * @typedef {CheckParameters} AttackCheckParameters
  * @property {boolean} cleave Whether this check is a Cleave attack.
- * @property {boolean} doubleExpertise Whether to double the Expertise applied..
+ * @property {boolean} doubleExpertise Whether to double the Expertise applied.
  * @property {boolean} doubleTraining Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an extra success.
@@ -43,9 +43,9 @@
  */
 
 /**
- * Creates an Attribute Check Parameters object, based off the provided input.
+ * Creates an Attack Check Parameters object, based off the provided input.
  * @param {AttackCheckOptions} options - Fully populated Attack Check Options.
- * @returns {AttackCheckParameters} - The new Attack Check Parameters.
+ * @returns {AttackCheckParameters} The new Attack Check Parameters.
  */
 export default function createAttackCheckParameters(options) {
    return {

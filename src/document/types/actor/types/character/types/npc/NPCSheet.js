@@ -4,14 +4,12 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * A Character Sheet class with functionality shared by all NPCs.
- * @param {Document} sheetDocument - The Document this sheet is for..
- * @param {object} options - Options object.
+ * @extends {TitanCharacterSheet}
  */
 export default class TitanNPCSheet extends TitanCharacterSheet {
    /**
-    * A Character Sheet class with functionality shared by all NPCs.
-    * @param {Document} sheetDocument - The Document this sheet is for..
-    * @param {object} options - Options object.
+    * @param {TitanActor} sheetDocument - The Document this sheet is for.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add sheet classes

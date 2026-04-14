@@ -4,7 +4,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { CHECKED_ICON, MULTI_ATTACK_ICON, NO_MULTI_ATTCK_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
-   /** @type TitanItem The Item this component belongs to. */
+   /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

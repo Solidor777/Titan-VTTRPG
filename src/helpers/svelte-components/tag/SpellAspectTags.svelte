@@ -4,10 +4,10 @@
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Aspects list
-   /** @type SpellAspect[] Array of Spell Custom Aspects to display. */
+   /** @type {SpellAspect}[] Array of Spell Custom Aspects to display. */
    export let standardAspects = void 0;
 
-   /** @type SpellCustomAspect[] Array of Spell Custom Aspects to display. */
+   /** @type {SpellCustomAspect}[] Array of Spell Custom Aspects to display. */
    export let customAspects = void 0;
 
    /**

@@ -5,22 +5,16 @@ import CheckDialogShell from '~/check/dialog/CheckDialogShell.svelte';
 import AttackCheckDialogShell from '~/check/types/attack-check/dialog/AttackCheckDialogShell.svelte';
 
 /**
- * Creates a dialog window for setting the Options of an Attack Check.
- * @param {AttackCheckOptions} checkOptions - The initial options for the check to be adjusted.
- * @param {AttackCheckParameters} checkParameters - The initial parameters for the check,
- * calculated from the options.
- * @param {TitanActor} actor - The Actor that will roll the check.
- * @extends TitanDialog
+ * Dialog window for setting the Options of an Attack Check.
+ * @extends {TitanDialog}
  */
 export default class AttackCheckDialog extends TitanDialog {
 
    /**
-    * Creates a dialog window for setting the Options of an Attack Check.
     * @param {AttackCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {AttackCheckParameters} checkParameters - The initial parameters for the check,
     * calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
-    * @extends TitanDialog
     */
    constructor(checkOptions, checkParameters, actor) {
       super({
@@ -38,6 +32,11 @@ export default class AttackCheckDialog extends TitanDialog {
       });
    }
 
+   /**
+    * @returns {string[]} Array of CSS classes to apply to the dialog element.
+    * @protected
+    * @override
+    */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();
       retVal.push('titan-check-dialog', 'titan-attack-check-dialog');

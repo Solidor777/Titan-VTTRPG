@@ -1,6 +1,6 @@
 <script>
 
-   /** @type SvelteComponent Header svelte components. */
+   /** @type {SvelteComponent} Header svelte components. */
    export let header = void 0;
 
    /** @type {object[]|string[]} Array of sections to include in the report. */

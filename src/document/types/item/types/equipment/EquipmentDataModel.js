@@ -7,7 +7,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Equipment.
- * @extends TitanDataModel
+ * @extends {RulesElementItemDataModel}
  */
 export default class EquipmentDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {

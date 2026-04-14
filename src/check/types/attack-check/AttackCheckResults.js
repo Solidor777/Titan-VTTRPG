@@ -1,4 +1,5 @@
 import calculateCheckResults from '~/check/CheckResults.js';
+
 /**
  * Results of an Attack Check.
  * @typedef {CheckResults} AttackCheckResults
@@ -19,7 +20,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
  * @param {AttackCheckParameters} parameters - Object containing the parameters of the check.
- * @returns {AttackCheckResults} - The final results of the check.
+ * @returns {AttackCheckResults} The final results of the check.
  */
 export default function calculateAttackCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);

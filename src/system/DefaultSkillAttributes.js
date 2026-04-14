@@ -1,6 +1,6 @@
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
-/** @type {object} List of all system Skills. */
+/** @type {object} Mapping of all system Skills to their default Attribute. */
 export const DEFAULT_SKILL_ATTRIBUTES = deepFreeze({
    arcana: 'mind',
    athletics: 'body',

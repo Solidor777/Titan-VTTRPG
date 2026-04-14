@@ -35,14 +35,12 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
  */
 
 /**
- * Base class for a creating and evaluating check in the Titan system.
- * @param {CheckParameters} parameters - Parameters for the Check.
+ * Base class for creating and evaluating a check in the Titan system.
  */
 export default class TitanCheck {
 
    /**
-    * Base class for a creating and evaluating check in the Titan system.
-    * @param {CheckParameters} parameters - Parameters for the Check.
+    * @param {CheckParameters} [parameters={}] - Parameters for the Check.
     */
    constructor(parameters = {}) {
       this.parameters = parameters;
@@ -79,7 +77,7 @@ export default class TitanCheck {
    /**
     * Applies expertise to the results of the dice roll, maximizing the number of successes achieved.
     * @param {CheckDie[]} dice - Results of the check dice roll, sorted from largest to smallest.
-    * @returns {CheckDiceResults} - The dice results after Expertise is applied,
+    * @returns {CheckDiceResults} The dice results after Expertise is applied,
     * along with the expertise remaining.
     * @protected
     */
@@ -170,7 +168,7 @@ export default class TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @returns {CheckResults} - The final results of the check.
+    * @returns {CheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults) {
@@ -183,7 +181,7 @@ export default class TitanCheck {
     * @param {object} [options] - Options for the chat message.
     * @param {string[]} [options.message] - Messages to attach to the check.
     * @param {object} [options.speaker] - The speaker for the chat message.
-    * @returns {Promise<ChatMessage>} - The newly created Chat Message.
+    * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat(options) {
       // Ensure the check is evaluated

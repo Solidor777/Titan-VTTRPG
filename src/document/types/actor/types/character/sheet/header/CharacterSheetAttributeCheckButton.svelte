@@ -5,13 +5,13 @@
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type {string} - The Attribute that this component represents. */
+   /** @type {string} The Attribute that this component represents. */
    export let attribute;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type AttributeCheckParameters Calculated check parameters. */
+   /** @type {AttributeCheckParameters} Calculated check parameters. */
    let checkParameters = $document.system.getAttributeCheckParameters(
       $document.system.initializeAttributeCheckOptions({ attribute: attribute }));
 

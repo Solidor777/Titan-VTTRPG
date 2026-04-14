@@ -1,4 +1,4 @@
-import TitanDataModel from '~/document/data-model/DataModel.js';
+import TitanDataModel from '~/document/data-model/TitanDataModel.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
@@ -9,10 +9,16 @@ import { ITEM_IMAGE } from '~/system/DefaultImages.js';
 
 /**
  * Data model with extra functionality for Items.
- * @extends TitanDataModel
- * @property {TitanItem} parent - The Item that owns this data model.
+ * @extends {TitanDataModel}
+ * @property {TitanItem} parent The Item that owns this data model.
  */
 export default class TitanItemDataModel extends TitanDataModel {
+   /**
+    * Defines the schema for Item documents, adding description, checks, and custom traits.
+    * @override
+    * @returns {object} The document schema.
+    * @protected
+    */
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -32,6 +38,13 @@ export default class TitanItemDataModel extends TitanDataModel {
       return schema;
    }
 
+   /**
+    * Gets the initial data for this document, setting a default image and name if none are provided.
+    * @override
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @returns {object|void} The initial data to update the document with.
+    * @protected
+    */
    _getInitialDocumentData(data) {
       const updateData = {};
       let shouldReturnData = false;
@@ -54,6 +67,11 @@ export default class TitanItemDataModel extends TitanDataModel {
       }
    }
 
+   /**
+    * Gets the type specific Roll Data for this item, including checks and custom traits.
+    * @override
+    * @returns {object} Roll Data for this item.
+    */
    getRollData() {
       const retVal = super.getRollData();
       retVal.check = foundry.utils.deepClone(this.check);
@@ -64,8 +82,8 @@ export default class TitanItemDataModel extends TitanDataModel {
 
    /**
     * Gets the default image for this document type.
-    * @returns {string} - The default image for this document type.
-    * @private
+    * @returns {string} The default image for this document type.
+    * @protected
     */
    _getDefaultImage() {
       return ITEM_IMAGE;
@@ -73,8 +91,8 @@ export default class TitanItemDataModel extends TitanDataModel {
 
    /**
     * Gets the default name for this document type.
-    * @returns {string} - The default name for this document type.
-    * @private
+    * @returns {string} The default name for this document type.
+    * @protected
     */
    _getDefaultName() {
       return localize('newItem');

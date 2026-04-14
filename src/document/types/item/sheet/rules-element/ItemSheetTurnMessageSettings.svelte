@@ -1,7 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
@@ -18,18 +17,11 @@
    /** @type {object} Reference to the Rules Element object. */
    $: element = $document?.rulesElement[idx];
 
+   // Options for when the turn the message is sent.
    const selectorOptions = [
-      {
-         label: localize('turnStart'),
-         value: 'turnStart',
-      },
-      {
-         label: localize('turnEnd'),
-         value: 'turnEnd',
-      },
+      'turnStart',
+      'turnEnd',
    ];
-
-   // Setup tabs
 </script>
 
 {#if element && element.operation === 'turnMessage'}

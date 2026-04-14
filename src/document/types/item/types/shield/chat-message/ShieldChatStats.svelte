@@ -8,7 +8,7 @@
    import { DEFENSE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type TitanItem The Item this component belongs to. */
+   /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
    const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 </script>

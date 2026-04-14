@@ -3,8 +3,7 @@ import calculateAttackCheckResults from '~/check/types/attack-check/AttackCheckR
 
 /**
  * Class for creating and calculating the result of an Attack Check.
- * @param {AttackCheckParameters} parameters - Parameters for the Check.
- * @extends TitanCheck
+ * @extends {TitanCheck}
  */
 export default class AttackCheck extends TitanCheck {
 
@@ -13,7 +12,7 @@ export default class AttackCheck extends TitanCheck {
     * Makes a call to the parent function, but has some additional functionality for spending expertise to
     * maximize the benefits of attack traits.
     * @param {number[]} sortedDice - Results of the dice roll, sorted from largest to smallest.
-    * @returns {CheckDiceResults} - The dice results after Expertise is applied,
+    * @returns {CheckDiceResults} The dice results after Expertise is applied,
     * along with the expertise remaining.
     * @protected
     */
@@ -56,18 +55,23 @@ export default class AttackCheck extends TitanCheck {
 
    /**
     * Calculates the results of an Attack Check, based on the inputted parameters,
-    * the dice rolled on the check,and the expertise that was applied.
+    * the dice rolled on the check, and the expertise that was applied.
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttackCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @returns {AttackCheckResults} - The final results of the check.
+    * @returns {AttackCheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults) {
       return calculateAttackCheckResults(diceResults, this.parameters);
    }
 
+   /**
+    * @returns {string} The check type identifier.
+    * @protected
+    * @override
+    */
    _getCheckType() {
       return 'attackCheck';
    }

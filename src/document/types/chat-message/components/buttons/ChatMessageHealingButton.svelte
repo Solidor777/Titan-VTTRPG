@@ -4,7 +4,7 @@
    import { HEALING_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type isInteger Amount of Healing to apply. */
+   /** @type {isInteger} Amount of Healing to apply. */
    export let healing = void 0;
 </script>
 

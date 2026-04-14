@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ':*)",
+      "Bash(find C:\\\\FoundryVTT\\\\V13\\\\Dev\\\\foundryuserdata\\\\Data\\\\systems\\\\titan\\\\src:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

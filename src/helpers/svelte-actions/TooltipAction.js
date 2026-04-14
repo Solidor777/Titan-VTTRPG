@@ -4,31 +4,31 @@ import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import processTextData from '~/helpers/ProcessTextData.js';
 
 /**
- * @type {number[]} - The delay in milliseconds before showing and hiding a tooltip.
+ * @type {number[]} The delay in milliseconds before showing and hiding a tooltip.
  * [0] = Delay before showing a tooltip.
  * [1] = Delay before hiding a tooltip.
- * */
+ */
 const TOOLTIP_DELAY = [1000, 250];
 
 /**
- * @type {number[]} - The time in milliseconds it takes to show or hide a tooltip after the delay has expired.
+ * @type {number[]} The time in milliseconds it takes to show or hide a tooltip after the delay has expired.
  * [0] = Time to show a tooltip.
  * [1] = Time to hide a tooltip.
- * */
+ */
 const TOOLTIP_DURATION = [400, 250];
 
 /**
  * @typedef {object} TooltipAction - Svelte action for adding a hovering tooltip to an element.
- * @property {Function} update - Updates the content in response to changes.
- * @property {Function} destroy - Destroys the action when no longer needed.
- * @property {tippy|boolean} tippyTooltip - The current tippy tooltip if the content is valid. Otherwise, false.
+ * @property {Function} update Updates the content in response to changes.
+ * @property {Function} destroy Destroys the action when no longer needed.
+ * @property {tippy|boolean} tippyTooltip The current tippy tooltip if the content is valid. Otherwise, false.
  * */
 
 /**
  * Svelte action for adding a hovering tooltip to an element.
  * @param {Element} element - The node to add the tooltip to.
  * @param {string|TextData} textData - The data for the tooltip.
- * @returns {TooltipAction} - The newly created tooltip.
+ * @returns {TooltipAction} The newly created tooltip.
  */
 export default function tooltipAction(element, textData) {
    // Calculate the initial content.
@@ -91,7 +91,7 @@ export default function tooltipAction(element, textData) {
  * Initializes a tippy tooltipAction object.
  * @param {Element} element - The node to add the tooltipAction to.
  * @param {string} content - The content of the tooltipAction. May be formatted as HTML.
- * @returns {tippy} - The new tooltipAction object.
+ * @returns {tippy} The new tooltipAction object.
  */
 function initializeTippy(element, content) {
    return tippy(

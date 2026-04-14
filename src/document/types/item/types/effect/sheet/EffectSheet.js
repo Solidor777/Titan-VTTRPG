@@ -4,14 +4,12 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Item Sheet class with functionality shared by all Effect Items.
- * @param {TitanItem} sheetDocument - The Document this sheet is for.
- * @param {object} options - Options object.
+ * @extends {TitanItemSheet}
  */
 export default class TitanEffectSheet extends TitanItemSheet {
    /**
-    * An Item Sheet class with functionality shared by all Commodity Items.
     * @param {TitanItem} sheetDocument - The Document this sheet is for.
-    * @param {object} options - Options object.
+    * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
       // Add sheet classes

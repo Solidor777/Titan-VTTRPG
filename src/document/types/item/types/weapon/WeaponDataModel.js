@@ -13,7 +13,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Weapons.
- * @extends TitanDataModel
+ * @extends {RulesElementItemDataModel}
  */
 export default class WeaponDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
@@ -65,7 +65,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Creates a dialog for editing the Standard Traits of an Attack.
-    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
+    * @param {number} attackIdx - The index of the Attack in the Attacks array.
     */
    editAttackTraits(attackIdx) {
       if (this.parent.isOwner) {
@@ -76,7 +76,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Creates a dialog for adding a new Custom Trait to an Attack.
-    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
+    * @param {number} attackIdx - The index of the Attack in the Attacks array.
     */
    addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
@@ -87,8 +87,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Creates a dialog for editing an Attack's existing Custom Trait.
-    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
-    * @param {number} traitIdx - The Idx of the Custom Trait in the Attack's Custom Traits array.
+    * @param {number} attackIdx - The index of the Attack in the Attacks array.
+    * @param {number} traitIdx - The index of the Custom Trait in the Attack's Custom Traits array.
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
@@ -99,8 +99,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Removes a Custom Trait from an Attack.
-    * @param {number} attackIdx - The Idx of the Attack in the Attacks array.
-    * @param {number} traitIdx - The Idx of the Custom Trait in the Attack's Custom Traits array.
+    * @param {number} attackIdx - The index of the Attack in the Attacks array.
+    * @param {number} traitIdx - The index of the Custom Trait in the Attack's Custom Traits array.
     */
    async deleteCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
@@ -119,7 +119,6 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    async addAttack() {
       if (this.parent.isOwner) {
-         // Update document
          this.attack.push(createWeaponAttackTemplate());
          await this.parent.update({
             system: {
@@ -127,7 +126,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
             },
          });
 
-         // Update Sheet
+         // Notify the sheet of the added attack.
          const sheet = this.parent._sheet;
          if (this._sheet) {
             sheet.postAddCheck();
@@ -136,19 +135,18 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
    }
 
    /**
-    * Removes a Check from this item.
-    * @param {number} idx - The Idx of the Check in this item's Checks array.
+    * Removes an Attack from this Weapon.
+    * @param {number} idx - The index of the Attack in the Attacks array.
     * @returns {Promise<void>}
     */
    async deleteAttack(idx) {
       if (this.parent.isOwner) {
-         // Update sheet
+         // Notify the sheet before deletion.
          const sheet = this.parent._sheet;
          if (sheet) {
             sheet.postDeleteAttack(idx);
          }
 
-         // Update document
          this.attack.splice(idx, 1);
          await this.parent.update({
             system: {

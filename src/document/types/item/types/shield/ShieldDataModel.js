@@ -9,7 +9,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Shields.
- * @extends TitanDataModel
+ * @extends {RulesElementItemDataModel}
  */
 export default class ShieldDataModel extends RulesElementItemDataModel {
    _getDefaultName() {

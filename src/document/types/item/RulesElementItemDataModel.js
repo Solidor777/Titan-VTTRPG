@@ -5,7 +5,7 @@ import createFlatModifierElement from '~/document/types/item/rules-element/FlatM
 
 /**
  * Data model with extra functionality for items that can contain Rules Elements.
- * @extends TitanDataModel
+ * @extends {TitanItemDataModel}
  */
 export default class RulesElementItemDataModel extends TitanItemDataModel {
    static _defineDocumentSchema() {

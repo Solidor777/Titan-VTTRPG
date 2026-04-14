@@ -14,7 +14,7 @@
    const document = getContext('document');
    const item = $document.flags.titan;
 
-   /** @type SpellAspect[] List of enabled Spell Aspects. */
+   /** @type {SpellAspect}[] List of enabled Spell Aspects. */
    const enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
 </script>
 

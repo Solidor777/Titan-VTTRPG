@@ -2,10 +2,10 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {boolean} - Whether this button is disabled. */
+   /** @type {boolean} Whether this button is disabled. */
    export let disabled = false;
 
-   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

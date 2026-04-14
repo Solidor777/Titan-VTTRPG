@@ -5,18 +5,18 @@
    import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {string} - The ID of the item to get the check from. */
+   /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type CastingCheckOptions Base options for the Casting Check. */
+   /** @type {CastingCheckOptions} Base options for the Casting Check. */
    const checkOptions = {
       itemId: item._id,
    };
 
-   /** @type CastingCheckParameters Calculated check parameters. */
+   /** @type {CastingCheckParameters} Calculated check parameters. */
    let checkParameters;
 
    // Update the svelte-components in response to changes

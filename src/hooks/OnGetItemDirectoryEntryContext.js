@@ -30,7 +30,7 @@ export default function onGetItemDirectoryEntryContext(element, options) {
 /**
  * Gets the Item from an Entry in the Items directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {TitanItem} - The Document from the Entry in the directory.
+ * @returns {TitanItem} The Document from the Entry in the directory.
  */
 function getItem(element) {
    return game.items.get(element.data('document-id'));
@@ -39,7 +39,7 @@ function getItem(element) {
 /**
  * Determines whether the current user owns the Item for an Entry in the Items directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {boolean} - Whether the current user owns the Document for an Entry in the directory.
+ * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
  */
 function isItemOwner(element) {
    return getItem(element)?.isOwner;

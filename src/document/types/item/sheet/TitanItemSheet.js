@@ -7,8 +7,7 @@ import ItemSheetImportItemButton from '~/document/types/item/sheet/ItemSheetImpo
 /**
  * A Document Sheet class with functionality shared by all Items.
  * @extends {TitanDocumentSheet}
- * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
- * @property {TitanItem} item - The Item this sheet represents.
+ * @property {RulesElementItemSheetState} applicationState The reactive application state store.
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
    /**
@@ -22,8 +21,9 @@ export default class TitanItemSheet extends TitanDocumentSheet {
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Initialize self object.
-      super(/** @type foundry.abstract.document */ sheetDocument, options);
+      super(/** @type {foundry.abstract.Document} */ sheetDocument, options);
+
+      /** @property {TitanItem} item The Item this sheet represents. */
       this.item = sheetDocument;
    }
 
@@ -43,7 +43,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    /**
     * Overridable function for creating the reactive state store for this sheet.
     * @override
-    * @returns {ItemSheetState} - The newly created state store.
+    * @returns {typeof ItemSheetState} The newly created state store.
     * @protected
     */
    _createReactiveState() {
@@ -87,8 +87,8 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Called after an Item Check is deleted from to this Sheet's Item.
-    * @param {number} idx - The idx of the Check to about to be deleted.
+    * Called before an Item Check is deleted from this Sheet's Item.
+    * @param {number} idx - The index of the Check about to be deleted.
     */
    preDeleteCheck(idx) {
       this.applicationState.preDeleteCheck(idx);

@@ -3,15 +3,15 @@ import formatString from '~/helpers/utility-functions/FormatString.js';
 
 /**
  * @typedef {object} TextData Object containing the data for a Text object.
- * @property {string|number} text - The string or number to display.
- * @property {boolean} [localize] - Whether to localize the text. Assumed to be true if not provided.
- * @property {*[]} [formattingArgs] - Arguments for formatting the string if appropriate.
+ * @property {string|number} text The string or number to display.
+ * @property {boolean} [localize] Whether to localize the text. Assumed to be true if not provided.
+ * @property {*[]} [formattingArgs] Arguments for formatting the string if appropriate.
  * */
 
 /**
  * Calculates the string text to display from a string or Text object.
  * @param {string|number|TextData} textData - The string or text to calculate.
- * @returns {string} - The calculated string.
+ * @returns {string} The calculated string.
  */
 export default function processTextData(textData) {
    let retVal = '';

@@ -1,11 +1,16 @@
-import TitanDataModel from '~/document/data-model/DataModel.js';
+import TitanDataModel from '~/document/data-model/TitanDataModel.js';
 
 /**
  * Data model with extra functionality for Actors.
- * @extends TitanDataModel
- * @property {TitanActor} parent - The Actor that owns this data model.
+ * @extends {TitanDataModel}
+ * @property {TitanActor} parent The Actor that owns this data model.
  */
 export default class TitanActorDataModel extends TitanDataModel {
+   /**
+    * Performs initialization logic before document creation, including prototype token initialization.
+    * @override
+    * @param {object} data - The initial data object provided to the document creation request.
+    */
    onPreCreate(data) {
       super.onPreCreate(data);
 
@@ -41,8 +46,8 @@ export default class TitanActorDataModel extends TitanDataModel {
    /**
     * Gets the initial data for the actor's prototype token.
     * @param {object} data - The initial data object provided to the document creation request.
-    * @returns {object|boolean} - The initial data for the prototype token,
-    * or false if there is no data to initialize.
+    * @returns {object|boolean} The initial data for the prototype token,
+    *    or false if there is no data to initialize.
     * @protected
     */
    _getInitialPrototypeTokenData(data) {

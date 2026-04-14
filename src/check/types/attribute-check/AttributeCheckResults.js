@@ -20,7 +20,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * See {@link calculateCheckResults}.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
  * @param {AttributeCheckParameters} parameters - Object containing the parameters of the check.
- * @returns {AttributeCheckResults} - The final results of the check.
+ * @returns {AttributeCheckResults} The final results of the check.
  */
 export default function calculateAttributeCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);

@@ -7,10 +7,10 @@
    /** @type {*[]} Components for changing the options and displaying the parameters. */
    export let rows = void 0;
 
-   /** @type EventDispatcher Dispatcher for component Events. */
+   /** @type {EventDispatcher} Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   /** @type SvelteApp The Svelte Component's Application. */
+   /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    /**

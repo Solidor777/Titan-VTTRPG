@@ -2,7 +2,7 @@
  * Formats a string with the provided arguments.
  * @param {string} string - The string to format.
  * @param {*} args - Arguments to format the string with.
- * @returns {string} - The formatted string.
+ * @returns {string} The formatted string.
  */
 export default function formatString(string, ...args) {
    // Initialize return value

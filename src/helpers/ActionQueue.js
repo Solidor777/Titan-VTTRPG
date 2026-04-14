@@ -30,14 +30,14 @@ export default class ActionQueue {
     * @param {Function} action.callback - The function to be performed by the action.
     * @param {object} action.thisArg - The 'this' context to use for the action. May be null.
     * @param {*[]} [action.args] - Optional arguments for the function being performed, in order.
-    * @param {number} [action.delay] - The Document this sheet is for.elay to wait before attempting this action. If
+    * @param {number} [action.delay] - The delay to wait before attempting this action. If
     *    not specified, the default delay will be used.
     * @param {string} action.key - An identifier that may be used to enqueue the action.
     * If the action is enqueued while an action with the same key is already
     * in the queue, then it will be ignored.
     * If the previous action is already being performed,
     * then the duplicate action will be called again.
-    * @returns {Promise<*>} - The return value of the action being queued.
+    * @returns {Promise<*>} The return value of the action being queued.
     */
    async enqueue(action) {
       // If the action is not already in the queue
@@ -76,7 +76,7 @@ export default class ActionQueue {
     * @returns {Promise<void>} Finishes when the action queue is empty.
     */
    async runQueue() {
-      // While there are still objections in the queue
+      // While there are still actions in the queue
       while (this.queue.length > 0) {
 
          // Get the current action

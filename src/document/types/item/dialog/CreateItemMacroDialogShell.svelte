@@ -7,7 +7,7 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
-   /** @type TitanItem The Item being edited. */
+   /** @type {TitanItem} The Item being edited. */
    export let item = void 0;
 
    // Slot on the hotbar that the macro will be assigned to
@@ -16,7 +16,7 @@
    // UUID of the item that was dropped
    export let uuid = void 0;
 
-   /** @type SvelteApp The Svelte Component's Application. */
+   /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    // Macro type

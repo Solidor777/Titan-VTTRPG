@@ -6,31 +6,31 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} - The Attribute to be used for the check. */
+   /** @type {string} The Attribute to be used for the check. */
    export let attribute = void 0;
 
-   /** @type isInteger The Difficulty of the check. */
+   /** @type {isInteger} The Difficulty of the check. */
    export let difficulty = void 0;
 
-   /** @type isInteger The Complexity of the check. */
+   /** @type {isInteger} The Complexity of the check. */
    export let complexity = void 0;
 
-   /** @type isInteger The total Dice for the check. */
+   /** @type {isInteger} The total Dice for the check. */
    export let totalDice = void 0;
 
-   /** @type isInteger The total Expertise for the check. */
+   /** @type {isInteger} The total Expertise for the check. */
    export let totalExpertise = void 0;
 
-   /** @type isInteger The Resolve Cost the check. */
+   /** @type {isInteger} The Resolve Cost the check. */
    export let resolveCost = void 0;
 
    /** @type {string} Icon to show in front of the check. */
    export let checkIcon = void 0;
 
-   /** @type {string} - The display Label of the check. */
+   /** @type {string} The display Label of the check. */
    export let label = void 0;
 
-   /** @type {string|TooltipAction} - The Tooltip to display for this element, if any. */
+   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

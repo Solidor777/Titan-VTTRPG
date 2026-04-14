@@ -14,11 +14,11 @@
    /** @type {string} Label for the confirmation button. */
    export let confirmLabel = void 0;
 
-   /** @type ConfirmationDialog The Svelte Component's Application. */
+   /** @type {ConfirmationDialog} The Svelte Component's Application. */
    const application = getApplication();
 
    /**
-    * Called when confirmation button clicked. /*.
+    * Called when the confirmation button is clicked. /*.
     */
    function onConfirmed() {
       application.confirmationCallback();

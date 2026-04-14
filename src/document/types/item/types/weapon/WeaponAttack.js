@@ -18,7 +18,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Creates a new Weapon Attack.
- * @returns {WeaponAttack} - The Weapon Attack with the default options sat.
+ * @returns {WeaponAttack} The Weapon Attack with the default options set.
  */
 export default function createWeaponAttackTemplate() {
    return {

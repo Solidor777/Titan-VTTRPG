@@ -13,12 +13,11 @@ import capitalize from '~/helpers/utility-functions/Capitalize.js';
 /**
  * Extends the base Actor class to implement additional system-specific logic for Titan.
  * @extends {BaseActor}
- * @property {TitanItem[]} items - A collection of embedded Item documents.
- * @property {TitanActorSheet} sheet - The Sheet that represents this Actor.
+ * @property {TitanItem[]} items A collection of embedded Item documents.
+ * @property {TitanActorSheet} sheet The Sheet that represents this Actor.
  */
 export default class TitanActor extends Actor {
 
-   // noinspection JSUnusedGlobalSymbols
    /**
     * Performs initialization logic before document creation.
     * @override
@@ -66,7 +65,7 @@ export default class TitanActor extends Actor {
 
    /**
     * A helper to get a speaker from this actor.
-    * @returns {SpeakerData} - The identified speaker data.
+    * @returns {SpeakerData} The identified speaker data.
     */
    getSpeaker() {
       return ChatMessage.getSpeaker({
@@ -78,7 +77,7 @@ export default class TitanActor extends Actor {
    /**
     * Gets this actor's Combatant in the active combat (if any).
     * Otherwise, returns undefined.
-    * @returns {Combatant|undefined} This Character's combatant in combat.
+    * @returns {Combatant|undefined} This Actor's combatant in the active combat.
     */
    getCombatant() {
       return game.combat?.getCombatantByActor(this.id);
@@ -87,7 +86,7 @@ export default class TitanActor extends Actor {
    /**
     * Adds an Item to the Actor, created from the item data.
     * @param {object[]|object} itemData - The Item data requested for creation.
-    * @returns {Promise<Item[]|void>} - The created or updated Item instances.
+    * @returns {Promise<Item[]|void>} The created or updated Item instances.
     */
    async addItem(itemData) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
@@ -99,7 +98,7 @@ export default class TitanActor extends Actor {
          // Create the item or items.
          const retVal = /** @type Item[] */ await this.createEmbeddedDocuments('Item', itemData);
 
-         // Broadcast downstream functions
+         // Notify the system and sheet of each added item.
          for (const item of retVal) {
             this.system.postAddItem(item);
             if (this.sheet) {
@@ -114,6 +113,7 @@ export default class TitanActor extends Actor {
    /**
     * Creates an item of the provided type, and adds it to the actor.
     * @param {string} type - The type of item to add.
+    * @returns {Promise<Item[]|void>} The created Item instances.
     */
    async createItemFromType(type) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
@@ -137,8 +137,8 @@ export default class TitanActor extends Actor {
 
    /**
     * Adds an Active Effect to the Actor, created from the active effect data.
-    * @param {object[]|object} activeEffectData - The Item data requested for creation.
-    * @returns {Promise<ActiveEffect[]|void>} - The created or updated Active Effect instances.
+    * @param {object[]|object} activeEffectData - The Active Effect data requested for creation.
+    * @returns {Promise<ActiveEffect[]|void>} The created or updated Active Effect instances.
     */
    async addActiveEffect(activeEffectData) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
@@ -146,7 +146,7 @@ export default class TitanActor extends Actor {
          if (!activeEffectData instanceof Array) {
             activeEffectData = [activeEffectData];
          }
-         // Create the item or items.
+         // Create the active effect or effects.
          return  /** @type ActiveEffect[] */ this.createEmbeddedDocuments(
             'ActiveEffect',
             activeEffectData
@@ -155,10 +155,11 @@ export default class TitanActor extends Actor {
       }
    }
 
-   /** Deletes the item with the specified ID from the actor.
+   /**
+    * Deletes the item with the specified ID from the actor.
     * @param {string} id - The ID of the item to delete.
-    * @returns {Promise<void>} Returns after the item has been deleted.
-    * */
+    * @returns {Promise<void>} Resolves after the item has been deleted.
+    */
    async deleteItem(id) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          const item = this.items.get(id);
@@ -189,7 +190,7 @@ export default class TitanActor extends Actor {
    /**
     * Gets all items of the provided Type.
     * @param {string} type - The Type of Item to search for.
-    * @returns {TitanItem[]} - List of all Items of the provided type owned by this Actor.
+    * @returns {TitanItem[]} List of all Items of the provided type owned by this Actor.
     */
    getItemsOfType(type) {
       return /** @type TitanItem[] */ this.items.filter(item => item.type === type);
@@ -198,7 +199,7 @@ export default class TitanActor extends Actor {
    /**
     * Gets all items of the provided Types.
     * @param {string[]} types - The Types of Item to search for.
-    * @returns {TitanItem[]} - List of all Items of the provided type owned by this Actor.
+    * @returns {TitanItem[]} List of all Items of the provided types owned by this Actor.
     */
    getItemsOfTypes(types) {
       return /** @type TitanItem[] */ this.items.filter(item => types.includes(item.type));

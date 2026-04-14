@@ -44,7 +44,7 @@ export const ARMOR_TRAIT_DESCRIPTIONS = deepFreeze({
 /**
  * Gets the localized description string for an Armor Trait.
  * @param {string} traitName - Name of the trait to get the description for.
- * @returns {string} - The localized description strings for the trait.
+ * @returns {string} The localized description strings for the trait.
  */
 export function getArmorTraitDescription(traitName) {
    return ARMOR_TRAIT_DESCRIPTIONS[traitName];

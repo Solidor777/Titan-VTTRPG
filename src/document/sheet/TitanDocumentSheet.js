@@ -7,7 +7,7 @@ import ConfigureSheetButton from '~/document/sheet/ConfigureSheetButton.svelte';
 
 /**
  * @class TitanDocumentSheet
- * @extends SvelteApp<Options>
+ * @extends SvelteApplication
  * A replacement Document Sheet that supports Svelte components.
  * @template {import('svelte/store').Writable<any>} TApplicationState
  */
@@ -47,21 +47,22 @@ export default class TitanDocumentSheet extends SvelteApplication {
          },
       ));
 
-      /** @type {Document} document - The Document this sheet represents. */
+      /** @type {Document} The Document this sheet represents. */
       this.document = sheetDocument;
 
-      /** @type {TJSDocument<Document>} document - The Document this sheet represents. */
+      /** @type {TJSDocument<Document>} Reactive TJSDocument store wrapping the document, passed to the Svelte component. */
       this.options.svelte.props.document = new TJSDocument(
          this.document,
          { delete: this.close.bind(this) }
       );
 
-      /** @type {TApplicationState} applicationState - The reactive application state store. */
+      /** @type {typeof TApplicationState} The reactive application state store, passed to the Svelte component. */
       this.applicationState = this._createReactiveState();
+
+      /** @type {typeof TApplicationState} The reactive application state store, passed to the Svelte component. */
       this.options.svelte.props.applicationState = this.applicationState;
 
-      // Initialize unsubscribe.
-      /** @type {Function|undefined} documentUnsubscribe - Holds the subscription / unsubscription functions. */
+      /** @type {Function|undefined} The unsubscribe function returned by the document store subscription, or undefined if not currently subscribed. */
       this.documentUnsubscribe = void 0;
    }
 
@@ -113,16 +114,16 @@ export default class TitanDocumentSheet extends SvelteApplication {
 
    /**
     * Overridable function for creating the reactive state store for this sheet.
-    * @returns {TApplicationState} - The newly created state store.
+    * @returns {typeof TApplicationState} The newly created state store.
     * @protected
     */
    _createReactiveState() {
    }
 
    /**
-    * Overridable function for getting the offset of a dialog created by this sheet.
-    * @returns {{top: number, left: number, force: boolean}} - The offset from the location of this sheet to create a
-    *    new dialog at.
+    * Overridable function for getting the render options for a dialog created by this sheet.
+    * @returns {{force: boolean, position: {top: number, left: number}}} Render options positioning the dialog
+    *    relative to this sheet.
     */
    getDialogRenderOptions() {
       return {
@@ -194,7 +195,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * Define whether a user is able to begin a dragstart workflow for a given drag selector.
     * @override
     * @param {string} selector - The candidate HTML selector for dragging.
-    * @returns {boolean} - Whether the current user drag this selector.
+    * @returns {boolean} Whether the current user drag this selector.
     * @protected
     */
    _canDragStart(selector) {
@@ -205,7 +206,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
     * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector.
     * @override
     * @param {string} selector - The candidate HTML selector for the drop target.
-    * @returns {boolean} - Whether current user can drop on this selector.
+    * @returns {boolean} Whether current user can drop on this selector.
     * @protected
     */
    _canDragDrop(selector) {

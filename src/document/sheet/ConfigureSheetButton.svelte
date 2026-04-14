@@ -3,7 +3,7 @@
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type TitanDocumentSheet Document Sheet Reference. */
+   /** @type {TitanDocumentSheet} Document Sheet Reference. */
    const application = getApplication();
 
    /** Opens a dialog to configure this sheet. */

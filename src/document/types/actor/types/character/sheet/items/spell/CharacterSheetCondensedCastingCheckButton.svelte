@@ -3,18 +3,18 @@
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
 
-   /** @type {string} - The ID of the Item to get the check from. */
+   /** @type {string} The ID of the Item to get the check from. */
    export let itemId = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type CastingCheckOptions Base options for the Check. */
+   /** @type {CastingCheckOptions} Base options for the Check. */
    const checkOptions = {
       itemId: itemId,
    };
 
-   /** @type CastingCheckParameters Calculated check parameters. */
+   /** @type {CastingCheckParameters} Calculated check parameters. */
    let checkParameters;
 
    /** @type {string} Calculated tooltipAction. */

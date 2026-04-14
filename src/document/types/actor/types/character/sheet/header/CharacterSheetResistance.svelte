@@ -7,7 +7,7 @@
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {string} - The Resistance that this component represents. */
+   /** @type {string} The Resistance that this component represents. */
    export let resistance;
 
    /** @type {object} Reference to the reactive Document store. */

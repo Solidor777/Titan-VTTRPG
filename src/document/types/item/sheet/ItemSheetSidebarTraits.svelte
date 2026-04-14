@@ -10,13 +10,13 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type Tag[] Optional input array of traits converted into Tags.*/
+   /** @type {Tag}[] Optional input array of traits converted into Tags.*/
    export let itemTypeTraits = [];
 
-   /** @type function Optional function to start editing item-type specific traits. */
+   /** @type {function} Optional function to start editing item-type specific traits. */
    export let editTraits = void 0;
 
-   /** @type Tag[] List of traits converted into tags. */
+   /** @type {Tag}[] List of traits converted into tags. */
    let tags;
 
    // Add Custom Traits to the tags list.

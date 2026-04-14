@@ -63,23 +63,23 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 /**
  * Data for a report detailing the Damage applied to a character.
  * @typedef {object} DamageReport
- * @property {string} type - The Chat Message type (damageReport).
- * @property {boolean} [ignoreArmor] - Whether to the attack Ignored Armor.
- * @property {number} [damageResisted] - The amount of Damage resisted.
- * @property {number} [damageTaken] - The amount of Damage taken.
- * @property {number} [staminaLost] - The amount of Stamina lost.
- * @property {object} [wounds] - The character's Wounds, if any.
- * @property {number} [wounds.max] - The character's maximum Wounds, if any.
- * @property {number} [wounds.value] - The character's current Wounds, if any.
- * @property {number} [woundsSuffered] - The number of Wounds suffered, if any.
- * @property {object} [stamina] - The character's Stamina.
- * @property {number} [stamina.max] - The character's maximum Stamina.
- * @property {number} [stamina.value] - The character's current Stamina.
- * @property {object} [tags] - Tags applied to the damage.
- * @property {boolean} [tags.ineffective] - Whether the Attack had the Ineffective trait.
- * @property {boolean} [tags.penetrating] - Whether the Attack had the Penetrating trait.
- * @property {string} actorImg - The character's image.
- * @property {string} actorName - The character's name.
+ * @property {string} type The Chat Message type (damageReport).
+ * @property {boolean} [ignoreArmor] Whether to the attack Ignored Armor.
+ * @property {number} [damageResisted] The amount of Damage resisted.
+ * @property {number} [damageTaken] The amount of Damage taken.
+ * @property {number} [staminaLost] The amount of Stamina lost.
+ * @property {object} [wounds] The character's Wounds, if any.
+ * @property {number} [wounds.max] The character's maximum Wounds, if any.
+ * @property {number} [wounds.value] The character's current Wounds, if any.
+ * @property {number} [woundsSuffered] The number of Wounds suffered, if any.
+ * @property {object} [stamina] The character's Stamina.
+ * @property {number} [stamina.max] The character's maximum Stamina.
+ * @property {number} [stamina.value] The character's current Stamina.
+ * @property {object} [tags] Tags applied to the damage.
+ * @property {boolean} [tags.ineffective] Whether the Attack had the Ineffective trait.
+ * @property {boolean} [tags.penetrating] Whether the Attack had the Penetrating trait.
+ * @property {string} actorImg The character's image.
+ * @property {string} actorName The character's name.
  */
 
 /**
@@ -95,16 +95,16 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 /**
  * Data for a report detailing the Healing applied to a character.
  * @typedef {object} HealingReport
- * @property {string} type - The Chat Message type (healingReport).
- * @property {string} actorImg - The character's image.
- * @property {string} actorName - The character's name.
- * @property {number} staminaRestored - The amount of Stamina healed.
- * @property {object} stamina - The character's Stamina.
- * @property {number} stamina.value - The character's current Stamina.
- * @property {number} stamina.max - The character's maximum Stamina.
- * @property {object} [wounds] - The character's Wounds, if any.
- * @property {number} [wounds.value] - The character's current Wounds, if any.
- * @property {number} [wounds.max] - The character's maximum Wounds, if any.
+ * @property {string} type The Chat Message type (healingReport).
+ * @property {string} actorImg The character's image.
+ * @property {string} actorName The character's name.
+ * @property {number} staminaRestored The amount of Stamina healed.
+ * @property {object} stamina The character's Stamina.
+ * @property {number} stamina.value The character's current Stamina.
+ * @property {number} stamina.max The character's maximum Stamina.
+ * @property {object} [wounds] The character's Wounds, if any.
+ * @property {number} [wounds.value] The character's current Wounds, if any.
+ * @property {number} [wounds.max] The character's maximum Wounds, if any.
  */
 
 /**
@@ -130,11 +130,11 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 /**
  * Data for a report detailing Resolve spent by the character.
  * @typedef {object} SpendResolveReport
- * @property {string} type - The Chat Message type (spendResolveReport).
- * @property {string} actorImg - The character's image.
- * @property {string} actorName - The character's name.
- * @property {number} resolveSpent - The amount of Resolve spent.
- * @property {number} [resolveShortage] - How much the character overspent their Resolve.
+ * @property {string} type The Chat Message type (spendResolveReport).
+ * @property {string} actorImg The character's image.
+ * @property {string} actorName The character's name.
+ * @property {number} resolveSpent The amount of Resolve spent.
+ * @property {number} [resolveShortage] How much the character overspent their Resolve.
  */
 
 /**
@@ -151,12 +151,12 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 /**
  * Data for a report detailing Rend applied to the character's Armor.
  * @typedef {object} RendReport
- * @property {string} type - The Chat Message type (rendReport).
- * @property {string} actorImg - The character's image.
- * @property {string} actorName - The character's name.
- * @property {string} armorImg - The armor's image.
- * @property {string} armorName - The armor's display name.
- * @property {number} [armorLost] - The amount of Armor lost, if any.
+ * @property {string} type The Chat Message type (rendReport).
+ * @property {string} actorImg The character's image.
+ * @property {string} actorName The character's name.
+ * @property {string} armorImg The armor's image.
+ * @property {string} armorName The armor's display name.
+ * @property {number} [armorLost] The amount of Armor lost, if any.
  */
 
 /**
@@ -172,55 +172,55 @@ import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryI
 /**
  * Data for a report detailing Repairs made to the character's Armor.
  * @typedef {object} RepairsReport
- * @property {string} type - The Chat Message type (repairsReport).
- * @property {string} actorImg - The character's image.
- * @property {string} actorName - The character's name.
- * @property {string} armorImg - The armor's image.
- * @property {string} armorName - The armor's display name.
- * @property {number} armorRepaired - The amount of Armor repaired.
+ * @property {string} type The Chat Message type (repairsReport).
+ * @property {string} actorImg The character's image.
+ * @property {string} actorName The character's name.
+ * @property {string} armorImg The armor's image.
+ * @property {string} armorName The armor's display name.
+ * @property {number} armorRepaired The amount of Armor repaired.
  */
 
 /**
  * Base report Data for an Effect item.
  * @typedef {object} EffectReportData
- * @property {string} label - The name of the Effect item.
- * @property {string} img - The image used by the Effect item.
- * @property {string} [description] - The description of the Effect item, if any.
+ * @property {string} label The name of the Effect item.
+ * @property {string} img The image used by the Effect item.
+ * @property {string} [description] The description of the Effect item, if any.
  */
 
 /**
  * Report Data for a Turn Effect item.
  * @typedef {object} TurnEffectReportData
- * @property {string} label - The name of the Effect item.
- * @property {string} img - The image used by the Effect item.
- * @property {string} [description] - The description of the Effect item, if any.
- * @property {number} remaining - The remaining turns for the Effect item.
+ * @property {string} label The name of the Effect item.
+ * @property {string} img The image used by the Effect item.
+ * @property {string} [description] The description of the Effect item, if any.
+ * @property {number} remaining The remaining turns for the Effect item.
  */
 
 /**
  * Report Data for a Turn Effect item.
  * @typedef {object} InitiativeEffectReportData
- * @property {string} label - The name of the Effect item.
- * @property {string} img - The image used by the Effect item.
- * @property {string} [description] - The description of the Effect item, if appropriate.
- * @property {number} remaining - The remaining turns for the Effect item.
- * @property {float} initiative - The initiative count on which the Effect duration is reduced.
+ * @property {string} label The name of the Effect item.
+ * @property {string} img The image used by the Effect item.
+ * @property {string} [description] The description of the Effect item, if appropriate.
+ * @property {number} remaining The remaining turns for the Effect item.
+ * @property {float} initiative The initiative count on which the Effect duration is reduced.
  */
 
 /**
  * Report Data for a Custom Effect item.
  * @typedef {object} CustomEffectReportData
- * @property {string} label - The name of the Effect item.
- * @property {string} img - The image used by the Effect item.
- * @property {string} [description] - The description of the Effect item, if appropriate.
- * @property {number} remaining - The remaining turns for the Effect item.
- * @property {string} custom - Custom duration of the Effect item.
+ * @property {string} label The name of the Effect item.
+ * @property {string} img The image used by the Effect item.
+ * @property {string} [description] The description of the Effect item, if appropriate.
+ * @property {number} remaining The remaining turns for the Effect item.
+ * @property {string} custom Custom duration of the Effect item.
  */
 
 /**
  * Actor data model with extra functionality for Characters.
  * @extends TitanActorDataModel
- * @property {TitanActor} parent - The Actor that owns this data model.
+ * @property {TitanActor} parent The Actor that owns this data model.
  */
 export default class CharacterDataModel extends TitanActorDataModel {
 
@@ -228,7 +228,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets the cached rulesElements on the parent actor, sorted by their type.
-    * @returns {object} - The parent actor's Rules Elements cache.
+    * @returns {object} The parent actor's Rules Elements cache.
     */
    get rulesElementsCache() {
       return this.parent.rulesElementsCache;
@@ -236,7 +236,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets the parent document's Action Queue object.
-    * @returns {ActionQueue} - The parent actor's Action Queue.
+    * @returns {ActionQueue} The parent actor's Action Queue.
     */
    get actionQueue() {
       return this.parent.actionQueue;
@@ -246,7 +246,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Identifies this data model as a Character.
-    * @returns {boolean} - True.
+    * @returns {boolean} True.
     */
    get isCharacter() {
       return true;
@@ -275,7 +275,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       /**
        * Creates a schema field formatted as a mod for a Character state (Skills, Attributes, Resistances, etc.).
-       * @returns {SchemaField} - A schema field formatted as a mod for a Character state.
+       * @returns {SchemaField} A schema field formatted as a mod for a Character state.
        */
       function createStatModField() {
          return createSchemaField({
@@ -286,7 +286,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /**
        * Creates a schema field formatted as a base stat for the Character (Attributes, Speeds, etc.).
        * @param {number} [initial] - The initial value of the schema field.
-       * @returns {SchemaField} - A schema field formatted as a base stat for the Character.
+       * @returns {SchemaField} A schema field formatted as a base stat for the Character.
        */
       function createBaseStatField(initial) {
          return createSchemaField({
@@ -297,7 +297,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       /**
        * Creates a schema field formatted as a derived stat for the Character (Resistances, Ratings, etc.).
-       * @returns {SchemaField} - A schema field formatted as a derived stat for the Character.
+       * @returns {SchemaField} A schema field formatted as a derived stat for the Character.
        */
       function createDerivedStatField() {
          return createSchemaField({
@@ -308,7 +308,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /**
        * Creates a schema field formatted as a Character Skill (Athletics, Perception, etc.).
        * @param {string} defaultAttribute - Default Attribute to be used when rolling the Skill.
-       * @returns {SchemaField} - A schema field formatted as a Character Skill.
+       * @returns {SchemaField} A schema field formatted as a Character Skill.
        */
       function createSkillSchema(defaultAttribute) {
          return createSchemaField({
@@ -321,7 +321,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /**
        * Creates a schema field formatted as a Character Resource (Stamina, Resolve, or Wounds).
        * @param {number} initial - The initial value of the field.
-       * @returns {SchemaField} - A schema field formatted as a Character Resource.
+       * @returns {SchemaField} A schema field formatted as a Character Resource.
        */
       function createResourceSchema(initial) {
          return createSchemaField({
@@ -477,7 +477,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets all the standard conditions affecting this Character.
-    * @returns {ActiveEffect[]|boolean} - Array of standard conditions affecting this actor, or false if there are none.
+    * @returns {ActiveEffect[]|boolean} Array of standard conditions affecting this actor, or false if there are none.
     */
    getConditions() {
       const conditions = this.parent.effects.filter((effect) => effect.flags.titan?.type === 'condition');
@@ -486,7 +486,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets all the Effect items affecting this Character that have Expired.
-    * @returns {TitanItem[]|boolean} - Array of Expired Effect items affecting this character, or false if there are
+    * @returns {TitanItem[]|boolean} Array of Expired Effect items affecting this character, or false if there are
     *    none.
     */
    getExpiredEffectItems() {
@@ -496,7 +496,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets all the Effect items affecting this character, sorted by their Duration type, and whether they have Expired.
-    * @returns {object|boolean} - Object containing the sorted Effect items, or False if there are non.
+    * @returns {object|boolean} Object containing the sorted Effect items, or False if there are non.
     */
    getSortedEffectItems() {
       const effects = this.parent.items.filter((item) => item.type === 'effect');
@@ -1609,7 +1609,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {object} conditionalRatingModifiers - The parent actor's Rules Element cache of mods for rating.
     * @param {string} selector - The type of condition for modifying the rating.
     * @param {*[]} keys - Array of keys to test against.
-    * @returns {object|boolean} - Object containing the mods to apply, sorted by source type, or false if there were no
+    * @returns {object|boolean} Object containing the mods to apply, sorted by source type, or false if there were no
     *    mods matching the input.
     * @private
     */
@@ -1645,7 +1645,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {object} conditionalRatingModifiers - The parent actor's Rules Element cache of mods for rating.
     * @param {string} selector - The type of condition for modifying the rating (attackType, etc.).
     * @param {string} key - The specific result of the condition for modifying the rating (melee, ranged, etc.).
-    * @returns {object|boolean} - Object containing the mods to apply, sorted by source type, or false if there were no
+    * @returns {object|boolean} Object containing the mods to apply, sorted by source type, or false if there were no
     *    mods matching the input.
     * @private
     */
@@ -1739,7 +1739,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for an Attribute check.
     * @param {object} options - Options for the Check.
-    * @returns {boolean} - Whether the check options were valid.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateAttributeCheckOptions(options) {
       // Ensure options were provided
@@ -1766,7 +1766,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Populates Attribute Check Options with this Character's specific data, unless specific overrides were applied.
     * @param {object} options - Options for the Check.
-    * @returns {AttributeCheckOptions} - The new, fully-populated Attribute Check Options.
+    * @returns {AttributeCheckOptions} The new, fully-populated Attribute Check Options.
     */
    initializeAttributeCheckOptions(options) {
       const checkOptions = createAttributeCheckOptions(options);
@@ -1805,7 +1805,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} modifierType - The modifier type to check for.
     * @param {string} attribute - The Attribute being used for the check.
     * @param {string} skill - The Skill being used for the check.
-    * @returns {number} - The modifier to apply to this aspect of the check.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttributeCheckMod(modifierType, attribute, skill) {
       // Contaminated creatures have -1 to all dice rolls
@@ -1840,7 +1840,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets the parameters for an Attribute Check to be rolled by this Character, accounting for the provided options.
     * @param {AttributeCheckOptions} options - Options for the Check.
-    * @returns {AttributeCheckParameters} - Parameters for the check, calculated from the provided options.
+    * @returns {AttributeCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getAttributeCheckParameters(options) {
       // Initialize check parameters
@@ -1856,7 +1856,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets conditional messages to that apply to a specific Attribute Check.
     * @param {AttributeCheckParameters} parameters - Parameters of the Check to get messages for.
-    * @returns {string[]|boolean} - Array of messages to attach to the check, or false if there are none.
+    * @returns {string[]|boolean} Array of messages to attach to the check, or false if there are none.
     * @private
     */
    _getAttributeCheckMessages(parameters) {
@@ -1972,7 +1972,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for a Resistance check.
     * @param {object} options - Initial options for the check.
-    * @returns {boolean} - Whether the check options were valid.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateResistanceCheckOptions(options) {
       // Ensure options were provided
@@ -1998,7 +1998,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Populates Resistance Check Options with this Character's specific data, unless specific overrides were applied.
     * @param {object} options - Options for the Check.
-    * @returns {ResistanceCheckOptions} - The new, fully-populated Resistance Check Options.
+    * @returns {ResistanceCheckOptions} The new, fully-populated Resistance Check Options.
     */
    initializeResistanceCheckOptions(options) {
       // For now, there are no actor specific resistance check modifiers,
@@ -2009,7 +2009,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets the parameters for a Resistance Check to be rolled by this Character, accounting for the provided options.
     * @param {ResistanceCheckOptions} options - Options for the Check.
-    * @returns {ResistanceCheckParameters} - Parameters for the check, calculated from the provided options.
+    * @returns {ResistanceCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getResistanceCheckParameters(options) {
       // Initialize check parameters
@@ -2031,7 +2031,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets conditional messages to that apply to a specific Resistance Check.
     * @param {ResistanceCheckParameters} parameters - Parameters of the Check to get messages for.
-    * @returns {string[]|boolean} - Array of messages to attach to the check, if any, or false if there are none.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any, or false if there are none.
     * @private
     */
    _getResistanceCheckMessages(parameters) {
@@ -2135,7 +2135,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for an Attack Check.
     * @param {object} options - Options for the Check.
-    * @returns {boolean} - Whether the check options were valid.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateAttackCheckOptions(options) {
       // Ensure options were provided
@@ -2184,7 +2184,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Populates Attack Check Options with this Character's specific data, unless specific overrides were applied.
     * @param {object} options - Options for the Check.
-    * @returns {AttributeCheckOptions} - The new, fully-populated Attack Check Options.
+    * @returns {AttributeCheckOptions} The new, fully-populated Attack Check Options.
     */
    initializeAttackCheckOptions(options) {
       const checkOptions = createAttackCheckOptions(options);
@@ -2390,7 +2390,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} type - The Type of Attack (Melee or Ranged).
     * @param {string[]} attackTraits - The attack Traits associated with the check.
     * @param {string[]} customTraits - The camel-case names of the Custom Traits associated with the attack and weapon.
-    * @returns {number} - The modifier to apply to this aspect of the check.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttackCheckMod(
       modifierType,
@@ -2485,7 +2485,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} type - The type of attack (melee or ranged).
     * @param {object[]} attackTraits - The standard traits associated with the attack.
     * @param {string[]} customTraits - The Custom Traits associated with the attack and weapon.
-    * @returns {number} - The attack rating for this attack with modifiers applied.
+    * @returns {number} The attack rating for this attack with modifiers applied.
     */
    _getAttackRatingMod(
       rating,
@@ -2545,7 +2545,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets the parameters for an Attack Check to be rolled by this Character, accounting for the provided options.
     * @param {AttackCheckOptions} options - Options for the Check.
-    * @returns {AttackCheckParameters} - Parameters for the check, calculated from the provided options.
+    * @returns {AttackCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getAttackCheckParameters(options) {
       // Initialize check parameters
@@ -2603,7 +2603,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets conditional messages to that apply to a specific Attack Check.
     * @param {AttackCheckParameters} parameters - Parameters of the Check to get messages for.
-    * @returns {string[]|boolean} - Array of messages to attach to the check, if any, or false if there are none.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any, or false if there are none.
     * @private
     */
    _getAttackCheckMessages(parameters) {
@@ -2731,7 +2731,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for a Casting Check.
     * @param {object} options - Options for the Check.
-    * @returns {boolean} - Whether the check options were valid.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateCastingCheckOptions(options) {
       // Ensure options were provided
@@ -2768,7 +2768,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Populates Casting Check Options with this Character's specific data, unless specific overrides were applied.
     * @param {object} options - Options for the Check.
-    * @returns {CastingCheckOptions} - The new, fully-populated Casting Check Options.
+    * @returns {CastingCheckOptions} The new, fully-populated Casting Check Options.
     */
    initializeCastingCheckOptions(options) {
       const checkOptions = createCastingCheckOptions(options);
@@ -2877,7 +2877,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} skill - The Skill being used for the check.
     * @param {string} tradition - The Tradition of the spell.
     * @param {string[]} customTraits - The camel-case names of the Custom Traits associated with the spell.
-    * @returns {number} - The modifier to apply to this aspect of the check.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getCastingCheckMod(
       modifierType,
@@ -2956,7 +2956,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets the parameters for a Casting Check to be rolled by this Character, accounting for the provided options.
     * @param {CastingCheckOptions} options - Options for the Check.
-    * @returns {CastingCheckParameters} - Parameters for the check, calculated from the provided options.
+    * @returns {CastingCheckParameters} Parameters for the check, calculated from the provided options.
     */
    getCastingCheckParameters(options) {
       // Initialize check parameters
@@ -3041,7 +3041,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets conditional messages to that apply to a specific Casting Check.
     * @param {CastingCheckParameters} parameters - Parameters of the Check to get messages for.
-    * @returns {string[]|boolean} - Array of messages to attach to the check, if any, or false if there are none.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any, or false if there are none.
     * @private
     */
    _getCastingCheckMessages(parameters) {
@@ -3163,7 +3163,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for an Item Check.
     * @param {object} options - Options for the Check.
-    * @returns {boolean} - Whether the check options were valid.
+    * @returns {boolean} Whether the check options were valid.
     */
    validateItemCheckOptions(options) {
       // Ensure options were provided
@@ -3200,7 +3200,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Populates Item Check Options with this Character's specific data, unless specific overrides were applied.
     * @param {object} options - Options for the Check.
-    * @returns {ItemCheckOptions} - The new, fully-populated Item Check Options.
+    * @returns {ItemCheckOptions} The new, fully-populated Item Check Options.
     */
    initializeItemCheckOptions(options) {
       const checkOptions = createItemCheckOptions(options);
@@ -3305,7 +3305,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} attribute - The Attribute being used for the check.
     * @param {string} skill - The Skill being used for the check.
     * @param {string[]} customTraits - The camel-case names of the Custom Traits associated with the item.
-    * @returns {number} - The modifier to apply to this aspect of the check.
+    * @returns {number} The modifier to apply to this aspect of the check.
     */
    getItemCheckMod(
       modifierType,
@@ -3376,7 +3376,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets the parameters for an Item Check to be rolled by this Character, accounting for the provided options.
     * @param {ItemCheckOptions} options - Options for the Check.
-    * @returns {ItemCheckParameters} - Parameters for the check, calculated from the provided options.
+    * @returns {ItemCheckParameters} Parameters for the check, calculated from the provided options.
     * @private
     */
    getItemCheckParameters(options) {
@@ -3437,7 +3437,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets conditional messages to that apply to a specific Item Check.
     * @param {ItemCheckParameters} parameters - Parameters of the Check to get messages for.
-    * @returns {string[]|boolean} - Array of messages to attach to the check, if any, or false if there are none.
+    * @returns {string[]|boolean} Array of messages to attach to the check, if any, or false if there are none.
     * @private
     */
    _getItemCheckMessages(parameters) {
@@ -3530,7 +3530,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     *    modifier type.
     * @param {string} selector - The type of condition for modifying the check (any, attribute, trait, etc.).
     * @param {string} key - The specific result of the condition for modifying the check (body, melee, etc.).
-    * @returns {number} - The mod to apply to the requested check.
+    * @returns {number} The mod to apply to the requested check.
     * @private
     */
    _getConditionalCheckModsForSelectorKey(
@@ -3557,7 +3557,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     *    modifier type.
     * @param {string} selector - The type of condition for modifying the check (trait, customTrait.).
     * @param {*[]} keys - Array of keys to test against.
-    * @returns {number} - The mod to apply to the requested check.
+    * @returns {number} The mod to apply to the requested check.
     * @private
     */
    _getConditionalCheckModsForSelectorKeys(
@@ -3588,7 +3588,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {object} categoryMessages - Messages that apply to a specific category of checks.
     * @param {string} selector - Desired Selector value to filter for.
     * @param {string} key - Desired Key value to filter for.
-    * @returns {string[]|boolean} - Array of messages whose Selector and Key values match those provided, or false if
+    * @returns {string[]|boolean} Array of messages whose Selector and Key values match those provided, or false if
     *    there were no natches.
     * @private
     */
@@ -3615,7 +3615,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {object} categoryMessages - Messages that apply to a specific category of checks.
     * @param {string} selector - Desired Selector value to filter for.
     * @param {string[]} keys - Array of desired Key values to filter for.
-    * @returns {string[]|boolean} - Array of messages whose Selector and Key values match those provided, or false if
+    * @returns {string[]|boolean} Array of messages whose Selector and Key values match those provided, or false if
     *    there were no natches.
     * @private
     */
@@ -3875,7 +3875,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Handles automatically expending Resolve for a Check.
     * @param {ItemCheckParameters} parameters - Parameters for the Check.
-    * @returns {Promise<void>} - Returns after the Resolve has been expended.
+    * @returns {Promise<void>} Returns after the Resolve has been expended.
     * @private
     */
    async _expendCheckResolve(parameters) {
@@ -3906,7 +3906,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Takes a pre-initialized check, rolls it, and sends it to chat, expending resolve as appropriate.
     * @param {TitanCheck} check - The check to send to chat.
     * @param {string[]} messages - Messages to attach to the check.
-    * @returns {ChatMessage} - The chat message being sent.
+    * @returns {ChatMessage} The chat message being sent.
     * @private
     */
    async _rollCheck(check, messages) {
@@ -3924,7 +3924,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Applies Damage to the Character.
     * @param {number} damage - Amount of Damage to apply.
     * @param {DamageOptions} [options] - Options for applying the Damage.
-    * @returns {Promise<DamageReport|void>} - Results of applying the Damage.
+    * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
       if (this.parent.isOwner && damage > 0) {
@@ -4030,7 +4030,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {number} staminaLost - The amount of Stamina lost.
     * @param {number} [woundsSuffered] - The number of Wounds suffered, if any.
     * @param {object} [options] - The options for the Damage.
-    * @returns {DamageReport} - Populated data for the report.
+    * @returns {DamageReport} Populated data for the report.
     * @private
     */
    _createDamageReportData(
@@ -4110,7 +4110,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Applies Healing to the character.
     * @param {number} healing - Amount of Healing to apply.
     * @param {HealingOptions} [options] - Options for restoring the Stamina.
-    * @returns {Promise<HealingReport|void>} - Results of applying the Healing.
+    * @returns {Promise<HealingReport|void>} Results of applying the Healing.
     */
    async applyHealing(healing, options) {
       if (healing > 0 && this.parent.isOwner) {
@@ -4154,7 +4154,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Initializes data for a report detailing Healing applied to this character.
     * @param {number} staminaRestored - The amount of Stamina Healed.
-    * @returns {HealingReport} - Populated data for the report.
+    * @returns {HealingReport} Populated data for the report.
     * @private
     */
    _createHealingReportData(staminaRestored) {
@@ -4185,7 +4185,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Restores the Character's Resolve.
     * @param {number} resolveRestored - Amount of Resolve to restore.
     * @param {RestoreResolveOptions} [options] - Options for restoring the Resolve.
-    * @returns {Promise<void>} - Returns after the Resolve has been restored.
+    * @returns {Promise<void>} Returns after the Resolve has been restored.
     */
    async regainResolve(resolveRestored, options) {
       if (resolveRestored > 0 && this.parent.isOwner) {
@@ -4212,7 +4212,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Spends the Character's Resolve.
     * @param {number} resolveSpent - Amount of Resolve to spend.
     * @param {SpendResolveOptions} [options] - Options for restoring the Resolve.
-    * @returns {Promise<SpendResolveReport|void>} - Results of spending Resolve, or void if none was spent.
+    * @returns {Promise<SpendResolveReport|void>} Results of spending Resolve, or void if none was spent.
     */
    async spendResolve(resolveSpent, options) {
       if (resolveSpent > 0 && this.parent.isOwner) {
@@ -4254,7 +4254,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Initializes data for a report detailing Resolve spent by the character.
     * @param {number} resolveSpent - The amount of Resolve spent.
     * @param {number} initialResolve - The initial Resolve held by this character.
-    * @returns {SpendResolveReport} - Populated data for the report.
+    * @returns {SpendResolveReport} Populated data for the report.
     * @private
     */
    _createSpendResolveReportData(resolveSpent, initialResolve) {
@@ -4282,7 +4282,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Rends the Character's Armor.
     * @param {number} rend - Amount of Rend to apply.
     * @param {RendOptions} [options] - Options for applying the Rend.
-    * @returns {Promise<RendReport|void>} - The result of Rending the Armor, or void if no rend was applied.
+    * @returns {Promise<RendReport|void>} The result of Rending the Armor, or void if no rend was applied.
     */
    async applyRend(rend, options) {
       if (rend > 0 && this.parent.isOwner) {
@@ -4340,7 +4340,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Initializes data for a report detailing Rend applied to this character.
     * @param {number} armorLost - The amount of Armor lost.
     * @param {TitanItem} armor - Reference to the Armor being Rent.
-    * @returns {RendReport} - Populated data for the report.
+    * @returns {RendReport} Populated data for the report.
     * @private
     */
    _createRendReportData(armorLost, armor) {
@@ -4369,7 +4369,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Repairs the Character's Armor.
     * @param {number} repairs - Amount of repairs to apply.
     * @param {RepairsOptions} [options] - Options for applying the repairs.
-    * @returns {Promise<RepairsReport|void>} - The result of Repairing the Armor, or void if no repairs were applied.
+    * @returns {Promise<RepairsReport|void>} The result of Repairing the Armor, or void if no repairs were applied.
     */
    async applyRepairs(repairs, options) {
       if (repairs > 0 && this.parent.isOwner) {
@@ -4412,7 +4412,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Initializes data for a report detailing Repairs made to the character's Armor.
     * @param {number} armorRepaired - The amount of Armor repaired.
     * @param {TitanItem} armor - Reference to the Armor being Repaired.
-    * @returns {RepairsReport} - Populated data for the report.
+    * @returns {RepairsReport} Populated data for the report.
     * @private
     */
    _createRepairsReportData(armorRepaired, armor) {
@@ -4977,7 +4977,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Retrieves the Effect Report Data for an array of Effect items.
     * @param {TitanItem[]} effectItems - The Effect items to get report data for.
-    * @returns {EffectReportData[]} - Array of objects containing the report data for the effect.
+    * @returns {EffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getEffectReportData(effectItems) {
       return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
@@ -4998,7 +4998,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Retrieves the Effect Report Data for an array of Turn Start or Turn End Effect items.
     * @param {TitanItem[]} effectItems - The Effect items to get report data for.
-    * @returns {TurnEffectReportData[]} - Array of objects containing the report data for the effect.
+    * @returns {TurnEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getTurnEffectReportData(effectItems) {
       return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
@@ -5020,7 +5020,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Retrieves the Effect Report Data for an array of Initiative Effect items.
     * @param {TitanItem[]} effectItems - The Effect items to get report data for.
-    * @returns {InitiativeEffectReportData[]} - Array of objects containing the report data for the effect.
+    * @returns {InitiativeEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getInitiativeEffectReportData(effectItems) {
       return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
@@ -5043,7 +5043,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Retrieves the Effect Report Data for an array of Custom Effect items.
     * @param {TitanItem[]} effectItems - The Effect items to get report data for.
-    * @returns {CustomEffectReportData[]} - Array of objects containing the report data for the effect.
+    * @returns {CustomEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getCustomEffectReportData(effectItems) {
       return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
@@ -5097,7 +5097,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Calculate the healing and damage that should be applied to a Character at the Start or End of their turn.
     * @param {object} reportData - Object for storing any necessary data for a message report.
     * @param {string} selector - Used to determine whether we are checking for turnStart Effects, or turnEnd Effects.
-    * @returns {Promise<boolean>} - Returns true if the actor should be updated.
+    * @returns {Promise<boolean>} Returns true if the actor should be updated.
     * @private
     */
    async _calculateTurnHealingAndDamage(reportData, selector) {
@@ -5199,7 +5199,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Calculates how much Resolve to regain at the start of the Character's turn.
     * @param {object} reportData - Object for storing any necessary data for a message report.
-    * @returns {Promise<boolean>} - Returns true if the actor should be updated.
+    * @returns {Promise<boolean>} Returns true if the actor should be updated.
     * @private
     */
    async _calculateResolveRegain(reportData) {
@@ -5372,7 +5372,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets the Armor item equipped by this Character, if any is equipped.
-    * @returns {TitanItem|boolean} - The equipped Armor item, or false if no Armor is equipped.
+    * @returns {TitanItem|boolean} The equipped Armor item, or false if no Armor is equipped.
     */
    getEquippedArmor() {
       const armor = this.equipped.armor;
@@ -5426,7 +5426,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets the Shield item equipped by this Character, if any is equipped.
-    * @returns {TitanItem|boolean} - The equipped Shield item, or false if no Shield is equipped.
+    * @returns {TitanItem|boolean} The equipped Shield item, or false if no Shield is equipped.
     */
    getShield() {
       const shield = this.equipped.shield;
@@ -5544,7 +5544,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets an Initiative roll for this character.
-    * @returns {Promise<Roll>} - The Initiative roll for this actor.
+    * @returns {Promise<Roll>} The Initiative roll for this actor.
     */
    async getInitiativeRoll() {
       // Calculate the initiative value
@@ -5558,7 +5558,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Retrieves the user ID to associate with turn reports. This is the UD of the Best Player Owner.
-    * @returns {string} - The ID of the user to associate with Turn Reports.
+    * @returns {string} The ID of the user to associate with Turn Reports.
     * @private
     */
    _getTurnReportUserID() {
@@ -5568,7 +5568,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Calculates the total amount of XP spent by the Character.
-    * @returns {number} - The total amount of XP spent.
+    * @returns {number} The total amount of XP spent.
     */
    _getSpentXP() {
       // Calculate the amount of XP spent=
@@ -5598,7 +5598,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Calculates the total XP cost for an Attribute at a given rank.
     * @param {number} value - The rank of the Attribute.
-    * @returns {number} - The total XP cost of the Attribute.
+    * @returns {number} The total XP cost of the Attribute.
     */
    _calculateAttributeXPCost(value) {
       // Attribute Cost starts at 2 for rank 2, and increases by consecutive odd integers, starting with 5
@@ -5617,7 +5617,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Calculates the total XP cost for a Skill at a given rank.
     * @param {number} value - The rank of the Skill.
-    * @returns {number} - The total XP cost of the Skill.
+    * @returns {number} The total XP cost of the Skill.
     */
    _calculateSkillXPCost(value) {
       // Skill Cost starts at 1 for rank 1, and increases by consecutive even integers, starting with 2
@@ -5635,7 +5635,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Creates a dialog for adding an item to this Character's inventory.
-    * @returns {Promise<Application>} - The newly created dialog.
+    * @returns {Promise<Application>} The newly created dialog.
     */
    async addInventoryItem() {
       if (this.parent.isOwner) {

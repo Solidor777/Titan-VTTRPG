@@ -3,9 +3,9 @@ import CreateItemMacroDialog from '~/document/types/item/dialog/CreateItemMacroD
 /**
  * Called when an object is dropped on the user's Hotbar.
  * @param {Hotbar} hotbar - The hotbar the object was dropped on.
- * @param {data} data - The Document this sheet is for.ata extracted from the drop event.
+ * @param {object} data - The data extracted from the drop event.
  * @param {number} slot - The hotbar slot that the item was dropped on.
- * @returns {boolean|void} - Returns Void if the default action should be performed. Otherwise, returns False.
+ * @returns {boolean|void} Returns void if the default action should be performed. Otherwise, returns false.
  */
 export default function onHotbarDrop (hotbar, data, slot) {
    // Ensure the object is an item

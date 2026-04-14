@@ -6,7 +6,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Data model with extra functionality for Commodities.
- * @extends TitanDataModel
+ * @extends {TitanItemDataModel}
  */
 export default class CommodityDataModel extends TitanItemDataModel {
    _getDefaultName() {

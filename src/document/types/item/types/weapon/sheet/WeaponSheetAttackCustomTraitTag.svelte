@@ -2,10 +2,10 @@
    import { getContext } from 'svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
-   /** @type {number} - The idx of the Attack in the Attacks array. */
+   /** @type {number} The idx of the Attack in the Attacks array. */
    export let attackIdx = void 0;
 
-   /** @type {number} - The idx of the Trait in the Custom Traits array. */
+   /** @type {number} The idx of the Trait in the Custom Traits array. */
    export let traitIdx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

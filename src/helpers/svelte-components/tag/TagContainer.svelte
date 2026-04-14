@@ -4,12 +4,12 @@
    /**
     * @typedef {object} Tag
     * Object used to store data for a Tag.
-    * @property {*} id - Identifier to use for ordering the tags.
-    * @property {SvelteComponent} component - Component to use for this tag.
-    * @property {object} props - Props to use with the component.
+    * @property {*} id Identifier to use for ordering the tags.
+    * @property {SvelteComponent} component Component to use for this tag.
+    * @property {object} props Props to use with the component.
     */
 
-   /** @type Tag List of tags to place in the container */
+   /** @type {Tag} List of tags to place in the container */
    export let tags = void 0;
 </script>
 <!--Tag Container-->

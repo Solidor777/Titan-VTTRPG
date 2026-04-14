@@ -3,7 +3,7 @@
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type TitanActorSheet Actor Sheet Reference. */
+   /** @type {TitanActorSheet} Actor Sheet Reference. */
    const application = getApplication();
 
    /** Unlinks this Actor from their Token. */

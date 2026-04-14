@@ -13,22 +13,22 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} - The ID of the item to get the check from. */
+   /** @type {string} The ID of the item to get the check from. */
    export let itemId = void 0;
 
-   /** @type {number} - The index of the check in the checks array. */
+   /** @type {number} The index of the check in the checks array. */
    export let checkIdx = void 0;
 
-   /** @type ItemCheckOptions Options for the check. */
+   /** @type {ItemCheckOptions} Options for the check. */
    const checkOptions = {
       itemId: itemId,
       checkIdx: checkIdx
    };
 
-   /** @type {boolean} - Whether to automatically spend the resolve for checks. */
+   /** @type {boolean} Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
-   /** @type ItemCheckParameters Calculated item check parameters. */
+   /** @type {ItemCheckParameters} Calculated item check parameters. */
    let checkParameters;
 
    // Update the svelte-components in response to changes

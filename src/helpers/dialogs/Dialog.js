@@ -5,16 +5,13 @@ import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
- * Base dialog class with system specific functionality.
- * @param {object} options - Options for the dialog window.
- * @extends TJSDialog
+ * Base dialog class with system-specific functionality.
+ * @extends {TJSDialog}
  */
 export default class TitanDialog extends TJSDialog {
 
    /**
-    * Base dialog class with system specific functionality.
     * @param {object} options - Options for the dialog window.
-    * @extends TJSDialog
     */
    constructor(options) {
       // Add default classes
@@ -39,7 +36,7 @@ export default class TitanDialog extends TJSDialog {
 
    /**
     * Default Application options.
-    * @returns {object} - Options - Application options.
+    * @returns {object} Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions() {

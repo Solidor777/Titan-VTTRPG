@@ -7,10 +7,10 @@
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type {string} - The Resource that this component represents. */
+   /** @type {string} The Resource that this component represents. */
    export let resource = void 0;
 
-   /** @type {string} - The Icon that represents this stat. */
+   /** @type {string} The Icon that represents this stat. */
    export let icon = getIcon(resource);
 
    /** @type {object} Reference to the reactive Document store. */

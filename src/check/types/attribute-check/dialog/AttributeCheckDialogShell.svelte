@@ -15,7 +15,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
 
-   /** @type TitanActor The Actor that will roll the Check. */
+   /** @type {TitanActor} The Actor that will roll the Check. */
    export let actor = void 0;
 
    /** @type {object} Reference to the Check Options store. */
@@ -24,7 +24,7 @@
    /** @type {object} Reference to calculated Check Parameters Store. */
    const checkParameters = getContext('checkParameters');
 
-   /** @type AttributeCheckDialog The Svelte Component's Application. */
+   /** @type {AttributeCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
    /** @type {*[]} Components for changing the options and displaying the parameters. */
@@ -42,7 +42,7 @@
       CheckDialogTotalExpertiseSummary,
    ];
 
-   /** @type Function Called when the check becomes invalid. */
+   /** @type {Function} Called when the check becomes invalid. */
    function onCheckInvalid() {
       ui.notifications.info(localize('attributeCheckNoLongerValid'));
       game.titan.warn(
@@ -53,7 +53,7 @@
       application.close();
    }
 
-   /** @type Function Called when the Roll button is clicked. */
+   /** @type {Function} Called when the Roll button is clicked. */
    function onRoll() {
       if (actor?.system.validateAttributeCheckOptions($checkOptions)) {
          actor.system.rollAttributeCheck($checkOptions);

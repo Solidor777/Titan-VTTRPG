@@ -3,7 +3,7 @@
    import { SEND_TO_CHAT_ICON } from '~/system/Icons.js';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type Item The Item this button is for. */
+   /** @type {Item} The Item this button is for. */
    export let item = void 0;
 </script>
 

@@ -3,8 +3,7 @@ import calculateCastingCheckResults from '~/check/types/casting-check/CastingChe
 
 /**
  * Class for creating and calculating the result of a Casting Check.
- * @param {CastingCheckParameters} parameters - Parameters for the Check.
- * @extends TitanCheck
+ * @extends {TitanCheck}
  */
 export default class CastingCheck extends TitanCheck {
 
@@ -15,13 +14,18 @@ export default class CastingCheck extends TitanCheck {
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCastingCheckResults}.
     * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
-    * @returns {CastingCheckResults} - The final results of the check.
+    * @returns {CastingCheckResults} The final results of the check.
     * @protected
     */
    _calculateResults(diceResults) {
       return calculateCastingCheckResults(diceResults, this.parameters);
    }
 
+   /**
+    * @returns {string} The check type identifier.
+    * @protected
+    * @override
+    */
    _getCheckType() {
       return 'castingCheck';
    }

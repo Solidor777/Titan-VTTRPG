@@ -18,7 +18,7 @@
 /**
  * Creates a Resistance Check Parameters object, based off the provided input.
  * @param {ResistanceCheckOptions} options - Fully populated Resistance Check Options.
- * @returns {ResistanceCheckParameters} - The new Resistance Check Parameters.
+ * @returns {ResistanceCheckParameters} The new Resistance Check Parameters.
  */
 export default function createResistanceCheckParameters(options) {
    return {

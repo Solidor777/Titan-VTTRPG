@@ -14,7 +14,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
 /**
  * Data model with extra functionality for Spells.
- * @extends TitanDataModel
+ * @extends {TitanItemDataModel}
  */
 export default class SpellDataModel extends TitanItemDataModel {
    _getDefaultName() {

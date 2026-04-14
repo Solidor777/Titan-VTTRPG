@@ -3,7 +3,7 @@
    import { getContext } from 'svelte';
    import ToggleButton from '~/helpers/svelte-components/button/ToggleButton.svelte';
 
-   /** @type TitanItem The Item this component belongs to. */
+   /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

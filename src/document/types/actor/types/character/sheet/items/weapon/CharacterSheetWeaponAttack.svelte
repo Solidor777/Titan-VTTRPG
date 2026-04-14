@@ -21,7 +21,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} - The ID of the item to get the check from. */
+   /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
    // Reference to the attack idx

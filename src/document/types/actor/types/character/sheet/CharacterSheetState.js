@@ -2,19 +2,21 @@ import { writable } from 'svelte/store';
 import createCharacterSheetData from '~/document/types/actor/types/character/sheet/CharacterSheetData.js';
 
 /**
- * @typedef {import('svelte/store').Writable<CharacterSheetData>} CharacterSheetState - The custom reactive store for
+ * @typedef {import('svelte/store').Writable<CharacterSheetData>} CharacterSheetState The custom reactive store for
  *    managing a Character Sheet.
  * @property {import('svelte/store').Writable<CharacterSheetData>['set']} set
  * @property {import('svelte/store').Writable<CharacterSheetData>['update']} update
  * @property {import('svelte/store').Writable<CharacterSheetData>['subscribe']} subscribe
- * @property {Function} postAddItem - Updates the reactive state store in response to an Item being added.
- * @property {Function} preDeleteItem - Updates the reactive state store in response to an Item being deleted.
+ * @property {(item: TitanItem) => void} postAddItem Updates the reactive state store in response to an Item being
+ *    added.
+ * @property {(item: TitanItem) => void} preDeleteItem Updates the reactive state store in response to an Item being
+ *    deleted.
  */
 
 /**
- * Creates a reactive state store for a Character sheet.
+ * Creates a reactive state store for a Character Sheet.
  * @param {TitanActor} actor - The Actor this sheet belongs to.
- * @returns {CharacterSheetState} - The newly created Character Sheet Store.
+ * @returns {CharacterSheetState} The newly created Character Sheet State.
  */
 export default function createCharacterSheetState(actor) {
    /** @type {import('svelte/store').Writable<CharacterSheetData>} */

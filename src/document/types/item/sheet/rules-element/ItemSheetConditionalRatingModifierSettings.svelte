@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
@@ -13,76 +12,31 @@
    import { DELETE_ICON } from '~/system/Icons.js';
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
+   import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
-   /**@type {object} Reference to the reactive Document store. */
+   /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /**@type {object} Reference to the Rules Element object. */
+   /** @type {object} Reference to the Rules Element object. */
    $: element = $document?.rulesElement[idx];
 
-   // Rating optiions
-   const ratingOptions = [
-      {
-         label: localize('melee'),
-         value: 'melee',
-      },
-      {
-         label: localize('accuracy'),
-         value: 'accuracy',
-      },
-      {
-         label: localize('defense'),
-         value: 'defense',
-      },
-   ];
+   /** @type {string[]} Options for selecting which rating the conditional modifier applies to. */
+   const ratingOptions = ['melee', 'accuracy', 'defense'];
 
-   const defenseSelectorOptions = [
-      {
-         label: localize('armorTrait'),
-         value: 'armorTrait',
-      },
-      {
-         label: localize('shieldTrait'),
-         value: 'shieldTrait',
-      },
-      {
-         label: localize('customArmorTrait'),
-         value: 'customArmorTrait',
-      },
-      {
-         label: localize('customShieldTrait'),
-         value: 'customShieldTrait',
-      },
-   ];
+   /** @type {string[]} Options for selecting the defense-related condition for the modifier. */
+   const defenseSelectorOptions = ['armorTrait', 'shieldTrait', 'customArmorTrait', 'customShieldTrait'];
 
-   const attackSelectorOptions = [
-      {
-         label: localize('attackTrait'),
-         value: 'attackTrait',
-      },
-      {
-         label: localize('attackType'),
-         value: 'attackType',
-      },
-      {
-         label: localize('customWeaponTrait'),
-         value: 'customWeaponTrait',
-      },
-      {
-         label: localize('multiAttack'),
-         value: 'multiAttack',
-      },
-   ];
+   /** @type {string[]} Options for selecting the attack-related condition for the modifier. */
+   const attackSelectorOptions = ['attackTrait', 'attackType', 'customWeaponTrait', 'multiAttack'];
 
-   // Updates the key when the selector changes
    /**
-    *
+    * Updates the element's key to a sensible default when the selector changes.
     */
    function onSelectorChange() {
-      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          switch (element.selector) {
             case 'armorTrait':
             case 'shieldTrait': {
@@ -115,9 +69,8 @@
       }
    }
 
-   // Updates the selector when the rating changes
    /**
-    *
+    * Updates the element's selector to a sensible default when the rating changes.
     */
    function onRatingChange() {
       switch (element.rating) {
@@ -135,7 +88,8 @@
    }
 
    /**
-    *
+    * Returns the appropriate Svelte input component for the current selector type.
+    * @returns {object} The Svelte component to use for the key field.
     */
    function getSelector() {
       switch (element.selector) {

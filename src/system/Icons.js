@@ -145,7 +145,7 @@ const ICON_MAP = deepFreeze({
 /**
  * Gets the Icon for a concept from the concept map.
  * @param {string} concept - The concept to get the icon for.
- * @returns {string} - The icon class for the provided constant.
+ * @returns {string} The icon class for the provided constant.
  */
 export function getIcon(concept) {
    return ICON_MAP[concept];

@@ -6,7 +6,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * Extends the base Item class to implement additional system-specific logic for Titan.
  * @extends {BaseItem}
- * @property {TitanItemSheet} sheet - The Sheet that represents this Item.
+ * @property {TitanItemSheet} sheet The Sheet that represents this Item.
  */
 export default class TitanItem extends Item {
 
@@ -32,7 +32,7 @@ export default class TitanItem extends Item {
 
    /**
     * Creates a Chat Message containing this item's data and sends it to chat.
-    * @returns {Promise<ChatMessage>} - The newly created Chat Message.
+    * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat() {
       // Create the context object
@@ -107,7 +107,6 @@ export default class TitanItem extends Item {
     */
    async addCheck() {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
-         // Update document
          this.system.check.push(createItemCheckTemplate());
          await this.update({
             system: {
@@ -115,7 +114,7 @@ export default class TitanItem extends Item {
             }
          });
 
-         // Broadcast delegates
+         // Notify the sheet of the added check.
          if (this.sheet) {
             this.sheet.postAddCheck();
          }
@@ -124,17 +123,16 @@ export default class TitanItem extends Item {
 
    /**
     * Removes a Check from this item.
-    * @param {number} idx - The Idx of the Check in this item's Checks array.
+    * @param {number} idx - The index of the Check in this item's Checks array.
     * @returns {Promise<void>}
     */
    async deleteCheck(idx) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
-         // Update sheet
+         // Notify the sheet before deletion.
          if (this.sheet) {
             this.sheet.preDeleteCheck(idx);
          }
 
-         // Update document
          this.system.check.splice(idx, 1);
          await this.update({
             system: {
@@ -157,7 +155,7 @@ export default class TitanItem extends Item {
 
    /**
     * Creates a dialog for editing an existing Custom Trait belonging to this item.
-    * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
+    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
     * @returns {void}
     */
    editCustomTrait(traitIdx) {
@@ -169,7 +167,7 @@ export default class TitanItem extends Item {
 
    /**
     * Removes a Custom Trait from this item.
-    * @param {number} traitIdx - The Idx of the Custom Trait in this item's Custom Traits array.
+    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
     * @returns {Promise<void>}
     */
    async deleteCustomTrait(traitIdx) {
@@ -186,7 +184,7 @@ export default class TitanItem extends Item {
    /**
     * Marks the item as being deleted before actually deleting the item
     * so that asynchronous update operations will not apply.
-    * @returns {Promise<void|boolean>} Returns false if the deletion failed.
+    * @returns {Promise<void|boolean>} Resolves once the item is deleted, or false if the deletion could not proceed.
     */
    async safeDelete() {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)

@@ -2,15 +2,16 @@ import createWeaponSheetData from '~/document/types/item/types/weapon/sheet/Weap
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
 
 /**
- * @typedef {RulesElementItemSheetState} WeaponSheetState - A custom reactive store for managing a Weapon Sheet.
- * @property {Function} postAddAttack - Updates the reactive state store in response to an Attack being added.
- * @property {Function} postDeleteAttack - Updates the reactive state store in response to an Attack being deleted.
+ * @typedef {RulesElementItemSheetState} WeaponSheetState A custom reactive store for managing a Weapon Sheet.
+ * @property {() => void} addAttack Updates the reactive state store in response to an Attack being added.
+ * @property {(idx: number) => void} postDeleteAttack Updates the reactive state store in response to an Attack being
+ *    deleted.
  */
 
 /**
  * Creates a reactive state store for a Weapon Sheet.
  * @param {TitanItem} item - The item we are creating the sheet state for.
- * @returns {WeaponSheetState} - The newly created Weapon Sheet State.
+ * @returns {WeaponSheetState} The newly created Weapon Sheet State.
  */
 export default function createWeaponSheetState(item) {
    /** @type {import('svelte/store').Writable<WeaponSheetData>} */
@@ -20,7 +21,7 @@ export default function createWeaponSheetState(item) {
             subscribe,
             postAddCheck,
             preDeleteCheck,
-         } = createRulesElementItemSheetState(item, /** @type RulesElementItemSheetData */ createWeaponSheetData(item));
+         } = createRulesElementItemSheetState(item, createWeaponSheetData(item));
 
    /**
     * Updates the reactive state store in response to an Attack being added.
@@ -35,7 +36,7 @@ export default function createWeaponSheetState(item) {
 
    /**
     * Updates the reactive state store in response to an Attack being deleted.
-    * @param {number} idx - The idx of the Attack that is about to be deleted.
+    * @param {number} idx - The index of the Attack about to be deleted.
     */
    function postDeleteAttack(idx) {
       update((data) => {

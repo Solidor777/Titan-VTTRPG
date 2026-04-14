@@ -8,7 +8,7 @@ import calculateResistanceCheckResults from '~/check/types/resistance-check/Resi
 /**
  * Takes a completed Check Chat Message and returns the new results in response to changes in the dice or parameters.
  * @param {object} checkChatMessage - The Check Chat Message to recalculate the results for.
- * @returns {CheckResults} - The new results in response to changes in the dice or parameters.
+ * @returns {CheckResults} The new results in response to changes in the dice or parameters.
  */
 export default function recalculateCheckResults(checkChatMessage) {
    // Initialize results
