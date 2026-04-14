@@ -1,5 +1,6 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import { INVENTORY_ITEM_TYPES } from '~/system/InventoryItemTypes.js';
 
    /** @type {string} The value that this input should modify. */
    export let value = void 0;
@@ -16,14 +17,8 @@
     */
    export let tooltip = void 0;
 
-   /** @type {SelectOption[]} Options for the Select Svelte component. */
-   const options = [
-      'armor',
-      'commodity',
-      'equipment',
-      'shield',
-      'weapon',
-   ];
+   /** @type {string[]}  Options for the Select Svelte component. */
+   const options = structuredClone(INVENTORY_ITEM_TYPES);
 
    // Add none option if appropriate.
    if (allowNone) {

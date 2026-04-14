@@ -13,9 +13,6 @@
    import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
    import error from '~/helpers/utility-functions/Error.js';
 
-   /** @type {boolean} Whether to allow None as an option. */
-   export let allowNone = false;
-
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
@@ -40,7 +37,7 @@
     */
    async function onRulesElementOperationChanged() {
       if ($document && idx < $document?.system.rulesElement.length) {
-         switch ($document.system.rulesElement[idx]) {
+         switch ($document.system.rulesElement[idx].operation) {
             case 'flatModifier': {
                $document.system.rulesElement[idx] = createFlatModifierElement($document.system.rulesElement[idx]);
                break;
@@ -92,8 +89,7 @@
 </script>
 
 <RulesElementOperationSelect
-   {allowNone}
-   bind:value={$document.system.rulesElement[idx]}
+   bind:value={$document.system.rulesElement[idx].operation}
    disabled={disabled || !$document?.isOwner}
    on:change={()=> onRulesElementOperationChanged()}
    {tooltip}

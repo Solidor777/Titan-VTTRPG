@@ -26,7 +26,8 @@
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   $: element = $document?.rulesElement[idx];
+   let element;
+   $: element = $document?.system.rulesElement[idx];
 
    // Selector options
    const selectorOptions = [

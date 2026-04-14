@@ -13,10 +13,6 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class ArmorDataModel extends RulesElementItemDataModel {
-   _getDefaultName() {
-      return localize('newArmor');
-   }
-
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -38,18 +34,22 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
-   _getDefaultImage() {
-      return ARMOR_IMAGE;
-   }
-
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
       retVal.value = this.value;
-      retVal.armor = foundry.utils.deepClone(this.armor);
-      retVal.trait = foundry.utils.deepClone(this.trait);
+      retVal.armor = foundry.utils.structuredClone(this.armor);
+      retVal.trait = foundry.utils.structuredClone(this.trait);
 
       return retVal;
+   }
+
+   _getDefaultImage() {
+      return ARMOR_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newArmor');
    }
 
    /**

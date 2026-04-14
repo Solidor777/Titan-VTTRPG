@@ -18,7 +18,7 @@
    export let tooltip = void 0;
 
    /** @type {string[]} Options for the Select Svelte component. */
-   const options = SKILLS;
+   const options = structuredClone(SKILLS);
 
    // Add none option if appropriate.
    if (allowNone) {

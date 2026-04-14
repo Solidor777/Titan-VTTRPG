@@ -4,25 +4,10 @@
    import { slide } from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import ItemSheetFlatModifierSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetFlatModifierSettings.svelte';
-   import ItemSheetMulBaseSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte';
-   import ItemSheetTurnMessageSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetTurnMessageSettings.svelte';
-   import ItemSheetFastHealingSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetFastHealingSettings.svelte';
-   import ItemSheetPersistentDamageSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetPersistentDamageSettings.svelte';
-   import ItemSheetRollMessageSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetRollMessageSettings.svelte';
-   import ItemSheetConditionaRatingModifierSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetConditionalRatingModifierSettings.svelte';
-   import ItemSheetConditionaCheckModifierSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte';
-   import ItemSheetInvalidRulesElement
-      from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
+   import ItemSheetRulesElementSettings
+      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementSettings.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -30,82 +15,8 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   const operationOptions = [
-      {
-         label: localize('flatModifier'),
-         value: 'flatModifier',
-      },
-      {
-         label: localize('mulBase'),
-         value: 'mulBase',
-      },
-      {
-         label: localize('fastHealing'),
-         value: 'fastHealing',
-      },
-      {
-         label: localize('persistentDamage'),
-         value: 'persistentDamage',
-      },
-      {
-         label: localize('turnMessage'),
-         value: 'turnMessage',
-      },
-      {
-         label: localize('rollMessage'),
-         value: 'rollMessage',
-      },
-      {
-         label: localize('conditionalRatingModifier'),
-         value: 'conditionalRatingModifier',
-      },
-      {
-         label: localize('conditionalCheckModifier'),
-         value: 'conditionalCheckModifier',
-      },
-   ];
-
-   /**
-    * @param operation
-    */
-   function selectComponent(operation) {
-      switch (operation) {
-         case 'flatModifier': {
-            return ItemSheetFlatModifierSettings;
-         }
-
-         case 'mulBase': {
-            return ItemSheetMulBaseSettings;
-         }
-
-         case 'turnMessage': {
-            return ItemSheetTurnMessageSettings;
-         }
-
-         case 'fastHealing': {
-            return ItemSheetFastHealingSettings;
-         }
-
-         case 'persistentDamage': {
-            return ItemSheetPersistentDamageSettings;
-         }
-
-         case 'rollMessage': {
-            return ItemSheetRollMessageSettings;
-         }
-
-         case 'conditionalRatingModifier': {
-            return ItemSheetConditionaRatingModifierSettings;
-         }
-
-         case 'conditionalCheckModifier': {
-            return ItemSheetConditionaCheckModifierSettings;
-         }
-
-         default: {
-            return ItemSheetInvalidRulesElement;
-         }
-      }
+   for (const element of $document.system.rulesElement) {
+      console.log(element);
    }
 </script>
 
@@ -125,14 +36,7 @@
             <!--Each Element-->
             {#each $document.system.rulesElement as element, idx (element.uuid)}
                <li transition:slide|local>
-                  <svelte:component
-                     this={selectComponent(
-                        $document.system.rulesElement[idx].operation,
-                     )}
-                     {idx}
-                     {element}
-                     {operationOptions}
-                  />
+                  <ItemSheetRulesElementSettings {idx}/>
                </li>
             {/each}
          </ol>
@@ -140,7 +44,7 @@
 
       <!--Add Element Button-->
       <div class="add-entry-button">
-         <Button
+         <DocumentOwnerButton
             on:click={() => {
                $document.system.addRulesElement();
             }}
@@ -155,7 +59,7 @@
                   {localize('addRulesElement')}
                </div>
             </div>
-         </Button>
+         </DocumentOwnerButton>
       </div>
    </ScrollingContainer>
 </div>

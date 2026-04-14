@@ -16,6 +16,10 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class WeaponDataModel extends RulesElementItemDataModel {
+   _getDefaultName() {
+      return localize('newWeapon');
+   }
+
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -43,24 +47,20 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   _getDefaultImage() {
+      return WEAPON_IMAGE;
+   }
+
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
       retVal.value = this.value;
       retVal.equipped = this.equipped;
-      retVal.attack = foundry.utils.deepClone(this.attack);
+      retVal.attack = foundry.utils.structuredClone(this.attack);
       retVal.attackNotes = this.attackNotes;
-      retVal.trait = foundry.utils.deepClone(this.trait);
+      retVal.trait = foundry.utils.structuredClone(this.trait);
 
       return retVal;
-   }
-
-   _getDefaultImage() {
-      return WEAPON_IMAGE;
-   }
-
-   _getDefaultName() {
-      return localize('newWeapon');
    }
 
    /**

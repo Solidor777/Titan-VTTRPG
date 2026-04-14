@@ -18,7 +18,8 @@
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   $: element = $document?.rulesElement[idx];
+   let element;
+   $: element = $document?.system.rulesElement[idx];
 
    // Options for when the turn the message is sent.
    const selectorOptions = [

@@ -80,8 +80,8 @@ export default class TitanItemDataModel extends TitanDataModel {
     */
    getRollData() {
       const retVal = super.getRollData();
-      retVal.check = foundry.utils.deepClone(this.check);
-      retVal.customTrait = foundry.utils.deepClone(this.customTrait);
+      retVal.check = foundry.utils.structuredClone(this.check);
+      retVal.customTrait = foundry.utils.structuredClone(this.customTrait);
 
       return retVal;
    }

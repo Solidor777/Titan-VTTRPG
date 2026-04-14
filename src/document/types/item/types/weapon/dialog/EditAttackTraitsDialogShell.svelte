@@ -1,10 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import {
-      ATTACK_TRAIT_DESCRIPTIONS,
-      ATTACK_TRAITS,
-   } from '~/document/types/item/types/weapon/AttackTraits.js';
+   import { ATTACK_TRAIT_DESCRIPTIONS, ATTACK_TRAITS, } from '~/document/types/item/types/weapon/AttackTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
 
    // The weapon document owning the attack
@@ -16,7 +13,7 @@
    export let attackIdx = void 0;
 
    // Trait options
-   let traitOptions = foundry.utils.deepClone(ATTACK_TRAITS);
+   let traitOptions = foundry.utils.structuredClone(ATTACK_TRAITS);
    let traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 

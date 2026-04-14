@@ -280,24 +280,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       return true;
    }
 
-   prepareDerivedData() {
-      super.prepareDerivedData();
-      this._calculateBaseRatings();
-      this._calculateBaseResistances();
-      this._calculateBaseResources();
-      this._resetDynamicMods();
-      this._applyRulesElements();
-      this._applyConditions();
-      this._applyArmorAndShields();
-      this._applyMods();
-      this._clampResources();
-
-      // Ensure the action queue is initialized
-      if (isCurrentUserBestOwner(this.parent) && !this.parent.actionQueue) {
-         this.parent.actionQueue = new ActionQueue();
-      }
-   }
-
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -452,17 +434,35 @@ export default class CharacterDataModel extends TitanActorDataModel {
       return schema;
    }
 
+   prepareDerivedData() {
+      super.prepareDerivedData();
+      this._calculateBaseRatings();
+      this._calculateBaseResistances();
+      this._calculateBaseResources();
+      this._resetDynamicMods();
+      this._applyRulesElements();
+      this._applyConditions();
+      this._applyArmorAndShields();
+      this._applyMods();
+      this._clampResources();
+
+      // Ensure the action queue is initialized
+      if (isCurrentUserBestOwner(this.parent) && !this.parent.actionQueue) {
+         this.parent.actionQueue = new ActionQueue();
+      }
+   }
+
    getRollData() {
       const retVal = super.getRollData();
-      retVal.attribute = foundry.utils.deepClone(this.attribute);
-      retVal.resistance = foundry.utils.deepClone(this.resistance);
-      retVal.skill = foundry.utils.deepClone(this.skill);
-      retVal.rating = foundry.utils.deepClone(this.rating);
-      retVal.resource = foundry.utils.deepClone(this.resource);
-      retVal.speed = foundry.utils.deepClone(this.speed);
-      retVal.mod = foundry.utils.deepClone(this.mod);
-      retVal.equipped = foundry.utils.deepClone(this.equipped);
-      retVal.bio = foundry.utils.deepClone(this.bio);
+      retVal.attribute = foundry.utils.structuredClone(this.attribute);
+      retVal.resistance = foundry.utils.structuredClone(this.resistance);
+      retVal.skill = foundry.utils.structuredClone(this.skill);
+      retVal.rating = foundry.utils.structuredClone(this.rating);
+      retVal.resource = foundry.utils.structuredClone(this.resource);
+      retVal.speed = foundry.utils.structuredClone(this.speed);
+      retVal.mod = foundry.utils.structuredClone(this.mod);
+      retVal.equipped = foundry.utils.structuredClone(this.equipped);
+      retVal.bio = foundry.utils.structuredClone(this.bio);
 
       return retVal;
    }
@@ -699,7 +699,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
        *    effect).
        */
       function processItemElements(item, type) {
-         const copiedElements = foundry.utils.deepClone(item.system.rulesElement);
+         const copiedElements = foundry.utils.structuredClone(item.system.rulesElement);
          for (const element of copiedElements) {
             element.type = type;
          }
@@ -1776,7 +1776,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this.rollAttributeCheck(options);
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are
+         // If we need to confirm the parameters, the options are valid, and we are
       // an owner
       else {
 
@@ -2019,7 +2019,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this.rollResistanceCheck(options);
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are
+         // If we need to confirm the parameters, the options are valid, and we are
       // an owner
       else {
 
@@ -2191,7 +2191,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this.rollAttackCheck(options);
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are
+         // If we need to confirm the parameters, the options are valid, and we are
       // an owner
       else {
 
@@ -2804,7 +2804,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this.rollCastingCheck(options);
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are
+         // If we need to confirm the parameters, the options are valid, and we are
       // an owner
       else {
 
@@ -3250,7 +3250,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this.rollItemCheck(options);
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are
+         // If we need to confirm the parameters, the options are valid, and we are
       // an owner
       else {
 
@@ -4177,7 +4177,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   woundsSuffered = 3;
                }
 
-               // Otherwise, if the Character has a Stamina deficit >= 5, then
+                  // Otherwise, if the Character has a Stamina deficit >= 5, then
                // they take 2 Wounds
                else if (stamina.value + 2 <= damageTaken) {
                   woundsSuffered = 2;
@@ -5040,7 +5040,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Get turn messages
          const message = this.rulesElementsCache?.turnMessage?.turnStart;
          if (message) {
-            reportData.message = foundry.utils.deepClone(message);
+            reportData.message = foundry.utils.structuredClone(message);
          }
 
          // Update the duration of turn effects
@@ -5100,7 +5100,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
          }
 
-         // Otherwise, add expired effects to the report if we need to show a
+            // Otherwise, add expired effects to the report if we need to show a
          // button for removing them
          else if (expiredEffects && autoRemoveExpiredEffects === 'showButton') {
             reportData.effects = {
@@ -5159,7 +5159,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Get turn messages
          const message = this.rulesElementsCache?.turnMessage?.turnEnd;
          if (message) {
-            reportData.message = foundry.utils.deepClone(message);
+            reportData.message = foundry.utils.structuredClone(message);
          }
 
          // Update the duration of turn effects
@@ -5442,14 +5442,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
                // Add the Fast Healing data
                if (healing > 0) {
-                  reportData.fastHealing = foundry.utils.deepClone(fastHealingElements);
+                  reportData.fastHealing = foundry.utils.structuredClone(fastHealingElements);
                   reportData.fastHealing.total = healing;
                   reportData.fastHealing.confirmed = healingConfirmed;
                }
 
                // Add the Persistent Damage data
                if (damage > 0) {
-                  reportData.persistentDamage = foundry.utils.deepClone(persistentDamageElements);
+                  reportData.persistentDamage = foundry.utils.structuredClone(persistentDamageElements);
                   reportData.persistentDamage.total = damage;
                   reportData.persistentDamage.confirmed = damageConfirmed;
                }

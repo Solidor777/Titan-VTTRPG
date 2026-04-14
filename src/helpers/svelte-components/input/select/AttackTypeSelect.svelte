@@ -13,13 +13,16 @@
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
+
+   /** @type {string[]} Options for the Select Svelte component. */
+   const options = structuredClone(ATTACK_TYPES);
 </script>
 
 <Select
    bind:value
    {disabled}
    on:change
-   options={ATTACK_TYPES}
+   {options}
    {tooltip}
 />
 

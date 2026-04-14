@@ -14,12 +14,14 @@
     */
    export let tooltip = void 0;
 
+   /** @type {string[]}  Options for the Select Svelte component. */
+   const options = structuredClone(RULES_ELEMENT_OPERATIONS);
 </script>
 
 <Select
    bind:value
    {disabled}
    on:change
-   options={RULES_ELEMENT_OPERATIONS}
+   {options}
    {tooltip}
 />

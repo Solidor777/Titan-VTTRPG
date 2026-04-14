@@ -20,7 +20,7 @@ export default class NPCDataModel extends CharacterDataModel {
 
          // Call the parent version of the function without updating the actor
          // or starting a report.
-         const superOptions = options ? foundry.utils.deepClone(options) : {};
+         const superOptions = options ? foundry.utils.structuredClone(options) : {};
          superOptions.updateActor = false;
          superOptions.report = false;
          const reportData = await super.applyDamage(damage, options);
@@ -69,7 +69,9 @@ export default class NPCDataModel extends CharacterDataModel {
       else {
          return super.applyDamage(damage, options);
       }
-   }   static _defineDocumentSchema() {
+   }
+
+   static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
       schema.bio.type = createStringField();
       schema.role = createStringField('warrior');
@@ -126,6 +128,5 @@ export default class NPCDataModel extends CharacterDataModel {
          }
       }
    }
-
 
 }

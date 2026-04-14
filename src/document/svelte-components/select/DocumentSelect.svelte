@@ -6,7 +6,7 @@
    /** @type * The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {SelectOption[]} Options for the Select Svelte component. */
+    /** @type {(SelectOption<T> | string | number)[]}  Options for the Select Svelte component. */
    export let options = void 0;
 
    /** @type {boolean} Whether the input should currently be disabled. */

@@ -14,40 +14,23 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /**
-    * @type {number}
-    * The index of the rules element in the item's rules elements array.
-    */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   $: element = $document?.rulesElement[idx];
+   let element;
+   $: element = $document?.system.rulesElement[idx];
 
    // Modifier type options
    const modifierTypeOptions = [
-      {
-         label: localize('damage'),
-         value: 'damage',
-      },
-      {
-         label: localize('dice'),
-         value: 'dice',
-      },
-      {
-         label: localize('expertise'),
-         value: 'expertise',
-      },
-      {
-         label: localize('training'),
-         value: 'training',
-      },
-      {
-         label: localize('healing'),
-         value: 'healing',
-      },
+      'damage',
+      'dice',
+      'expertise',
+      'training',
+      'healing'
    ];
 
    // Check type options
@@ -89,92 +72,32 @@
    // Attack Check options
    const selectorOptions = {
       any: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
+         'any',
+         'attribute',
+         'skill',
+         'customTrait',
       ],
       attack: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('attackTrait'),
-            value: 'attackTrait',
-         },
-         {
-            label: localize('attackType'),
-            value: 'attackType',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('multiAttack'),
-            value: 'multiAttack',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'attackTrait',
+         'attackType',
+         'customTrait',
+         'multiAttack',
+         'skill',
       ],
       casting: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('spellTradition'),
-            value: 'spellTradition',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'customTrait',
+         'spellTradition',
+         'skill',
       ],
       item: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'customTrait',
+         'skill',
       ],
    };
 

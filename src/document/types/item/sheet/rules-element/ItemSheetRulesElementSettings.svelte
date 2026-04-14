@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import { DELETE_ICON } from '~/system/Icons.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import ItemSheetRulesElementOperationSelect
@@ -22,6 +21,7 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetTurnMessageSettings.svelte';
    import ItemSheetInvalidRulesElement
       from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
+   import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
    /**
     * @type {number}
@@ -34,7 +34,7 @@
 
    /**
     * @type {object}
-    * The operation specific settings component for this Rules Element.
+    * The operation-specific settings component for this Rules Element.
     */
    let operationSettingsComponent;
    $: {
@@ -82,12 +82,14 @@
 
 <!--Rules Element Settings-->
 {#if $document?.system.rulesElement[idx]}
-   <div class="rules-element" transition:slide|local>
-
+   <div class="rules-element">
       <div class="row">
          <!--Operation Select-->
+
          <div class="operation">
-            <ItemSheetRulesElementOperationSelect {idx}/>
+            <LabeledElement label="operation">
+               <ItemSheetRulesElementOperationSelect {idx}/>
+            </LabeledElement>
          </div>
 
          <!--Delete Button-->
@@ -108,17 +110,6 @@
             {idx}
          />
       </div>
-
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <DocumentOwnerIconButton
-            icon={DELETE_ICON}
-            on:click={() => {
-               $document.system.deleteRulesElement(idx);
-            }}
-         />
-      </div>
    </div>
 {/if}
 
@@ -128,6 +119,7 @@
       @include flex-group-top;
       @include border;
       @include panel-1;
+      @include padding-standard;
 
       width: 100%;
 

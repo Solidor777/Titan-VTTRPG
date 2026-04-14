@@ -12,10 +12,6 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class ShieldDataModel extends RulesElementItemDataModel {
-   _getDefaultName() {
-      return localize('newShield');
-   }
-
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -34,18 +30,22 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
-   _getDefaultImage() {
-      return SHIELD_IMAGE;
-   }
-
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
       retVal.value = this.value;
       retVal.defense = this.defense;
-      retVal.trait = foundry.utils.deepClone(this.trait);
+      retVal.trait = foundry.utils.structuredClone(this.trait);
 
       return retVal;
+   }
+
+   _getDefaultImage() {
+      return SHIELD_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newShield');
    }
 
    /**

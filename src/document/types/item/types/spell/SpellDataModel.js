@@ -17,10 +17,6 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
  * @extends {TitanItemDataModel}
  */
 export default class SpellDataModel extends TitanItemDataModel {
-   _getDefaultName() {
-      return localize('newSpell');
-   }
-
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -101,13 +97,13 @@ export default class SpellDataModel extends TitanItemDataModel {
                   aspectCost += settings.allOptionsCost;
                }
 
-               // Add the cost for each option when the cost of each option is
+                  // Add the cost for each option when the cost of each option is
                // the same
                else if (settings.optionCost) {
                   aspectCost += settings.optionCost * aspect.option.length;
                }
 
-               // Add the cost for each option when the cost of each option is
+                  // Add the cost for each option when the cost of each option is
                // different
                else if (settings.optionCosts) {
                   for (const option of aspect.option) {
@@ -158,21 +154,25 @@ export default class SpellDataModel extends TitanItemDataModel {
       }
    }
 
-   _getDefaultImage() {
-      return SPELL_IMAGE;
-   }
-
    getRollData() {
       const retVal = super.getRollData();
       retVal.xpCost = this.xpCost;
       retVal.tradition = this.tradition;
-      retVal.castingCheck = foundry.utils.deepClone(this.castingCheck);
+      retVal.castingCheck = foundry.utils.structuredClone(this.castingCheck);
       retVal.quantity = this.quantity;
-      retVal.aspect = foundry.utils.deepClone(this.aspect);
-      retVal.customAspect = foundry.utils.deepClone(this.customAspect);
+      retVal.aspect = foundry.utils.structuredClone(this.aspect);
+      retVal.customAspect = foundry.utils.structuredClone(this.customAspect);
       retVal.rarity = this.rarity;
 
       return retVal;
+   }
+
+   _getDefaultImage() {
+      return SPELL_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newSpell');
    }
 
    /**

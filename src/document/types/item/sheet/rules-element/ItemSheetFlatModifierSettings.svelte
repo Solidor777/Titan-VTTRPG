@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
@@ -13,8 +12,6 @@
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
-   import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
    /**
     * @type {number}
@@ -26,42 +23,19 @@
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   $: element = $document?.rulesElement[idx];
+   let element;
+   $: element = $document?.system.rulesElement[idx];
 
    // Selector options
    const selectorOptions = [
-      {
-         label: localize('attribute'),
-         value: 'attribute',
-      },
-      {
-         label: localize('expertise'),
-         value: 'expertise',
-      },
-      {
-         label: localize('mod'),
-         value: 'mod',
-      },
-      {
-         label: localize('rating'),
-         value: 'rating',
-      },
-      {
-         label: localize('resistance'),
-         value: 'resistance',
-      },
-      {
-         label: localize('resource'),
-         value: 'resource',
-      },
-      {
-         label: localize('speed'),
-         value: 'speed',
-      },
-      {
-         label: localize('training'),
-         value: 'training',
-      },
+      'attribute',
+      'expertise',
+      'mod',
+      'rating',
+      'resistance',
+      'resource',
+      'speed',
+      'training',
    ];
 
    /**
@@ -152,9 +126,6 @@
    <div class="element" transition:slide|local>
       <!--Element Operation-->
       <div class="settings">
-         <div class="field select">
-            <ItemSheetRulesElementOperationSelect {idx}/>
-         </div>
 
          <!--Selector-->
          <div class="field select">

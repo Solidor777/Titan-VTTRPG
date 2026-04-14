@@ -14,6 +14,9 @@
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
+
+   /** @type {string[]}  Options for the Select Svelte component. */
+   const options = structuredClone(RARITIES);
 </script>
 
 <RarityInput rarity={value}>
@@ -21,7 +24,7 @@
       bind:value
       {disabled}
       on:change
-      options={RARITIES}
+      {options}
       {tooltip}
    />
 </RarityInput>

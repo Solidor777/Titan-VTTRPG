@@ -18,8 +18,8 @@
     */
    export let tooltip = void 0;
 
-   /** @type {SelectOption[]} Options for the Select Svelte component. */
-   const options = RESISTANCES;
+   /** @type {string[]}  Options for the Select Svelte component. */
+   const options = structuredClone(RESISTANCES);
 
    // Add none option if appropriate.
    if (allowNone) {

@@ -71,7 +71,7 @@ export default function calculateCastingCheckResults(diceResults, parameters) {
 
       // Duplicate the scaling aspects from the parameters so that they can be
       // edited safely
-      results.scalingAspect = foundry.utils.deepClone(parameters.scalingAspect).map((aspect) => {
+      results.scalingAspect = foundry.utils.structuredClone(parameters.scalingAspect).map((aspect) => {
          return {
             isDamage: aspect.isDamage,
             isHealing: aspect.isHealing,
