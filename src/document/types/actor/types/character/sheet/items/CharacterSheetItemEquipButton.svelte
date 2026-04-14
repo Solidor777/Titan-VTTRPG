@@ -5,6 +5,7 @@
 
    /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
+   /** @type {boolean} */
    export let equipped = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

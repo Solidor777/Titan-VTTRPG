@@ -1,7 +1,8 @@
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
- * Called before a Journal Sheet is rendered to add the dark mode class if appropriate.
+ * Called before a Journal Sheet is rendered to add the dark mode class if
+ * appropriate.
  * @param {JournalSheet} journalSheet - The Journal Sheet being rendered.
  * @param {Element} element - The Element of the Journal Sheet being rendered.
  */

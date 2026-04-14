@@ -5,7 +5,12 @@
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON } from '~/system/Icons.js';
+   import {
+      ACCURACY_ICON,
+      MELEE_ICON,
+      MULTI_ATTACK_ICON,
+      RANGE_ICON,
+   } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type {object} Reference to the reactive Document store. */

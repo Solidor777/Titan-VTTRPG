@@ -3,14 +3,19 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
+   /** @type {string} */
    export let attribute = 'body';
+   /** @type {string} */
    export let skill = 'arcana';
+   /** @type {number} */
    export let difficulty = 4;
+   /** @type {number} */
    export let complexity = 1;
+   /** @type {number} */
    export let damageToReduce = 0;
 
    /**
-    *
+    * Rolls opposed Attribute Checks for all targeted characters.
     */
    async function rollOpposedCheck() {
       const targets = getBestCharactersToUpdate();

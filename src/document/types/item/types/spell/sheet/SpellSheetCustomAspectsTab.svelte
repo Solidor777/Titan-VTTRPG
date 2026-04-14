@@ -16,6 +16,7 @@
    const appState = getContext('applicationState');
 
    // Initialize filtered entries
+   /** @type {*[]} */
    let filteredEntries = [];
    $: {
       filteredEntries = [];

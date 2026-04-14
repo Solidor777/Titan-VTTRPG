@@ -33,4 +33,5 @@ export default class SocketManager {
    }
 }
 
+/** @type {string} */
 const SOCKET_NAME = 'system.titan';

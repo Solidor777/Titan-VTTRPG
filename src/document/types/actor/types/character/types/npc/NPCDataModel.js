@@ -4,7 +4,7 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
  * Data model for NPC actors.
- * @extends CharacterDataModel
+ * @extends {CharacterDataModel}
  */
 export default class NPCDataModel extends CharacterDataModel {
    /**
@@ -18,7 +18,8 @@ export default class NPCDataModel extends CharacterDataModel {
       // If we are a minion and not already dead
       if (this.role === 'minion' && this.resource.stamina.value > 0) {
 
-         // Call the parent version of the function without updating the actor or starting a report.
+         // Call the parent version of the function without updating the actor
+         // or starting a report.
          const superOptions = options ? foundry.utils.deepClone(options) : {};
          superOptions.updateActor = false;
          superOptions.report = false;

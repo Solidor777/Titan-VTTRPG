@@ -1,7 +1,11 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { REFLEXES_ICON, RESILIENCE_ICON, WILLPOWER_ICON } from '~/system/Icons.js';
+   import {
+      REFLEXES_ICON,
+      RESILIENCE_ICON,
+      WILLPOWER_ICON,
+   } from '~/system/Icons.js';
    import DocumentOwnerResistanceButton from '~/document/svelte-components/DocumentOwnerResistanceButton.svelte';
    import getResistanceCheckParametersTooltip from '~/helpers/utility-functions/GetResistanceCheckParametersTooltip.js';
 

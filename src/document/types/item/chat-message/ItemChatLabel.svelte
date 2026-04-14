@@ -1,5 +1,6 @@
 <script>
    // Chat context reference
+   /** @type {TitanItem} */
    export let item = void 0;
 </script>
 

@@ -1,4 +1,4 @@
-import onHotbarDrop from '~/hooks/OnHotbarDrop';
+import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
 
 /**
  * Attached to the Ready hook.

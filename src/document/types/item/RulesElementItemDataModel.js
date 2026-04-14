@@ -4,7 +4,8 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
 
 /**
- * Data model with extra functionality for items that can contain Rules Elements.
+ * Data model with extra functionality for items that can contain Rules
+ * Elements.
  * @extends {TitanItemDataModel}
  */
 export default class RulesElementItemDataModel extends TitanItemDataModel {
@@ -46,7 +47,8 @@ export default class RulesElementItemDataModel extends TitanItemDataModel {
 
    /**
     * Removes a Rules Element from this item.
-    * @param {number} idx - The index of the Rules Element in the Rules Elements array.
+    * @param {number} idx - The index of the Rules Element in the Rules Elements
+    *    array.
     * @returns {Promise<void>}
     */
    async deleteRulesElement(idx) {

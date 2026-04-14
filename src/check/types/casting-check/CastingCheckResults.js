@@ -5,7 +5,8 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @typedef {object} ScalingAspect
  * @property {boolean} isDamage Whether the aspect applies damage.
  * @property {boolean} isHealing Whether the aspect applies healing.
- * @property {number} cost The success cost for increasing the value of the aspect.
+ * @property {number} cost The success cost for increasing the value of the
+ *    aspect.
  * @property {number} currentValue The current value of the aspect.
  * @property {number} initialValue The initial value of the aspect.
  * @property {string} label The display name for the aspect.
@@ -14,17 +15,22 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Results of a Casting Check.
  * @typedef {CheckResults} CastingCheckResults
- * @property {CheckDie[]} dice The sorted dice rolled for the check, after having expertise applied.
+ * @property {CheckDie[]} dice The sorted dice rolled for the check, after
+ *    having expertise applied.
  * @property {boolean} succeeded Whether the Check Succeeded.
  * @property {number} criticalFailures The number of Critical Failures rolled.
- * @property {number} criticalSuccesses The number of Critical Successes achieved.
+ * @property {number} criticalSuccesses The number of Critical Successes
+ *    achieved.
  * @property {number} damage The amount of Damage inflicted.
- * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
+ * @property {number} expertiseRemaining The Expertise remaining after being
+ *    applied to the dice.
  * @property {number} extraSuccesses The number of Critical Successes achieved.
- * @property {number} extraSuccessesRemaining The remaining successes that have not yet been applied to scaling aspects.
+ * @property {number} extraSuccessesRemaining The remaining successes that have
+ *    not yet been applied to scaling aspects.
  * @property {number} successes The total number of Successes achieved.
  * @property {number} healing The amount of Healing applied.
- * @property {ScalingAspect[]} scalingAspect The scaling aspects associated with the check.
+ * @property {ScalingAspect[]} scalingAspect The scaling aspects associated with
+ *    the check.
  */
 
 /**
@@ -32,8 +38,10 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
  * See {@link calculateCheckResults}.
- * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
- * @param {CastingCheckParameters} parameters - Object containing the parameters of the check.
+ * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check,
+ *    after Expertise is applied.
+ * @param {CastingCheckParameters} parameters - Object containing the parameters
+ *    of the check.
  * @returns {CastingCheckResults} The final results of the check.
  */
 export default function calculateCastingCheckResults(diceResults, parameters) {
@@ -61,7 +69,8 @@ export default function calculateCastingCheckResults(diceResults, parameters) {
       results.damage = parameters.damage;
       results.healing = parameters.healing;
 
-      // Duplicate the scaling aspects from the parameters so that they can be edited safely
+      // Duplicate the scaling aspects from the parameters so that they can be
+      // edited safely
       results.scalingAspect = foundry.utils.deepClone(parameters.scalingAspect).map((aspect) => {
          return {
             isDamage: aspect.isDamage,

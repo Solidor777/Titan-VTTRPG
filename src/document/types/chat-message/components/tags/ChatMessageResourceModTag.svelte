@@ -15,9 +15,8 @@
    /** @type {string} The style class to use for the tag. */
    export let styleClass = void 0;
 
-   // Calculate the tooltipAction for the resource mod
    /**
-    *
+    * Calculates the tooltip HTML for the resource mod tag.
     */
    function getTooltip() {
       // Base label

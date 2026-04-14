@@ -3,7 +3,10 @@
     "allow": [
       "Bash(node -e ':*)",
       "Bash(find C:\\\\FoundryVTT\\\\V13\\\\Dev\\\\foundryuserdata\\\\Data\\\\systems\\\\titan\\\\src:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(shuf)",
+      "Bash(grep -l \"@param {TitanActor\\\\|TitanItem\\\\|CheckResults\\\\|TitanCheck\" /c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/dialog/*.js)",
+      "Bash(grep:*)"
     ]
   }
 }

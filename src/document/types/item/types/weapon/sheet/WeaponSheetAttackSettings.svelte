@@ -27,6 +27,7 @@
       from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
 
    // Attack idx
+   /** @type {number} */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -40,7 +41,7 @@
    $: isExpanded = $appState.attacks.isExpanded[idx];
 
    /**
-    *
+    * Updates the attack skill when the attack type changes.
     */
    async function updateAttackSkill() {
       if ($document?.isOwner && attack) {

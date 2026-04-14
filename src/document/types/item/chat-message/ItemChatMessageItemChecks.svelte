@@ -10,13 +10,15 @@
    import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
+   /** @type {TitanItem} */
    export let item = void 0;
 
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    /**
     * Rolls a Check from the Item's roll data.
-    * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check array.
+    * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check
+    *    array.
     */
    async function rollItemCheck(idx) {
 

@@ -8,9 +8,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Removes expired effects from the chat message owner
    /**
-    *
+    * Removes expired effects from the character that owns this chat message.
     */
    async function removeExpiredEffects() {
       // If we own this chat message and the actor associated with it

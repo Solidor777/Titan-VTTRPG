@@ -1,7 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
@@ -17,13 +17,17 @@
    /** @type {object[]} The traits to select from. */
    export let traitOptions = void 0;
 
-   /** @type {object} Object containing a mapping of each trait to its description. */
+   /**
+    * @type {object}
+    * Object containing a mapping of each trait to its description.
+    */
    export let traitDescriptions = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   // Initialize the value of each trait option to the current value of the document's matching trait
+   // Initialize the value of each trait option to the current value of the
+   // document's matching trait
    for (const trait of documentTraits) {
       for (let idx = 0; idx < traitOptions.length; idx++) {
          if (traitOptions[idx].name === trait.name) {
@@ -40,7 +44,8 @@
       // If the document and traits are still valid
       if (item && documentTraits) {
 
-         // Set the document's traits to equal the active traits from the trait options
+         // Set the document's traits to equal the active traits from the trait
+         // options
          documentTraits = traitOptions.filter((trait) =>
             (typeof (trait.value) === 'boolean' && trait.value === true) ||
             (typeof (trait.value) === 'number' && trait.value > 0),

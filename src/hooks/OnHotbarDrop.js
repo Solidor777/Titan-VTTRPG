@@ -1,11 +1,12 @@
-import CreateItemMacroDialog from '~/document/types/item/dialog/CreateItemMacroDialog'
+import CreateItemMacroDialog from '~/document/types/item/dialog/CreateItemMacroDialog.js';
 
 /**
  * Called when an object is dropped on the user's Hotbar.
  * @param {Hotbar} hotbar - The hotbar the object was dropped on.
  * @param {object} data - The data extracted from the drop event.
  * @param {number} slot - The hotbar slot that the item was dropped on.
- * @returns {boolean|void} Returns void if the default action should be performed. Otherwise, returns false.
+ * @returns {boolean|void} Returns void if the default action should be
+ *    performed. Otherwise, returns false.
  */
 export default function onHotbarDrop (hotbar, data, slot) {
    // Ensure the object is an item
@@ -72,7 +73,8 @@ export default function onHotbarDrop (hotbar, data, slot) {
       }
    }
 
-   // This is a separate function because if onHotbarDrop does not return immediately,
+   // This is a separate function because if onHotbarDrop does not return
+   // immediately,
    // the default macro will be created
    createToggleDocumentSheetMacro(macroItem.name, macroItem.img, data.uuid, slot)
    return false

@@ -1,5 +1,5 @@
 <script>
-   import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
+   import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
@@ -50,7 +50,9 @@
       }
    }
 
-   /** @type {boolean} Whether applying Expertise to the die should be disabled. */
+   /**
+    * @type {boolean} Whether applying Expertise to the die should be disabled.
+    */
    const disabled = !$document.isOwner ||
       $document.flags.titan.results.expertiseRemaining === 0 ||
       die.final >= 6;

@@ -21,25 +21,29 @@
       // Update the scroll top state variable.
       scrollTop = event.target.scrollTop;
 
-      // Styling code for a blur at the top and bottom of an overflowing element.
+      // Styling code for a blur at the top and bottom of an overflowing
+      // element.
       const element = event.target;
       updateOverflowingState(element);
    }
 
    /**
-    * Initializes the position of the scroll and the scroll classes on the scrollable element.
+    * Initializes the position of the scroll and the scroll classes on the
+    * scrollable element.
     * @param {Element} element - The scrollable element.
     */
    function initialScroll(element) {
       // Initialize the element's scroll top.
       element.scrollTop = scrollTop;
 
-      // Styling code for a blur at the top and bottom of an overflowing element.
+      // Styling code for a blur at the top and bottom of an overflowing
+      // element.
       updateOverflowingState(element);
    }
 
    /**
-    * Updates the scroll class depending on whether the top or bottom of the element is overflowing.
+    * Updates the scroll class depending on whether the top or bottom of the
+    * element is overflowing.
     * @param {Element} element - The scrollable element.
     */
    function updateOverflowingState(element) {

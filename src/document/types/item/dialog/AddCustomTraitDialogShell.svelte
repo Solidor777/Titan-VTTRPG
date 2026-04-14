@@ -2,13 +2,14 @@
 
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 
    // The document owning the trait
+   /** @type {TitanItem} */
    export let item = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
@@ -17,7 +18,7 @@
    const newTrait = createCustomItemTraitTemplate();
 
    /**
-    *
+    * Adds the new trait to the item and closes the dialog.
     */
    function addTrait() {
       const customTrait = item.system.customTrait;

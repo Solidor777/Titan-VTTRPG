@@ -4,11 +4,14 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * Results of an Attack Check.
  * @typedef {CheckResults} AttackCheckResults
  * @property {boolean} succeeded Whether the Check Succeeded.
- * @property {CheckDie[]} dice The sorted dice rolled for the check, after Expertise is applied.
+ * @property {CheckDie[]} dice The sorted dice rolled for the check, after
+ *    Expertise is applied.
  * @property {number} criticalFailures The number of Critical Failures rolled.
- * @property {number} criticalSuccesses The number of Critical Successes achieved.
+ * @property {number} criticalSuccesses The number of Critical Successes
+ *    achieved.
  * @property {number} damage The amount of Damage inflicted.
- * @property {number} expertiseRemaining The Expertise remaining after being applied to the dice.
+ * @property {number} expertiseRemaining The Expertise remaining after being
+ *    applied to the dice.
  * @property {number} extraSuccesses The number of Critical Successes achieved.
  * @property {number} successes The total number of Successes achieved.
  */
@@ -18,8 +21,10 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
  * See {@link calculateCheckResults}.
- * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
- * @param {AttackCheckParameters} parameters - Object containing the parameters of the check.
+ * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check,
+ *    after Expertise is applied.
+ * @param {AttackCheckParameters} parameters - Object containing the parameters
+ *    of the check.
  * @returns {AttackCheckResults} The final results of the check.
  */
 export default function calculateAttackCheckResults(diceResults, parameters) {

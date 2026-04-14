@@ -2,23 +2,25 @@
 
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    // The document document owning the trait
+   /** @type {TitanItem} */
    export let item = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
+   /** @type {number} */
    export let traitIdx = void 0;
 
    const trait = item.system.customTrait[traitIdx];
 
    /**
-    *
+    * Saves the edited trait and closes the dialog.
     */
    function editTrait() {
       const customTrait = item.system.customTrait;

@@ -14,7 +14,10 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
+   /**
+    * @type {number}
+    * The index of the rules element in the item's rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -23,17 +26,27 @@
    /** @type {object} Reference to the Rules Element object. */
    $: element = $document?.rulesElement[idx];
 
-   /** @type {string[]} Options for selecting which rating the conditional modifier applies to. */
+   /**
+    * @type {string[]}
+    * Options for selecting which rating the conditional modifier applies to.
+    */
    const ratingOptions = ['melee', 'accuracy', 'defense'];
 
-   /** @type {string[]} Options for selecting the defense-related condition for the modifier. */
+   /**
+    * @type {string[]}
+    * Options for selecting the defense-related condition for the modifier.
+    */
    const defenseSelectorOptions = ['armorTrait', 'shieldTrait', 'customArmorTrait', 'customShieldTrait'];
 
-   /** @type {string[]} Options for selecting the attack-related condition for the modifier. */
+   /**
+    * @type {string[]}
+    * Options for selecting the attack-related condition for the modifier.
+    */
    const attackSelectorOptions = ['attackTrait', 'attackType', 'customWeaponTrait', 'multiAttack'];
 
    /**
-    * Updates the element's key to a sensible default when the selector changes.
+    * Updates the element's key to a sensible default when the selector
+    * changes.
     */
    function onSelectorChange() {
       if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
@@ -70,7 +83,8 @@
    }
 
    /**
-    * Updates the element's selector to a sensible default when the rating changes.
+    * Updates the element's selector to a sensible default when the rating
+    * changes.
     */
    function onRatingChange() {
       switch (element.rating) {
@@ -88,7 +102,8 @@
    }
 
    /**
-    * Returns the appropriate Svelte input component for the current selector type.
+    * Returns the appropriate Svelte input component for the current selector
+    * type.
     * @returns {object} The Svelte component to use for the key field.
     */
    function getSelector() {

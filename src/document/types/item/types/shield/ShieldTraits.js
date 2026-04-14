@@ -12,7 +12,8 @@ export const SHIELD_TRAITS = deepFreeze([
 ]);
 
 /**
- * Keys for the localized description strings for Shield Traits, mapped to the Trait name.
+ * Keys for the localized description strings for Shield Traits, mapped to the
+ * Trait name.
  * @type {object}
  */
 export const SHIELD_TRAIT_DESCRIPTIONS = deepFreeze({

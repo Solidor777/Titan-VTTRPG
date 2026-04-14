@@ -1,5 +1,6 @@
 /**
- * Helper function for svelte elements that need to force an update on a system document.
+ * Helper function for svelte elements that need to force an update on a system
+ * document.
  * @param {Document} document - The document to be updated.
  * @param {boolean} disabled - Whether the element is currently disabled.
  */

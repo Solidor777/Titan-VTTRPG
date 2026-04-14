@@ -2,12 +2,14 @@ import createNumberField from '~/helpers/utility-functions/CreateNumberField.js'
 
 /**
  * A specialized subclass of TypeDataModel,
- * with extra functionality to support data model svelte-components and version migrations.
+ * with extra functionality to support data model svelte-components and version
+ * migrations.
  * @extends {foundry.abstract.TypeDataModel}
  */
 export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    /**
-    * Map of the object's svelte-components, sorted by Name and Component Class.
+    * Map of the object's svelte-components, sorted by Name and Component
+    * Class.
     * @type {object}
     * @private
     */
@@ -21,6 +23,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
       super(data, options);
 
       // Construct and freeze the svelte-components map.
+      /** @type {object} */
       const components = {};
       for (const [key, component] of Object.entries(this.constructor._prototypeComponents)) {
          components[key] = new component(this);
@@ -59,7 +62,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Defines the full schema for this document, including all svelte-component schemas.
+    * Defines the full schema for this document, including all svelte-component
+    * schemas.
     * @override
     * @returns {object} The complete document schema.
     */
@@ -76,8 +80,10 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Defines the schema for the document, excluding svelte-component schemas which are added by defineSchema.
-    * @returns {object} The document schema, excluding svelte-component schemas.
+    * Defines the schema for the document, excluding svelte-component schemas
+    * which are added by defineSchema.
+    * @returns {object} The document schema, excluding svelte-component
+    *    schemas.
     * @protected
     */
    static _defineDocumentSchema() {
@@ -112,10 +118,14 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Perform preliminary operations before a data model of this type is created.
-    * Pre-creation operations only occur for the client which requested the operation.
-    * Modifications to the pending document before it is persisted should be performed with this.parent.updateSource().
-    * @param {object} data - The initial data object provided to the document creation request.
+    * Perform preliminary operations before a data model of this type is
+    * created.
+    * Pre-creation operations only occur for the client which requested the
+    * operation.
+    * Modifications to the pending document before it is persisted should be
+    * performed with this.parent.updateSource().
+    * @param {object} data - The initial data object provided to the document
+    *    creation request.
     */
    onPreCreate(data) {
       // Initialize document data
@@ -127,7 +137,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Gets the initial data for this document.
-    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} data - The initial data object provided to the document
+    *    creation request.
     * @returns {object|void} The initial data to update the document with.
     * @protected
     */
@@ -135,7 +146,8 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    }
 
    /**
-    * Apply transformations of derivations to the values of the source data object.
+    * Apply transformations of derivations to the values of the source data
+    * object.
     * Compute data fields whose values are not stored to the database.
     */
    prepareDerivedData() {

@@ -3,11 +3,21 @@
    import applyHealingToTargets from '~/helpers/utility-functions/ApplyHealingToTargets.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { CLEAVE_ICON, DAMAGE_ICON, HALF_DAMAGE_ICON, HEALING_ICON, IGNORE_ARMOR_ICON } from '~/system/Icons';
+   import {
+      CLEAVE_ICON,
+      DAMAGE_ICON,
+      HALF_DAMAGE_ICON,
+      HEALING_ICON,
+      IGNORE_ARMOR_ICON,
+   } from '~/system/Icons.js';
 
+   /** @type {number} */
    export let damage = void 0;
+   /** @type {boolean} */
    export let ineffective = false;
+   /** @type {boolean} */
    export let penetrating = false;
+   /** @type {number} */
    export let cleave = 0;
 </script>
 

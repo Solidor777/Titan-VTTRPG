@@ -2,6 +2,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
 
    // Check reference
+   /** @type {object} */
    export let check = void 0;
 </script>
 

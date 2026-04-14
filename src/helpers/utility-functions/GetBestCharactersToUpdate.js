@@ -2,10 +2,14 @@ import getTargetedCharacters from "~/helpers/utility-functions/GetTargetedCharac
 import getControlledTokens from "~/helpers/utility-functions/GetControlledTokens.js";
 
 /**
- * Gets the best Character Actors for the current user to perform combat updates on.
- * If the user is a Player, filters from controlled Tokens, with their main Character as a fallback.
- * If the user is a GM, filters from targeted Tokens, with their controlled Tokens as a fallback.
- * @returns {TitanActor[]} Array of the best Character Actors for the current user to perform combat updates on.
+ * Gets the best Character Actors for the current user to perform combat updates
+ * on.
+ * If the user is a Player, filters from controlled Tokens, with their main
+ * Character as a fallback.
+ * If the user is a GM, filters from targeted Tokens, with their controlled
+ * Tokens as a fallback.
+ * @returns {TitanActor[]} Array of the best Character Actors for the current
+ *    user to perform combat updates on.
  */
 export default function getBestCharactersToUpdate() {
    // If the user is a gm, return targeted characters.
@@ -14,6 +18,7 @@ export default function getBestCharactersToUpdate() {
    }
 
    // Otherwise, get controlled tokens
+   /** @type {*[]} */
    const retVal = [];
    const controlledTokens = getControlledTokens();
 

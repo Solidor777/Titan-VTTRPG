@@ -7,13 +7,13 @@ import TitanArmorSheet from '~/document/types/item/types/armor/sheet/ArmorSheet.
 import TitanCommoditySheet from '~/document/types/item/types/commodity/sheet/CommoditySheet.js';
 import TitanEffectSheet from '~/document/types/item/types/effect/sheet/EffectSheet.js';
 import TitanEquipmentSheet from '~/document/types/item/types/equipment/sheet/EquipmentSheet.js';
-import TitanShieldSheet from '~/document/types/item/types/shield/sheet/ShieldSheet';
+import TitanShieldSheet from '~/document/types/item/types/shield/sheet/ShieldSheet.js';
 import TitanSpellSheet from '~/document/types/item/types/spell/sheet/SpellSheet.js';
 import TitanWeaponSheet from '~/document/types/item/types/weapon/sheet/WeaponSheet.js';
-import TitanMacros from '~/system/Macros';
+import TitanMacros from '~/system/Macros.js';
 import PlayerDataModel from '~/document/types/actor/types/character/types/player/PlayerDataModel.js';
 import NPCDataModel from '~/document/types/actor/types/character/types/npc/NPCDataModel.js';
-import log from '~/helpers/utility-functions/Log';
+import log from '~/helpers/utility-functions/Log.js';
 import warn from '~/helpers/utility-functions/Warn.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 import error from '~/helpers/utility-functions/Error.js';

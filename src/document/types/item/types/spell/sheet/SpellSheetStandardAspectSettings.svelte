@@ -9,15 +9,16 @@
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
 
+   /** @type {object} */
    export let aspectOptions = void 0;
+   /** @type {number} */
    let idx = 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Determines whether an aspect should have a details div
    /**
-    *
+    * Returns whether the aspect has additional configurable settings.
     */
    function hasDetails() {
       return aspectOptions.settings || aspectOptions.template.resistanceCheck;

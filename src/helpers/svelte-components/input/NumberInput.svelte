@@ -17,10 +17,16 @@
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */
+   /**
+    * @type {boolean}
+    * Whether the input should be an Integer. If False, it will be a Float.
+    */
    export let isInteger = false;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string|TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 
    /** @type {boolean} Whether editing is currently active for the input. */
@@ -38,13 +44,15 @@
    }
 
    /**
-    * Called when the input changes to ensure the input is valid before setting the value.
+    * Called when the input changes to ensure the input is valid before setting
+    * the value.
     */
    function parseInput() {
       // Get the new value front the inputted string.
       let newValue = isInteger ? parseInt(input) : parseFloat(input);
 
-      // If the new value is not a number (such as if it is blank), set it to 0.
+      // If the new value is not a number (such as if it is blank), set it to
+      // 0.
       if (isNaN(newValue)) {
          newValue = 0;
       }
@@ -76,7 +84,8 @@
    }
 
    /**
-    * Called when the key is pressed to ensure that invalid characters are not added to the input.
+    * Called when the key is pressed to ensure that invalid characters are not
+    * added to the input.
     * @param {object} event - The input event on the key press.
     */
    function filterInput(event) {

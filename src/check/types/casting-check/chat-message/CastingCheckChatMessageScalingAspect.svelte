@@ -2,9 +2,17 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON } from '~/system/Icons.js';
+   import {
+      DAMAGE_ICON,
+      DECREMENT_ICON,
+      HEALING_ICON,
+      INCREMENT_ICON,
+      RESET_ICON,
+   } from '~/system/Icons.js';
 
-   /** @type {number} Index of the Scaling Aspect in the Scaling Aspects array. */
+   /**
+    * @type {number} Index of the Scaling Aspect in the Scaling Aspects array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -34,9 +42,8 @@
       aspect = $document.flags.titan.results.scalingAspect[idx];
    }
 
-   // Increases the aspect by the increment, updating the total cost as appropriate.
    /**
-    *
+    * Increases the aspect by the increment and updates the total cost.
     */
    function increaseAspect() {
       // Increase the aspect
@@ -65,9 +72,8 @@
       });
    }
 
-   // Decreases the aspect by the increment, updating the total cost as appropriate.
    /**
-    *
+    * Decreases the aspect by the increment and updates the total cost.
     */
    function decreaseAspect() {
       // Decrease the aspect
@@ -96,9 +102,8 @@
       });
    }
 
-   // Resets all increases to the aspect, updating the total cost as appropriate.
    /**
-    *
+    * Resets all increases to the aspect and restores the total cost.
     */
    function resetAspect() {
       // Get the aspect delta

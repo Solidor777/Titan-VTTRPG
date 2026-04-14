@@ -11,7 +11,8 @@
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
     * @property {string} custom The custom duration unit for the effect.
-    * @property {number} remaining The number of duration units remaining for the effect.
+    * @property {number} remaining The number of duration units remaining for
+    *    the effect.
     */
 
    /**
@@ -28,8 +29,10 @@
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
-    * @property {number} initiative The Initiative turn in combat on which this effect's duration should decrease.
-    * @property {number} remaining The number of duration units remaining for the effect.
+    * @property {number} initiative The Initiative turn in combat on which this
+    *    effect's duration should decrease.
+    * @property {number} remaining The number of duration units remaining for
+    *    the effect.
     */
 
    /**
@@ -46,7 +49,8 @@
     * @property {string} label The label to display for the effect.
     * @property {string} img The image to display for the effect.
     * @property {string} description The description of the effect.
-    * @property {number} remaining The number of duration units remaining for the effect.
+    * @property {number} remaining The number of duration units remaining for
+    *    the effect.
     */
 
    /**
@@ -58,7 +62,8 @@
     */
 
    /**
-    * @type {CustomEffectData|ExpiredEffectData|InitiativeEffectData|PermanentEffectData|TurnEffectData|ConditionEffectData}
+    * @type {CustomEffectData|ExpiredEffectData|InitiativeEffectData|
+    *    PermanentEffectData|TurnEffectData|ConditionEffectData}
     * Object containing the essential data for this effect.
     */
    export let effect = void 0;
@@ -66,7 +71,10 @@
    /** @type {string} The icon to show for the Effect. */
    export let icon = void 0;
 
-   /** @type {string} Calculated tooltipAction depending on whether the effect has a description */
+   /**
+    * @type {string}
+    * Calculated tooltipAction depending on whether the effect has a description
+    */
    const tooltip = !isHTMLBlank(effect.description) ?
       `${localize('effect.custom.desc')}${effect.description}` :
       localize('effect.custom.desc');

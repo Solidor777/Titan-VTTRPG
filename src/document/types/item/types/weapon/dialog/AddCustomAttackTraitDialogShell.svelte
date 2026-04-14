@@ -2,16 +2,18 @@
 
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
    // The weapon document owning the attack
+   /** @type {TitanItem|TitanActor} */
    export let document = void 0;
 
    // The attack idx
+   /** @type {number} */
    export let attackIdx = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
@@ -24,7 +26,7 @@
    };
 
    /**
-    *
+    * Adds the new custom trait to the attack and closes the dialog.
     */
    function addTrait() {
       const attack = document.system.attack[attackIdx];

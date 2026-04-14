@@ -7,7 +7,12 @@
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON, TRAINING_ICON } from '~/system/Icons.js';
+   import {
+      DICE_ICON,
+      EXPERTISE_ICON,
+      SPEND_RESOLVE_ICON,
+      TRAINING_ICON,
+   } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -25,7 +30,9 @@
       checkIdx: checkIdx
    };
 
-   /** @type {boolean} Whether to automatically spend the resolve for checks. */
+   /**
+    * @type {boolean} Whether to automatically spend the resolve for checks.
+    */
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    /** @type {ItemCheckParameters} Calculated item check parameters. */

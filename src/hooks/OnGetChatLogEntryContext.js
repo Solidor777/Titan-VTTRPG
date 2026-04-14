@@ -1,14 +1,16 @@
 import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
-import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
+import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults.js';
 import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
 import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 
 /**
- * Generates contextual options when right-clicking on a Chat Message in the Chat Log.
+ * Generates contextual options when right-clicking on a Chat Message in the
+ * Chat Log.
  * @param {Element} element - The Element that was clicked.
- * @param {object} options - Array of buttons contenting the contextual options.
+ * @param {object} options - Array of buttons contenting the contextual
+ *    options.
  */
 export default function onGetChatLogEntryContext(element, options) {
    // Get the settings for ato spending resolve
@@ -84,7 +86,8 @@ export default function onGetChatLogEntryContext(element, options) {
 /**
  * Gets the Titan flags from the Entry for a Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {object} The Titan flags from the Entry for a Chat Message in the Chat Log.
+ * @returns {object} The Titan flags from the Entry for a Chat Message in the
+ *    Chat Log.
  */
 function getTitanFlags(element) {
    // Get the message from the list item
@@ -104,16 +107,19 @@ function getTitanFlags(element) {
 }
 
 /**
- * Determines whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
+ * Determines whether to display the Re-Roll Failures contextual option for a
+ * Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {boolean} Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
+ * @returns {boolean} Whether to display the Re-Roll Failures contextual option
+ *    for a Chat Message in the Chat Log.
  */
 function canReRollFailures(element) {
    // Get the Titan Flags
    const titanFlags = getTitanFlags(element);
    if (titanFlags) {
 
-      // If this is a check AND it has not re-rolled failures OR the current user is a GM
+      // If this is a check AND it has not re-rolled failures OR the current
+      // user is a GM
       if (isCheck(titanFlags.type) && (titanFlags.failuresReRolled === false || game.user.isGM)) {
 
          // Return true if the check has any failures.
@@ -129,15 +135,19 @@ function canReRollFailures(element) {
 }
 
 /**
- * Re-Rolls the failures for a Check belonging to a Chat Message Entry in the Chat Log.
+ * Re-Rolls the failures for a Check belonging to a Chat Message Entry in the
+ * Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
+ * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1
+ *    Resolve.
  */
 async function reRollFailures(element, spendResolve) {
    // Get the successes and failure count
    const message = game.messages.get(element.data('messageId'));
    const titanFlags = message?.flags?.titan;
+   /** @type {number} */
    let failureCount = 0;
+   /** @type {number} */
    let expertiseToRefund = 0;
    const successes = titanFlags.results.dice.filter((die) => {
       if (die.base >= titanFlags.parameters.difficulty) {
@@ -184,12 +194,15 @@ async function reRollFailures(element, spendResolve) {
 }
 
 /**
- * Determines whether to display the Double Training contextual option for a Chat Message in the Chat Log.
+ * Determines whether to display the Double Training contextual option for a
+ * Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {boolean} Whether to display the Double Training contextual option for a Chat Message in the Chat Log.
+ * @returns {boolean} Whether to display the Double Training contextual option
+ *    for a Chat Message in the Chat Log.
  */
 function canDoubleTraining(element) {
-   // Return true if the message is a check with Training that has not yet been doubled.
+   // Return true if the message is a check with Training that has not yet been
+   // doubled.
    const titanFlags = getTitanFlags(element);
    return (titanFlags &&
       isCheck(titanFlags.type) &&
@@ -198,9 +211,11 @@ function canDoubleTraining(element) {
 }
 
 /**
- * Doubles the Training for a Check belonging to a Chat Message Entry in the Chat Log.
+ * Doubles the Training for a Check belonging to a Chat Message Entry in the
+ * Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
+ * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1
+ *    Resolve.
  */
 async function doubleTraining(element, spendResolve) {
    // If expertise is not already doubled
@@ -236,12 +251,15 @@ async function doubleTraining(element, spendResolve) {
 }
 
 /**
- * Determines whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
+ * Determines whether to display the Double Expertise contextual option for a
+ * Chat Message in the Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @returns {boolean} Whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
+ * @returns {boolean} Whether to display the Double Expertise contextual option
+ *    for a Chat Message in the Chat Log.
  */
 function canDoubleExpertise(element) {
-   // Return true if the message is a check with Expertise that has not yet been doubled.
+   // Return true if the message is a check with Expertise that has not yet been
+   // doubled.
    const titanFlags = getTitanFlags(element);
    return (titanFlags &&
       isCheck(titanFlags.type) &&
@@ -250,9 +268,11 @@ function canDoubleExpertise(element) {
 }
 
 /**
- * Doubles the Expertise for a Check belonging to a Chat Message Entry in the Chat Log.
+ * Doubles the Expertise for a Check belonging to a Chat Message Entry in the
+ * Chat Log.
  * @param {Element} element - The Entry for a Chat Message in the Chat Log.
- * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
+ * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1
+ *    Resolve.
  */
 async function doubleExpertise(element, spendResolve) {
    // If expertise is not already doubled
@@ -285,7 +305,8 @@ async function doubleExpertise(element, spendResolve) {
 /**
  * Returns whether the provided chat message type is a Check Chat Message.
  * @param {string} chatMessageType - The chat message type to check.
- * @returns {boolean} Whether the provided chat message type is a Check Chat Message.
+ * @returns {boolean} Whether the provided chat message type is a Check Chat
+ *    Message.
  */
 function isCheck(chatMessageType) {
    switch (chatMessageType) {

@@ -1,10 +1,11 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    // document to edit the UUID for
+   /** @type {TitanItem|TitanActor} */
    export let document = void 0;
 
    // UUID of the document
@@ -14,7 +15,7 @@
    const application = getApplication();
 
    /**
-    *
+    * Applies the edited UUID to the document and closes the dialog.
     */
    async function onApplyEdits() {
       if (document) {
@@ -33,7 +34,7 @@
    }
 
    /**
-    *
+    * Cancels the edit and closes the dialog.
     */
    async function onCancel() {
       return application.close();

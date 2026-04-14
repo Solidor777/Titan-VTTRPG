@@ -2,7 +2,7 @@
 
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
    /** @type {string[]} Header lines. */

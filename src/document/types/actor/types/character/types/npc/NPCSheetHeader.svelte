@@ -16,7 +16,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {SelectOption<string>[]} Options for the role of NPC (Minion, Warrior, Elite, or Champion).*/
+   /**
+    * @type {SelectOption<string>[]}
+    * Options for the role of NPC (Minion, Warrior, Elite, or Champion).
+    */
    const roleOptions = createLocalizedOptions(ROLES);
 </script>
 

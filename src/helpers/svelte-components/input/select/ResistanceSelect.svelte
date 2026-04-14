@@ -12,10 +12,13 @@
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string | TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 
-   /** @type {SelectOption}[] Options for the Select Svelte component. */
+   /** @type {SelectOption[]} Options for the Select Svelte component. */
    const options = RESISTANCES;
 
    // Add none option if appropriate.

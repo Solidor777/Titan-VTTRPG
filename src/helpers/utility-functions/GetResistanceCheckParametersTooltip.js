@@ -1,12 +1,21 @@
-import {DICE_ICON, EXPERTISE_ICON, MOD_ICON, REFLEXES_ICON, RESILIENCE_ICON, WILLPOWER_ICON} from '~/system/Icons.js';
+import {
+   DICE_ICON,
+   EXPERTISE_ICON,
+   MOD_ICON,
+   REFLEXES_ICON,
+   RESILIENCE_ICON,
+   WILLPOWER_ICON,
+} from '~/system/Icons.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Creates a tooltip based on the provided parameters of a Resistance check.
- * @param {ResistanceCheckParameters} checkParameters - The check parameters used to create the check tooltip.
+ * @param {ResistanceCheckParameters} checkParameters - The check parameters
+ *    used to create the check tooltip.
  * @returns {string} A tooltip based on the provided check parameters.
  */
 export default function getResistanceCheckParametersTooltip(checkParameters) {
+   /** @type {string} */
    let retVal = '';
 
    // Add Resistance dice.

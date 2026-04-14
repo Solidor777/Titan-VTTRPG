@@ -5,10 +5,16 @@
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
-   import { ACCURACY_ICON, DAMAGE_ICON, MELEE_ICON, RANGE_ICON } from '~/system/Icons.js';
+   import {
+      ACCURACY_ICON,
+      DAMAGE_ICON,
+      MELEE_ICON,
+      RANGE_ICON,
+   } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
+   /** @type {TitanItem} */
    export let item = void 0;
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>

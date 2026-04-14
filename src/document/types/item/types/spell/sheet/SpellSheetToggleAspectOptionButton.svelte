@@ -2,7 +2,9 @@
    import { getContext } from 'svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
+   /** @type {boolean} */
    export let enabled = void 0;
+   /** @type {string} */
    export let label = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

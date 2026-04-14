@@ -8,8 +8,10 @@
     * @template T
     * @typedef {object} SelectOption
     * @property {T} value The value for this option.
-    * @property {string | number|TextData} [label] The label to display for this option.
-    * @property {string | TooltipAction} [tooltip] The Tooltip to display for this option, if any.
+    * @property {string | number|TextData} [label] The label to display for this
+    *    option.
+    * @property {string | TooltipAction} [tooltip] The Tooltip to display for
+    *    this option, if any.
     */
 
    /**
@@ -24,7 +26,10 @@
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string | TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 
    /** @type {EventDispatcher} Dispatcher for component Events. */

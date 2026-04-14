@@ -4,22 +4,28 @@
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Component class for the item
+   /** @type {object} */
    export let itemComponents = void 0;
 
    // Filter function
+   /** @type {Function} */
    export let filterFunction = void 0;
 
    // Optional filter for the items
+   /** @type {string} */
    export let filter = '';
 
    // Is expanded map
+   /** @type {object} */
    export let isExpandedMap = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    // Currently drag hovered state
+   /** @type {boolean} */
    let isDragHovering = false;
+   /** @type {string} */
    let hoveredItemId = '';
 
    // Drag item start
@@ -51,9 +57,8 @@
       }
    }
 
-   // Drag item end
    /**
-    *
+    * Handles the end of an item drag event, resetting drag state.
     */
    function onDragEnd() {
       hoveredItemId = '';

@@ -3,13 +3,19 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import createModifiableStatTooltip from '~/helpers/utility-functions/CreateModifiableStatTooltip.js';
 
-   /** @type {number} The base value of the stat before any modifiers are applied. */
+   /**
+    * @type {number}
+    * The base value of the stat before any modifiers are applied.
+    */
    export let baseValue = void 0;
 
    /** @type {number} The value of the stat after any modifiers are applied. */
    export let value = void 0;
 
-   /** @type {number} Override for the value of the stat after any modifiers are applied. */
+   /**
+    * @type {number}
+    * Override for the value of the stat after any modifiers are applied.
+    */
    export let valueOverride = void 0;
 
    /** @type {number} Bonuses and penalties from Abilities. */
@@ -34,7 +40,8 @@
    let styleClass = 'label';
 
    $: {
-      // Calculate the normal value by adding the ability and equipment mods to the base value.
+      // Calculate the normal value by adding the ability and equipment mods to
+      // the base value.
       let normalValue = baseValue;
       if (abilityMod) {
          normalValue += abilityMod;

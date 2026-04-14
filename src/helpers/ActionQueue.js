@@ -11,7 +11,8 @@ import delay from '~/helpers/utility-functions/Delay.js';
 export default class ActionQueue {
    /**
     * Constructs a new Action Queue.
-    * @param {number} defaultDelay - How many milliseconds (minimum of 1) that the action queue
+    * @param {number} defaultDelay - How many milliseconds (minimum of 1) that
+    *    the action queue
     * will wait between resolving actions by default.
     * This can be overridden with the Delay property on the input object when
     * enqueuing an action.
@@ -26,13 +27,19 @@ export default class ActionQueue {
 
    /**
     * Enqueues a new action object.
-    * @param {object} action - Object containing the properties of the action being performed.
-    * @param {Function} action.callback - The function to be performed by the action.
-    * @param {object} action.thisArg - The 'this' context to use for the action. May be null.
-    * @param {*[]} [action.args] - Optional arguments for the function being performed, in order.
-    * @param {number} [action.delay] - The delay to wait before attempting this action. If
+    * @param {object} action - Object containing the properties of the action
+    *    being performed.
+    * @param {Function} action.callback - The function to be performed by the
+    *    action.
+    * @param {object} action.thisArg - The 'this' context to use for the action.
+    *    May be null.
+    * @param {*[]} [action.args] - Optional arguments for the function being
+    *    performed, in order.
+    * @param {number} [action.delay] - The delay to wait before attempting this
+    *    action. If
     *    not specified, the default delay will be used.
-    * @param {string} action.key - An identifier that may be used to enqueue the action.
+    * @param {string} action.key - An identifier that may be used to enqueue the
+    *    action.
     * If the action is enqueued while an action with the same key is already
     * in the queue, then it will be ignored.
     * If the previous action is already being performed,
@@ -72,7 +79,8 @@ export default class ActionQueue {
    }
 
    /**
-    * Starts the action queue, and continues to dequeue actions until the queue is empty.
+    * Starts the action queue, and continues to dequeue actions until the queue
+    * is empty.
     * @returns {Promise<void>} Finishes when the action queue is empty.
     */
    async runQueue() {
@@ -82,7 +90,8 @@ export default class ActionQueue {
          // Get the current action
          const currentAction = this.queue[0];
 
-         // Wait for the action's delay or the default delay if no delay has been specific
+         // Wait for the action's delay or the default delay if no delay has
+         // been specific
          await delay(currentAction.delay ?? this.defaultDelay);
 
          // Set the current action and remove it from the queue.

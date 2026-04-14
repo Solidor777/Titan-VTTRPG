@@ -5,7 +5,7 @@ import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.j
 
 /**
  * Data model for player actors.
- * @extends CharacterDataModel
+ * @extends {CharacterDataModel}
  */
 export default class PlayerDataModel extends CharacterDataModel {
    static _defineDocumentSchema() {

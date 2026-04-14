@@ -7,7 +7,13 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import { COLLAPSED_ICON, DAMAGE_ICON, DELETE_ICON, EXPANDED_ICON, HEALING_ICON } from '~/system/Icons.js';
+   import {
+      COLLAPSED_ICON,
+      DAMAGE_ICON,
+      DELETE_ICON,
+      EXPANDED_ICON,
+      HEALING_ICON,
+   } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -16,6 +22,7 @@
    const appState = getContext('applicationState');
 
    // Idx of the custom aspect being represented
+   /** @type {number} */
    export let idx = void 0;
 
    $: aspect = $document.system.customAspect[idx];

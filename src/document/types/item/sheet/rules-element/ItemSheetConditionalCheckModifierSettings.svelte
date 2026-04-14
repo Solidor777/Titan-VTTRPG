@@ -14,7 +14,10 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
+   /**
+    * @type {number}
+    * The index of the rules element in the item's rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -177,7 +180,8 @@
 
    /**
     * Updates the check type if necessary when the modifier type changes.
-    * If the modifier type is 'healing' and the check type is 'attack', resets the check type to 'any'
+    * If the modifier type is 'healing' and the check type is 'attack', resets
+    * the check type to 'any'
     * and cascades the change to the selector.
     */
    function onModifierTypeChanged() {
@@ -196,7 +200,8 @@
 
    /**
     * Updates the selector when the check type changes.
-    * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a valid 'skill' selector.
+    * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a
+    * valid 'skill' selector.
     * @returns {boolean} Whether a document update was triggered.
     */
    function onCheckTypeChange() {
@@ -258,7 +263,8 @@
 
    /**
     * Returns the appropriate Svelte component for the current selector type.
-    * @returns {object | undefined} The selector input component, or undefined if there is no valid case.
+    * @returns {object | undefined} The selector input component, or undefined
+    *    if there is no valid case.
     */
    function getSelector() {
       switch (element.selector) {

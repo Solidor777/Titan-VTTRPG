@@ -16,7 +16,10 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
+   /**
+    * @type {number}
+    * The index of the rules element in the item's rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -61,9 +64,8 @@
       },
    ];
 
-   // Updates the key when the selector changes
    /**
-    *
+    * Updates the element key to a sensible default when the selector changes.
     */
    function onSelectorChange() {
       if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
@@ -110,7 +112,7 @@
    }
 
    /**
-    *
+    * Returns the appropriate select component for the current selector type.
     */
    function getSelector() {
       switch (element.selector) {

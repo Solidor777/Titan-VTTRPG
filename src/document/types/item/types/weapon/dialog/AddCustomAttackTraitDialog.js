@@ -4,11 +4,13 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 
 /**
  * Dialog for adding a Custom Trait to an Attack.
- * @param {TitanItem} item - The Item to edit the Trait of.
- * @param {number} traitIdx - The idx of the Custom Trait in the traits array.
- * @extends TitanDialog
+ * @extends {TitanDialog}
  */
 export default class AddCustomAttackTraitDialog extends TitanDialog {
+   /**
+    * @param {TitanItem} document - The Item to add the Trait to.
+    * @param {number} attackIdx - The idx of the Attack in the attacks array.
+    */
    constructor(document, attackIdx) {
       super({
          title: `${document.name}: ${document.system.attack[attackIdx].label}`,

@@ -1,7 +1,11 @@
 <script>
+   /** @type {number} */
    export let max = void 0;
+   /** @type {number} */
    export let value = void 0;
+   /** @type {string} */
    export let icon = void 0;
+   /** @type {string} */
    export let label = void 0;
 </script>
 

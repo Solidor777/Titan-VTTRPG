@@ -2,7 +2,12 @@
    import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
-   import { LONG_REST_ICON, REMOVE_TEMP_EFFECTS_ICON, SHORT_REST_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
+   import {
+      LONG_REST_ICON,
+      REMOVE_TEMP_EFFECTS_ICON,
+      SHORT_REST_ICON,
+      SPEND_RESOLVE_ICON,
+   } from '~/system/Icons.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */

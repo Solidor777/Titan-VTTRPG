@@ -20,7 +20,9 @@
    } from '~/system/Icons.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type {number} The index of the Check in the item's item checks array. */
+   /**
+    * @type {number} The index of the Check in the item's item checks array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

@@ -4,7 +4,9 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   /** @type {string} */
    export let icon = void 0;
+   /** @type {string} */
    export let label = void 0;
 </script>
 

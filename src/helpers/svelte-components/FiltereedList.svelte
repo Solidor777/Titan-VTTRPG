@@ -8,12 +8,16 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
+   /** @type {*[]} */
    export let entries = void 0;
 
+   /** @type {Function} */
    export let filterFunction = void 0;
 
+   /** @type {Function} */
    export let mapFunction = void 0;
 
+   /** @type {Function} */
    export let idFunction = (entry, idx) => {
       return idx;
    };
@@ -24,7 +28,9 @@
       filteredEntries = entries.filter((entry) => filterFunction(entry));
       filteredEntries = filteredEntries.map((entry, idx) => mapFunction(entry, idx));
    }
+   /** @type {Function} */
    export let componentFunction;
+   /** @type {Function} */
    export let propsFunction = void 0;
 </script>
 

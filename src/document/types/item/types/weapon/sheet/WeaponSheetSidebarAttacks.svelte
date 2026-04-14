@@ -7,7 +7,13 @@
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import { COLLAPSED_ICON, DAMAGE_ICON, EXPANDED_ICON, MELEE_ICON, RANGE_ICON } from '~/system/Icons.js';
+   import {
+      COLLAPSED_ICON,
+      DAMAGE_ICON,
+      EXPANDED_ICON,
+      MELEE_ICON,
+      RANGE_ICON,
+   } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 

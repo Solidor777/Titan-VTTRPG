@@ -19,10 +19,15 @@
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string | TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 
-   /** @type {number} The idx of the Rules Element in the rules elements array. */
+   /**
+    * @type {number} The idx of the Rules Element in the rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -30,7 +35,8 @@
 
    /**
     * Updates a Rules Element when its Operation type changes.
-    * @returns {Promise<void>} Returns after the item owning the Rules Element has been updated.
+    * @returns {Promise<void>} Returns after the item owning the Rules Element
+    *    has been updated.
     */
    async function onRulesElementOperationChanged() {
       if ($document && idx < $document?.system.rulesElement.length) {

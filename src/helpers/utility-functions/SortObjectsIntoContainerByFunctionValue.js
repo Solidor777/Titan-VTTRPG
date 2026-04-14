@@ -8,6 +8,7 @@
  * sorted by the return value of the function when applied to them.
  */
 export default function sortObjectsIntoContainerByFunctionValue(objects, sortFunction) {
+   /** @type {object} */
    const retVal = {};
 
    // For each object
@@ -16,7 +17,8 @@ export default function sortObjectsIntoContainerByFunctionValue(objects, sortFun
       // Find the value of the function for this object
       const sortedKey = sortFunction(object);
 
-      // If the array for the value of this object's key does not already exist in the retval,
+      // If the array for the value of this object's key does not already exist
+      // in the retval,
       // then create the array and add it to the retval
       if (!retVal[sortedKey]) {
          retVal[sortedKey] = [];

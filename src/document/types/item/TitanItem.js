@@ -4,8 +4,9 @@ import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
 /**
- * Extends the base Item class to implement additional system-specific logic for Titan.
- * @extends {BaseItem}
+ * Extends the base Item class to implement additional system-specific logic for
+ * Titan.
+ * @extends {Item}
  * @property {TitanItemSheet} sheet The Sheet that represents this Item.
  */
 export default class TitanItem extends Item {
@@ -19,7 +20,8 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Apply transformations of derivations to the values of the source data object.
+    * Apply transformations of derivations to the values of the source data
+    * object.
     * Compute data fields whose values are not stored to the database.
     * @override
     */
@@ -68,10 +70,13 @@ export default class TitanItem extends Item {
    /**
     * Performs initialization logic before document creation.
     * @override
-    * @param {object} data - The initial data object provided to the document creation request.
-    * @param {object} options - Additional options which modify the creation request.
+    * @param {object} data - The initial data object provided to the document
+    *    creation request.
+    * @param {object} options - Additional options which modify the creation
+    *    request.
     * @param {User} user - The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
+    * @returns {Promise<boolean|void>} A return value of false indicates the
+    *    creation operation should be cancelled.
     * @protected
     */
    async _preCreate(data, options, user) {
@@ -154,8 +159,10 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Creates a dialog for editing an existing Custom Trait belonging to this item.
-    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
+    * Creates a dialog for editing an existing Custom Trait belonging to this
+    * item.
+    * @param {number} traitIdx - The index of the Custom Trait in this item's
+    *    Custom Traits array.
     * @returns {void}
     */
    editCustomTrait(traitIdx) {
@@ -167,7 +174,8 @@ export default class TitanItem extends Item {
 
    /**
     * Removes a Custom Trait from this item.
-    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
+    * @param {number} traitIdx - The index of the Custom Trait in this item's
+    *    Custom Traits array.
     * @returns {Promise<void>}
     */
    async deleteCustomTrait(traitIdx) {
@@ -184,7 +192,8 @@ export default class TitanItem extends Item {
    /**
     * Marks the item as being deleted before actually deleting the item
     * so that asynchronous update operations will not apply.
-    * @returns {Promise<void|boolean>} Resolves once the item is deleted, or false if the deletion could not proceed.
+    * @returns {Promise<void|boolean>} Resolves once the item is deleted, or
+    *    false if the deletion could not proceed.
     */
    async safeDelete() {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)

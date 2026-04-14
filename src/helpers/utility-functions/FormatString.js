@@ -25,7 +25,8 @@ export default function formatString(string, ...args) {
 
       // Otherwise, if the args is an object
       else if (argType === 'object') {
-         // Replace the instances of the object keys with the object values for those keys
+         // Replace the instances of the object keys with the object values for
+         // those keys
          for (const [key, value] of Object.entries(args[0])) {
             retVal = retVal.replace(new RegExp('\\{' + key + '\\}', 'gi'), value.toString());
          }

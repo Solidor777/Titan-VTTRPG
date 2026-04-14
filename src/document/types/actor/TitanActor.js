@@ -3,7 +3,8 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import capitalize from '~/helpers/utility-functions/Capitalize.js';
 
 /**
- * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
+ * @typedef {object} SpeakerData An object containing data on a Chat Message's
+ *    speaker.
  * @property {string} [scene] The Scene in which the speaker resides.
  * @property {string} [actor] The ID of the speaker's actor.
  * @property {string} [alias] The name of the speaker to display.
@@ -11,8 +12,9 @@ import capitalize from '~/helpers/utility-functions/Capitalize.js';
  */
 
 /**
- * Extends the base Actor class to implement additional system-specific logic for Titan.
- * @extends {BaseActor}
+ * Extends the base Actor class to implement additional system-specific logic
+ * for Titan.
+ * @extends {Actor}
  * @property {TitanItem[]} items A collection of embedded Item documents.
  * @property {TitanActorSheet} sheet The Sheet that represents this Actor.
  */
@@ -21,10 +23,13 @@ export default class TitanActor extends Actor {
    /**
     * Performs initialization logic before document creation.
     * @override
-    * @param {object} data - The initial data object provided to the document creation request.
-    * @param {object} options - Additional options which modify the creation request.
+    * @param {object} data - The initial data object provided to the document
+    *    creation request.
+    * @param {object} options - Additional options which modify the creation
+    *    request.
     * @param {User} user - The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be canceled.
+    * @returns {Promise<boolean|void>} A return value of false indicates the
+    *    creation operation should be canceled.
     * @protected
     */
    async _preCreate(data, options, user) {
@@ -77,7 +82,8 @@ export default class TitanActor extends Actor {
    /**
     * Gets this actor's Combatant in the active combat (if any).
     * Otherwise, returns undefined.
-    * @returns {Combatant|undefined} This Actor's combatant in the active combat.
+    * @returns {Combatant|undefined} This Actor's combatant in the active
+    *    combat.
     */
    getCombatant() {
       return game.combat?.getCombatantByActor(this.id);
@@ -137,8 +143,10 @@ export default class TitanActor extends Actor {
 
    /**
     * Adds an Active Effect to the Actor, created from the active effect data.
-    * @param {object[]|object} activeEffectData - The Active Effect data requested for creation.
-    * @returns {Promise<ActiveEffect[]|void>} The created or updated Active Effect instances.
+    * @param {object[]|object} activeEffectData - The Active Effect data
+    *    requested for creation.
+    * @returns {Promise<ActiveEffect[]|void>} The created or updated Active
+    *    Effect instances.
     */
    async addActiveEffect(activeEffectData) {
       if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
@@ -190,7 +198,8 @@ export default class TitanActor extends Actor {
    /**
     * Gets all items of the provided Type.
     * @param {string} type - The Type of Item to search for.
-    * @returns {TitanItem[]} List of all Items of the provided type owned by this Actor.
+    * @returns {TitanItem[]} List of all Items of the provided type owned by
+    *    this Actor.
     */
    getItemsOfType(type) {
       return /** @type TitanItem[] */ this.items.filter(item => item.type === type);
@@ -199,7 +208,8 @@ export default class TitanActor extends Actor {
    /**
     * Gets all items of the provided Types.
     * @param {string[]} types - The Types of Item to search for.
-    * @returns {TitanItem[]} List of all Items of the provided types owned by this Actor.
+    * @returns {TitanItem[]} List of all Items of the provided types owned by
+    *    this Actor.
     */
    getItemsOfTypes(types) {
       return /** @type TitanItem[] */ this.items.filter(item => types.includes(item.type));

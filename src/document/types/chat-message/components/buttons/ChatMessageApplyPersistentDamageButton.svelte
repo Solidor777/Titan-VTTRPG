@@ -8,9 +8,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Calculate the tooltipAction for the resource mod
    /**
-    *
+    * Calculates the tooltip HTML for the persistent damage button.
     */
    function getTooltip() {
       // Base label
@@ -35,7 +34,8 @@
    }
 
    /**
-    * Applies damage to the character that owns this chat message and updates the message accordingly
+    * Applies damage to the character that owns this chat message and updates
+    * the message accordingly
     */
    async function confirmPersistentDamage() {
 

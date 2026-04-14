@@ -5,6 +5,7 @@
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
    import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
 
+   /** @type {number} */
    export let idx = 0;
 
    /** @type {object} Reference to the reactive Document store. */

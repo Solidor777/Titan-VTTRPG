@@ -11,10 +11,16 @@
    /** @type {number} The minimum roll on a die to achieve a Success. */
    export let difficulty = void 0;
 
-   /** @type {number} The minimum number of Successes needed to succeed at the Check. */
+   /**
+    * @type {number}
+    * The minimum number of Successes needed to succeed at the Check.
+    */
    export let complexity = void 0;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string|TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 </script>
 

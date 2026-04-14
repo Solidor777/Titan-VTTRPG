@@ -1,7 +1,7 @@
 import {TJSDocument} from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.svelte';
-import deepFreeze from '~/helpers/utility-functions/DeepFreeze';
+import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
 /**
  * List of Titan Chat Message types.
@@ -36,7 +36,8 @@ const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
 ]));
 
 /**
- * Called before a Chat Message is rendered to attach Svelte components and the dark mode class if appropriate.
+ * Called before a Chat Message is rendered to attach Svelte components and the
+ * dark mode class if appropriate.
  * @param {Element} element - The Element of the Chat Message being rendered.
  * @param {ChatMessage} message - The Chat Message being rendered.
  */
@@ -68,7 +69,8 @@ export default function onRenderChatMessage(message, element) {
       });
    }
 
-   // If this is not a titan message, but dark mode is enabled for all messages, add the dark mode class anyway
+   // If this is not a titan message, but dark mode is enabled for all messages,
+   // add the dark mode class anyway
    else if (getSetting('darkModeChatMessages') === 'all') {
       const content = element.find('.chat-message').prevObject;
       content.addClass('titan-dark-mode');

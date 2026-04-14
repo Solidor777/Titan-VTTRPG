@@ -7,6 +7,7 @@
  * sorted by the value of their inputted key.
  */
 export default function sortObjectsIntoContainerByKeyValue(objects, key) {
+   /** @type {object} */
    const retVal = {};
 
    // For each object
@@ -15,7 +16,8 @@ export default function sortObjectsIntoContainerByKeyValue(objects, key) {
       // Find the value of the key for this object
       const keyArray = object[key];
 
-      // If the array for the value of this object's key does not already exist in the retval,
+      // If the array for the value of this object's key does not already exist
+      // in the retval,
       // then create the array and add it to the retval
       if (!retVal[keyArray]) {
          retVal[keyArray] = [];

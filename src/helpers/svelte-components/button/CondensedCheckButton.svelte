@@ -1,5 +1,9 @@
 <script>
-   import { DICE_ICON, EXPERTISE_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
+   import {
+      DICE_ICON,
+      EXPERTISE_ICON,
+      SPEND_RESOLVE_ICON,
+   } from '~/system/Icons.js';
    import { getContext } from 'svelte';
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
 
@@ -30,7 +34,10 @@
    /** @type {string} The display Label of the check. */
    export let label = void 0;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string|TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 </script>
 

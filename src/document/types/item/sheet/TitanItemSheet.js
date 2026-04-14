@@ -7,7 +7,8 @@ import ItemSheetImportItemButton from '~/document/types/item/sheet/ItemSheetImpo
 /**
  * A Document Sheet class with functionality shared by all Items.
  * @extends {TitanDocumentSheet}
- * @property {RulesElementItemSheetState} applicationState The reactive application state store.
+ * @property {RulesElementItemSheetState} applicationState The reactive
+ *    application state store.
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
    /**
@@ -41,7 +42,8 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Overridable function for creating the reactive state store for this sheet.
+    * Overridable function for creating the reactive state store for this
+    * sheet.
     * @override
     * @returns {typeof ItemSheetState} The newly created state store.
     * @protected

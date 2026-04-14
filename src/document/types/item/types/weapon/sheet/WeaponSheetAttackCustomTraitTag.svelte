@@ -12,14 +12,14 @@
    const document = getContext('document');
 
    /**
-    * Called when the Delete Icon is pressed.
+    * Called when the Delete button is clicked.
     */
    function deleteFunction() {
       $document.deleteCustomAttackTrait(attackIdx, traitIdx);
    }
 
    /**
-    * Called when the Edit Icon is pressed.
+    * Called when the Edit button is clicked.
     */
    function editFunction() {
       $document.editCustomAttackTrait(attackIdx, traitIdx);

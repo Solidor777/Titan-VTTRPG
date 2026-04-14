@@ -2,7 +2,11 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
+   import {
+      DICE_ICON,
+      EXPERTISE_ICON,
+      TRAINING_ICON,
+   } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    /** @type {string} The ID of the item to get the check from. */

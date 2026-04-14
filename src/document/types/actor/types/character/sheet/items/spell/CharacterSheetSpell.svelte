@@ -29,7 +29,7 @@
    /** @type {boolean} Whether this Item is currently expanded. */
    export let isExpanded = void 0;
 
-   /** @type {SpellAspect}[] List of enabled Spell Aspects. */
+   /** @type {SpellAspect[]} List of enabled Spell Aspects. */
    let enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
 
    // Update enabled aspects in response to changes

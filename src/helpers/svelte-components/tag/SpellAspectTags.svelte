@@ -4,18 +4,21 @@
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
    // Aspects list
-   /** @type {SpellAspect}[] Array of Spell Custom Aspects to display. */
+   /** @type {SpellAspect[]} Array of Spell Custom Aspects to display. */
    export let standardAspects = void 0;
 
-   /** @type {SpellCustomAspect}[] Array of Spell Custom Aspects to display. */
+   /** @type {SpellCustomAspect[]} Array of Spell Custom Aspects to display. */
    export let customAspects = void 0;
 
    /**
-    * Calculates a number representing the approximate relative size of an Aspect Tag.
+    * Calculates a number representing the approximate relative size of an
+    * Aspect Tag.
     * @param {object} aspect - The Aspect to calculate the tag size of.
-    * @returns {number} A number representing the approximate relative size of an Aspect Tag.
+    * @returns {number} A number representing the approximate relative size of
+    *    an Aspect Tag.
     */
    function calculateAspectTagSize(aspect) {
+      /** @type {number} */
       let retVal = 0;
 
       // Add +1 is the Aspect is scaling.
@@ -43,7 +46,8 @@
 
    /**
     * @type {object[]}
-    * List of all Aspects with a mapping of their index in their corresponding array, sorted from
+    * List of all Aspects with a mapping of their index in their corresponding
+    * array, sorted from
     * smallest to largest.
     */
    const aspectSizeMap = standardAspects

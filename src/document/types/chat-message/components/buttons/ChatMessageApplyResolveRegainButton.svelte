@@ -8,9 +8,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Calculate the tooltipAction for the resource mod
    /**
-    *
+    * Calculates the tooltip HTML for the resolve regain button.
     */
    function getTooltip() {
       // Base label
@@ -34,9 +33,8 @@
       return retVal;
    }
 
-   // Applies damage to the character that owns this chat message and updates the message accordingly
    /**
-    *
+    * Applies resolve regain to the chat message owner and updates the message.
     */
    async function confirmResolveRegain() {
       // If we own this chat message and the associated actor

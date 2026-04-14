@@ -29,10 +29,12 @@
     * Calculates the tooltipAction for the total Training or Expertise value.
     * @param {object} valueObject - The Training or Expertise object.
     * @param {number} mod - Modifier for the total value or expertise.
-    * @returns {string} The tooltipAction for the total Training or Expertise value.
+    * @returns {string} The tooltipAction for the total Training or Expertise
+    *    value.
     */
    function getTotalValueTooltip(valueObject, mod) {
       // Base value label
+      /** @type {string} */
       let retVal = `<p>${localize('base')}: ${valueObject.baseValue}</p>`;
 
       // Equipment mod

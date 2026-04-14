@@ -1,16 +1,14 @@
 import localize from '~/helpers/utility-functions/Localize.js';
-import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog';
+import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
 
 /**
- * Creates a confirmation dialog for confirming removing expired Effects from the Actor.
- * @param {TitanActor} actor - The Actor to remove expired Effects from.
- * @extends ConfirmationDialog
+ * A confirmation dialog for confirming removing expired Effects from the
+ * Actor.
+ * @extends {ConfirmationDialog}
  */
 export default class ConfirmRemoveExpiredEffectsDialog extends ConfirmationDialog {
    /**
-    * Creates a confirmation dialog for confirming removing expired Effects from the Actor.
     * @param {TitanActor} actor - The Actor to remove expired Effects from.
-    * @extends ConfirmationDialog
     */
    constructor(actor) {
       super(

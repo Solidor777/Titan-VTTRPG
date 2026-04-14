@@ -4,12 +4,15 @@
    import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
    // Value to toggle
+   /** @type {boolean} */
    export let enabled = void 0;
 
    // Label to display
+   /** @type {string} */
    export let label = void 0;
 
    // Cost of the aspect
+   /** @type {number} */
    export let cost = void 0;
 </script>
 

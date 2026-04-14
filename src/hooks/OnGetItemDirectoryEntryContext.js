@@ -4,9 +4,11 @@ import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.j
 import { ID_ICON } from '~/system/Icons.js';
 
 /**
- * Generates contextual options when right-clicking on an Item in the Items directory.
+ * Generates contextual options when right-clicking on an Item in the Items
+ * directory.
  * @param {Element} element - The Element that was clicked.
- * @param {object} options - Array of buttons contenting the contextual options.
+ * @param {object} options - Array of buttons contenting the contextual
+ *    options.
  */
 export default function onGetItemDirectoryEntryContext(element, options) {
 
@@ -37,9 +39,11 @@ function getItem(element) {
 }
 
 /**
- * Determines whether the current user owns the Item for an Entry in the Items directory.
+ * Determines whether the current user owns the Item for an Entry in the Items
+ * directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
+ * @returns {boolean} Whether the current user owns the Document for an Entry in
+ *    the directory.
  */
 function isItemOwner(element) {
    return getItem(element)?.isOwner;

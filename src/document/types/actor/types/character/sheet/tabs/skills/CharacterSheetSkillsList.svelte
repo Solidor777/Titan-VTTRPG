@@ -12,6 +12,7 @@
    const appState = getContext('applicationState');
 
    // Filtered Skill list
+   /** @type {*[]} */
    let filteredList = [];
    $: {
       // Get skills whose name matches the filter
@@ -19,7 +20,8 @@
       const filter = $appState.tabs.skills.filter.toLowerCase();
       filteredList = skillList.filter(([key]) => localize(key).toLowerCase().includes(filter));
 
-      // If no skill names match, look for skills with matching default attributes.
+      // If no skill names match, look for skills with matching default
+      // attributes.
       if (filteredList.length === 0) {
          filteredList = skillList.filter((skill) =>
             localize(skill.defaultAttribute).toLowerCase().includes(filter));

@@ -1,13 +1,18 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import {ATTACK_TRAIT_DESCRIPTIONS, ATTACK_TRAITS,} from '~/document/types/item/types/weapon/AttackTraits.js';
+   import {
+      ATTACK_TRAIT_DESCRIPTIONS,
+      ATTACK_TRAITS,
+   } from '~/document/types/item/types/weapon/AttackTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
 
    // The weapon document owning the attack
+   /** @type {TitanItem} */
    export let item = void 0;
 
    // The attack idx
+   /** @type {number} */
    export let attackIdx = void 0;
 
    // Trait options

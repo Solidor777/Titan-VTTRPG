@@ -1,9 +1,14 @@
 import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
 
+/** @type {number} */
 const ATTACK_CHECK_MACRO_VERSION = 0;
+/** @type {number} */
 const CASTING_CHECK_MACRO_VERSION = 0;
+/** @type {number} */
 const ITEM_CHECK_MACRO_VERSION = 0;
+/** @type {number} */
 const TOGGLE_EFFECT_ACTIVE_MACRO_VERSION = 0;
+/** @type {number} */
 const TOGGLE_DOCUMENT_SHEET_MACRO_VERSION = 0;
 
 /**
@@ -11,10 +16,13 @@ const TOGGLE_DOCUMENT_SHEET_MACRO_VERSION = 0;
  */
 export default class TitanMacros {
    /**
-    * Rolls an Attack Check for each controlled Character using the provided Item and Attack idx.
+    * Rolls an Attack Check for each controlled Character using the provided
+    * Item and Attack idx.
     * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
-    * @param {number} attackIdx - The idx of the Attack in the item's Attack array.
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
+    * @param {number} attackIdx - The idx of the Attack in the item's Attack
+    *    array.
     */
    rollAttackCheck(id, idMethod, attackIdx) {
       // For each controlled character actor
@@ -32,9 +40,11 @@ export default class TitanMacros {
    }
 
    /**
-    * Rolls a Casting Check for each controlled Character using the provided Item.
+    * Rolls a Casting Check for each controlled Character using the provided
+    * Item.
     * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
     */
    rollCastingCheck(id, idMethod) {
       // For each controlled character actor
@@ -52,10 +62,13 @@ export default class TitanMacros {
    }
 
    /**
-    * Rolls an Item Check for each controlled Character using the provided Item and Check Idx.
+    * Rolls an Item Check for each controlled Character using the provided Item
+    * and Check Idx.
     * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
-    * @param {number} checkIdx - The idx of the Check in the Item's Checks array.
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
+    * @param {number} checkIdx - The idx of the Check in the Item's Checks
+    *    array.
     */
    rollItemCheck(id, idMethod, checkIdx) {
       // For each controlled character actor
@@ -73,9 +86,11 @@ export default class TitanMacros {
    }
 
    /**
-    * Toggles Active on an effect for each controlled Character using the provided Item.
+    * Toggles Active on an effect for each controlled Character using the
+    * provided Item.
     * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
     */
    toggleEffectActive(id, idMethod) {
       // For each controlled character actor
@@ -93,12 +108,15 @@ export default class TitanMacros {
    }
 
    /**
-    * Creates Macro for rolling an Attack Check using provided Weapon Item and Attack idx.
+    * Creates Macro for rolling an Attack Check using provided Weapon Item and
+    * Attack idx.
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
-    * @param {number} attackIdx - The idx of the Attack in the item's Attack array.
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
+    * @param {number} attackIdx - The idx of the Attack in the item's Attack
+    *    array.
     * @returns {Macro} The newly created Macro.
     */
    async getAttackCheckMacro(item, name, img, idMethod, attackIdx) {
@@ -109,6 +127,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Create the command
+         /** @type {string} */
          const command = `game.titan.macros.requestAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
 
          // Get or create the macro
@@ -117,11 +136,13 @@ export default class TitanMacros {
    }
 
    /**
-    * Creates a Macro for rolling a Casting Check using the provided Spell Item.
+    * Creates a Macro for rolling a Casting Check using the provided Spell
+    * Item.
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
     * @returns {Macro} The newly created Macro.
     */
    async getCastingCheckMacro(item, name, img, idMethod) {
@@ -132,6 +153,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Create the command
+         /** @type {string} */
          const command = `game.titan.macros.rollCastingCheck('${id}', '${idMethod}')`;
 
          // Get or create the macro
@@ -140,12 +162,15 @@ export default class TitanMacros {
    }
 
    /**
-    * Creates a Macro for rolling an Item Check using the provided Item and Check idx.
+    * Creates a Macro for rolling an Item Check using the provided Item and
+    * Check idx.
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
-    * @param {number} checkIdx - The idx of the Check in the Item's Check array.
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
+    * @param {number} checkIdx - The idx of the Check in the Item's Check
+    *    array.
     * @returns {Macro} The newly created Macro.
     */
    async getItemCheckMacro(item, name, img, idMethod, checkIdx) {
@@ -156,6 +181,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Create the command
+         /** @type {string} */
          const command = `game.titan.macros.rollItemCheck('${id}', '${idMethod}', ${checkIdx})`;
 
          // Get or create the macro
@@ -164,11 +190,13 @@ export default class TitanMacros {
    }
 
    /**
-    * Creates a Macro for toggling whether the provided Effect is active on a Character.
+    * Creates a Macro for toggling whether the provided Effect is active on a
+    * Character.
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid, name, or documentId).
+    * @param {string} idMethod - The method used to identity the Item (uuid,
+    *    name, or documentId).
     * @returns {Macro} The newly created Macro.
     */
    async getToggleEffectActiveMacro(item, name, img, idMethod) {
@@ -179,6 +207,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Get the command
+         /** @type {string} */
          const command = `game.titan.macros.toggleEffectActive('${id}', '${idMethod}')`;
 
          // Get or create the macro
@@ -191,11 +220,13 @@ export default class TitanMacros {
     * Creates a Macro for toggling the sheet for a provided Document.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} uuid - The unique identifier for the Document to toggle the sheet for.
+    * @param {string} uuid - The unique identifier for the Document to toggle
+    *    the sheet for.
     * @returns {Macro} The newly created Macro.
     */
    async getToggleDocumentSheetMacro(name, img, uuid) {
       // Create the command
+      /** @type {string} */
       const command = `Hotbar.toggleDocumentSheet('${uuid}')`;
 
       // Get or create the macro
@@ -204,11 +235,14 @@ export default class TitanMacros {
    }
 
    /**
-    * Gets the ID to be used with the provided ID method to retrieve the document when executing the macro.
+    * Gets the ID to be used with the provided ID method to retrieve the
+    * document when executing the macro.
     * @param {Document} document - The Document to get the ID for.
-    * @param {string} idMethod - The method that will be used to get the Document from the ID (uuid, name, or document
+    * @param {string} idMethod - The method that will be used to get the
+    *    Document from the ID (uuid, name, or document
     * ID).
-    * @returns {string} The ID to be used with the provided ID method to retrieve the document when executing the
+    * @returns {string} The ID to be used with the provided ID method to
+    *    retrieve the document when executing the
     *    macro.
     */
    getMacroID(document, idMethod) {
@@ -226,11 +260,15 @@ export default class TitanMacros {
    }
 
    /**
-    * Retrieves an Item from the provided Actor using the provided ID and ID method.
+    * Retrieves an Item from the provided Actor using the provided ID and ID
+    * method.
     * @param {Document} actor - The Actor to retrieve the Item from.
-    * @param {string} id - The ID to be used with the provided ID method to retrieve the item.
-    * @param {string} idMethod - The method that will be used to get the Item from the ID (uuid, name, or document ID).
-    * @returns {TitanItem|void} The retrieved Item from the provided Actor using the provided ID and ID method, if
+    * @param {string} id - The ID to be used with the provided ID method to
+    *    retrieve the item.
+    * @param {string} idMethod - The method that will be used to get the Item
+    *    from the ID (uuid, name, or document ID).
+    * @returns {TitanItem|void} The retrieved Item from the provided Actor using
+    *    the provided ID and ID method, if
     *    any.
     */
    getMacroItemFromID(actor, id, idMethod) {
@@ -265,9 +303,11 @@ export default class TitanMacros {
    }
 
    /**
-    * Checks if a Macro with a matching name, image, and command already exists.
+    * Checks if a Macro with a matching name, image, and command already
+    * exists.
     * If so, gets and returns that Macro.
-    * If not creates a new Macro with the name, image, command, and the provided type.
+    * If not creates a new Macro with the name, image, command, and the provided
+    * type.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
     * @param {string} command - The command for the Macro to execute.

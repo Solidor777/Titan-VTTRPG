@@ -11,8 +11,10 @@ import AttributeCheckDialogShell from '~/check/types/attribute-check/dialog/Attr
 export default class AttributeCheckDialog extends TitanDialog {
 
    /**
-    * @param {AttributeCheckOptions} checkOptions - The initial options for the check to be adjusted.
-    * @param {AttributeCheckParameters} checkParameters - The initial parameters for the check,
+    * @param {AttributeCheckOptions} checkOptions - The initial options for the
+    *    check to be adjusted.
+    * @param {AttributeCheckParameters} checkParameters - The initial parameters
+    *    for the check,
     * calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */

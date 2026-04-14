@@ -36,7 +36,8 @@ export default class EffectDataModel extends RulesElementItemDataModel {
 
    /**
     * Returns whether Effect item is a Combat Effect.
-    * Permanent Effects and effects with a custom Duration are considered non-Combat Effects.
+    * Permanent Effects and effects with a custom Duration are considered
+    * non-Combat Effects.
     * Effects with a duration measured in turns are considered Combat Effects.
     * @returns {boolean} Whether this Effect item is a Combat Effect.
     */
@@ -53,7 +54,8 @@ export default class EffectDataModel extends RulesElementItemDataModel {
    }
 
    prepareDerivedData() {
-      // If we are the best first owner of this document, and this document is not in a compendium
+      // If we are the best first owner of this document, and this document is
+      // not in a compendium
       if (isCurrentUserBestOwner(this.parent) &&
          !this.parent.pack && this.parent.id &&
          !this.parent.isMarkedForDeletion) {

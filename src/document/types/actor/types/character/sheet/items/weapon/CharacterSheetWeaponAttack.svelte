@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits';
+   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
@@ -25,12 +25,14 @@
    export let item = void 0;
 
    // Reference to the attack idx
+   /** @type {number} */
    export let attackIdx = void 0;
 
    // Attack reference
    $: attack = item.system.attack[attackIdx];
 
    // Calculate dice pool
+   /** @type {number} */
    let dicePool = 0;
    $: {
       // Get base dice
@@ -47,6 +49,7 @@
       // Cut the dice in half if multi attacking
       if (item.system.multiAtta) {
          // Round up or down, depending on the flurry trait
+         /** @type {boolean} */
          let flurry = false;
          for (const trait of attack.trait) {
             if (trait.name === flurry) {
@@ -61,6 +64,7 @@
    }
 
    // Calculate expertise
+   /** @type {number} */
    let expertise = 0;
    $: {
       // Get base expertise

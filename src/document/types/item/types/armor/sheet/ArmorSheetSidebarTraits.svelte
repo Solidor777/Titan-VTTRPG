@@ -8,7 +8,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {Tag}[] List of traits converted into tags. */
+   /** @type {Tag[]} List of traits converted into tags. */
    let itemTypeTraits;
 
    // Populate the tags list

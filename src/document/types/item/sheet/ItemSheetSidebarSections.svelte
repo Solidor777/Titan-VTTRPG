@@ -5,6 +5,7 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+   /** @type {*[]} */
    export let sections = void 0;
 </script>
 

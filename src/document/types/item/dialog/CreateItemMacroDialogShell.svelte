@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getApplication from '~/helpers/utility-functions/GetApplication';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
@@ -11,15 +11,18 @@
    export let item = void 0;
 
    // Slot on the hotbar that the macro will be assigned to
+   /** @type {number} */
    export let slot = void 0;
 
    // UUID of the item that was dropped
+   /** @type {string} */
    export let uuid = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    // Macro type
+   /** @type {string} */
    let macroType = 'toggleDocumentSheet';
    const macroTypeOptions = [
       {
@@ -29,7 +32,9 @@
    ];
 
    // Item check
+   /** @type {number} */
    let itemCheckIdx = 0;
+   /** @type {*[]} */
    const itemCheckOptions = [];
    // If the item has item checks
    if (item.system.check.length > 0) {
@@ -50,7 +55,9 @@
    }
 
    // Type specific macro type
+   /** @type {number} */
    let attackIdx = 0;
+   /** @type {*[]} */
    const attackOptions = [];
    switch (item.type) {
       case 'weapon': {
@@ -103,6 +110,7 @@
    }
 
    // ID method
+   /** @type {string} */
    let idMethod = 'uuid';
    const idMethodOptions = [
       {
@@ -126,7 +134,8 @@
    let name = item.name;
 
    /**
-    *
+    * Creates the macro based on the current settings and assigns it to
+    * the hotbar slot.
     */
    async function onCreateMacro() {
       let macro;
@@ -195,7 +204,7 @@
    }
 
    /**
-    *
+    * Cancels macro creation and closes the dialog.
     */
    function onCancel() {
       return application.close();

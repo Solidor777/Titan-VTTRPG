@@ -1,4 +1,4 @@
-import setupConditions from '~/system/Conditions';
+import setupConditions from '~/system/Conditions.js';
 
 /**
  * Attached to the Setup hook.

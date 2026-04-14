@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults';
+   import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults.js';
    import { RESET_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */

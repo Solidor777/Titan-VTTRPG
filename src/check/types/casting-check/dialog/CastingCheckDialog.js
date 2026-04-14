@@ -11,8 +11,10 @@ import CastingCheckDialogShell from '~/check/types/casting-check/dialog/CastingC
 export default class CastingCheckDialog extends TitanDialog {
 
    /**
-    * @param {CastingCheckOptions} checkOptions - The initial options for the check to be adjusted.
-    * @param {CastingCheckParameters} checkParameters - The initial parameters for the check,
+    * @param {CastingCheckOptions} checkOptions - The initial options for the
+    *    check to be adjusted.
+    * @param {CastingCheckParameters} checkParameters - The initial parameters
+    *    for the check,
     * calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */

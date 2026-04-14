@@ -116,13 +116,15 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @returns {Promise<void>}
     */
    async close(options = {}) {
-      // Clear the token reference so it is not held in memory after the sheet closes.
+      // Clear the token reference so it is not held in memory after the sheet
+      // closes.
       this.options.token = null;
       return super.close(options);
    }
 
    /**
-    * If this sheet's Actor Sheet represents a synthetic Token actor, gets a reference to the active Token.
+    * If this sheet's Actor Sheet represents a synthetic Token actor, gets a
+    * reference to the active Token.
     * @type {TokenDocument|null}
     */
    get token() {
@@ -131,9 +133,11 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Handles the dropping of ActiveEffect data onto an Actor Sheet.
-    * @param {DragEvent} event - The concluding DragEvent which contains drop data.
+    * @param {DragEvent} event - The concluding DragEvent which contains drop
+    *    data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<ActiveEffect[]|boolean>} The created ActiveEffect instances, or false if the effect couldn't be created.
+    * @returns {Promise<ActiveEffect[]|boolean>} The created ActiveEffect
+    *    instances, or false if the effect couldn't be created.
     * @protected
     */
    async _onDropActiveEffect(event, data) {
@@ -151,9 +155,11 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Handle dropping of an item reference or item data onto an Actor Sheet.
-    * @param {DragEvent} event - The concluding DragEvent which contains drop data.
+    * @param {DragEvent} event - The concluding DragEvent which contains drop
+    *    data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<Item[]|boolean>} The created or updated Item instances, or false if the drop was not permitted.
+    * @returns {Promise<Item[]|boolean>} The created or updated Item instances,
+    *    or false if the drop was not permitted.
     * @protected
     */
    async _onDropItem(event, data) {
@@ -167,7 +173,8 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       // Make the item data into an object
       const itemData = item.toObject();
 
-      // If this item is from this sheet's Actor, sort the item rather than creating a new one
+      // If this item is from this sheet's Actor, sort the item rather than
+      // creating a new one
       if (this.actor.uuid === item.parent?.uuid) {
          return this._onSortItem(event, itemData);
       }
@@ -177,10 +184,13 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Handle a drop event for an existing embedded Item to sort that Item relative to its siblings.
-    * @param {DragEvent} event - The concluding DragEvent which contains drop data.
+    * Handle a drop event for an existing embedded Item to sort that Item
+    * relative to its siblings.
+    * @param {DragEvent} event - The concluding DragEvent which contains drop
+    *    data.
     * @param {object} itemData - The item data requested for sorting.
-    * @returns {Promise<TitanItem[]|boolean>} The updated item instances, or false if the data was invalid.
+    * @returns {Promise<TitanItem[]|boolean>} The updated item instances, or
+    *    false if the data was invalid.
     * @private
     */
    async _onSortItem(event, itemData) {
@@ -226,10 +236,13 @@ export default class TitanActorSheet extends TitanDocumentSheet {
 
    /**
     * Handle dropping of a Folder on an Actor Sheet.
-    * The core sheet currently supports dropping a Folder of Items to create all items as owned items.
-    * @param {DragEvent} event - The concluding DragEvent which contains drop data.
+    * The core sheet currently supports dropping a Folder of Items to create all
+    * items as owned items.
+    * @param {DragEvent} event - The concluding DragEvent which contains drop
+    *    data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<Item[]|boolean>} The created Item instances, or false if the folder was invalid or not of type
+    * @returns {Promise<Item[]|boolean>} The created Item instances, or false if
+    *    the folder was invalid or not of type
     *    Item.
     * @protected
     */
@@ -278,8 +291,10 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    /**
     * Processes data when dropped onto this sheet.
     * @override
-    * @param {DragEvent} event - The concluding DragEvent which contains drop data.
-    * @returns {Promise<Item[]|ActiveEffect[]|boolean>} The newly created embedded documents, or false if the drop was
+    * @param {DragEvent} event - The concluding DragEvent which contains drop
+    *    data.
+    * @returns {Promise<Item[]|ActiveEffect[]|boolean>} The newly created
+    *    embedded documents, or false if the drop was
     *    not allowed.
     * @protected
     */
@@ -288,7 +303,8 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       const data = TextEditor.getDragEventData(event);
 
       /**
-       * A hook event that fires when some useful data is dropped onto an ActorSheet.
+       * A hook event that fires when some useful data is dropped onto an
+       * ActorSheet.
        * @param {Actor} actor - The Actor that the data was dropped onto.
        * @param {ActorSheet} sheet - The ActorSheet application.
        * @param {object} data - The data that has been dropped onto the sheet.

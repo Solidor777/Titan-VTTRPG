@@ -5,6 +5,7 @@
  * @returns {number} The sum of the values contained within the object.
  */
 export default function getSumOfObjectValues(object) {
+   /** @type {number} */
    let retVal = 0;
    for (const value of Object.values(object)) {
       retVal += value;

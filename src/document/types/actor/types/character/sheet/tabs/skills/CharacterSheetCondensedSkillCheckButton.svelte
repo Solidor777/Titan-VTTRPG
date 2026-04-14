@@ -4,7 +4,10 @@
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {AttributeCheckParameters} The Parameters of the Check this component represents. */
+   /**
+    * @type {AttributeCheckParameters}
+    * The Parameters of the Check this component represents.
+    */
    export let checkParameters = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

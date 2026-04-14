@@ -1,12 +1,13 @@
 import TitanItemSheet from '~/document/types/item/sheet/TitanItemSheet.js';
 import SpellSheetShell from '~/document/types/item/types/spell/sheet/SpellSheetShell.svelte';
-import createSpellSheetState from '~/document/types/item/types/spell/sheet/SpellSheetState';
+import createSpellSheetState from '~/document/types/item/types/spell/sheet/SpellSheetState.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Item Sheet class with functionality shared by all Spell Items.
  * @extends {TitanItemSheet}
- * @property {SpellSheetState} applicationState Reactive store for managing the state of the Spell Sheet.
+ * @property {SpellSheetState} applicationState Reactive store for managing the
+ *    state of the Spell Sheet.
  */
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
@@ -42,7 +43,8 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    /**
-    * Removes the Custom Aspect at the provided index from this sheet's application state.
+    * Removes the Custom Aspect at the provided index from this sheet's
+    * application state.
     * @param {number} idx - The index of the aspect to remove.
     */
    removeCustomAspect(idx) {
@@ -50,7 +52,8 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    /**
-    * Overridable function for creating the reactive state store for this sheet.
+    * Overridable function for creating the reactive state store for this
+    * sheet.
     * @override
     * @returns {typeof SpellSheetState} The newly created state store.
     * @protected

@@ -1,13 +1,21 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {number} The Base value of the stat before any modifiers are applied. */
+   /**
+    * @type {number}
+    * The Base value of the stat before any modifiers are applied.
+    */
    export let baseValue = void 0;
 
-   /** @type {number} The Current value of the stat after modifiers are applied. */
+   /**
+    * @type {number} The Current value of the stat after modifiers are applied.
+    */
    export let currentValue = void 0;
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string|TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 
    /** @type {string} The class to use for styling the label. */

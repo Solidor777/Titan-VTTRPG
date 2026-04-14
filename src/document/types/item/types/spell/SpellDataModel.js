@@ -59,6 +59,7 @@ export default class SpellDataModel extends TitanItemDataModel {
    prepareDerivedData() {
 
       // Update the spell's aspects
+      /** @type {number} */
       let totalAspectCost = 0;
 
       // For each standard aspect
@@ -69,7 +70,8 @@ export default class SpellDataModel extends TitanItemDataModel {
          const settings = aspectSettings.settings;
          const template = aspectSettings.template;
 
-         // The aspect is disabled if it requires an option and has no options set
+         // The aspect is disabled if it requires an option and has no options
+         // set
          if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
             aspect.enabled = false;
             aspect.cost = 0;
@@ -99,12 +101,14 @@ export default class SpellDataModel extends TitanItemDataModel {
                   aspectCost += settings.allOptionsCost;
                }
 
-               // Add the cost for each option when the cost of each option is the same
+               // Add the cost for each option when the cost of each option is
+               // the same
                else if (settings.optionCost) {
                   aspectCost += settings.optionCost * aspect.option.length;
                }
 
-               // Add the cost for each option when the cost of each option is different
+               // Add the cost for each option when the cost of each option is
+               // different
                else if (settings.optionCosts) {
                   for (const option of aspect.option) {
                      aspect.option.forEach((option) => {
@@ -137,6 +141,7 @@ export default class SpellDataModel extends TitanItemDataModel {
 
       // Calculate suggested complexity and difficulty
       let suggestedDifficulty = totalAspectCost;
+      /** @type {number} */
       let suggestedComplexity = 1;
       if (suggestedDifficulty > 5) {
          suggestedComplexity = totalAspectCost - 4;

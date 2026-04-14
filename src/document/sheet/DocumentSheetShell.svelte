@@ -4,16 +4,23 @@
    import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/application';
    import { setContext } from 'svelte';
 
-   /** @type {object} The root element of the application. */
+   /** @type {HTMLElement} The root element of the application. */
    export let elementRoot;
 
-   /** @type {Document} The Document that this sheet is for. */
+   /**
+    * @type {TJSDocument} The reactive TJSDocument store wrapping the Document.
+    */
    export let document = void 0;
 
-   /** @type {object} Writable for storing the sheet's state. */
+   /**
+    * @type {object} Writable store for managing the sheet's reactive state.
+    */
    export let applicationState = void 0;
 
-   /** @type {object} Child svelte-components that contains the sheet functionality. */
+   /**
+    * @type {typeof import('svelte').SvelteComponent}
+    * The Svelte component that contains the sheet functionality.
+    */
    export let shell = void 0;
 
    // Setup context variables

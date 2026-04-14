@@ -6,28 +6,41 @@
    /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value for this input, or false if there is none. */
+   /**
+    * @type {number|boolean}
+    * The minimum value for this input, or false if there is none.
+    */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value for this input, or false if there is none. */
+   /**
+    * @type {number|boolean}
+    * The maximum value for this input, or false if there is none.
+    */
    export let max = false;
 
    /** @type {boolean} Whether editing this input should be disabled. */
    export let disabled = false;
 
-   /** @type {number} The increment by which to increase or decrease the value when clicking the corresponding buttons. */
+   /**
+    * @type {number} The increment by which to increase or decrease the value
+    *    when clicking the corresponding buttons.
+    */
    export let increment = 1;
 
    /**
-    * @type {number} The increment by which to increase or decrease the value when clicking the corresponding buttons
-    * while the modifier key is pressed.
+    * @type {number} The increment by which to increase or decrease the value
+    *    when clicking the corresponding buttons while the modifier key is
+    *    pressed.
     */
    export let modifierIncrement = 10;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string|TooltipAction} The Tooltip to display for this element, if any. */
+   /**
+    * @type {string|TooltipAction}
+    * The Tooltip to display for this element, if any.
+    */
    export let tooltip = void 0;
 
    /**

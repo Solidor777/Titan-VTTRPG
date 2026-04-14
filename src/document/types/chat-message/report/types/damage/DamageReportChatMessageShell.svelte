@@ -38,7 +38,8 @@
       // Wounds suffered
       if ($document.flags.titan.woundsSuffered) {
 
-         // Stamina lost if wounds were suffered so that we can see the breakdown
+         // Stamina lost if wounds were suffered so that we can see the
+         // breakdown
          if ($document.flags.titan.staminaLost) {
             sections.push(localize('lostX%Stamina').replace('X%', $document.flags.titan.staminaLost));
          }

@@ -42,6 +42,7 @@
       from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageShell.svelte';
 
    // Context object
+   /** @type {TJSDocument} */
    export let documentStore = void 0;
 
    // Setup

@@ -7,7 +7,10 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
+   /**
+    * @type {number}
+    * The index of the rules element in the item's rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

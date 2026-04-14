@@ -34,7 +34,10 @@
    /** @type {AttackCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {*[]} Components for changing the options and displaying the parameters. */
+   /**
+    * @type {*[]}
+    * Components for changing the options and displaying the parameters.
+    */
    const rows = [
       AttackCheckDialogMeleeField,
       AttackCheckDialogDefenseField,

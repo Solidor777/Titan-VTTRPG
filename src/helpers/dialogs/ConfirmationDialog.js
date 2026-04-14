@@ -8,11 +8,14 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 export default class ConfirmationDialog extends TitanDialog {
    /**
     * @param {string} title - The title for the Dialog.
-    * @param {string[]} headers - Header lines to display at the top of the dialog.
+    * @param {string[]} headers - Header lines to display at the top of the
+    *    dialog.
     * @param {string} message - Message explaining the purpose of the dialog.
     * @param {string} confirmLabel - Label text for the confirmation button.
-    * @param {Function} confirmationCallback - Callback function to execute on confirmation.
-    * @param {object} [confirmationContext] - Optional context to bind to the callback function.
+    * @param {Function} confirmationCallback - Callback function to execute on
+    *    confirmation.
+    * @param {object} [confirmationContext] - Optional context to bind to the
+    *    callback function.
     */
    constructor(
       title,
@@ -34,7 +37,8 @@ export default class ConfirmationDialog extends TitanDialog {
          id: `titan-confirmation-dialog`,
       });
 
-      // If we were provided with a callback context then bind the function to the context
+      // If we were provided with a callback context then bind the function to
+      // the context
       if (confirmationContext) {
          this.confirmationCallback = confirmationCallback.bind(confirmationContext);
       }

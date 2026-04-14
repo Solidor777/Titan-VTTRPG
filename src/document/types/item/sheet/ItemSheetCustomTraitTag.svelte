@@ -2,21 +2,23 @@
    import { getContext } from 'svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
-   /** @type {number} The idx of the Trait in the item's Custom Traits array. */
+   /**
+    * @type {number} The idx of the Trait in the item's Custom Traits array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
-    * Called when the Delete icon is pressed.
+    * Called when the Delete button is clicked.
     */
    function deleteFunction() {
       $document.deleteCustomTrait(idx);
    }
 
    /**
-    * Called when the Edit icon is pressed.
+    * Called when the Edit button is clicked.
     */
    function editFunction() {
       $document.editCustomTrait(idx);

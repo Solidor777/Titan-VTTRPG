@@ -6,7 +6,8 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 /**
  * An Item Sheet class with functionality shared by all Weapon Items.
  * @extends {TitanItemSheet}
- * @property {WeaponSheetState} applicationState Reactive store for managing the state of the Weapon Sheet.
+ * @property {WeaponSheetState} applicationState Reactive store for managing the
+ *    state of the Weapon Sheet.
  */
 export default class TitanWeaponSheet extends TitanItemSheet {
    /**
@@ -35,7 +36,8 @@ export default class TitanWeaponSheet extends TitanItemSheet {
    }
 
    /**
-    * Overridable function for creating the reactive state store for this sheet.
+    * Overridable function for creating the reactive state store for this
+    * sheet.
     * @override
     * @returns {typeof WeaponSheetState} The newly created state store.
     * @protected
@@ -52,7 +54,8 @@ export default class TitanWeaponSheet extends TitanItemSheet {
    }
 
    /**
-    * Removes the Attack at the provided idx from this sheet's application state.
+    * Removes the Attack at the provided idx from this sheet's application
+    * state.
     * @param {number} idx - The idx of the attack to remove.
     */
    postDeleteAttack(idx) {

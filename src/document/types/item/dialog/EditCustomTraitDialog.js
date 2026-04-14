@@ -3,17 +3,13 @@ import EditCustomTraitDialogShell from '~/document/types/item/dialog/EditCustomT
 
 /**
  * Dialog for editing the Custom Trait of an Item.
- * @param {TitanItem} document - The Item to edit the Traits of.
- * @param {number} traitIdx - The idx of the Trait in the traits array.
- * @extends TitanDialog
+ * @extends {TitanDialog}
  */
 export default class EditCustomTraitDialog extends TitanDialog {
 
    /**
-    * Dialog for editing the Custom Trait of an Item.
     * @param {TitanItem} item - The Item to edit the Traits of.
     * @param {number} traitIdx - The idx of the Trait in the traits array.
-    * @extends TitanDialog
     */
    constructor(item, traitIdx) {
       super({

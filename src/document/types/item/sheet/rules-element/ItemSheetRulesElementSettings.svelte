@@ -23,13 +23,19 @@
    import ItemSheetInvalidRulesElement
       from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
+   /**
+    * @type {number}
+    * The index of the rules element in the item's rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} The operation specific settings component for this Rules Element. */
+   /**
+    * @type {object}
+    * The operation specific settings component for this Rules Element.
+    */
    let operationSettingsComponent;
    $: {
       switch ($document?.system.rulesElement[idx]?.operation) {

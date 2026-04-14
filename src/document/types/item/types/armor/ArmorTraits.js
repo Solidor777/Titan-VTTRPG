@@ -31,7 +31,8 @@ export const ARMOR_TRAITS = deepFreeze([
 ]);
 
 /**
- * Keys for the localized description strings for Armor Traits, mapped to the Trait name.
+ * Keys for the localized description strings for Armor Traits, mapped to the
+ * Trait name.
  * @type {object}
  */
 export const ARMOR_TRAIT_DESCRIPTIONS = deepFreeze({

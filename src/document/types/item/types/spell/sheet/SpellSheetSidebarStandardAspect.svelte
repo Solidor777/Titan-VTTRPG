@@ -43,6 +43,7 @@
       melee: MELEE_ICON,
    };
 
+   /** @type {object} */
    export let aspect = void 0;
 </script>
 
