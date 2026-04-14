@@ -454,15 +454,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    getRollData() {
       const retVal = super.getRollData();
-      retVal.attribute = foundry.utils.structuredClone(this.attribute);
-      retVal.resistance = foundry.utils.structuredClone(this.resistance);
-      retVal.skill = foundry.utils.structuredClone(this.skill);
-      retVal.rating = foundry.utils.structuredClone(this.rating);
-      retVal.resource = foundry.utils.structuredClone(this.resource);
-      retVal.speed = foundry.utils.structuredClone(this.speed);
-      retVal.mod = foundry.utils.structuredClone(this.mod);
-      retVal.equipped = foundry.utils.structuredClone(this.equipped);
-      retVal.bio = foundry.utils.structuredClone(this.bio);
+      retVal.attribute = structuredClone(this.attribute);
+      retVal.resistance = structuredClone(this.resistance);
+      retVal.skill = structuredClone(this.skill);
+      retVal.rating = structuredClone(this.rating);
+      retVal.resource = structuredClone(this.resource);
+      retVal.speed = structuredClone(this.speed);
+      retVal.mod = structuredClone(this.mod);
+      retVal.equipped = structuredClone(this.equipped);
+      retVal.bio = structuredClone(this.bio);
 
       return retVal;
    }
@@ -699,7 +699,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
        *    effect).
        */
       function processItemElements(item, type) {
-         const copiedElements = foundry.utils.structuredClone(item.system.rulesElement);
+         const copiedElements = structuredClone(item.system.rulesElement);
          for (const element of copiedElements) {
             element.type = type;
          }
@@ -5040,7 +5040,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Get turn messages
          const message = this.rulesElementsCache?.turnMessage?.turnStart;
          if (message) {
-            reportData.message = foundry.utils.structuredClone(message);
+            reportData.message = structuredClone(message);
          }
 
          // Update the duration of turn effects
@@ -5159,7 +5159,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Get turn messages
          const message = this.rulesElementsCache?.turnMessage?.turnEnd;
          if (message) {
-            reportData.message = foundry.utils.structuredClone(message);
+            reportData.message = structuredClone(message);
          }
 
          // Update the duration of turn effects
@@ -5442,14 +5442,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
                // Add the Fast Healing data
                if (healing > 0) {
-                  reportData.fastHealing = foundry.utils.structuredClone(fastHealingElements);
+                  reportData.fastHealing = structuredClone(fastHealingElements);
                   reportData.fastHealing.total = healing;
                   reportData.fastHealing.confirmed = healingConfirmed;
                }
 
                // Add the Persistent Damage data
                if (damage > 0) {
-                  reportData.persistentDamage = foundry.utils.structuredClone(persistentDamageElements);
+                  reportData.persistentDamage = structuredClone(persistentDamageElements);
                   reportData.persistentDamage.total = damage;
                   reportData.persistentDamage.confirmed = damageConfirmed;
                }

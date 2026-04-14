@@ -40,7 +40,7 @@ export default class PlayerDataModel extends CharacterDataModel {
 
    getRollData() {
       const retVal = super.getRollData();
-      retVal.xp = foundry.utils.structuredClone(this.xp);
+      retVal.xp = structuredClone(this.xp);
       retVal.inspiration = this.inspiration;
 
       return retVal;

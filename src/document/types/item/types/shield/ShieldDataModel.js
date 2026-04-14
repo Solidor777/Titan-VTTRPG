@@ -35,7 +35,7 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
       retVal.rarity = this.rarity;
       retVal.value = this.value;
       retVal.defense = this.defense;
-      retVal.trait = foundry.utils.structuredClone(this.trait);
+      retVal.trait = structuredClone(this.trait);
 
       return retVal;
    }

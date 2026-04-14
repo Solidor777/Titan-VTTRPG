@@ -20,7 +20,7 @@ export default class NPCDataModel extends CharacterDataModel {
 
          // Call the parent version of the function without updating the actor
          // or starting a report.
-         const superOptions = options ? foundry.utils.structuredClone(options) : {};
+         const superOptions = options ? structuredClone(options) : {};
          superOptions.updateActor = false;
          superOptions.report = false;
          const reportData = await super.applyDamage(damage, options);

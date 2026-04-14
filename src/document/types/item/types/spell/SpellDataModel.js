@@ -158,10 +158,10 @@ export default class SpellDataModel extends TitanItemDataModel {
       const retVal = super.getRollData();
       retVal.xpCost = this.xpCost;
       retVal.tradition = this.tradition;
-      retVal.castingCheck = foundry.utils.structuredClone(this.castingCheck);
+      retVal.castingCheck = structuredClone(this.castingCheck);
       retVal.quantity = this.quantity;
-      retVal.aspect = foundry.utils.structuredClone(this.aspect);
-      retVal.customAspect = foundry.utils.structuredClone(this.customAspect);
+      retVal.aspect = structuredClone(this.aspect);
+      retVal.customAspect = structuredClone(this.customAspect);
       retVal.rarity = this.rarity;
 
       return retVal;

@@ -20,7 +20,7 @@ export default class RulesElementItemDataModel extends TitanItemDataModel {
 
    getRollData() {
       const retVal = super.getRollData();
-      retVal.rulesElement = foundry.utils.structuredClone(this.rulesElement);
+      retVal.rulesElement = structuredClone(this.rulesElement);
 
       return retVal;
    }

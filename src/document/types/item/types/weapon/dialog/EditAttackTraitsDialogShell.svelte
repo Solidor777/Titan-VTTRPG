@@ -13,7 +13,7 @@
    export let attackIdx = void 0;
 
    // Trait options
-   let traitOptions = foundry.utils.structuredClone(ATTACK_TRAITS);
+   let traitOptions = structuredClone(ATTACK_TRAITS);
    let traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 

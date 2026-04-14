@@ -53,10 +53,6 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return this.parent.actionQueue;
    }
 
-   _getDefaultName() {
-      return localize('newEffect');
-   }
-
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -72,10 +68,6 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       schema.active = createBooleanField(true);
 
       return schema;
-   }
-
-   _getDefaultImage() {
-      return EFFECT_IMAGE;
    }
 
    _getInitialDocumentData(data) {
@@ -125,10 +117,18 @@ export default class EffectDataModel extends RulesElementItemDataModel {
 
    getRollData() {
       const retVal = super.getRollData();
-      retVal.duration = foundry.utils.structuredClone(this.duration);
+      retVal.duration = structuredClone(this.duration);
       retVal.active = this.active;
 
       return retVal;
+   }
+
+   _getDefaultImage() {
+      return EFFECT_IMAGE;
+   }
+
+   _getDefaultName() {
+      return localize('newEffect');
    }
 
    /**

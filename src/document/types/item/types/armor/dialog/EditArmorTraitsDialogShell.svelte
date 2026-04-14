@@ -9,7 +9,7 @@
    export let item = void 0;
 
    // The trait options
-   let traitOptions = foundry.utils.structuredClone(ARMOR_TRAITS);
+   let traitOptions = structuredClone(ARMOR_TRAITS);
    let traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
 </script>
 

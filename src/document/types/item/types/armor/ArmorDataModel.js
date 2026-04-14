@@ -38,8 +38,8 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
       retVal.value = this.value;
-      retVal.armor = foundry.utils.structuredClone(this.armor);
-      retVal.trait = foundry.utils.structuredClone(this.trait);
+      retVal.armor = structuredClone(this.armor);
+      retVal.trait = structuredClone(this.trait);
 
       return retVal;
    }

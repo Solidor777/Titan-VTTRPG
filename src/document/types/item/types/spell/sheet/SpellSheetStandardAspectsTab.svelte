@@ -11,7 +11,7 @@
    const appState = getContext('applicationState');
 
    // Aspect Options
-   const aspectOptions = foundry.utils.structuredClone(SpellAspects);
+   const aspectOptions = structuredClone(SpellAspects);
 
    // Localize Option Labels
    for (const aspect of Object.values(aspectOptions)) {
