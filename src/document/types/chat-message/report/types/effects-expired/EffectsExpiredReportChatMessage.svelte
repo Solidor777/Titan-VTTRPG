@@ -14,10 +14,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Header svelte-components to use. */
+   /** @type {object} The header Svelte component to render. */
    const header = EffectsExpiredReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte components. */
+   /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [];
 
    // Add expired effects

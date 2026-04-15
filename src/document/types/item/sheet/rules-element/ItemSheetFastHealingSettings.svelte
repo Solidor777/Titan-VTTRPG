@@ -1,18 +1,9 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
-   import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /**
-    * @type {number}
-    * The index of the rules element in the item's rules elements array.
-    */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -22,97 +13,47 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /**
-    * @type {{label: string, value: string}[]}
-    * Options for which turn the fast healing activates.
-    */
+   /** @type {{label: string, value: string}[]} Options for when in the turn the Fast Healing activates. */
    const selectorOptions = [
-      {
-         label: localize('turnStart'),
-         value: 'turnStart',
-      },
-      {
-         label: localize('turnEnd'),
-         value: 'turnEnd',
-      },
+      'turnStart',
+      'turnEnd'
    ];
 </script>
 
-{#if element && element.operation === 'fastHealing'}
-   <div class="element" transition:slide|local>
-      <!--Element Operation-->
-      <div class="settings">
-         <div class="field select">
-            <ItemSheetRulesElementOperationSelect {idx}/>
-         </div>
 
-         <!--Selector-->
-         <div class="field select">
-            <DocumentSelect
-               options={selectorOptions}
-               bind:value={element.selector}
-            />
-         </div>
+<!--Settings-->
+<div class="settings">
 
-         <!--Value-->
-         <div class="field number">
-            <DocumentIntegerInput bind:value={element.value} min={1}/>
-         </div>
-      </div>
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <IconButton
-            icon={DELETE_ICON}
-            on:click={() => {
-               $document.system.deleteRulesElement(idx);
-            }}
-         />
-      </div>
+   <!--Selector-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={element.selector}
+         options={selectorOptions}
+      />
    </div>
-{/if}
+
+   <!--Value-->
+   <div class="field number">
+      <DocumentIntegerInput bind:value={element.value} min={1}/>
+   </div>
+</div>
+
 
 <style lang="scss">
-   .element {
-      @include flex-row;
-      @include flex-space-between;
-      @include border;
-      @include panel-1;
+   .settings {
+      @include tag-container;
+      @include flex-group-left;
 
-      width: 100%;
-      height: 100%;
-
-      .settings {
+      .field {
          @include flex-row;
-         @include flex-group-left;
 
-         flex-wrap: wrap;
-         width: 100%;
-         margin-bottom: var(--titan-spacing-large);
-
-         .field {
-            @include flex-row;
-
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
-
-            &.select {
-               @include flex-group-left;
-            }
-
-            &.number {
-               @include flex-group-center;
-
-               width: 32px;
-            }
+         &.select {
+            @include flex-group-left;
          }
-      }
 
-      .delete-button {
-         @include flex-column;
-         @include flex-group-top;
-
-         height: 100%;
-         margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 0;
+         &.number {
+            @include flex-group-center;
+         }
       }
    }
 </style>

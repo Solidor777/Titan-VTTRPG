@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
@@ -12,10 +11,7 @@
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /**
-    * @type {number}
-    * The index of the rules element in the item's rules elements array.
-    */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -25,10 +21,7 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /**
-    * @type {string[]}
-    * Options for selecting the stat the flat modifier applies to.
-    */
+   /** @type {string[]} Options for selecting the stat the flat modifier applies to. */
    const selectorOptions = [
       'attribute',
       'expertise',
@@ -94,10 +87,10 @@
    }
 
    /**
-    * Returns the appropriate select component for the current selector type.
+    * Returns the appropriate select component for the key, depending on the current selector type.
     * @returns {object | undefined} The select component, or undefined if no case matches.
     */
-   function getSelector() {
+   function getKeySelect() {
       switch (element.selector) {
          case 'attribute': {
             return DocumentAttributeSelect;
@@ -129,63 +122,44 @@
    }
 </script>
 
-{#if element && element.operation === 'flatModifier'}
-   <div class="element" transition:slide|local>
-      <!--Element Operation-->
-      <div class="settings">
+<!--Operation settings-->
+<div class="settings">
 
-         <!--Selector-->
-         <div class="field select">
-            <DocumentSelect
-               options={selectorOptions}
-               bind:value={element.selector}
-               on:change={onSelectorChange}
-            />
-         </div>
-
-         <!--Key-->
-         <div class="field select">
-            <svelte:component this={getSelector()} bind:value={element.key}/>
-         </div>
-
-         <!--Value-->
-         <div class="field number">
-            <DocumentIntegerInput bind:value={element.value}/>
-         </div>
-      </div>
+   <!--Selector-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={element.selector}
+         on:change={onSelectorChange}
+         options={selectorOptions}
+      />
    </div>
-{/if}
+
+   <!--Key-->
+   <div class="field select">
+      <svelte:component bind:value={element.key} this={getKeySelect()}/>
+   </div>
+
+   <!--Value-->
+   <div class="field number">
+      <DocumentIntegerInput bind:value={element.value}/>
+   </div>
+</div>
+
 
 <style lang="scss">
-   .element {
-      @include flex-row;
-      @include flex-space-between;
+   .settings {
+      @include tag-container;
+      @include flex-group-left;
 
-      width: 100%;
-      height: 100%;
-
-      .settings {
+      .field {
          @include flex-row;
-         @include flex-group-left;
 
-         flex-wrap: wrap;
-         width: 100%;
-         margin-bottom: var(--titan-spacing-large);
+         &.select {
+            @include flex-group-left;
+         }
 
-         .field {
-            @include flex-row;
-
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
-
-            &.select {
-               @include flex-group-left;
-            }
-
-            &.number {
-               @include flex-group-center;
-
-               width: 32px;
-            }
+         &.number {
+            @include flex-group-center;
          }
       }
    }

@@ -30,10 +30,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Header svelte-components to use. */
+   /** @type {object} The header Svelte component to render. */
    const header = TurnStartReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte components. */
+   /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [];
 
    // Add Stamina if appropriate
@@ -105,7 +105,7 @@
          sections.push(ChatMessageResolveRegainTag);
       }
 
-      // Otherwise, add apply persistent damage button
+      // Otherwise, add apply resolve regain button
       else {
          sections.push(ChatMessageApplyResolveRegainButton);
       }
@@ -118,7 +118,6 @@
          isRichText: true,
       });
    }
-
 </script>
 
 <ReportChatMessageBase {header} {sections}/>

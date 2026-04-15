@@ -6,7 +6,6 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
 </script>
 
 <ReportChatMessageHeader

@@ -16,7 +16,7 @@
    <!--Apply Rend button-->
    <div class="button">
       <ChatMessageButton
-         on:click={() => applyRendToTargets(rend, {magical: magical})}
+         on:click={() => applyRendToTargets(rend, { magical })}
          tooltip={localize('rendArmor')}
       >
          <i class={REND_ICON}/>
