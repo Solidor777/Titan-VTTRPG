@@ -5,7 +5,7 @@ const config = {
    preprocess: sveltePreprocess({
       scss: {
          api: 'modern',
-         prependData: '@use "src/Styles/Root.scss" as *;'
+         prependData: '@use "src/styles/Root.scss" as *;'
       },
       postcss: {
          plugins: [autoprefixer()]

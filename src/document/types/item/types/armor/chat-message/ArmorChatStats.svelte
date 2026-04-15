@@ -1,7 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import { ARMOR_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/armor/ArmorTraits.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
@@ -17,8 +16,9 @@
 </script>
 
 <div class="stats">
-   <div class="stat" use:tooltipAction={'armor.desc'}>
+   <div class="stat">
       <IconStatTag
+         tooltip={'armor.desc'}
          icon={ARMOR_ICON}
          stat={localize('armor')}
          value={item.system.armor.value === item.system.armor.max

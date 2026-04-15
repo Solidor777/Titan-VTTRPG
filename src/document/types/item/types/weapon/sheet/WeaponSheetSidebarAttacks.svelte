@@ -3,7 +3,6 @@
    import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
@@ -106,20 +105,17 @@
 
                <!--Normal Traits-->
                {#each attack.trait as trait (trait.name)}
-                  <div
-                     class="stat"
-                     use:tooltipAction={traitDescriptions[trait.name]}
-                     transition:slide|local
-                  >
+                  <div class="stat" transition:slide|local>
                      {#if typeof (trait.value) === 'number'}
                         <!--Number Trait-->
                         <StatTag
+                           tooltip={traitDescriptions[trait.name]}
                            label={localize(trait.name)}
                            value={trait.value}
                         />
                      {:else}
                         <!--Bool Trait-->
-                        <Tag>{localize(trait.name)}</Tag>
+                        <Tag tooltip={traitDescriptions[trait.name]}>{localize(trait.name)}</Tag>
                      {/if}
                   </div>
                {/each}
