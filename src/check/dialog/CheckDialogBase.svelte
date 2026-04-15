@@ -4,10 +4,7 @@
    import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
 
-   /**
-    * @type {*[]}
-    * Components for changing the options and displaying the parameters.
-    */
+   /** @type {*[]} Components for changing the options and displaying the parameters. */
    export let rows = void 0;
 
    /** @type {EventDispatcher} Dispatcher for component Events. */

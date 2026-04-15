@@ -14,10 +14,7 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /**
-    * @type {number}
-    * The index of the rules element in the item's rules elements array.
-    */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -27,16 +24,10 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /**
-    * @type {string[]}
-    * Options for selecting which rating the conditional modifier applies to.
-    */
+   /** @type {string[]} Options for selecting which rating the conditional modifier applies to. */
    const ratingOptions = ['melee', 'accuracy', 'defense'];
 
-   /**
-    * @type {string[]}
-    * Options for selecting the defense-related condition for the modifier.
-    */
+   /** @type {string[]} Options for selecting the defense-related condition for the modifier. */
    const defenseSelectorOptions = [
       'armorTrait',
       'shieldTrait',
@@ -44,10 +35,7 @@
       'customShieldTrait',
    ];
 
-   /**
-    * @type {string[]}
-    * Options for selecting the attack-related condition for the modifier.
-    */
+   /** @type {string[]} Options for selecting the attack-related condition for the modifier. */
    const attackSelectorOptions = [
       'attackTrait',
       'attackType',

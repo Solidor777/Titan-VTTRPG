@@ -2,10 +2,7 @@
    import { getContext } from 'svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
-   /**
-    * @type {number}
-    * The index of the Trait in the item's Custom Traits array.
-    */
+   /** @type {number} The index of the Trait in the item's Custom Traits array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

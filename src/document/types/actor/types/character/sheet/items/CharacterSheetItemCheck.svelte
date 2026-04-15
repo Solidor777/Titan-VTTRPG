@@ -30,9 +30,7 @@
       checkIdx: checkIdx
    };
 
-   /**
-    * @type {boolean} Whether to automatically spend the resolve for checks.
-    */
+   /** @type {boolean} Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = getSetting('autoSpendResolveChecks');
 
    /** @type {ItemCheckParameters} Calculated item check parameters. */

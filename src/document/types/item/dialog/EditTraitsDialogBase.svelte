@@ -17,10 +17,7 @@
    /** @type {object[]} The traits to select from. */
    export let traitOptions = void 0;
 
-   /**
-    * @type {object}
-    * Object containing a mapping of each trait to its description.
-    */
+   /** @type {object} Object containing a mapping of each trait to its description. */
    export let traitDescriptions = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */

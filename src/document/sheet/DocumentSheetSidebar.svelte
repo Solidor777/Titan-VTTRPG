@@ -1,8 +1,5 @@
 <script>
-   /**
-    * @type {SvelteComponent[]}
-    * List of Svelte Components that make up the sections of the sidebar.
-    */
+   /** @type {SvelteComponent[]} List of Svelte Components that make up the sections of the sidebar. */
    export let sections = void 0;
 </script>
 

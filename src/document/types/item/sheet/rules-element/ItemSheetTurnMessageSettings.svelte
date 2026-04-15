@@ -8,10 +8,7 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /**
-    * @type {number}
-    * The index of the rules element in the item's rules elements array.
-    */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -21,10 +18,7 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /**
-    * @type {string[]}
-    * Options for which turn the message is sent.
-    */
+   /** @type {string[]} Options for which turn the message is sent. */
    const selectorOptions = [
       'turnStart',
       'turnEnd',

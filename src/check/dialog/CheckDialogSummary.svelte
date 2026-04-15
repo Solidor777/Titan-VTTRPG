@@ -8,10 +8,7 @@
    /** @type {*} The value to display. */
    export let value = void 0;
 
-   /**
-    * @type {string | TextData}
-    * The tooltip to display when the element is hovered.
-    */
+   /** @type {string | TextData} The tooltip to display when the element is hovered. */
    export let tooltip = void 0;
 
 </script>

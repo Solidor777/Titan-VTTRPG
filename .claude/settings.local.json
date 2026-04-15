@@ -17,7 +17,8 @@
       "Bash(awk '$1 > 120 {print $2 \": \" $1 \" chars\"}')",
       "Bash(perl -i -pe 's/headerlabel=/headerLabel=/g' document/types/chat-message/report/types/damage/DamageReportChatMessageHeader.svelte document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageHeader.svelte document/types/chat-message/report/types/healing/HealingReportChatMessageHeader.svelte document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageHeader.svelte document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageHeader.svelte document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageHeader.svelte)",
       "Bash(perl -i -pe 's/\\\\@type \\\\{isInteger\\\\}/\\\\@type \\\\{number\\\\}/g' document/types/chat-message/components/buttons/ChatMessageHealingButton.svelte document/types/chat-message/components/buttons/ChatMessageRendButtons.svelte)",
-      "Bash(perl -i -pe 's/if appropriat$/if appropriate/' document/types/chat-message/report/types/long-rest/LongRestReportChatMessage.svelte)"
+      "Bash(perl -i -pe 's/if appropriat$/if appropriate/' document/types/chat-message/report/types/long-rest/LongRestReportChatMessage.svelte)",
+      "Bash(python3 *)"
     ]
   }
 }

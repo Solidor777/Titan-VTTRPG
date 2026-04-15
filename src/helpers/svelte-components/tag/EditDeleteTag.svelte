@@ -14,9 +14,7 @@
    /** @type {string} The Tooltip to display when the Label is hovered. */
    export let labelTooltip = void 0;
 
-   /**
-    * @type {string} The Tooltip to display when the Delete Icon is hovered.
-    */
+   /** @type {string} The Tooltip to display when the Delete Icon is hovered. */
    export let deleteTooltip = void 0;
 
    /** @type {string} The Tooltip to display when the Edit Icon is hovered. */

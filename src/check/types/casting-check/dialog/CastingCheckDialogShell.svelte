@@ -45,10 +45,7 @@
       CheckDialogTotalExpertiseSummary,
    ];
 
-   /**
-    * @type {*[]}
-    * Components for changing the options and displaying the parameters.
-    */
+   /** @type {*[]} Components for changing the options and displaying the parameters. */
    let rows = baseRows;
 
    /** @type {Function} Called when the check becomes invalid. */

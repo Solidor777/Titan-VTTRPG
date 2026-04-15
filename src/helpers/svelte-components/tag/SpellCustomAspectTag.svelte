@@ -3,10 +3,7 @@
    import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
-   /**
-    * @type {SpellCustomAspect}
-    * The Spell Custom Aspect represented by this element.
-    */
+   /** @type {SpellCustomAspect} The Spell Custom Aspect represented by this element. */
    export let aspect = void 0;
 </script>
 

@@ -17,10 +17,7 @@
       6
    ];
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

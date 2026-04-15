@@ -16,10 +16,7 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /**
-    * @type {number}
-    * The index of the rules element in the item's rules elements array.
-    */
+   /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -29,10 +26,7 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /**
-    * @type {{label: string, value: string}[]}
-    * Options for the type of check that triggers the roll message.
-    */
+   /** @type {{label: string, value: string}[]} Options for the type of check that triggers the roll message. */
    const checkTypeOptions = [
       {
          label: localize('anyCheck'),
@@ -60,10 +54,7 @@
       },
    ];
 
-   /**
-    * @type {Record<string, {label: string, value: string}[]>}
-    * Selector options keyed by check type.
-    */
+   /** @type {Record<string, {label: string, value: string}[]>} Selector options keyed by check type. */
    const selectorOptions = {
       any: [
          {

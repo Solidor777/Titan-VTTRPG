@@ -6,10 +6,7 @@
    /** @type {boolean} The value that this input should modify. */
    export let value = void 0;
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** @type {boolean} Whether editing this input should be disabled. */

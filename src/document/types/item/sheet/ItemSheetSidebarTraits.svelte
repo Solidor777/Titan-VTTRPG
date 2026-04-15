@@ -13,10 +13,7 @@
    /** @type {object[]} An optional input array of traits converted into Tags. */
    export let itemTypeTraits = [];
 
-   /**
-    * @type {function | undefined}
-    * An optional function to start editing item-type specific traits.
-    */
+   /** @type {function | undefined} An optional function to start editing item-type specific traits. */
    export let editTraits = void 0;
 
    /** @type {object[]} The complete list of traits converted into tags. */

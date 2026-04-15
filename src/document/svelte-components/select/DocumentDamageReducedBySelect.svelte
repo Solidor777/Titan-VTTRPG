@@ -15,10 +15,7 @@
    /** @type {boolean} Whether to allow Opposed Check as an option */
    export let allowOpposedCheck = true;
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

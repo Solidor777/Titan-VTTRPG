@@ -22,7 +22,7 @@ import onGetActorDirectoryEntryContext from '~/hooks/OnGetActorDirectoryEntryCon
 import onGetChatLogEntryContext from '~/hooks/OnGetChatLogEntryContext.js';
 import onGetItemDirectoryEntryContext from '~/hooks/OnGetItemDirectoryEntryContext.js';
 import onPreDeleteChatMessage from '~/hooks/OnPreDeleteChatMessage.js';
-import onRenderChatMessage from '~/hooks/OnRenderChatMessage.js';
+import onRenderChatMessageHTML from '~/hooks/OnRenderChatMessageHTML.js';
 import onRenderJournalSheet from '~/hooks/OnRenderJournalSheet.js';
 import onRenderJournalTextPageSheet from '~/hooks/OnRenderJournalTextPageSheet.js';
 import onceInit from '~/hooks/OnceInit.js';
@@ -34,7 +34,7 @@ Hooks.on('getActorDirectoryEntryContext', onGetActorDirectoryEntryContext);
 Hooks.on('getChatLogEntryContext', onGetChatLogEntryContext);
 Hooks.on('getItemDirectoryEntryContext', onGetItemDirectoryEntryContext);
 Hooks.on('preDeleteChatMessage', onPreDeleteChatMessage);
-Hooks.on('renderChatMessage', onRenderChatMessage);
+Hooks.on('renderChatMessageHTML', onRenderChatMessageHTML);
 Hooks.on('renderJournalSheet', onRenderJournalSheet);
 Hooks.on('renderJournalTextPageSheet', onRenderJournalTextPageSheet);
 Hooks.once('init', onceInit);

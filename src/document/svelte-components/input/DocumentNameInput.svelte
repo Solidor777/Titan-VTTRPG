@@ -5,15 +5,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /**
-    * @type {boolean} Whether editing should be disabled for this component.
-    */
+   /** @type {boolean} Whether editing should be disabled for this component. */
    export let disabled = false;
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** @type {string} The name of the document. */

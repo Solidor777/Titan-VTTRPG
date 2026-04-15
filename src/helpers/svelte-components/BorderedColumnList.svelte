@@ -1,8 +1,6 @@
 <script>
 
-   /**
-    * @type {object} The Svelte Component to use for each object in the list.
-    */
+   /** @type {object} The Svelte Component to use for each object in the list. */
    export let entryComponent = void 0;
 
    /** @type {*[]} The properties for each entry in the list. */

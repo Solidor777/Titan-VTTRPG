@@ -15,19 +15,13 @@
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /**
-    * @type {boolean}
-    * Whether the input should be an Integer. If False, it will be a Float.
-    */
+   /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */
    export let isInteger = false;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /**

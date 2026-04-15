@@ -5,10 +5,7 @@
    /** @type {string} The Rarity to associate with the tag. */
    export let rarity = void 0;
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 </script>
 

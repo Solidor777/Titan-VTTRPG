@@ -6,16 +6,10 @@
    /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
-   /**
-    * @type {number | boolean}
-    * The minimum value for this input, or false if there is none.
-    */
+   /** @type {number | boolean} The minimum value for this input, or false if there is none. */
    export let min = false;
 
-   /**
-    * @type {number | boolean}
-    * The maximum value for this input, or false if there is none.
-    */
+   /** @type {number | boolean} The maximum value for this input, or false if there is none. */
    export let max = false;
 
    /** @type {number | boolean} The maximum number of digits this input can display. */
@@ -27,10 +21,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /**

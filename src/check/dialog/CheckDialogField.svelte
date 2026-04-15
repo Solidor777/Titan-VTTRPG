@@ -8,15 +8,10 @@
    /** @type {*} The value that this input should modify. */
    export let value = void 0;
 
-   /**
-    * @type {SvelteComponent} The input svelte component to bind the value to.
-    */
+   /** @type {SvelteComponent} The input svelte component to bind the value to. */
    export let input = void 0;
 
-   /**
-    * @type {string | TextData}
-    * The tooltip to display when the element is hovered.
-    */
+   /** @type {string | TextData} The tooltip to display when the element is hovered. */
    export let tooltip = void 0;
 
    /** @type {*} Properties for the input svelte components. */

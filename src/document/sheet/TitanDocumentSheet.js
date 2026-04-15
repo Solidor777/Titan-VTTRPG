@@ -59,16 +59,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
          { delete: this.close.bind(this) }
       );
 
-      /**
-       * @type {typeof TApplicationState}
-       * The reactive application state store, passed to the Svelte component.
-       */
+      /** @type {typeof TApplicationState} The reactive application state store, passed to the Svelte component. */
       this.applicationState = this._createReactiveState();
 
-      /**
-       * @type {typeof TApplicationState}
-       * The reactive application state store, passed to the Svelte component.
-       */
+      /** @type {typeof TApplicationState} The reactive application state store, passed to the Svelte component. */
       this.options.svelte.props.applicationState = this.applicationState;
 
       /**

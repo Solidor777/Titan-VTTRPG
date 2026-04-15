@@ -13,10 +13,7 @@
    /** @type {boolean} Whether to allow Opposed Check as an option. */
    export let allowOpposedCheck = void 0;
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /** @type {string[]} Options for the Select Svelte component. */

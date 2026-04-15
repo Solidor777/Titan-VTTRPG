@@ -15,10 +15,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /**
-    * @type {string[]}
-    * Options for the role of NPC (Minion, Warrior, Elite, or Champion).
-    */
+   /** @type {string[]} Options for the role of NPC (Minion, Warrior, Elite, or Champion). */
    const roleOptions = ROLES;
 </script>
 

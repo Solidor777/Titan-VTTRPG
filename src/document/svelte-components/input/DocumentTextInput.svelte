@@ -12,10 +12,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /**
-    * @type {string | TooltipAction}
-    * The Tooltip to display for this element, if any.
-    */
+   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
    /**

@@ -10,9 +10,7 @@
       RESET_ICON,
    } from '~/system/Icons.js';
 
-   /**
-    * @type {number} Index of the Scaling Aspect in the Scaling Aspects array.
-    */
+   /** @type {number} Index of the Scaling Aspect in the Scaling Aspects array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

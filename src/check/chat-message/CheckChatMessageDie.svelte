@@ -50,9 +50,7 @@
       }
    }
 
-   /**
-    * @type {boolean} Whether applying Expertise to the die should be disabled.
-    */
+   /** @type {boolean} Whether applying Expertise to the die should be disabled. */
    const disabled = !$document.isOwner ||
       $document.flags.titan.results.expertiseRemaining === 0 ||
       die.final >= 6;
