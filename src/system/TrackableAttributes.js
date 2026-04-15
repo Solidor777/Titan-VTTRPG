@@ -16,9 +16,16 @@ export default function getTrackableAttributes() {
  */
 function getCharacterTrackableAttributes() {
    return {
-      bar: ['resource.stamina', 'resource.resolve', 'resource.wounds'],
+      bar: [
+         'resource.stamina',
+         'resource.resolve',
+         'resource.wounds',
+      ],
       value: [
-         'mod.armor.value', 'rating.awareness.value', 'rating.defense.value', 'rating.melee.value',
+         'mod.armor.value',
+         'rating.awareness.value',
+         'rating.defense.value',
+         'rating.melee.value',
          'rating.accuracy.value',
       ],
    };

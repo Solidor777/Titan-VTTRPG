@@ -3,17 +3,17 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Results of an Attribute Check.
  * @typedef {CheckResults} AttributeCheckResults
- * @property {boolean} succeeded Whether the Check Succeeded.
- * @property {CheckDie[]} dice The sorted dice rolled for the check, after
+ * @property {boolean} succeeded - Whether the Check Succeeded.
+ * @property {CheckDie[]} dice - The sorted dice rolled for the check, after
  *    Expertise is applied.
- * @property {number} criticalFailures The number of Critical Failures rolled.
- * @property {number} criticalSuccesses The number of Critical Successes
+ * @property {number} criticalFailures - The number of Critical Failures rolled.
+ * @property {number} criticalSuccesses - The number of Critical Successes
  *    achieved.
- * @property {number} damageTaken Damage taken, if any.
- * @property {number} expertiseRemaining The Expertise remaining after being
+ * @property {number} damageTaken - Damage taken, if any.
+ * @property {number} expertiseRemaining - The Expertise remaining after being
  *    applied to the dice.
- * @property {number} extraSuccesses The number of extra Successes achieved beyond the Complexity.
- * @property {number} successes The total number of Successes achieved.
+ * @property {number} extraSuccesses - The number of extra Successes achieved beyond the Complexity.
+ * @property {number} successes - The total number of Successes achieved.
  */
 
 /**

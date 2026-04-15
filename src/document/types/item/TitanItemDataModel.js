@@ -10,7 +10,7 @@ import { ITEM_IMAGE } from '~/system/DefaultImages.js';
 /**
  * Data model with extra functionality for Items.
  * @extends {TitanDataModel}
- * @property {TitanItem} parent The Item that owns this data model.
+ * @property {TitanItem} parent - The Item that owns this data model.
  */
 export default class TitanItemDataModel extends TitanDataModel {
    /**

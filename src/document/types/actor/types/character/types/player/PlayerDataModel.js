@@ -14,7 +14,11 @@ export default class PlayerDataModel extends CharacterDataModel {
     * @returns {Promise<void>}
     */
    async toggleInspiration() {
-      if (assert(this.parent.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          this.inspiration = !this.inspiration;
          await this.parent.update({
             system: {

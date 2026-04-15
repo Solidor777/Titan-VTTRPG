@@ -41,7 +41,11 @@ export default function onHotbarDrop(hotbar, data, slot) {
 
    // Create a dialog if this item has any associated checks
    if (macroItem.system.check.length > 0) {
-      const dialog = new CreateItemMacroDialog(macroItem, slot, data.uuid);
+      const dialog = new CreateItemMacroDialog(
+         macroItem,
+         slot,
+         data.uuid,
+      );
       dialog.render(true);
 
       return false;
@@ -51,7 +55,11 @@ export default function onHotbarDrop(hotbar, data, slot) {
    switch (macroItem.type) {
       case 'weapon': {
          if (macroItem.system.attack.length > 0) {
-            const dialog = new CreateItemMacroDialog(macroItem, slot, data.uuid);
+            const dialog = new CreateItemMacroDialog(
+         macroItem,
+         slot,
+         data.uuid,
+      );
             dialog.render(true);
 
             return false;
@@ -62,7 +70,11 @@ export default function onHotbarDrop(hotbar, data, slot) {
 
       case 'spell':
       case 'effect': {
-         const dialog = new CreateItemMacroDialog(macroItem, slot, data.uuid);
+         const dialog = new CreateItemMacroDialog(
+         macroItem,
+         slot,
+         data.uuid,
+      );
          dialog.render(true);
 
          return false;
@@ -75,7 +87,12 @@ export default function onHotbarDrop(hotbar, data, slot) {
 
    // This is a separate function because if onHotbarDrop does not return
    // immediately, the default macro will be created
-   createToggleDocumentSheetMacro(macroItem.name, macroItem.img, data.uuid, slot);
+   createToggleDocumentSheetMacro(
+      macroItem.name,
+      macroItem.img,
+      data.uuid,
+      slot,
+   );
    return false;
 }
 
@@ -87,6 +104,13 @@ export default function onHotbarDrop(hotbar, data, slot) {
  * @param {number} slot - The slot on the user's hotbar to add the macro to.
  */
 async function createToggleDocumentSheetMacro(name, img, uuid, slot) {
-   const macro = await game.titan.macros.getToggleDocumentSheetMacro(name, img, uuid);
-   await game.user.assignHotbarMacro(macro, slot);
+   const macro = await game.titan.macros.getToggleDocumentSheetMacro(
+      name,
+      img,
+      uuid,
+   );
+   await game.user.assignHotbarMacro(
+      macro,
+      slot,
+   );
 }

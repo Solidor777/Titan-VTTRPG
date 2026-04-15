@@ -14,7 +14,10 @@ export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
    constructor(actor, item) {
       super(
          localize('deleteItem'),
-         [actor.name, item.name],
+         [
+            actor.name,
+            item.name,
+         ],
          localize('confirmDeleteItem.desc'),
          localize('deleteItem'),
          () => {

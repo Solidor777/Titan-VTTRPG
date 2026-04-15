@@ -90,7 +90,10 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    editAttackTraits(attackIdx) {
       if (this.parent.isOwner) {
-         const dialog = new EditAttackTraitsDialog(this.parent, attackIdx);
+         const dialog = new EditAttackTraitsDialog(
+            this.parent,
+            attackIdx,
+         );
          dialog.render(true);
       }
    }
@@ -102,7 +105,10 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
-         const dialog = new AddCustomAttackTraitDialog(this.parent, attackIdx);
+         const dialog = new AddCustomAttackTraitDialog(
+            this.parent,
+            attackIdx,
+         );
          dialog.render(true);
       }
    }
@@ -116,7 +122,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
-         const dialog = new EditCustomAttackTraitDialog(this.parent, attackIdx, traitIdx);
+         const dialog = new EditCustomAttackTraitDialog(
+            this.parent,
+            attackIdx,
+            traitIdx,
+         );
          dialog.render(true);
       }
    }

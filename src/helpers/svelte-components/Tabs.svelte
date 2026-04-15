@@ -4,8 +4,8 @@
    /**
     * Object for storing tab information.
     * @typedef {object} Tab
-    * @property {string} id The ID to use for the type.
-    * @property {object} component The Svelte component to use for the Tab.
+    * @property {string} id - The ID to use for the type.
+    * @property {object} component - The Svelte component to use for the Tab.
     */
 
    /** @type {Tab[]} Array of Tab objects. */

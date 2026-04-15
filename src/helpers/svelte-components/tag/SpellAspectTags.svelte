@@ -64,7 +64,10 @@
             };
          }),
       )
-      .sort((a, b) => sortAscending(calculateAspectTagSize(a), calculateAspectTagSize(b)));
+      .sort((a, b) => sortAscending(
+         calculateAspectTagSize(a),
+         calculateAspectTagSize(b),
+      ));
 </script>
 
 <!--Aspect Tag Container-->

@@ -16,7 +16,10 @@
             SpellSheetSidebarCastingCheck,
             ItemSheetSidebarChecks,
          ]
-         : [ItemSheetSidebarTraits, SpellSheetSidebarCastingCheck];
+         : [
+            ItemSheetSidebarTraits,
+            SpellSheetSidebarCastingCheck,
+         ];
 </script>
 
 <ItemSheetSidebarSections {sections}/>

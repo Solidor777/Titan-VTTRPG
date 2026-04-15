@@ -3,10 +3,10 @@ import sortDescending from '~/helpers/utility-functions/SortDescending.js';
 /**
  * A check die that has been processed by applying expertise.
  * @typedef {object} CheckDie
- * @property {number} base The base number that was rolled on the dice.
- * @property {number} expertiseApplied The amount of expertise that was applied
+ * @property {number} base - The base number that was rolled on the dice.
+ * @property {number} expertiseApplied - The amount of expertise that was applied
  *    to the die.
- * @property {number} final The final number after applying expertise to the
+ * @property {number} final - The final number after applying expertise to the
  *    base result.
  */
 

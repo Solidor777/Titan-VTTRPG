@@ -14,7 +14,11 @@
     * confirmed.
     */
    async function confirmRegainResolve() {
-      if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(
+         document?.isOwner,
+         'Cannot modify document %s if not owner.',
+         document?.name,
+      )) {
          // Get the actor
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {

@@ -9,7 +9,10 @@ import processTextData from '~/helpers/ProcessTextData.js';
  * [0] = Delay before showing a tooltip.
  * [1] = Delay before hiding a tooltip.
  */
-const TOOLTIP_DELAY = [1000, 250];
+const TOOLTIP_DELAY = [
+   1000,
+   250,
+];
 
 /**
  * @type {number[]} The time in milliseconds it takes to show or hide a tooltip
@@ -17,14 +20,17 @@ const TOOLTIP_DELAY = [1000, 250];
  * [0] = Time to show a tooltip.
  * [1] = Time to hide a tooltip.
  */
-const TOOLTIP_DURATION = [400, 250];
+const TOOLTIP_DURATION = [
+   400,
+   250,
+];
 
 /**
  * @typedef {object} TooltipAction - Svelte action for adding a hovering tooltip
  *    to an element.
- * @property {Function} update Updates the content in response to changes.
- * @property {Function} destroy Destroys the action when no longer needed.
- * @property {tippy|boolean} tippyTooltip The current tippy tooltip if the
+ * @property {Function} update - Updates the content in response to changes.
+ * @property {Function} destroy - Destroys the action when no longer needed.
+ * @property {tippy|boolean} tippyTooltip - The current tippy tooltip if the
  *    content is valid. Otherwise, false.
  * */
 

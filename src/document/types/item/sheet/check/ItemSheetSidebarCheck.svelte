@@ -26,7 +26,13 @@
 
          <!--Name-->
          <div class="name">
-            <IconLabel icon={DICE_ICON} label={{text:$document.system.check[idx].label, localize: false}}/>
+            <IconLabel
+               icon={DICE_ICON}
+               label={{
+                  text: $document.system.check[idx].label,
+                  localize: false,
+               }}
+            />
          </div>
 
          <!--Rolled Stats-->

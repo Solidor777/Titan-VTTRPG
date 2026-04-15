@@ -19,7 +19,8 @@
       "Bash(perl -i -pe 's/\\\\@type \\\\{isInteger\\\\}/\\\\@type \\\\{number\\\\}/g' document/types/chat-message/components/buttons/ChatMessageHealingButton.svelte document/types/chat-message/components/buttons/ChatMessageRendButtons.svelte)",
       "Bash(perl -i -pe 's/if appropriat$/if appropriate/' document/types/chat-message/report/types/long-rest/LongRestReportChatMessage.svelte)",
       "Bash(python3 *)",
-      "Bash(head *)"
+      "Bash(head *)",
+      "Bash(xargs sed *)"
     ]
   }
 }

@@ -15,7 +15,10 @@ export default class TitanDialog extends TJSDialog {
     */
    constructor(options) {
       // Add default classes
-      const classes = ['titan', 'titan-dialog'];
+      const classes = [
+         'titan',
+         'titan-dialog',
+      ];
 
       // Add dark mode class if appropriate
       if (isDarkModeSheetsEnabled()) {

@@ -3,33 +3,33 @@ import calculateCheckResults from '~/check/CheckResults.js';
 /**
  * Data for a scaling aspect used in the check.
  * @typedef {object} ScalingAspect
- * @property {boolean} isDamage Whether the aspect applies damage.
- * @property {boolean} isHealing Whether the aspect applies healing.
- * @property {number} cost The success cost for increasing the value of the
+ * @property {boolean} isDamage - Whether the aspect applies damage.
+ * @property {boolean} isHealing - Whether the aspect applies healing.
+ * @property {number} cost - The success cost for increasing the value of the
  *    aspect.
- * @property {number} currentValue The current value of the aspect.
- * @property {number} initialValue The initial value of the aspect.
- * @property {string} label The display name for the aspect.
+ * @property {number} currentValue - The current value of the aspect.
+ * @property {number} initialValue - The initial value of the aspect.
+ * @property {string} label - The display name for the aspect.
  */
 
 /**
  * Results of a Casting Check.
  * @typedef {CheckResults} CastingCheckResults
- * @property {CheckDie[]} dice The sorted dice rolled for the check, after
+ * @property {CheckDie[]} dice - The sorted dice rolled for the check, after
  *    having expertise applied.
- * @property {boolean} succeeded Whether the Check Succeeded.
- * @property {number} criticalFailures The number of Critical Failures rolled.
- * @property {number} criticalSuccesses The number of Critical Successes
+ * @property {boolean} succeeded - Whether the Check Succeeded.
+ * @property {number} criticalFailures - The number of Critical Failures rolled.
+ * @property {number} criticalSuccesses - The number of Critical Successes
  *    achieved.
- * @property {number} damage The amount of Damage inflicted.
- * @property {number} expertiseRemaining The Expertise remaining after being
+ * @property {number} damage - The amount of Damage inflicted.
+ * @property {number} expertiseRemaining - The Expertise remaining after being
  *    applied to the dice.
- * @property {number} extraSuccesses The number of extra Successes achieved beyond the Complexity.
- * @property {number} extraSuccessesRemaining The remaining successes that have
+ * @property {number} extraSuccesses - The number of extra Successes achieved beyond the Complexity.
+ * @property {number} extraSuccessesRemaining - The remaining successes that have
  *    not yet been applied to scaling aspects.
- * @property {number} successes The total number of Successes achieved.
- * @property {number} healing The amount of Healing applied.
- * @property {ScalingAspect[]} scalingAspect The scaling aspects associated with
+ * @property {number} successes - The total number of Successes achieved.
+ * @property {number} healing - The amount of Healing applied.
+ * @property {ScalingAspect[]} scalingAspect - The scaling aspects associated with
  *    the check.
  */
 

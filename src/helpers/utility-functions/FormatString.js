@@ -19,7 +19,13 @@ export default function formatString(string, ...args) {
 
          // Replace the indexes of the arguments with the argument values
          for (const [key, value] of args.entries()) {
-            retVal = retVal.replace(new RegExp('\\{' + key + '\\}', 'gi'), value.toString());
+            retVal = retVal.replace(
+               new RegExp(
+                  '\\{' + key + '\\}',
+                  'gi',
+               ),
+               value.toString(),
+            );
          }
       }
 
@@ -28,7 +34,13 @@ export default function formatString(string, ...args) {
          // Replace the instances of the object keys with the object values for
          // those keys
          for (const [key, value] of Object.entries(args[0])) {
-            retVal = retVal.replace(new RegExp('\\{' + key + '\\}', 'gi'), value.toString());
+            retVal = retVal.replace(
+               new RegExp(
+                  '\\{' + key + '\\}',
+                  'gi',
+               ),
+               value.toString(),
+            );
          }
       }
    }

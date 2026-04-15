@@ -51,205 +51,205 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * Options for applying Damage to a Character.
  * @typedef {object} DamageOptions
- * @property {boolean} [ignoreArmor = false] - Whether to Ignore Armor when
+ * @property {boolean} [ignoreArmor - = false] - Whether to Ignore Armor when
  *    applying the Damage.
- * @property {boolean} [ineffective = false] - Whether the Attack had the
+ * @property {boolean} [ineffective - = false] - Whether the Attack had the
  *    Ineffective trait.
- * @property {boolean} [penetrating = false] - Whether the Attack had the
+ * @property {boolean} [penetrating - = false] - Whether the Attack had the
  *    Penetrating trait.
- * @property {boolean} [updateActor = true] - Whether to update the Character
+ * @property {boolean} [updateActor - = true] - Whether to update the Character
  *    after applying the Damage. When updating
  *    multiple values, it is useful to set this to false.
- * @property {boolean} [report = true] - Whether to send a Chat Message report,
+ * @property {boolean} [report - = true] - Whether to send a Chat Message report,
  *    provided this setting is enabled. When
  *    sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound = true] - Whether to play a sound when sending
+ * @property {boolean} [playSound - = true] - Whether to play a sound when sending
  *    the report.
  */
 
 /**
  * Data for a report detailing the Damage applied to a character.
  * @typedef {object} DamageReport
- * @property {string} type The Chat Message type (damageReport).
- * @property {boolean} [ignoreArmor] Whether to the attack Ignored Armor.
- * @property {number} [damageResisted] The amount of Damage resisted.
- * @property {number} [damageTaken] The amount of Damage taken.
- * @property {number} [staminaLost] The amount of Stamina lost.
- * @property {object} [wounds] The character's Wounds, if any.
- * @property {number} [wounds.max] The character's maximum Wounds, if any.
- * @property {number} [wounds.value] The character's current Wounds, if any.
- * @property {number} [woundsSuffered] The number of Wounds suffered, if any.
- * @property {object} [stamina] The character's Stamina.
- * @property {number} [stamina.max] The character's maximum Stamina.
- * @property {number} [stamina.value] The character's current Stamina.
- * @property {object} [tags] Tags applied to the damage.
- * @property {boolean} [tags.ineffective] Whether the Attack had the Ineffective
+ * @property {string} type - The Chat Message type (damageReport).
+ * @property {boolean} [ignoreArmor] - Whether to the attack Ignored Armor.
+ * @property {number} [damageResisted] - The amount of Damage resisted.
+ * @property {number} [damageTaken] - The amount of Damage taken.
+ * @property {number} [staminaLost] - The amount of Stamina lost.
+ * @property {object} [wounds] - The character's Wounds, if any.
+ * @property {number} [wounds.max] - The character's maximum Wounds, if any.
+ * @property {number} [wounds.value] - The character's current Wounds, if any.
+ * @property {number} [woundsSuffered] - The number of Wounds suffered, if any.
+ * @property {object} [stamina] - The character's Stamina.
+ * @property {number} [stamina.max] - The character's maximum Stamina.
+ * @property {number} [stamina.value] - The character's current Stamina.
+ * @property {object} [tags] - Tags applied to the damage.
+ * @property {boolean} [tags.ineffective] - Whether the Attack had the Ineffective
  *    trait.
- * @property {boolean} [tags.penetrating] Whether the Attack had the Penetrating
+ * @property {boolean} [tags.penetrating] - Whether the Attack had the Penetrating
  *    trait.
- * @property {string} actorImg The character's image.
- * @property {string} actorName The character's name.
+ * @property {string} actorImg - The character's image.
+ * @property {string} actorName - The character's name.
  */
 
 /**
  * Options for applying Healing to a Character.
  * @typedef {object} HealingOptions
- * @property {boolean} [updateActor = true] - Whether to update the Character
+ * @property {boolean} [updateActor - = true] - Whether to update the Character
  *    after applying the Healing. When updating
  *    multiple values, it is useful to set this to false.
- * @property {boolean} [report = true] - Whether to send a Chat Message report,
+ * @property {boolean} [report - = true] - Whether to send a Chat Message report,
  *    provided this setting is enabled. When
  *    sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound = true] - Whether to play a sound when sending
+ * @property {boolean} [playSound - = true] - Whether to play a sound when sending
  *    the report.
  */
 
 /**
  * Data for a report detailing the Healing applied to a character.
  * @typedef {object} HealingReport
- * @property {string} type The Chat Message type (healingReport).
- * @property {string} actorImg The character's image.
- * @property {string} actorName The character's name.
- * @property {number} staminaRestored The amount of Stamina healed.
- * @property {object} stamina The character's Stamina.
- * @property {number} stamina.value The character's current Stamina.
- * @property {number} stamina.max The character's maximum Stamina.
- * @property {object} [wounds] The character's Wounds, if any.
- * @property {number} [wounds.value] The character's current Wounds, if any.
- * @property {number} [wounds.max] The character's maximum Wounds, if any.
+ * @property {string} type - The Chat Message type (healingReport).
+ * @property {string} actorImg - The character's image.
+ * @property {string} actorName - The character's name.
+ * @property {number} staminaRestored - The amount of Stamina healed.
+ * @property {object} stamina - The character's Stamina.
+ * @property {number} stamina.value - The character's current Stamina.
+ * @property {number} stamina.max - The character's maximum Stamina.
+ * @property {object} [wounds] - The character's Wounds, if any.
+ * @property {number} [wounds.value] - The character's current Wounds, if any.
+ * @property {number} [wounds.max] - The character's maximum Wounds, if any.
  */
 
 /**
  * Options for restoring a Character's Resolve.
  * @typedef {object} RestoreResolveOptions
- * @property {boolean} [updateActor = true] - Whether to update the Character
+ * @property {boolean} [updateActor - = true] - Whether to update the Character
  *    after restoring the Resolve. When
  *    updating multiple values, it is useful to set this to false.
- * @property {boolean} [report = true] - Whether to send a Chat Message report,
+ * @property {boolean} [report - = true] - Whether to send a Chat Message report,
  *    provided this setting is enabled. When
  *    sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound = true] - Whether to play a sound when sending
+ * @property {boolean} [playSound - = true] - Whether to play a sound when sending
  *    the report.
  */
 
 /**
  * Options for spending a Character's Resolve.
  * @typedef {object} SpendResolveOptions
- * @property {boolean} [updateActor = true] - Whether to update the Character
+ * @property {boolean} [updateActor - = true] - Whether to update the Character
  *    after spending the Resolve. When updating
  *    multiple values, it is useful to set this to false.
- * @property {boolean} [report = true] - Whether to send a Chat Message report,
+ * @property {boolean} [report - = true] - Whether to send a Chat Message report,
  *    provided this setting is enabled. When
  *    sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound = true] - Whether to play a sound when sending
+ * @property {boolean} [playSound - = true] - Whether to play a sound when sending
  *    the report.
  */
 
 /**
  * Data for a report detailing Resolve spent by the character.
  * @typedef {object} SpendResolveReport
- * @property {string} type The Chat Message type (spendResolveReport).
- * @property {string} actorImg The character's image.
- * @property {string} actorName The character's name.
- * @property {number} resolveSpent The amount of Resolve spent.
- * @property {number} [resolveShortage] How much the character overspent their
+ * @property {string} type - The Chat Message type (spendResolveReport).
+ * @property {string} actorImg - The character's image.
+ * @property {string} actorName - The character's name.
+ * @property {number} resolveSpent - The amount of Resolve spent.
+ * @property {number} [resolveShortage] - How much the character overspent their
  *    Resolve.
  */
 
 /**
  * Options for Rending the character's Armor.
  * @typedef {object} RendOptions
- * @property {boolean} [magical = false] - Whether the rending Attack was
+ * @property {boolean} [magical - = false] - Whether the rending Attack was
  *    magical.
- * @property {boolean} [updateArmor = true] - Whether to update the Armor after
+ * @property {boolean} [updateArmor - = true] - Whether to update the Armor after
  *    applying the Rend. When updating
  *    multiple values, it is useful to set this to false.
- * @property {boolean} [report = true] - Whether to send a Chat Message report,
+ * @property {boolean} [report - = true] - Whether to send a Chat Message report,
  *    provided this setting is enabled. When
  *    sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound = true] - Whether to play a sound when sending
+ * @property {boolean} [playSound - = true] - Whether to play a sound when sending
  *    the report.
  */
 
 /**
  * Data for a report detailing Rend applied to the character's Armor.
  * @typedef {object} RendReport
- * @property {string} type The Chat Message type (rendReport).
- * @property {string} actorImg The character's image.
- * @property {string} actorName The character's name.
- * @property {string} armorImg The armor's image.
- * @property {string} armorName The armor's display name.
- * @property {number} [armorLost] The amount of Armor lost, if any.
+ * @property {string} type - The Chat Message type (rendReport).
+ * @property {string} actorImg - The character's image.
+ * @property {string} actorName - The character's name.
+ * @property {string} armorImg - The armor's image.
+ * @property {string} armorName - The armor's display name.
+ * @property {number} [armorLost] - The amount of Armor lost, if any.
  */
 
 /**
  * Options for Repairing the character's Armor.
  * @typedef {object} RepairsOptions
- * @property {boolean} [updateArmor = true] - Whether to update the Armor after
+ * @property {boolean} [updateArmor - = true] - Whether to update the Armor after
  *    applying the repairs. When updating
  *    multiple values, it is useful to set this to false.
- * @property {boolean} [report = true] - Whether to send a Chat Message report,
+ * @property {boolean} [report - = true] - Whether to send a Chat Message report,
  *    provided this setting is enabled. When
  *    sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound = true] - Whether to play a sound when sending
+ * @property {boolean} [playSound - = true] - Whether to play a sound when sending
  *    the report.
  */
 
 /**
  * Data for a report detailing Repairs made to the character's Armor.
  * @typedef {object} RepairsReport
- * @property {string} type The Chat Message type (repairsReport).
- * @property {string} actorImg The character's image.
- * @property {string} actorName The character's name.
- * @property {string} armorImg The armor's image.
- * @property {string} armorName The armor's display name.
- * @property {number} armorRepaired The amount of Armor repaired.
+ * @property {string} type - The Chat Message type (repairsReport).
+ * @property {string} actorImg - The character's image.
+ * @property {string} actorName - The character's name.
+ * @property {string} armorImg - The armor's image.
+ * @property {string} armorName - The armor's display name.
+ * @property {number} armorRepaired - The amount of Armor repaired.
  */
 
 /**
  * Base report Data for an Effect item.
  * @typedef {object} EffectReportData
- * @property {string} label The name of the Effect item.
- * @property {string} img The image used by the Effect item.
- * @property {string} [description] The description of the Effect item, if any.
+ * @property {string} label - The name of the Effect item.
+ * @property {string} img - The image used by the Effect item.
+ * @property {string} [description] - The description of the Effect item, if any.
  */
 
 /**
  * Report Data for a Turn Effect item.
  * @typedef {object} TurnEffectReportData
- * @property {string} label The name of the Effect item.
- * @property {string} img The image used by the Effect item.
- * @property {string} [description] The description of the Effect item, if any.
- * @property {number} remaining The remaining turns for the Effect item.
+ * @property {string} label - The name of the Effect item.
+ * @property {string} img - The image used by the Effect item.
+ * @property {string} [description] - The description of the Effect item, if any.
+ * @property {number} remaining - The remaining turns for the Effect item.
  */
 
 /**
  * Report Data for a Turn Effect item.
  * @typedef {object} InitiativeEffectReportData
- * @property {string} label The name of the Effect item.
- * @property {string} img The image used by the Effect item.
- * @property {string} [description] The description of the Effect item, if
+ * @property {string} label - The name of the Effect item.
+ * @property {string} img - The image used by the Effect item.
+ * @property {string} [description] - The description of the Effect item, if
  *    appropriate.
- * @property {number} remaining The remaining turns for the Effect item.
- * @property {float} initiative The initiative count on which the Effect
+ * @property {number} remaining - The remaining turns for the Effect item.
+ * @property {float} initiative - The initiative count on which the Effect
  *    duration is reduced.
  */
 
 /**
  * Report Data for a Custom Effect item.
  * @typedef {object} CustomEffectReportData
- * @property {string} label The name of the Effect item.
- * @property {string} img The image used by the Effect item.
- * @property {string} [description] The description of the Effect item, if
+ * @property {string} label - The name of the Effect item.
+ * @property {string} img - The image used by the Effect item.
+ * @property {string} [description] - The description of the Effect item, if
  *    appropriate.
- * @property {number} remaining The remaining turns for the Effect item.
- * @property {string} custom Custom duration of the Effect item.
+ * @property {number} remaining - The remaining turns for the Effect item.
+ * @property {string} custom - Custom duration of the Effect item.
  */
 
 /**
  * Actor data model with extra functionality for Characters.
  * @extends {TitanActorDataModel}
- * @property {TitanActor} parent The Actor that owns this data model.
+ * @property {TitanActor} parent - The Actor that owns this data model.
  */
 export default class CharacterDataModel extends TitanActorDataModel {
 
@@ -474,9 +474,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @override
     */
    async preDeleteItem(item) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)
-         && assert(!this.parent.uuid === item.parent?.uuid,
-            'Item is already owned by actor', this.parent.name, item.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && assert(
+         !this.parent.uuid === item.parent?.uuid,
+         'Item is already owned by actor',
+         this.parent.name,
+         item.name,
+      )) {
 
          // Perform type specific deletion operations.
          switch (item.type) {
@@ -1829,7 +1836,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const checkParameters = this.getAttributeCheckParameters(checkOptions);
 
          // Create and display the check dialog
-         new AttributeCheckDialog(checkOptions, checkParameters, this.parent).render(true);
+         new AttributeCheckDialog(
+            checkOptions,
+            checkParameters,
+            this.parent,
+         ).render(true);
       }
    }
 
@@ -2073,7 +2084,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const checkParameters = this.getResistanceCheckParameters(checkOptions);
 
          // Create and display the check dialog
-         new ResistanceCheckDialog(checkOptions, checkParameters, this.parent).render(true);
+         new ResistanceCheckDialog(
+            checkOptions,
+            checkParameters,
+            this.parent,
+         ).render(true);
       }
    }
 
@@ -2244,7 +2259,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const checkParameters = this.getAttackCheckParameters(checkOptions);
 
          // Create and display the check dialog
-         new AttackCheckDialog(checkOptions, checkParameters, this.parent).render(true);
+         new AttackCheckDialog(
+            checkOptions,
+            checkParameters,
+            this.parent,
+         ).render(true);
       }
    }
 
@@ -2857,7 +2876,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const checkParameters = this.getCastingCheckParameters(checkOptions);
 
          // Create and display the check dialog
-         new CastingCheckDialog(checkOptions, checkParameters, this.parent).render(true);
+         new CastingCheckDialog(
+            checkOptions,
+            checkParameters,
+            this.parent,
+         ).render(true);
       }
    }
 
@@ -3303,7 +3326,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const checkParameters = this.getItemCheckParameters(checkOptions);
 
          // Create and display the check dialog
-         new ItemCheckDialog(checkOptions, checkParameters, this.parent).render(true);
+         new ItemCheckDialog(
+            checkOptions,
+            checkParameters,
+            this.parent,
+         ).render(true);
       }
    }
 
@@ -5423,14 +5450,26 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
             // Apply healing if appropriate
             if (turnStaminaMod > 0 && this.resource.stamina.value < this.resource.stamina.max) {
-               await this.applyHealing(turnStaminaMod, { updateActor: false, report: false });
+               await this.applyHealing(
+                  turnStaminaMod,
+                  {
+                     updateActor: false,
+                     report: false,
+                  },
+               );
                shouldUpdateActor = true;
             }
 
             // Otherwise, apply damage if appropriate
             else if (turnStaminaMod < 0) {
-               await this.applyDamage(-turnStaminaMod,
-                  { updateActor: false, ignoreArmor: true, report: false });
+               await this.applyDamage(
+                  -turnStaminaMod,
+                  {
+                     updateActor: false,
+                     ignoreArmor: true,
+                     report: false,
+                  },
+               );
                shouldUpdateActor = true;
             }
 
@@ -5784,7 +5823,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Otherwise, confirm deleting the item
          const item = this.parent.items.get(itemId);
          if (item) {
-            new ConfirmDeleteItemDialog(this.parent, item).render(true);
+            new ConfirmDeleteItemDialog(
+               this.parent,
+               item,
+            ).render(true);
          }
       }
    }

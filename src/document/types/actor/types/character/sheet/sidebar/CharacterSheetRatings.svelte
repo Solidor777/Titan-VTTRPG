@@ -10,7 +10,10 @@
 
 <BorderedColumnList
    entries={[
-      {rating: 'initiative', onClick: () => $document.system.requestInitiativeRoll()},
+      {
+         rating: 'initiative',
+         onClick: () => $document.system.requestInitiativeRoll(),
+      },
       {rating: 'awareness'},
       {rating: 'defense'},
       {rating: 'melee'},

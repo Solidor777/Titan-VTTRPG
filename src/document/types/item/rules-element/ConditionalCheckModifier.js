@@ -3,15 +3,15 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * A Rules Element for conditionally modifying a Check made by a Character.
  * @typedef {object} ConditionalCheckModifierElement
- * @property {string} operation The operation to be performed by the Rules
+ * @property {string} operation - The operation to be performed by the Rules
  *    Element (conditionalCheckModifier).
- * @property {string} modifierType The part of the check to modify (damage,
+ * @property {string} modifierType - The part of the check to modify (damage,
  *    bonus dice, etc.).
- * @property {string} selector The type of condition for modifying the rating
+ * @property {string} selector - The type of condition for modifying the rating
  *    (any, attribute, trait, etc.).
- * @property {string} key The specific result of the condition for modifying the
+ * @property {string} key - The specific result of the condition for modifying the
  *    check (body, melee, etc.).
- * @property {string} uuid Unique identifier for the Rules Element,
+ * @property {string} uuid - Unique identifier for the Rules Element,
  *    used to track the element across type changes.
  */
 

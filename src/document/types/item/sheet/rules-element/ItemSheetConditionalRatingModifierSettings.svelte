@@ -25,7 +25,11 @@
    $: element = $document?.system.rulesElement[idx];
 
    /** @type {string[]} Options for selecting which rating the conditional modifier applies to. */
-   const ratingOptions = ['melee', 'accuracy', 'defense'];
+   const ratingOptions = [
+      'melee',
+      'accuracy',
+      'defense',
+   ];
 
    /** @type {string[]} Options for selecting the defense-related condition for the modifier. */
    const defenseSelectorOptions = [

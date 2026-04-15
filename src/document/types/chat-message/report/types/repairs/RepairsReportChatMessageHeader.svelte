@@ -8,13 +8,22 @@
    const document = getContext('document');
 
    /** @type {string[]} Actor and armor images. */
-   const images = [$document.flags.titan.actorImg, $document.flags.titan.armorImg];
+   const images = [
+      $document.flags.titan.actorImg,
+      $document.flags.titan.armorImg,
+   ];
 
    /** @type {string[]} Actor and armor names. */
-   const subHeaderLabels = [$document.flags.titan.actorName, [$document.flags.titan.armorName]];
+   const subHeaderLabels = [
+      $document.flags.titan.actorName,
+      [$document.flags.titan.armorName],
+   ];
 
    /** @type {string} Calculated main label for the header. */
-   const headerLabel = localize('repairedX%Armor').replace('X%', $document.flags.titan.armorRepaired);
+   const headerLabel = localize('repairedX%Armor').replace(
+      'X%',
+      $document.flags.titan.armorRepaired,
+   );
 </script>
 
 <ChatReportHeader

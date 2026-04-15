@@ -4,10 +4,10 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
  * @typedef {TitanItemSheetData} RulesElementItemSheetData Data representing the
  *    state of a Rules Element
  *    Item Sheet.
- * @property {object} tabs.rulesElements State for the Rules Elements tab.
- * @property {string} tabs.rulesElements.filter The current filter text for the
+ * @property {object} tabs.rulesElements - State for the Rules Elements tab.
+ * @property {string} tabs.rulesElements.filter - The current filter text for the
  *    Rules Elements tab.
- * @property {number} tabs.rulesElements.scrollTop The current top of the
+ * @property {number} tabs.rulesElements.scrollTop - The current top of the
  *    scrollbar for the Rules Elements tab.
  */
 

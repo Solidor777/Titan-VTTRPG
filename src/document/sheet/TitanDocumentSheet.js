@@ -18,7 +18,10 @@ export default class TitanDocumentSheet extends SvelteApplication {
     */
    constructor(sheetDocument, options = {}) {
       // Add default classes
-      const classes = ['titan', 'titan-document-sheet'];
+      const classes = [
+         'titan',
+         'titan-document-sheet',
+      ];
 
       // Add dark mode class if appropriate
       if (isDarkModeSheetsEnabled()) {
@@ -87,7 +90,12 @@ export default class TitanDocumentSheet extends SvelteApplication {
          baseApplication: 'DocumentSheet',
          resizable: false,
          minimizable: true,
-         dragDrop: [{ dragSelector: '.directory-list .item', dropSelector: null }],
+         dragDrop: [
+            {
+               dragSelector: '.directory-list .item',
+               dropSelector: null,
+            },
+         ],
       });
    }
 

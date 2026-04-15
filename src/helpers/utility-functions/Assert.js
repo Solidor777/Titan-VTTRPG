@@ -8,5 +8,9 @@
  * @param {...*} args - Additional objects to log.
  */
 export default function assert(assertion, message, ...args) {
-   console.assert(assertion, `TITAN | ${message}`, args);
+   console.assert(
+      assertion,
+      `TITAN | ${message}`,
+      args,
+   );
 }

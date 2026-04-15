@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
@@ -27,36 +26,15 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /** @type {{label: string, value: string}[]} Options for selecting the stat the multiplier applies to. */
+   /** @type {string[]} Options for selecting the stat the multiplier applies to. */
    const selectorOptions = [
-      {
-         label: localize('attribute'),
-         value: 'attribute',
-      },
-      {
-         label: localize('expertise'),
-         value: 'expertise',
-      },
-      {
-         label: localize('rating'),
-         value: 'rating',
-      },
-      {
-         label: localize('resistance'),
-         value: 'resistance',
-      },
-      {
-         label: localize('resource'),
-         value: 'resource',
-      },
-      {
-         label: localize('speed'),
-         value: 'speed',
-      },
-      {
-         label: localize('training'),
-         value: 'training',
-      },
+      'attribute',
+      'expertise',
+      'rating',
+      'resistance',
+      'resource',
+      'speed',
+      'training',
    ];
 
    /**

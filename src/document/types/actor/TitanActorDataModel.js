@@ -3,7 +3,7 @@ import TitanDataModel from '~/document/data-model/TitanDataModel.js';
 /**
  * Data model with extra functionality for Actors.
  * @extends {TitanDataModel}
- * @property {TitanActor} parent The Actor that owns this data model.
+ * @property {TitanActor} parent - The Actor that owns this data model.
  */
 export default class TitanActorDataModel extends TitanDataModel {
    /**

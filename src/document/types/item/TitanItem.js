@@ -8,7 +8,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * Extends the base Item class to implement additional system-specific logic for
  * Titan.
  * @extends {Item}
- * @property {TitanItemSheet} sheet The Sheet that represents this Item.
+ * @property {TitanItemSheet} sheet - The Sheet that represents this Item.
  */
 export default class TitanItem extends Item {
 
@@ -112,7 +112,11 @@ export default class TitanItem extends Item {
     * @returns {Promise<void>}
     */
    async addCheck() {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          this.system.check.push(createItemCheckTemplate());
          await this.update({
             system: {
@@ -133,7 +137,11 @@ export default class TitanItem extends Item {
     * @returns {Promise<void>}
     */
    async deleteCheck(idx) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          // Notify the sheet before deletion.
          if (this.sheet) {
             this.sheet.preDeleteCheck(idx);
@@ -153,7 +161,11 @@ export default class TitanItem extends Item {
     * @returns {void}
     */
    addCustomTrait() {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          const dialog = new AddCustomTraitDialog(this);
          dialog.render(true);
       }
@@ -167,8 +179,15 @@ export default class TitanItem extends Item {
     * @returns {void}
     */
    editCustomTrait(traitIdx) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
-         const dialog = new EditCustomTraitDialog(this, traitIdx);
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
+         const dialog = new EditCustomTraitDialog(
+            this,
+            traitIdx,
+         );
          dialog.render(true);
       }
    }
@@ -180,7 +199,11 @@ export default class TitanItem extends Item {
     * @returns {Promise<void>}
     */
    async deleteCustomTrait(traitIdx) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          this.system.customTrait.splice(traitIdx, 1);
          await this.update({
             system: {
@@ -197,8 +220,15 @@ export default class TitanItem extends Item {
     *    false if the deletion could not proceed.
     */
    async safeDelete() {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)
-         && assert(!this.isMarkedForDeletion, 'Item already marked for deletion.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      ) && assert(
+         !this.isMarkedForDeletion,
+         'Item already marked for deletion.',
+         this.name,
+      )) {
          await this.update({
             flags: {
                titan: {

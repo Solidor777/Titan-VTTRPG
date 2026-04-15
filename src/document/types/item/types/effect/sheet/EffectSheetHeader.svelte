@@ -12,27 +12,13 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   /** @type {string[]} Options for the duration type of the effect. */
    const durationOptions = [
-      {
-         value: 'turnEnd',
-         label: localize('turnEnd'),
-      },
-      {
-         value: 'turnStart',
-         label: localize('turnStart'),
-      },
-      {
-         value: 'initiative',
-         label: localize('initiative'),
-      },
-      {
-         value: 'permanent',
-         label: localize('permanent'),
-      },
-      {
-         value: 'custom',
-         label: localize('custom'),
-      },
+      'turnEnd',
+      'turnStart',
+      'initiative',
+      'permanent',
+      'custom',
    ];
 </script>
 

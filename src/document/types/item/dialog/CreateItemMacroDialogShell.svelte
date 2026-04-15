@@ -27,7 +27,7 @@
    const macroTypeOptions = [
       {
          value: 'toggleDocumentSheet',
-         label: localize('toggleItemSheet'),
+         label: 'toggleItemSheet',
       },
    ];
 
@@ -41,7 +41,7 @@
       // Add item check to the macro type options
       macroTypeOptions.push({
          value: 'itemCheck',
-         label: localize('itemCheck'),
+         label: 'itemCheck',
       });
       macroType = 'itemCheck';
 
@@ -66,7 +66,7 @@
             // Add Attack Check to the macro type options
             macroTypeOptions.push({
                value: 'attackCheck',
-               label: localize('attackCheck'),
+               label: 'attackCheck',
             });
             macroType = 'attackCheck';
 
@@ -85,7 +85,7 @@
          // Add Casting Check to the macro type options
          macroTypeOptions.push({
             value: 'castingCheck',
-            label: localize('castingCheck'),
+            label: 'castingCheck',
          });
          macroType = 'castingCheck';
          break;
@@ -97,7 +97,7 @@
             // Add toggle active to the macro type options
             macroTypeOptions.push({
                value: 'toggleEffectActive',
-               label: localize('toggleEffectActive'),
+               label: 'toggleEffectActive',
             });
             macroType = 'toggleEffectActive';
          }
@@ -115,15 +115,15 @@
    const idMethodOptions = [
       {
          value: 'uuid',
-         label: localize('itemUuid'),
+         label: 'itemUuid',
       },
       {
          value: 'name',
-         label: localize('itemName'),
+         label: 'itemName',
       },
       {
          value: 'documentId',
-         label: localize('documentId'),
+         label: 'documentId',
       },
    ];
 

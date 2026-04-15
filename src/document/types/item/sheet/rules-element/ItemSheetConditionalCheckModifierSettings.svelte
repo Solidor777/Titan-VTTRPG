@@ -36,19 +36,19 @@
    /** @type {{label: string, value: string}[]} Options for the type of check the modifier applies to. */
    const checkTypeOptions = [
       {
-         label: localize('anyCheck'),
+         label: 'anyCheck',
          value: 'any',
       },
       {
-         label: localize('attackCheck'),
+         label: 'attackCheck',
          value: 'attack',
       },
       {
-         label: localize('castingCheck'),
+         label: 'castingCheck',
          value: 'casting',
       },
       {
-         label: localize('itemCheck'),
+         label: 'itemCheck',
          value: 'item',
       },
    ];
@@ -60,15 +60,15 @@
     */
    const healingCheckTypeOptions = [
       {
-         label: localize('anyCheck'),
+         label: 'anyCheck',
          value: 'any',
       },
       {
-         label: localize('castingCheck'),
+         label: 'castingCheck',
          value: 'casting',
       },
       {
-         label: localize('itemCheck'),
+         label: 'itemCheck',
          value: 'item',
       },
    ];

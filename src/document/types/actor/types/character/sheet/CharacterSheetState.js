@@ -8,10 +8,10 @@ import createCharacterSheetData from '~/document/types/actor/types/character/she
  * @property {import('svelte/store').Writable<CharacterSheetData>['set']} set
  * @property {import('svelte/store').Writable<CharacterSheetData>['update']} update
  * @property {import('svelte/store').Writable<CharacterSheetData>['subscribe']} subscribe
- * @property {(item: TitanItem) => void} postAddItem Updates the reactive state
+ * @property {(item: TitanItem) => void} postAddItem - Updates the reactive state
  *    store in response to an Item being
  *    added.
- * @property {(item: TitanItem) => void} preDeleteItem Updates the reactive
+ * @property {(item: TitanItem) => void} preDeleteItem - Updates the reactive
  *    state store in response to an Item being
  *    deleted.
  */

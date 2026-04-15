@@ -15,7 +15,10 @@
     */
    $: sections =
       $document.system.check.length > 0
-         ? [ItemSheetSidebarTraits, ItemSheetSidebarChecks]
+         ? [
+            ItemSheetSidebarTraits,
+            ItemSheetSidebarChecks,
+         ]
          : [ItemSheetSidebarTraits];
 </script>
 

@@ -5,7 +5,7 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 /**
  * An Actor Sheet class with functionality shared by all Characters.
  * @extends {TitanActorSheet}
- * @property {CharacterSheetState} applicationState Reactive store for managing
+ * @property {CharacterSheetState} applicationState - Reactive store for managing
  *    the state of the Character Sheet.
  */
 export default class TitanCharacterSheet extends TitanActorSheet {

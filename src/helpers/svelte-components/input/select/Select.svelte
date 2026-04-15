@@ -7,10 +7,10 @@
     * Object used to store data for an Option within a Select Svelte component.
     * @template T
     * @typedef {object} SelectOption
-    * @property {T} value The value for this option.
-    * @property {string | number | TextData} [label] The label to display for this
+    * @property {T} value - The value for this option.
+    * @property {string | number | TextData} [label] - The label to display for this
     *    option.
-    * @property {string | TooltipAction} [tooltip] The Tooltip to display for
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for
     *    this option, if any.
     */
 

@@ -6,7 +6,7 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 /**
  * An Item Sheet class with functionality shared by all Weapon Items.
  * @extends {TitanItemSheet}
- * @property {WeaponSheetState} applicationState Reactive store for managing the
+ * @property {WeaponSheetState} applicationState - Reactive store for managing the
  *    state of the Weapon Sheet.
  */
 export default class TitanWeaponSheet extends TitanItemSheet {

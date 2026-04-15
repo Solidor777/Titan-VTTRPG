@@ -29,144 +29,69 @@
    /** @type {{label: string, value: string}[]} Options for the type of check that triggers the roll message. */
    const checkTypeOptions = [
       {
-         label: localize('anyCheck'),
+         label: 'anyCheck',
          value: 'any',
       },
       {
-         label: localize('attributeCheck'),
+         label: 'attributeCheck',
          value: 'attribute',
       },
       {
-         label: localize('attackCheck'),
+         label: 'attackCheck',
          value: 'attack',
       },
       {
-         label: localize('castingCheck'),
+         label: 'castingCheck',
          value: 'casting',
       },
       {
-         label: localize('itemCheck'),
+         label: 'itemCheck',
          value: 'item',
       },
       {
-         label: localize('resistanceCheck'),
+         label: 'resistanceCheck',
          value: 'resistance',
       },
    ];
 
-   /** @type {Record<string, {label: string, value: string}[]>} Selector options keyed by check type. */
+   /** @type {Record<string, string[]>} Selector options keyed by check type. */
    const selectorOptions = {
       any: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'customTrait',
+         'skill',
       ],
       attribute: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'skill',
       ],
       attack: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('attackTrait'),
-            value: 'attackTrait',
-         },
-         {
-            label: localize('attackType'),
-            value: 'attackType',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('multiAttack'),
-            value: 'multiAttack',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'attackTrait',
+         'attackType',
+         'customTrait',
+         'multiAttack',
+         'skill',
       ],
       casting: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
-         {
-            label: localize('spellTradition'),
-            value: 'spellTradition',
-         },
+         'any',
+         'attribute',
+         'customTrait',
+         'skill',
+         'spellTradition',
       ],
       item: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('attribute'),
-            value: 'attribute',
-         },
-         {
-            label: localize('customTrait'),
-            value: 'customTrait',
-         },
-         {
-            label: localize('skill'),
-            value: 'skill',
-         },
+         'any',
+         'attribute',
+         'customTrait',
+         'skill',
       ],
       resistance: [
-         {
-            label: localize('any'),
-            value: 'any',
-         },
-         {
-            label: localize('resistance'),
-            value: 'resistance',
-         },
+         'any',
+         'resistance',
       ],
    };
 

@@ -27,7 +27,10 @@
          });
       }
       ui.notifications.info(
-         localize('editedUUIDForDocumentX%').replace('X%', document.name),
+         localize('editedUUIDForDocumentX%').replace(
+            'X%',
+            document.name,
+         ),
       );
       return application.close();
    }

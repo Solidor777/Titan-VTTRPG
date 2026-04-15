@@ -6,18 +6,18 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's
  *    speaker.
- * @property {string} [scene] The Scene in which the speaker resides.
- * @property {string} [actor] The ID of the speaker's actor.
- * @property {string} [alias] The name of the speaker to display.
- * @property {string} [token] The ID of the speaker's Token.
+ * @property {string} [scene] - The Scene in which the speaker resides.
+ * @property {string} [actor] - The ID of the speaker's actor.
+ * @property {string} [alias] - The name of the speaker to display.
+ * @property {string} [token] - The ID of the speaker's Token.
  */
 
 /**
  * Extends the base Actor class to implement additional system-specific logic
  * for Titan.
  * @extends {Actor}
- * @property {TitanItem[]} items A collection of embedded Item documents.
- * @property {TitanActorSheet} sheet The Sheet that represents this Actor.
+ * @property {TitanItem[]} items - A collection of embedded Item documents.
+ * @property {TitanActorSheet} sheet - The Sheet that represents this Actor.
  */
 export default class TitanActor extends Actor {
 
@@ -96,7 +96,11 @@ export default class TitanActor extends Actor {
     * @returns {Promise<Item[] | void>} The created or updated Item instances.
     */
    async addItem(itemData) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          // Ensure the item data is in an array.
          if (!itemData instanceof Array) {
             itemData = [itemData];
@@ -123,7 +127,11 @@ export default class TitanActor extends Actor {
     * @returns {Promise<Item[] | void>} The created Item instances.
     */
    async createItemFromType(type) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          // Get the desired name
          let itemName = localize(`new${capitalize(type)}`);
 
@@ -150,7 +158,11 @@ export default class TitanActor extends Actor {
     *    Effect instances.
     */
    async addActiveEffect(activeEffectData) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          // Ensure the active effect data is in an array.
          if (!activeEffectData instanceof Array) {
             activeEffectData = [activeEffectData];
@@ -170,13 +182,24 @@ export default class TitanActor extends Actor {
     * @returns {Promise<void>} Resolves after the item has been deleted.
     */
    async deleteItem(id) {
-      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
          const item = this.items.get(id);
-         if (assert(item !== undefined, '' +
+         if (assert(
+               item !== undefined,
                'Item was not valid.',
-               this.name, id)
-            && assert(!item.isMarkedForDeletion,
-               'Item is already marked for deletion.', this.name, item.name)) {
+               this.name,
+               id,
+            )
+            && assert(
+               !item.isMarkedForDeletion,
+               'Item is already marked for deletion.',
+               this.name,
+               item.name,
+            )) {
 
             // Execute pre-delete operations.
             this.system.preDeleteItem(item);

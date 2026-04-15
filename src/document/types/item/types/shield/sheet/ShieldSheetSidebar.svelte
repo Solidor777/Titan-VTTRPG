@@ -9,7 +9,10 @@
 
    $: sections =
       $document.system.check.length > 0
-         ? [ShieldSheetSidebarTraits, ItemSheetSidebarChecks]
+         ? [
+            ShieldSheetSidebarTraits,
+            ItemSheetSidebarChecks,
+         ]
          : [ShieldSheetSidebarTraits];
 </script>
 

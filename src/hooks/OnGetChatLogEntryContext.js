@@ -189,7 +189,13 @@ async function reRollFailures(element, spendResolve) {
          }
       }
 
-      foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice, loop: false }, true);
+      foundry.audio.AudioHelper.play(
+         {
+            src: CONFIG.sounds.dice,
+            loop: false,
+         },
+         true,
+      );
    }
 }
 
@@ -246,7 +252,13 @@ async function doubleTraining(element, spendResolve) {
          }
       }
 
-      foundry.audio.AudioHelper.play({ src: CONFIG.sounds.dice, loop: false }, true);
+      foundry.audio.AudioHelper.play(
+         {
+            src: CONFIG.sounds.dice,
+            loop: false,
+         },
+         true,
+      );
    }
 }
 

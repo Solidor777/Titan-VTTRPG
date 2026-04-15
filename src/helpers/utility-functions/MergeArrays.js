@@ -8,5 +8,10 @@
  * @returns {*[]} Array containing all the unique entries of a and b.
  */
 export default function mergeArrays(a = [], b = []) {
-   return [...new Set([...a, ...b])]
+   return [
+      ...new Set([
+         ...a,
+         ...b,
+      ]),
+   ]
 }

@@ -34,7 +34,10 @@ export default class TitanMacros {
          if (item?.system.attack?.length > attackIdx) {
 
             // Roll the check
-            actor.system.requestAttackCheck({ itemId: item._id, attackIdx: attackIdx });
+            actor.system.requestAttackCheck({
+               itemId: item._id,
+               attackIdx: attackIdx,
+            });
          }
       }
    }
@@ -80,7 +83,10 @@ export default class TitanMacros {
          if (item?.system.check.length > 0) {
 
             // Roll the check
-            actor.system.requestItemCheck({ itemId: item._id, checkIdx: checkIdx });
+            actor.system.requestItemCheck({
+               itemId: item._id,
+               checkIdx: checkIdx,
+            });
          }
       }
    }

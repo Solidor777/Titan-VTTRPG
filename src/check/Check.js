@@ -42,9 +42,9 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 /**
  * The sorted dice rolled for the check, after Expertise is applied.
  * @typedef {object} CheckDiceResults
- * @property {CheckDie[]} dice Array of dice objects that has been processed by
+ * @property {CheckDie[]} dice - Array of dice objects that has been processed by
  *    applying expertise.
- * @property {number} expertiseRemaining The Expertise remaining after being
+ * @property {number} expertiseRemaining - The Expertise remaining after being
  *    applied to the dice.
  */
 

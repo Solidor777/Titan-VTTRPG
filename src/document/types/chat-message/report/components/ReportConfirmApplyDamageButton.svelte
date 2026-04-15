@@ -13,7 +13,11 @@
     * Applies damage to the chat message owner and marks it as confirmed.
     */
    async function confirmDamageApplied() {
-      if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(
+         document?.isOwner,
+         'Cannot modify document %s if not owner.',
+         document?.name,
+      )) {
          // Get the actor
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
@@ -21,7 +25,10 @@
             // Update the actor
             await actor.system.applyDamage(
                $document.flags.titan.damageApplied.total,
-               { ignoreArmor: true, report: false },
+               {
+                  ignoreArmor: true,
+                  report: false,
+               },
             );
 
             // Update the chat document

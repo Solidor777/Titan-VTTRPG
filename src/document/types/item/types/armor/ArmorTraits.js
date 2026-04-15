@@ -3,8 +3,8 @@ import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 /**
  * @typedef {object} StandardTrait
  * A standardized trait used by various items.
- * @property {string} name The name and identifier of the trait.
- * @property {boolean|number} value The value of the trait.
+ * @property {string} name - The name and identifier of the trait.
+ * @property {boolean|number} value - The value of the trait.
  */
 
 /**

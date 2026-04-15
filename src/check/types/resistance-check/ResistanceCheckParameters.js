@@ -2,25 +2,25 @@
  * Calculated parameters for the creation of a new Resistance Check, based off
  * an Actor's data.
  * @typedef {CheckParameters} ResistanceCheckParameters
- * @property {boolean} doubleExpertise Whether to double the Expertise applied.
- * @property {boolean} extraFailureOnCritical Whether a roll of 1 equals a
+ * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
+ * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a
  *    negative success.
- * @property {boolean} extraSuccessOnCritical Whether a roll of 6 equals an
+ * @property {boolean} extraSuccessOnCritical - Whether a roll of 6 equals an
  *    extra success.
- * @property {number} complexity The minimum number of Successes needed to
+ * @property {number} complexity - The minimum number of Successes needed to
  *    succeed at the Check.
- * @property {number} damageToReduce Base amount of damage to be reduced by this
+ * @property {number} damageToReduce - Base amount of damage to be reduced by this
  *    check if any.
- * @property {number} diceMod Modifier for the number of Dice being rolled.
- * @property {number} difficulty The minimum roll on a die to achieve a
+ * @property {number} diceMod - Modifier for the number of Dice being rolled.
+ * @property {number} difficulty - The minimum roll on a die to achieve a
  *    Success.
- * @property {number} expertiseMod Modifier for the amount of Expertise to be
+ * @property {number} expertiseMod - Modifier for the amount of Expertise to be
  *    applied.
- * @property {number} resistanceDice The number of dice granted by the
+ * @property {number} resistanceDice - The number of dice granted by the
  *    Resistance.
- * @property {number} totalDice The total number of dice to be rolled.
- * @property {number} totalExpertise The total amount of expertise to apply.
- * @property {string} resistance The Resistance to roll for the Check.
+ * @property {number} totalDice - The total number of dice to be rolled.
+ * @property {number} totalExpertise - The total amount of expertise to apply.
+ * @property {string} resistance - The Resistance to roll for the Check.
  */
 
 /**

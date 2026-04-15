@@ -7,7 +7,7 @@ import ItemSheetImportItemButton from '~/document/types/item/sheet/ItemSheetImpo
 /**
  * A Document Sheet class with functionality shared by all Items.
  * @extends {TitanDocumentSheet}
- * @property {RulesElementItemSheetState} applicationState The reactive
+ * @property {RulesElementItemSheetState} applicationState - The reactive
  *    application state store.
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
@@ -24,7 +24,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
       super(/** @type {foundry.abstract.Document} */ sheetDocument, options);
 
-      /** @property {TitanItem} item The Item this sheet represents. */
+      /** @property {TitanItem} item - The Item this sheet represents. */
       this.item = sheetDocument;
    }
 

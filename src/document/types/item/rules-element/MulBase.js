@@ -3,14 +3,14 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * A Rules Element for multiplying the base value of a Character's stat.
  * @typedef {object} MulBaseElement
- * @property {string} operation The operation to be performed by the Rules
+ * @property {string} operation - The operation to be performed by the Rules
  *    Element (mulBase).
- * @property {string} selector The type of stat being modified (attribute,
+ * @property {string} selector - The type of stat being modified (attribute,
  *    rating, training, expertise, resistance, or mod).
- * @property {string} key The key of the stat being multiplied (body, willpower,
+ * @property {string} key - The key of the stat being multiplied (body, willpower,
  *    etc.).
- * @property {number} value The value by which to multiply the stat.
- * @property {string} uuid Unique identifier for the Rules Element,
+ * @property {number} value - The value by which to multiply the stat.
+ * @property {string} uuid - Unique identifier for the Rules Element,
  *    used to track the element across type changes.
  */
 

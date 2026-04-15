@@ -4,9 +4,9 @@ import createTitanItemSheetState from '~/document/types/item/sheet/TitanItemShee
 /**
  * @typedef {ItemSheetState} SpellSheetState A custom reactive store for
  *    managing a Spell Sheet.
- * @property {() => void} addCustomAspect Adds a Custom Aspect to the reactive
+ * @property {() => void} addCustomAspect - Adds a Custom Aspect to the reactive
  *    application state.
- * @property {(idx: number) => void} removeCustomAspect Removes the Custom
+ * @property {(idx: number) => void} removeCustomAspect - Removes the Custom
  *    Aspect at the provided index from the
  *    reactive application state.
  */

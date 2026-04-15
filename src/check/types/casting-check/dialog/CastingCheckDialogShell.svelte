@@ -86,12 +86,20 @@
 
       // Add healing mod
       if ($checkParameters.healing) {
-         rows.splice(4, 0, CheckDialogHealingModField);
+         rows.splice(
+            4,
+            0,
+            CheckDialogHealingModField,
+         );
       }
 
       // Add damage mod
       if ($checkParameters.damage) {
-         rows.splice(4, 0, CheckDialogDamageModField);
+         rows.splice(
+            4,
+            0,
+            CheckDialogDamageModField,
+         );
       }
    }
 

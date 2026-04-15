@@ -1,7 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
@@ -19,16 +18,10 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   /** @type {{label: string, value: string}[]} Options for which turn the persistent damage activates. */
+   /** @type {string[]} Options for which turn the persistent damage activates. */
    const selectorOptions = [
-      {
-         label: localize('turnStart'),
-         value: 'turnStart',
-      },
-      {
-         label: localize('turnEnd'),
-         value: 'turnEnd',
-      },
+      'turnStart',
+      'turnEnd',
    ];
 </script>
 

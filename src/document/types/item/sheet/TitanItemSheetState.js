@@ -8,9 +8,9 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
  * @property {import('svelte/store').Writable<TitanItemSheetData>['set']} set
  * @property {import('svelte/store').Writable<TitanItemSheetData>['update']} update
  * @property {import('svelte/store').Writable<TitanItemSheetData>['subscribe']} subscribe
- * @property {() => void} postAddCheck Updates the reactive state store in
+ * @property {() => void} postAddCheck - Updates the reactive state store in
  *    response to an Item Check being added.
- * @property {(idx: number) => void} preDeleteCheck Updates the reactive state
+ * @property {(idx: number) => void} preDeleteCheck - Updates the reactive state
  *    store in response to an Item Check
  *    being deleted.
  */

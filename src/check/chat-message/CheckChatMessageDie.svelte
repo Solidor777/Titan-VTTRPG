@@ -64,7 +64,10 @@
 
 </script>
 
-<div class={`die ${result}`} use:tooltipAction={{text: dieTooltip, localize: false}}>
+<div class={`die ${result}`} use:tooltipAction={{
+   text: dieTooltip,
+   localize: false,
+}}>
    <Button {disabled} on:click={applyExpertise}>
       {label}
    </Button>
