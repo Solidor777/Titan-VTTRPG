@@ -3,7 +3,7 @@
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import { getContext } from 'svelte';
 
-   /** @type {CastingCheckOptions} Reference to the Check Options. */
+   /** @type {object} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
 </script>

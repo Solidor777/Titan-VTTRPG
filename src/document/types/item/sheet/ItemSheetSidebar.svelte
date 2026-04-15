@@ -8,9 +8,10 @@
    const document = getContext('document');
 
    /**
+    * @type {object[]}
     * Each section of the Sidebar.
-    * Only include Checks section if the item has checks.
-    * Always include Traits since those are added from the Sidebar.
+    * Only includes the Checks section if the item has checks.
+    * Always includes the Traits section since custom traits are added from the Sidebar.
     */
    $: sections =
       $document.system.check.length > 0

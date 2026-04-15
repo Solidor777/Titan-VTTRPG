@@ -15,7 +15,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Initialize filtered entries
+   /** @type {number[]} The filtered list of check indices to display. */
    let filteredEntries;
    $: {
       filteredEntries = [];

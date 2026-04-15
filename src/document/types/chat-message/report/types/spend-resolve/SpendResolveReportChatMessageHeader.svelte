@@ -13,12 +13,11 @@
          ? 'attemptedToSpendX%Resolve'
          : 'spentX%Resolve',
    ).replace('X%', $document.flags.titan.resolveSpent);
-
 </script>
 
 <ReportChatMessageHeader
    headerIcon={SPEND_RESOLVE_ICON}
-   headerlabel={headerLabel}
+   headerLabel={headerLabel}
    images={[$document.flags.titan.actorImg]}
    subHeaderLabels={[$document.flags.titan.actorName]}
 />

@@ -41,8 +41,7 @@
    import RepairsReportChatMessageShell
       from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageShell.svelte';
 
-   // Context object
-   /** @type {TJSDocument} */
+   /** @type {TJSDocument} The reactive Document store for this chat message. */
    export let documentStore = void 0;
 
    // Setup
@@ -52,7 +51,7 @@
    const document = getContext('document');
 
    /**
-    * Selector for the chat message type
+    * Selects the correct chat message component based on the message type.
     */
    function selectComponent() {
       if (game.user.isGM || !$document.blind) {

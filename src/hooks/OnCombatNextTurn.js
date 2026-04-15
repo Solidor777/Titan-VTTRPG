@@ -1,10 +1,12 @@
+import warn from '~/helpers/utility-functions/Warn.js';
+
 /**
  * Called when combat advances from one turn to the next turn.
  * @param {Combatant} currentCombatant - The Combatant whose turn it currently
  *    is.
  * @param {Combatant} previousCombatant - The Combatant whose turn it previously
  *    was.
- * @param {Combatant} combat - The Combat that just advanced a turn.
+ * @param {TitanCombat} combat - The Combat that just advanced a turn.
  */
 export default async function onCombatNextTurn(currentCombatant, previousCombatant, combat) {
    if (currentCombatant && previousCombatant && combat) {
@@ -14,7 +16,7 @@ export default async function onCombatNextTurn(currentCombatant, previousCombata
 
       // Ensure that the combatants have initiative set
       if (currentInitiative === null || previousInitiative === null) {
-         game.titan.warn(
+         warn(
             'Current or Previous combatant had an Initiative of null. Initiative based effects will not function.',
             currentCombatant,
             previousCombatant,
@@ -28,9 +30,9 @@ export default async function onCombatNextTurn(currentCombatant, previousCombata
          for (const combatant of combat.getCharacterCombatants()) {
 
             // Update initiative based effects on the character
-            const character = combatant?.actor.isCharacter;
-            if (character) {
-               await character.system.onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound);
+            const actor = combatant?.actor;
+            if (actor) {
+               await actor.system.onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound);
             }
          }
       }
@@ -43,7 +45,7 @@ export default async function onCombatNextTurn(currentCombatant, previousCombata
 
       // Start of turn operations for current combatant
       const currentCharacter = currentCombatant?.actor;
-      if (currentCharacter && previousCharacter.system.isCharacter) {
+      if (currentCharacter && currentCharacter.system.isCharacter) {
          await currentCharacter.system.onTurnStart();
       }
    }

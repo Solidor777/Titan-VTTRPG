@@ -3,10 +3,10 @@ import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharac
 /**
  * Applies damage to the user's available combat targets.
  * @param {number} damage - Amount of damage to apply to the Character.
- * @param {DamageOptions|null} options - Options for applying the damage.
+ * @param {DamageOptions | null} options - Options for applying the damage.
  * @returns {Promise<void>} Returns after the damage has been applied.
  */
-export default async function applyDamageToTargets(damage, options,) {
+export default async function applyDamageToTargets(damage, options) {
    // Get targets
    const targets = getBestCharactersToUpdate();
 

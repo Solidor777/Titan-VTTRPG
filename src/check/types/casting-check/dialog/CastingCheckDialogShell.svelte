@@ -15,6 +15,7 @@
    import CheckDialogTrainingModField from '~/check/dialog/CheckDialogTrainingModField.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import warn from '~/helpers/utility-functions/Warn.js';
    import { getContext } from 'svelte';
 
    /** @type {TitanActor} The Actor that will roll the Check. */
@@ -53,7 +54,7 @@
    /** @type {Function} Called when the check becomes invalid. */
    function onCheckInvalid() {
       ui.notifications.info(localize('castingCheckNoLongerValid'));
-      game.titan.warn(
+      warn(
          localize('castingCheckNoLongerValid'),
          checkOptions,
          actor,

@@ -7,13 +7,13 @@
    export let value = void 0;
 
    /**
-    * @type {number|boolean}
+    * @type {number | boolean}
     * The minimum value for this input, or false if there is none.
     */
    export let min = false;
 
    /**
-    * @type {number|boolean}
+    * @type {number | boolean}
     * The maximum value for this input, or false if there is none.
     */
    export let max = false;
@@ -38,13 +38,14 @@
    const document = getContext('document');
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
 
    /**
-    * Update the document data when the input changes.
+    * Updates the document data when the input changes.
+    * @returns {void}
     */
    function updateDocument() {
       refreshSystemDocument($document, disabled);

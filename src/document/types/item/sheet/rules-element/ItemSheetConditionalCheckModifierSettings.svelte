@@ -14,7 +14,10 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
+   /**
+    * @type {number}
+    * The index of the rules element in the item's rules elements array.
+    */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -24,16 +27,22 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   // Modifier type options
+   /**
+    * @type {string[]}
+    * Options for the type of value the modifier applies to.
+    */
    const modifierTypeOptions = [
       'damage',
       'dice',
       'expertise',
       'training',
-      'healing'
+      'healing',
    ];
 
-   // Check type options
+   /**
+    * @type {{label: string, value: string}[]}
+    * Options for the type of check the modifier applies to.
+    */
    const checkTypeOptions = [
       {
          label: localize('anyCheck'),
@@ -53,7 +62,11 @@
       },
    ];
 
-   // Special case for healing because attacks cannot heal
+   /**
+    * @type {{label: string, value: string}[]}
+    * Check type options when healing is selected. Excludes attack checks,
+    * because attacks cannot heal.
+    */
    const healingCheckTypeOptions = [
       {
          label: localize('anyCheck'),
@@ -69,7 +82,10 @@
       },
    ];
 
-   // Attack Check options
+   /**
+    * @type {Record<string, string[]>}
+    * Selector options keyed by check type.
+    */
    const selectorOptions = {
       any: [
          'any',
@@ -103,9 +119,10 @@
 
    /**
     * Updates the check type if necessary when the modifier type changes.
-    * If the modifier type is 'healing' and the check type is 'attack', resets
-    * the check type to 'any'
-    * and cascades the change to the selector.
+    * If the modifier type is 'healing' and the check type is 'attack',
+    * resets the check type to 'any' and cascades the change to the
+    * selector.
+    * @returns {void}
     */
    function onModifierTypeChanged() {
       if (
@@ -302,7 +319,7 @@
          .field {
             @include flex-row;
 
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
 
             &.select {
                @include flex-group-left;

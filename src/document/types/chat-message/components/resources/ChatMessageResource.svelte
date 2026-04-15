@@ -1,11 +1,14 @@
 <script>
-   /** @type {number} */
+   /** @type {number} The maximum value of the resource. */
    export let max = void 0;
-   /** @type {number} */
+
+   /** @type {number} The current value of the resource. */
    export let value = void 0;
-   /** @type {string} */
+
+   /** @type {string} The icon class to display for this resource. */
    export let icon = void 0;
-   /** @type {string} */
+
+   /** @type {string} The localized label to display for this resource. */
    export let label = void 0;
 </script>
 

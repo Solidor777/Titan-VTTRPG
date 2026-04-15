@@ -18,8 +18,8 @@ export default class TitanMacros {
    /**
     * Rolls an Attack Check for each controlled Character using the provided
     * Item and Attack idx.
-    * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} id - The ID used to identify the Item.
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     * @param {number} attackIdx - The idx of the Attack in the item's Attack
     *    array.
@@ -42,8 +42,8 @@ export default class TitanMacros {
    /**
     * Rolls a Casting Check for each controlled Character using the provided
     * Item.
-    * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} id - The ID used to identify the Item.
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     */
    rollCastingCheck(id, idMethod) {
@@ -64,8 +64,8 @@ export default class TitanMacros {
    /**
     * Rolls an Item Check for each controlled Character using the provided Item
     * and Check Idx.
-    * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} id - The ID used to identify the Item.
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     * @param {number} checkIdx - The idx of the Check in the Item's Checks
     *    array.
@@ -88,8 +88,8 @@ export default class TitanMacros {
    /**
     * Toggles Active on an effect for each controlled Character using the
     * provided Item.
-    * @param {string} id - The ID used to identity the Item.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} id - The ID used to identify the Item.
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     */
    toggleEffectActive(id, idMethod) {
@@ -113,7 +113,7 @@ export default class TitanMacros {
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     * @param {number} attackIdx - The idx of the Attack in the item's Attack
     *    array.
@@ -141,7 +141,7 @@ export default class TitanMacros {
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     * @returns {Macro} The newly created Macro.
     */
@@ -167,7 +167,7 @@ export default class TitanMacros {
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     * @param {number} checkIdx - The idx of the Check in the Item's Check
     *    array.
@@ -195,7 +195,7 @@ export default class TitanMacros {
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
     * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identity the Item (uuid,
+    * @param {string} idMethod - The method used to identify the Item (uuid,
     *    name, or documentId).
     * @returns {Macro} The newly created Macro.
     */
@@ -239,11 +239,9 @@ export default class TitanMacros {
     * document when executing the macro.
     * @param {Document} document - The Document to get the ID for.
     * @param {string} idMethod - The method that will be used to get the
-    *    Document from the ID (uuid, name, or document
-    * ID).
+    *    Document from the ID (uuid, name, or document ID).
     * @returns {string} The ID to be used with the provided ID method to
-    *    retrieve the document when executing the
-    *    macro.
+    *    retrieve the document when executing the macro.
     */
    getMacroID(document, idMethod) {
       switch (idMethod) {

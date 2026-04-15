@@ -9,7 +9,7 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
 export default class NPCDataModel extends CharacterDataModel {
    /**
     * Applies Damage to the Character.
-    * Override for handling Minions dying in 1 hit and overkill damage;.
+    * Override for handling Minions dying in 1 hit and overkill damage.
     * @param {number} damage - Amount of Damage to apply.
     * @param {DamageOptions} [options] - Options for applying the Damage.
     * @returns {Promise<DamageReport|void>} Results of applying the Damage.
@@ -23,7 +23,7 @@ export default class NPCDataModel extends CharacterDataModel {
          const superOptions = options ? structuredClone(options) : {};
          superOptions.updateActor = false;
          superOptions.report = false;
-         const reportData = await super.applyDamage(damage, options);
+         const reportData = await super.applyDamage(damage, superOptions);
 
          // If we took any damage
          if (reportData.damageTaken) {
@@ -71,6 +71,11 @@ export default class NPCDataModel extends CharacterDataModel {
       }
    }
 
+   /**
+    * @override
+    * @returns {object} The schema for this data model.
+    * @protected
+    */
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
       schema.bio.type = createStringField();
@@ -79,6 +84,10 @@ export default class NPCDataModel extends CharacterDataModel {
       return schema;
    }
 
+   /**
+    * @override
+    * @returns {object} Roll data for this Character, including the NPC role.
+    */
    getRollData() {
       const retVal = super.getRollData();
       retVal.role = this.role;
@@ -86,6 +95,9 @@ export default class NPCDataModel extends CharacterDataModel {
       return retVal;
    }
 
+   /**
+    * @override
+    */
    prepareDerivedData() {
       super.prepareDerivedData();
       this.parent.system.xp = this._getSpentXP();

@@ -21,6 +21,11 @@
    /** @type {object} Reference to the Rules Element object. */
    let element;
    $: element = $document?.system.rulesElement[idx];
+
+   /**
+    * @type {{label: string, value: string}[]}
+    * Options for which turn the persistent damage activates.
+    */
    const selectorOptions = [
       {
          label: localize('turnStart'),
@@ -88,7 +93,7 @@
          .field {
             @include flex-row;
 
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
 
             &.select {
                @include flex-group-left;

@@ -13,16 +13,16 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Header svelte-components to use. */
+   /** @type {object} The header Svelte component to render. */
    const header = LongRestReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte components. */
+   /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [
       ChatMessageResolveRestoredMessage,
       ChatMessageStaminaRestoredMessage,
    ];
 
-   // Add wounds to the messages if appropriat
+   // Add wounds to the messages if appropriate
    if ($document.flags.titan.woundsHealed) {
       sections.push(localize('healedX%Wounds').replace('X%', $document.flags.titan.woundsHealed));
       sections.push(ChatMessageWounds);

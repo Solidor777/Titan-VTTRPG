@@ -95,10 +95,7 @@
 
       <!--Rend-->
       {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
-         <div
-            class="stat"
-            use:tooltipAction={'attack.rend.desc'}
-         >
+         <div class="stat" use:tooltipAction={'attack.rend.desc'}>
             <i class={REND_ICON}/>
             {localize('rend')}:
             {$document.flags.titan.results.criticalSuccesses}
@@ -107,10 +104,7 @@
 
       <!--Cleave-->
       {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
-         <div
-            class="stat"
-            use:tooltipAction={'attack.cleave.desc'}
-         >
+         <div class="stat" use:tooltipAction={'attack.cleave.desc'}>
             <i class={CLEAVE_ICON}/>
             {localize('cleave')}:
             {$document.flags.titan.results.criticalSuccesses}

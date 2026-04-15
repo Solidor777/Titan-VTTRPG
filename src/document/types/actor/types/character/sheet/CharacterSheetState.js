@@ -32,7 +32,7 @@ export default function createCharacterSheetState(actor) {
    function postAddItem(item) {
       update((data) => {
          switch (item.type) {
-            case 'ability' : {
+            case 'ability': {
                data.tabs.abilities.isExpanded[item._id] = false;
                break;
             }
@@ -64,7 +64,7 @@ export default function createCharacterSheetState(actor) {
    function preDeleteItem(item) {
       update((data) => {
          switch (item.type) {
-            case 'ability' : {
+            case 'ability': {
                delete data.tabs.abilities.isExpanded[item._id];
                break;
             }

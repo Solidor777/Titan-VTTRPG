@@ -4,7 +4,7 @@
  * @param {object[]} objects - The objects being sorted.
  * @param {string} key - The key of the object to compare their values against.
  * @returns {object} Object holding arrays the inputted objects,
- * sorted by the value of their inputted key.
+ *    sorted by the value of their inputted key.
  */
 export default function sortObjectsIntoContainerByKeyValue(objects, key) {
    /** @type {object} */

@@ -10,7 +10,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Tabs
+   /** @type {{label: string, id: string, component: object}[]} The tab definitions for the weapon sheet. */
    const tabs = [
       {
          label: localize('description'),
@@ -35,4 +35,4 @@
    ];
 </script>
 
-<Tabs bind:activeTab={$appState.tabs.activeTab} bordre={true} {tabs}/>
+<Tabs bind:activeTab={$appState.tabs.activeTab} border={true} {tabs}/>

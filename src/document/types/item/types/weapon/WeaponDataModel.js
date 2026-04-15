@@ -16,6 +16,11 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class WeaponDataModel extends RulesElementItemDataModel {
+   /**
+    * Defines the data schema for Weapon documents.
+    * @returns {object} The document schema.
+    * @override
+    */
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -43,6 +48,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   /**
+    * Returns the roll data object for this document.
+    * @returns {object} The roll data.
+    * @override
+    */
    getRollData() {
       const retVal = super.getRollData();
       retVal.rarity = this.rarity;
@@ -55,10 +65,20 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       return retVal;
    }
 
+   /**
+    * Returns the default image path for new Weapon documents.
+    * @returns {string} The default image path.
+    * @override
+    */
    _getDefaultImage() {
       return WEAPON_IMAGE;
    }
 
+   /**
+    * Returns the default name for new Weapon documents.
+    * @returns {string} The default name.
+    * @override
+    */
    _getDefaultName() {
       return localize('newWeapon');
    }
@@ -66,6 +86,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
    /**
     * Creates a dialog for editing the Standard Traits of an Attack.
     * @param {number} attackIdx - The index of the Attack in the Attacks array.
+    * @returns {void}
     */
    editAttackTraits(attackIdx) {
       if (this.parent.isOwner) {
@@ -77,6 +98,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
    /**
     * Creates a dialog for adding a new Custom Trait to an Attack.
     * @param {number} attackIdx - The index of the Attack in the Attacks array.
+    * @returns {void}
     */
    addCustomAttackTrait(attackIdx) {
       if (this.parent.isOwner) {
@@ -90,6 +112,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @param {number} attackIdx - The index of the Attack in the Attacks array.
     * @param {number} traitIdx - The index of the Custom Trait in the Attack's
     *    Custom Traits array.
+    * @returns {void}
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {
@@ -103,6 +126,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @param {number} attackIdx - The index of the Attack in the Attacks array.
     * @param {number} traitIdx - The index of the Custom Trait in the Attack's
     *    Custom Traits array.
+    * @returns {Promise<void>}
     */
    async deleteCustomAttackTrait(attackIdx, traitIdx) {
       if (this.parent.isOwner) {

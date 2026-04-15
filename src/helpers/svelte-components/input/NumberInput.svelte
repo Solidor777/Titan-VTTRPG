@@ -5,13 +5,13 @@
    /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value of the input. */
+   /** @type {number | boolean} The minimum value of the input. */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value of the input. */
+   /** @type {number | boolean} The maximum value of the input. */
    export let max = false;
 
-   /** @type {number|boolean} The value digits this input can be. */
+   /** @type {number | boolean} The maximum number of digits this input can display. */
    export let maxDigits = false;
 
    /** @type {boolean} Whether the input should currently be disabled. */
@@ -19,12 +19,12 @@
 
    /**
     * @type {boolean}
-    * Whether the input should be an Integer. If False, it will be a Float.
+    * Whether the input should be an Integer. If false, it will be a Float.
     */
    export let isInteger = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
@@ -48,7 +48,7 @@
     * the value.
     */
    function parseInput() {
-      // Get the new value front the inputted string.
+      // Get the new value from the inputted string.
       let newValue = isInteger ? parseInt(input) : parseFloat(input);
 
       // If the new value is not a number (such as if it is blank), set it to

@@ -12,7 +12,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} damage The amount of Damage inflicted.
  * @property {number} expertiseRemaining The Expertise remaining after being
  *    applied to the dice.
- * @property {number} extraSuccesses The number of Critical Successes achieved.
+ * @property {number} extraSuccesses The number of extra Successes achieved beyond the Complexity.
  * @property {number} healing The amount of Healing applied.
  * @property {number} successes The total number of Successes achieved.
  * @property {number} opposedCheckComplexity The Complexity of the Opposed

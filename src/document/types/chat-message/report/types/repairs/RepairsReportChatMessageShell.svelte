@@ -4,10 +4,10 @@
    import RepairsReportChatMessageHeader
       from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageHeader.svelte';
 
-   /** @type {object} Header svelte-components to use. */
+   /** @type {object} The header Svelte component to render. */
    const header = RepairsReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte components. */
+   /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [ChatMessageArmor];
 </script>
 

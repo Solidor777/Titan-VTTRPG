@@ -1,4 +1,5 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
+import warn from '~/helpers/utility-functions/Warn.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import ActorSheetToggleLinkedTokenButton from '~/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte';
 import ActorSheetUnlinkTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkTokenButton.svelte';
@@ -125,7 +126,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    /**
     * If this sheet's Actor Sheet represents a synthetic Token actor, gets a
     * reference to the active Token.
-    * @type {TokenDocument|null}
+    * @type {TokenDocument | null}
     */
    get token() {
       return this.options?.token || this.actor.token || null;
@@ -136,7 +137,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop
     *    data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<ActiveEffect[]|boolean>} The created ActiveEffect
+    * @returns {Promise<ActiveEffect[] | boolean>} The created ActiveEffect
     *    instances, or false if the effect couldn't be created.
     * @protected
     */
@@ -158,7 +159,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop
     *    data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<Item[]|boolean>} The created or updated Item instances,
+    * @returns {Promise<Item[] | boolean>} The created or updated Item instances,
     *    or false if the drop was not permitted.
     * @protected
     */
@@ -189,7 +190,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop
     *    data.
     * @param {object} itemData - The item data requested for sorting.
-    * @returns {Promise<TitanItem[]|boolean>} The updated item instances, or
+    * @returns {Promise<TitanItem[] | boolean>} The updated item instances, or
     *    false if the data was invalid.
     * @private
     */
@@ -241,7 +242,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop
     *    data.
     * @param {object} data - The data transfer extracted from the event.
-    * @returns {Promise<Item[]|boolean>} The created Item instances, or false if
+    * @returns {Promise<Item[] | boolean>} The created Item instances, or false if
     *    the folder was invalid or not of type
     *    Item.
     * @protected
@@ -293,7 +294,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @override
     * @param {DragEvent} event - The concluding DragEvent which contains drop
     *    data.
-    * @returns {Promise<Item[]|ActiveEffect[]|boolean>} The newly created
+    * @returns {Promise<Item[] | ActiveEffect[] | boolean>} The newly created
     *    embedded documents, or false if the drop was
     *    not allowed.
     * @protected
@@ -326,7 +327,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
             return this._onDropFolder(event, data);
          }
          default: {
-            game.titan.warn(`${this.actor.name} | Invalid type in _onDrop (${data.type}).`);
+            warn(`${this.actor.name} | Invalid type in _onDrop (${data.type}).`);
             break;
          }
       }

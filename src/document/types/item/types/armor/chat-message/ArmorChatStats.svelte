@@ -11,6 +11,8 @@
 
    /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
+
+   /** @type {Record<string, string>} Map of armor trait names to their description localization keys. */
    const traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
 </script>
 

@@ -11,5 +11,5 @@
 <CheckDialogSummary
    label={'totalDice'}
    tooltip={'check.totalDice.desc'}
-   value={$checkParameters.totalDice
-   }/>
+   value={$checkParameters.totalDice}
+/>

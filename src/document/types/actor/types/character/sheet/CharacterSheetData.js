@@ -113,7 +113,7 @@ export default function createCharacterSheetData(actor) {
    // Initialize the expanded state map.
    for (const item of actor.items) {
       switch (item.type) {
-         case 'ability' : {
+         case 'ability': {
             retVal.tabs.abilities.isExpanded[item._id] = false;
             break;
          }

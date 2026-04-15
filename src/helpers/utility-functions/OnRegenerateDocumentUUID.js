@@ -17,13 +17,13 @@ import regenerateDocumentUUID from '~/helpers/utility-functions/RegenerateDocume
 export default function onRegenerateDocumentUUID(document) {
    if (document) {
 
-      // If the system is set confirm the UUID regeneration, then bring up a
+      // If the system is set to confirm the UUID regeneration, then bring up a
       // dialog
       if (getSetting('confirmRegenerateUUID')) {
          return new ConfirmRegenerateUUIDDialog(document).render(true);
       }
 
-      // Otherwise, immediately regeneration the UUID
+      // Otherwise, immediately regenerate the UUID
       else {
          return regenerateDocumentUUID(document);
       }

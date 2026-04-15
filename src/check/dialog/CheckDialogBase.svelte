@@ -35,7 +35,7 @@
 
 <div class="check-dialog" on:change>
    <!--Fields-->
-   {#each rows as row }
+   {#each rows as row}
       <div class="row">
          <svelte:component
             this={row}

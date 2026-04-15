@@ -15,7 +15,6 @@
 
    /** @type {string} Calculated main label for the header. */
    const headerLabel = localize('repairedX%Armor').replace('X%', $document.flags.titan.armorRepaired);
-
 </script>
 
 <ChatReportHeader

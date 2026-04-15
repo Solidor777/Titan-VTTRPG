@@ -1,5 +1,6 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import { MODS } from '~/system/Mods.js';
 
    /** @type {string} The value that this input should modify. */
    export let value = void 0;

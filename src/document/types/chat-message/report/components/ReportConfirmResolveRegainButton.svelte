@@ -4,6 +4,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { REGAIN_RESOLVE_ICON } from '~/system/Icons.js';
+   import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -13,7 +14,7 @@
     * confirmed.
     */
    async function confirmRegainResolve() {
-      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          // Get the actor
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {

@@ -12,6 +12,7 @@
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import assert from '~/helpers/utility-functions/Assert.js';
    import DocumentNumberInput from '~/document/svelte-components/input/DocumentNumberInput.svelte';
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
@@ -29,7 +30,10 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   // Selector options
+   /**
+    * @type {{label: string, value: string}[]}
+    * Options for selecting the stat the multiplier applies to.
+    */
    const selectorOptions = [
       {
          label: localize('attribute'),
@@ -63,9 +67,14 @@
 
    /**
     * Updates the element key to a sensible default when the selector changes.
+    * @returns {void}
     */
    function onSelectorChange() {
-      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(
+         document?.isOwner,
+         'Cannot modify document %s if not owner.',
+         document?.name,
+      )) {
          switch (element.selector) {
             case 'attribute': {
                element.key = 'body';
@@ -110,6 +119,7 @@
 
    /**
     * Returns the appropriate select component for the current selector type.
+    * @returns {object | undefined} The select component, or undefined if no case matches.
     */
    function getSelector() {
       switch (element.selector) {
@@ -204,7 +214,7 @@
          .field {
             @include flex-row;
 
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
 
             &.select {
                @include flex-group-left;

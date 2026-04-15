@@ -11,16 +11,16 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} selector The type of condition for displaying the message
  *    (any, attribute, trait, etc.).
  * @property {string} key The specific result of the condition for displaying
- *    the message (body, willpower, etc).
+ *    the message (body, willpower, etc.).
  * @property {string} message The message to display.
- * @property {string} uuid Unique identifier for the Rules Element.
- * Used to help keep track of the element when changing types.
+ * @property {string} uuid Unique identifier for the Rules Element,
+ *    used to track the element across type changes.
  */
 
 /**
  * Creates a Rules Element for conditionally displaying a message when a
  * Character rolls a check.
- * @param {object?} options - Options for the rules element.
+ * @param {object} [options] - Options for the rules element.
  * @returns {RollMessageElement} The new Rules Element.
  */
 export default function createRollMessageElement(options) {
@@ -30,6 +30,6 @@ export default function createRollMessageElement(options) {
       selector: 'attribute',
       key: 'body',
       message: '',
-      uuid: options.uuid ?? generateUUID(),
+      uuid: options?.uuid ?? generateUUID(),
    };
 }

@@ -8,13 +8,13 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} selector Whether to apply the damage at the start or end
  *    of the Character's turn.
  * @property {number} value The value by which to damage the Character.
- * @property {string} uuid Unique identifier for the Rules Element.
- * Used to help keep track of the element when changing types.
+ * @property {string} uuid Unique identifier for the Rules Element,
+ *    used to track the element across type changes.
  */
 
 /**
  * Creates a Rules Element for dealing damage to a Character every turn.
- * @param {object?} options - Options for the rules element.
+ * @param {object} [options] - Options for the rules element.
  * @returns {PersistentDamageElement} The new Rules Element.
  */
 export default function createPersistentDamageElement(options) {
@@ -22,6 +22,6 @@ export default function createPersistentDamageElement(options) {
       operation: 'persistentDamage',
       selector: 'turnStart',
       value: 1,
-      uuid: options.uuid ?? generateUUID(),
+      uuid: options?.uuid ?? generateUUID(),
    };
 }

@@ -45,7 +45,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
     * Overridable function for creating the reactive state store for this
     * sheet.
     * @override
-    * @returns {typeof CharacterSheetState} The newly created state store.
+    * @returns {CharacterSheetState} The newly created state store.
     * @protected
     */
    _createReactiveState() {

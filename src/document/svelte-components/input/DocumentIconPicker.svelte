@@ -11,7 +11,7 @@
    export let disabled = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;

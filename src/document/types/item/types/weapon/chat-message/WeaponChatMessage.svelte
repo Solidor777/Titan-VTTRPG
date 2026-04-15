@@ -10,8 +10,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} The Titan-specific flags data for this document. */
    const item = $document.flags.titan;
-   console.log(item);
 </script>
 
 <div class="item-chat-message">

@@ -4,12 +4,13 @@
    import { ARMOR_TRAIT_DESCRIPTIONS, ARMOR_TRAITS, } from '~/document/types/item/types/armor/ArmorTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
 
-   // The weapon item owning the attack
-   /** @type {TitanItem} */
+   /** @type {TitanItem} The armor item owning the traits being edited. */
    export let item = void 0;
 
-   // The trait options
+   /** @type {StandardTrait[]} The available armor trait options. */
    let traitOptions = structuredClone(ARMOR_TRAITS);
+
+   /** @type {Record<string, string>} Map of armor trait names to their description localization keys. */
    let traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
 </script>
 

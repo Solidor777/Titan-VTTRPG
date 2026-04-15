@@ -2,14 +2,12 @@ import getPlayerOwners from '~/helpers/utility-functions/GetPlayerOwners.js';
 
 /**
  * Helper function for determining if the current user is the first best active
- * owner of a document, prioritizing gms,
- * followed by the first owning player
+ * owner of a document, prioritizing GMs followed by the first owning player.
  * This is used to ensure certain functions only fire once, such as when an
  * actor's turn starts.
- * @param {Document} document - The Document this sheet is for.ocument to est.
- * @returns {boolean} True if the current user is the first active owner of a
- *    document.
- * Otherwise, returns false.
+ * @param {Document} document - The document to test ownership for.
+ * @returns {boolean} True if the current user is the first active owner of the
+ *    document, or false if there are no active owners.
  */
 export default function isCurrentUserBestOwner(document) {
    // Check if a gm is currently active.

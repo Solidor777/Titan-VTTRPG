@@ -31,5 +31,5 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
 
       // Initialize self object.
       super(sheetDocument, options);
-   };
+   }
 }

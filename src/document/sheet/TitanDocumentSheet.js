@@ -72,7 +72,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
       this.options.svelte.props.applicationState = this.applicationState;
 
       /**
-       * @type {Function|undefined} The unsubscribe function returned by the
+       * @type {Function | undefined} The unsubscribe function returned by the
        *    document store subscription, or undefined if not currently
        *    subscribed.
        */

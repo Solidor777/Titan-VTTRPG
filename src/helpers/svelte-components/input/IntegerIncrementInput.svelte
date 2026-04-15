@@ -8,17 +8,17 @@
    /** @type {number} The value that this input should modify. */
    export let value = void 0;
 
-   /** @type {number|boolean} The minimum value of the input. */
+   /** @type {number | boolean} The minimum value of the input. */
    export let min = false;
 
-   /** @type {number|boolean} The maximum value of the input. */
+   /** @type {number | boolean} The maximum value of the input. */
    export let max = false;
 
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
@@ -26,18 +26,15 @@
    /**
     * @type {number}
     * How much to increment or decrement the value when the increase or decrease
-    * buttons are pressed while the modifier
-    * is NOT active.
+    * buttons are pressed while the modifier is NOT active.
     */
-   /** @type {number} */
    export let increment = 1;
 
    /**
     * @type {number}
     * How much to increment or decrement the value when the increase or decrease
-    * buttons while the modifier IS active.
+    * buttons are pressed while the modifier IS active.
     */
-   /** @type {number} */
    export let modifierIncrement = 10;
 
    /**

@@ -11,7 +11,7 @@
 
 <ReportChatMessageHeader
    headerIcon={DURATION_ICON}
-   headerlabel={localize('effectsExpired')}
+   headerLabel={localize('effectsExpired')}
    images={[$document.flags.titan.actorImg]}
    subHeaderLabels={[$document.flags.titan.actorName]}
 />

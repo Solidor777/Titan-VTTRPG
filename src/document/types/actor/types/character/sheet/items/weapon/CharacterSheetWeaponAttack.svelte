@@ -47,7 +47,7 @@
          );
 
       // Cut the dice in half if multi attacking
-      if (item.system.multiAtta) {
+      if (item.system.multiAttack) {
          // Round up or down, depending on the flurry trait
          /** @type {boolean} */
          let flurry = false;

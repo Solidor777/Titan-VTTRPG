@@ -19,6 +19,7 @@
    import AttackCheckDialogDefenseField
       from '~/check/types/attack-check/dialog/AttackCheckDialogTargetDefenseField.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import warn from '~/helpers/utility-functions/Warn.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import CheckDialogDamageModField from '~/check/dialog/CheckDialogDamageModField.svelte';
 
@@ -57,7 +58,7 @@
    /** @type {Function} Called when the check becomes invalid. */
    function onCheckInvalid() {
       ui.notifications.info(localize('attackCheckNoLongerValid'));
-      game.titan.warn(
+      warn(
          localize('attackCheckNoLongerValid'),
          checkOptions,
          actor,

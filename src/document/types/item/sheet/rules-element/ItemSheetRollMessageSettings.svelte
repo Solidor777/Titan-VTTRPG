@@ -12,6 +12,7 @@
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import assert from '~/helpers/utility-functions/Assert.js';
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
@@ -28,7 +29,10 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   // Check type options
+   /**
+    * @type {{label: string, value: string}[]}
+    * Options for the type of check that triggers the roll message.
+    */
    const checkTypeOptions = [
       {
          label: localize('anyCheck'),
@@ -56,7 +60,10 @@
       },
    ];
 
-   // Selector options by check type
+   /**
+    * @type {Record<string, {label: string, value: string}[]>}
+    * Selector options keyed by check type.
+    */
    const selectorOptions = {
       any: [
          {
@@ -174,6 +181,7 @@
 
    /**
     * Resets the selector to 'any' when the check type changes.
+    * @returns {void}
     */
    function onCheckTypeChange() {
       element.selector = 'any';
@@ -185,7 +193,11 @@
     * Updates the element key to a sensible default when the selector changes.
     */
    function onSelectorChange() {
-      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(
+         document?.isOwner,
+         'Cannot modify document %s if not owner.',
+         document?.name,
+      )) {
          switch (element.selector) {
             case 'any':
             case 'customTrait':
@@ -230,6 +242,7 @@
 
    /**
     * Returns the appropriate select component for the current selector type.
+    * @returns {object | undefined} The select component, or undefined if no case matches.
     */
    function getSelector() {
       switch (element.selector) {
@@ -290,7 +303,8 @@
             </div>
 
             <!--Key-->
-            {#if element.selector !== 'multiAttack' && element.selector !== 'any'}
+            {#if element.selector !== 'multiAttack'
+               && element.selector !== 'any'}
                <div class="field select">
                   <svelte:component
                      this={getSelector()}
@@ -312,7 +326,9 @@
       </div>
       <!--Message text-->
       <div class="section" transition:slide|local>
-         <DocumentBoundEditorInput bind:value={$document.system.rulesElement[idx].message}/>
+         <DocumentBoundEditorInput
+            bind:value={$document.system.rulesElement[idx].message}
+         />
       </div>
    </div>
 {/if}
@@ -343,7 +359,8 @@
             .field {
                @include flex-row;
 
-               margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+               margin: var(--titan-spacing-large)
+                  var(--titan-spacing-standard) 0;
 
                &.select {
                   @include flex-group-left;
@@ -355,7 +372,8 @@
             @include flex-column;
             @include flex-group-top;
 
-            margin: var(--titan-spacing-standard) var(--titan-spacing-standard) 0 0;
+            margin-top: var(--titan-spacing-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 

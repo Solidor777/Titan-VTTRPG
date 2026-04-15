@@ -10,7 +10,7 @@
    export let icon = void 0;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
@@ -22,7 +22,7 @@
 >
    <!--Label-->
    <div class="label">
-      {#if (icon)}
+      {#if icon}
          <IconLabel
             {icon}
             {label}

@@ -4,6 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { PERSISTENT_DAMAGE_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -13,7 +14,7 @@
     */
    function getTooltip() {
       // Base label
-      let retVal = `<p>${localize(`persistentDamage.desc`)}</p>`;
+      let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment
       if ($document.flags.titan.persistentDamage.equipment) {
@@ -38,9 +39,8 @@
     * the message accordingly
     */
    async function confirmPersistentDamage() {
-
       // If we own this chat message and the associated actor
-      if (game.titan.assert($document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert($document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 

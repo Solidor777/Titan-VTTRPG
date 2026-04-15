@@ -8,19 +8,19 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} selector Whether to display the message at the start or
  *    end of the Character's turn.
  * @property {string} message The message to display.
- * @property {string} uuid Unique identifier for the Rules Element.
- * Used to help keep track of the element when changing types.
+ * @property {string} uuid Unique identifier for the Rules Element,
+ *    used to track the element across type changes.
  */
 
 /**
  * Creates a Rules Element for displaying a message on a Character's turn.
- * @param {object?} options - Options for the rules element.
+ * @param {object} [options] - Options for the rules element.
  * @returns {TurnMessageElement} The new Rules Element.
  */
 export default function createTurnMessageElement(options) {
    return {
       operation: 'turnMessage',
       selector: 'turnStart',
-      uuid: options.uuid ?? generateUUID(),
+      uuid: options?.uuid ?? generateUUID(),
    };
 }

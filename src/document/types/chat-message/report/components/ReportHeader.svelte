@@ -4,9 +4,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} */
+   /** @type {string} The icon class to display in the header. */
    export let icon = void 0;
-   /** @type {string} */
+
+   /** @type {string} The localized label to display in the header. */
    export let label = void 0;
 </script>
 

@@ -73,7 +73,7 @@ export default class TitanCheck {
       const dice = await rollCheckDice(this.parameters.totalDice);
       this.results = this._calculateResults(this._applyExpertise(dice));
 
-      // Update the state and returns the results
+      // Update the state and return the results
       this.isEvaluated = true;
    }
 
@@ -163,7 +163,7 @@ export default class TitanCheck {
             if (extraSuccessOnCritical) {
                for (const die of retVal.dice) {
                   if (die.final < 6 &&
-                     6 - retVal.dice[i].final === increment
+                     6 - die.final === increment
                   ) {
                      retVal.expertiseRemaining -= increment;
                      die.final = 6;
@@ -185,7 +185,7 @@ export default class TitanCheck {
    /**
     * Calculates the results of a check in the Titan system, based on the
     * inputted parameters,
-    * the dice rolled on the check,and the expertise that was applied.
+    * the dice rolled on the check, and the expertise that was applied.
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateCheckResults}.
@@ -221,7 +221,7 @@ export default class TitanCheck {
       };
 
       // Add the messages if appropriate
-      if (options.message) {
+      if (options?.message) {
          messageData.message = options.message;
       }
 

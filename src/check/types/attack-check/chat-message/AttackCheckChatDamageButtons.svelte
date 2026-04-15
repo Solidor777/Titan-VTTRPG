@@ -11,13 +11,16 @@
       IGNORE_ARMOR_ICON,
    } from '~/system/Icons.js';
 
-   /** @type {number} */
+   /** @type {number} The amount of damage dealt by the attack. */
    export let damage = void 0;
-   /** @type {boolean} */
+
+   /** @type {boolean} Whether the attack is ineffective (deals half damage). */
    export let ineffective = false;
-   /** @type {boolean} */
+
+   /** @type {boolean} Whether the attack is penetrating (ignores some armor). */
    export let penetrating = false;
-   /** @type {number} */
+
+   /** @type {number} The number of cleave hits from critical successes. */
    export let cleave = 0;
 </script>
 

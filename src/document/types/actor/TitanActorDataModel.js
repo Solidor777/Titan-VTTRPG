@@ -26,6 +26,7 @@ export default class TitanActorDataModel extends TitanDataModel {
    /**
     * Called after an Item is added to this Data Model's Actor.
     * @param {TitanItem} item - The Item that was just created.
+    * @returns {void}
     */
    postAddItem(item) {
    }
@@ -33,6 +34,7 @@ export default class TitanActorDataModel extends TitanDataModel {
    /**
     * Called before an Item is removed from this Data Model's Actor.
     * @param {TitanItem} item - The Item being deleted.
+    * @returns {void}
     */
    preDeleteItem(item) {
    }
@@ -41,6 +43,7 @@ export default class TitanActorDataModel extends TitanDataModel {
     * Called after an Item is removed from this Data Model's Actor.
     * @param {string} id - The ID of the item that was deleted.
     * @param {string} type - The Type of the item that was deleted.
+    * @returns {void}
     */
    postDeleteItem(id, type) {
    }
@@ -49,7 +52,7 @@ export default class TitanActorDataModel extends TitanDataModel {
     * Gets the initial data for the actor's prototype token.
     * @param {object} data - The initial data object provided to the document
     *    creation request.
-    * @returns {object|boolean} The initial data for the prototype token,
+    * @returns {object | boolean} The initial data for the prototype token,
     *    or false if there is no data to initialize.
     * @protected
     */

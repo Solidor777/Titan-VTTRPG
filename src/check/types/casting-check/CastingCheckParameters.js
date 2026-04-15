@@ -98,7 +98,7 @@ export default function createCastingCheckParameters(options) {
       totalExpertise: 0,
       totalTrainingDice: 0,
       tradition: '',
-      trainingMod: 0,
+      trainingMod: options.trainingMod,
       willpowerCheck: false,
    };
 }

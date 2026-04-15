@@ -14,8 +14,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Initialize filtered entries
-   /** @type {*[]} */
+   /** @type {number[]} The filtered list of attack indices to display. */
    let filteredEntries = [];
    $: {
       filteredEntries = [];
@@ -39,7 +38,7 @@
       </div>
    {/if}
 
-   <!--Scroling Content-->
+   <!--Scrolling Content-->
    <ScrollingContainer bind:scrollTop={$appState.tabs.attacks.scrollTop}>
       <div class="scrolling-content">
          <!--Attacks List-->

@@ -4,7 +4,7 @@
  * @param {Document} document - The document to be updated.
  * @param {boolean} disabled - Whether the element is currently disabled.
  */
-export default async function refreshSystemDocument (document, disabled) {
+export default async function refreshSystemDocument(document, disabled) {
    if (!disabled && document?.isOwner) {
       return await document.update({
          system: structuredClone(document.system),

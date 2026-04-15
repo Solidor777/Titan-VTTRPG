@@ -3,11 +3,13 @@
    import CheckChatDiceContainer from '~/check/chat-message/CheckChatMessageDice.svelte';
    import ResistanceCheckChatHeader from '~/check/types/resistance-check/chat-message/ResistanceCheckChatHeader.svelte';
    import CheckChatResults from '~/check/chat-message/CheckChatResults.svelte';
-   import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
+   import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ChatDamageButtons from '~/document/types/chat-message/components/buttons/ChatMessageDamageButtons.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} The Titan-specific flags data for this document. */
    const check = $document.flags.titan;
 </script>
 
@@ -20,7 +22,7 @@
    <!--Chat Messages-->
    {#if $document.flags.titan.message}
       <div class="section">
-         <CheckChatMesssages/>
+         <CheckChatMessages/>
       </div>
    {/if}
 

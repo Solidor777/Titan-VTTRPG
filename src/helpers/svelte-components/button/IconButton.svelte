@@ -2,14 +2,14 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {boolean} The icon to display for this button. */
+   /** @type {string} The icon class to display for this button. */
    export let icon = void 0;
 
    /** @type {boolean} Whether this input is disabled. */
    export let disabled = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;

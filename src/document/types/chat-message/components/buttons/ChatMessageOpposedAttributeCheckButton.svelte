@@ -3,15 +3,19 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {string} */
+   /** @type {string} The Attribute to use for the opposed check. */
    export let attribute = 'body';
-   /** @type {string} */
+
+   /** @type {string} The Skill to use for the opposed check. */
    export let skill = 'arcana';
-   /** @type {number} */
+
+   /** @type {number} The Difficulty of the opposed check. */
    export let difficulty = 4;
-   /** @type {number} */
+
+   /** @type {number} The Complexity of the opposed check. */
    export let complexity = 1;
-   /** @type {number} */
+
+   /** @type {number} Damage to be reduced by the check, if any. */
    export let damageToReduce = 0;
 
    /**
@@ -32,13 +36,11 @@
    }
 </script>
 
-<!--Apply healing button-->
+<!--Opposed check button-->
 <div class="opposed-check-button {attribute}">
    <Button on:click={() => rollOpposedCheck()}>
       {#if skill && skill !== 'none'}
-         {`${localize(attribute)}
-         (${localize(`${skill}`)})
-         ${difficulty}:${complexity}`}
+         {`${localize(attribute)} (${localize(skill)}) ${difficulty}:${complexity}`}
       {:else}
          {`${localize(attribute)} ${difficulty}:${complexity}`}
       {/if}

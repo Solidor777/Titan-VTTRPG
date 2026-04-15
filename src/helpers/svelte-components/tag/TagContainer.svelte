@@ -9,7 +9,7 @@
     * @property {object} props Props to use with the component.
     */
 
-   /** @type {Tag} List of tags to place in the container */
+   /** @type {Tag[]} List of tags to place in the container. */
    export let tags = void 0;
 </script>
 <!--Tag Container-->

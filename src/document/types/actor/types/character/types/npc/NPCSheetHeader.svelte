@@ -9,7 +9,6 @@
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
-   import createLocalizedOptions from '~/helpers/utility-functions/CreateLocalizedOptions.js';
    import { ROLES } from '~/system/Roles.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
@@ -17,10 +16,10 @@
    const document = getContext('document');
 
    /**
-    * @type {SelectOption<string>[]}
+    * @type {string[]}
     * Options for the role of NPC (Minion, Warrior, Elite, or Champion).
     */
-   const roleOptions = createLocalizedOptions(ROLES);
+   const roleOptions = ROLES;
 </script>
 
 <div class="header">

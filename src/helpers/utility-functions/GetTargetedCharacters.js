@@ -15,7 +15,7 @@ export default function getTargetedCharacters() {
    // Get the targeted tokens.
    let targetedTokens = getTargetedTokens();
 
-   // If there are no targeted, and the current user is a GM, get the controlled
+   // If there are no targeted tokens, and the current user is a GM, get the controlled
    // tokens.
    if (targetedTokens.length < 1 && game.user.isGM) {
       targetedTokens = getControlledTokens();

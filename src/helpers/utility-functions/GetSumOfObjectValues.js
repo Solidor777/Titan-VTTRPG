@@ -1,6 +1,6 @@
 /**
  * Returns the sum of the key values contained within an object.
- * Assumed the object only contains numbers.
+ * Assumes the object only contains numbers.
  * @param {object} object - Object to get the sum values of.
  * @returns {number} The sum of the values contained within the object.
  */

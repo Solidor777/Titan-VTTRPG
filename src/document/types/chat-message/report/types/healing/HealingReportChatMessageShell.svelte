@@ -9,10 +9,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Header svelte-component to use. */
+   /** @type {object} The header Svelte component to render. */
    const header = HealingReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte components. */
+   /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [ChatMessageStamina];
 
    // Add wounds if appropriate

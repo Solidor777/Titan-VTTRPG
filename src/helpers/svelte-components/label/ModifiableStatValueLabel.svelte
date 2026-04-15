@@ -83,8 +83,8 @@
 <div
    class={styleClass}
    use:tooltipAction={{
-      text:tooltip,
-      localize:false
+      text: tooltip,
+      localize: false
    }}
 >
    {value}

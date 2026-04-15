@@ -1,8 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   // Check reference
-   /** @type {object} */
+   /** @type {object} The Titan check flags data for this document. */
    export let check = void 0;
 </script>
 

@@ -7,7 +7,7 @@ import { ID_ICON } from '~/system/Icons.js';
  * Generates contextual options when right-clicking on an Item in the Items
  * directory.
  * @param {Element} element - The Element that was clicked.
- * @param {object} options - Array of buttons contenting the contextual
+ * @param {object[]} options - Array of buttons containing the contextual
  *    options.
  */
 export default function onGetItemDirectoryEntryContext(element, options) {

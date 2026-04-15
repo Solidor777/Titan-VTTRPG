@@ -12,6 +12,7 @@
       from '~/check/types/resistance-check/dialog/ResistanceCheckDialogResistanceField.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import warn from '~/helpers/utility-functions/Warn.js';
 
    /** @type {TitanActor} The Actor that will roll the Check. */
    export let actor = void 0;
@@ -43,7 +44,7 @@
    /** @type {Function} Called when the check becomes invalid. */
    function onCheckInvalid() {
       ui.notifications.info(localize('resistanceCheckNoLongerValid'));
-      game.titan.warn(
+      warn(
          localize('resistanceCheckNoLongerValid'),
          checkOptions,
          actor,

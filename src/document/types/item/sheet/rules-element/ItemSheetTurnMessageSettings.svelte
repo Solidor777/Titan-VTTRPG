@@ -21,7 +21,10 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   // Options for when the turn the message is sent.
+   /**
+    * @type {string[]}
+    * Options for which turn the message is sent.
+    */
    const selectorOptions = [
       'turnStart',
       'turnEnd',
@@ -59,7 +62,9 @@
       </div>
       <!--Message text-->
       <div class="section">
-         <DocumentBoundEditorInput bind:value={$document.system.rulesElement[idx].message}/>
+         <DocumentBoundEditorInput
+            bind:value={$document.system.rulesElement[idx].message}
+         />
       </div>
    </div>
 {/if}
@@ -90,7 +95,8 @@
             .field {
                @include flex-row;
 
-               margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+               margin: var(--titan-spacing-large)
+                  var(--titan-spacing-standard) 0;
 
                &.select {
                   @include flex-group-left;
@@ -102,7 +108,8 @@
             @include flex-column;
             @include flex-group-top;
 
-            margin: var(--titan-spacing-standard) var(--titan-spacing-standard) 0 0;
+            margin-top: var(--titan-spacing-standard);
+            margin-right: var(--titan-spacing-standard);
          }
       }
 

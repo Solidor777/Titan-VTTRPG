@@ -9,13 +9,12 @@
  *    achieved.
  * @property {number} expertiseRemaining The Expertise remaining after being
  *    applied to the dice.
- * @property {number} extraSuccesses The number of Critical Successes achieved.
+ * @property {number} extraSuccesses The number of extra Successes achieved beyond the Complexity.
  * @property {number} successes The total number of Successes achieved.
  */
 
 /**
- * Calculates the results of a check in the Titan system, based on the inputted
- * parameters,
+ * Calculates the results of a check in the Titan system, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check,
  *    after Expertise is applied.
@@ -49,7 +48,7 @@ export default function calculateCheckResults(diceResults, parameters) {
          retVal.successes += parameters.extraSuccessOnCritical ? 2 : 1;
       }
 
-      // If this dice was a normal success
+      // If this die was a normal success
       else if (retVal.dice[i].final >= parameters.difficulty) {
 
          // Increment the number of successes

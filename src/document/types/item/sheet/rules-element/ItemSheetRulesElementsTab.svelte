@@ -2,12 +2,14 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
-   import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import ScrollingContainer
+      from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
    import ItemSheetRulesElementSettings
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementSettings.svelte';
-   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
+   import DocumentOwnerButton
+      from '~/document/svelte-components/DocumentOwnerButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -15,9 +17,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   for (const element of $document.system.rulesElement) {
-      console.log(element);
-   }
+
 </script>
 
 <div class="tab">

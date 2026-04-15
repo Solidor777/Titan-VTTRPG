@@ -4,12 +4,12 @@
    import { OVERKILL_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type {isInteger} Amount of Damage to apply. */
+   /** @type {number} Amount of Damage to apply. */
    export let damage = void 0;
 </script>
 
 <ChatMessageButton
-   on:click={() =>applyDamageToTargets(damage, {ignoreArmor: true})}
+   on:click={() => applyDamageToTargets(damage, { ignoreArmor: true })}
    tooltip={localize('applyOverkillDamage')}
 >
    <i class={OVERKILL_ICON}/>

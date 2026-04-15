@@ -7,20 +7,21 @@
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   // The document document owning the trait
-   /** @type {TitanItem} */
+   /** @type {TitanItem} The item owning the custom trait being edited. */
    export let item = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {number} */
+   /** @type {number} The index of the trait in the item's custom traits array. */
    export let traitIdx = void 0;
 
+   /** @type {object} The custom trait being edited. */
    const trait = item.system.customTrait[traitIdx];
 
    /**
     * Saves the edited trait and closes the dialog.
+    * @returns {void}
     */
    function editTrait() {
       const customTrait = item.system.customTrait;

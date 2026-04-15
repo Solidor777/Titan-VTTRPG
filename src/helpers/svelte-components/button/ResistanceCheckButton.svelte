@@ -6,7 +6,7 @@
    /** @type {string} The Resistance to roll. */
    export let resistance = void 0;
 
-   /** @type {string} The Difficulty of the Check. */
+   /** @type {number} The Difficulty of the Check. */
    export let difficulty = 4;
 
    /** @type {number} The Complexity of the Check. */
@@ -15,7 +15,7 @@
    /** @type {number} Damage to be reduced by the check, if any. */
    export let damageToReduce = 0;
 
-   /** @type {boolean} The Complexity of the Check. */
+   /** @type {boolean} Whether the button should be disabled. */
    export let disabled = false;
 
    /**

@@ -7,7 +7,7 @@
    import ChatHealingButton from '~/document/types/chat-message/components/buttons/ChatMessageHealingButton.svelte';
    import CheckChatScalingAspects from '~/check/chat-message/CheckChatScalingAspects.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
+   import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
    import CastingCheckChatMessageResistanceCheckButtons
       from '~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte';
@@ -15,7 +15,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Scaling aspects list
+   /** @type {boolean} Whether to show the scaling aspect controls. */
    $: scalingAspect =
       $document.flags.titan.results.scalingAspect &&
       $document.flags.titan.results.scalingAspect.length > 0 &&
@@ -32,7 +32,7 @@
    <!--Chat Messages-->
    {#if $document.flags.titan.message}
       <div class="section">
-         <CheckChatMesssages/>
+         <CheckChatMessages/>
       </div>
    {/if}
 

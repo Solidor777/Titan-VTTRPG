@@ -62,8 +62,8 @@
     */
 
    /**
-    * @type {CustomEffectData|ExpiredEffectData|InitiativeEffectData|
-    *    PermanentEffectData|TurnEffectData|ConditionEffectData}
+    * @type {CustomEffectData | ExpiredEffectData | InitiativeEffectData |
+    *    PermanentEffectData | TurnEffectData | ConditionEffectData}
     * Object containing the essential data for this effect.
     */
    export let effect = void 0;

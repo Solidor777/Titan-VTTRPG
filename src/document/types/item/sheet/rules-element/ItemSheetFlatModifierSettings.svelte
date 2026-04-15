@@ -2,7 +2,6 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
@@ -11,7 +10,7 @@
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
+   import assert from '~/helpers/utility-functions/Assert.js';
 
    /**
     * @type {number}
@@ -26,7 +25,10 @@
    let element;
    $: element = $document?.system.rulesElement[idx];
 
-   // Selector options
+   /**
+    * @type {string[]}
+    * Options for selecting the stat the flat modifier applies to.
+    */
    const selectorOptions = [
       'attribute',
       'expertise',
@@ -39,10 +41,16 @@
    ];
 
    /**
-    * Updates the element key to a sensible default when the selector changes.
+    * Updates the element key to a sensible default when the selector
+    * changes, then triggers a document update.
+    * @returns {void}
     */
    function onSelectorChange() {
-      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(
+         document?.isOwner,
+         'Cannot modify document %s if not owner.',
+         document?.name,
+      )) {
          switch (element.selector) {
             case 'attribute': {
                element.key = 'body';
@@ -87,6 +95,7 @@
 
    /**
     * Returns the appropriate select component for the current selector type.
+    * @returns {object | undefined} The select component, or undefined if no case matches.
     */
    function getSelector() {
       switch (element.selector) {
@@ -118,8 +127,6 @@
          }
       }
    }
-
-   // Setup tabs
 </script>
 
 {#if element && element.operation === 'flatModifier'}
@@ -146,16 +153,6 @@
             <DocumentIntegerInput bind:value={element.value}/>
          </div>
       </div>
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <IconButton
-            icon={DELETE_ICON}
-            on:click={() => {
-               $document.system.deleteRulesElement(idx);
-            }}
-         />
-      </div>
    </div>
 {/if}
 
@@ -163,8 +160,6 @@
    .element {
       @include flex-row;
       @include flex-space-between;
-      @include border;
-      @include panel-1;
 
       width: 100%;
       height: 100%;
@@ -180,7 +175,7 @@
          .field {
             @include flex-row;
 
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
 
             &.select {
                @include flex-group-left;
@@ -192,14 +187,6 @@
                width: 32px;
             }
          }
-      }
-
-      .delete-button {
-         @include flex-column;
-         @include flex-group-top;
-
-         height: 100%;
-         margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 0;
       }
    }
 </style>

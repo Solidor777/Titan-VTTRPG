@@ -9,7 +9,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {CheckDie} The individual die being display. */
+   /** @type {CheckDie} The individual die being displayed. */
    export let die = void 0;
 
    /** @type {string} The label to display for the die. */

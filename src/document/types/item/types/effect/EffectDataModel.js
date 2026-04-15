@@ -53,6 +53,11 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return this.parent.actionQueue;
    }
 
+   /**
+    * Defines the data schema for Effect documents.
+    * @returns {object} The document schema.
+    * @override
+    */
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
@@ -70,6 +75,13 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return schema;
    }
 
+   /**
+    * Returns initial data overrides for the document on creation.
+    * Sets the initiative to match the owning actor's active combat initiative, if any.
+    * @param {object} data - The initial document data.
+    * @returns {object | undefined} Initial data overrides, or undefined if none.
+    * @override
+    */
    _getInitialDocumentData(data) {
       let retVal = super._getInitialDocumentData(data);
 
@@ -94,6 +106,12 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return retVal;
    }
 
+   /**
+    * Prepares derived data for this document.
+    * Queues the latent data preparation action if this client is the best owner.
+    * @returns {void}
+    * @override
+    */
    prepareDerivedData() {
       // If we are the best first owner of this document, and this document is
       // not in a compendium
@@ -115,6 +133,11 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       }
    }
 
+   /**
+    * Returns the roll data object for this document.
+    * @returns {object} The roll data.
+    * @override
+    */
    getRollData() {
       const retVal = super.getRollData();
       retVal.duration = structuredClone(this.duration);
@@ -123,10 +146,20 @@ export default class EffectDataModel extends RulesElementItemDataModel {
       return retVal;
    }
 
+   /**
+    * Returns the default image path for new Effect documents.
+    * @returns {string} The default image path.
+    * @override
+    */
    _getDefaultImage() {
       return EFFECT_IMAGE;
    }
 
+   /**
+    * Returns the default name for new Effect documents.
+    * @returns {string} The default name.
+    * @override
+    */
    _getDefaultName() {
       return localize('newEffect');
    }

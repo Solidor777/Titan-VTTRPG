@@ -3,7 +3,8 @@
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
    /**
-    * @type {number} The idx of the Trait in the item's Custom Traits array.
+    * @type {number}
+    * The index of the Trait in the item's Custom Traits array.
     */
    export let idx = void 0;
 
@@ -12,6 +13,7 @@
 
    /**
     * Called when the Delete button is clicked.
+    * @returns {void}
     */
    function deleteFunction() {
       $document.deleteCustomTrait(idx);
@@ -19,6 +21,7 @@
 
    /**
     * Called when the Edit button is clicked.
+    * @returns {void}
     */
    function editFunction() {
       $document.editCustomTrait(idx);

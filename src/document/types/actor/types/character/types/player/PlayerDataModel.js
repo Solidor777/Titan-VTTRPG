@@ -2,6 +2,7 @@ import CharacterDataModel from '~/document/types/actor/types/character/Character
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
 import createNumberField from '~/helpers/utility-functions/CreateNumberField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Data model for player actors.
@@ -13,7 +14,7 @@ export default class PlayerDataModel extends CharacterDataModel {
     * @returns {Promise<void>}
     */
    async toggleInspiration() {
-      if (game.titan.assert(this.parent.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)) {
+      if (assert(this.parent.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)) {
          this.inspiration = !this.inspiration;
          await this.parent.update({
             system: {

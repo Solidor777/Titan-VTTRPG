@@ -14,13 +14,13 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Header svelte-component to use. */
+   /** @type {object} The header Svelte component to render. */
    const header = DamageReportChatMessageHeader;
 
-   /** @type {object|string[]} Calculated section svelte components. */
+   /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [];
 
-   /** @type {object[]} Calculated tag svelte components. */
+   /** @type {object[]} Array of tag Svelte components to include. */
    const tags = [];
 
    // If we took damage, conditionally add more information to the messages

@@ -33,18 +33,20 @@
    const document = getContext('document');
 
    /**
-    * @type {object}
+    * @type {object | undefined}
     * The operation-specific settings component for this Rules Element.
     */
    let operationSettingsComponent;
    $: {
       switch ($document?.system.rulesElement[idx]?.operation) {
          case 'conditionalCheckModifier': {
-            operationSettingsComponent = ItemSheetConditionalCheckModifierSettings;
+            operationSettingsComponent =
+               ItemSheetConditionalCheckModifierSettings;
             break;
          }
-         case 'conditionalRatingModifierSettings': {
-            operationSettingsComponent = ItemSheetConditionalRatingModifierSettings;
+         case 'conditionalRatingModifier': {
+            operationSettingsComponent =
+               ItemSheetConditionalRatingModifierSettings;
             break;
          }
          case 'fastHealing': {
@@ -60,7 +62,8 @@
             break;
          }
          case 'persistentDamage': {
-            operationSettingsComponent = ItemSheetPersistentDamageSettings;
+            operationSettingsComponent =
+               ItemSheetPersistentDamageSettings;
             break;
          }
          case 'rollMessage': {
@@ -119,7 +122,7 @@
       @include flex-group-top;
       @include border;
       @include panel-1;
-      @include padding-standard;
+      @include padding-large;
 
       width: 100%;
 

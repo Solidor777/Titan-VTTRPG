@@ -40,7 +40,7 @@ export default class AttackCheck extends TitanCheck {
             // critical success
             for (const die of retVal.dice) {
                if (die.final < 6 &&
-                  6 - retVal.dice[i].final === increment
+                  6 - die.final === increment
                ) {
                   retVal.expertiseRemaining -= increment;
                   die.final = 6;
@@ -59,8 +59,7 @@ export default class AttackCheck extends TitanCheck {
    }
 
    /**
-    * Calculates the results of an Attack Check, based on the inputted
-    * parameters,
+    * Calculates the results of an Attack Check, based on the inputted parameters,
     * the dice rolled on the check, and the expertise that was applied.
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.

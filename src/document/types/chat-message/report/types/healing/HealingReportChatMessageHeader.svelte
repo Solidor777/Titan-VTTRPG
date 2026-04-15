@@ -13,7 +13,7 @@
 
 <ChatReportHeader
    headerIcon={HEALING_ICON}
-   headerlabel={headerLabel}
+   headerLabel={headerLabel}
    images={[$document.flags.titan.actorImg]}
    subHeaderLabels={[$document.flags.titan.actorName]}
 />

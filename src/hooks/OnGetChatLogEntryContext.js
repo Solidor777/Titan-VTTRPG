@@ -9,11 +9,11 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
  * Generates contextual options when right-clicking on a Chat Message in the
  * Chat Log.
  * @param {Element} element - The Element that was clicked.
- * @param {object} options - Array of buttons contenting the contextual
+ * @param {object[]} options - Array of buttons containing the contextual
  *    options.
  */
 export default function onGetChatLogEntryContext(element, options) {
-   // Get the settings for ato spending resolve
+   // Get the settings for auto spending resolve
    const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
    const autoSpendResolveDoubleExpertise = getSetting('autoSpendResolveDoubleExpertise');
    const autoSpendResolveDoubleTraining = getSetting('autoSpendResolveDoubleTraining');
@@ -222,7 +222,7 @@ async function doubleTraining(element, spendResolve) {
    const message = game.messages.get(element.data('messageId'));
    const titanFlags = message?.flags?.titan;
 
-   // Re roll dice equal to the number of falures
+   // Re-roll dice equal to the number of failures
    if (titanFlags.parameters.doubleTraining === false && titanFlags.parameters.totalTrainingDice > 0) {
       titanFlags.parameters.doubleTraining = true;
 

@@ -1,9 +1,8 @@
 <script>
-
    /** @type {string} The message to display. */
    export let message = void 0;
 
-   /** @type {string} The icon to display next to the message. */
+   /** @type {string} The icon class to display next to the message. */
    export let icon = void 0;
 </script>
 

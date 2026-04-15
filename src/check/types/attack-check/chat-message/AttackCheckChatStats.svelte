@@ -15,6 +15,8 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} Map of attack trait names to their description localization keys. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
@@ -61,9 +63,7 @@
 
    <!--Attack Traits-->
    {#each $document.flags.titan.parameters.attackTrait as trait}
-      <div
-         class="stat"
-      >
+      <div class="stat">
          {#if typeof (trait.value) === 'number'}
             <StatTag
                tooltip={traitDescriptions[trait.name]}

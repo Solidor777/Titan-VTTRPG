@@ -46,6 +46,7 @@ import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Options for applying Damage to a Character.
@@ -473,8 +474,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @override
     */
    async preDeleteItem(item) {
-      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)
-         && game.titan.assert(!this.parent.uuid === item.parent?.uuid,
+      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)
+         && assert(!this.parent.uuid === item.parent?.uuid,
             'Item is already owned by actor', this.parent.name, item.name)) {
 
          // Perform type specific deletion operations.

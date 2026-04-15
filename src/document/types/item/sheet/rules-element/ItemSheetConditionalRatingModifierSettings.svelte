@@ -37,20 +37,34 @@
     * @type {string[]}
     * Options for selecting the defense-related condition for the modifier.
     */
-   const defenseSelectorOptions = ['armorTrait', 'shieldTrait', 'customArmorTrait', 'customShieldTrait'];
+   const defenseSelectorOptions = [
+      'armorTrait',
+      'shieldTrait',
+      'customArmorTrait',
+      'customShieldTrait',
+   ];
 
    /**
     * @type {string[]}
     * Options for selecting the attack-related condition for the modifier.
     */
-   const attackSelectorOptions = ['attackTrait', 'attackType', 'customWeaponTrait', 'multiAttack'];
+   const attackSelectorOptions = [
+      'attackTrait',
+      'attackType',
+      'customWeaponTrait',
+      'multiAttack',
+   ];
 
    /**
     * Updates the element's key to a sensible default when the selector
     * changes.
     */
    function onSelectorChange() {
-      if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(
+         document?.isOwner,
+         'Cannot modify document %s if not owner.',
+         document?.name,
+      )) {
          switch (element.selector) {
             case 'armorTrait':
             case 'shieldTrait': {
@@ -86,6 +100,7 @@
    /**
     * Updates the element's selector to a sensible default when the rating
     * changes.
+    * @returns {void}
     */
    function onRatingChange() {
       switch (element.rating) {
@@ -205,7 +220,7 @@
          .field {
             @include flex-row;
 
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
+            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
 
             &.select {
                @include flex-group-left;

@@ -31,7 +31,6 @@
       headerLabel = localize('resistedX%Rend').replace('X%', $document.flags.titan.rend);
       headerIcon = ARMOR_ICON;
    }
-
 </script>
 
 <ChatReportHeader

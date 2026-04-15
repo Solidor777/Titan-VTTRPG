@@ -13,7 +13,7 @@
    /** @type {string} Calculated header icon. */
    let headerIcon;
 
-   // If we tool damage, use that as the main header
+   // If we took damage, use that as the main header
    if ($document.flags.titan.damageTaken) {
       headerLabel = localize('tookX%Damage').replace('X%', $document.flags.titan.damageTaken);
       headerIcon = DAMAGE_ICON;
@@ -24,12 +24,11 @@
       headerLabel = localize('resistedX%Damage').replace('X%', $document.flags.titan.damageResisted);
       headerIcon = ARMOR_ICON;
    }
-
 </script>
 
 <ReportChatMessageHeader
    headerIcon={headerIcon}
-   headerlabel={headerLabel}
+   headerLabel={headerLabel}
    images={[$document.flags.titan.actorImg]}
    subHeaderLabels={[$document.flags.titan.actorName]}
 />

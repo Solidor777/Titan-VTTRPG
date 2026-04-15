@@ -10,11 +10,13 @@
       IGNORE_ARMOR_ICON,
    } from '~/system/Icons.js';
 
-   /** @type {number} */
+   /** @type {number} The amount of damage to apply. */
    export let damage = void 0;
-   /** @type {boolean} */
+
+   /** @type {boolean} Whether the attack is ineffective (deals half damage). */
    export let ineffective = false;
-   /** @type {boolean} */
+
+   /** @type {boolean} Whether the attack is penetrating (ignores some armor). */
    export let penetrating = false;
 </script>
 
@@ -33,10 +35,7 @@
    </div>
 
    <!--Apply damage ignore armor button-->
-   <div
-      class="button"
-      use:tooltipAction={'applyDamageIgnoreArmor'}
-   >
+   <div class="button" use:tooltipAction={'applyDamageIgnoreArmor'}>
       <Button
          on:click={() =>
             applyDamageToTargets(damage, {

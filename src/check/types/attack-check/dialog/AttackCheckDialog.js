@@ -14,8 +14,7 @@ export default class AttackCheckDialog extends TitanDialog {
     * @param {AttackCheckOptions} checkOptions - The initial options for the
     *    check to be adjusted.
     * @param {AttackCheckParameters} checkParameters - The initial parameters
-    *    for the check,
-    * calculated from the options.
+    *    for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {

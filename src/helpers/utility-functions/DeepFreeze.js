@@ -1,8 +1,8 @@
 /**
  * Recursively freezes all properties of an object or array, so that they can no
- * longer be changes.
- * @param {object|[]} data - The object or array to freeze.
- * @returns {object|[]} The frozen object or array.
+ * longer be changed.
+ * @param {object | []} data - The object or array to freeze.
+ * @returns {object | []} The frozen object or array.
  */
 export default function deepFreeze(data) {
    // If array, freeze every entry
@@ -13,7 +13,7 @@ export default function deepFreeze(data) {
    }
 
    // Otherwise, freeze every property on this object
-   else if (typeof value === 'object') {
+   else if (typeof data === 'object') {
       for (const key in data) {
          if (Object.prototype.hasOwn(data, key)) {
             deepFreeze(data[key]);

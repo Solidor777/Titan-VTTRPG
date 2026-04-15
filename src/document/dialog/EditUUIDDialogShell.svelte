@@ -4,11 +4,10 @@
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   // document to edit the UUID for
-   /** @type {TitanItem|TitanActor} */
+   /** @type {TitanItem | TitanActor} The document to edit the UUID for. */
    export let document = void 0;
 
-   // UUID of the document
+   /** @type {string | undefined} The UUID of the document. */
    let uuid = document.flags?.titan?.uuid;
 
    /** @type {SvelteApp} The Svelte Component's Application. */

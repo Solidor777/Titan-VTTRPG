@@ -14,7 +14,7 @@
 
    /**
     * Called when the element is scrolled.
-    * @param {DOM Event} event - The DOM Event of the scroll input.
+    * @param {Event} event - The DOM Event of the scroll input.
     */
    function onScroll(event) {
 

@@ -14,8 +14,7 @@ export default class ResistanceCheckDialog extends TitanDialog {
     * @param {ResistanceCheckOptions} checkOptions - The initial options for the
     *    check to be adjusted.
     * @param {ResistanceCheckParameters} checkParameters - The initial
-    *    parameters for the check,
-    * calculated from the options.
+    *    parameters for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {

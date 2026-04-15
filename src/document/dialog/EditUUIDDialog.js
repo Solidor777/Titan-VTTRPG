@@ -9,7 +9,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 export default class EditUUIDDialog extends TitanDialog {
 
    /**
-    * @param {TitanItem|TitanActor} document - The Document to edit the UUID
+    * @param {TitanItem | TitanActor} document - The Document to edit the UUID
     *    for.
     */
    constructor(document) {

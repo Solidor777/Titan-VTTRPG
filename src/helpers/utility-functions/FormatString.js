@@ -1,7 +1,7 @@
 /**
  * Formats a string with the provided arguments.
  * @param {string} string - The string to format.
- * @param {*} args - Arguments to format the string with.
+ * @param {...*} args - Arguments to format the string with.
  * @returns {string} The formatted string.
  */
 export default function formatString(string, ...args) {
@@ -18,7 +18,7 @@ export default function formatString(string, ...args) {
       if (argType === 'string' || argType === 'number') {
 
          // Replace the indexes of the arguments with the argument values
-         for (const [key, value] of args) {
+         for (const [key, value] of args.entries()) {
             retVal = retVal.replace(new RegExp('\\{' + key + '\\}', 'gi'), value.toString());
          }
       }
@@ -34,4 +34,4 @@ export default function formatString(string, ...args) {
    }
 
    return retVal;
-};
+}

@@ -1,9 +1,9 @@
-import getBestCharactersToUpdate from "~/helpers/utility-functions/GetBestCharactersToUpdate.js";
+import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharactersToUpdate.js';
 
 /**
  * Applies repairs to the user's available combat targets.
  * @param {number} repairs - Amount of repairs to apply.
- * @param {RepairsOptions?} options - Options for applying the repairs.
+ * @param {RepairsOptions} [options] - Options for applying the repairs.
  * @returns {Promise<void>} Returns after the repairs have been applied.
  */
 export default async function applyRepairsToTargets(repairs, options) {

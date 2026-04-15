@@ -50,7 +50,7 @@
  * @property {string[]} customTrait Array of custom traits applied to this
  *    attack.
  * @property {string} attackName The display name of the attack.
- * @property {string} attackNotes Messages to that are specific to this attack,
+ * @property {string} attackNotes Messages that are specific to this attack,
  *    if any.
  * @property {string} attribute The Attribute to use for the Check.
  * @property {string} img The image to display with the check.

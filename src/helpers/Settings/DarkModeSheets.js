@@ -1,4 +1,4 @@
-import getSetting from "~/helpers/utility-functions/GetSetting.js";
+import getSetting from '~/helpers/utility-functions/GetSetting.js';
 
 /**
  * Returns whether Dark Mode Sheets is Enabled.

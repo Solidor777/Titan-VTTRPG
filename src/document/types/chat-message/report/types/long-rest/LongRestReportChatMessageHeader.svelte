@@ -9,7 +9,6 @@
 
    /** @type {string} Header label. */
    const headerLabel = localize('tookALongRest');
-
 </script>
 
 <ReportChatMessageHeader

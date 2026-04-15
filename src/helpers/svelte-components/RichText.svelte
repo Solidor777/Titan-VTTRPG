@@ -7,29 +7,18 @@
    /** @type {string} The raw html to display. */
    export let value = void 0;
 
-   /** @type {string} Enriched HTMl to display. */
+   /** @type {string} Enriched HTML to display. */
    let displayText = TextEditor.enrichHTML(value, {
       async: false,
       secrets: true,
    });
 
-   /** @type {string} Calculated class for Rich Text object. */
-   let textClass = $document.isOwner ?
-      'rich-text' :
-      'rich-text not-owner';
-
-   // Update in response to changes.
+   // Update display text in response to changes.
    $: {
-      // Update display text
       displayText = TextEditor.enrichHTML(value, {
          async: false,
          secrets: true,
       });
-
-      // Update text class
-      textClass = $document.isOwner ?
-         'rich-text' :
-         'rich-text not-owner';
    }
 
 </script>

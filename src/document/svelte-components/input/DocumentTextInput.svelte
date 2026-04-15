@@ -13,13 +13,14 @@
    const document = getContext('document');
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
 
    /**
-    * Update the document data when the input changes.
+    * Updates the document data when the input changes.
+    * @returns {void}
     */
    function updateDocument() {
       refreshSystemDocument($document, disabled);

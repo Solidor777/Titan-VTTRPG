@@ -49,8 +49,7 @@
  * @property {string} attribute The Attribute to use for the Check.
  * @property {string} checkLabel The display name of the check.
  * @property {string} damageReducedBy Whether Damage from this check can be
- *    reduced by an Opposed Check, or a
- * Resistance Check.
+ *    reduced by an Opposed Check, or a Resistance Check.
  * @property {string} img The image to display with the check.
  * @property {string} itemDescription The description of the item being rolled.
  * @property {string} itemName The name of the item being rolled.

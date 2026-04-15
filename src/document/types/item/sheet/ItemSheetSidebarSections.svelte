@@ -5,7 +5,7 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-   /** @type {*[]} */
+   /** @type {object[]} The list of section components to render in the sidebar. */
    export let sections = void 0;
 </script>
 

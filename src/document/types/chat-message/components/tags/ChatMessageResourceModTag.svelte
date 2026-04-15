@@ -9,7 +9,7 @@
    /** @type {string} The Key of the resource to display information for. */
    export let key = void 0;
 
-   /** @type {string} The Icon to use for the tag. */
+   /** @type {string} The icon class to use for the tag. */
    export let icon = void 0;
 
    /** @type {string} The style class to use for the tag. */

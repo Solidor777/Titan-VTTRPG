@@ -8,8 +8,10 @@
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
-   import DocumentCheckDifficultySelect from '~/document/svelte-components/select/DocumentCheckDifficultySelect.svelte';
-   import DocumentDamageReducedBySelect from '~/document/svelte-components/select/DocumentDamageReducedBySelect.svelte';
+   import DocumentCheckDifficultySelect
+      from '~/document/svelte-components/select/DocumentCheckDifficultySelect.svelte';
+   import DocumentDamageReducedBySelect
+      from '~/document/svelte-components/select/DocumentDamageReducedBySelect.svelte';
    import {
       COLLAPSED_ICON,
       DAMAGE_ICON,

@@ -1,5 +1,5 @@
-import getTargetedCharacters from "~/helpers/utility-functions/GetTargetedCharacters.js";
-import getControlledTokens from "~/helpers/utility-functions/GetControlledTokens.js";
+import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
+import getControlledTokens from '~/helpers/utility-functions/GetControlledTokens.js';
 
 /**
  * Gets the best Character Actors for the current user to perform combat updates

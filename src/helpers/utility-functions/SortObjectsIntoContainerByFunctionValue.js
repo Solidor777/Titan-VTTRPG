@@ -3,9 +3,9 @@
  * mapped by the return value of a function applied to each object.
  * @param {object} objects - The objects being sorted.
  * @param {Function} sortFunction - The function to apply to the objects to
- * determine which array they should be sorted into.
+ *    determine which array they should be sorted into.
  * @returns {object} Object holding arrays of the inputted objects,
- * sorted by the return value of the function when applied to them.
+ *    sorted by the return value of the function when applied to them.
  */
 export default function sortObjectsIntoContainerByFunctionValue(objects, sortFunction) {
    /** @type {object} */

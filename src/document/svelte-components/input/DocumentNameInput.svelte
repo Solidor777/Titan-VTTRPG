@@ -11,15 +11,18 @@
    export let disabled = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
 
-   /** The name of the document. */
+   /** @type {string} The name of the document. */
    let value = $document.name;
 
-   /** Update the name when the input changes. */
+   /**
+    * Updates the document name when the input changes.
+    * @returns {void}
+    */
    function updateDocument() {
       if (value.length > 0) {
          $document.update({

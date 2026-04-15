@@ -20,7 +20,7 @@
       <div class="labels">
          <!--Label-->
          <div class="label">
-            {`${$document.flags.titan.parameters.itemName}`}
+            {$document.flags.titan.parameters.itemName}
          </div>
 
          <!--Type Label -->

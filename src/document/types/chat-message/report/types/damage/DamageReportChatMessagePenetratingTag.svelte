@@ -2,4 +2,4 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 </script>
-<Tag>{localize('penetrating')} tooltip={localize('attack.penetrating.desc')}</Tag>
+<Tag tooltip={localize('attack.penetrating.desc')}>{localize('penetrating')}</Tag>

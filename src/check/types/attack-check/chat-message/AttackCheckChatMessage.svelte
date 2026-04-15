@@ -5,7 +5,7 @@
    import AttackCheckChatHeader from '~/check/types/attack-check/chat-message/AttackCheckChatHeader.svelte';
    import AttackCheckChatStats from '~/check/types/attack-check/chat-message/AttackCheckChatStats.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
+   import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ChatRendButtons from '~/document/types/chat-message/components/buttons/ChatMessageRendButtons.svelte';
    import AttackCheckChatDamageButtons
       from '~/check/types/attack-check/chat-message/AttackCheckChatDamageButtons.svelte';
@@ -33,7 +33,7 @@
    <!--Chat Messages-->
    {#if $document.flags.titan.message}
       <div class="section">
-         <CheckChatMesssages/>
+         <CheckChatMessages/>
       </div>
    {/if}
 

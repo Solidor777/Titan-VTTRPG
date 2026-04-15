@@ -1,13 +1,13 @@
 <script>
    import { getContext } from 'svelte';
 
-   /** @type {svelte}:component Header Component */
+   /** @type {object | undefined} The Header component for the sheet. */
    export let header = void 0;
 
-   /** @type {svelte}:component Sidebar Component */
+   /** @type {object | undefined} The Sidebar component for the sheet. */
    export let sidebar = void 0;
 
-   /** @type {svelte}:component Tabs Component */
+   /** @type {object | undefined} The Tabs component for the sheet. */
    export let tabs = void 0;
 
    /** @type {object} Reference to the reactive Document store. */

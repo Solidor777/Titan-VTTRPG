@@ -26,8 +26,7 @@
    import WeaponSheetAttackCustomTraitTag
       from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
 
-   // Attack idx
-   /** @type {number} */
+   /** @type {number} The index of the attack in the weapon's attack array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
@@ -35,13 +34,18 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+   /** @type {Record<string, string>} Map of attack trait names to their description localization keys. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
+   /** @type {object} The attack data for this component. */
    $: attack = $document.system.attack[idx];
+
+   /** @type {boolean} Whether this attack component is currently expanded. */
    $: isExpanded = $appState.attacks.isExpanded[idx];
 
    /**
     * Updates the attack skill when the attack type changes.
+    * @returns {Promise<void>}
     */
    async function updateAttackSkill() {
       if ($document?.isOwner && attack) {

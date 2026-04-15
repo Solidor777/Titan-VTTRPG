@@ -8,8 +8,7 @@ import calculateCastingCheckResults from '~/check/types/casting-check/CastingChe
 export default class CastingCheck extends TitanCheck {
 
    /**
-    * Calculates the results of a Casting Check, based on the inputted
-    * parameters,
+    * Calculates the results of a Casting Check, based on the inputted parameters,
     * the dice rolled on the check, and the expertise that was applied.
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.

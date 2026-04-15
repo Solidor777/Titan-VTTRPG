@@ -6,7 +6,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** Imports the actor from a compendium sheet. */
+   /**
+    * Imports the item from a compendium sheet.
+    * @returns {Promise<Document>} The imported Document.
+    */
    async function importItem() {
       return $document.collection.importFromCompendium($document.compendium, $document.id);
    }

@@ -1,4 +1,4 @@
-import getControlledTokens from "~/helpers/utility-functions/GetControlledTokens.js";
+import getControlledTokens from '~/helpers/utility-functions/GetControlledTokens.js';
 
 /**
  * Gets an array of Character Actors controlled by the current user.
@@ -6,5 +6,5 @@ import getControlledTokens from "~/helpers/utility-functions/GetControlledTokens
  *    user.
  */
 export default function getControlledCharacters() {
-   return getControlledTokens().filter((token) => token.actor?.system.isCharacter).map((token => token.actor));
+   return getControlledTokens().filter((token) => token.actor?.system.isCharacter).map((token) => token.actor);
 }

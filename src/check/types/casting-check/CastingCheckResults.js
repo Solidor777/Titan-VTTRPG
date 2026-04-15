@@ -24,7 +24,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} damage The amount of Damage inflicted.
  * @property {number} expertiseRemaining The Expertise remaining after being
  *    applied to the dice.
- * @property {number} extraSuccesses The number of Critical Successes achieved.
+ * @property {number} extraSuccesses The number of extra Successes achieved beyond the Complexity.
  * @property {number} extraSuccessesRemaining The remaining successes that have
  *    not yet been applied to scaling aspects.
  * @property {number} successes The total number of Successes achieved.
@@ -48,7 +48,6 @@ export default function calculateCastingCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);
 
    const results = {
-      aspect: [],
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damage: 0,

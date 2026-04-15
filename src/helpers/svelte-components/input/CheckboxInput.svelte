@@ -6,14 +6,14 @@
    /** @type {EventDispatcher} Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   /** @type {boolean} The value that this input should modify. */
+   /** @type {boolean} The boolean value to bind to. */
    export let value;
 
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;

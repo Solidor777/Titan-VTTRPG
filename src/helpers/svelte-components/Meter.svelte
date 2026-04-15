@@ -21,7 +21,7 @@
    let meterPercentWidth = (value / max - min) * 100;
 
    /**
-    * @type {number|null}
+    * @type {number | null}
     * Handle ID of the meter update function that fires on interval.
     */
    let updateHandle = null;
@@ -51,7 +51,7 @@
       }
    }
 
-   // Update the meter in reponse to changes.
+   // Update the meter in response to changes.
    $: {
       // Update the target percent width
       targetMeterPercentWidth = (value / max - min) * 100;

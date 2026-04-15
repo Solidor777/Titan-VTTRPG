@@ -10,7 +10,7 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
 export default class ConfirmRegenerateUUIDDialog extends ConfirmationDialog {
 
    /**
-    * @param {TitanItem|TitanActor} document - The Document to regenerate the
+    * @param {TitanItem | TitanActor} document - The Document to regenerate the
     *    UUID for.
     */
    constructor(document) {

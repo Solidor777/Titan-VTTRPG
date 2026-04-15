@@ -7,7 +7,7 @@ import { ID_ICON } from '~/system/Icons.js';
  * Generates contextual options when right-clicking on an Actor in the Actors
  * directory.
  * @param {Element} element - The Element that was clicked.
- * @param {object} options - Array of buttons contenting the contextual
+ * @param {object[]} options - Array of buttons containing the contextual
  *    options.
  */
 export default function onGetActorDirectoryEntryContext(element, options) {

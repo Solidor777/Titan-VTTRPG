@@ -2,7 +2,7 @@
    /** @type {string} Main label for the header. */
    export let headerLabel = void 0;
 
-   /** @type {string} Icon for the header. */
+   /** @type {string} The icon class for the header. */
    export let headerIcon = void 0;
 
    /** @type {string[]} Labels for the sub-headers. */

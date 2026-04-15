@@ -10,14 +10,14 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} selector The type of condition for modifying the rating
  *    (any, attribute, trait, etc.).
  * @property {string} key The specific result of the condition for modifying the
- *    rating (body, melee, etc).
- * @property {string} uuid Unique identifier for the Rules Element.
- * Used to help keep track of the element when changing types.
+ *    rating (body, melee, etc.).
+ * @property {string} uuid Unique identifier for the Rules Element,
+ *    used to track the element across type changes.
  */
 
 /**
  * Creates a Rules Element for conditionally modifying a Character's Rating.
- * @param {object?} options - Options for the rules element.
+ * @param {object} [options] - Options for the rules element.
  * @returns {ConditionalRatingModifierElement} The new Rules Element.
  */
 export default function createConditionalRatingModifierElement(options) {
@@ -27,6 +27,6 @@ export default function createConditionalRatingModifierElement(options) {
       selector: 'attackTrait',
       key: 'blast',
       value: 1,
-      uuid: options.uuid ?? generateUUID(),
+      uuid: options?.uuid ?? generateUUID(),
    };
 }

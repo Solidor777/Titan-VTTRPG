@@ -1,6 +1,7 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import capitalize from '~/helpers/utility-functions/Capitalize.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's
@@ -28,7 +29,7 @@ export default class TitanActor extends Actor {
     * @param {object} options - Additional options which modify the creation
     *    request.
     * @param {User} user - The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the
+    * @returns {Promise<boolean | void>} A return value of false indicates the
     *    creation operation should be canceled.
     * @protected
     */
@@ -82,7 +83,7 @@ export default class TitanActor extends Actor {
    /**
     * Gets this actor's Combatant in the active combat (if any).
     * Otherwise, returns undefined.
-    * @returns {Combatant|undefined} This Actor's combatant in the active
+    * @returns {Combatant | undefined} This Actor's combatant in the active
     *    combat.
     */
    getCombatant() {
@@ -91,11 +92,11 @@ export default class TitanActor extends Actor {
 
    /**
     * Adds an Item to the Actor, created from the item data.
-    * @param {object[]|object} itemData - The Item data requested for creation.
-    * @returns {Promise<Item[]|void>} The created or updated Item instances.
+    * @param {object[] | object} itemData - The Item data requested for creation.
+    * @returns {Promise<Item[] | void>} The created or updated Item instances.
     */
    async addItem(itemData) {
-      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Ensure the item data is in an array.
          if (!itemData instanceof Array) {
             itemData = [itemData];
@@ -119,10 +120,10 @@ export default class TitanActor extends Actor {
    /**
     * Creates an item of the provided type, and adds it to the actor.
     * @param {string} type - The type of item to add.
-    * @returns {Promise<Item[]|void>} The created Item instances.
+    * @returns {Promise<Item[] | void>} The created Item instances.
     */
    async createItemFromType(type) {
-      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Get the desired name
          let itemName = localize(`new${capitalize(type)}`);
 
@@ -143,13 +144,13 @@ export default class TitanActor extends Actor {
 
    /**
     * Adds an Active Effect to the Actor, created from the active effect data.
-    * @param {object[]|object} activeEffectData - The Active Effect data
+    * @param {object[] | object} activeEffectData - The Active Effect data
     *    requested for creation.
-    * @returns {Promise<ActiveEffect[]|void>} The created or updated Active
+    * @returns {Promise<ActiveEffect[] | void>} The created or updated Active
     *    Effect instances.
     */
    async addActiveEffect(activeEffectData) {
-      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          // Ensure the active effect data is in an array.
          if (!activeEffectData instanceof Array) {
             activeEffectData = [activeEffectData];
@@ -169,12 +170,12 @@ export default class TitanActor extends Actor {
     * @returns {Promise<void>} Resolves after the item has been deleted.
     */
    async deleteItem(id) {
-      if (game.titan.assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
+      if (assert(this.isOwner, 'Cannot modify document %s if not owner.', this.name)) {
          const item = this.items.get(id);
-         if (game.titan.assert(item !== undefined, '' +
+         if (assert(item !== undefined, '' +
                'Item was not valid.',
                this.name, id)
-            && game.titan.assert(!item.isMarkedForDeletion,
+            && assert(!item.isMarkedForDeletion,
                'Item is already marked for deletion.', this.name, item.name)) {
 
             // Execute pre-delete operations.

@@ -65,7 +65,7 @@ export default function setupConditions() {
    ];
 
    // Sort conditions by name
-   conditions.sort((a, b) => sortAscending(localize(a.label), localize(b.label)));
+   conditions.sort((a, b) => sortAscending(localize(a.name), localize(b.name)));
 
    // For each condition
    for (const condition of conditions) {

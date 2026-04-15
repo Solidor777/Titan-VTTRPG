@@ -14,7 +14,7 @@ export default function paragraphize(text) {
 
    // Add the closing tag if necessary
    if (retVal.slice(-3) !== '</p>') {
-      retVal += '<p>';
+      retVal += '</p>';
    }
 
    return retVal;

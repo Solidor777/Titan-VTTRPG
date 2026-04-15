@@ -10,7 +10,7 @@
    export let disabled = false;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
@@ -23,7 +23,7 @@
    <IntegerInput
       bind:value={$document.system.xpCost}
       disabled={disabled || !$document?.isOwner}
-      on:change={()=> $document.update({system: {xpCost: $document.system.xpCost}})}
+      on:change={() => $document.update({system: {xpCost: $document.system.xpCost}})}
    />
 </LabeledElement>
 

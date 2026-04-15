@@ -8,15 +8,14 @@
     */
    export let type = void 0;
 
-   /** @type {number} The remaining Duration units, if any.*/
+   /** @type {number} The remaining Duration units, if any. */
    export let remaining = void 0;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;
-   void 0;
 </script>
 
 <div class="tag" use:tooltipAction={tooltip}>

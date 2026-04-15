@@ -159,7 +159,7 @@
       <div class="value">{$document.flags.titan.results.scalingAspect[idx].currentValue}</div>
    </div>
 
-   <!-- Controls-->
+   <!-- Controls -->
    <div class="controls">
 
       <!--Incremental Cost-->
@@ -172,7 +172,7 @@
 
          <!--Value-->
          <div class="value">
-            {`${aspect.cost} ${localize('extraSuccesses.short',)}`}
+            {`${aspect.cost} ${localize('extraSuccesses.short')}`}
          </div>
       </div>
 

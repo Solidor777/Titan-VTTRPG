@@ -4,6 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { REMOVE_TEMP_EFFECTS_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -13,7 +14,7 @@
     */
    async function removeExpiredEffects() {
       // If we own this chat message and the actor associated with it
-      if (game.titan.assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
+      if (assert(document?.isOwner, 'Cannot modify document %s if not owner.', document?.name)) {
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 

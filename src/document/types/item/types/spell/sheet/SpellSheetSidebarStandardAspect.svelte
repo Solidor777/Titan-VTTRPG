@@ -21,7 +21,7 @@
    } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   // Application statee reference
+   /** @type {Record<string, string>} Map of aspect label keys to their icon classes. */
    const labelIcons = {
       damage: DAMAGE_ICON,
       decreaseSpeed: DECREASE_SPEED_ICON,
@@ -32,6 +32,7 @@
       range: RANGE_ICON,
    };
 
+   /** @type {Record<string, string>} Map of aspect option keys to their icon classes. */
    const optionIcons = {
       accuracy: ACCURACY_ICON,
       armor: ARMOR_ICON,
@@ -43,7 +44,7 @@
       melee: MELEE_ICON,
    };
 
-   /** @type {object} */
+   /** @type {object} The standard aspect data to display. */
    export let aspect = void 0;
 </script>
 

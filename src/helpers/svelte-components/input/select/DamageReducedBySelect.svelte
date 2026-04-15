@@ -7,10 +7,10 @@
    /** @type {boolean} Whether the input should currently be disabled. */
    export let disabled = false;
 
-   /** @type {boolean} Whether to allow Resistance Check as an option */
+   /** @type {boolean} Whether to allow Resistance Check as an option. */
    export let allowResistanceCheck = void 0;
 
-   /** @type {boolean} Whether to allow Opposed Check as an option */
+   /** @type {boolean} Whether to allow Opposed Check as an option. */
    export let allowOpposedCheck = void 0;
 
    /**

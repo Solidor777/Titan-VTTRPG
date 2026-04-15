@@ -17,7 +17,7 @@
    <RaritySelect
       bind:value={$document.system.rarity}
       disabled={disabled || !$document?.isOwner}
-      on:change={()=> $document.update({system: {rarity: $document.system.rarity}})}
+      on:change={() => $document.update({system: {rarity: $document.system.rarity}})}
    />
 </LabeledElement>
 

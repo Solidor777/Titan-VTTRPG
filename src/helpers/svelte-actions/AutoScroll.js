@@ -1,11 +1,9 @@
 /**
  * Action for auto-scrolling to the bottom of the chat log when displaying a
- * chat message with Svelte
- * components.
- * @param {Element} element - The Element containing the Svelte svelte
- *    components.
+ * chat message with Svelte components.
+ * @param {Element} element - The Element containing the Svelte components.
  */
-export default function autoScroll (element) {
+export default function autoScroll(element) {
    // Wait until the next frame before executing
    setTimeout(() => {
       // Get the chat message from the node

@@ -8,7 +8,7 @@
    import ChatAttributeCheckButton
       from '~/document/types/chat-message/components/buttons/ChatMessageOpposedAttributeCheckButton.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
-   import CheckChatMesssages from '~/check/chat-message/CheckChatMessages.svelte';
+   import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -24,7 +24,7 @@
    <!--Chat Messages-->
    {#if $document.flags.titan.message}
       <div class="section">
-         <CheckChatMesssages/>
+         <CheckChatMessages/>
       </div>
    {/if}
 
@@ -96,7 +96,6 @@
                   0
                }
             />
-            /
          </div>
       {/if}
    {/if}

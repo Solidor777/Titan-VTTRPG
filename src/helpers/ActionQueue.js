@@ -12,10 +12,9 @@ export default class ActionQueue {
    /**
     * Constructs a new Action Queue.
     * @param {number} defaultDelay - How many milliseconds (minimum of 1) that
-    *    the action queue
-    * will wait between resolving actions by default.
-    * This can be overridden with the Delay property on the input object when
-    * enqueuing an action.
+    *    the action queue will wait between resolving actions by default.
+    *    This can be overridden with the Delay property on the input object when
+    *    enqueuing an action.
     */
    constructor(defaultDelay = 100) {
       // Initial state
@@ -39,11 +38,9 @@ export default class ActionQueue {
     *    action. If
     *    not specified, the default delay will be used.
     * @param {string} action.key - An identifier that may be used to enqueue the
-    *    action.
-    * If the action is enqueued while an action with the same key is already
-    * in the queue, then it will be ignored.
-    * If the previous action is already being performed,
-    * then the duplicate action will be called again.
+    *    action. If the action is enqueued while an action with the same key is
+    *    already in the queue, then it will be ignored. If the previous action
+    *    is already being performed, then the duplicate action will be called again.
     * @returns {Promise<*>} The return value of the action being queued.
     */
    async enqueue(action) {
@@ -91,7 +88,7 @@ export default class ActionQueue {
          const currentAction = this.queue[0];
 
          // Wait for the action's delay or the default delay if no delay has
-         // been specific
+         // been specified
          await delay(currentAction.delay ?? this.defaultDelay);
 
          // Set the current action and remove it from the queue.

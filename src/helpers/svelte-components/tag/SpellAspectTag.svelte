@@ -10,6 +10,7 @@
    } from '~/system/Icons.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
+   /** @type {object} Map of aspect label keys to their corresponding icon classes. */
    const labelIcons = {
       damage: DAMAGE_ICON,
       healing: HEALING_ICON,

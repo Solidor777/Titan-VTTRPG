@@ -4,11 +4,11 @@
    /** @type {string} The text to display for this element. */
    export let label = void 0;
 
-   /** @type {string|number} The Value of this Stat. */
+   /** @type {string | number} The Value of this Stat. */
    export let value = void 0;
 
    /**
-    * @type {string|TooltipAction}
+    * @type {string | TooltipAction}
     * The Tooltip to display for this element, if any.
     */
    export let tooltip = void 0;

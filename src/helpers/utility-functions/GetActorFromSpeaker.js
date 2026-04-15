@@ -5,7 +5,7 @@
  */
 export default function getActorFromSpeaker(speaker) {
    const token = speaker.token ?
-      canvas?.tokens?.placeables?.find((currentToken) => currentToken.id === tokenId) :
+      canvas?.tokens?.placeables?.find((currentToken) => currentToken.id === speaker.token) :
       false;
    return token ? token.actor : game.actors.get(speaker.actor);
 }

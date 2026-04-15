@@ -15,7 +15,7 @@
     */
    export let tooltip = void 0;
 
-   /** @type {string[]}  Options for the Select Svelte component. */
+   /** @type {string[]} Options for the Select Svelte component. */
    const options = structuredClone(RARITIES);
 </script>
 

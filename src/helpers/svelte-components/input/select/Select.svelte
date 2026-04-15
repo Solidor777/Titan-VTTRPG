@@ -8,7 +8,7 @@
     * @template T
     * @typedef {object} SelectOption
     * @property {T} value The value for this option.
-    * @property {string | number|TextData} [label] The label to display for this
+    * @property {string | number | TextData} [label] The label to display for this
     *    option.
     * @property {string | TooltipAction} [tooltip] The Tooltip to display for
     *    this option, if any.
@@ -17,7 +17,8 @@
    /**
     * Options for the Select Svelte component.
     * @template T
-    * @type {(SelectOption<T> | string | number)[]} */
+    * @type {(SelectOption<T> | string | number)[]}
+    */
    export let options = void 0;
 
    /** @type {*} The value that this input should modify. */
