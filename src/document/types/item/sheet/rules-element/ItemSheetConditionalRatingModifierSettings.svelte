@@ -48,8 +48,7 @@
    ];
 
    /**
-    * Updates the element's key to a sensible default when the selector
-    * changes.
+    * Updates the element's key to a sensible default when the selector changes.
     */
    function onSelectorChange() {
       if (assert(
@@ -90,8 +89,7 @@
    }
 
    /**
-    * Updates the element's selector to a sensible default when the rating
-    * changes.
+    * Updates the element's selector to a sensible default when the rating changes.
     * @returns {void}
     */
    function onRatingChange() {
@@ -110,8 +108,7 @@
    }
 
    /**
-    * Returns the appropriate Svelte input component for the current selector
-    * type.
+    * Returns the appropriate Svelte input component for the current selector type.
     * @returns {object} The Svelte component to use for the key field.
     */
    function getSelector() {

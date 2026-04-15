@@ -69,7 +69,7 @@
       }
    }
 
-   // Update the parameters whenever the check options are displayed
+   // Update the parameters whenever the check options are changed.
    $: {
       if (actor?.system.validateCastingCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getCastingCheckParameters($checkOptions);
@@ -79,12 +79,12 @@
       }
    }
 
-   // Update whether Damage and Healing mod fields are display
+   // Update whether Damage and Healing mod fields are displayed.
    $: {
-      // Reset the rows
+      // Reset the rows.
       rows = baseRows;
 
-      // Add healing mod
+      // Add the Healing Mod field.
       if ($checkParameters.healing) {
          rows.splice(
             4,
@@ -93,7 +93,7 @@
          );
       }
 
-      // Add damage mod
+      // Add the Damage Mod field.
       if ($checkParameters.damage) {
          rows.splice(
             4,

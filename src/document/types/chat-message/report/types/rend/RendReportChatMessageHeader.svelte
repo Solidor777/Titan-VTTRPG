@@ -25,8 +25,7 @@
    /** @type {string} Calculated header icon. */
    let headerIcon;
 
-   // If armor was lost, update the header label and icon to show that the armor
-   // was damaged
+   // If armor was lost, update the header label and icon to show that the armor was damaged.
    if ($document.flags.titan.armorLost) {
       headerLabel = localize('lostX%Armor').replace(
          'X%',
@@ -35,7 +34,7 @@
       headerIcon = REND_ICON;
    }
 
-   // Otherwise, show that no armor was lost
+   // Otherwise, show that no armor was lost.
    else {
       headerLabel = localize('resistedX%Rend').replace(
          'X%',

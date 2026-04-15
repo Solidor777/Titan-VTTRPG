@@ -5,8 +5,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
- * Extends the base Item class to implement additional system-specific logic for
- * Titan.
+ * Extends the base Item class to implement additional system-specific logic for Titan.
  * @extends {Item}
  * @property {TitanItemSheet} sheet - The Sheet that represents this Item.
  */
@@ -21,13 +20,12 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Apply transformations of derivations to the values of the source data
-    * object.
+    * Apply transformations of derivations to the values of the source data object.
     * Compute data fields whose values are not stored to the database.
     * @override
     */
    prepareDerivedData() {
-      // Prepare type specific data
+      // Prepare type-specific data.
       if (this.system) {
          this.system.prepareDerivedData();
       }
@@ -38,10 +36,10 @@ export default class TitanItem extends Item {
     * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat() {
-      // Create the context object
+      // Create the context object.
       const messageData = this.getRollData();
 
-      // Create and post the message
+      // Create and post the message.
       return ChatMessage.create(
          ChatMessage.applyRollMode(
             {
@@ -71,20 +69,17 @@ export default class TitanItem extends Item {
    /**
     * Performs initialization logic before document creation.
     * @override
-    * @param {object} data - The initial data object provided to the document
-    *    creation request.
-    * @param {object} options - Additional options which modify the creation
-    *    request.
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
     * @param {User} user - The User requesting the document creation.
-    * @returns {Promise<boolean|void>} A return value of false indicates the
-    *    creation operation should be cancelled.
+    * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
     * @protected
     */
    async _preCreate(data, options, user) {
       const retVal = await super._preCreate(data, options, user);
       if (retVal !== false) {
 
-         // Initialize the document's uuid
+         // Initialize the document's UUID.
          const uuid = this.flags?.titan?.uuid;
          if (!uuid) {
             const initialData = {
@@ -98,7 +93,7 @@ export default class TitanItem extends Item {
             this.updateSource(initialData);
          }
 
-         // Update initial data if provided by the data model
+         // Update initial data if provided by the data model.
          if (retVal !== false && typeof this.system.onPreCreate === 'function') {
             this.system.onPreCreate(data);
          }
@@ -172,10 +167,8 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Creates a dialog for editing an existing Custom Trait belonging to this
-    * item.
-    * @param {number} traitIdx - The index of the Custom Trait in this item's
-    *    Custom Traits array.
+    * Creates a dialog for editing an existing Custom Trait belonging to this item.
+    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
     * @returns {void}
     */
    editCustomTrait(traitIdx) {
@@ -194,8 +187,7 @@ export default class TitanItem extends Item {
 
    /**
     * Removes a Custom Trait from this item.
-    * @param {number} traitIdx - The index of the Custom Trait in this item's
-    *    Custom Traits array.
+    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
     * @returns {Promise<void>}
     */
    async deleteCustomTrait(traitIdx) {
@@ -215,9 +207,8 @@ export default class TitanItem extends Item {
 
    /**
     * Marks the item as being deleted before actually deleting the item
-    * so that asynchronous update operations will not apply.
-    * @returns {Promise<void|boolean>} Resolves once the item is deleted, or
-    *    false if the deletion could not proceed.
+    *    so that asynchronous update operations will not apply.
+    * @returns {Promise<void|boolean>} Resolves once the item is deleted, or false if the deletion could not proceed.
     */
    async safeDelete() {
       if (assert(

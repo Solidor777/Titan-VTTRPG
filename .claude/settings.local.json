@@ -20,7 +20,32 @@
       "Bash(perl -i -pe 's/if appropriat$/if appropriate/' document/types/chat-message/report/types/long-rest/LongRestReportChatMessage.svelte)",
       "Bash(python3 *)",
       "Bash(head *)",
-      "Bash(xargs sed *)"
+      "Bash(xargs sed *)",
+      "Bash(awk -F: 'NR>0{prev=$1; prevline=$2} NR>1 && $1==prev+1 {print prev\": \"prevline; print $1\": \"$2}')",
+      "Bash(awk -F: 'BEGIN{prev=-2} {n=int\\($1\\); if\\(n==prev+1\\){print prev\": \"prevline; print $1\": \"$2} prev=n; prevline=$2}')",
+      "Bash(perl *)",
+      "Bash(git *)",
+      "Bash(sed -n '718,726p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1047,1055p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1096,1104p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1108,1116p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '716,726p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1493,1500p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1539,1546p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1663,1670p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1784,1792p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '2031,2038p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '2207,2214p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '2824,2831p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '3173,3186p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '3274,3282p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1135,1145p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1210,1225p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1398,1410p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '4110,4120p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1263,1267p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '4912,4968p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1399,1408p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")"
     ]
   }
 }

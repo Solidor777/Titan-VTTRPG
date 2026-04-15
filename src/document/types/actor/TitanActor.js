@@ -4,8 +4,7 @@ import capitalize from '~/helpers/utility-functions/Capitalize.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
- * @typedef {object} SpeakerData An object containing data on a Chat Message's
- *    speaker.
+ * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
  * @property {string} [scene] - The Scene in which the speaker resides.
  * @property {string} [actor] - The ID of the speaker's actor.
  * @property {string} [alias] - The name of the speaker to display.
@@ -13,8 +12,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  */
 
 /**
- * Extends the base Actor class to implement additional system-specific logic
- * for Titan.
+ * Extends the base Actor class to implement additional system-specific logic for Titan.
  * @extends {Actor}
  * @property {TitanItem[]} items - A collection of embedded Item documents.
  * @property {TitanActorSheet} sheet - The Sheet that represents this Actor.
@@ -24,20 +22,17 @@ export default class TitanActor extends Actor {
    /**
     * Performs initialization logic before document creation.
     * @override
-    * @param {object} data - The initial data object provided to the document
-    *    creation request.
-    * @param {object} options - Additional options which modify the creation
-    *    request.
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
     * @param {User} user - The User requesting the document creation.
-    * @returns {Promise<boolean | void>} A return value of false indicates the
-    *    creation operation should be canceled.
+    * @returns {Promise<boolean | void>} A return value of false indicates the creation operation should be canceled.
     * @protected
     */
    async _preCreate(data, options, user) {
       const retVal = await super._preCreate(data, options, user);
       if (retVal !== false) {
 
-         // Initialize the document's uuid
+         // Initialize the document's UUID.
          const uuid = this.flags?.titan?.uuid;
          if (!uuid) {
             const initialData = {
@@ -51,7 +46,7 @@ export default class TitanActor extends Actor {
             this.updateSource(initialData);
          }
 
-         // Update initial data if provided by the data model
+         // Update initial data if provided by the data model.
          if (retVal !== false && typeof this.system.onPreCreate === 'function') {
             this.system.onPreCreate(data);
          }
@@ -81,10 +76,8 @@ export default class TitanActor extends Actor {
    }
 
    /**
-    * Gets this actor's Combatant in the active combat (if any).
-    * Otherwise, returns undefined.
-    * @returns {Combatant | undefined} This Actor's combatant in the active
-    *    combat.
+    * Gets this actor's Combatant in the active combat (if any). Otherwise, returns undefined.
+    * @returns {Combatant | undefined} This Actor's combatant in the active combat.
     */
    getCombatant() {
       return game.combat?.getCombatantByActor(this.id);
@@ -107,7 +100,7 @@ export default class TitanActor extends Actor {
          }
 
          // Create the item or items.
-         const retVal = /** @type Item[] */ await this.createEmbeddedDocuments('Item', itemData);
+         const retVal = /** @type TitanItem [] */ await this.createEmbeddedDocuments('Item', itemData);
 
          // Notify the system and sheet of each added item.
          for (const item of retVal) {
@@ -132,10 +125,10 @@ export default class TitanActor extends Actor {
          'Cannot modify document %s if not owner.',
          this.name,
       )) {
-         // Get the desired name
+         // Get the desired name.
          let itemName = localize(`new${capitalize(type)}`);
 
-         // Add a number if necessary
+         // Add a number suffix if a duplicate name already exists.
          const duplicateNames = this.parent.items.filter((item) => item.name.includes(itemName));
          if (duplicateNames.length > 0) {
             itemName += ` (${duplicateNames.length})`;
@@ -152,10 +145,8 @@ export default class TitanActor extends Actor {
 
    /**
     * Adds an Active Effect to the Actor, created from the active effect data.
-    * @param {object[] | object} activeEffectData - The Active Effect data
-    *    requested for creation.
-    * @returns {Promise<ActiveEffect[] | void>} The created or updated Active
-    *    Effect instances.
+    * @param {object[] | object} activeEffectData - The Active Effect data requested for creation.
+    * @returns {Promise<ActiveEffect[] | void>} The created or updated Active Effect instances.
     */
    async addActiveEffect(activeEffectData) {
       if (assert(
@@ -167,6 +158,7 @@ export default class TitanActor extends Actor {
          if (!activeEffectData instanceof Array) {
             activeEffectData = [activeEffectData];
          }
+
          // Create the active effect or effects.
          return  /** @type ActiveEffect[] */ this.createEmbeddedDocuments(
             'ActiveEffect',
@@ -211,7 +203,7 @@ export default class TitanActor extends Actor {
             // Delete the item.
             if (await item.safeDelete() !== false) {
 
-               // Execute post delete operations.
+               // Execute post-delete operations.
                this.system.postDeleteItem(id, type);
                this.sheet.postDeleteItem(id, type);
             }
@@ -222,8 +214,7 @@ export default class TitanActor extends Actor {
    /**
     * Gets all items of the provided Type.
     * @param {string} type - The Type of Item to search for.
-    * @returns {TitanItem[]} List of all Items of the provided type owned by
-    *    this Actor.
+    * @returns {TitanItem[]} List of all Items of the provided type owned by this Actor.
     */
    getItemsOfType(type) {
       return /** @type TitanItem[] */ this.items.filter(item => item.type === type);
@@ -232,8 +223,7 @@ export default class TitanActor extends Actor {
    /**
     * Gets all items of the provided Types.
     * @param {string[]} types - The Types of Item to search for.
-    * @returns {TitanItem[]} List of all Items of the provided types owned by
-    *    this Actor.
+    * @returns {TitanItem[]} List of all Items of the provided types owned by this Actor.
     */
    getItemsOfTypes(types) {
       return /** @type TitanItem[] */ this.items.filter(item => types.includes(item.type));

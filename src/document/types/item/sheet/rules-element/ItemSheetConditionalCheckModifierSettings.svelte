@@ -55,8 +55,7 @@
 
    /**
     * @type {{label: string, value: string}[]}
-    * Check type options when healing is selected. Excludes attack checks,
-    * because attacks cannot heal.
+    * Check type options when healing is selected. Excludes attack checks, because attacks cannot heal.
     */
    const healingCheckTypeOptions = [
       {
@@ -108,8 +107,7 @@
    /**
     * Updates the check type if necessary when the modifier type changes.
     * If the modifier type is 'healing' and the check type is 'attack',
-    * resets the check type to 'any' and cascades the change to the
-    * selector.
+    * resets the check type to 'any' and cascades the change to the selector.
     * @returns {void}
     */
    function onModifierTypeChanged() {
@@ -191,8 +189,7 @@
 
    /**
     * Returns the appropriate Svelte component for the current selector type.
-    * @returns {object | undefined} The selector input component, or undefined
-    *    if there is no valid case.
+    * @returns {object | undefined} The selector input component, or undefined if there is no valid case.
     */
    function getSelector() {
       switch (element.selector) {

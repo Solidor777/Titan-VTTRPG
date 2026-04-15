@@ -14,23 +14,23 @@ export default class TitanDialog extends TJSDialog {
     * @param {object} options - Options for the dialog window.
     */
    constructor(options) {
-      // Add default classes
+      // Add default classes.
       const classes = [
          'titan',
          'titan-dialog',
       ];
 
-      // Add dark mode class if appropriate
+      // Add the dark mode class if appropriate.
       if (isDarkModeSheetsEnabled()) {
          classes.push('titan-dark-mode');
       }
 
-      // Merge the classes with those provided by the options object
+      // Merge the classes with those provided by the options object.
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Set base properties for the dialog
+      // Set base properties for the dialog.
       options.id = options.id ?
          `${options.id}-${generateUUID()}` :
          `titan-dialog-${generateUUID()}`;

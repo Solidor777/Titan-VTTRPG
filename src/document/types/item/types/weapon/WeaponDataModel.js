@@ -24,25 +24,25 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Rarity
+      // Rarity.
       schema.rarity = createStringField('common');
 
-      // Value
+      // Value.
       schema.value = createIntegerField();
 
-      // Equipped
+      // Equipped.
       schema.equipped = createBooleanField();
 
-      // Attacks
+      // Attacks.
       schema.attack = createArrayField(
          createObjectField(() => createWeaponAttackTemplate()),
          [createWeaponAttackTemplate()],
       );
 
-      // Attack Notes
+      // Attack Notes.
       schema.attackNotes = createStringField();
 
-      // WeaponTraits
+      // Weapon Traits.
       schema.trait = createArrayField(createObjectField());
 
       return schema;
@@ -116,8 +116,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
    /**
     * Creates a dialog for editing an Attack's existing Custom Trait.
     * @param {number} attackIdx - The index of the Attack in the Attacks array.
-    * @param {number} traitIdx - The index of the Custom Trait in the Attack's
-    *    Custom Traits array.
+    * @param {number} traitIdx - The index of the Custom Trait in the Attack's Custom Traits array.
     * @returns {void}
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
@@ -134,8 +133,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
    /**
     * Removes a Custom Trait from an Attack.
     * @param {number} attackIdx - The index of the Attack in the Attacks array.
-    * @param {number} traitIdx - The index of the Custom Trait in the Attack's
-    *    Custom Traits array.
+    * @param {number} traitIdx - The index of the Custom Trait in the Attack's Custom Traits array.
     * @returns {Promise<void>}
     */
    async deleteCustomAttackTrait(attackIdx, traitIdx) {

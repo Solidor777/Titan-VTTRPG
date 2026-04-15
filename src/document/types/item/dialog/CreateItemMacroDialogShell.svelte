@@ -10,18 +10,18 @@
    /** @type {TitanItem} The Item being edited. */
    export let item = void 0;
 
-   // Slot on the hotbar that the macro will be assigned to
+   // Slot on the hotbar that the macro will be assigned to.
    /** @type {number} */
    export let slot = void 0;
 
-   // UUID of the item that was dropped
+   // UUID of the item that was dropped.
    /** @type {string} */
    export let uuid = void 0;
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   // Macro type
+   // Macro type.
    /** @type {string} */
    let macroType = 'toggleDocumentSheet';
    const macroTypeOptions = [
@@ -31,21 +31,21 @@
       },
    ];
 
-   // Item check
+   // Item check.
    /** @type {number} */
    let itemCheckIdx = 0;
    /** @type {*[]} */
    const itemCheckOptions = [];
-   // If the item has item checks
+   // If the item has item checks.
    if (item.system.check.length > 0) {
-      // Add item check to the macro type options
+      // Add item check to the macro type options.
       macroTypeOptions.push({
          value: 'itemCheck',
          label: 'itemCheck',
       });
       macroType = 'itemCheck';
 
-      // Add the item checks to the item check select
+      // Add the item checks to the item check select options.
       item.system.check.forEach((check, idx) => {
          itemCheckOptions.push({
             value: idx,
@@ -54,23 +54,23 @@
       });
    }
 
-   // Type specific macro type
+   // Type-specific macro type.
    /** @type {number} */
    let attackIdx = 0;
    /** @type {*[]} */
    const attackOptions = [];
    switch (item.type) {
       case 'weapon': {
-         // If the item has attacks
+         // If the item has attacks.
          if (item.system.attack.length > 0) {
-            // Add Attack Check to the macro type options
+            // Add Attack Check to the macro type options.
             macroTypeOptions.push({
                value: 'attackCheck',
                label: 'attackCheck',
             });
             macroType = 'attackCheck';
 
-            // Add the attacks to the attack options
+            // Add the attacks to the attack options.
             item.system.attack.forEach((attack, idx) => {
                attackOptions.push({
                   value: idx,
@@ -82,7 +82,7 @@
       }
 
       case 'spell': {
-         // Add Casting Check to the macro type options
+         // Add Casting Check to the macro type options.
          macroTypeOptions.push({
             value: 'castingCheck',
             label: 'castingCheck',
@@ -92,9 +92,9 @@
       }
 
       case 'effect': {
-         // If this is a permanent effect
+         // If this is a permanent effect.
          if (item.system.duration.type === 'permanent') {
-            // Add toggle active to the macro type options
+            // Add toggle active effect to the macro type options.
             macroTypeOptions.push({
                value: 'toggleEffectActive',
                label: 'toggleEffectActive',
@@ -109,7 +109,7 @@
       }
    }
 
-   // ID method
+   // ID method.
    /** @type {string} */
    let idMethod = 'uuid';
    const idMethodOptions = [
@@ -127,15 +127,14 @@
       },
    ];
 
-   // Macro image
+   // Macro image.
    let img = item.img;
 
-   // Macro name
+   // Macro name.
    let name = item.name;
 
    /**
-    * Creates the macro based on the current settings and assigns it to
-    * the hotbar slot.
+    * Creates the macro based on the current settings and assigns it to the hotbar slot.
     */
    async function onCreateMacro() {
       let macro;
