@@ -10,6 +10,7 @@ import EditAttackTraitsDialog from '~/document/types/item/types/weapon/dialog/Ed
 import AddCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/AddCustomAttackTraitDialog.js';
 import EditCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/EditCustomAttackTraitDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Data model with extra functionality for Weapons.
@@ -89,7 +90,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @returns {void}
     */
    editAttackTraits(attackIdx) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          const dialog = new EditAttackTraitsDialog(
             this.parent,
             attackIdx,
@@ -104,7 +109,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @returns {void}
     */
    addCustomAttackTrait(attackIdx) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          const dialog = new AddCustomAttackTraitDialog(
             this.parent,
             attackIdx,
@@ -120,7 +129,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @returns {void}
     */
    editCustomAttackTrait(attackIdx, traitIdx) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          const dialog = new EditCustomAttackTraitDialog(
             this.parent,
             attackIdx,
@@ -137,7 +150,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @returns {Promise<void>}
     */
    async deleteCustomAttackTrait(attackIdx, traitIdx) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          this.parent.system.attack[attackIdx].customTrait.splice(traitIdx, 1);
          await this.parent.update({
             system: {
@@ -152,7 +169,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @returns {Promise<void>}
     */
    async addAttack() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          this.attack.push(createWeaponAttackTemplate());
          await this.parent.update({
             system: {
@@ -174,7 +195,11 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
     * @returns {Promise<void>}
     */
    async deleteAttack(idx) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          // Notify the sheet before deletion.
          const sheet = this.parent._sheet;
          if (sheet) {

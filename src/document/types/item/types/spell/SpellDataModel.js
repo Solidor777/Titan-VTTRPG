@@ -11,6 +11,7 @@ import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
 import { SPELL_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Data model with extra functionality for Spells.
@@ -180,8 +181,11 @@ export default class SpellDataModel extends TitanItemDataModel {
     * @param {object} aspect - The aspect to add.
     */
    async addStandardAspect(aspect) {
-      // If the current user owns this item.
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Add the aspect.
          this.aspect.push(aspect);
@@ -204,8 +208,11 @@ export default class SpellDataModel extends TitanItemDataModel {
     * @param {number} idx - The index of the Standard Aspect to remove.
     */
    async removeStandardAspect(idx) {
-      // If the current user owns this item.
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Remove the aspect.
          this.aspect.splice(idx, 1);
@@ -224,8 +231,11 @@ export default class SpellDataModel extends TitanItemDataModel {
     * @returns {Promise<void>}
     */
    async addCustomAspect() {
-      // If the current user owns this item.
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Add the aspect.
          this.customAspect.push(createCustomAspectTemplate());
@@ -250,8 +260,11 @@ export default class SpellDataModel extends TitanItemDataModel {
     * @param {number} idx - The index of the Custom Aspect to remove.
     */
    async removeCustomAspect(idx) {
-      // If the current user owns this item.
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the sheet.
          const sheet = this.parent._sheet;

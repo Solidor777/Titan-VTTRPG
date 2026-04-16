@@ -53,7 +53,8 @@
       "Bash(sed -n '508,513p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
       "Bash(sed -n '1234,1241p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
       "Bash(sed -n '40,65p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/check/Check.js\")",
-      "Bash(sed -n '1,30p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/check/types/attack-check/AttackCheckOptions.js\")"
+      "Bash(sed -n '1,30p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/check/types/attack-check/AttackCheckOptions.js\")",
+      "Bash(wc -l /c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/helpers/svelte-components/**/*.svelte)"
     ]
   }
 }

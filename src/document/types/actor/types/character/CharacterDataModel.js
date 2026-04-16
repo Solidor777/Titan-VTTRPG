@@ -437,7 +437,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    async preDeleteItem(item) {
       if (assert(
-         this.isOwner,
+         this.parent.isOwner,
          'Cannot modify document %s if not owner.',
          this.parent.name,
       ) && assert(
@@ -1723,7 +1723,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async rollAttributeCheck(options) {
 
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateAttributeCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateAttributeCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeAttributeCheckOptions(options);
@@ -1749,7 +1753,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _createAttributeCheckDialog(options) {
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateAttributeCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateAttributeCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeAttributeCheckOptions(options);
@@ -1963,7 +1971,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async rollResistanceCheck(options) {
 
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateResistanceCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateResistanceCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeResistanceCheckOptions(options);
@@ -1989,7 +2001,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _createResistanceCheckDialog(options) {
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateResistanceCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateResistanceCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeResistanceCheckOptions(options);
@@ -2131,7 +2147,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async rollAttackCheck(options) {
 
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateAttackCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateAttackCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeAttackCheckOptions(options);
@@ -2157,7 +2177,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _createAttackCheckDialog(options) {
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateAttackCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateAttackCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeAttackCheckOptions(options);
@@ -2736,7 +2760,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async rollCastingCheck(options) {
 
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateCastingCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateCastingCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeCastingCheckOptions(options);
@@ -2762,7 +2790,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _createCastingCheckDialog(options) {
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateCastingCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateCastingCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeCastingCheckOptions(options);
@@ -3175,7 +3207,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async rollItemCheck(options) {
 
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateItemCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateItemCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeItemCheckOptions(options);
@@ -3201,7 +3237,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _createItemCheckDialog(options) {
       // If the check options are valid.
-      if (this.parent.isOwner && this.validateItemCheckOptions(options)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.validateItemCheckOptions(options)) {
 
          // Ensure the check options are initialized.
          const checkOptions = this.initializeItemCheckOptions(options);
@@ -3992,7 +4032,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
-      if (this.parent.isOwner && damage > 0) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && damage > 0) {
 
          // If the damage ignores armor then no damage is resisted.
          // Otherwise, resist damage equal to the Characters armor.
@@ -4183,7 +4227,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<HealingReport|void>} Results of applying the Healing.
     */
    async applyHealing(healing, options) {
-      if (healing > 0 && this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && healing > 0) {
 
          // If the actor's stamina is less than max.
          const stamina = this.resource.stamina;
@@ -4258,7 +4306,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>} Returns after the Resolve has been restored.
     */
    async regainResolve(resolveRestored, options) {
-      if (resolveRestored > 0 && this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && resolveRestored > 0) {
 
          // Update the resolve if appropriate.
          const resolve = this.resource.resolve;
@@ -4285,7 +4337,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<SpendResolveReport|void>} Results of spending Resolve, or void if none was spent.
     */
    async spendResolve(resolveSpent, options) {
-      if (resolveSpent > 0 && this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && resolveSpent > 0) {
 
          // Update the resolve if appropriate.
          const resolve = this.resource.resolve;
@@ -4355,7 +4411,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<RendReport|void>} The result of Rending the Armor, or void if no rend was applied.
     */
    async applyRend(rend, options) {
-      if (rend > 0 && this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && rend > 0) {
 
          // If this character has armor.
          const armor = this.getEquippedArmor();
@@ -4445,7 +4505,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<RepairsReport|void>} The result of Repairing the Armor, or void if no repairs were applied.
     */
    async applyRepairs(repairs, options) {
-      if (repairs > 0 && this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && repairs > 0) {
 
          // If this character has damaged armor.
          const armor = this.getEquippedArmor();
@@ -4509,8 +4573,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async requestRemoveExpiredEffects() {
-      if (this.parent.isOwner &&
-         this.parent.items.some((item) => item.type === 'effect' && item.system.isExpired)) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      ) && this.parent.items.some((item) => item.type === 'effect' && item.system.isExpired)) {
 
          // Remove effects if removal does not need to be confirmed.
          if (!shouldConfirmDeletingItems()) {
@@ -4529,7 +4596,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async removeExpiredEffects() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          const expiredEffects = this.getExpiredEffectItems();
          if (expiredEffects) {
             for (const effect of expiredEffects) {
@@ -4548,7 +4619,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async removeCombatEffects(options) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          // Delete all combat effect items.
          const combatEffects = this.parent.items.filter((item) => item.system.isCombatEffect);
          for (const effect of combatEffects) {
@@ -4627,7 +4702,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async shortRest(options) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          // Restore stamina.
          this.resource.stamina.value = this.resource.stamina.max;
 
@@ -4659,7 +4738,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async longRest(options) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Decrease wounds.
          /** @type {number} */
@@ -5708,7 +5791,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async toggleMultiAttack(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the item if the item is valid.
          const item = this.parent.items.get(itemId);
@@ -5730,7 +5817,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async toggleEquipped(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the item if the item is valid.
          const item = this.parent.items.get(itemId);
@@ -5783,7 +5874,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async toggleEffectActive(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the item if valid.
          const item = this.parent.items.get(itemId);
@@ -5816,7 +5911,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async equipArmor(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the equipped armor on this character if the armor item is.
          // valid.
@@ -5839,7 +5938,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async unEquipArmor() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the equipped armor on this character.
          this.equipped.armor = null;
@@ -5871,7 +5974,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async equipShield(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the equipped shield on this character if the shield item is.
          // valid.
@@ -5894,7 +6001,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async unEquipShield() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // Update the equipped shield on this character.
          this.equipped.shield = null;
@@ -5913,7 +6024,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} itemId - The ID of the item being deleted.
     */
    async requestItemDeletion(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // If the deletion does not need to be confirmed, then delete the item.
          if (!shouldConfirmDeletingItems()) {
@@ -5937,7 +6052,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async safeDeleteItem(itemId) {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          await this.parent.deleteEmbeddedDocuments('Item', [itemId]);
       }
    }
@@ -5948,7 +6067,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<void>}
     */
    async requestInitiativeRoll() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
 
          // If this Character is a combatant, then roll initiative as per normal.
          if (this.parent.getCombatant()) {
@@ -6080,7 +6203,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {Promise<Application>} The newly created dialog.
     */
    async addInventoryItem() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          return new AddInventoryItemDialog(this.parent).render(true);
       }
    }
