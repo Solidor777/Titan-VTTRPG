@@ -3,8 +3,7 @@
  * @param {ChatMessage} message - The chat message being deleted.
  */
 export default function onPreDeleteChatMessage(message) {
-   // Check if this chat message was sent by the titan system and has a Svelte.
-   // component.
+   // Check if this chat message was sent by the titan system and has a Svelte component.
    if (message?.flags.titan && typeof (message._svelteComponent?.$destroy) === 'function') {
 
       // If so, delete the Svelte component.

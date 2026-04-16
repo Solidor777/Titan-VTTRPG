@@ -8,8 +8,7 @@ export default class SocketManager {
    }
 
    /**
-    * Called when a socket is received from this system.
-    * Performs functions and replication as appropriate.
+    * Called when a socket is received from this system. Performs functions and replication as appropriate.
     * @param {object} message - The message that was sent.
     * @param {string} senderId - The ID of the user sending the message.
     * @private

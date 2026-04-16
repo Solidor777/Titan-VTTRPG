@@ -4,14 +4,9 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import {
-      ACCURACY_ICON,
-      MELEE_ICON,
-      MULTI_ATTACK_ICON,
-      RANGE_ICON,
-   } from '~/system/Icons.js';
+   import TraitTag from '~/helpers/svelte-components/tag/TraitTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON, } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -64,17 +59,11 @@
    <!--Attack Traits-->
    {#each $document.flags.titan.parameters.attackTrait as trait}
       <div class="stat">
-         {#if typeof (trait.value) === 'number'}
-            <StatTag
-               tooltip={traitDescriptions[trait.name]}
-               label={localize(trait.name)}
-               value={trait.value}
-            />
-         {:else}
-            <Tag tooltip={traitDescriptions[trait.name]}>
-               {localize(trait.name)}
-            </Tag>
-         {/if}
+         <TraitTag
+            label={localize(trait.name)}
+            value={trait.value}
+            tooltip={traitDescriptions[trait.name]}
+         />
       </div>
    {/each}
 </div>

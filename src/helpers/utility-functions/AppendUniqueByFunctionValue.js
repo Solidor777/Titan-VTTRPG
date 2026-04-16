@@ -1,7 +1,6 @@
 /**
- * Adds each entry from the source array to the destination array,
- * provided that said entry is not already in the destination array.
- * Uses a function to determine whether the object is already in the array.
+ * Adds each entry from the source array to the destination array, provided that said entry is not already in the
+ * destination array. Uses a function to determine whether the object is already in the array.
  * @param {object[]} destination - The destination array.
  * @param {object[]} source - The source array.
  * @param {Function} idFunction - The function applied to each object from the

@@ -1,17 +1,17 @@
 import delay from '~/helpers/utility-functions/Delay.js';
 
 /**
- * Because some Foundry updates are asynchronous, (such as actor updates),
- * we need a way to ensure that certain events occur in a specific order,
- * such as for deriving state modifications from active effects, or for deleting effects that have expired.
- * To this, we have the Action Queue, which accepts functions and inputs, and ensures they resolve in the proper order.
+ * Because some Foundry updates are asynchronous, (such as actor updates), we need a way to ensure that certain events
+ * occur in a specific order, such as for deriving state modifications from active effects, or for deleting effects
+ * that have expired. To do this, we have the Action Queue, which accepts functions and inputs and ensures they resolve
+ * in the proper order.
  */
 export default class ActionQueue {
    /**
     * Constructs a new Action Queue.
-    * @param {number} defaultDelay - How many milliseconds (minimum of 1) that
-    *    the action queue will wait between resolving actions by default.
-    *    This can be overridden with the Delay property on the input object when enqueuing an action.
+    * @param {number} defaultDelay - How many milliseconds (minimum of 1) that the action queue will wait between
+    *    resolving actions by default. This can be overridden with the Delay property on the input object when
+    *    enqueuing an action.
     */
    constructor(defaultDelay = 100) {
       // Initial state.
@@ -27,12 +27,11 @@ export default class ActionQueue {
     * @param {Function} action.callback - The function to be performed by the action.
     * @param {object} action.thisArg - The 'this' context to use for the action. May be null.
     * @param {*[]} [action.args] - Optional arguments for the function being performed, in order.
-    * @param {number} [action.delay] - The delay to wait before attempting this action. If
-    *    not specified, the default delay will be used.
-    * @param {string} action.key - An identifier that may be used to enqueue the
-    *    action. If the action is enqueued while an action with the same key is
-    *    already in the queue, then it will be ignored. If the previous action
-    *    is already being performed, then the duplicate action will be called again.
+    * @param {number} [action.delay] - The delay to wait before attempting this action. If not specified, the default
+    *    delay will be used.
+    * @param {string} action.key - An identifier that may be used to enqueue the action. If the action is enqueued
+    *    while an action with the same key is already in the queue, then it will be ignored. If the previous action is
+    *    already being performed, then the duplicate action will be called again.
     * @returns {Promise<*>} The return value of the action being queued.
     */
    async enqueue(action) {
@@ -68,7 +67,7 @@ export default class ActionQueue {
    }
 
    /**
-    * Starts the action queue, and continues to dequeue actions until the queue is empty.
+    * Starts the action queue and continues to dequeue actions until the queue is empty.
     * @returns {Promise<void>} Finishes when the action queue is empty.
     */
    async runQueue() {
@@ -78,12 +77,10 @@ export default class ActionQueue {
          // Get the current action.
          const currentAction = this.queue[0];
 
-         // Wait for the action's delay or the default delay if no delay has.
-         // been specified.
+         // Wait for the action's delay or the default delay if no delay has been specified.
          await delay(currentAction.delay ?? this.defaultDelay);
 
-         // Set the current action and remove it from the queue.
-         // The enqueuing function will handle executing it.
+         // Set the current action and remove it from the queue The enqueuing function will handle executing it.
          this.currentAction = this.queue.shift();
 
          // Wait for the current action to be finished executing.
@@ -97,8 +94,8 @@ export default class ActionQueue {
    }
 
    /**
-    * Returns when the queue has been cleared of actions.
-    * Useful if you need to know that no actions are currently in progress.
+    * Returns when the queue has been cleared of actions. Useful if you need to know that no actions are currently in
+    * progress.
     * @returns {Promise<void>}
     */
    async onQueueEmpty() {

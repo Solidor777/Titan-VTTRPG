@@ -11,9 +11,8 @@ export default function autoScroll(element) {
       // Get the chat log from the chat message.
       const chatLog = chatMessage.parentNode;
 
-      // Check whether the difference between the current scroll-top and the.
-      // scroll height is less or equal to the.
-      // chat message height.
+      // Check whether the difference between the current scroll-top and the scroll height is less or equal to the chat
+      // message height.
       const scrollTop = chatLog.scrollTop;
       const scrollHeight = chatLog.scrollHeight - chatLog.offsetHeight;
       const chatMessageHeight = chatMessage.offsetHeight;

@@ -10,7 +10,7 @@ import {
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
- * Creates a tooltip based on the provided parameters of an Attribute based check.
+ * Creates a tooltip based on the provided parameters of an Attribute-based check.
  * @param {AttributeCheckParameters} checkParameters - The check parameters used to create the check tooltip.
  * @returns {string} A tooltip based on the provided check parameters.
  */
@@ -55,11 +55,13 @@ export default function getAttributeCheckParametersTooltip(checkParameters) {
    }
 
    // Add Total Dice data.
-   retVal += `<p><i style="width:20px;text-align:center" class="${DICE_ICON}"></i> ${localize('totalDice')}: ${checkParameters.totalDice}</p>`;
+   retVal +=
+      `<p><i style="width:20px;text-align:center" class="${DICE_ICON}"></i> ${localize('totalDice')}: ${checkParameters.totalDice}</p>`;
 
    // Add Expertise data.
    if (checkParameters.totalExpertise) {
-      retVal += `<p><i style="width:20px;text-align:center" class="${EXPERTISE_ICON}"></i> ${localize('expertise')}: ${checkParameters.totalExpertise}</p>`;
+      retVal +=
+         `<p><i style="width:20px;text-align:center" class="${EXPERTISE_ICON}"></i> ${localize('expertise')}: ${checkParameters.totalExpertise}</p>`;
    }
 
    return retVal;
