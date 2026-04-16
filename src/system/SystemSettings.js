@@ -194,6 +194,57 @@ export default function registerSystemSettings() {
       type: String,
    });
 
+   // Auto-revert Fast Healing when Previous Turn is called.
+   game.settings.register('titan', 'autoRevertFastHealing', {
+      choices: {
+         enabled: 'SETTINGS.autoRevertFastHealing.enabled',
+         showButton: 'SETTINGS.autoRevertFastHealing.showButton',
+         disabled: 'SETTINGS.autoRevertFastHealing.disabled',
+      },
+      config: true,
+      default: 'enabled',
+      hint: 'SETTINGS.autoRevertFastHealing.hint',
+      name: 'SETTINGS.autoRevertFastHealing.text',
+      requiresReload: true,
+      restricted: true,
+      scope: 'world',
+      type: String,
+   });
+
+   // Auto-revert Persistent Damage when Previous Turn is called.
+   game.settings.register('titan', 'autoRevertPersistentDamage', {
+      choices: {
+         enabled: 'SETTINGS.autoRevertPersistentDamage.enabled',
+         showButton: 'SETTINGS.autoRevertPersistentDamage.showButton',
+         disabled: 'SETTINGS.autoRevertPersistentDamage.disabled',
+      },
+      config: true,
+      default: 'enabled',
+      hint: 'SETTINGS.autoRevertPersistentDamage.hint',
+      name: 'SETTINGS.autoRevertPersistentDamage.text',
+      requiresReload: true,
+      restricted: true,
+      scope: 'world',
+      type: String,
+   });
+
+   // Auto-revert Resolve Regain when Previous Turn is called.
+   game.settings.register('titan', 'autoRevertResolveRegain', {
+      choices: {
+         enabled: 'SETTINGS.autoRevertResolveRegain.enabled',
+         showButton: 'SETTINGS.autoRevertResolveRegain.showButton',
+         disabled: 'SETTINGS.autoRevertResolveRegain.disabled',
+      },
+      config: true,
+      default: 'enabled',
+      hint: 'SETTINGS.autoRevertResolveRegain.hint',
+      name: 'SETTINGS.autoRevertResolveRegain.text',
+      requiresReload: true,
+      restricted: true,
+      scope: 'world',
+      type: String,
+   });
+
    // Auto-decrease the Duration of Effects for Combatants.
    game.settings.register('titan', 'autoDecreaseEffectDuration', {
       config: true,

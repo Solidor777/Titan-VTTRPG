@@ -5132,22 +5132,95 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Reverts the Turn-Start effect duration changes made during a prior call to onTurnStart.
+    * Reverts the Turn-Start changes made during a prior call to onTurnStart, including effect duration increases,
+    * Fast Healing reversal, Persistent Damage reversal, and Resolve Regain reversal.
     * @returns {Promise<void>}
     */
    async onTurnStartReverted() {
       if (isCurrentUserBestOwner(this.parent)) {
+
+         // Initialize variables.
+         /** @type {object} */
+         const reportData = {};
+         /** @type {boolean} */
+         let shouldUpdateActor = false;
+
+         // Revert healing and damage.
+         if (await this._calculateTurnHealingAndDamageRevert(reportData, 'turnStart')) {
+            shouldUpdateActor = true;
+         }
+
+         // Revert resolve regain.
+         if (await this._calculateResolveRegainRevert(reportData)) {
+            shouldUpdateActor = true;
+         }
+
+         // Update the actor if appropriate.
+         if (shouldUpdateActor) {
+            await this.parent.update({
+               system: {
+                  resource: this.resource,
+               },
+            });
+         }
+
+         // Revert the duration of turn start effects.
          await this._increaseTurnEffectDuration('turnStart');
+
+         // Send a report if appropriate.
+         if (Object.keys(reportData).length > 0) {
+
+            // Prepare the report data.
+            reportData.type = 'turnStartRevertReport';
+            reportData.actorImg = this.parent.img;
+            reportData.actorName = this.parent.name;
+
+            await this._whisperOwners(reportData, this._getTurnReportUserID(), true);
+         }
       }
    }
 
    /**
-    * Reverts the Turn-End effect duration changes made during a prior call to onTurnEnd.
+    * Reverts the Turn-End changes made during a prior call to onTurnEnd, including effect duration increases and
+    * Fast Healing and Persistent Damage reversal.
     * @returns {Promise<void>}
     */
    async onTurnEndReverted() {
       if (isCurrentUserBestOwner(this.parent)) {
+
+         // Initialize variables.
+         /** @type {object} */
+         const reportData = {};
+         /** @type {boolean} */
+         let shouldUpdateActor = false;
+
+         // Revert healing and damage.
+         if (await this._calculateTurnHealingAndDamageRevert(reportData, 'turnEnd')) {
+            shouldUpdateActor = true;
+         }
+
+         // Update the actor if appropriate.
+         if (shouldUpdateActor) {
+            await this.parent.update({
+               system: {
+                  resource: this.resource,
+               },
+            });
+         }
+
+         // Revert the duration of turn end effects.
          await this._increaseTurnEffectDuration('turnEnd');
+
+         // Send a report if appropriate.
+         if (Object.keys(reportData).length > 0) {
+
+            // Prepare the report data.
+            reportData.type = 'turnEndRevertReport';
+            reportData.actorName = this.parent.name;
+            reportData.actorImg = this.parent.img;
+
+            await this._whisperOwners(reportData, this._getTurnReportUserID(), true);
+         }
       }
    }
 
@@ -5436,6 +5509,164 @@ export default class CharacterDataModel extends TitanActorDataModel {
                      confirmed: confirmed,
                   };
                }
+            }
+         }
+      }
+
+      return shouldUpdateActor;
+   }
+
+   /**
+    * Calculates the resource changes needed to revert Fast Healing and Persistent Damage applied at the Start or End
+    * of a prior turn, and applies them or queues a chat button based on the revert settings.
+    * @param {object} reportData - Object for storing any necessary data for a message report.
+    * @param {string} selector - Used to determine whether we are checking for turnStart or turnEnd Effects.
+    * @returns {Promise<boolean>} Returns true if the actor should be updated.
+    * @private
+    */
+   async _calculateTurnHealingAndDamageRevert(reportData, selector) {
+      /** @type {boolean} */
+      let shouldUpdateActor = false;
+
+      // If any Fast Healing or Persistent Damage rules elements affect this character.
+      const rulesElements = this.rulesElementsCache;
+      if (rulesElements && (rulesElements.fastHealing || rulesElements.persistentDamage)) {
+
+         // Cache the Fast Healing and Persistent Damage rules elements for this selector.
+         const fastHealingElements = rulesElements.fastHealing?.[selector];
+         const persistentDamageElements = rulesElements.persistentDamage?.[selector];
+
+         // Determine whether to auto-revert healing and damage.
+         const autoRevertHealing = getSetting('autoRevertFastHealing');
+         const autoRevertDamage = getSetting('autoRevertPersistentDamage');
+
+         // Determine whether the revert operations are already confirmed.
+         const healingRevertConfirmed = autoRevertHealing === 'enabled';
+         const damageRevertConfirmed = autoRevertDamage === 'enabled';
+
+         // Calculate the totals to revert.
+         /** @type {number} */
+         let healingToRevert = 0;
+         /** @type {number} */
+         let damageToRevert = 0;
+         /** @type {number} */
+         let staminaMod = 0;
+
+         // Get the amount of fast healing to revert (by applying damage).
+         if (fastHealingElements && autoRevertHealing !== 'disabled') {
+            healingToRevert = getSumOfObjectValues(fastHealingElements);
+            if (healingRevertConfirmed) {
+               staminaMod -= healingToRevert;
+            }
+         }
+
+         // Get the amount of persistent damage to revert (by applying healing).
+         if (persistentDamageElements && autoRevertDamage !== 'disabled') {
+            damageToRevert = getSumOfObjectValues(persistentDamageElements);
+            if (damageRevertConfirmed) {
+               staminaMod += damageToRevert;
+            }
+         }
+
+         // If there is any healing or damage to revert.
+         if (healingToRevert > 0 || damageToRevert > 0) {
+
+            // Apply damage to revert fast healing if appropriate.
+            if (staminaMod < 0) {
+               await this.applyDamage(
+                  -staminaMod,
+                  {
+                     updateActor: false,
+                     ignoreArmor: true,
+                     report: false,
+                  },
+               );
+               shouldUpdateActor = true;
+            }
+
+            // Apply healing to revert persistent damage if appropriate.
+            else if (staminaMod > 0) {
+               await this.applyHealing(
+                  staminaMod,
+                  {
+                     updateActor: false,
+                     report: false,
+                  },
+               );
+               shouldUpdateActor = true;
+            }
+
+            // Populate report data if needed.
+            if (healingToRevert > 0 && autoRevertHealing !== 'disabled') {
+               reportData.fastHealingRevert = structuredClone(fastHealingElements);
+               reportData.fastHealingRevert.total = healingToRevert;
+               reportData.fastHealingRevert.confirmed = healingRevertConfirmed;
+            }
+
+            if (damageToRevert > 0 && autoRevertDamage !== 'disabled') {
+               reportData.persistentDamageRevert = structuredClone(persistentDamageElements);
+               reportData.persistentDamageRevert.total = damageToRevert;
+               reportData.persistentDamageRevert.confirmed = damageRevertConfirmed;
+            }
+
+            // Add stamina to the report.
+            reportData.stamina = {
+               max: this.resource.stamina.max,
+               value: this.resource.stamina.value,
+            };
+
+            // Add wounds to the report if appropriate.
+            if (healingToRevert > 0 && this.resource.wounds.max > 0) {
+               reportData.wounds = {
+                  max: this.resource.wounds.max,
+                  value: this.resource.wounds.value,
+               };
+            }
+         }
+      }
+
+      return shouldUpdateActor;
+   }
+
+   /**
+    * Calculates how much Resolve to spend at the start of a prior turn's reversal.
+    * @param {object} reportData - Object for storing any necessary data for a message report.
+    * @returns {Promise<boolean>} Returns true if the actor should be updated.
+    * @private
+    */
+   async _calculateResolveRegainRevert(reportData) {
+      /** @type {boolean} */
+      let shouldUpdateActor = false;
+
+      // Determine whether to auto-revert resolve regain.
+      const autoRevertResolveRegain = getSetting('autoRevertResolveRegain');
+      if (autoRevertResolveRegain !== 'disabled') {
+
+         // If any resolve will be reverted.
+         const maxResolveToRevert = getSetting('resolveBaseRegain') + this.mod.resolveRegain.value;
+         if (maxResolveToRevert > 0) {
+
+            // Determine whether the revert is confirmed.
+            const confirmed = autoRevertResolveRegain === 'enabled';
+            if (confirmed) {
+               await this.spendResolve(maxResolveToRevert, {
+                  updateActor: false,
+                  report: false,
+               });
+               shouldUpdateActor = true;
+            }
+
+            // Update the report data if appropriate.
+            if (getSetting('reportRegainingResolve') || !confirmed) {
+               reportData.resolve = {
+                  value: this.resource.resolve.value,
+                  max: this.resource.resolve.max,
+               };
+
+               reportData.resolveRegainRevert = {
+                  total: maxResolveToRevert,
+                  confirmed: confirmed,
+               };
             }
          }
       }

@@ -34,6 +34,10 @@
       from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessage.svelte';
    import TurnEndReportChatMessage
       from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessage.svelte';
+   import TurnStartRevertReportChatMessage
+      from '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessage.svelte';
+   import TurnEndRevertReportChatMessage
+      from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessage.svelte';
    import EffectsExpiredReportChatMessage
       from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessage.svelte';
    import RendReportChatMessage
@@ -77,6 +81,8 @@
             longRestReport: LongRestReportChatMessage,
             turnStartReport: TurnStartReportChatMessage,
             turnEndReport: TurnEndReportChatMessage,
+            turnStartRevertReport: TurnStartRevertReportChatMessage,
+            turnEndRevertReport: TurnEndRevertReportChatMessage,
             effectsExpiredReport: EffectsExpiredReportChatMessage,
             rendReport: RendReportChatMessage,
             repairsReport: RepairsReportChatMessageShell,
