@@ -35,7 +35,7 @@
 
          document.update({
             system: {
-               attack: document.system.attack,
+               attack: structuredClone(document.system.attack),
             },
          });
       }

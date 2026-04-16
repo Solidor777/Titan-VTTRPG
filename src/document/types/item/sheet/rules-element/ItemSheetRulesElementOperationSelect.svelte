@@ -1,13 +1,15 @@
 <script>
    import { getContext } from 'svelte';
-   import RulesElementOperationSelect from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
+   import RulesElementOperationSelect
+      from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
    import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
    import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
    import createFastHealingElement from '~/document/types/item/rules-element/FastHealing.js';
    import createPersistentDamageElement from '~/document/types/item/rules-element/PersistentDamage.js';
    import createTurnMessageElement from '~/document/types/item/rules-element/TurnMessage.js';
    import createRollMessageElement from '~/document/types/item/rules-element/RollMessage.js';
-   import createConditionalRatingModifierElement from '~/document/types/item/rules-element/ConditionalRatingModifier.js';
+   import createConditionalRatingModifierElement
+      from '~/document/types/item/rules-element/ConditionalRatingModifier.js';
    import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
    import error from '~/helpers/utility-functions/Error.js';
 
@@ -88,7 +90,7 @@
             }
             default: {
                const op =
-                  $document.system.rulesElement[idx].operation;
+                        $document.system.rulesElement[idx].operation;
                error(`Invalid Rules Element operation ${op}`);
                return;
             }
@@ -96,12 +98,11 @@
 
          await $document.update({
             system: {
-               rulesElement: $document.system.rulesElement,
+               rulesElement: structuredClone($document.system.rulesElement),
             },
          });
       }
    }
-
 </script>
 
 <RulesElementOperationSelect

@@ -141,7 +141,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          this.parent.system.attack[attackIdx].customTrait.splice(traitIdx, 1);
          await this.parent.update({
             system: {
-               attack: this.parent.system.attack,
+               attack: structuredClone(this.parent.system.attack),
             },
          });
       }
@@ -156,7 +156,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          this.attack.push(createWeaponAttackTemplate());
          await this.parent.update({
             system: {
-               attack: this.attack,
+               attack: structuredClone(this.attack),
             },
          });
 
@@ -184,7 +184,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          this.attack.splice(idx, 1);
          await this.parent.update({
             system: {
-               attack: this.attack,
+               attack: structuredClone(this.attack),
             }
          });
       }

@@ -16,11 +16,7 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
-
+   
    /** @type {string[]} Options for selecting the stat the flat modifier applies to. */
    const selectorOptions = [
       'attribute',
@@ -43,34 +39,34 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         switch (element.selector) {
+         switch ($document.system.rulesElement[idx].selector) {
             case 'attribute': {
-               element.key = 'body';
+               $document.system.rulesElement[idx].key = 'body';
                break;
             }
             case 'training':
             case 'expertise': {
-               element.key = 'arcana';
+               $document.system.rulesElement[idx].key = 'arcana';
                break;
             }
             case 'mod': {
-               element.key = 'armor';
+               $document.system.rulesElement[idx].key = 'armor';
                break;
             }
             case 'rating': {
-               element.key = 'awareness';
+               $document.system.rulesElement[idx].key = 'awareness';
                break;
             }
             case 'resistance': {
-               element.key = 'reflexes';
+               $document.system.rulesElement[idx].key = 'reflexes';
                break;
             }
             case 'resource': {
-               element.key = 'resolve';
+               $document.system.rulesElement[idx].key = 'resolve';
                break;
             }
             case 'speed': {
-               element.key = 'burrow';
+               $document.system.rulesElement[idx].key = 'burrow';
                break;
             }
 
@@ -80,7 +76,7 @@
          }
 
          $document.update({
-            system: $document.system,
+            system: structuredClone($document.system),
          });
       }
    }
@@ -90,7 +86,7 @@
     * @returns {object | undefined} The select component, or undefined if no case matches.
     */
    function getKeySelect() {
-      switch (element.selector) {
+      switch ($document.system.rulesElement[idx].selector) {
          case 'attribute': {
             return DocumentAttributeSelect;
          }
@@ -127,7 +123,7 @@
    <!--Selector-->
    <div class="field select">
       <DocumentSelect
-         bind:value={element.selector}
+         bind:value={$document.system.rulesElement[idx].selector}
          on:change={onSelectorChange}
          options={selectorOptions}
       />
@@ -135,20 +131,21 @@
 
    <!--Key-->
    <div class="field select">
-      <svelte:component bind:value={element.key} this={getKeySelect()}/>
+      <svelte:component bind:value={$document.system.rulesElement[idx].key} this={getKeySelect()}/>
    </div>
 
    <!--Value-->
    <div class="field number">
-      <DocumentIntegerInput bind:value={element.value}/>
+      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value}/>
    </div>
 </div>
-
 
 <style lang="scss">
    .settings {
       @include tag-container;
       @include flex-group-left;
+
+      width: 100%;
 
       .field {
          @include flex-row;

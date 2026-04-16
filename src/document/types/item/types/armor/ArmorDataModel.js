@@ -7,6 +7,7 @@ import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js'
 import { ARMOR_IMAGE } from '~/system/DefaultImages.js';
 import EditArmorTraitsDialog from '~/document/types/item/types/armor/dialog/EditArmorTraitsDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Data model with extra functionality for Armor items.
@@ -56,7 +57,11 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
     * Creates a dialog for editing the Armor's traits.
     */
    editArmorTraits() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          const dialog = new EditArmorTraitsDialog(this.parent);
          dialog.render(true);
       }

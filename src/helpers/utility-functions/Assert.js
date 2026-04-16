@@ -11,4 +11,5 @@ export default function assert(assertion, message, ...args) {
       `TITAN | ${message}`,
       args,
    );
+   return assertion;
 }

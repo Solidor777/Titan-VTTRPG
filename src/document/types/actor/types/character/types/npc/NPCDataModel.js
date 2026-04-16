@@ -1,6 +1,7 @@
 import CharacterDataModel from '~/document/types/actor/types/character/CharacterDataModel.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Data model for NPC actors.
@@ -15,6 +16,14 @@ export default class NPCDataModel extends CharacterDataModel {
     * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
+      if (!assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         return;
+      }
+
       // If we are a minion and not already dead.
       if (this.role === 'minion' && this.resource.stamina.value > 0) {
 

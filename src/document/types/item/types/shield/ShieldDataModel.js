@@ -6,6 +6,7 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import EditShieldTraitsDialog from '~/document/types/item/types/shield/dialog/EditShieldTraitsDialog.js';
 import { SHIELD_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Data model with extra functionality for Shields.
@@ -52,7 +53,11 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
     * Creates a dialog for editing the Shield's traits.
     */
    editShieldTraits() {
-      if (this.parent.isOwner) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
          const dialog = new EditShieldTraitsDialog(this.parent);
          dialog.render(true);
       }

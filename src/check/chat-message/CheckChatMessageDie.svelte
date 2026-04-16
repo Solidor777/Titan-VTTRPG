@@ -43,7 +43,7 @@
          $document.update({
             flags: {
                titan: {
-                  results: $document.flags.titan.results,
+                  results: structuredClone($document.flags.titan.results),
                },
             },
          });

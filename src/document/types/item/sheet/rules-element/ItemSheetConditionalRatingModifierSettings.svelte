@@ -1,17 +1,12 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentArmorTraitSelect from '~/document/svelte-components/select/DocumentArmorTraitSelect.svelte';
    import DocumentShieldTraitSelect from '~/document/svelte-components/select/DocumentShieldTraitSelect.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
-   import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {number} The index of the rules element in the item's rules elements array. */
@@ -19,10 +14,6 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
 
    /** @type {string[]} Options for selecting which rating the conditional modifier applies to. */
    const ratingOptions = [
@@ -56,25 +47,25 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         switch (element.selector) {
+         switch ($document.system.rulesElement[idx].selector) {
             case 'armorTrait':
             case 'shieldTrait': {
-               element.key = 'magical';
+               $document.system.rulesElement[idx].key = 'magical';
                break;
             }
             case 'customArmorTrait':
             case 'customWeaponTrait':
             case 'customShieldTrait':
             case 'multiAttack': {
-               element.key = '';
+               $document.system.rulesElement[idx].key = '';
                break;
             }
             case 'attackTrait': {
-               element.key = 'blast';
+               $document.system.rulesElement[idx].key = 'blast';
                break;
             }
             case 'attackType': {
-               element.key = 'melee';
+               $document.system.rulesElement[idx].key = 'melee';
                break;
             }
             default: {
@@ -83,7 +74,7 @@
          }
 
          $document.update({
-            system: $document.system,
+            system: structuredClone($document.system),
          });
       }
    }
@@ -93,13 +84,13 @@
     * @returns {void}
     */
    function onRatingChange() {
-      switch (element.rating) {
+      switch ($document.system.rulesElement[idx].rating) {
          case 'defense': {
-            element.selector = 'armorTrait';
+            $document.system.rulesElement[idx].selector = 'armorTrait';
             break;
          }
          default: {
-            element.selector = 'attackTrait';
+            $document.system.rulesElement[idx].selector = 'attackTrait';
             break;
          }
       }
@@ -112,7 +103,7 @@
     * @returns {object} The Svelte component to use for the key field.
     */
    function getSelector() {
-      switch (element.selector) {
+      switch ($document.system.rulesElement[idx].selector) {
          case 'attackTrait': {
             return DocumentAttackTraitSelect;
          }
@@ -137,98 +128,51 @@
    }
 </script>
 
-{#if element && element.operation === 'conditionalRatingModifier'}
-   <div class="element" transition:slide|local>
-      <!--Element Operation-->
-      <div class="settings">
-         <div class="field select">
-            <ItemSheetRulesElementOperationSelect {idx}/>
-         </div>
+<!--Settings-->
+<div class="settings">
 
-         <!--Rating-->
-         <div class="field select">
-            <DocumentSelect
-               options={ratingOptions}
-               bind:value={element.rating}
-               on:change={onRatingChange}
-            />
-         </div>
+   <!--Rating-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={$document.system.rulesElement[idx].rating}
+         on:change={onRatingChange}
+         options={ratingOptions}
+      />
+   </div>
 
-         <!--Selector-->
-         <div class="field select">
-            <DocumentSelect
-               options={element.rating === 'defense'
+   <!--Selector-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={$document.system.rulesElement[idx].selector}
+         on:change={onSelectorChange}
+         options={$document.system.rulesElement[idx].rating === 'defense'
                   ? defenseSelectorOptions
                   : attackSelectorOptions}
-               bind:value={element.selector}
-               on:change={onSelectorChange}
-            />
-         </div>
-
-         <!--Key-->
-         <div class="field select">
-            <svelte:component this={getSelector()} bind:value={element.key}/>
-         </div>
-
-         <!--Value-->
-         <div class="field number">
-            <DocumentIntegerInput bind:value={element.value}/>
-         </div>
-      </div>
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <IconButton
-            icon={DELETE_ICON}
-            on:click={() => {
-               $document.system.deleteRulesElement(idx);
-            }}
-         />
-      </div>
+      />
    </div>
-{/if}
+
+   <!--Key-->
+   <div class="field select">
+      <svelte:component bind:value={$document.system.rulesElement[idx].key} this={getSelector()}/>
+   </div>
+
+   <!--Value-->
+   <div class="field number">
+      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value}/>
+   </div>
+</div>
 
 <style lang="scss">
-   .element {
-      @include flex-row;
-      @include flex-space-between;
-      @include border;
-      @include panel-1;
+   .settings {
+      @include tag-container;
+      @include flex-group-left;
 
       width: 100%;
-      height: 100%;
 
-      .settings {
+      .field {
          @include flex-row;
          @include flex-group-left;
-
-         flex-wrap: wrap;
-         width: 100%;
-         margin-bottom: var(--titan-spacing-large);
-
-         .field {
-            @include flex-row;
-
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
-
-            &.select {
-               @include flex-group-left;
-            }
-
-            &.number {
-               @include flex-group-center;
-
-               width: 32px;
-            }
-         }
-      }
-
-      .delete-button {
-         @include flex-column;
-         @include flex-group-top;
-
-         height: 100%;
-         margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 0;
       }
    }
 </style>
+

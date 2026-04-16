@@ -56,8 +56,7 @@
             break;
          }
          case 'persistentDamage': {
-            operationSettingsComponent =
-               ItemSheetPersistentDamageSettings;
+            operationSettingsComponent = ItemSheetPersistentDamageSettings;
             break;
          }
          case 'rollMessage': {

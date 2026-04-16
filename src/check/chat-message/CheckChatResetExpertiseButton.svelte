@@ -24,7 +24,7 @@
       $document.update({
          flags: {
             titan: {
-               results: newResults,
+               results: structuredClone(newResults),
             },
          },
       });

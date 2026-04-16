@@ -159,7 +159,7 @@
                               }
                               $document.update({
                                  system: {
-                                    aspect: $document.system.aspect,
+                                    aspect: structuredClone($document.system.aspect),
                                  },
                               });
                            }}

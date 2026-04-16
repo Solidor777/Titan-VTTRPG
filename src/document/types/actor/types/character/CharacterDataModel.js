@@ -51,14 +51,14 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * Options for applying Damage to a Character.
  * @typedef {object} DamageOptions
- * @property {boolean} [ignoreArmor - = false] - Whether to Ignore Armor when applying the Damage.
- * @property {boolean} [ineffective - = false] - Whether the Attack had the Ineffective trait.
- * @property {boolean} [penetrating - = false] - Whether the Attack had the Penetrating trait.
- * @property {boolean} [updateActor - = true] - Whether to update the Character after applying the Damage.
+ * @property {boolean} [ignoreArmor = false] - Whether to Ignore Armor when applying the Damage.
+ * @property {boolean} [ineffective = false] - Whether the Attack had the Ineffective trait.
+ * @property {boolean} [penetrating = false] - Whether the Attack had the Penetrating trait.
+ * @property {boolean} [updateActor = true] - Whether to update the Character after applying the Damage.
  *    When updating multiple values, it is useful to set this to false.
- * @property {boolean} [report - = true] - Whether to send a Chat Message report, provided this setting is enabled.
+ * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
  *    When sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound - = true] - Whether to play a sound when sending the report.
+ * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
 /**
@@ -86,11 +86,11 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * Options for applying Healing to a Character.
  * @typedef {object} HealingOptions
- * @property {boolean} [updateActor - = true] - Whether to update the Character after applying the Healing.
+ * @property {boolean} [updateActor = true] - Whether to update the Character after applying the Healing.
  *    When updating multiple values, it is useful to set this to false.
- * @property {boolean} [report - = true] - Whether to send a Chat Message report, provided this setting is enabled.
+ * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
  *    When sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound - = true] - Whether to play a sound when sending the report.
+ * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
 /**
@@ -111,21 +111,21 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * Options for restoring a Character's Resolve.
  * @typedef {object} RestoreResolveOptions
- * @property {boolean} [updateActor - = true] - Whether to update the Character after restoring the Resolve.
+ * @property {boolean} [updateActor = true] - Whether to update the Character after restoring the Resolve.
  *    When updating multiple values, it is useful to set this to false.
- * @property {boolean} [report - = true] - Whether to send a Chat Message report, provided this setting is enabled.
+ * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
  *    When sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound - = true] - Whether to play a sound when sending the report.
+ * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
 /**
  * Options for spending a Character's Resolve.
  * @typedef {object} SpendResolveOptions
- * @property {boolean} [updateActor - = true] - Whether to update the Character after spending the Resolve.
+ * @property {boolean} [updateActor = true] - Whether to update the Character after spending the Resolve.
  *    When updating multiple values, it is useful to set this to false.
- * @property {boolean} [report - = true] - Whether to send a Chat Message report, provided this setting is enabled.
+ * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
  *    When sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound - = true] - Whether to play a sound when sending the report.
+ * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
 /**
@@ -141,12 +141,12 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * Options for Rending the character's Armor.
  * @typedef {object} RendOptions
- * @property {boolean} [magical - = false] - Whether the rending Attack was magical.
- * @property {boolean} [updateArmor - = true] - Whether to update the Armor after applying the Rend.
+ * @property {boolean} [magical = false] - Whether the rending Attack was magical.
+ * @property {boolean} [updateArmor = true] - Whether to update the Armor after applying the Rend.
  *    When updating multiple values, it is useful to set this to false.
- * @property {boolean} [report - = true] - Whether to send a Chat Message report, provided this setting is enabled.
+ * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
  *    When sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound - = true] - Whether to play a sound when sending the report.
+ * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
 /**
@@ -163,11 +163,11 @@ import assert from '~/helpers/utility-functions/Assert.js';
 /**
  * Options for Repairing the character's Armor.
  * @typedef {object} RepairsOptions
- * @property {boolean} [updateArmor - = true] - Whether to update the Armor after applying the repairs.
+ * @property {boolean} [updateArmor = true] - Whether to update the Armor after applying the repairs.
  *    When updating multiple values, it is useful to set this to false.
- * @property {boolean} [report - = true] - Whether to send a Chat Message report, provided this setting is enabled.
+ * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
  *    When sending multiple reports, it is useful to set this to false.
- * @property {boolean} [playSound - = true] - Whether to play a sound when sending the report.
+ * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
 /**
@@ -4594,13 +4594,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (options?.updateActor !== false) {
             await this.parent.update({
                system: {
-                  attribute: this.attribute,
-                  resistance: this.resistance,
-                  skill: this.skill,
-                  resource: this.resource,
-                  rating: this.rating,
-                  speed: this.speed,
-                  mod: this.mod,
+                  attribute: structuredClone(this.attribute),
+                  resistance: structuredClone(this.resistance),
+                  skill: structuredClone(this.skill),
+                  resource: structuredClone(this.resource),
+                  rating: structuredClone(this.rating),
+                  speed: structuredClone(this.speed),
+                  mod: structuredClone(this.mod),
                },
             });
          }
@@ -4862,7 +4862,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (shouldUpdateActor) {
             await this.parent.update({
                system: {
-                  resource: this.resource,
+                  resource: structuredClone(this.resource),
                },
             });
          }
@@ -4980,7 +4980,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (shouldUpdateActor) {
             await this.parent.update({
                system: {
-                  resource: this.resource,
+                  resource: structuredClone(this.resource),
                },
             });
          }
@@ -5159,7 +5159,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (shouldUpdateActor) {
             await this.parent.update({
                system: {
-                  resource: this.resource,
+                  resource: structuredClone(this.resource),
                },
             });
          }
@@ -5203,7 +5203,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (shouldUpdateActor) {
             await this.parent.update({
                system: {
-                  resource: this.resource,
+                  resource: structuredClone(this.resource),
                },
             });
          }

@@ -31,7 +31,7 @@
 
          item.update({
             system: {
-               customTrait: customTrait,
+               customTrait: structuredClone(customTrait),
             },
          });
       }

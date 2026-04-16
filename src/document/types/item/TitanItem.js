@@ -115,7 +115,7 @@ export default class TitanItem extends Item {
          this.system.check.push(createItemCheckTemplate());
          await this.update({
             system: {
-               check: this.system.check,
+               check: structuredClone(this.system.check),
             }
          });
 
@@ -145,7 +145,7 @@ export default class TitanItem extends Item {
          this.system.check.splice(idx, 1);
          await this.update({
             system: {
-               check: this.system.check,
+               check: structuredClone(this.system.check),
             }
          });
       }
@@ -199,7 +199,7 @@ export default class TitanItem extends Item {
          this.system.customTrait.splice(traitIdx, 1);
          await this.update({
             system: {
-               customTrait: this.system.customTrait,
+               customTrait: structuredClone(this.system.customTrait),
             },
          });
       }

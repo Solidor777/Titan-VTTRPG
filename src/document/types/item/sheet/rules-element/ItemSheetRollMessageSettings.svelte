@@ -1,9 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
@@ -11,10 +9,7 @@
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
    import assert from '~/helpers/utility-functions/Assert.js';
-   import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
    /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
@@ -151,7 +146,7 @@
          }
 
          $document.update({
-            system: $document.system,
+            system: structuredClone($document.system),
          });
       }
    }
@@ -190,116 +185,70 @@
    }
 </script>
 
-{#if element && element.operation === 'rollMessage'}
-   <div class="element" transition:slide|local>
-      <!--Main header-->
-      <div class="header">
-         <!--Element Operation-->
-         <div class="settings">
-            <div class="field select">
-               <ItemSheetRulesElementOperationSelect {idx}/>
-            </div>
+<!--Operation settings-->
+<div class="settings">
 
-            <!--Type-->
-            <div class="field select">
-               <DocumentSelect
-                  options={checkTypeOptions}
-                  bind:value={$document.system.rulesElement[idx].checkType}
-                  on:change={onCheckTypeChange}
-               />
-            </div>
-
-            <!--Selector-->
-            <div class="field select">
-               <DocumentSelect
-                  options={selectorOptions[element.checkType]}
-                  bind:value={$document.system.rulesElement[idx].selector}
-                  on:change={onSelectorChange}
-               />
-            </div>
-
-            <!--Key-->
-            {#if element.selector !== 'multiAttack'
-               && element.selector !== 'any'}
-               <div class="field select">
-                  <svelte:component
-                     this={getSelector()}
-                     bind:value={$document.system.rulesElement[idx].key}
-                  />
-               </div>
-            {/if}
-         </div>
-
-         <!--Delete Element-->
-         <div class="delete-button">
-            <IconButton
-               icon={DELETE_ICON}
-               on:click={() => {
-                  $document.system.deleteRulesElement(idx);
-               }}
-            />
-         </div>
-      </div>
-      <!--Message text-->
-      <div class="section" transition:slide|local>
-         <DocumentBoundEditorInput
-            bind:value={$document.system.rulesElement[idx].message}
+   <!--Operation Fields-->
+   <div class="fields">
+      
+      <!--Type-->
+      <div class="field select">
+         <DocumentSelect
+            bind:value={$document.system.rulesElement[idx].checkType}
+            on:change={onCheckTypeChange}
+            options={checkTypeOptions}
          />
       </div>
+
+      <!--Selector-->
+      <div class="field select">
+         <DocumentSelect
+            bind:value={$document.system.rulesElement[idx].selector}
+            on:change={onSelectorChange}
+            options={selectorOptions[element.checkType]}
+         />
+      </div>
+
+      <!--Key-->
+      {#if element.selector !== 'multiAttack'
+      && element.selector !== 'any'}
+         <div class="field select">
+            <svelte:component
+               this={getSelector()}
+               bind:value={$document.system.rulesElement[idx].key}
+            />
+         </div>
+      {/if}
    </div>
-{/if}
+
+   <!--Message text-->
+   <div class="message">
+      <DocumentBoundEditorInput
+         bind:value={$document.system.rulesElement[idx].message}
+      />
+   </div>
+</div>
 
 <style lang="scss">
-   .element {
+   .settings {
       @include flex-column;
-      @include flex-group-top-left;
-      @include border;
-      @include panel-1;
+      @include flex-group-top;
 
       width: 100%;
-      height: 100%;
 
-      .header {
-         @include flex-row;
+      .fields {
+         @include tag-container;
+         @include flex-group-left;
 
-         width: 100%;
-
-         .settings {
+         .field {
             @include flex-row;
             @include flex-group-left;
-
-            width: 100%;
-            margin-bottom: var(--titan-spacing-large);
-            flex-wrap: wrap;
-
-            .field {
-               @include flex-row;
-
-               margin: var(--titan-spacing-large)
-                  var(--titan-spacing-standard) 0;
-
-               &.select {
-                  @include flex-group-left;
-               }
-            }
-         }
-
-         .delete-button {
-            @include flex-column;
-            @include flex-group-top;
-
-            margin-top: var(--titan-spacing-standard);
-            margin-right: var(--titan-spacing-standard);
          }
       }
 
-      .section {
-         @include flex-column;
-
-         margin-top: var(--titan-spacing-standard);
-         width: 100%;
-         min-height: 160px;
-         height: 100%;
+      .message {
+         @include flex-row;
+         @include flex-group-left;
       }
    }
 </style>

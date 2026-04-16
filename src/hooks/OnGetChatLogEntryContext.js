@@ -229,7 +229,7 @@ async function doubleTraining(element, spendResolve) {
       titanFlags.parameters.totalTrainingDice *= 2;
       await message.update({
          flags: {
-            titan: titanFlags,
+            titan: structuredClone(titanFlags),
          },
       });
 
@@ -285,7 +285,7 @@ async function doubleExpertise(element, spendResolve) {
       // Update the message.
       await message.update({
          flags: {
-            titan: titanFlags,
+            titan: structuredClone(titanFlags),
          },
       });
 

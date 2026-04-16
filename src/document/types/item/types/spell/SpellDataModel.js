@@ -193,7 +193,7 @@ export default class SpellDataModel extends TitanItemDataModel {
          // Update the document.
          await this.parent.update({
             system: {
-               aspect: this.aspect
+               aspect: structuredClone(this.aspect)
             },
          });
       }
@@ -213,7 +213,7 @@ export default class SpellDataModel extends TitanItemDataModel {
          // Update the document.
          await this.parent.update({
             system: {
-               aspect: this.aspect,
+               aspect: structuredClone(this.aspect),
             },
          });
       }
@@ -233,7 +233,7 @@ export default class SpellDataModel extends TitanItemDataModel {
          // Update the document.
          await this.parent.update({
             system: {
-               customAspect: this.customAspect,
+               customAspect: structuredClone(this.customAspect),
             },
          });
 
@@ -263,7 +263,7 @@ export default class SpellDataModel extends TitanItemDataModel {
          this.customAspect.splice(idx, 1);
          await this.parent.update({
             system: {
-               customAspect: this.customAspect,
+               customAspect: structuredClone(this.customAspect),
             },
          });
       }

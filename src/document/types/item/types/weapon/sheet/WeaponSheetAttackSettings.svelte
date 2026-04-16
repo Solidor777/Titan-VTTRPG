@@ -53,7 +53,7 @@
                attack.skill = 'meleeWeapons';
                $document.update({
                   system: {
-                     attack: $document.system.attack,
+                     attack: structuredClone($document.system.attack),
                   },
                });
             }
@@ -62,7 +62,7 @@
             attack.skill = 'rangedWeapons';
             $document.update({
                system: {
-                  attack: $document.system.attack,
+                  attack: structuredClone($document.system.attack),
                },
             });
          }

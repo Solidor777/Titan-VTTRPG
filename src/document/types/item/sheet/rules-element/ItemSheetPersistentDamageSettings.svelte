@@ -1,10 +1,7 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
@@ -14,10 +11,6 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
-
    /** @type {string[]} Options for which turn the persistent damage activates. */
    const selectorOptions = [
       'turnStart',
@@ -25,81 +18,44 @@
    ];
 </script>
 
-{#if element && element.operation === 'persistentDamage'}
-   <div class="element" transition:slide|local>
-      <!--Element Operation-->
-      <div class="settings">
-         <div class="field select">
-            <ItemSheetRulesElementOperationSelect {idx}/>
-         </div>
 
-         <!--Selector-->
-         <div class="field select">
-            <DocumentSelect
-               options={selectorOptions}
-               bind:value={element.selector}
-            />
-         </div>
-
-         <!--Value-->
-         <div class="field number">
-            <DocumentIntegerInput bind:value={element.value} min={1}/>
-         </div>
-      </div>
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <IconButton
-            icon={DELETE_ICON}
-            on:click={() => {
-               $document.system.deleteRulesElement(idx);
-            }}
-         />
-      </div>
+<!--Operation settings-->
+<div class="settings">
+   <div class="field select">
+      <ItemSheetRulesElementOperationSelect {idx}/>
    </div>
-{/if}
+
+   <!--Selector-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={$document.system.rulesElement[idx].selector}
+         options={selectorOptions}
+      />
+   </div>
+
+   <!--Value-->
+   <div class="field number">
+      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value} min={1}/>
+   </div>
+</div>
 
 <style lang="scss">
-   .element {
-      @include flex-row;
-      @include flex-space-between;
-      @include border;
-      @include panel-1;
+   .settings {
+      @include tag-container;
+      @include flex-group-left;
 
       width: 100%;
-      height: 100%;
 
-      .settings {
+      .field {
          @include flex-row;
-         @include flex-group-left;
 
-         flex-wrap: wrap;
-         width: 100%;
-         margin-bottom: var(--titan-spacing-large);
-
-         .field {
-            @include flex-row;
-
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
-
-            &.select {
-               @include flex-group-left;
-            }
-
-            &.number {
-               @include flex-group-center;
-
-               width: 32px;
-            }
+         &.select {
+            @include flex-group-left;
          }
-      }
 
-      .delete-button {
-         @include flex-column;
-         @include flex-group-top;
-
-         height: 100%;
-         margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 0;
+         &.number {
+            @include flex-group-center;
+         }
       }
    }
 </style>

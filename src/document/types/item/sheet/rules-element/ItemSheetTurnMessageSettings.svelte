@@ -1,22 +1,13 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
-   import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
    /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
 
    /** @type {string[]} Options for which turn the message is sent. */
    const selectorOptions = [
@@ -25,95 +16,50 @@
    ];
 </script>
 
-{#if element && element.operation === 'turnMessage'}
-   <div class="element" transition:slide|local>
-      <!--Main Header-->
-      <div class="header">
-         <!--Element Operation-->
-         <div class="settings">
-            <div class="field select">
-               <ItemSheetRulesElementOperationSelect {idx}/>
-            </div>
+<!--Operation settings-->
+<div class="settings">
 
-            <!--Selector-->
-            <div class="field select">
-               <DocumentSelect
-                  options={selectorOptions}
-                  bind:value={$document.system.rulesElement[idx].selector}
-               />
-            </div>
-         </div>
+   <!--Operation Fields-->
+   <div class="fields">
 
-         <!--Delete Element-->
-         <div class="delete-button">
-            <IconButton
-               icon={DELETE_ICON}
-               on:click={() => {
-                  $document.system.deleteRulesElement(idx);
-               }}
-            />
-         </div>
-      </div>
-      <!--Message text-->
-      <div class="section">
-         <DocumentBoundEditorInput
-            bind:value={$document.system.rulesElement[idx].message}
+      <!--Selector-->
+      <div class="field select">
+         <DocumentSelect
+            bind:value={$document.system.rulesElement[idx].selector}
+            options={selectorOptions}
          />
       </div>
    </div>
-{/if}
+
+   <!--Message text-->
+   <div class="message">
+      <DocumentBoundEditorInput
+         bind:value={$document.system.rulesElement[idx].message}
+      />
+   </div>
+</div>
 
 <style lang="scss">
-   .element {
+   .settings {
       @include flex-column;
-      @include flex-group-top-left;
-      @include border;
-      @include panel-1;
+      @include flex-group-top;
 
       width: 100%;
-      height: 100%;
 
-      .header {
-         @include flex-row;
+      .fields {
+         @include tag-container;
+         @include flex-group-left;
 
-         width: 100%;
-
-         .settings {
+         .field {
             @include flex-row;
             @include flex-group-left;
-
-            width: 100%;
-            margin-bottom: var(--titan-spacing-large);
-            flex-wrap: wrap;
-
-            .field {
-               @include flex-row;
-
-               margin: var(--titan-spacing-large)
-                  var(--titan-spacing-standard) 0;
-
-               &.select {
-                  @include flex-group-left;
-               }
-            }
-         }
-
-         .delete-button {
-            @include flex-column;
-            @include flex-group-top;
-
-            margin-top: var(--titan-spacing-standard);
-            margin-right: var(--titan-spacing-standard);
          }
       }
 
-      .section {
-         @include flex-column;
-
-         margin-top: var(--titan-spacing-standard);
-         width: 100%;
-         min-height: 160px;
-         height: 100%;
+      .message {
+         @include flex-row;
+         @include flex-group-left;
       }
    }
 </style>
+

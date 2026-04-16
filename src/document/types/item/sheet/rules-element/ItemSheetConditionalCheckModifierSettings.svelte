@@ -1,7 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import { slide } from 'svelte/transition';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
@@ -9,10 +8,6 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
-   import { DELETE_ICON } from '~/system/Icons.js';
-   import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
-   import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
    /** @type {number} The index of the rules element in the item's rules elements array. */
    export let idx = void 0;
@@ -112,13 +107,13 @@
     */
    function onModifierTypeChanged() {
       if (
-         element.modifierType === 'healing' &&
-         element.checkType === 'attack'
+         $document.system.rulesElement[idx].modifierType === 'healing' &&
+         $document.system.rulesElement[idx].checkType === 'attack'
       ) {
-         element.checkType = 'any';
+         $document.system.rulesElement[idx].checkType = 'any';
          if (onCheckTypeChange() !== true) {
             $document.update({
-               system: $document.system,
+               system: structuredClone($document.system),
             });
          }
       }
@@ -131,12 +126,11 @@
     */
    function onCheckTypeChange() {
       if (
-         element &&
-         element.selector !== 'customTrait' &&
-         element.selector !== 'attribute' &&
-         !(element.checkType !== 'any' && element.selector === 'skill')
+         $document.system.rulesElement[idx].selector !== 'customTrait' &&
+         $document.system.rulesElement[idx].selector !== 'attribute' &&
+         !($document.system.rulesElement[idx].checkType !== 'any' && element.selector === 'skill')
       ) {
-         element.selector = 'any';
+         $document.system.rulesElement[idx].selector = 'any';
          onSelectorChange();
 
          return true;
@@ -149,30 +143,30 @@
     * Updates the element key to a default value when the selector changes, then triggers a document update.
     */
    function onSelectorChange() {
-      switch (element.selector) {
+      switch ($document.system.rulesElement[idx].selector) {
          case 'attribute': {
-            element.key = 'body';
+            $document.system.rulesElement[idx].key = 'body';
             break;
          }
          case 'attackTrait': {
-            element.key = 'blast';
+            $document.system.rulesElement[idx].key = 'blast';
             break;
          }
          case 'attackType': {
-            element.key = 'melee';
+            $document.system.rulesElement[idx].key = 'melee';
             break;
          }
          case 'customTrait':
          case 'multiAttack': {
-            element.key = '';
+            $document.system.rulesElement[idx].key = '';
             break;
          }
          case 'skill': {
-            element.key = 'arcana';
+            $document.system.rulesElement[idx].key = 'arcana';
             break;
          }
          case 'spellTradition': {
-            element.key = localize('any');
+            $document.system.rulesElement[idx].key = localize('any');
             break;
          }
          default: {
@@ -181,7 +175,7 @@
       }
 
       $document.update({
-         system: $document.system,
+         system: structuredClone($document.system),
       });
    }
 
@@ -190,7 +184,7 @@
     * @returns {object | undefined} The selector input component, or undefined if there is no valid case.
     */
    function getSelector() {
-      switch (element.selector) {
+      switch ($document.system.rulesElement[idx].selector) {
          case 'attribute': {
             return DocumentAttributeSelect;
          }
@@ -216,112 +210,69 @@
    }
 </script>
 
-{#if element && element.operation === 'conditionalCheckModifier'}
-   <div class="element" transition:slide|local>
-      <!--Element Operation-->
-      <div class="settings">
-         <div class="field select">
-            <ItemSheetRulesElementOperationSelect {idx}/>
-         </div>
+<!--Operation Settings-->
+<div class="settings">
 
-         <!--Modifier Type-->
-         <div class="field select">
-            <DocumentSelect
-               options={modifierTypeOptions}
-               bind:value={element.modifierType}
-               on:change={onModifierTypeChanged}
-            />
-         </div>
+   <!--Modifier Type-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={$document.system.rulesElement[idx].modifierType}
+         on:change={onModifierTypeChanged}
+         options={modifierTypeOptions}
+      />
+   </div>
 
-         <!--Check Type-->
-         <div class="field select">
-            <DocumentSelect
-               options={element.modifierType === 'healing'
+   <!--Check Type-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={$document.system.rulesElement[idx].checkType}
+         on:change={onCheckTypeChange}
+         options={$document.system.rulesElement[idx].modifierType === 'healing'
                   ? healingCheckTypeOptions
                   : checkTypeOptions}
-               bind:value={element.checkType}
-               on:change={onCheckTypeChange}
-            />
-         </div>
+      />
+   </div>
 
-         <!--Selector-->
-         <div class="field select">
-            <DocumentSelect
-               options={selectorOptions[element.checkType]}
-               bind:value={element.selector}
-               on:change={onSelectorChange}
-            />
-         </div>
+   <!--Selector-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={$document.system.rulesElement[idx].selector}
+         on:change={onSelectorChange}
+         options={selectorOptions[$document.system.rulesElement[idx].checkType]}
+      />
+   </div>
 
-         <!--Key-->
-         {#if element.selector !== 'any'}
-            <div class="field select">
-               <svelte:component
-                  this={getSelector()}
-                  bind:value={element.key}
-               />
-            </div>
-         {/if}
-
-         <!--Value-->
-         <div class="field number">
-            <DocumentIntegerInput bind:value={element.value}/>
-         </div>
-      </div>
-
-      <!--Delete Element-->
-      <div class="delete-button">
-         <DocumentOwnerIconButton
-            icon={DELETE_ICON}
-            on:click={() => {
-               $document.system.deleteRulesElement(idx);
-            }}
+   <!--Key-->
+   {#if $document.system.rulesElement[idx].selector !== 'any'}
+      <div class="field select">
+         <svelte:component
+            this={getSelector()}
+            bind:value={$document.system.rulesElement[idx].key}
          />
       </div>
+   {/if}
+
+   <!--Value-->
+   <div class="field number">
+      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value}/>
    </div>
-{/if}
+</div>
 
 <style lang="scss">
-   .element {
-      @include flex-row;
-      @include flex-space-between;
-      @include border;
-      @include panel-1;
+   .settings {
+      @include tag-container;
+      @include flex-group-left;
 
-      width: 100%;
-      height: 100%;
-
-      .settings {
+      .field {
          @include flex-row;
-         @include flex-group-left;
 
-         flex-wrap: wrap;
-         width: 100%;
-         margin-bottom: var(--titan-spacing-large);
-
-         .field {
-            @include flex-row;
-
-            margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0;
-
-            &.select {
-               @include flex-group-left;
-            }
-
-            &.number {
-               @include flex-group-center;
-
-               width: 32px;
-            }
+         &.select {
+            @include flex-group-left;
          }
-      }
 
-      .delete-button {
-         @include flex-column;
-         @include flex-group-top;
-
-         height: 100%;
-         margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 0;
+         &.number {
+            @include flex-group-center;
+         }
       }
    }
 </style>

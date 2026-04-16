@@ -9,10 +9,6 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
-
    /** @type {{label: string, value: string}[]} Options for when in the turn the Fast Healing activates. */
    const selectorOptions = [
       'turnStart',
@@ -27,17 +23,16 @@
    <!--Selector-->
    <div class="field select">
       <DocumentSelect
-         bind:value={element.selector}
+         bind:value={$document.system.rulesElement[idx].selector}
          options={selectorOptions}
       />
    </div>
 
    <!--Value-->
    <div class="field number">
-      <DocumentIntegerInput bind:value={element.value} min={1}/>
+      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value} min={1}/>
    </div>
 </div>
-
 
 <style lang="scss">
    .settings {
