@@ -18,7 +18,7 @@
       "addCheck.text": "Add Check",
       "addCondition.text": "Add Condition",
       "addCustomAspect.text": "Add Custom Aspect",
-      "addCustomTrait.text": "Add Custom trait",
+      "addCustomTrait.text": "Add Custom Trait",
       "addNewAbility.text": "Add New Ability",
       "addNewArmor.text": "Add New Armor",
       "addNewCommodity.text": "Add New Commodity",
@@ -29,7 +29,7 @@
       "addNewSpell.text": "Add New Spell",
       "addNewWeapon.text": "Add New Weapon",
       "addRulesElement.text": "Add Rules Element",
-      "addTrait.text": "Add trait",
+      "addTrait.text": "Add Trait",
       "all.text": "All",
       "allOptions.text": "All Options",
       "any.text": "Any",
@@ -56,7 +56,7 @@
       "aspectCosts.text": "Aspect Costs",
       "athletics.desc.text": "<p><strong>Athletics</strong> is your ability to perform acts of physical prowess.</p>",
       "athletics.text": "Athletics",
-      "attack.blast.desc.text": "<p><strong>Blast</strong> attacks apply their damage to all unobstructed creatures within the listed <strong>Blast</strong> radius of the center of the attack.</p><p>For example, an attack with <strong>Blast 1</strong> would damage all unobstructed creatures within <strong>1 space</strong> of the  center of the attack.</p>",
+      "attack.blast.desc.text": "<p><strong>Blast</strong> attacks apply their damage to all unobstructed creatures within the listed <strong>Blast</strong> radius of the center of the attack.</p><p>For example, an attack with <strong>Blast 1</strong> would damage all unobstructed creatures within <strong>1 space</strong> of the center of the attack.</p>",
       "attack.cleave.desc.text": "Each roll of <strong>6</strong> on an attack with the <strong>Cleave</strong> trait deals <strong>1 Damage</strong> to all other enemies adjacent to the attacker.",
       "attack.close.desc.text": "Ranged attacks with the <strong>Close</strong> trait do not suffer a penalty to <strong>Accuracy</strong> when attacking an adjacent enemy.",
       "attack.crushing.desc.text": "A <strong>Crushing</strong> attack is heavy and solid, and deals bludgeoning blows to enemies.",
@@ -69,7 +69,7 @@
       "attack.push.desc.text": "If you hit and deal damage on an attack with the <strong>Push</strong> trait, you may move the target <strong>1 space</strong> away from you, provided it is no more than <strong>1 Size</strong> larger than you.",
       "attack.reload.desc.text": "Attacks with the <strong>Reload</strong> trait require an <strong>Action</strong> to be reloaded after an attack before they can be used again.",
       "attack.rend.desc.text": "Each roll of <strong>6</strong> with a <strong>Rend</strong> attack destroys <strong>1</strong> point of <strong>Armor</strong> after the damage is applied.<p><strong>Magical</strong> armor can only be destroyed by <strong>Magical</strong> weapons.</p>",
-      "attack.restraining.desc.text": "When a <strong>Restraining</strong> attack deals to a creature up to <strong>1 Size</strong> larger than the attacker, that creature is <strong>Restrained</strong> until it uses an <strong>Action</strong> to free itself.",
+      "attack.restraining.desc.text": "When a <strong>Restraining</strong> attack deals damage to a creature up to <strong>1 Size</strong> larger than the attacker, that creature is <strong>Restrained</strong> until it uses an <strong>Action</strong> to free itself.",
       "attack.slashing.desc.text": "A <strong>Slashing</strong> attack is sharp and typically bladed, and is used to cut enemies open.",
       "attack.splash.desc.text": "Attacks with the <strong>Splash</strong> trait apply half their damage to all unobstructed creatures adjacent to the target.",
       "attack.text": "Attack",
@@ -111,7 +111,7 @@
       "castingChecks.text": "Casting Checks",
       "champion.text": "Champion",
       "characterName.desc.text": "The <strong>name</strong> of this character.",
-      "check.attackType.desc.text": "The attacker's Melee to use for calculating the Difficulty of the Check.",
+      "check.attackType.desc.text": "The type of attack to use for calculating the Difficulty of the Check.",
       "check.attackerAccuracy.desc.text": "The attacker's Accuracy to use for calculating the Difficulty of the Check.",
       "check.attackerMelee.desc.text": "The attacker's Melee to use for calculating the Difficulty of the Check.",
       "check.attribute.desc.text": "The Attribute to use for the Check.",
@@ -128,7 +128,7 @@
       "check.isDamage.desc.text": "Whether this Check inflicts Damage on a target.",
       "check.isHealing.desc.text": "Whether this Check applies Healing to a target.",
       "check.opposedCheck.attribute.desc.text": "The Attribute used by the Opposed Check.",
-      "check.opposedCheck.enabled.desc.text": "Whether an this Check can be counteracted by an Opposed Check.",
+      "check.opposedCheck.enabled.desc.text": "Whether this Check can be counteracted by an Opposed Check.",
       "check.opposedCheck.skill.desc.text": "The Skill used by the Opposed Check.",
       "check.resistance.desc.text": "Whether this Check can be counteracted by a Resistance Check, and if so, which Resistance to use.",
       "check.resolveCost.desc.text": "The Resolve that must be spent to roll this Check.",
@@ -177,7 +177,7 @@
       "dc.text": "DC",
       "dead.desc.text": "A <strong>Dead</strong> creature can take no actions of any kind.",
       "dead.text": "Dead",
-      "deafened.desc.text": "<p>A <strong>Deafened</strong> creature cannot hear.</p><p>A <strong>Deafened</strong> automatically fails any <strong>Awareness</strong> and <strong>Perception</strong> checks that rely on hearing.</p>",
+      "deafened.desc.text": "<p>A <strong>Deafened</strong> creature cannot hear.</p><p>A <strong>Deafened</strong> creature automatically fails any <strong>Awareness</strong> and <strong>Perception</strong> checks that rely on hearing.</p>",
       "deafened.text": "Deafened",
       "deception.desc.text": "<p><strong>Deception</strong> is your ability to lie and mislead.</p>",
       "deception.text": "Deception",
@@ -231,7 +231,7 @@
       "editLinkedToken.desc.text": "<p>Edit the <strong>Token</strong> used by this <strong>Actor</strong>.</p><p>Since this <strong>Actor</strong> is <strong>linked</strong> to their <strong>Token</strong>, this will affect <strong>ALL</strong> linked instances of this <strong>Actor</strong>.</p>",
       "editTrait.text": "Edit Trait",
       "editTraits.text": "Edit Traits",
-      "editUUID.desc.text": "<p><strong>WARNING</strong>: The Unique ID of a document is generated by the TITAN System when a document is created. It does not change if the document is edited or duplicated, and is can optionally be used to identify a document for user-created macros.</p><p>Editing the Unique ID will break macros created using the Unique ID Identify method, unless you update the macros to use the new Unique ID.</p><p>You may want to do this if have duplicated a document as base for other documents, if you want to prevent macros from identifying the duplicates as the original.</p>",
+      "editUUID.desc.text": "<p><strong>WARNING</strong>: The Unique ID of a document is generated by the TITAN System when a document is created. It does not change if the document is edited or duplicated, and can optionally be used to identify a document for user-created macros.</p><p>Editing the Unique ID will break macros created using the Unique ID Identify method, unless you update the macros to use the new Unique ID.</p><p>You may want to do this if you have duplicated a document as a base for other documents and want to prevent macros from identifying the duplicates as the original.</p>",
       "editUUID.text": "Edit Unique ID",
       "editUnlinkedToken.desc.text": "<p>Edit the <strong>Token</strong> used by this <strong>Actor</strong>.</p><p>Since this <strong>Actor</strong> is <strong>NOT</strong> linked to their <strong>Token</strong>, this will affect <strong>ONLY</strong> this and any future instances of this <strong>Actor</strong>.</p>",
       "editedUUIDForDocumentX%.text": "Edited Unique ID for document: X%",
@@ -342,7 +342,7 @@
       "medicine.desc.text": "<p><strong>Medicine</strong> is your ability to patch up wounds and treat diseases and poisons.</p>",
       "medicine.text": "Medicine",
       "medium.text": "Medium",
-      "melee.baseValue.text": "<strong>Melee</strong> = <strong>1 / 2</strong> of your combined <strong>Body</strong> and <strong>Training</strong> in <strong>Melee Weapons</strong>, rounded up., rounded up.",
+      "melee.baseValue.text": "<strong>Melee</strong> = <strong>1 / 2</strong> of your combined <strong>Body</strong> and <strong>Training</strong> in <strong>Melee Weapons</strong>, rounded up.",
       "melee.desc.text": "<p><strong>Melee</strong> measures your effectiveness with close-range attacks, and affects the <strong>Difficulty</strong> of melee attacks you make.</p> <p>Your <strong>Melee</strong> is equal to <strong>1 / 2</strong> of your combined <strong>Body</strong> and <strong>Training</strong> in <strong>Melee Weapons</strong>, rounded up.</p>",
       "melee.text": "Melee",
       "melee.value.text": "Total Melee Rating",
@@ -372,7 +372,7 @@
       "newItem.text": "New Item",
       "newShield.text": "New Shield",
       "newSpell.text": "New Spell",
-      "newTrait.text": "New trait",
+      "newTrait.text": "New Trait",
       "newWeapon.text": "New Weapon",
       "none.text": "None",
       "normalAttack.text": "Normal Attack",
@@ -397,7 +397,7 @@
       "persistentDamageRevert.desc.text": "<p>While affected by <strong>Persistent Damage</strong>, a combatant will take the designated amount of damage every turn.</p>",
       "persistentDamageRevert.text": "Persistent Damage Reverted",
       "piercing.text": "Piercing",
-      "prone.desc.text": "<p>A <strong>Prone</strong> creature has their speed reduced by half, rounded up.</p><p>The creature's <strong>Melee</strong> and <strong>Accuracy</strong> are decreased by <strong>-1</strong>.</p><p>A creature attacking a <strong>Prone</strong> within <strong>1 space</strong>e increases their <strong>Melee</strong> or <strong>Accuracy</strong> by <strong>+1</strong>.</p><p>A creature attacking a <strong>Prone</strong> target at a distance greater than <strong>1 space</strong> decreases their <strong>Accuracy</strong> by <strong>-1</strong> per 1<strong>0 spaces</strong>, rounded down.</p><p>Standing up from <strong>Prone</strong> may be done with a <strong>Move</strong> or an <strong>Action</strong>.</p>",
+      "prone.desc.text": "<p>A <strong>Prone</strong> creature has their speed reduced by half, rounded up.</p><p>The creature's <strong>Melee</strong> and <strong>Accuracy</strong> are decreased by <strong>-1</strong>.</p><p>A creature attacking a <strong>Prone</strong> creature within <strong>1 space</strong> increases their <strong>Melee</strong> or <strong>Accuracy</strong> by <strong>+1</strong>.</p><p>A creature attacking a <strong>Prone</strong> target at a distance greater than <strong>1 space</strong> decreases their <strong>Accuracy</strong> by <strong>-1</strong> per 1<strong>0 spaces</strong>, rounded down.</p><p>Standing up from <strong>Prone</strong> may be done with a <strong>Move</strong> or an <strong>Action</strong>.</p>",
       "prone.text": "Prone",
       "prototypeToken.text": "Prototype Token",
       "push.text": "Push",
@@ -462,10 +462,10 @@
       "resolveRegainRevert.text": "Resolve Regain Reverted",
       "resource.text": "Resource",
       "restoredX%Stamina.text": "Restored X% Stamina",
-      "restrained.desc.text": "<p>A <strong>Restrained</strong> creature cannot move.</p><p>Additionally, their <strong>Melee</strong>, <strong>Accuracy</strong>, and <strong>Defense</strong> decrease by <strong>-1, a</strong>nd they automatically fail<strong> Reflexes </strong>checks.</p>",
+      "restrained.desc.text": "<p>A <strong>Restrained</strong> creature cannot move.</p><p>Additionally, their <strong>Melee</strong>, <strong>Accuracy</strong>, and <strong>Defense</strong> decrease by <strong>-1</strong>, and they automatically fail <strong>Reflexes</strong> checks.</p>",
       "restrained.text": "Restrained",
       "restraining.text": "Restraining",
-      "role.desc.text": "<p>The <strong>Role</strong> of this character</p><p><strong>Minions</strong> are defeated in one hit.</p><p><strong>Warriors</strong> are defeated after they lose all of their <strong>Stamina</strong>.</p><p><strong>Elites</strong> are defeated after they lose all of their <strong>Stamina</strong> and <strong>Wounds</strong>.</p><strong>Champions</strong> are defeated after they lose all of their <strong>Stamina</strong> and <strong>Wounds</strong>. Additionally, they may use and regain <strong>Resolve</strong>.</p>",
+      "role.desc.text": "<p>The <strong>Role</strong> of this character.</p><p><strong>Minions</strong> are defeated in one hit.</p><p><strong>Warriors</strong> are defeated after they lose all of their <strong>Stamina</strong>.</p><p><strong>Elites</strong> are defeated after they lose all of their <strong>Stamina</strong> and <strong>Wounds</strong>.</p><p><strong>Champions</strong> are defeated after they lose all of their <strong>Stamina</strong> and <strong>Wounds</strong>. Additionally, they may use and regain <strong>Resolve</strong>.</p>",
       "role.text": "Role",
       "roll.text": "Roll",
       "rollMessage.text": "Roll Message",
@@ -523,7 +523,7 @@
       "successes.text": "Successes",
       "sufferedX%Wounds.text": "Suffered X% Wounds",
       "suggestedDifficultyAndComplexity.text": "Suggested Difficulty & Complexity",
-      "swim.desc.text": "<strong>Swim</strong> is the ability move through or other liquids.",
+      "swim.desc.text": "<strong>Swim</strong> is the ability to move through water or other liquids.",
       "swim.text": "Swim",
       "swim.value.text": "Total Swim Speed",
       "target.text": "Target",
@@ -556,7 +556,7 @@
       "turnStartMessage.text": "Turn Start Message",
       "turns.text": "Turns",
       "twoHanded.text": "Two-Handed",
-      "type.desc.text": "The <strong>Type</strong> of creature this character is. (Human, Animal, Monster etc).",
+      "type.desc.text": "The <strong>Type</strong> of creature this character is (Human, Animal, Monster, etc.).",
       "type.text": "Type",
       "unEquip.text": "Un-Equip",
       "unarmed.text": "Unarmed",
@@ -581,7 +581,7 @@
       "willpower.text": "Willpower",
       "willpower.value.text": "Total Willpower",
       "woundRegain.text": "Wound Regain",
-      "wounds.desc.text": "<p><strong>Wounds</strong> increase by taking <strong>Damage</strong> is excess of your remaining <strong>Stamina</strong>.</p><p>You start <strong>Dying</strong> when you take damage in excess of your maximum <strong>Wounds</strong> and <strong>Stamina</strong></p><p>Your <strong>Wounds</strong> decrease by <strong>-1</strong> when you complete a <strong>Long Rest</strong>.</p>",
+      "wounds.desc.text": "<p><strong>Wounds</strong> increase by taking <strong>Damage</strong> in excess of your remaining <strong>Stamina</strong>.</p><p>You start <strong>Dying</strong> when you take damage in excess of your maximum <strong>Wounds</strong> and <strong>Stamina</strong>.</p><p>Your <strong>Wounds</strong> decrease by <strong>-1</strong> when you complete a <strong>Long Rest</strong>.</p>",
       "wounds.maxValue.text": "Max Wounds = (Body + Mind + Soul)",
       "wounds.text": "Wounds",
       "woundsTaken.text": "Wounds Taken",
@@ -593,12 +593,12 @@
    },
    "SETTINGS": {
       "getCheckOptions": {
-         "label": "Ask for Check Options by default.",
-         "hint": "If true, an options dialog will pop-up when rolling a Check. Hold Shift to toggle this setting."
+         "label": "Ask for Check Options by Default",
+         "hint": "If true, an options dialog will pop up when rolling a Check. Hold Shift to toggle this setting."
       },
       "confirmDeletingItems": {
-         "label": "Confirm Deleting Items from Actors.",
-         "hint": "If true, a confirmation dialog will be displayed when attempting to delete an Item from an Actor. Can be suppressed by holding shift."
+         "label": "Confirm Deleting Items from Actors",
+         "hint": "If true, a confirmation dialog will be displayed when attempting to delete an Item from an Actor. Can be suppressed by holding Shift."
       },
       "autoOpenCharacterSheetsPlayer": {
          "label": "Auto-Open Character Sheets (Player Only)",
@@ -686,11 +686,11 @@
          "hint": "When enabled, a combatant's Resolve will automatically be decreased by 1 when they Re-roll failures on a Check."
       },
       "autoSpendResolveChecks": {
-         "label": "Auto-Spend Resolve when using checks",
-         "hint": "When enabled, a combatant's Resolve will automatically be decreased when they perform a Check with a resolve cost."
+         "label": "Auto-Spend Resolve when Using Checks",
+         "hint": "When enabled, a combatant's Resolve will automatically be decreased when they perform a Check with a Resolve cost."
       },
       "autoDecreaseEffectDuration": {
-         "label": "Auto-Decrease Effect Duration.",
+         "label": "Auto-Decrease Effect Duration",
          "hint": "When enabled, a combatant's temporary effects will automatically decrease their duration by 1 at the start or end of their turn, depending on the effect."
       },
       "autoRemoveExpiredEffects": {
@@ -726,15 +726,15 @@
       },
       "reportRegainingResolve": {
          "label": "Report Regaining Resolve",
-         "hint": "Report when an actor regains Resolve at the start of their turn."
+         "hint": "Notify when an actor regains Resolve at the start of their turn."
       },
       "reportEffects": {
          "label": "Report Effects",
-         "hint": "Report an character's active Effects at the start of their turn."
+         "hint": "Notify when a character's active Effects are reported at the start of their turn."
       },
       "staminaBaseMultiplier": {
          "label": "Base Stamina Multiplier",
-         "hint": "Base Stamina as a multiple of an character's Body + Mind + Soul."
+         "hint": "Base Stamina as a multiple of a character's Body + Mind + Soul."
       },
       "minionStaminaMultiplier": {
          "label": "Minion Stamina Multiplier",
@@ -742,19 +742,19 @@
       },
       "resolveBaseMultiplier": {
          "label": "Base Resolve Multiplier",
-         "hint": "Base Resolve as a multiple of an character's Soul."
+         "hint": "Base Resolve as a multiple of a character's Soul."
       },
       "woundsBaseMultiplier": {
          "label": "Base Wounds Multiplier",
-         "hint": "Base Wounds as a multiple of an character's Body + Mind + Soul."
+         "hint": "Base Wounds as a multiple of a character's Body + Mind + Soul."
       },
       "woundsBaseRegain": {
-         "label": "Base Resolve Regain",
-         "hint": "This is the base value by which a combatant's Wounds will be healed when they take a Long Rest."
+         "label": "Base Wound Regain",
+         "hint": "The base number of Wounds healed when a combatant takes a Long Rest."
       },
       "resolveBaseRegain": {
          "label": "Base Resolve Regain",
-         "hint": "When Auto-Regain Resolve is not disabled, this is the base value by which a combatant's Resolve will increase by at the start of their turn."
+         "hint": "When Auto-Regain Resolve is not disabled, this is the base amount by which a combatant's Resolve will increase at the start of their turn."
       },
       "confirmRegenerateUUID": {
          "label": "Confirm Regenerating Unique ID",
@@ -770,67 +770,67 @@
       },
       "defaultAttribute.deception": {
          "label": "Default Attribute (Deception)",
-         "hint": "The Default Attribute to use for Deception Checks."
+         "hint": "The default Attribute to use for Deception Checks."
       },
       "defaultAttribute.dexterity": {
          "label": "Default Attribute (Dexterity)",
-         "hint": "The Default Attribute to use for Dexterity Checks."
+         "hint": "The default Attribute to use for Dexterity Checks."
       },
       "defaultAttribute.diplomacy": {
          "label": "Default Attribute (Diplomacy)",
-         "hint": "The Default Attribute to use for Diplomacy Checks."
+         "hint": "The default Attribute to use for Diplomacy Checks."
       },
       "defaultAttribute.engineering": {
          "label": "Default Attribute (Engineering)",
-         "hint": "The Default Attribute to use for Engineering Checks."
+         "hint": "The default Attribute to use for Engineering Checks."
       },
       "defaultAttribute.intimidation": {
          "label": "Default Attribute (Intimidation)",
-         "hint": "The Default Attribute to use for Intimidation Checks."
+         "hint": "The default Attribute to use for Intimidation Checks."
       },
       "defaultAttribute.investigation": {
          "label": "Default Attribute (Investigation)",
-         "hint": "The Default Attribute to use for Investigation Checks."
+         "hint": "The default Attribute to use for Investigation Checks."
       },
       "defaultAttribute.lore": {
          "label": "Default Attribute (Lore)",
-         "hint": "The Default Attribute to use for Lore Checks."
+         "hint": "The default Attribute to use for Lore Checks."
       },
       "defaultAttribute.medicine": {
          "label": "Default Attribute (Medicine)",
-         "hint": "The Default Attribute to use for Medicine Checks."
+         "hint": "The default Attribute to use for Medicine Checks."
       },
       "defaultAttribute.meleeWeapons": {
          "label": "Default Attribute (Melee Weapons)",
-         "hint": "The Default Attribute to use for Melee Weapons Checks."
+         "hint": "The default Attribute to use for Melee Weapons Checks."
       },
       "defaultAttribute.metaphysics": {
          "label": "Default Attribute (Metaphysics)",
-         "hint": "The Default Attribute to use for Metaphysics Checks."
+         "hint": "The default Attribute to use for Metaphysics Checks."
       },
       "defaultAttribute.Nature": {
          "label": "Default Attribute (Nature)",
-         "hint": "The Default Attribute to use for Nature Checks."
+         "hint": "The default Attribute to use for Nature Checks."
       },
       "defaultAttribute.perception": {
          "label": "Default Attribute (Perception)",
-         "hint": "The Default Attribute to use for Perception Checks."
+         "hint": "The default Attribute to use for Perception Checks."
       },
       "defaultAttribute.performance": {
          "label": "Default Attribute (Performance)",
-         "hint": "The Default Attribute to use for Performance Checks."
+         "hint": "The default Attribute to use for Performance Checks."
       },
       "defaultAttribute.rangedWeapons": {
          "label": "Default Attribute (Ranged Weapons)",
-         "hint": "The Default Attribute to use for Ranged Weapons Checks."
+         "hint": "The default Attribute to use for Ranged Weapons Checks."
       },
       "defaultAttribute.subterfuge": {
          "label": "Default Attribute (Subterfuge)",
-         "hint": "The Default Attribute to use for Subterfuge Checks."
+         "hint": "The default Attribute to use for Subterfuge Checks."
       },
       "defaultAttribute.stealth": {
          "label": "Default Attribute (Stealth)",
-         "hint": "The Default Attribute to use for Stealth Checks."
+         "hint": "The default Attribute to use for Stealth Checks."
       },
       "defaultXpCost.ability": {
          "label": "Default XP Cost (Abilities)",
