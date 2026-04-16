@@ -28,7 +28,7 @@ import ShieldDataModel from '~/document/types/item/types/shield/ShieldDataModel.
 import SpellDataModel from '~/document/types/item/types/spell/SpellDataModel.js';
 import WeaponDataModel from '~/document/types/item/types/weapon/WeaponDataModel.js';
 import localize from '~/helpers/utility-functions/Localize.js';
-import TitanCombat from '~/document/types/combat/Combat.js';
+import TitanCombat from '~/document/types/combat/TitanCombat.js';
 import SocketManager from '~/helpers/SocketManager.js';
 import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
