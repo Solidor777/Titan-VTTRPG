@@ -4,15 +4,13 @@ import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.j
 import { ID_ICON } from '~/system/Icons.js';
 
 /**
- * Generates contextual options when right-clicking on an Actor in the Actors
- * directory.
+ * Generates contextual options when right-clicking on an Actor in the Actors directory.
  * @param {Element} element - The Element that was clicked.
- * @param {object[]} options - Array of buttons containing the contextual
- *    options.
+ * @param {object[]} options - Array of buttons containing the contextual options.
  */
 export default function onGetActorDirectoryEntryContext(element, options) {
 
-   // Regenerate UUID
+   // Regenerate UUID.
    options.push({
       name: localize('regenerateUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
@@ -20,7 +18,7 @@ export default function onGetActorDirectoryEntryContext(element, options) {
       callback: (entry) => onRegenerateDocumentUUID(getActorFromDirectoryEntry(entry)),
    });
 
-   // Edit UUID
+   // Edit UUID.
    options.push({
       name: localize('editUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
@@ -39,11 +37,9 @@ function getActorFromDirectoryEntry(element) {
 }
 
 /**
- * Determines whether the current user owns the Actor for an Entry in the Actors
- * directory.
+ * Determines whether the current user owns the Actor for an Entry in the Actors directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {boolean} Whether the current user owns the Document for an Entry in
- *    the directory.
+ * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
  */
 function isActorOwner(element) {
    return getActorFromDirectoryEntry(element)?.isOwner;

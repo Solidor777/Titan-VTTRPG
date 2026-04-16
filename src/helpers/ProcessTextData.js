@@ -4,10 +4,8 @@ import formatString from '~/helpers/utility-functions/FormatString.js';
 /**
  * @typedef {object} TextData Object containing the data for a Text object.
  * @property {string|number} text - The string or number to display.
- * @property {boolean} [localize] - Whether to localize the text. Assumed to be
- *    true if not provided.
- * @property {*[]} [formattingArgs] - Arguments for formatting the string if
- *    appropriate.
+ * @property {boolean} [localize] - Whether to localize the text. Assumed to be true if not provided.
+ * @property {*[]} [formattingArgs] - Arguments for formatting the string if appropriate.
  * */
 
 /**
@@ -19,7 +17,7 @@ export default function processTextData(textData) {
    /** @type {string} */
    let retVal = '';
 
-   // If the content is valid
+   // If the content is valid.
    if (textData) {
       switch (typeof textData) {
          // If the content is a string...

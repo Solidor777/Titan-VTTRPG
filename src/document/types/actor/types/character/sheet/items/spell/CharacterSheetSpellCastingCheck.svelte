@@ -23,12 +23,12 @@
    /** @type {CastingCheckParameters} Calculated check parameters. */
    let checkParameters;
 
-   // Update the svelte-components in response to changes
+   // Update the svelte-components in response to changes.
    $: {
-      // Ensure the item is still valid
+      // Ensure the item is still valid.
       if ($document.items.get(item._id)) {
 
-         // Update the parameters
+         // Update the parameters.
          checkParameters = $document.system.getCastingCheckParameters(
             $document.system.initializeCastingCheckOptions(checkOptions)
          );

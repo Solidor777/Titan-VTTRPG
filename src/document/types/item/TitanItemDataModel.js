@@ -14,8 +14,7 @@ import { ITEM_IMAGE } from '~/system/DefaultImages.js';
  */
 export default class TitanItemDataModel extends TitanDataModel {
    /**
-    * Defines the schema for Item documents, adding description, checks, and
-    * custom traits.
+    * Defines the schema for Item documents, adding description, checks, and custom traits.
     * @override
     * @returns {object} The document schema.
     * @protected
@@ -23,15 +22,15 @@ export default class TitanItemDataModel extends TitanDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Description
+      // Description.
       schema.description = createStringField();
 
-      // Checks
+      // Checks.
       schema.check = createArrayField(
          createObjectField(() => createItemCheckTemplate()),
       );
 
-      // Custom Traits
+      // Custom Traits.
       schema.customTrait = createArrayField(
          createObjectField(() => createCustomItemTraitTemplate()),
       );
@@ -40,11 +39,9 @@ export default class TitanItemDataModel extends TitanDataModel {
    }
 
    /**
-    * Gets the initial data for this document, setting a default image and name
-    * if none are provided.
+    * Gets the initial data for this document, setting a default image and name if none are provided.
     * @override
-    * @param {object} data - The initial data object provided to the document
-    *    creation request.
+    * @param {object} data - The initial data object provided to the document creation request.
     * @returns {object|void} The initial data to update the document with.
     * @protected
     */
@@ -54,13 +51,13 @@ export default class TitanItemDataModel extends TitanDataModel {
       /** @type {boolean} */
       let shouldReturnData = false;
 
-      // Set the image if none is set
+      // Set the image if none is set.
       if (!data.img) {
          shouldReturnData = true;
          updateData.img = this._getDefaultImage();
       }
 
-      // Set the name if none is set
+      // Set the name if none is set.
       const newItemLabel = localize('newItem');
       if (data.name.includes(newItemLabel)) {
          shouldReturnData = true;
@@ -73,8 +70,7 @@ export default class TitanItemDataModel extends TitanDataModel {
    }
 
    /**
-    * Gets the type specific Roll Data for this item, including checks and
-    * custom traits.
+    * Gets the type specific Roll Data for this item, including checks and custom traits.
     * @override
     * @returns {object} Roll Data for this item.
     */

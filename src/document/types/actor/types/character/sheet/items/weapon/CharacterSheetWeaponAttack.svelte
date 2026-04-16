@@ -24,18 +24,18 @@
    /** @type {string} The ID of the item to get the check from. */
    export let item = void 0;
 
-   // Reference to the attack idx
+   // Reference to the attack idx.
    /** @type {number} */
    export let attackIdx = void 0;
 
-   // Attack reference
+   // Attack reference.
    $: attack = item.system.attack[attackIdx];
 
-   // Calculate dice pool
+   // Calculate dice pool.
    /** @type {number} */
    let dicePool = 0;
    $: {
-      // Get base dice
+      // Get base dice.
       dicePool =
          $document.system.attribute[attack.attribute].value +
          $document.system.skill[attack.skill].training.value +
@@ -46,9 +46,9 @@
             item.system.multiAttack,
          );
 
-      // Cut the dice in half if multi attacking
+      // Cut the dice in half if multi attacking.
       if (item.system.multiAttack) {
-         // Round up or down, depending on the flurry trait
+         // Round up or down, depending on the flurry trait.
          /** @type {boolean} */
          let flurry = false;
          for (const trait of attack.trait) {
@@ -63,11 +63,11 @@
       }
    }
 
-   // Calculate expertise
+   // Calculate expertise.
    /** @type {number} */
    let expertise = 0;
    $: {
-      // Get base expertise
+      // Get base expertise.
       expertise =
          $document.system.skill[attack.skill].expertise.value +
          $document.system.getAttackCheckMod(
@@ -77,7 +77,7 @@
             item.system.multiAttack,
          );
 
-      // Cut the expertise in half if multi attacking
+      // Cut the expertise in half if multi attacking.
       if (item.system.multiAttack) {
          expertise = Math.floor(expertise * 0.5);
       }

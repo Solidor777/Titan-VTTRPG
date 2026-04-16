@@ -8,11 +8,11 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
-   // The weapon document owning the attack
+   // The weapon document owning the attack.
    /** @type {TitanItem|TitanActor} */
    export let document = void 0;
 
-   // The attack idx
+   // The attack idx.
    /** @type {number} */
    export let attackIdx = void 0;
 

@@ -4,15 +4,13 @@ import onEditDocumentUUID from '~/helpers/utility-functions/OnEditDocumentUUID.j
 import { ID_ICON } from '~/system/Icons.js';
 
 /**
- * Generates contextual options when right-clicking on an Item in the Items
- * directory.
+ * Generates contextual options when right-clicking on an Item in the Items directory.
  * @param {Element} element - The Element that was clicked.
- * @param {object[]} options - Array of buttons containing the contextual
- *    options.
+ * @param {object[]} options - Array of buttons containing the contextual options.
  */
 export default function onGetItemDirectoryEntryContext(element, options) {
 
-   // Regenerate UUID
+   // Regenerate UUID.
    options.push({
       name: localize('regenerateUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
@@ -20,7 +18,7 @@ export default function onGetItemDirectoryEntryContext(element, options) {
       callback: (entry) => onRegenerateDocumentUUID(getItem(entry)),
    });
 
-   // Edit UUID
+   // Edit UUID.
    options.push({
       name: localize('editUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
@@ -39,11 +37,9 @@ function getItem(element) {
 }
 
 /**
- * Determines whether the current user owns the Item for an Entry in the Items
- * directory.
+ * Determines whether the current user owns the Item for an Entry in the Items directory.
  * @param {Element} element - Element Entry for the Document in the directory.
- * @returns {boolean} Whether the current user owns the Document for an Entry in
- *    the directory.
+ * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
  */
 function isItemOwner(element) {
    return getItem(element)?.isOwner;

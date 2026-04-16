@@ -40,7 +40,7 @@ import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
 export default function onceInit() {
    log('Starting Titan VTTRPG System');
 
-   // Initialize titan namespace
+   // Initialize titan namespace.
    game.titan = {
       macros: new TitanMacros(),
       assert,
@@ -50,13 +50,13 @@ export default function onceInit() {
       socketManager: new SocketManager(),
    };
 
-   // Register system settings
+   // Register system settings.
    registerSystemSettings();
 
-   // Register initiative formula
+   // Register initiative formula.
    registerInitiativeFormula();
 
-   // Configure Actors
+   // Configure Actors.
    CONFIG.Actor.documentClass = TitanActor;
    CONFIG.Actor.dataModels = {
       player: PlayerDataModel,
@@ -64,7 +64,7 @@ export default function onceInit() {
    };
    CONFIG.Actor.trackableAttributes = getTrackableAttributes();
 
-   // Configure Items
+   // Configure Items.
    CONFIG.Item.documentClass = Item;
    CONFIG.Item.dataModels = {
       ability: AbilityDataModel,
@@ -77,7 +77,7 @@ export default function onceInit() {
       weapon: WeaponDataModel,
    };
 
-   // Configure Chat Messages
+   // Configure Chat Messages.
    CONFIG.ChatMessage.documentClass = TitanChatMessage;
 
    CONFIG.time.roundTime = 6;
@@ -85,7 +85,7 @@ export default function onceInit() {
 
    CONFIG.Combat.documentClass = TitanCombat;
 
-   // Register Sheet Classes
+   // Register Sheet Classes.
    foundry.documents.collections.Actors.registerSheet(
       'titan', TitanNPCSheet, {
          types: ['npc'],
@@ -157,7 +157,7 @@ export default function onceInit() {
       },
    );
 
-   // Unregister old sheet classes
+   // Unregister old sheet classes.
    foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
    foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
 }

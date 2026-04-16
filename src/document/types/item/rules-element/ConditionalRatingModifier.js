@@ -3,16 +3,11 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * A Rules Element for conditionally modifying a Character's Rating.
  * @typedef {object} ConditionalRatingModifierElement
- * @property {string} operation - The operation to be performed by the Rules
- *    Element (conditionalRatingModifier).
- * @property {string} rating - The rating to modify (accuracy, melee, or
- *    defense).
- * @property {string} selector - The type of condition for modifying the rating
- *    (any, attribute, trait, etc.).
- * @property {string} key - The specific result of the condition for modifying the
- *    rating (body, melee, etc.).
- * @property {string} uuid - Unique identifier for the Rules Element,
- *    used to track the element across type changes.
+ * @property {string} operation - The operation to be performed by the Rules Element (conditionalRatingModifier).
+ * @property {string} rating - The rating to modify (accuracy, melee, or defense).
+ * @property {string} selector - The type of condition for modifying the rating (any, attribute, trait, etc.).
+ * @property {string} key - The specific result of the condition for modifying the rating (body, melee, etc.).
+ * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */
 
 /**

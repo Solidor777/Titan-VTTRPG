@@ -18,11 +18,11 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         // Get the actor
+         // Get the actor.
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor
+            // Update the actor.
             await actor.system.applyDamage(
                $document.flags.titan.damageApplied.total,
                {
@@ -31,7 +31,7 @@
                },
             );
 
-            // Update the chat document
+            // Update the chat document.
             await $document.update({
                flags: {
                   titan: {

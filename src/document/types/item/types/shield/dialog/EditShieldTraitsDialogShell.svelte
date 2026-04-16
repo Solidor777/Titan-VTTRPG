@@ -4,11 +4,11 @@
    import { SHIELD_TRAIT_DESCRIPTIONS, SHIELD_TRAITS, } from '~/document/types/item/types/shield/ShieldTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
 
-   // The weapon item owning the attack
+   // The weapon item owning the attack.
    /** @type {TitanItem} */
    export let item = void 0;
 
-   // The trait options
+   // The trait options.
    let traitOptions = structuredClone(SHIELD_TRAITS);
    let traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 </script>

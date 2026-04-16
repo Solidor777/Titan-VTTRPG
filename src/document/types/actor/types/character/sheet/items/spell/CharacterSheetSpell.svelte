@@ -32,7 +32,7 @@
    /** @type {SpellAspect[]} List of enabled Spell Aspects. */
    let enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
 
-   // Update enabled aspects in response to changes
+   // Update enabled aspects in response to changes.
    $: {
       if (item) {
          enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);

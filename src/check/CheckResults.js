@@ -2,13 +2,10 @@
  * Results of a check in the Titan system.
  * @typedef {object} CheckResults
  * @property {boolean} succeeded - Whether the Check Succeeded.
- * @property {CheckDie[]} dice - The sorted dice rolled for the check, after
- *    Expertise is applied.
+ * @property {CheckDie[]} dice - The sorted dice rolled for the check, after Expertise is applied.
  * @property {number} criticalFailures - The number of Critical Failures rolled.
- * @property {number} criticalSuccesses - The number of Critical Successes
- *    achieved.
- * @property {number} expertiseRemaining - The Expertise remaining after being
- *    applied to the dice.
+ * @property {number} criticalSuccesses - The number of Critical Successes achieved.
+ * @property {number} expertiseRemaining - The Expertise remaining after being applied to the dice.
  * @property {number} extraSuccesses - The number of extra Successes achieved beyond the Complexity.
  * @property {number} successes - The total number of Successes achieved.
  */
@@ -16,14 +13,12 @@
 /**
  * Calculates the results of a check in the Titan system, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
- * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check,
- *    after Expertise is applied.
- * @param {CheckParameters} parameters - Object containing the parameters of the
- *    check.
+ * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
+ * @param {CheckParameters} parameters - Object containing the parameters of the check.
  * @returns {CheckResults} The final results of the check.
  */
 export default function calculateCheckResults(diceResults, parameters) {
-   // Initialize return value
+   // Initialize return value.
    const retVal = {
       dice: diceResults.dice,
       expertiseRemaining: diceResults.expertiseRemaining,
@@ -34,50 +29,50 @@ export default function calculateCheckResults(diceResults, parameters) {
       successes: 0,
    };
 
-   // Calculate successes and failures
+   // Calculate successes and failures.
    for (let i = 0; i < retVal.dice.length; i++) {
 
-      // If this die was a critical success
+      // If this die was a critical success.
       if (retVal.dice[i].final === 6) {
 
-         // Increment the number of critical successes
+         // Increment the number of critical successes.
          retVal.criticalSuccesses += 1;
 
-         // Add to the number of successes
-         // Add 2 successes if we gain an extra success on critical successes
+         // Add to the number of successes.
+         // Add 2 successes if we gain an extra success on critical successes.
          retVal.successes += parameters.extraSuccessOnCritical ? 2 : 1;
       }
 
-      // If this die was a normal success
+      // If this die was a normal success.
       else if (retVal.dice[i].final >= parameters.difficulty) {
 
-         // Increment the number of successes
+         // Increment the number of successes.
          retVal.successes += 1;
       }
 
-      // If this die was a critical failure
+      // If this die was a critical failure.
       else if (retVal.dice[i].final === 1) {
 
-         // Increment the number of critical failures
+         // Increment the number of critical failures.
          retVal.criticalFailures += 1;
 
-         // Decrement the number of successes if we lose a success on critical
-         // failures
+         // Decrement the number of successes if we lose a success on critical.
+         // failures.
          if (parameters.extraFailureOnCritical) {
             retVal.successes -= 1;
          }
       }
    }
 
-   // Calculate whether the Check Succeeded
+   // Calculate whether the Check Succeeded.
    const complexity = parameters.complexity;
    if (complexity > 0) {
 
-      // If successes >= 0 then the check was a success
+      // If successes >= 0 then the check was a success.
       if (retVal.successes >= complexity) {
          retVal.succeeded = true;
 
-         // If extra successes
+         // If extra successes.
          if (retVal.successes > complexity) {
             retVal.extraSuccesses = retVal.successes - complexity;
          }

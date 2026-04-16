@@ -32,66 +32,66 @@
    /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [];
 
-   // Add Stamina if appropriate
+   // Add Stamina if appropriate.
    if ($document.flags.titan.stamina) {
       sections.push(ChatMessageStamina);
    }
 
-   // Add Wounds if appropriate
+   // Add Wounds if appropriate.
    if ($document.flags.titan.wounds) {
       sections.push(ChatMessageWounds);
    }
 
-   // Cache whether the report has expired effects
+   // Cache whether the report has expired effects.
    const hasExpiredEffects = !!$document.flags.titan.effects?.expired;
 
-   // Add expired effects
+   // Add expired effects.
    if (hasExpiredEffects) {
       sections.push({
          component: ChatMessageExpiredEffectsTags,
          isTags: true,
       });
 
-      // Add message if the expired effects were removed
+      // Add message if the expired effects were removed.
       if ($document.flags.titan.expiredEffectsRemoved === true) {
          sections.push(ChatMessageExpiredEffectsRemovedMessage);
       }
 
-      // Otherwise, show a button if appropriate
+      // Otherwise, show a button if appropriate.
       else if (getSetting('autoRemoveExpiredEffects') === 'showButton') {
          sections.push(ChatMessageRemoveExpiredEffectsButton);
       }
    }
 
-   // Add fast healing information if appropriate
+   // Add fast healing information if appropriate.
    if ($document.flags.titan.fastHealing) {
 
-      // Add fast healing Tag if confirmed
+      // Add fast healing Tag if confirmed.
       if ($document.flags.titan.fastHealing.confirmed) {
          sections.push(ChatMessageFastHealingTag);
       }
 
-      // Otherwise, add apply fast healing button
+      // Otherwise, add apply fast healing button.
       else {
          sections.push(ChatMessageApplyFastHealingButton);
       }
    }
 
-   // Add fast persistent damage information if appropriate
+   // Add fast persistent damage information if appropriate.
    if ($document.flags.titan.persistentDamage) {
 
-      // Add persistent damage Tag if confirmed
+      // Add persistent damage Tag if confirmed.
       if ($document.flags.titan.persistentDamage.confirmed) {
          sections.push(ChatMessagePersistentDamageTag);
       }
 
-      // Otherwise, add apply persistent damage button
+      // Otherwise, add apply persistent damage button.
       else {
          sections.push(ChatMessageApplyPersistentDamageButton);
       }
    }
 
-   // Add messages if appropriate
+   // Add messages if appropriate.
    if ($document.flags.titan.message) {
       sections.push({
          component: ChatMessageRichTextMessages,

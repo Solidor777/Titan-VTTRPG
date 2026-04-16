@@ -2,12 +2,9 @@ import createSpellSheetData from '~/document/types/item/types/spell/sheet/SpellS
 import createTitanItemSheetState from '~/document/types/item/sheet/TitanItemSheetState.js';
 
 /**
- * @typedef {ItemSheetState} SpellSheetState A custom reactive store for
- *    managing a Spell Sheet.
- * @property {() => void} addCustomAspect - Adds a Custom Aspect to the reactive
- *    application state.
- * @property {(idx: number) => void} removeCustomAspect - Removes the Custom
- *    Aspect at the provided index from the
+ * @typedef {ItemSheetState} SpellSheetState A custom reactive store for managing a Spell Sheet.
+ * @property {() => void} addCustomAspect - Adds a Custom Aspect to the reactive application state.
+ * @property {(idx: number) => void} removeCustomAspect - Removes the Custom Aspect at the provided index from the
  *    reactive application state.
  */
 
@@ -37,8 +34,7 @@ export default function createSpellSheetState(item) {
    }
 
    /**
-    * Removes the Custom Aspect at the provided index from the reactive
-    * application state.
+    * Removes the Custom Aspect at the provided index from the reactive application state.
     * @param {number} idx - The index of the Custom Aspect to remove.
     */
    function removeCustomAspect(idx) {

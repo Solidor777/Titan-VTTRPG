@@ -11,8 +11,7 @@
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
     * @property {string} custom - The custom duration unit for the effect.
-    * @property {number} remaining - The number of duration units remaining for
-    *    the effect.
+    * @property {number} remaining - The number of duration units remaining for the effect.
     */
 
    /**
@@ -29,10 +28,8 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
-    * @property {number} initiative - The Initiative turn in combat on which this
-    *    effect's duration should decrease.
-    * @property {number} remaining - The number of duration units remaining for
-    *    the effect.
+    * @property {number} initiative - The Initiative turn in combat on which this effect's duration should decrease.
+    * @property {number} remaining - The number of duration units remaining for the effect.
     */
 
    /**
@@ -49,8 +46,7 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
-    * @property {number} remaining - The number of duration units remaining for
-    *    the effect.
+    * @property {number} remaining - The number of duration units remaining for the effect.
     */
 
    /**

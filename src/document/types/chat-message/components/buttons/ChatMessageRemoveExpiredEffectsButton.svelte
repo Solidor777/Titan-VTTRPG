@@ -13,7 +13,7 @@
     * Removes expired effects from the character that owns this chat message.
     */
    async function removeExpiredEffects() {
-      // If we own this chat message and the actor associated with it
+      // If we own this chat message and the actor associated with it.
       if (assert(
          document?.isOwner,
          'Cannot modify document %s if not owner.',
@@ -22,10 +22,10 @@
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Remove expired effects from the actor
+            // Remove expired effects from the actor.
             await actor.system.removeExpiredEffects();
 
-            // Update this document
+            // Update this document.
             $document.flags.titan.expiredEffectsRemoved = true;
             await $document.update({
                flags: {

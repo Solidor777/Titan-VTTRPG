@@ -19,20 +19,20 @@
     * Calculates the tooltip HTML for the resource mod tag.
     */
    function getTooltip() {
-      // Base label
+      // Base label.
       let retVal = `<p>${localize(`${key}.desc`)}</p>`;
 
-      // Equipment
+      // Equipment.
       if ($document.flags.titan[key].equipment) {
          retVal += `<p>${localize('equipment')}: ${$document.flags.titan[key].equipment}</p>`;
       }
 
-      // Abilities
+      // Abilities.
       if ($document.flags.titan[key].ability) {
          retVal += `<p>${localize('abilities')}: ${$document.flags.titan[key].ability}</p>`;
       }
 
-      // Effects
+      // Effects.
       if ($document.flags.titan[key].effect) {
          retVal += `<p>${localize('effects')}: ${$document.flags.titan[key].effect}</p>`;
       }

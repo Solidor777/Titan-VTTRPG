@@ -4,15 +4,15 @@
    import { ATTACK_TRAIT_DESCRIPTIONS, ATTACK_TRAITS, } from '~/document/types/item/types/weapon/AttackTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
 
-   // The weapon document owning the attack
+   // The weapon document owning the attack.
    /** @type {TitanItem} */
    export let item = void 0;
 
-   // The attack idx
+   // The attack idx.
    /** @type {number} */
    export let attackIdx = void 0;
 
-   // Trait options
+   // Trait options.
    let traitOptions = structuredClone(ATTACK_TRAITS);
    let traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>

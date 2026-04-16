@@ -7,10 +7,10 @@ import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharac
  * @returns {Promise<void>} Returns after the rend has been applied.
  */
 export default async function applyRendToTargets(rend, options) {
-   // Get targets
+   // Get targets.
    const targets = getBestCharactersToUpdate();
 
-   // Rend each target
+   // Rend each target.
    for (const target of targets) {
       await target.system.applyRend(rend, options);
    }

@@ -29,7 +29,7 @@
     */
    function toggleAspect(idx) {
       if ($document?.isOwner) {
-         // If disabled, add the aspect
+         // If disabled, add the aspect.
          if (idx === -1) {
             $document.system.addStandardAspect(aspectOptions.template);
          }

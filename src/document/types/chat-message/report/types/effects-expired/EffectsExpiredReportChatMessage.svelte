@@ -20,18 +20,18 @@
    /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [];
 
-   // Add expired effects
+   // Add expired effects.
    sections.push({
       component: ChatMessageExpiredEffectsTags,
       isTags: true,
    });
 
-   // Add message if the expired effects were removed
+   // Add message if the expired effects were removed.
    if ($document.flags.titan.expiredEffectsRemoved === true) {
       sections.push(ChatMessageExpiredEffectsRemovedMessage);
    }
 
-   // Otherwise, show a button if appropriate
+   // Otherwise, show a button if appropriate.
    else if (getSetting('autoRemoveExpiredEffects') === 'showButton') {
       sections.push(ChatMessageRemoveExpiredEffectsButton);
    }

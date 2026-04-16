@@ -3,15 +3,13 @@ import regenerateDocumentUUID from '~/helpers/utility-functions/RegenerateDocume
 import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
 
 /**
- * A dialog for regenerating the UUID used by Titan Macros for identifying a
- * Document.
+ * A dialog for regenerating the UUID used by Titan Macros for identifying a Document.
  * @extends {ConfirmationDialog}
  */
 export default class ConfirmRegenerateUUIDDialog extends ConfirmationDialog {
 
    /**
-    * @param {TitanItem | TitanActor} document - The Document to regenerate the
-    *    UUID for.
+    * @param {TitanItem | TitanActor} document - The Document to regenerate the UUID for.
     */
    constructor(document) {
       super(

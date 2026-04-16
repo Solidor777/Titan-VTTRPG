@@ -20,17 +20,17 @@
    /** @type {string} Calculated tooltipAction. */
    let tooltip;
 
-   // Update the svelte-components in response to changes
+   // Update the svelte-components in response to changes.
    $: {
-      // Ensure the item is valid
+      // Ensure the item is valid.
       if ($document.items.get(itemId)) {
 
-         // Update the parameters
+         // Update the parameters.
          checkParameters = $document.system.getCastingCheckParameters(
             $document.system.initializeCastingCheckOptions(checkOptions)
          );
 
-         // Update the tooltipAction
+         // Update the tooltipAction.
          tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
    }

@@ -1,6 +1,5 @@
 /**
- * Helper function for localizing a string using the Titan system's localization
- * files.
+ * Helper function for localizing a string using the Titan system's localization files.
  * @param {string} string - String to localize.
  * @returns {string} Localized string.
  */

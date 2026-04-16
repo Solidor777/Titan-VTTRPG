@@ -7,10 +7,10 @@ import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharac
  * @returns {Promise<void>} Returns after the healing has been applied.
  */
 export default async function applyHealingToTargets(healing, options) {
-   // Get targets
+   // Get targets.
    const targets = getBestCharactersToUpdate();
 
-   // Apply healing to each target
+   // Apply healing to each target.
    for (const target of targets) {
       await target.system.applyHealing(healing, options);
    }

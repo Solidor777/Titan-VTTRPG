@@ -13,20 +13,20 @@
     * Calculates the tooltip HTML for the fast healing button.
     */
    function getTooltip() {
-      // Base label
+      // Base label.
       let retVal = `<p>${localize('fastHealing.desc')}</p>`;
 
-      // Equipment
+      // Equipment.
       if ($document.flags.titan.fastHealing.equipment) {
          retVal += `<p>${localize('equipment')}: ${$document.flags.titan.fastHealing.equipment}</p>`;
       }
 
-      // Abilities
+      // Abilities.
       if ($document.flags.titan.fastHealing.ability) {
          retVal += `<p>${localize('abilities')}: ${$document.flags.titan.fastHealing.ability}</p>`;
       }
 
-      // Effects
+      // Effects.
       if ($document.flags.titan.fastHealing.effect) {
          retVal += `<p>${localize('effects')}: ${$document.flags.titan.fastHealing.effect}</p>`;
       }
@@ -35,11 +35,10 @@
    }
 
    /**
-    * Applies healing to the character that owns this chat message and updates
-    * the message accordingly
+    * Applies healing to the character that owns this chat message and updates the message accordingly
     */
    async function confirmFastHealing() {
-      // If we own this chat message and the associated actor
+      // If we own this chat message and the associated actor.
       if (assert(
          $document?.isOwner,
          'Cannot modify document %s if not owner.',
@@ -48,13 +47,13 @@
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor
+            // Update the actor.
             await actor.system.applyHealing(
                $document.flags.titan.fastHealing.total,
                { report: false },
             );
 
-            // Update the chat message
+            // Update the chat message.
             await $document.update({
                flags: {
                   titan: {

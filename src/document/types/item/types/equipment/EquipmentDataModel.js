@@ -13,13 +13,13 @@ export default class EquipmentDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Rarity
+      // Rarity.
       schema.rarity = createStringField('common');
 
-      // Value
+      // Value.
       schema.value = createIntegerField();
 
-      // Equipped
+      // Equipped.
       schema.equipped = createBooleanField();
 
       return schema;

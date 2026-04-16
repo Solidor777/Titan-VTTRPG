@@ -34,7 +34,7 @@
    let styleClass = 'label';
 
    $: {
-      // Calculate the normal value by adding the ability and equipment mods to
+      // Calculate the normal value by adding the ability and equipment mods to.
       // the base value.
       let normalValue = baseValue;
       if (abilityMod) {

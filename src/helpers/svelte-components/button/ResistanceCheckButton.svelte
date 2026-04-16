@@ -24,9 +24,9 @@
    async function requestResistanceCheck() {
       const userTargets = getBestCharactersToUpdate();
 
-      // For each target
+      // For each target.
       for (const target of userTargets) {
-         // Roll a Resistance Check
+         // Roll a Resistance Check.
          await target.system.requestResistanceCheck(
             {
                resistance: resistance,

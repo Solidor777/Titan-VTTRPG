@@ -126,8 +126,7 @@
 
    /**
     * Updates the selector when the check type changes.
-    * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a
-    * valid 'skill' selector.
+    * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a valid 'skill' selector.
     * @returns {boolean} Whether a document update was triggered.
     */
    function onCheckTypeChange() {
@@ -147,8 +146,7 @@
    }
 
    /**
-    * Updates the element key to a default value when the selector changes,
-    * then triggers a document update.
+    * Updates the element key to a default value when the selector changes, then triggers a document update.
     */
    function onSelectorChange() {
       switch (element.selector) {

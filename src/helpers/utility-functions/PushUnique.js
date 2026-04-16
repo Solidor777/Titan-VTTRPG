@@ -2,8 +2,7 @@
  * Adds an entry to the array, provided it is not already in the array.
  * @param {*[]} array - The array to add the entry to.
  * @param {*} value - The value to add to the array.
- * @returns {number} Returns the index of the new object if it was added to the
- *    array, or -1 if it was not added.
+ * @returns {number} Returns the index of the new object if it was added to the array, or -1 if it was not added.
  */
 export default function pushUnique(array, value) {
    if (!array.includes(value)) {

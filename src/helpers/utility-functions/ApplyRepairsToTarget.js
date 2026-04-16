@@ -7,10 +7,10 @@ import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharac
  * @returns {Promise<void>} Returns after the repairs have been applied.
  */
 export default async function applyRepairsToTargets(repairs, options) {
-   // Get targets
+   // Get targets.
    const targets = getBestCharactersToUpdate();
 
-   // Apply repairs to each target
+   // Apply repairs to each target.
    for (const target of targets) {
       await target.system.applyRepairs(repairs, options);
    }

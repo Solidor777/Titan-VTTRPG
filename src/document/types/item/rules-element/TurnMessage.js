@@ -3,13 +3,10 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 /**
  * A Rules Element for displaying a message on a Character's turn.
  * @typedef {object} TurnMessageElement
- * @property {string} operation - The operation to be performed by the Rules
- *    Element (turnMessage).
- * @property {string} selector - Whether to display the message at the start or
- *    end of the Character's turn.
+ * @property {string} operation - The operation to be performed by the Rules Element (turnMessage).
+ * @property {string} selector - Whether to display the message at the start or end of the Character's turn.
  * @property {string} message - The message to display.
- * @property {string} uuid - Unique identifier for the Rules Element,
- *    used to track the element across type changes.
+ * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */
 
 /**

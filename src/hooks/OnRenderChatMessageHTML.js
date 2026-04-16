@@ -33,29 +33,28 @@ const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
 ]));
 
 /**
- * Called before a Chat Message is rendered to attach Svelte components and the
- * dark mode class if appropriate.
+ * Called before a Chat Message is rendered to attach Svelte components and the dark mode class if appropriate.
  * @param {ChatMessage} message - The Chat Message being rendered.
  * @param {HTMLElement} html - The HTML element of the Chat Message.
  */
 export default function onRenderChatMessageHTML(message, html) {
-   // Check if this is a valid titan chat message
+   // Check if this is a valid titan chat message.
    const titanFlags = message?.flags?.titan;
    if (TITAN_CHAT_MESSAGE_TYPES.has(titanFlags?.type)) {
-      // Add the titan class
+      // Add the titan class.
       html.classList.add('titan');
 
-      // Add the owner class if the current user owns the message
+      // Add the owner class if the current user owns the message.
       if (message.isOwner) {
          html.classList.add('owner');
       }
 
-      // Add the dark mode class if dark mode is enabled
+      // Add the dark mode class if dark mode is enabled.
       if (getSetting('darkModeChatMessages') !== 'disabled') {
          html.classList.add('titan-dark-mode');
       }
 
-      // Add the Svelte components
+      // Add the Svelte components.
       const document = new TJSDocument(message);
       message._svelteComponent = new ChatMessageShell({
          target: html.querySelector('.message-content'),
@@ -65,8 +64,8 @@ export default function onRenderChatMessageHTML(message, html) {
       });
    }
 
-   // If this is not a titan message, but dark mode is enabled for all messages,
-   // add the dark mode class anyway
+   // If this is not a titan message, but dark mode is enabled for all messages,.
+   // add the dark mode class anyway.
    else if (getSetting('darkModeChatMessages') === 'all') {
       html.classList.add('titan-dark-mode');
    }

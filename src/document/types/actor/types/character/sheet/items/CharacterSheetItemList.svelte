@@ -3,32 +3,32 @@
    import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
-   // Component class for the item
+   // Component class for the item.
    /** @type {typeof import("svelte").SvelteComponent} */
    export let itemComponent = void 0;
 
-   // Filter function
+   // Filter function.
    /** @type {Function} */
    export let filterFunction = void 0;
 
-   // Optional filter for the items
+   // Optional filter for the items.
    /** @type {string} */
    export let filter = '';
 
-   // Is expanded map
+   // Is expanded map.
    /** @type {object} */
    export let isExpandedMap = void 0;
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Currently drag hovered state
+   // Currently drag hovered state.
    /** @type {boolean} */
    let isDragHovering = false;
    /** @type {string} */
    let hoveredItemId = '';
 
-   // Drag item start
+   // Drag item start.
    /**
     * @param event
     * @param id
@@ -47,7 +47,7 @@
       event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
    }
 
-   // Drag item hovered
+   // Drag item hovered.
    /**
     * @param id
     */
@@ -65,7 +65,7 @@
       isDragHovering = false;
    }
 
-   // Sort and filter items
+   // Sort and filter items.
    /** @type {*[]} */
    let items = [];
    $: {

@@ -28,7 +28,7 @@
    /** @type {TitanItem} Reference to the Item document. */
    export let item = void 0;
 
-   // Expanded object
+   // Expanded object.
    /** @type {boolean} */
    export let isExpanded = void 0;
 </script>

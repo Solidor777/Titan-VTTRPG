@@ -16,19 +16,19 @@ export default class ArmorDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Rarity
+      // Rarity.
       schema.rarity = createStringField('common');
 
-      // Value
+      // Value.
       schema.value = createIntegerField();
 
-      // Armor
+      // Armor.
       schema.armor = createSchemaField({
          max: createIntegerField(1),
          value: createIntegerField(1),
       });
 
-      // Armor traits
+      // Armor traits.
       schema.trait = createArrayField(createObjectField({}));
 
       return schema;

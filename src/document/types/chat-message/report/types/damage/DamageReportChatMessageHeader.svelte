@@ -13,13 +13,13 @@
    /** @type {string} Calculated header icon. */
    let headerIcon;
 
-   // If we took damage, use that as the main header
+   // If we took damage, use that as the main header.
    if ($document.flags.titan.damageTaken) {
       headerLabel = localize('tookX%Damage').replace('X%', $document.flags.titan.damageTaken);
       headerIcon = DAMAGE_ICON;
    }
 
-   // Otherwise, we resisted all damage, and should use that as the main header
+   // Otherwise, we resisted all damage, and should use that as the main header.
    else {
       headerLabel = localize('resistedX%Damage').replace('X%', $document.flags.titan.damageResisted);
       headerIcon = ARMOR_ICON;

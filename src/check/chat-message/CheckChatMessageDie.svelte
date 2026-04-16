@@ -25,21 +25,21 @@
     * Applies a point of Expertise to the die.
     */
    function applyExpertise() {
-      // If expertise can be applied
+      // If expertise can be applied.
       if ($document.flags.titan.results.expertiseRemaining > 0 &&
          die.final < 6
       ) {
-         // Add the expertise and decrement it from those remaining
+         // Add the expertise and decrement it from those remaining.
          die.final += 1;
          die.expertiseApplied += 1;
          $document.flags.titan.results.expertiseRemaining -= 1;
 
-         // Recalculate the results
+         // Recalculate the results.
          $document.flags.titan.results = recalculateCheckResults(
             $document.flags.titan,
          );
 
-         // Update the document
+         // Update the document.
          $document.update({
             flags: {
                titan: {

@@ -14,19 +14,19 @@ export default class AbilityDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // XP cost
+      // XP cost.
       schema.xpCost = createIntegerField(getSetting('defaultXpCost.ability'));
 
-      // Rarity
+      // Rarity.
       schema.rarity = createStringField('common');
 
-      // Action
+      // Action.
       schema.action = createBooleanField();
 
-      // Reaction
+      // Reaction.
       schema.reaction = createBooleanField();
 
-      // Passive
+      // Passive.
       schema.passive = createBooleanField();
 
       return schema;

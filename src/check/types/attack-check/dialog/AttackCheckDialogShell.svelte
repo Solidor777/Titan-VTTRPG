@@ -73,7 +73,7 @@
       }
    }
 
-   // Update the parameters whenever the check options are displayed
+   // Update the parameters whenever the check options are displayed.
    $: {
       if (actor?.system.validateAttackCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getAttackCheckParameters($checkOptions);
@@ -83,7 +83,7 @@
       }
    }
 
-   // Update the first row whenever the attack type is changed
+   // Update the first row whenever the attack type is changed.
    $: rows[0] = $checkOptions.type === 'melee' ? AttackCheckDialogMeleeField : AttackCheckDialogAccuracyField;
 
 </script>

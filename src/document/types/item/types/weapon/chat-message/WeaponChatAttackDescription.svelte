@@ -4,7 +4,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Chat context reference
+   // Chat context reference.
    const titanFlags = $document.flags.titan;
 </script>
 

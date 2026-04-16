@@ -9,7 +9,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Setup tabs
+   // Setup tabs.
    const tabs = [
       {
          label: localize('description'),

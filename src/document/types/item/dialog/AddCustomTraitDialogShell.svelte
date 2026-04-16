@@ -8,7 +8,7 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 
-   // The document owning the trait
+   // The document owning the trait.
    /** @type {TitanItem} */
    export let item = void 0;
 

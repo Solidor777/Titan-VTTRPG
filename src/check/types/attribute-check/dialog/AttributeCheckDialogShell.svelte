@@ -64,7 +64,7 @@
       }
    }
 
-   // Update the parameters whenever the check options are displayed
+   // Update the parameters whenever the check options are displayed.
    $: {
       if (actor?.system.validateAttributeCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getAttributeCheckParameters($checkOptions);

@@ -5,6 +5,6 @@ import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
  * Sets up hot-bar dropping.
  */
 export default function onceReady() {
-   // Register sub-hooks
+   // Register sub-hooks.
    Hooks.on('hotbarDrop', onHotbarDrop);
 }

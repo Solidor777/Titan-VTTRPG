@@ -15,7 +15,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Initialize filtered entries
+   // Initialize filtered entries.
    /** @type {*[]} */
    let filteredEntries = [];
    $: {

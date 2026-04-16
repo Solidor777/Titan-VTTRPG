@@ -25,8 +25,7 @@
 
    /**
     * Updates a Rules Element when its Operation type changes.
-    * @returns {Promise<void>} Returns after the item owning the Rules Element
-    *    has been updated.
+    * @returns {Promise<void>} Returns after the item owning the Rules Element has been updated.
     */
    async function onRulesElementOperationChanged() {
       if ($document && idx < $document?.system.rulesElement.length) {

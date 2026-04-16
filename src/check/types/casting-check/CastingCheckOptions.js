@@ -1,37 +1,26 @@
 /**
  * Options for requesting a Casting Check from an Actor.
  * @typedef {CheckOptions} CastingCheckOptions
- * @property {boolean} [doubleExpertise] - Whether to double the Expertise
- *    applied.
+ * @property {boolean} [doubleExpertise] - Whether to double the Expertise applied.
  * @property {boolean} [doubleTraining] - Whether to double the Training applied.
- * @property {boolean} [extraFailureOnCritical] - Whether a roll of 1 equals a
- *    negative success.
- * @property {boolean} [extraSuccessOnCritical] - Whether a roll of 6 equals an
- *    extra success.
- * @property {number} [complexity] - The minimum number of Successes needed to
- *    succeed at the Check.
- * @property {number} [damageMod] - Modifier for the amount of Damage to be
- *    inflicted.
- * @property {number} [difficulty] - The minimum roll on a die to achieve a
- *    Success.
+ * @property {boolean} [extraFailureOnCritical] - Whether a roll of 1 equals a negative success.
+ * @property {boolean} [extraSuccessOnCritical] - Whether a roll of 6 equals an extra success.
+ * @property {number} [complexity] - The minimum number of Successes needed to succeed at the Check.
+ * @property {number} [damageMod] - Modifier for the amount of Damage to be inflicted.
+ * @property {number} [difficulty] - The minimum roll on a die to achieve a Success.
  * @property {number} [diceMod] - Modifier for the number of Dice being rolled.
- * @property {number} [expertiseMod] - Modifier for the amount of Expertise to be
- *    applied.
- * @property {number} [healingMod] - Modifier for the amount of Healing to be
- *    applied.
- * @property {number} [trainingMod] - Modifier for the amount of Training to be
- *    applied.
+ * @property {number} [expertiseMod] - Modifier for the amount of Expertise to be applied.
+ * @property {number} [healingMod] - Modifier for the amount of Healing to be applied.
+ * @property {number} [trainingMod] - Modifier for the amount of Training to be applied.
  * @property {string} [attribute] - The Attribute to use for the Check.
- * @property {string} itemId - The ID of the spell being cast for the casting
- *    check.
+ * @property {string} itemId - The ID of the spell being cast for the casting check.
  * @property {string} [skill] - The Skill to use for the Check.
  */
 
 /**
  * Creates a Casting Check Options object, based off the provided input.
  * @param {object} options - Object containing the initial options.
- * @returns {CastingCheckOptions} The new, fully-populated Casting Check
- *    Options.
+ * @returns {CastingCheckOptions} The new, fully-populated Casting Check Options.
  */
 export default function createCastingCheckOptions(options) {
    return {

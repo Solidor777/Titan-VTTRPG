@@ -44,7 +44,7 @@
    /** @type {TJSDocument} The reactive Document store for this chat message. */
    export let documentStore = void 0;
 
-   // Setup
+   // Setup.
    setContext('document', documentStore);
 
    /** @type {object} Reference to the reactive Document store. */

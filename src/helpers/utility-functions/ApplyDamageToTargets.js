@@ -7,10 +7,10 @@ import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharac
  * @returns {Promise<void>} Returns after the damage has been applied.
  */
 export default async function applyDamageToTargets(damage, options) {
-   // Get targets
+   // Get targets.
    const targets = getBestCharactersToUpdate();
 
-   // Apply damage to each target
+   // Apply damage to each target.
    for (const target of targets) {
       await target.system.applyDamage(damage, options);
    }

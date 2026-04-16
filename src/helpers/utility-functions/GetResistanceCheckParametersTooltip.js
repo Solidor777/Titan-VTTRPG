@@ -10,8 +10,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
  * Creates a tooltip based on the provided parameters of a Resistance check.
- * @param {ResistanceCheckParameters} checkParameters - The check parameters
- *    used to create the check tooltip.
+ * @param {ResistanceCheckParameters} checkParameters - The check parameters used to create the check tooltip.
  * @returns {string} A tooltip based on the provided check parameters.
  */
 export default function getResistanceCheckParametersTooltip(checkParameters) {
@@ -21,7 +20,7 @@ export default function getResistanceCheckParametersTooltip(checkParameters) {
    // Add Resistance dice.
    if (checkParameters.resistanceDice) {
 
-      // Add the icon appropriate to the attribute
+      // Add the icon appropriate to the attribute.
       let resistanceIcon;
       switch (checkParameters.resistance) {
          case 'reflexes': {

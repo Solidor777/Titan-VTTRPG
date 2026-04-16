@@ -15,29 +15,29 @@ export default class NPCDataModel extends CharacterDataModel {
     * @returns {Promise<DamageReport|void>} Results of applying the Damage.
     */
    async applyDamage(damage, options) {
-      // If we are a minion and not already dead
+      // If we are a minion and not already dead.
       if (this.role === 'minion' && this.resource.stamina.value > 0) {
 
-         // Call the parent version of the function without updating the actor
+         // Call the parent version of the function without updating the actor.
          // or starting a report.
          const superOptions = options ? structuredClone(options) : {};
          superOptions.updateActor = false;
          superOptions.report = false;
          const reportData = await super.applyDamage(damage, superOptions);
 
-         // If we took any damage
+         // If we took any damage.
          if (reportData.damageTaken) {
 
-            // Set stamina to 0
+            // Set stamina to 0.
             this.resource.stamina.value = 0;
 
-            // Calculate overkill damage
+            // Calculate overkill damage.
             const overkillDamage = reportData.damageTaken - this.resource.stamina.max;
             if (overkillDamage > 0) {
                reportData.overkillDamage = overkillDamage;
             }
 
-            // Update the actor document unless explicitly instructed otherwise
+            // Update the actor document unless explicitly instructed otherwise.
             if (options?.updateActor !== false) {
 
                await this.parent.update({
@@ -55,17 +55,17 @@ export default class NPCDataModel extends CharacterDataModel {
             }
          }
 
-         // Report taking and resisting damage if appropriate
+         // Report taking and resisting damage if appropriate.
          if (options?.report !== false && getSetting('reportTakingDamage')) {
 
-            // Send the report to chat
+            // Send the report to chat.
             await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
          }
 
          return reportData;
       }
 
-      // Otherwise, apply damage as normal
+      // Otherwise, apply damage as normal.
       else {
          return super.applyDamage(damage, options);
       }
@@ -110,7 +110,7 @@ export default class NPCDataModel extends CharacterDataModel {
    _calculateBaseResources() {
       super._calculateBaseResources();
 
-      // Resource amounts vary by NPC types
+      // Resource amounts vary by NPC types.
       switch (this.role) {
          // Minions and below have a special stamina multiplier.
          case 'minion': {
@@ -121,20 +121,20 @@ export default class NPCDataModel extends CharacterDataModel {
             return;
          }
 
-         // Warriors and below have no resolve
+         // Warriors and below have no resolve.
          case 'warrior': {
             this.resource.resolve.maxBase = 0;
             this.resource.wounds.maxBase = 0;
             return;
          }
 
-         // Elites and below have no wounds
+         // Elites and below have no wounds.
          case 'elite': {
             this.resource.wounds.maxBase = 0;
             return;
          }
 
-         // Champions have the same stats as players
+         // Champions have the same stats as players.
          default: {
             return;
          }

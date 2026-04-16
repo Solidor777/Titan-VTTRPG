@@ -16,13 +16,13 @@ export default class CommodityDataModel extends TitanItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Rarity
+      // Rarity.
       schema.rarity = createStringField('common');
 
-      // Value
+      // Value.
       schema.value = createIntegerField();
 
-      // Quantity
+      // Quantity.
       schema.quantity = createIntegerField(1);
 
       return schema;

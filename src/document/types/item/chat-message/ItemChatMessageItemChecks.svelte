@@ -17,16 +17,15 @@
 
    /**
     * Rolls a Check from the Item's roll data.
-    * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check
-    *    array.
+    * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check array.
     */
    async function rollItemCheck(idx) {
 
-      // For each controlled character
+      // For each controlled character.
       const controlledCharacters = getControlledCharacters();
       for (const actor of controlledCharacters) {
 
-         // Roll the check
+         // Roll the check.
          await actor.system.requestItemCheck({
             itemRollData: item,
             checkIdx: idx
@@ -40,11 +39,11 @@
     */
    async function spendResolve(resolveSpent) {
 
-      // For each controlled character
+      // For each controlled character.
       const controlledCharacters = getControlledCharacters();
       for (const actor of controlledCharacters) {
 
-         // Spend the resolve
+         // Spend the resolve.
          await actor.system.spendResolve(resolveSpent);
       }
    }

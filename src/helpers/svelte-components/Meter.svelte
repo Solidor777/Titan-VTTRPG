@@ -37,7 +37,7 @@
          meterPercentWidth = Math.max(meterPercentWidth - meterScaleSpeed, targetMeterPercentWidth);
       }
 
-      // If the meter percent width is equal to the target, clear the update
+      // If the meter percent width is equal to the target, clear the update.
       // handle.
       else {
          clearInterval(updateHandle);
@@ -47,11 +47,11 @@
 
    // Update the meter in response to changes.
    $: {
-      // Update the target percent width
+      // Update the target percent width.
       targetMeterPercentWidth = (value / max - min) * 100;
 
-      // If the target width and current width are different, begin updating the
-      // meter
+      // If the target width and current width are different, begin updating the.
+      // meter.
       if (meterPercentWidth !== targetMeterPercentWidth && updateHandle === null) {
          updateHandle = setInterval(updateMeterWidth, updateInterval);
       }

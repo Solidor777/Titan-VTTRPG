@@ -23,23 +23,23 @@
    /** @type {object[]} Array of tag Svelte components to include. */
    const tags = [];
 
-   // If we took damage, conditionally add more information to the messages
+   // If we took damage, conditionally add more information to the messages.
    if ($document.flags.titan.damageTaken) {
-      // Damage Resisted
+      // Damage Resisted.
       if ($document.flags.titan.damageResisted) {
          sections.unshift(localize('resistedX%Damage').replace('X%', $document.flags.titan.damageResisted));
       }
 
-      // Armored ignored
+      // Armored ignored.
       else if ($document.flags.titan.ignoredArmor) {
          sections.unshift(localize('armorIgnored'));
       }
 
-      // Wounds suffered
+      // Wounds suffered.
       if ($document.flags.titan.woundsSuffered) {
 
-         // Stamina lost if wounds were suffered so that we can see the
-         // breakdown
+         // Stamina lost if wounds were suffered so that we can see the.
+         // breakdown.
          if ($document.flags.titan.staminaLost) {
             sections.push(localize('lostX%Stamina').replace('X%', $document.flags.titan.staminaLost));
          }
@@ -47,24 +47,24 @@
          sections.push(localize('sufferedX%Wounds').replace('X%', $document.flags.titan.woundsSuffered));
       }
 
-      // Stamina
+      // Stamina.
       sections.push(ChatMessageStamina);
 
-      // Add wounds if appropriate
+      // Add wounds if appropriate.
       if ($document.flags.titan.wounds) {
          sections.push(ChatMessageWounds);
       }
    }
 
-   // Add tags
+   // Add tags.
    if ($document.flags.titan.tags) {
 
-      // Penetrating
+      // Penetrating.
       if ($document.flags.titan.tags.penetrating) {
          tags.push(DamageReportChatMessagePenetratingTag);
       }
 
-      // Ineffective
+      // Ineffective.
       if ($document.flags.titan.tags.ineffective) {
          tags.push(DamageReportChatMessageIneffectiveTag);
       }

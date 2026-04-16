@@ -11,16 +11,16 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Filtered Skill list
+   // Filtered Skill list.
    /** @type {*[]} */
    let filteredList = [];
    $: {
-      // Get skills whose name matches the filter
+      // Get skills whose name matches the filter.
       const skillList = Object.entries($document.system.skill);
       const filter = $appState.tabs.skills.filter.toLowerCase();
       filteredList = skillList.filter(([key]) => localize(key).toLowerCase().includes(filter));
 
-      // If no skill names match, look for skills with matching default
+      // If no skill names match, look for skills with matching default.
       // attributes.
       if (filteredList.length === 0) {
          filteredList = skillList.filter((skill) =>

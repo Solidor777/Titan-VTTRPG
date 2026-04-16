@@ -14,13 +14,13 @@ export default class TitanCommoditySheet extends TitanItemSheet {
     * @param {object} options - Options object.
     */
    constructor(sheetDocument, options = {}) {
-      // Add sheet classes
+      // Add sheet classes.
       const classes = ['titan-commodity-sheet'];
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Add Svelte Shell
+      // Add Svelte Shell.
       options = foundry.utils.mergeObject(
          options, {
             svelte: {

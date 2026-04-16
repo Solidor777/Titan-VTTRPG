@@ -16,15 +16,13 @@
    export let disabled = false;
 
    /**
-    * @type {number} The increment by which to increase or decrease the value
-    *    when clicking the corresponding buttons.
+    * @type {number} The increment by which to increase or decrease the value when clicking the corresponding buttons.
     */
    export let increment = 1;
 
    /**
     * @type {number} The increment by which to increase or decrease the value
-    *    when clicking the corresponding buttons while the modifier key is
-    *    pressed.
+    *    when clicking the corresponding buttons while the modifier key is pressed.
     */
    export let modifierIncrement = 10;
 

@@ -29,30 +29,29 @@
     * Calculates the tooltipAction for the total Training or Expertise value.
     * @param {object} valueObject - The Training or Expertise object.
     * @param {number} mod - Modifier for the total value or expertise.
-    * @returns {string} The tooltipAction for the total Training or Expertise
-    *    value.
+    * @returns {string} The tooltipAction for the total Training or Expertise value.
     */
    function getTotalValueTooltip(valueObject, mod) {
-      // Base value label
+      // Base value label.
       /** @type {string} */
       let retVal = `<p>${localize('base')}: ${valueObject.baseValue}</p>`;
 
-      // Equipment mod
+      // Equipment mod.
       if (valueObject.mod.equipment) {
          retVal += `<p>${localize('equipment')}: ${valueObject.mod.equipment}</p>`;
       }
 
-      // Ability mod
+      // Ability mod.
       if (valueObject.mod.ability) {
          retVal += `<p>${localize('abilities')}: ${valueObject.mod.ability}</p>`;
       }
 
-      // Effects mod
+      // Effects mod.
       if (valueObject.mod.effect) {
          retVal += `<p>${localize('effects')}: ${valueObject.mod.effect}</p>`;
       }
 
-      // Static mod
+      // Static mod.
       if (valueObject.mod.static + mod !== 0) {
          retVal += `<p>${localize('mod')}: ${valueObject.mod.static + mod}</p>`;
       }
@@ -62,17 +61,17 @@
 
    // Update calculated data in response to changes.
    $: {
-      // Update check parameters
+      // Update check parameters.
       checkParameters = $document.system.getAttributeCheckParameters(
          $document.system.initializeAttributeCheckOptions({ skill: key }));
 
-      // Update total training tooltip
+      // Update total training tooltip.
       totalTrainingTooltip = getTotalValueTooltip(
          $document.system.skill[key].training,
          checkParameters.trainingMod
       );
 
-      // Update total expertise tooltipAction
+      // Update total expertise tooltipAction.
       totalExpertiseTooltip = getTotalValueTooltip(
          $document.system.skill[key].expertise,
          checkParameters.expertiseMod

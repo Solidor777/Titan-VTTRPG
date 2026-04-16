@@ -23,8 +23,8 @@
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   // Initialize the value of each trait option to the current value of the
-   // document's matching trait
+   // Initialize the value of each trait option to the current value of the.
+   // document's matching trait.
    for (const trait of documentTraits) {
       for (let idx = 0; idx < traitOptions.length; idx++) {
          if (traitOptions[idx].name === trait.name) {
@@ -38,17 +38,17 @@
     * Applies the trait edits to the Document.
     */
    function applyTraitEdits() {
-      // If the document and traits are still valid
+      // If the document and traits are still valid.
       if (item && documentTraits) {
 
-         // Set the document's traits to equal the active traits from the trait
-         // options
+         // Set the document's traits to equal the active traits from the trait.
+         // options.
          documentTraits = traitOptions.filter((trait) =>
             (typeof (trait.value) === 'boolean' && trait.value === true) ||
             (typeof (trait.value) === 'number' && trait.value > 0),
          );
 
-         // Update the document
+         // Update the document.
          item.update({
             system: structuredClone(item.system),
          });

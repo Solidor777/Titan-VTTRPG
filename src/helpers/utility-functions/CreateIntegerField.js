@@ -1,6 +1,5 @@
 /**
- * Creates a Number Field that is set as an integer, required, and with an
- * initial value.
+ * Creates a Number Field that is set as an integer, required, and with an initial value.
  * Will be nullable if the initial value is null.
  * @param {number} [initial] - Initial value for the field.
  * @returns {NumberField} The new Integer Number field.

@@ -10,8 +10,7 @@ export default class CreateItemMacroDialog extends TitanDialog {
 
    /**
     * @param {TitanItem} item - The Item to create the macro for.
-    * @param {number} slot - The hotbar slot to assign the macro to after
-    *    creation.
+    * @param {number} slot - The hotbar slot to assign the macro to after creation.
     * @param {string} uuid - The unique identifier of the object.
     */
    constructor(item, slot, uuid) {

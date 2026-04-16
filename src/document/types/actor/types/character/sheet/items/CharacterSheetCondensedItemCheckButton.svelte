@@ -20,19 +20,19 @@
    /** @type {string} Calculated tooltipAction. */
    let tooltip;
 
-   // Update parameters in response to changes
+   // Update parameters in response to changes.
    $: {
 
-      // Ensure the item and check are valid
+      // Ensure the item and check are valid.
       const item = $document.items.get(itemId);
       if (item?.system.check.length > 0) {
 
-         // Update the parameters
+         // Update the parameters.
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );
 
-         // Update the tooltipAction
+         // Update the tooltipAction.
          tooltip = getItemCheckParametersTooltip(checkParameters);
       }
    }

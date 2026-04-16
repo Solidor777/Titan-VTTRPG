@@ -7,15 +7,15 @@
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   // The weapon document owning the attack
+   // The weapon document owning the attack.
    /** @type {TitanItem|TitanActor} */
    export let document = void 0;
 
-   // The attack idx
+   // The attack idx.
    /** @type {number} */
    export let attackIdx = void 0;
 
-   // The trait idx
+   // The trait idx.
    /** @type {number} */
    export let traitIdx = void 0;
 

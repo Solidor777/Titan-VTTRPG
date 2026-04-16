@@ -2,12 +2,9 @@ import createWeaponSheetData from '~/document/types/item/types/weapon/sheet/Weap
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
 
 /**
- * @typedef {RulesElementItemSheetState} WeaponSheetState A custom reactive
- *    store for managing a Weapon Sheet.
- * @property {() => void} addAttack - Updates the reactive state store in response
- *    to an Attack being added.
- * @property {(idx: number) => void} postDeleteAttack - Updates the reactive state
- *    store in response to an Attack being
+ * @typedef {RulesElementItemSheetState} WeaponSheetState A custom reactive store for managing a Weapon Sheet.
+ * @property {() => void} addAttack - Updates the reactive state store in response to an Attack being added.
+ * @property {(idx: number) => void} postDeleteAttack - Updates the reactive state store in response to an Attack being
  *    deleted.
  */
 

@@ -5,7 +5,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
  * Sets up the system conditions.
  */
 export default function setupConditions() {
-   // Create list of conditions
+   // Create list of conditions.
    const conditions = [
       {
          id: 'blinded',
@@ -64,16 +64,16 @@ export default function setupConditions() {
       },
    ];
 
-   // Sort conditions by name
+   // Sort conditions by name.
    conditions.sort((a, b) => sortAscending(localize(a.name), localize(b.name)));
 
-   // For each condition
+   // For each condition.
    for (const condition of conditions) {
 
-      // Set the description
+      // Set the description.
       const description = localize(`${condition.id}.desc`);
 
-      // Set the flags for visual active effects
+      // Set the flags for visual active effects.
       condition.flags = {
          titan: {
             description: description,

@@ -12,8 +12,7 @@ export default class AttributeCheck extends TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateAttributeCheckResults}.
-    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the
-    *    check, after Expertise is applied.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
     * @returns {AttributeCheckResults} The final results of the check.
     * @protected
     */

@@ -21,7 +21,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Idx of the custom aspect being represented
+   // Idx of the custom aspect being represented.
    /** @type {number} */
    export let idx = void 0;
 

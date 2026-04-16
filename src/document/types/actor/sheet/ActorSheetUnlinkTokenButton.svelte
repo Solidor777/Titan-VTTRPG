@@ -8,11 +8,11 @@
 
    /** Unlinks this Actor from their Token. */
    async function unlinkToken() {
-      // Unlink the actor
+      // Unlink the actor.
       const token = application.token;
       await token.update({ actorLink: false });
 
-      // Close this actor and open the new actor sheet
+      // Close this actor and open the new actor sheet.
       const newToken = application.token;
       await application.close();
       newToken.actor.sheet.render({ force: true });

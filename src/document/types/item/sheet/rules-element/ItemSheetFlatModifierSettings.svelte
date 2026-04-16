@@ -34,8 +34,7 @@
    ];
 
    /**
-    * Updates the element key to a sensible default when the selector
-    * changes, then triggers a document update.
+    * Updates the element key to a sensible default when the selector changes, then triggers a document update.
     * @returns {void}
     */
    function onSelectorChange() {

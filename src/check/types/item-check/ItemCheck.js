@@ -12,8 +12,7 @@ export default class ItemCheck extends TitanCheck {
     * This calls an external helper function specific to the check type,
     * so that re-calculation can be easily performed by external sources.
     * See {@link calculateItemCheckResults}.
-    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the
-    *    check, after Expertise is applied.
+    * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
     * @returns {ItemCheckResults} The final results of the check.
     * @protected
     */

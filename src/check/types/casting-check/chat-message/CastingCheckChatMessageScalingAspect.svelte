@@ -25,12 +25,12 @@
    /** @type {string[]} Calculated aspect icons */
    const icons = [];
 
-   // Add damage icon if appropriate
+   // Add damage icon if appropriate.
    if (aspect.isDamage) {
       icons.push(DAMAGE_ICON);
    }
 
-   // Add healing icon if appropriate
+   // Add healing icon if appropriate.
    if (aspect.isHealing) {
       icons.push(HEALING_ICON);
    }
@@ -44,23 +44,23 @@
     * Increases the aspect by the increment and updates the total cost.
     */
    function increaseAspect() {
-      // Increase the aspect
+      // Increase the aspect.
       aspect.currentValue += aspectIncrement;
 
-      // Decrease the extra successes by the cost
+      // Decrease the extra successes by the cost.
       $document.flags.titan.results.extraSuccessesRemaining -= aspect.cost;
 
-      // Update damage if appropriate
+      // Update damage if appropriate.
       if (aspect.isDamage) {
          $document.flags.titan.results.damage += aspectIncrement;
       }
 
-      // Update healing if appropriate
+      // Update healing if appropriate.
       if (aspect.isHealing) {
          $document.flags.titan.results.healing += aspectIncrement;
       }
 
-      // Update the document
+      // Update the document.
       $document.update({
          flags: {
             titan: {
@@ -74,23 +74,23 @@
     * Decreases the aspect by the increment and updates the total cost.
     */
    function decreaseAspect() {
-      // Decrease the aspect
+      // Decrease the aspect.
       aspect.currentValue -= aspectIncrement;
 
-      // Increase the extra successes by the cost
+      // Increase the extra successes by the cost.
       $document.flags.titan.results.extraSuccessesRemaining += aspect.cost;
 
-      // Update damage if appropriate
+      // Update damage if appropriate.
       if (aspect.isDamage) {
          $document.flags.titan.results.damage -= aspectIncrement;
       }
 
-      // Update healing if appropriate
+      // Update healing if appropriate.
       if (aspect.isHealing) {
          $document.flags.titan.results.healing -= aspectIncrement;
       }
 
-      // Update the document
+      // Update the document.
       $document.update({
          flags: {
             titan: {
@@ -104,23 +104,23 @@
     * Resets all increases to the aspect and restores the total cost.
     */
    function resetAspect() {
-      // Get the aspect delta
+      // Get the aspect delta.
       const delta = aspect.currentValue - aspect.initialValue;
       const incrementCount = delta / aspectIncrement;
       const cost = incrementCount * aspect.cost;
 
-      // Reset the aspect to its original value
+      // Reset the aspect to its original value.
       aspect.currentValue = aspect.initialValue;
 
-      // Reset the extra successes
+      // Reset the extra successes.
       $document.flags.titan.results.extraSuccessesRemaining += cost;
 
-      // Update damage if appropriate
+      // Update damage if appropriate.
       if (aspect.isDamage) {
          $document.flags.titan.results.damage -= delta;
       }
 
-      // Update healing if appropriate
+      // Update healing if appropriate.
       if (aspect.isHealing) {
          $document.flags.titan.results.healing -= delta;
       }

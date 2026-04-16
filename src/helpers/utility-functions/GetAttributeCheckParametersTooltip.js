@@ -10,10 +10,8 @@ import {
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
- * Creates a tooltip based on the provided parameters of an Attribute based
- * check.
- * @param {AttributeCheckParameters} checkParameters - The check parameters used
- *    to create the check tooltip.
+ * Creates a tooltip based on the provided parameters of an Attribute based check.
+ * @param {AttributeCheckParameters} checkParameters - The check parameters used to create the check tooltip.
  * @returns {string} A tooltip based on the provided check parameters.
  */
 export default function getAttributeCheckParametersTooltip(checkParameters) {
@@ -23,7 +21,7 @@ export default function getAttributeCheckParametersTooltip(checkParameters) {
    // Add Attribute dice.
    if (checkParameters.attributeDice) {
 
-      // Add the icon appropriate to the attribute
+      // Add the icon appropriate to the attribute.
       let attributeIcon;
       switch (checkParameters.attribute) {
          case 'body': {

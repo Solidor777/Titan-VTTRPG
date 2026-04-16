@@ -45,7 +45,15 @@
       "Bash(sed -n '4110,4120p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
       "Bash(sed -n '1263,1267p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
       "Bash(sed -n '4912,4968p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
-      "Bash(sed -n '1399,1408p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")"
+      "Bash(sed -n '1399,1408p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '499,505p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '666,672p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '5197,5207p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '258,264p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '508,513p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '1234,1241p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/CharacterDataModel.js\")",
+      "Bash(sed -n '40,65p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/check/Check.js\")",
+      "Bash(sed -n '1,30p' \"C:/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/check/types/attack-check/AttackCheckOptions.js\")"
     ]
   }
 }

@@ -54,8 +54,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
       this.document = sheetDocument;
 
       /**
-       * @type {TJSDocument<Document>} Reactive TJSDocument store wrapping the document,
-       *    passed to the Svelte component.
+       * @type {TJSDocument<Document>} Reactive TJSDocument store wrapping the document, passed to the Svelte component.
        */
       this.options.svelte.props.document = new TJSDocument(
          this.document,

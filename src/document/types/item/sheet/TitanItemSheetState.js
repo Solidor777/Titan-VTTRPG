@@ -2,24 +2,20 @@ import { writable } from 'svelte/store';
 import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheetData.js';
 
 /**
- * @typedef {import('svelte/store').Writable<TitanItemSheetData>} ItemSheetState
- *    A custom reactive store for managing
+ * @typedef {import('svelte/store').Writable<TitanItemSheetData>} ItemSheetState A custom reactive store for managing
  *    an Item Sheet.
  * @property {import('svelte/store').Writable<TitanItemSheetData>['set']} set
  * @property {import('svelte/store').Writable<TitanItemSheetData>['update']} update
  * @property {import('svelte/store').Writable<TitanItemSheetData>['subscribe']} subscribe
- * @property {() => void} postAddCheck - Updates the reactive state store in
- *    response to an Item Check being added.
- * @property {(idx: number) => void} preDeleteCheck - Updates the reactive state
- *    store in response to an Item Check
+ * @property {() => void} postAddCheck - Updates the reactive state store in response to an Item Check being added.
+ * @property {(idx: number) => void} preDeleteCheck - Updates the reactive state store in response to an Item Check
  *    being deleted.
  */
 
 /**
  * Creates a reactive state store for an Item Sheet.
  * @param {TitanItem} item - The item we are creating the sheet state for.
- * @param {typeof TitanItemSheetData} [overrideData] - Optional override data
- *    for initializing the store.
+ * @param {typeof TitanItemSheetData} [overrideData] - Optional override data for initializing the store.
  * @returns {ItemSheetState} The newly created Item Sheet State.
  */
 export default function createTitanItemSheetState(item, overrideData) {
@@ -27,8 +23,7 @@ export default function createTitanItemSheetState(item, overrideData) {
    const { set, update, subscribe } = writable(overrideData ?? createTitanItemSheetData(item));
 
    /**
-    * Updates the reactive state store in response to an Item Check being
-    * added.
+    * Updates the reactive state store in response to an Item Check being added.
     */
    function postAddCheck() {
       update((data) => {
@@ -39,8 +34,7 @@ export default function createTitanItemSheetState(item, overrideData) {
    }
 
    /**
-    * Updates the reactive state store in response to an Item Check being
-    * deleted.
+    * Updates the reactive state store in response to an Item Check being deleted.
     * @param {number} idx - The index of the Check about to be deleted.
     */
    function preDeleteCheck(idx) {

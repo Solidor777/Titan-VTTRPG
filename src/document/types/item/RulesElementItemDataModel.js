@@ -4,15 +4,14 @@ import createObjectField from '~/helpers/utility-functions/CreateObjectField.js'
 import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
 
 /**
- * Data model with extra functionality for items that can contain Rules
- * Elements.
+ * Data model with extra functionality for items that can contain Rules Elements.
  * @extends {TitanItemDataModel}
  */
 export default class RulesElementItemDataModel extends TitanItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Rules Elements
+      // Rules Elements.
       schema.rulesElement = createArrayField(createObjectField());
 
       return schema;
@@ -32,10 +31,10 @@ export default class RulesElementItemDataModel extends TitanItemDataModel {
    async addRulesElement() {
       if (this.parent.isOwner) {
 
-         // Create a new element
+         // Create a new element.
          const newElement = createFlatModifierElement();
 
-         // Add the Element to the Rules Elements array
+         // Add the Element to the Rules Elements array.
          this.rulesElement.push(newElement);
          await this.parent.update({
             system: {
@@ -47,14 +46,13 @@ export default class RulesElementItemDataModel extends TitanItemDataModel {
 
    /**
     * Removes a Rules Element from this item.
-    * @param {number} idx - The index of the Rules Element in the Rules Elements
-    *    array.
+    * @param {number} idx - The index of the Rules Element in the Rules Elements array.
     * @returns {Promise<void>}
     */
    async deleteRulesElement(idx) {
       if (this.parent.isOwner) {
 
-         // Remove the Element from the Rules Elements array
+         // Remove the Element from the Rules Elements array.
          this.rulesElement.splice(idx, 1);
          await this.parent.update({
             system: {

@@ -14,7 +14,7 @@
    /** @type {object[] | string[]} Array of section Svelte components to include. */
    const sections = [];
 
-   // Add wounds if appropriate
+   // Add wounds if appropriate.
    if ($document.flags.titan.armor) {
       sections.push(ChatMessageArmor);
    }

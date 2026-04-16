@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   // Reference to the item
+   // Reference to the item.
    /** @type {TitanItem} */
    export let item = void 0;
 </script>

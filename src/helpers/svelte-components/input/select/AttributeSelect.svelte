@@ -18,7 +18,7 @@
    /** @type {string[]} Options for the Select Svelte component. */
    const options = structuredClone(ATTRIBUTES);
 
-   // Add none option if appropriate
+   // Add none option if appropriate.
    if (allowNone) {
       options.push('none');
    }

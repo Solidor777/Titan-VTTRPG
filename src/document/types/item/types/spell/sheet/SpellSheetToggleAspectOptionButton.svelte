@@ -10,7 +10,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Copy of the document data
+   // Copy of the document data.
    let data;
    $: {
       data = {

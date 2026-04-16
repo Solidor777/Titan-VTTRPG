@@ -110,7 +110,7 @@ export default class TitanCheck {
             }
          }
 
-         // Iterate over each die and apply expertise in successively greater increments
+         // Iterate over each die and apply expertise in successively greater increments.
          // to maximize the number of successes.
          for (let increment = 1; increment < 6; increment++) {
 
@@ -135,7 +135,7 @@ export default class TitanCheck {
                }
             }
 
-            // If using critical successes, apply expertise to dice that are
+            // If using critical successes, apply expertise to dice that are.
             // exactly the current increment away from a critical success.
             if (extraSuccessOnCritical) {
                for (const die of retVal.dice) {

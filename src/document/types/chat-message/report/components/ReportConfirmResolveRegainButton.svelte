@@ -10,8 +10,7 @@
    const document = getContext('document');
 
    /**
-    * Applies resolve regain to the chat message owner and marks it as
-    * confirmed.
+    * Applies resolve regain to the chat message owner and marks it as confirmed.
     */
    async function confirmRegainResolve() {
       if (assert(
@@ -19,14 +18,14 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         // Get the actor
+         // Get the actor.
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor
+            // Update the actor.
             await actor.system.regainResolve($document.flags.titan.resolveRegain.total);
 
-            // Update the chat document
+            // Update the chat document.
             $document.update({
                flags: {
                   titan: {

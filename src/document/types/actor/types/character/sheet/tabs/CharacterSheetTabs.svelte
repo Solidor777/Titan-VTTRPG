@@ -17,7 +17,7 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Tabs
+   // Tabs.
    const tabs = [
       {
          label: localize('skills'),

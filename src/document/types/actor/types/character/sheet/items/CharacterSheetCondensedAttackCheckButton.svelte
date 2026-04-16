@@ -24,22 +24,22 @@
    /** @type {string} Calculated tooltipAction. */
    let tooltip;
 
-   // Update parameters in response to changes
+   // Update parameters in response to changes.
    $: {
 
-      // Ensure the item and check are valid
+      // Ensure the item and check are valid.
       const item = $document.items.get(itemId);
       if (item?.system.attack.length > 0) {
 
-         // Update the parameters
+         // Update the parameters.
          checkParameters = $document.system.getAttackCheckParameters(
             $document.system.initializeAttackCheckOptions(checkOptions)
          );
 
-         // Update the icon
+         // Update the icon.
          icon = checkParameters.type === 'melee' ? MELEE_ICON : ACCURACY_ICON;
 
-         // Update the tooltipAction
+         // Update the tooltipAction.
          tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
    }

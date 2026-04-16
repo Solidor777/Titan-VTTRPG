@@ -15,16 +15,16 @@ export default class ShieldDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Rarity
+      // Rarity.
       schema.rarity = createStringField('common');
 
-      // Value
+      // Value.
       schema.value = createIntegerField();
 
-      // Defense
+      // Defense.
       schema.defense = createIntegerField();
 
-      // Shield Traits
+      // Shield Traits.
       schema.trait = createArrayField(createObjectField());
 
       return schema;

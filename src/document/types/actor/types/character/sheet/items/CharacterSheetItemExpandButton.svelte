@@ -8,7 +8,7 @@
    /** @type {TitanItem} The Item this component belongs to. */
    export let item = void 0;
 
-   // Optional override for the name text
+   // Optional override for the name text.
    /** @type {boolean} */
    export let name = false;
 </script>

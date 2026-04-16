@@ -12,8 +12,7 @@ export default class TitanCombat extends Combat {
    }
 
    /**
-    * Advances to the next turn, triggering the combatNextTurn hook via socket
-    * for all clients.
+    * Advances to the next turn, triggering the combatNextTurn hook via socket for all clients.
     * @returns {Promise<Combat>} The updated Combat document.
     * @override
     */

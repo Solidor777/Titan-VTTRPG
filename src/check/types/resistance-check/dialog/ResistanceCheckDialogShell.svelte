@@ -59,7 +59,7 @@
       }
    }
 
-   // Update the parameters whenever the check options are displayed
+   // Update the parameters whenever the check options are displayed.
    $: {
       if (actor?.system.validateResistanceCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getResistanceCheckParameters($checkOptions);

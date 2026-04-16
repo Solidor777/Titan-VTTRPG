@@ -36,15 +36,15 @@
    /** @type {ItemCheckParameters} Calculated item check parameters. */
    let checkParameters;
 
-   // Update the svelte-components in response to changes
+   // Update the svelte-components in response to changes.
    $: {
 
-      // Ensure the item and check are valid
+      // Ensure the item and check are valid.
       const item = $document.items.get(itemId);
       if (item?.system.check.length > checkIdx
       ) {
 
-         // Update the check parameters
+         // Update the check parameters.
          checkParameters = $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );

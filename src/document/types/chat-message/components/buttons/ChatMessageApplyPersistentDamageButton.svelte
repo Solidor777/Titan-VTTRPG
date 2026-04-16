@@ -13,20 +13,20 @@
     * Calculates the tooltip HTML for the persistent damage button.
     */
    function getTooltip() {
-      // Base label
+      // Base label.
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
-      // Equipment
+      // Equipment.
       if ($document.flags.titan.persistentDamage.equipment) {
          retVal += `<p>${localize('equipment')}: ${$document.flags.titan.persistentDamage.equipment}</p>`;
       }
 
-      // Abilities
+      // Abilities.
       if ($document.flags.titan.persistentDamage.ability) {
          retVal += `<p>${localize('abilities')}: ${$document.flags.titan.persistentDamage.ability}</p>`;
       }
 
-      // Effects
+      // Effects.
       if ($document.flags.titan.persistentDamage.effect) {
          retVal += `<p>${localize('effects')}: ${$document.flags.titan.persistentDamage.effect}</p>`;
       }
@@ -35,11 +35,10 @@
    }
 
    /**
-    * Applies damage to the character that owns this chat message and updates
-    * the message accordingly
+    * Applies damage to the character that owns this chat message and updates the message accordingly
     */
    async function confirmPersistentDamage() {
-      // If we own this chat message and the associated actor
+      // If we own this chat message and the associated actor.
       if (assert(
          $document?.isOwner,
          'Cannot modify document %s if not owner.',
@@ -48,7 +47,7 @@
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor
+            // Update the actor.
             await actor.system.applyDamage(
                $document.flags.titan.persistentDamage.total,
                {
@@ -57,7 +56,7 @@
                },
             );
 
-            // Update the chat message
+            // Update the chat message.
             const updateData = {
                flags: {
                   titan: {

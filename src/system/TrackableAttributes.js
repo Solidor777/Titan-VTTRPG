@@ -11,8 +11,7 @@ export default function getTrackableAttributes() {
 
 /**
  * Creates a trackable attributes object for a Character.
- * @returns {object} The newly created trackable attributes object for a
- *    Character.
+ * @returns {object} The newly created trackable attributes object for a Character.
  */
 function getCharacterTrackableAttributes() {
    return {

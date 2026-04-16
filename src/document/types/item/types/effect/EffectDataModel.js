@@ -36,8 +36,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
 
    /**
     * Returns whether Effect item is a Combat Effect.
-    * Permanent Effects and effects with a custom Duration are considered
-    * non-Combat Effects.
+    * Permanent Effects and effects with a custom Duration are considered non-Combat Effects.
     * Effects with a duration measured in turns are considered Combat Effects.
     * @returns {boolean} Whether this Effect item is a Combat Effect.
     */
@@ -61,7 +60,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Duration
+      // Duration.
       schema.duration = createSchemaField({
          type: createStringField('turnStart'),
          remaining: createIntegerField(1),
@@ -69,7 +68,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
          custom: createStringField(),
       });
 
-      // Active
+      // Active.
       schema.active = createBooleanField(true);
 
       return schema;
@@ -85,16 +84,16 @@ export default class EffectDataModel extends RulesElementItemDataModel {
    _getInitialDocumentData(data) {
       let retVal = super._getInitialDocumentData(data);
 
-      // Check if we have a valid actor owner
+      // Check if we have a valid actor owner.
       if (this.parent && !this.parent.pack && this.parent.id && typeof data?.system?.initiative !== 'number') {
          const actor = this.parent.parent;
          if (actor) {
 
-            // Check if the actor is in an active combat
+            // Check if the actor is in an active combat.
             const initiative = actor.getFirstActiveCombat()?.initiative;
             if (initiative !== null) {
 
-               // If so, set our initiative accordingly
+               // If so, set our initiative accordingly.
                retVal ??= {};
                retVal.system ??= {};
                retVal.system.duration ??= {};
@@ -113,18 +112,18 @@ export default class EffectDataModel extends RulesElementItemDataModel {
     * @override
     */
    prepareDerivedData() {
-      // If we are the best first owner of this document, and this document is
-      // not in a compendium
+      // If we are the best first owner of this document, and this document is.
+      // not in a compendium.
       if (isCurrentUserBestOwner(this.parent) &&
          !this.parent.pack && this.parent.id &&
          !this.parent.isMarkedForDeletion) {
 
-         // Ensure the action queue is initialized
+         // Ensure the action queue is initialized.
          if (!this.parent.actionQueue) {
             this.parent.actionQueue = new ActionQueue();
          }
 
-         // Queue the latent data preparation
+         // Queue the latent data preparation.
          this.actionQueue.enqueue({
             callback: this._updateActiveEffects,
             thisArg: this,
@@ -165,8 +164,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
    }
 
    /**
-    * Handles preparing data that could take more than one frame,
-    * or that could trigger other updates on the document.
+    * Handles preparing data that could take more than one frame, or that could trigger other updates on the document.
     * @returns {Promise<void>}
     * @private
     */
@@ -175,7 +173,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
          const effects = this.parent.effects.filter((effect) => effect.flags?.titan);
          const shouldBeActive = this.isActive;
 
-         // Add the first effect if necessary
+         // Add the first effect if necessary.
          if (effects.length < 1) {
             await this.parent.addActiveEffect(
                [
@@ -208,23 +206,23 @@ export default class EffectDataModel extends RulesElementItemDataModel {
             );
          }
 
-         // Otherwise, update effects
+         // Otherwise, update effects.
          else {
-            // Ensure the first effect owned by the item matches the item data
+            // Ensure the first effect owned by the item matches the item data.
             const effect = effects[0];
 
-            // Update the effect if appropriate
+            // Update the effect if appropriate.
             const updateData = {};
             let shouldUpdateEffect = false;
 
-            // Update the icon
+            // Update the icon.
             const img = this.parent.img;
             if (effect.img !== img) {
                shouldUpdateEffect = true;
                updateData.img = img;
             }
 
-            // Update the turns remaining
+            // Update the turns remaining.
             const isPermanent = this.duration.type === 'permanent';
             const turnsRemaining = isPermanent ? 0 : this.duration.remaining;
             if (effect.duration.turns !== turnsRemaining) {
@@ -234,14 +232,14 @@ export default class EffectDataModel extends RulesElementItemDataModel {
                };
             }
 
-            // Update active
+            // Update active.
             if (effect.transfer !== shouldBeActive) {
                shouldUpdateEffect = true;
                updateData.transfer = shouldBeActive;
                updateData.disabled = !shouldBeActive;
             }
 
-            // Update the label
+            // Update the label.
             const label = this.isExpired ?
                `${this.parent.name} (${localize('expired')})` :
                this.parent.name;
@@ -250,7 +248,7 @@ export default class EffectDataModel extends RulesElementItemDataModel {
                updateData.label = label;
             }
 
-            // Update visual active effects description if appropriate
+            // Update visual active effects description if appropriate.
             let description = '';
             if (!isHTMLBlank(this.description)) {
                description = await TextEditor.enrichHTML(this.description, {
@@ -263,12 +261,12 @@ export default class EffectDataModel extends RulesElementItemDataModel {
                updateData['flags.visual-active-effects.data.content'] = description;
             }
 
-            // Update effect if appropriate
+            // Update effect if appropriate.
             if (shouldUpdateEffect) {
                await effect.update(updateData);
             }
 
-            // Delete any additional effect items
+            // Delete any additional effect items.
             for (let idx = 1; idx < effect.length; idx++) {
                await effect.delete;
             }

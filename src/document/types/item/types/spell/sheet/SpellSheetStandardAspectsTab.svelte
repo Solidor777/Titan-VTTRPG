@@ -10,12 +10,12 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Aspect Options
+   // Aspect Options.
    const aspectOptions = structuredClone(SpellAspects);
 
-   // Localize Option Labels
+   // Localize Option Labels.
    for (const aspect of Object.values(aspectOptions)) {
-      // Localize value options
+      // Localize value options.
       if (aspect.settings?.initialValueOptions) {
          aspect.settings.initialValueOptions.forEach((option) => {
             if (typeof option.label === 'string') {
@@ -24,7 +24,7 @@
          });
       }
 
-      // Localize unit options
+      // Localize unit options.
       if (aspect.settings?.unitOptions) {
          aspect.settings.unitOptions.forEach((option) => {
             if (typeof option.label === 'string') {

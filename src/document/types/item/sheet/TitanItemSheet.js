@@ -7,8 +7,7 @@ import ItemSheetImportItemButton from '~/document/types/item/sheet/ItemSheetImpo
 /**
  * A Document Sheet class with functionality shared by all Items.
  * @extends {TitanDocumentSheet}
- * @property {RulesElementItemSheetState} applicationState - The reactive
- *    application state store.
+ * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
    /**
@@ -16,7 +15,7 @@ export default class TitanItemSheet extends TitanDocumentSheet {
     * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
-      // Add sheet classes
+      // Add sheet classes.
       const classes = ['titan-item-sheet'];
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
@@ -42,14 +41,13 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Overridable function for creating the reactive state store for this
-    * sheet.
+    * Overridable function for creating the reactive state store for this sheet.
     * @override
     * @returns {typeof ItemSheetState} The newly created state store.
     * @protected
     */
    _createReactiveState() {
-      // By default, assume we have rules elements since only spells do not
+      // By default, assume we have rules elements since only spells do not.
       return createRulesElementItemSheetState(/** @type {TitanItem} */ this.document);
    }
 
@@ -62,14 +60,14 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    _getHeaderButtons() {
       const buttons = super._getHeaderButtons();
 
-      // Button for sending the item to chat
+      // Button for sending the item to chat.
       buttons.unshift({
          svelte: {
             class: ItemSheetSendToChatButton,
          }
       });
 
-      // Button for importing the item from a compendium pack
+      // Button for importing the item from a compendium pack.
       if (this.item.pack) {
          buttons.unshift({
             svelte: {

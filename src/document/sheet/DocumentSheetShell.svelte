@@ -16,7 +16,7 @@
    /** @type {typeof import('svelte').SvelteComponent} The Svelte component that contains the sheet functionality. */
    export let shell = void 0;
 
-   // Setup context variables
+   // Setup context variables.
    setContext('document', document);
    setContext('applicationState', applicationState);
 </script>

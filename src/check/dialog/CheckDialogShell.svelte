@@ -15,7 +15,7 @@
    /** @type {TitanActor} The actor that will roll the check. */
    export let actor = void 0;
 
-   // Setup context objects
+   // Setup context objects.
    setContext('checkOptions', checkOptions);
    setContext('checkParameters', checkParameters);
 </script>

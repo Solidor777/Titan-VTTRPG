@@ -3,7 +3,7 @@
  */
 export default function registerSystemSettings() {
 
-   // Get Check Options
+   // Get Check Options.
    game.settings.register('titan', 'getCheckOptions', {
       config: true,
       default: false,
@@ -13,7 +13,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Confirm Deleting Items
+   // Confirm Deleting Items.
    game.settings.register('titan', 'confirmDeletingItems', {
       config: true,
       default: true,
@@ -23,7 +23,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-open Combatant Sheets for Players
+   // Auto-open Combatant Sheets for Players.
    game.settings.register('titan', 'autoOpenCharacterSheetsPlayer', {
       config: true,
       default: true,
@@ -33,7 +33,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-open Combatant Sheets for GMs
+   // Auto-open Combatant Sheets for GMs.
    game.settings.register('titan', 'autoOpenCharacterSheetsGM', {
       choices: {
          npcsOnly: 'SETTINGS.autoOpenCharacterSheetsGM.npcsOnly',
@@ -50,7 +50,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Dark Mode Sheets
+   // Dark Mode Sheets.
    game.settings.register('titan', 'darkModeSheets', {
       config: true,
       default: true,
@@ -61,7 +61,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Dark Mode Chat Messages
+   // Dark Mode Chat Messages.
    game.settings.register('titan', 'darkModeChatMessages', {
       choices: {
          all: 'SETTINGS.darkModeChatMessages.all',
@@ -77,7 +77,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Dark Mode Journals
+   // Dark Mode Journals.
    game.settings.register('titan', 'darkModeJournals', {
       config: true,
       default: true,
@@ -88,7 +88,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Initiative Formula
+   // Initiative Formula.
    game.settings.register('titan', 'initiativeFormula', {
       config: true,
       default: '+2d6',
@@ -99,7 +99,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Auto-regain Resolve
+   // Auto-regain Resolve.
    game.settings.register('titan', 'autoRegainResolve', {
       choices: {
          enabled: 'SETTINGS.autoRegainResolve.enabled',
@@ -116,7 +116,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Auto-spend Resolve when Doubling Training
+   // Auto-spend Resolve when Doubling Training.
    game.settings.register('titan', 'autoSpendResolveDoubleTraining', {
       config: true,
       default: true,
@@ -127,7 +127,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-spend Resolve when Doubling Expertise
+   // Auto-spend Resolve when Doubling Expertise.
    game.settings.register('titan', 'autoSpendResolveDoubleExpertise', {
       config: true,
       default: true,
@@ -138,7 +138,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-spend Resolve when Re-Rolling Failures
+   // Auto-spend Resolve when Re-Rolling Failures.
    game.settings.register('titan', 'autoSpendResolveReRollFailures', {
       config: true,
       default: true,
@@ -149,7 +149,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-spend Resolve when Checks have a Resolve Cost
+   // Auto-spend Resolve when Checks have a Resolve Cost.
    game.settings.register('titan', 'autoSpendResolveChecks', {
       config: true,
       default: true,
@@ -160,7 +160,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-apply Fast Healing to Combatants
+   // Auto-apply Fast Healing to Combatants.
    game.settings.register('titan', 'autoApplyFastHealing', {
       choices: {
          enabled: 'SETTINGS.autoApplyFastHealing.enabled',
@@ -177,7 +177,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Auto-apply Persistent Damage to Combatants
+   // Auto-apply Persistent Damage to Combatants.
    game.settings.register('titan', 'autoApplyPersistentDamage', {
       choices: {
          enabled: 'SETTINGS.autoApplyPersistentDamage.enabled',
@@ -194,7 +194,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Auto-decrease the Duration of Effects for Combatants
+   // Auto-decrease the Duration of Effects for Combatants.
    game.settings.register('titan', 'autoDecreaseEffectDuration', {
       config: true,
       default: true,
@@ -205,7 +205,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Auto-remove Expired Effects from Combatants
+   // Auto-remove Expired Effects from Combatants.
    game.settings.register('titan', 'autoRemoveExpiredEffects', {
       choices: {
          enabled: 'SETTINGS.autoRemoveExpiredEffects.enabled',
@@ -222,7 +222,7 @@ export default function registerSystemSettings() {
       type: String,
    });
 
-   // Report taking Damage
+   // Report taking Damage.
    game.settings.register('titan', 'reportTakingDamage', {
       config: true,
       default: true,
@@ -233,7 +233,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report Healing Damage
+   // Report Healing Damage.
    game.settings.register('titan', 'reportHealingDamage', {
       config: true,
       default: true,
@@ -244,7 +244,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report Rending Armor
+   // Report Rending Armor.
    game.settings.register('titan', 'reportRendingArmor', {
       config: true,
       default: true,
@@ -255,7 +255,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report Repairing Armor
+   // Report Repairing Armor.
    game.settings.register('titan', 'reportRepairingArmor', {
       config: true,
       default: true,
@@ -266,7 +266,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report Spending Resolve
+   // Report Spending Resolve.
    game.settings.register('titan', 'reportSpendingResolve', {
       config: true,
       default: true,
@@ -277,7 +277,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report Regaining Resolve
+   // Report Regaining Resolve.
    game.settings.register('titan', 'reportRegainingResolve', {
       config: true,
       default: true,
@@ -288,7 +288,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report Resting
+   // Report Resting.
    game.settings.register('titan', 'reportResting', {
       config: true,
       default: true,
@@ -299,7 +299,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Report a Combatant's Effects at the Start and End of their Turn
+   // Report a Combatant's Effects at the Start and End of their Turn.
    game.settings.register('titan', 'reportEffects', {
       config: true,
       default: true,
@@ -310,7 +310,7 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Base multiplier for a Character's maximum Stamina
+   // Base multiplier for a Character's maximum Stamina.
    game.settings.register('titan', 'staminaBaseMultiplier', {
       config: true,
       default: 2,
@@ -321,7 +321,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Base multiplier for a Minion or Warrior's maximum Stamina
+   // Base multiplier for a Minion or Warrior's maximum Stamina.
    game.settings.register('titan', 'minionStaminaMultiplier', {
       config: true,
       default: 0.5,
@@ -332,7 +332,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Base multiplier for a Character's maximum Resolve
+   // Base multiplier for a Character's maximum Resolve.
    game.settings.register('titan', 'resolveBaseMultiplier', {
       config: true,
       default: 0.5,
@@ -343,7 +343,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Base multiplier for a Character's maximum Wounds
+   // Base multiplier for a Character's maximum Wounds.
    game.settings.register('titan', 'woundsBaseMultiplier', {
       config: true,
       default: 0.5,
@@ -354,7 +354,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Base Wounds Healed every time a Character takes a Long Rest
+   // Base Wounds Healed every time a Character takes a Long Rest.
    game.settings.register('titan', 'woundsBaseRegain', {
       config: true,
       default: 1,
@@ -370,7 +370,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Base Resolve Regained at the start of a Combatant's turn
+   // Base Resolve Regained at the start of a Combatant's turn.
    game.settings.register('titan', 'resolveBaseRegain', {
       config: true,
       default: 1,
@@ -386,7 +386,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Whether to confirm requests to regenerate a Document's Unique Identifier
+   // Whether to confirm requests to regenerate a Document's Unique Identifier.
    game.settings.register('titan', 'confirmRegenerateUUID', {
       config: true,
       default: true,
@@ -419,7 +419,7 @@ export default function registerSystemSettings() {
       });
    }
 
-   // Register default Attributes for Skills
+   // Register default Attributes for Skills.
    createDefaultSkillAttributeSettings('arcana', 'mind');
    createDefaultSkillAttributeSettings('athletics', 'body');
    createDefaultSkillAttributeSettings('deception', 'mind');
@@ -439,7 +439,7 @@ export default function registerSystemSettings() {
    createDefaultSkillAttributeSettings('subterfuge', 'mind');
    createDefaultSkillAttributeSettings('stealth', 'body');
 
-   // Default XP cost for Abilities
+   // Default XP cost for Abilities.
    game.settings.register('titan', 'defaultXpCost.ability', {
       config: true,
       default: 2,
@@ -450,7 +450,7 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
-   // Default XP cost for Spells
+   // Default XP cost for Spells.
    game.settings.register('titan', 'defaultXpCost.spell', {
       config: true,
       default: 0,

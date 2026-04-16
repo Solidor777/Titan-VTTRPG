@@ -11,7 +11,7 @@
    /** @type {Tag[]} List of traits converted into tags. */
    let itemTypeTraits;
 
-   // Populate the tags list
+   // Populate the tags list.
    $: {
       itemTypeTraits = [];
       for (const [idx] in $document.system.trait) {

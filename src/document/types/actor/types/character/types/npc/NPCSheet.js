@@ -12,13 +12,13 @@ export default class TitanNPCSheet extends TitanCharacterSheet {
     * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
-      // Add sheet classes
+      // Add sheet classes.
       const classes = ['titan-npc-sheet'];
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Add Svelte Shell
+      // Add Svelte Shell.
       options = foundry.utils.mergeObject(
          options, {
             svelte: {

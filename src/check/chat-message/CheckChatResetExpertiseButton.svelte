@@ -17,7 +17,7 @@
          die.expertiseApplied = 0;
       }
 
-      // Reset the expertise available and recalculate the check results
+      // Reset the expertise available and recalculate the check results.
       $document.flags.titan.results.expertiseRemaining = $document.flags.titan.parameters.totalExpertise;
       const newResults = recalculateCheckResults($document.flags.titan);
 

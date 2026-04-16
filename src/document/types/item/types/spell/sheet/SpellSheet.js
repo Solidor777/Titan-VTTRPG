@@ -6,8 +6,7 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 /**
  * An Item Sheet class with functionality shared by all Spell Items.
  * @extends {TitanItemSheet}
- * @property {SpellSheetState} applicationState - Reactive store for managing the
- *    state of the Spell Sheet.
+ * @property {SpellSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.
  */
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
@@ -15,13 +14,13 @@ export default class TitanSpellSheet extends TitanItemSheet {
     * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
-      // Add sheet classes
+      // Add sheet classes.
       const classes = ['titan-spell-sheet'];
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)
          : classes;
 
-      // Add Svelte Shell
+      // Add Svelte Shell.
       options = foundry.utils.mergeObject(
          options, {
             svelte: {
@@ -43,8 +42,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    /**
-    * Removes the Custom Aspect at the provided index from this sheet's
-    * application state.
+    * Removes the Custom Aspect at the provided index from this sheet's application state.
     * @param {number} idx - The index of the aspect to remove.
     */
    removeCustomAspect(idx) {
@@ -52,8 +50,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    /**
-    * Overridable function for creating the reactive state store for this
-    * sheet.
+    * Overridable function for creating the reactive state store for this sheet.
     * @override
     * @returns {typeof SpellSheetState} The newly created state store.
     * @protected

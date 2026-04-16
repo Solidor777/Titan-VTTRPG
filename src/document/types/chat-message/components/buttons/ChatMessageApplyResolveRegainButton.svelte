@@ -13,20 +13,20 @@
     * Calculates the tooltip HTML for the resolve regain button.
     */
    function getTooltip() {
-      // Base label
+      // Base label.
       let retVal = `<p>${localize('resolveRegain.desc')}</p>`;
 
-      // Equipment
+      // Equipment.
       if ($document.flags.titan.resolveRegain.equipment) {
          retVal += `<p>${localize('equipment')}: ${$document.flags.titan.resolveRegain.equipment}</p>`;
       }
 
-      // Abilities
+      // Abilities.
       if ($document.flags.titan.resolveRegain.ability) {
          retVal += `<p>${localize('abilities')}: ${$document.flags.titan.resolveRegain.ability}</p>`;
       }
 
-      // Effects
+      // Effects.
       if ($document.flags.titan.resolveRegain.effect) {
          retVal += `<p>${localize('effects')}: ${$document.flags.titan.resolveRegain.effect}</p>`;
       }
@@ -38,7 +38,7 @@
     * Applies resolve regain to the chat message owner and updates the message.
     */
    async function confirmResolveRegain() {
-      // If we own this chat message and the associated actor
+      // If we own this chat message and the associated actor.
       if (assert(
          document?.isOwner,
          'Cannot modify document %s if not owner.',
@@ -47,7 +47,7 @@
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor
+            // Update the actor.
             await actor.system.regainResolve(
                $document.flags.titan.resolveRegain.total,
                {
@@ -55,7 +55,7 @@
                },
             );
 
-            // Update the chat message
+            // Update the chat message.
             await $document.update({
                flags: {
                   titan: {

@@ -8,7 +8,7 @@
    /** @type {CheckDie[]} Array of processed dice from the Check. */
    let dice;
 
-   // Update the dice in response to changes
+   // Update the dice in response to changes.
    $: {
       dice = $document.flags.titan.results.dice;
    }

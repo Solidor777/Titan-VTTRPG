@@ -32,20 +32,19 @@
    /** @type {EventDispatcher} Dispatcher for component Events. */
    const eventDispatcher = createEventDispatcher();
 
-   // Update the input if the value changes
+   // Update the input if the value changes.
    $: if (!editingActive) {
       input = value.toString();
    }
 
    /**
-    * Called when the input changes to ensure the input is valid before setting
-    * the value.
+    * Called when the input changes to ensure the input is valid before setting the value.
     */
    function parseInput() {
       // Get the new value from the inputted string.
       let newValue = isInteger ? parseInt(input) : parseFloat(input);
 
-      // If the new value is not a number (such as if it is blank), set it to
+      // If the new value is not a number (such as if it is blank), set it to.
       // 0.
       if (isNaN(newValue)) {
          newValue = 0;
@@ -78,8 +77,7 @@
    }
 
    /**
-    * Called when the key is pressed to ensure that invalid characters are not
-    * added to the input.
+    * Called when the key is pressed to ensure that invalid characters are not added to the input.
     * @param {object} event - The input event on the key press.
     */
    function filterInput(event) {
