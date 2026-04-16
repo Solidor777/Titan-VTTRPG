@@ -5039,18 +5039,115 @@ export default class CharacterDataModel extends TitanActorDataModel {
             item.type === 'effect' && item.system.duration.type === selector);
          if (turnEffects.length > 0) {
             for (const effect of turnEffects) {
-               if (effect.system.duration.remaining > 0) {
-                  effect.system.duration.remaining -= 1;
-                  await effect.update({
-                     system: {
-                        duration: {
-                           remaining: effect.system.duration.remaining,
-                        },
+               effect.system.duration.remaining -= 1;
+               await effect.update({
+                  system: {
+                     duration: {
+                        remaining: effect.system.duration.remaining,
                      },
+                  },
+               });
+            }
+         }
+      }
+   }
+
+   /**
+    * Increases the duration of turn effects by 1, reversing a prior decrease. Allows remaining to become positive
+    * after going negative, but will not incorrectly restore an effect that was already expired before the decrease.
+    * @param {string} selector - Used to determine whether we are checking for turnStart or turnEnd Effects.
+    * @private
+    */
+   async _increaseTurnEffectDuration(selector) {
+      // Increase effect duration if appropriate.
+      if (getSetting('autoDecreaseEffectDuration')) {
+         const turnEffects = this.parent.items.filter((item) =>
+            item.type === 'effect' && item.system.duration.type === selector);
+         if (turnEffects.length > 0) {
+            for (const effect of turnEffects) {
+               effect.system.duration.remaining += 1;
+               await effect.update({
+                  system: {
+                     duration: {
+                        remaining: effect.system.duration.remaining,
+                     },
+                  },
+               });
+            }
+         }
+      }
+   }
+
+   /**
+    * Reverts the Initiative effect duration changes made during a prior call to onInitiativeAdvanced.
+    * Uses the same filter as onInitiativeAdvanced but increments remaining instead of decrementing it.
+    * @param {float} currentInitiative - The initiative of the combatant that advanced to current in the forward step.
+    * @param {float} previousInitiative - The initiative of the combatant that was current before the forward step.
+    * @param {boolean} isNewRound - Whether the forward step was the start of a new round.
+    * @returns {Promise<void>}
+    */
+   async onInitiativeReverted(currentInitiative, previousInitiative, isNewRound) {
+      if (isCurrentUserBestOwner(this.parent)) {
+         if (getSetting('autoDecreaseEffectDuration')) {
+            const initiativeEffects = this.parent.items.filter((item) =>
+               item.type === 'effect' && item.system.duration.type === 'initiative');
+            if (initiativeEffects) {
+
+               // Calculate which effects to revert using the same filter as onInitiativeAdvanced.
+               let effectsToRevert;
+
+               // If the forward step was the start of a new round, revert effects with an initiative lesser or equal
+               // to the forward step's previous initiative, or greater than or equal to the forward step's current.
+               if (isNewRound) {
+                  effectsToRevert = initiativeEffects.filter((effect) => {
+                     const initiative = effect.system.duration.initiative;
+                     return (initiative < previousInitiative || initiative >= currentInitiative);
                   });
+               }
+               else {
+                  // If the forward step was not the start of a new round, revert effects with an initiative lesser
+                  // than the forward step's previous initiative, but greater than or equal to the current.
+                  effectsToRevert = initiativeEffects.filter((effect) => {
+                     const initiative = effect.system.duration.initiative;
+                     return (initiative < previousInitiative && initiative >= currentInitiative);
+                  });
+               }
+
+               // Increase the duration of each matched effect by 1 round.
+               if (effectsToRevert.length > 0) {
+                  for (const effect of effectsToRevert) {
+                     effect.system.duration.remaining += 1;
+                     await effect.update({
+                        system: {
+                           duration: {
+                              remaining: effect.system.duration.remaining,
+                           },
+                        },
+                     });
+                  }
                }
             }
          }
+      }
+   }
+
+   /**
+    * Reverts the Turn-Start effect duration changes made during a prior call to onTurnStart.
+    * @returns {Promise<void>}
+    */
+   async onTurnStartReverted() {
+      if (isCurrentUserBestOwner(this.parent)) {
+         await this._increaseTurnEffectDuration('turnStart');
+      }
+   }
+
+   /**
+    * Reverts the Turn-End effect duration changes made during a prior call to onTurnEnd.
+    * @returns {Promise<void>}
+    */
+   async onTurnEndReverted() {
+      if (isCurrentUserBestOwner(this.parent)) {
+         await this._increaseTurnEffectDuration('turnEnd');
       }
    }
 

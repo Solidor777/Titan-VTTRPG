@@ -2,6 +2,7 @@ import '~/styles/Global.scss';
 import '~/styles/Lato.scss';
 import '~/styles/OpenSans.scss';
 import onCombatNextTurn from '~/hooks/OnCombatNextTurn.js';
+import onCombatPreviousTurn from '~/hooks/OnCombatPreviousTurn.js';
 import onGetActorDirectoryEntryContext from '~/hooks/OnGetActorDirectoryEntryContext.js';
 import onGetChatLogEntryContext from '~/hooks/OnGetChatLogEntryContext.js';
 import onGetItemDirectoryEntryContext from '~/hooks/OnGetItemDirectoryEntryContext.js';
@@ -14,6 +15,7 @@ import onceReady from '~/hooks/OnceReady.js';
 import onceSetup from '~/hooks/OnceSetup.js';
 
 Hooks.on('combatNextTurn', onCombatNextTurn);
+Hooks.on('combatPreviousTurn', onCombatPreviousTurn);
 Hooks.on('getActorDirectoryEntryContext', onGetActorDirectoryEntryContext);
 Hooks.on('getChatLogEntryContext', onGetChatLogEntryContext);
 Hooks.on('getItemDirectoryEntryContext', onGetItemDirectoryEntryContext);

@@ -27,6 +27,21 @@ export default class TitanCombat extends Combat {
    }
 
    /**
+    * Retreats to the previous turn, triggering the combatPreviousTurn hook via socket for all clients.
+    * @returns {Promise<Combat>} The updated Combat document.
+    * @override
+    */
+   async previousTurn() {
+      let displacedCombatant = this.combatant;
+      const retVal = await super.previousTurn();
+      if (this.turns.length > 1) {
+         const restoredCombatant = this.combatant;
+         game.titan.socketManager.triggerSocketHook('combatPreviousTurn', restoredCombatant, displacedCombatant, this);
+      }
+      return retVal;
+   }
+
+   /**
     * Gets all the Character combatants owned by this combat.
     * @returns {Combatant[]} All Character combatants owned by this combat.
     */
