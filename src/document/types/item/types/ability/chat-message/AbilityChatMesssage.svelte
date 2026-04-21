@@ -1,13 +1,10 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ItemChatMessageItemChecks
       from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AbilityChatStats from '~/document/types/item/types/ability/chat-message/AbilityChatStats.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -31,62 +28,21 @@
       </div>
    {/if}
 
-   <!--Footer-->
-   <div class="section small-text tags">
-      <!--Rarity-->
-      <div class="tag">
-         <RarityTag rarity={item.rarity}/>
-      </div>
-
-      <!--Action-->
-      {#if item.action}
-         <div class="tag">
-            <Tag>{localize('action')}</Tag>
-         </div>
-      {/if}
-
-      <!--Reaction-->
-      {#if item.reaction}
-         <div class="tag">
-            <Tag>{localize('reaction')}</Tag>
-         </div>
-      {/if}
-
-      <!--Passive-->
-      {#if item.passive}
-         <div class="tag">
-            <Tag>{localize('passive')}</Tag>
-         </div>
-      {/if}
-
-      <!--XP Cost-->
-      {#if item.xpCost}
-         <div class="tag">
-            <StatTag label={localize('xpCost')} value={item.xpCost}/>
-         </div>
-      {/if}
-
-      <!--Custom Traits-->
-      {#each item.customTrait as trait}
-         <div class="tag">
-            <Tag tooltip={trait.description}>
-               {trait.name}
-            </Tag>
-         </div>
-      {/each}
+   <!--Stats-->
+   <div class="section">
+      <AbilityChatStats {item}/>
    </div>
 </ItemChatMessageShell>
 
 <style lang="scss">
    .section {
+      @include flex-column;
+      @include flex-group-top;
+
       width: 100%;
 
       &:not(.rich-text) {
          padding-bottom: var(--titan-spacing-large);
-
-         &:not(.tags) {
-            padding-top: var(--titan-spacing-large);
-         }
       }
 
       &:last-child {
@@ -95,26 +51,6 @@
 
       &:not(:first-child) {
          @include border-top;
-      }
-
-      &.tags {
-         @include flex-row;
-         @include flex-group-center;
-
-         flex-wrap: wrap;
-
-         .tag {
-            @include tag-container-child-margin;
-         }
-      }
-
-      &:not(.tags) {
-         @include flex-column;
-         @include flex-group-top;
-      }
-
-      &.small-text {
-         @include font-size-small;
       }
    }
 </style>
