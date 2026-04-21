@@ -4,7 +4,7 @@
    import ChatMessageExpiredEffectsRemovedMessage
       from '~/document/types/chat-message/components/messages/ChatMessageExpiredEffectsRemovedMessage.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
-   import getSetting from '~/helpers/utility-functions/GetSetting.js';
+   import autoRemoveExpiredEffects from '~/helpers/Settings/AutoRemoveExpiredEffects.js';
    import { getContext } from 'svelte';
    import EffectsExpiredReportChatMessageHeader
       from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageHeader.svelte';
@@ -32,7 +32,7 @@
    }
 
    // Otherwise, show a button if appropriate.
-   else if (getSetting('autoRemoveExpiredEffects') === 'showButton') {
+   else if (autoRemoveExpiredEffects() === 'showButton') {
       sections.push(ChatMessageRemoveExpiredEffectsButton);
    }
 </script>

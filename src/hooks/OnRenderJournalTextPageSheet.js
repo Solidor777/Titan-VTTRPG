@@ -1,4 +1,4 @@
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import darkModeJournals from '~/helpers/Settings/DarkModeJournals.js';
 
 /**
  * Called before a Journal Text Page Sheet is rendered to add the dark mode class if appropriate.
@@ -7,7 +7,7 @@ import getSetting from '~/helpers/utility-functions/GetSetting.js';
  */
 export default function onRenderJournalTextPageSheet(journalSheet, element) {
    // If dark mode journals are enabled, add the titan dark mode class.
-   if (getSetting('darkModeJournals')) {
+   if (darkModeJournals()) {
       const journal = element.find('journal-entry').prevObject;
       journal.addClass('titan-dark-mode');
    }

@@ -2,7 +2,7 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
-import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
+import darkModeSheets from '~/helpers/Settings/DarkModeSheets.js';
 import ConfigureSheetButton from '~/document/sheet/ConfigureSheetButton.svelte';
 
 /**
@@ -24,7 +24,7 @@ export default class TitanDocumentSheet extends SvelteApplication {
       ];
 
       // Add the dark mode class if appropriate.
-      if (isDarkModeSheetsEnabled()) {
+      if (darkModeSheets()) {
          classes.push('titan-dark-mode');
       }
 

@@ -1,5 +1,5 @@
 import TitanItemDataModel from '~/document/types/item/TitanItemDataModel.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import defaultXpCostSpell from '~/helpers/Settings/DefaultXpCostSpell.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
@@ -25,7 +25,7 @@ export default class SpellDataModel extends TitanItemDataModel {
       schema.rarity = createStringField('common');
 
       // XP Cost.
-      schema.xpCost = createIntegerField(getSetting('defaultXpCost.spell'));
+      schema.xpCost = createIntegerField(defaultXpCostSpell());
 
       // Tradition.
       schema.tradition = createStringField('');

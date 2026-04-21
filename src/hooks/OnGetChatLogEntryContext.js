@@ -1,6 +1,8 @@
 import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
 import localize from '~/helpers/utility-functions/Localize.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import autoSpendResolveReRollFailures from '~/helpers/Settings/AutoSpendResolveReRollFailures.js';
+import autoSpendResolveDoubleExpertise from '~/helpers/Settings/AutoSpendResolveDoubleExpertise.js';
+import autoSpendResolveDoubleTraining from '~/helpers/Settings/AutoSpendResolveDoubleTraining.js';
 import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults.js';
 import { DICE_ICON, EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
 import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
@@ -12,9 +14,9 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
  */
 export default function onGetChatLogEntryContext(element, options) {
    // Get the settings for auto spending resolve.
-   const autoSpendResolveReRollFailures = getSetting('autoSpendResolveReRollFailures');
-   const autoSpendResolveDoubleExpertise = getSetting('autoSpendResolveDoubleExpertise');
-   const autoSpendResolveDoubleTraining = getSetting('autoSpendResolveDoubleTraining');
+   const autoSpendResolveReRollFailuresEnabled = autoSpendResolveReRollFailures();
+   const autoSpendResolveDoubleExpertiseEnabled = autoSpendResolveDoubleExpertise();
+   const autoSpendResolveDoubleTrainingEnabled = autoSpendResolveDoubleTraining();
 
    // Re-roll Failures (Spend Resolve).
    const reRollFailureOptions = [
@@ -27,7 +29,7 @@ export default function onGetChatLogEntryContext(element, options) {
    ];
 
    // Re-roll Failures without spending resolve.
-   if (game.user.isGM || !autoSpendResolveReRollFailures) {
+   if (game.user.isGM || !autoSpendResolveReRollFailuresEnabled) {
       reRollFailureOptions.unshift({
          name: localize('reRollFailures'),
          icon: `<i class="${DICE_ICON}"></i>`,
@@ -47,7 +49,7 @@ export default function onGetChatLogEntryContext(element, options) {
    ];
 
    // Double Expertise without spending resolve.
-   if (game.user.isGM || !autoSpendResolveDoubleExpertise) {
+   if (game.user.isGM || !autoSpendResolveDoubleExpertiseEnabled) {
       doubleExpertiseOptions.unshift({
          name: localize('doubleExpertise'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
@@ -67,7 +69,7 @@ export default function onGetChatLogEntryContext(element, options) {
    ];
 
    // Double Training without spending resolve.
-   if (game.user.isGM || !autoSpendResolveDoubleTraining) {
+   if (game.user.isGM || !autoSpendResolveDoubleTrainingEnabled) {
       doubleTrainingOptions.push({
          name: localize('doubleTraining'),
          icon: `<i class="${TRAINING_ICON}"></i>`,

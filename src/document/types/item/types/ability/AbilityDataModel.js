@@ -2,7 +2,7 @@ import RulesElementItemDataModel from '~/document/types/item/RulesElementItemDat
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import defaultXpCostAbility from '~/helpers/Settings/DefaultXpCostAbility.js';
 import { ABILITY_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -15,7 +15,7 @@ export default class AbilityDataModel extends RulesElementItemDataModel {
       const schema = super._defineDocumentSchema();
 
       // XP cost.
-      schema.xpCost = createIntegerField(getSetting('defaultXpCost.ability'));
+      schema.xpCost = createIntegerField(defaultXpCostAbility());
 
       // Rarity.
       schema.rarity = createStringField('common');

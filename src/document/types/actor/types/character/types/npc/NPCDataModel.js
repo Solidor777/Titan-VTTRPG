@@ -1,6 +1,7 @@
 import CharacterDataModel from '~/document/types/actor/types/character/CharacterDataModel.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import minionStaminaMultiplier from '~/helpers/Settings/MinionStaminaMultiplier.js';
+import reportTakingDamage from '~/helpers/Settings/ReportTakingDamage.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
@@ -65,7 +66,7 @@ export default class NPCDataModel extends CharacterDataModel {
          }
 
          // Report taking and resisting damage if appropriate.
-         if (options?.report !== false && getSetting('reportTakingDamage')) {
+         if (options?.report !== false && reportTakingDamage()) {
 
             // Send the report to chat.
             await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
@@ -124,7 +125,7 @@ export default class NPCDataModel extends CharacterDataModel {
          // Minions and below have a special stamina multiplier.
          case 'minion': {
             this.resource.stamina.maxBase =
-               Math.max(this.resource.stamina.maxBase * getSetting('minionStaminaMultiplier'), 1);
+               Math.max(this.resource.stamina.maxBase * minionStaminaMultiplier(), 1);
             this.resource.resolve.maxBase = 0;
             this.resource.wounds.maxBase = 0;
             return;

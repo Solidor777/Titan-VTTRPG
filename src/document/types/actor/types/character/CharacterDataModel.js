@@ -32,7 +32,51 @@ import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js'
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
 import getOwners from '~/helpers/utility-functions/GetOwners.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import autoDecreaseEffectDuration from '~/helpers/Settings/AutoDecreaseEffectDuration.js';
+import autoOpenCharacterSheetsGM from '~/helpers/Settings/AutoOpenCharacterSheetsGM.js';
+import autoOpenCharacterSheetsPlayer from '~/helpers/Settings/AutoOpenCharacterSheetsPlayer.js';
+import autoApplyFastHealing from '~/helpers/Settings/AutoApplyFastHealing.js';
+import autoApplyPersistentDamage from '~/helpers/Settings/AutoApplyPersistentDamage.js';
+import autoRegainResolve from '~/helpers/Settings/AutoRegainResolve.js';
+import autoRemoveExpiredEffects from '~/helpers/Settings/AutoRemoveExpiredEffects.js';
+import autoRevertFastHealing from '~/helpers/Settings/AutoRevertFastHealing.js';
+import autoRevertPersistentDamage from '~/helpers/Settings/AutoRevertPersistentDamage.js';
+import autoRevertResolveRegain from '~/helpers/Settings/AutoRevertResolveRegain.js';
+import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
+import autoSpendResolveDoubleExpertise from '~/helpers/Settings/AutoSpendResolveDoubleExpertise.js';
+import autoSpendResolveDoubleTraining from '~/helpers/Settings/AutoSpendResolveDoubleTraining.js';
+import defaultAttributeArcana from '~/helpers/Settings/DefaultAttributeArcana.js';
+import defaultAttributeAthletics from '~/helpers/Settings/DefaultAttributeAthletics.js';
+import defaultAttributeDeception from '~/helpers/Settings/DefaultAttributeDeception.js';
+import defaultAttributeDexterity from '~/helpers/Settings/DefaultAttributeDexterity.js';
+import defaultAttributeDiplomacy from '~/helpers/Settings/DefaultAttributeDiplomacy.js';
+import defaultAttributeEngineering from '~/helpers/Settings/DefaultAttributeEngineering.js';
+import defaultAttributeIntimidation from '~/helpers/Settings/DefaultAttributeIntimidation.js';
+import defaultAttributeInvestigation from '~/helpers/Settings/DefaultAttributeInvestigation.js';
+import defaultAttributeLore from '~/helpers/Settings/DefaultAttributeLore.js';
+import defaultAttributeMedicine from '~/helpers/Settings/DefaultAttributeMedicine.js';
+import defaultAttributeMeleeWeapons from '~/helpers/Settings/DefaultAttributeMeleeWeapons.js';
+import defaultAttributeMetaphysics from '~/helpers/Settings/DefaultAttributeMetaphysics.js';
+import defaultAttributeNature from '~/helpers/Settings/DefaultAttributeNature.js';
+import defaultAttributePerception from '~/helpers/Settings/DefaultAttributePerception.js';
+import defaultAttributePerformance from '~/helpers/Settings/DefaultAttributePerformance.js';
+import defaultAttributeRangedWeapons from '~/helpers/Settings/DefaultAttributeRangedWeapons.js';
+import defaultAttributeSubterfuge from '~/helpers/Settings/DefaultAttributeSubterfuge.js';
+import defaultAttributeStealth from '~/helpers/Settings/DefaultAttributeStealth.js';
+import initiativeFormula from '~/helpers/Settings/InitiativeFormula.js';
+import reportEffects from '~/helpers/Settings/ReportEffects.js';
+import reportHealingDamage from '~/helpers/Settings/ReportHealingDamage.js';
+import reportRegainingResolve from '~/helpers/Settings/ReportRegainingResolve.js';
+import reportRendingArmor from '~/helpers/Settings/ReportRendingArmor.js';
+import reportRepairingArmor from '~/helpers/Settings/ReportRepairingArmor.js';
+import reportResting from '~/helpers/Settings/ReportResting.js';
+import reportSpendingResolve from '~/helpers/Settings/ReportSpendingResolve.js';
+import reportTakingDamage from '~/helpers/Settings/ReportTakingDamage.js';
+import resolveBaseMultiplier from '~/helpers/Settings/ResolveBaseMultiplier.js';
+import resolveBaseRegain from '~/helpers/Settings/ResolveBaseRegain.js';
+import staminaBaseMultiplier from '~/helpers/Settings/StaminaBaseMultiplier.js';
+import woundsBaseMultiplier from '~/helpers/Settings/WoundsBaseMultiplier.js';
+import woundsBaseRegain from '~/helpers/Settings/WoundsBaseRegain.js';
 import getSumOfObjectValues from '~/helpers/utility-functions/GetSumOfObjectValues.js';
 import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
 import isCurrentUserBestOwner from '~/helpers/utility-functions/IsCurrentUserBestOwner.js';
@@ -329,24 +373,24 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // Add skills.
       schema.skill = createSchemaField({
-         arcana: createSkillSchema(getSetting('defaultAttribute.arcana')),
-         athletics: createSkillSchema(getSetting('defaultAttribute.athletics')),
-         deception: createSkillSchema(getSetting('defaultAttribute.deception')),
-         dexterity: createSkillSchema(getSetting('defaultAttribute.dexterity')),
-         diplomacy: createSkillSchema(getSetting('defaultAttribute.diplomacy')),
-         engineering: createSkillSchema(getSetting('defaultAttribute.engineering')),
-         intimidation: createSkillSchema(getSetting('defaultAttribute.intimidation')),
-         investigation: createSkillSchema(getSetting('defaultAttribute.investigation')),
-         lore: createSkillSchema(getSetting('defaultAttribute.lore')),
-         medicine: createSkillSchema(getSetting('defaultAttribute.medicine')),
-         meleeWeapons: createSkillSchema(getSetting('defaultAttribute.meleeWeapons')),
-         metaphysics: createSkillSchema(getSetting('defaultAttribute.metaphysics')),
-         nature: createSkillSchema(getSetting('defaultAttribute.nature')),
-         perception: createSkillSchema(getSetting('defaultAttribute.perception')),
-         performance: createSkillSchema(getSetting('defaultAttribute.performance')),
-         rangedWeapons: createSkillSchema(getSetting('defaultAttribute.rangedWeapons')),
-         subterfuge: createSkillSchema(getSetting('defaultAttribute.subterfuge')),
-         stealth: createSkillSchema(getSetting('defaultAttribute.stealth')),
+         arcana: createSkillSchema(defaultAttributeArcana()),
+         athletics: createSkillSchema(defaultAttributeAthletics()),
+         deception: createSkillSchema(defaultAttributeDeception()),
+         dexterity: createSkillSchema(defaultAttributeDexterity()),
+         diplomacy: createSkillSchema(defaultAttributeDiplomacy()),
+         engineering: createSkillSchema(defaultAttributeEngineering()),
+         intimidation: createSkillSchema(defaultAttributeIntimidation()),
+         investigation: createSkillSchema(defaultAttributeInvestigation()),
+         lore: createSkillSchema(defaultAttributeLore()),
+         medicine: createSkillSchema(defaultAttributeMedicine()),
+         meleeWeapons: createSkillSchema(defaultAttributeMeleeWeapons()),
+         metaphysics: createSkillSchema(defaultAttributeMetaphysics()),
+         nature: createSkillSchema(defaultAttributeNature()),
+         perception: createSkillSchema(defaultAttributePerception()),
+         performance: createSkillSchema(defaultAttributePerformance()),
+         rangedWeapons: createSkillSchema(defaultAttributeRangedWeapons()),
+         subterfuge: createSkillSchema(defaultAttributeSubterfuge()),
+         stealth: createSkillSchema(defaultAttributeStealth()),
       });
 
       // Add ratings.
@@ -360,8 +404,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // Add resources.
       schema.resource = createSchemaField({
-         stamina: createResourceSchema(Math.ceil(3 * getSetting('staminaBaseMultiplier'))),
-         resolve: createResourceSchema(Math.ceil(1 * getSetting('resolveBaseMultiplier'))),
+         stamina: createResourceSchema(Math.ceil(3 * staminaBaseMultiplier())),
+         resolve: createResourceSchema(Math.ceil(1 * resolveBaseMultiplier())),
          wounds: createResourceSchema(0),
       });
 
@@ -562,15 +606,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Calculate base resource values.
       // Stamina = Total Attribute Mod.
       this.resource.stamina.maxBase = Math.max(Math.ceil(
-         totalBaseAttributeValue * getSetting('staminaBaseMultiplier')), 1);
+         totalBaseAttributeValue * staminaBaseMultiplier()), 1);
 
       // Resolve = Soul / 2 rounded up.
       this.resource.resolve.maxBase = Math.max(Math.ceil(
-         this.attribute.soul.baseValue * getSetting('resolveBaseMultiplier')), 1);
+         this.attribute.soul.baseValue * resolveBaseMultiplier()), 1);
 
       // Wounds = Total Attribute mod / 2 rounded up.
       this.resource.wounds.maxBase = Math.max(Math.ceil(
-         totalBaseAttributeValue * getSetting('woundsBaseMultiplier')), 1);
+         totalBaseAttributeValue * woundsBaseMultiplier()), 1);
    }
 
    /**
@@ -3987,17 +4031,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Double training.
       /** @type {number} */
       let resolveSpent = 0;
-      if (parameters.doubleTraining && getSetting('autoSpendResolveDoubleTraining')) {
+      if (parameters.doubleTraining && autoSpendResolveDoubleTraining()) {
          resolveSpent += 1;
       }
 
       // Double expertise.
-      if (parameters.doubleExpertise && getSetting('autoSpendResolveDoubleExpertise')) {
+      if (parameters.doubleExpertise && autoSpendResolveDoubleExpertise()) {
          resolveSpent += 1;
       }
 
       // Resolve cost.
-      if (parameters.resolveCost && getSetting('autoSpendResolveChecks')) {
+      if (parameters.resolveCost && autoSpendResolveChecks()) {
          resolveSpent += parameters.resolveCost;
       }
 
@@ -4127,7 +4171,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          );
 
          // Report taking and resisting damage if appropriate.
-         if (options?.report !== false && getSetting('reportTakingDamage')) {
+         if (options?.report !== false && reportTakingDamage()) {
 
             // Send the report to chat.
             await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
@@ -4258,7 +4302,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             const reportData = this._createHealingReportData(staminaRestored);
 
             // Report healing damage if appropriate.
-            if (options?.report !== false && getSetting('reportHealingDamage')) {
+            if (options?.report !== false && reportHealingDamage()) {
 
                // Send the report to chat.
                await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
@@ -4368,7 +4412,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const reportData = this._createSpendResolveReportData(resolveSpent, initialResolve);
 
          // Report regaining resolve if appropriate.
-         if (options?.report !== false && getSetting('reportSpendingResolve')) {
+         if (options?.report !== false && reportSpendingResolve()) {
             await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
          }
 
@@ -4457,7 +4501,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             const reportData = this._createRendReportData(armorLost, armor);
 
             // Report rending armor if appropriate.
-            if (options?.report !== false && getSetting('reportRendingArmor')) {
+            if (options?.report !== false && reportRendingArmor()) {
 
                // Send the report to chat.
                await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
@@ -4534,7 +4578,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             const reportData = this._createRepairsReportData(armorRepaired, armor);
 
             // Report repairing armor if appropriate.
-            if (options?.report !== false && getSetting('reportRepairingArmor')) {
+            if (options?.report !== false && reportRepairingArmor()) {
 
                // Send the report to chat.
                await this._whisperOwners(reportData, game.user.id, options?.playSound !== false);
@@ -4681,7 +4725,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Send a chat message report if appropriate.
-         if (getSetting('reportResting') && options?.report !== false) {
+         if (reportResting() && options?.report !== false) {
 
             const reportData = {
                type: 'removeCombatEffectsReport',
@@ -4717,7 +4761,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          });
 
          // Send a chat message report if appropriate.
-         if (getSetting('reportResting') && options?.report !== false) {
+         if (reportResting() && options?.report !== false) {
 
             const reportData = {
                type: 'shortRestReport',
@@ -4749,7 +4793,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          let woundsHealed = 0;
          const wounds = this.resource.wounds;
          if (wounds.value > 0) {
-            woundsHealed = Math.min(getSetting('woundsBaseRegain') + this.mod.woundRegain.value, wounds.value);
+            woundsHealed = Math.min(woundsBaseRegain() + this.mod.woundRegain.value, wounds.value);
             wounds.value -= woundsHealed;
          }
 
@@ -4760,7 +4804,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          });
 
          // Send a chat message report if appropriate.
-         if (getSetting('reportResting') && options?.report !== false) {
+         if (reportResting() && options?.report !== false) {
 
             const reportData = {
                type: 'longRestReport',
@@ -4795,7 +4839,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (isCurrentUserBestOwner(this.parent)) {
 
          // Decrease the duration of effects with the Initiative duration type.
-         if (getSetting('autoDecreaseEffectDuration')) {
+         if (autoDecreaseEffectDuration()) {
             let initiativeEffects = this.parent.items.filter((item) =>
                item.type === 'effect' && item.system.duration.type === 'initiative');
             if (initiativeEffects) {
@@ -4846,8 +4890,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
                      const reportData = {};
 
                      // Get the report data for each expired effect if appropriate.
-                     const reportEffects = getSetting('reportEffects');
-                     const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
+                     const reportEffects = reportEffects();
+                     const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
                      const shouldSendReport = (reportEffects || autoRemoveExpiredEffects === 'showButton');
                      if (shouldSendReport) {
                         reportData.effects = {
@@ -4886,7 +4930,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Handle opening the sheet if appropriate.
       // If the current user a GM...
       if (game.user.isGM) {
-         switch (getSetting('autoOpenCharacterSheetsGM')) {
+         switch (autoOpenCharacterSheetsGM()) {
 
             // If set for NPCs only, open the sheet only if it has no player.
             // owners.
@@ -4916,7 +4960,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
          }
       }
-      else if (this.parent.isOwner && getSetting('autoOpenCharacterSheetsPlayer')) {
+      else if (this.parent.isOwner && autoOpenCharacterSheetsPlayer()) {
          // If the current user is a player and an owner,.
          // open the sheet if auto open sheets is enabled for players.
          this.parent.sheet.render(true);
@@ -4961,8 +5005,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Calculate whether to report effects and whether to remove expired.
          // effects.
-         const reportEffects = getSetting('reportEffects');
-         const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
+         const reportEffects = reportEffects();
+         const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
          const expiredEffects = this.getExpiredEffectItems();
 
          // If report effects is true, add all effects to the report.
@@ -5079,8 +5123,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Calculate whether to report effects and whether to remove expired.
          // effects.
-         const reportEffects = getSetting('reportEffects');
-         const autoRemoveExpiredEffects = getSetting('autoRemoveExpiredEffects');
+         const reportEffects = reportEffects();
+         const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
          const expiredEffects = this.getExpiredEffectItems();
 
          // Otherwise, add expired effects to the report if appropriate.
@@ -5117,7 +5161,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    async _decreaseTurnEffectDuration(reportData, selector) {
       // Decrease effect duration if appropriate.
-      if (getSetting('autoDecreaseEffectDuration')) {
+      if (autoDecreaseEffectDuration()) {
          const turnEffects = this.parent.items.filter((item) =>
             item.type === 'effect' && item.system.duration.type === selector);
          if (turnEffects.length > 0) {
@@ -5143,7 +5187,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    async _increaseTurnEffectDuration(selector) {
       // Increase effect duration if appropriate.
-      if (getSetting('autoDecreaseEffectDuration')) {
+      if (autoDecreaseEffectDuration()) {
          const turnEffects = this.parent.items.filter((item) =>
             item.type === 'effect' && item.system.duration.type === selector);
          if (turnEffects.length > 0) {
@@ -5171,7 +5215,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    async onInitiativeReverted(currentInitiative, previousInitiative, isNewRound) {
       if (isCurrentUserBestOwner(this.parent)) {
-         if (getSetting('autoDecreaseEffectDuration')) {
+         if (autoDecreaseEffectDuration()) {
             const initiativeEffects = this.parent.items.filter((item) =>
                item.type === 'effect' && item.system.duration.type === 'initiative');
             if (initiativeEffects) {
@@ -5448,8 +5492,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const persistentDamageElements = rulesElements.persistentDamage?.[selector];
 
          // Determine whether to auto apply dealing and damage.
-         const autoApplyHealing = getSetting('autoApplyFastHealing');
-         const autoApplyDamage = getSetting('autoApplyPersistentDamage');
+         const autoApplyHealing = autoApplyFastHealing();
+         const autoApplyDamage = autoApplyPersistentDamage();
 
          // Determine whether healing and damage are already confirmed.
          const healingConfirmed = autoApplyHealing === 'enabled';
@@ -5511,8 +5555,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
             // a button for either...
             if ((healing > 0 &&
                   (this.resource.stamina.value < this.resource.stamina.max || damage > 0) &&
-                  (getSetting('reportHealingDamage') || autoApplyHealing === 'showButton')) ||
-               (damage > 0 && (getSetting('reportTakingDamage') || autoApplyDamage === 'showButton'))) {
+                  (reportHealingDamage() || autoApplyHealing === 'showButton')) ||
+               (damage > 0 && (reportTakingDamage() || autoApplyDamage === 'showButton'))) {
 
                // Add the Fast Healing data.
                if (healing > 0) {
@@ -5559,7 +5603,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let shouldUpdateActor = false;
 
       // Determine whether to auto-regain resolve.
-      const autoRegainResolve = getSetting('autoRegainResolve');
+      const autoRegainResolve = autoRegainResolve();
       if (autoRegainResolve !== 'disabled') {
 
          // If the resolve value is below max.
@@ -5567,7 +5611,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (resolve.value < resolve.max) {
 
             // If any resolve will be regained.
-            const maxResolveRegained = getSetting('resolveBaseRegain') + this.mod.resolveRegain.value;
+            const maxResolveRegained = resolveBaseRegain() + this.mod.resolveRegain.value;
             if (maxResolveRegained > 0) {
 
                // Update the resources if appropriate.
@@ -5581,7 +5625,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                }
 
                // Update the report data if appropriate.
-               if (getSetting('reportRegainingResolve') || !confirmed) {
+               if (reportRegainingResolve() || !confirmed) {
                   reportData.resolve = {
                      value: resolve.value,
                      max: resolve.max,
@@ -5620,8 +5664,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const persistentDamageElements = rulesElements.persistentDamage?.[selector];
 
          // Determine whether to auto-revert healing and damage.
-         const autoRevertHealing = getSetting('autoRevertFastHealing');
-         const autoRevertDamage = getSetting('autoRevertPersistentDamage');
+         const autoRevertHealing = autoRevertFastHealing();
+         const autoRevertDamage = autoRevertPersistentDamage();
 
          // Determine whether the revert operations are already confirmed.
          const healingRevertConfirmed = autoRevertHealing === 'enabled';
@@ -5722,11 +5766,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let shouldUpdateActor = false;
 
       // Determine whether to auto-revert resolve regain.
-      const autoRevertResolveRegain = getSetting('autoRevertResolveRegain');
+      const autoRevertResolveRegain = autoRevertResolveRegain();
       if (autoRevertResolveRegain !== 'disabled') {
 
          // If any resolve will be reverted.
-         const maxResolveToRevert = getSetting('resolveBaseRegain') + this.mod.resolveRegain.value;
+         const maxResolveToRevert = resolveBaseRegain() + this.mod.resolveRegain.value;
          if (maxResolveToRevert > 0) {
 
             // Determine whether the revert is confirmed.
@@ -5740,7 +5784,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
 
             // Update the report data if appropriate.
-            if (getSetting('reportRegainingResolve') || !confirmed) {
+            if (reportRegainingResolve() || !confirmed) {
                reportData.resolve = {
                   value: this.resource.resolve.value,
                   max: this.resource.resolve.max,
@@ -6107,7 +6151,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const initiative = this.rating.initiative.value;
 
       // Get the initiative formula.
-      const initiativeFormula = getSetting('initiativeFormula');
+      const initiativeFormula = initiativeFormula();
 
       return new Roll(`${initiative}${initiativeFormula}`);
    }

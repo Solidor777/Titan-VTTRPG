@@ -1,7 +1,7 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import { Z_INDEX_APP } from '~/system/Constants.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
-import isDarkModeSheetsEnabled from '~/helpers/Settings/DarkModeSheets.js';
+import darkModeSheets from '~/helpers/Settings/DarkModeSheets.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
@@ -21,7 +21,7 @@ export default class TitanDialog extends TJSDialog {
       ];
 
       // Add the dark mode class if appropriate.
-      if (isDarkModeSheetsEnabled()) {
+      if (darkModeSheets()) {
          classes.push('titan-dark-mode');
       }
 

@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import getSetting from '~/helpers/utility-functions/GetSetting.js';
+   import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
@@ -31,7 +31,7 @@
    };
 
    /** @type {boolean} Whether to automatically spend the resolve for checks. */
-   const autoSpendResolve = getSetting('autoSpendResolveChecks');
+   const autoSpendResolve = autoSpendResolveChecks();
 
    /** @type {ItemCheckParameters} Calculated item check parameters. */
    let checkParameters;

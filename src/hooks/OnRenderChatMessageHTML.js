@@ -1,5 +1,5 @@
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import darkModeChatMessages from '~/helpers/Settings/DarkModeChatMessages.js';
 import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.svelte';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 
@@ -50,7 +50,7 @@ export default function onRenderChatMessageHTML(message, html) {
       }
 
       // Add the dark mode class if dark mode is enabled.
-      if (getSetting('darkModeChatMessages') !== 'disabled') {
+      if (darkModeChatMessages() !== 'disabled') {
          html.classList.add('titan-dark-mode');
       }
 
@@ -66,7 +66,7 @@ export default function onRenderChatMessageHTML(message, html) {
 
    // If this is not a titan message, but dark mode is enabled for all messages,.
    // add the dark mode class anyway.
-   else if (getSetting('darkModeChatMessages') === 'all') {
+   else if (darkModeChatMessages() === 'all') {
       html.classList.add('titan-dark-mode');
    }
 }

@@ -16,7 +16,7 @@
    import ChatMessageStamina from '~/document/types/chat-message/components/resources/ChatMessageStamina.svelte';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
-   import getSetting from '~/helpers/utility-functions/GetSetting.js';
+   import autoRemoveExpiredEffects from '~/helpers/Settings/AutoRemoveExpiredEffects.js';
    import { getContext } from 'svelte';
    import TurnEndReportChatMessageHeader
       from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageHeader.svelte';
@@ -58,7 +58,7 @@
       }
 
       // Otherwise, show a button if appropriate.
-      else if (getSetting('autoRemoveExpiredEffects') === 'showButton') {
+      else if (autoRemoveExpiredEffects() === 'showButton') {
          sections.push(ChatMessageRemoveExpiredEffectsButton);
       }
    }

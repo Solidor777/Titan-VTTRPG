@@ -1,5 +1,5 @@
 import ConfirmRegenerateUUIDDialog from '~/document/dialog/ConfirmRegenerateUUIDDialog.js';
-import getSetting from '~/helpers/utility-functions/GetSetting.js';
+import confirmRegenerateUUID from '~/helpers/Settings/ConfirmRegenerateUUID.js';
 import regenerateDocumentUUID from '~/helpers/utility-functions/RegenerateDocumentUUID.js';
 
 /**
@@ -16,7 +16,7 @@ export default function onRegenerateDocumentUUID(document) {
 
       // If the system is set to confirm the UUID regeneration, then bring up a.
       // dialog.
-      if (getSetting('confirmRegenerateUUID')) {
+      if (confirmRegenerateUUID()) {
          return new ConfirmRegenerateUUIDDialog(document).render(true);
       }
 

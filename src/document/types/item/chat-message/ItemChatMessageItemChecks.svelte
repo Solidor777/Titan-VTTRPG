@@ -1,5 +1,5 @@
 <script>
-   import getSetting from '~/helpers/utility-functions/GetSetting.js';
+   import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
    import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
@@ -13,7 +13,7 @@
    /** @type {TitanItem} */
    export let item = void 0;
 
-   const autoSpendResolve = getSetting('autoSpendResolveChecks');
+   const autoSpendResolve = autoSpendResolveChecks();
 
    /**
     * Rolls a Check from the Item's roll data.
