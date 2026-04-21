@@ -1,27 +1,24 @@
 <script>
-   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
-   import CharacterSheetItemExpandButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import CharacterSheetItem
+      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
-   import CharacterSheetItemImage
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
-   import CharacterSheetSpellCastingCheck
-      from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   import CharacterSheetSpellCastingCheck
+      from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
    import CharacterSheetCondensedCastingCheckButton
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type {TitanItem} Reference to the Item document. */
    export let item = void 0;
@@ -38,202 +35,92 @@
          enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
       }
    }
-
 </script>
 
-<div class="item">
-   <!--Header-->
-   <div class="header">
-      <div class="label">
-         <!--Image-->
-         <div class="image">
-            <CharacterSheetItemImage {item}/>
-         </div>
-
-         <!--Expand button-->
-         <div class="button">
-            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
-         </div>
+<CharacterSheetItem {item} bind:isExpanded>
+   <svelte:fragment slot="controls">
+      <!--Cast Spell-->
+      <div class="button">
+         <CharacterSheetCondensedCastingCheckButton itemId={item._id}/>
       </div>
 
-      <!--Controls-->
-      <div class="controls">
-         <!--Cast Spell-->
-         <div>
-            <CharacterSheetCondensedCastingCheckButton itemId={item._id}/>
-         </div>
-
-         <!--Send to Chat button-->
-         <div class="button">
-            <CharacterSheetItemSendToChatButton {item}/>
-         </div>
-
-         <!--Edit Button-->
-         <div class="button">
-            <CharacterSheetItemEditButton {item}/>
-         </div>
-
-         <!--Delete Button-->
-         <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
-         </div>
+      <!--Send to Chat button-->
+      <div class="button">
+         <CharacterSheetItemSendToChatButton {item}/>
       </div>
+
+      <!--Edit Button-->
+      <div class="button">
+         <CharacterSheetItemEditButton {item}/>
+      </div>
+
+      <!--Delete Button-->
+      <div class="button">
+         <CharacterSheetItemDeleteButton itemId={item._id}/>
+      </div>
+   </svelte:fragment>
+
+   <!--Item Check Data-->
+   <div class="section tags">
+      <CharacterSheetSpellCastingCheck {item}/>
    </div>
 
-   <!--Expandable content-->
-   {#if isExpanded === true}
-      <div class="expandable-content" transition:slide|local>
-         <!--Item Check Data-->
-         <div class="section tags">
-            <CharacterSheetSpellCastingCheck {item}/>
-         </div>
-
-         <!--Spell Aspects-->
-         {#if enabledAspects.length > 0 || item.system.customAspect.length > 0}
-            <div class="section tags">
-               <SpellAspectTags
-                  standardAspects={enabledAspects}
-                  customAspects={item.system.customAspect}
-               />
-            </div>
-         {/if}
-
-         <!--Item Checks-->
-         {#if item.system.check.length > 0}
-            <div class="section">
-               <CharacterSheetItemChecks {item}/>
-            </div>
-         {/if}
-
-         <!--Item Description-->
-         {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-            <div class="section rich-text">
-               <RichText value={item.system.description}/>
-            </div>
-         {/if}
-
-         <!--Footer-->
-         <div class="section tags small-text">
-            <!--Rarity-->
-            <div class="tag">
-               <RarityTag rarity={item.system.rarity}/>
-            </div>
-
-            <!--Tradition-->
-            <div class="tag">
-               <StatTag
-                  label={localize('tradition')}
-                  value={item.system.tradition}
-               />
-            </div>
-
-            <!--XP Cost-->
-            {#if item.system.xpCost}
-               <div class="tag">
-                  <StatTag
-                     label={localize('xpCost')}
-                     value={item.system.xpCost}
-                  />
-               </div>
-            {/if}
-
-            <!--Custom Traits-->
-            {#each item.system.customTrait as trait}
-               <div class="tag">
-                  <Tag tooltip={trait.description}>
-                     {trait.name}
-                  </Tag>
-               </div>
-            {/each}
-         </div>
+   <!--Spell Aspects-->
+   {#if enabledAspects.length > 0 || item.system.customAspect.length > 0}
+      <div class="section tags">
+         <SpellAspectTags
+            standardAspects={enabledAspects}
+            customAspects={item.system.customAspect}
+         />
       </div>
    {/if}
-</div>
 
-<style lang="scss">
-   .item {
-      @include flex-column;
-      @include flex-group-top;
+   <!--Item Checks-->
+   {#if item.system.check.length > 0}
+      <div class="section">
+         <CharacterSheetItemChecks {item}/>
+      </div>
+   {/if}
 
-      width: 100%;
+   <!--Item Description-->
+   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      <div class="section rich-text">
+         <RichText value={item.system.description}/>
+      </div>
+   {/if}
 
-      .header {
-         @include flex-row;
-         @include flex-space-between;
-         @include border-top-bottom-right;
-         @include panel-1;
-         @include padding-large;
+   <!--Footer-->
+   <div class="section tags small-text">
+      <!--Rarity-->
+      <div class="tag">
+         <RarityTag rarity={item.system.rarity}/>
+      </div>
 
-         width: 100%;
-         font-weight: bold;
+      <!--Tradition-->
+      <div class="tag">
+         <StatTag
+            label={localize('tradition')}
+            value={item.system.tradition}
+         />
+      </div>
 
-         .label {
-            @include flex-row;
-            @include flex-group-center;
+      <!--XP Cost-->
+      {#if item.system.xpCost}
+         <div class="tag">
+            <StatTag
+               label={localize('xpCost')}
+               value={item.system.xpCost}
+            />
+         </div>
+      {/if}
 
-            .button {
-               margin-left: var(--titan-spacing-standard);
-            }
-         }
-
-         .controls {
-            @include flex-row;
-            @include flex-group-right;
-
-            height: 100%;
-
-            .button {
-               &:not(:first-child) {
-                  margin-left: var(--titan-spacing-standard);
-               }
-            }
-         }
-      }
-
-      .expandable-content {
-         @include flex-column;
-         @include flex-group-top;
-         @include panel-3;
-         @include border-bottom-sides;
-
-         width: calc(100% - 16px);
-         padding: 0 var(--titan-spacing-standard);
-
-         .section {
-            width: 100%;
-
-            &:not(.rich-text) {
-               padding-bottom: var(--titan-spacing-large);
-
-               &:not(.tags) {
-                  padding-top: var(--titan-spacing-large);
-               }
-            }
-
-            &:not(:first-child) {
-               @include border-top;
-            }
-
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-
-               flex-wrap: wrap;
-
-               .tag {
-                  @include tag-container-child-margin;
-               }
-            }
-
-            &:not(.tags) {
-               @include flex-column;
-               @include flex-group-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
-            }
-         }
-      }
-   }
-</style>
+      <!--Custom Traits-->
+      {#each item.system.customTrait as trait}
+         <div class="tag">
+            <Tag tooltip={trait.description}>
+               {trait.name}
+            </Tag>
+         </div>
+      {/each}
+   </div>
+</CharacterSheetItem>

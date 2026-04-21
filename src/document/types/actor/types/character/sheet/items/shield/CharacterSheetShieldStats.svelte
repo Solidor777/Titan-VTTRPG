@@ -2,7 +2,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { SHIELD_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/shield/ShieldTraits.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import TraitTag from '~/helpers/svelte-components/tag/TraitTag.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import { DEFENSE_ICON } from '~/system/Icons.js';
@@ -39,16 +39,11 @@
    <!--Traits-->
    {#each item.system.trait as trait}
       <div class="stat">
-         {#if typeof (trait.value) === 'number'}
-            <StatTag
-               tooltip={localize(traitDescriptions[trait.name])}
-               label={localize(trait.name)}
-               value={trait.value}/>
-         {:else}
-            <Tag tooltip={localize(traitDescriptions[trait.name])}>
-               {localize(trait.name)}
-            </Tag>
-         {/if}
+         <TraitTag
+            label={localize(trait.name)}
+            value={trait.value}
+            tooltip={localize(traitDescriptions[trait.name])}
+         />
       </div>
    {/each}
 

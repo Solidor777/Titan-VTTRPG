@@ -1,25 +1,22 @@
 <script>
-   import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import CharacterSheetItemExpandButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
+   import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
+   import CharacterSheetItem
+      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
-   import CharacterSheetItemImage
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
-   import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import CharacterSheetItemToggleActiveButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
-   import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type {TitanItem} Reference to the Item document. */
    export let item = void 0;
@@ -28,67 +25,26 @@
    export let isExpanded = void 0;
 </script>
 
-<div class="item">
-   <!--Header-->
-   <div class="header">
-      <div class="label">
-         <!--Image-->
-         <div class="image">
-            <CharacterSheetItemImage {item}/>
-         </div>
-
-         <!--Expand button-->
-         <div class="button">
-            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
-         </div>
-      </div>
-
-      <!--Controls-->
-      <div class="controls">
-         <!--Duration-->
-         {#if item.system.duration.type !== 'permanent'}
-            {#if item.system.duration.type === 'initiative'}
-               <!--Initiative-->
-               <div class="field margin-right">
-                  <div class="label">
-                     {localize('initiative')}
-                  </div>
-                  <div class="input">
-                     <IntegerInput
-                        min={0}
-                        bind:value={item.system.duration.initiative}
-                        on:change={() => {
-                              item.update({
-                                 system: {
-                                    duration: {
-                                       initiative:
-                                          item.system.duration.initiative,
-                                    },
-                                 },
-                              });
-                           }}
-                     />
-                  </div>
-               </div>
-            {/if}
-
-            <div class="field">
+<CharacterSheetItem {item} bind:isExpanded>
+   <svelte:fragment slot="controls">
+      <!--Duration-->
+      {#if item.system.duration.type !== 'permanent'}
+         {#if item.system.duration.type === 'initiative'}
+            <!--Initiative-->
+            <div class="field margin-right">
                <div class="label">
-                  {item.system.duration.type === 'custom'
-                     ? item.system.duration.custom
-                     : localize('turns')}
+                  {localize('initiative')}
                </div>
-
-               <!--Duration input-->
                <div class="input">
-                  <IntegerIncrementInput
+                  <IntegerInput
                      min={0}
-                     bind:value={item.system.duration.remaining}
+                     bind:value={item.system.duration.initiative}
                      on:change={() => {
                            item.update({
                               system: {
                                  duration: {
-                                    remaining: item.system.duration.remaining,
+                                    initiative:
+                                       item.system.duration.initiative,
                                  },
                               },
                            });
@@ -96,180 +52,109 @@
                   />
                </div>
             </div>
-         {:else}
-            <!--Toggle Active Button-->
-            <CharacterSheetItemToggleActiveButton {item}/>
          {/if}
 
-         <!--Send to Chat button-->
-         <div class="button">
-            <CharacterSheetItemSendToChatButton {item}/>
-         </div>
-
-         <!--Edit Button-->
-         <div class="button">
-            <CharacterSheetItemEditButton {item}/>
-         </div>
-
-         <!--Delete Button-->
-         <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
-         </div>
-      </div>
-   </div>
-
-   <!--Expandable content-->
-   {#if isExpanded === true}
-      <div class="expandable-content" transition:slide|local>
-         <!--Item Checks-->
-         {#if item.system.check.length > 0}
-            <div class="section">
-               <CharacterSheetItemChecks {item}/>
+         <div class="field">
+            <div class="label">
+               {item.system.duration.type === 'custom'
+                  ? item.system.duration.custom
+                  : localize('turns')}
             </div>
-         {/if}
 
-         <!--Item Description-->
-         {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-            <div class="section rich-text">
-               <RichText value={item.system.description}/>
-            </div>
-         {/if}
-
-         <div class="section tags small-text">
-            <!--Duration-->
-            <div class="tag">
-               <DurationTag
-                  type={item.system.duration.type}
-                  remaining={item.system.duration.remaining}
+            <!--Duration input-->
+            <div class="input">
+               <IntegerIncrementInput
+                  min={0}
+                  bind:value={item.system.duration.remaining}
+                  on:change={() => {
+                        item.update({
+                           system: {
+                              duration: {
+                                 remaining: item.system.duration.remaining,
+                              },
+                           },
+                        });
+                     }}
                />
             </div>
-
-            <!--Expired-->
-            {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
-               <div class="tag">
-                  <Tag>{localize('expired')}</Tag>
-               </div>
-            {/if}
-
-            <!--Traits-->
-            {#if item.system.customTrait.length > 0}
-               {#each item.system.customTrait as trait}
-                  <div class="tag">
-                     <Tag tooltip={trait.description}>
-                        {trait.name}
-                     </Tag>
-                  </div>
-               {/each}
-            {/if}
          </div>
+      {:else}
+         <!--Toggle Active Button-->
+         <CharacterSheetItemToggleActiveButton {item}/>
+      {/if}
+
+      <!--Send to Chat button-->
+      <div class="button">
+         <CharacterSheetItemSendToChatButton {item}/>
+      </div>
+
+      <!--Edit Button-->
+      <div class="button">
+         <CharacterSheetItemEditButton {item}/>
+      </div>
+
+      <!--Delete Button-->
+      <div class="button">
+         <CharacterSheetItemDeleteButton itemId={item._id}/>
+      </div>
+   </svelte:fragment>
+
+   <!--Item Checks-->
+   {#if item.system.check.length > 0}
+      <div class="section">
+         <CharacterSheetItemChecks {item}/>
       </div>
    {/if}
-</div>
+
+   <!--Item Description-->
+   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      <div class="section rich-text">
+         <RichText value={item.system.description}/>
+      </div>
+   {/if}
+
+   <div class="section tags small-text">
+      <!--Duration-->
+      <div class="tag">
+         <DurationTag
+            type={item.system.duration.type}
+            remaining={item.system.duration.remaining}
+         />
+      </div>
+
+      <!--Expired-->
+      {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
+         <div class="tag">
+            <Tag>{localize('expired')}</Tag>
+         </div>
+      {/if}
+
+      <!--Traits-->
+      {#each item.system.customTrait as trait}
+         <div class="tag">
+            <Tag tooltip={trait.description}>
+               {trait.name}
+            </Tag>
+         </div>
+      {/each}
+   </div>
+</CharacterSheetItem>
 
 <style lang="scss">
-   .item {
-      @include flex-column;
-      @include flex-group-top;
+   .field {
+      @include flex-row;
+      @include flex-group-center;
 
-      width: 100%;
-
-      .header {
-         @include flex-row;
-         @include flex-space-between;
-         @include border-top-bottom-right;
-         @include panel-1;
-         @include padding-large;
-
-         width: 100%;
-         font-weight: bold;
-
-         .label {
-            @include flex-row;
-            @include flex-group-center;
-
-            .button {
-               margin-left: var(--titan-spacing-standard);
-            }
-         }
-
-         .controls {
-            @include flex-row;
-            @include flex-group-right;
-
-            height: 100%;
-
-            .button {
-               &:not(:first-child) {
-                  margin-left: var(--titan-spacing-standard);
-               }
-            }
-
-            .field {
-               @include flex-row;
-               @include flex-group-center;
-
-               &.margin-right {
-                  margin-right: var(--titan-spacing-standard);
-               }
-
-               .label {
-                  margin-right: var(--titan-spacing-standard);
-               }
-
-               .input {
-                  --titan-input-width: 32px;
-               }
-            }
-         }
+      &.margin-right {
+         margin-right: var(--titan-spacing-standard);
       }
 
-      .expandable-content {
-         @include flex-column;
-         @include flex-group-top;
-         @include panel-3;
-         @include border-bottom-sides;
+      .label {
+         margin-right: var(--titan-spacing-standard);
+      }
 
-         width: calc(100% - 16px);
-         padding: 0 var(--titan-spacing-standard);
-
-         .section {
-            @include flex-column;
-            @include flex-group-top;
-
-            width: 100%;
-
-            &:not(.rich-text) {
-               padding-bottom: var(--titan-spacing-large);
-
-               &:not(.tags) {
-                  padding-top: var(--titan-spacing-large);
-               }
-            }
-
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-
-               flex-wrap: wrap;
-
-               .tag {
-                  @include tag-container-child-margin;
-               }
-            }
-
-            &:not(.tags) {
-               @include flex-column;
-               @include flex-group-top;
-            }
-
-            &:not(:first-child) {
-               @include border-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
-            }
-         }
+      .input {
+         --titan-input-width: 32px;
       }
    }
 </style>

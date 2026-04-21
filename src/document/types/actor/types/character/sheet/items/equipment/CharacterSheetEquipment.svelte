@@ -1,10 +1,10 @@
 <script>
-   import { slide } from 'svelte/transition';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import CharacterSheetItemExpandButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import CharacterSheetItem
+      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
@@ -13,13 +13,10 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemEquipButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
-   import CharacterSheetItemImage
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import CharacterSheetCondensedItemCheckButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type {TitanItem} Reference to the Item document. */
    export let item = void 0;
@@ -28,192 +25,83 @@
    export let isExpanded = void 0;
 </script>
 
-<div class="item">
-   <!--Header-->
-   <div class="header">
-      <div class="label">
-         <!--Image-->
-         <div class="image">
-            <CharacterSheetItemImage {item}/>
-         </div>
-
-         <!--Expand button-->
+<CharacterSheetItem {item} bind:isExpanded>
+   <svelte:fragment slot="controls">
+      <!--Toggle Equipped button-->
+      {#if item.system.equipped === false || item.system.check.length === 0}
          <div class="button">
-            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
+            <CharacterSheetItemEquipButton
+               {item}
+               equipped={item.system.equipped}
+            />
          </div>
+      {:else if (item.system.check.length > 0)}
+         <div class="button">
+            <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+         </div>
+      {/if}
+
+      <!--Send to Chat button-->
+      <div class="button">
+         <CharacterSheetItemSendToChatButton {item}/>
       </div>
 
-      <!--Controls-->
-      <div class="controls">
-         <!--Toggle Equipped button-->
-         {#if item.system.equipped === false || item.system.check.length === 0}
-            <div class="button">
-               <CharacterSheetItemEquipButton
-                  {item}
-                  equipped={item.system.equipped}
-               />
-            </div>
-         {:else if (item.system.check.length > 0)}
-            <div class="button">
-               <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
-            </div>
-         {/if}
-
-         <!--Send to Chat button-->
-         <div class="button">
-            <CharacterSheetItemSendToChatButton {item}/>
-         </div>
-
-         <!--Edit Button-->
-         <div class="button">
-            <CharacterSheetItemEditButton {item}/>
-         </div>
-
-         <!--Delete Button-->
-         <div class="button">
-            <CharacterSheetItemDeleteButton itemId={item._id}/>
-         </div>
+      <!--Edit Button-->
+      <div class="button">
+         <CharacterSheetItemEditButton {item}/>
       </div>
-   </div>
 
-   <!--Expandable content-->
-   {#if isExpanded === true}
-      <div class="expandable-content" transition:slide|local>
-         <!--Equip button-->
-         {#if item.system.check.length > 0}
-            <div class="section">
-               <CharacterSheetItemEquipButton
-                  {item}
-                  equipped={item.system.equipped}
-               />
-            </div>
-         {/if}
+      <!--Delete Button-->
+      <div class="button">
+         <CharacterSheetItemDeleteButton itemId={item._id}/>
+      </div>
+   </svelte:fragment>
 
-         <!--Item Checks-->
-         {#if item.system.check.length > 0}
-            <div class="section">
-               <CharacterSheetItemChecks {item}/>
-            </div>
-         {/if}
-
-         <!--Item Description-->
-         {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-            <div class="section rich-text">
-               <RichText value={item.system.description}/>
-            </div>
-         {/if}
-
-         <!--Footer-->
-         <div class="section tags small-text">
-            <!--Rarity-->
-            <div class="tag">
-               <RarityTag rarity={item.system.rarity}/>
-            </div>
-
-            <!--Value-->
-            {#if item.system.value}
-               <div class="tag">
-                  <ValueTag value={item.system.value}/>
-               </div>
-            {/if}
-
-            <!--Custom Traits-->
-            {#each item.system.customTrait as trait}
-               <div class="tag">
-                  <Tag tooltip={trait.description}>
-                     {trait.name}
-                  </Tag>
-               </div>
-            {/each}
-         </div>
+   <!--Equip button-->
+   {#if item.system.check.length > 0}
+      <div class="section">
+         <CharacterSheetItemEquipButton
+            {item}
+            equipped={item.system.equipped}
+         />
       </div>
    {/if}
-</div>
 
-<style lang="scss">
-   .item {
-      @include flex-column;
-      @include flex-group-top;
+   <!--Item Checks-->
+   {#if item.system.check.length > 0}
+      <div class="section">
+         <CharacterSheetItemChecks {item}/>
+      </div>
+   {/if}
 
-      width: 100%;
+   <!--Item Description-->
+   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      <div class="section rich-text">
+         <RichText value={item.system.description}/>
+      </div>
+   {/if}
 
-      .header {
-         @include flex-row;
-         @include flex-space-between;
-         @include border-top-bottom-right;
-         @include panel-1;
-         @include padding-large;
+   <!--Footer-->
+   <div class="section tags small-text">
+      <!--Rarity-->
+      <div class="tag">
+         <RarityTag rarity={item.system.rarity}/>
+      </div>
 
-         width: 100%;
-         font-weight: bold;
+      <!--Value-->
+      {#if item.system.value}
+         <div class="tag">
+            <ValueTag value={item.system.value}/>
+         </div>
+      {/if}
 
-         .label {
-            @include flex-row;
-            @include flex-group-center;
-
-            .button {
-               margin-left: var(--titan-spacing-standard);
-            }
-         }
-
-         .controls {
-            @include flex-row;
-            @include flex-group-right;
-
-            height: 100%;
-
-            .button {
-               &:not(:first-child) {
-                  margin-left: var(--titan-spacing-standard);
-               }
-            }
-         }
-      }
-
-      .expandable-content {
-         @include flex-column;
-         @include flex-group-top;
-         @include panel-3;
-         @include border-bottom-sides;
-
-         width: calc(100% - 16px);
-         padding: 0 var(--titan-spacing-standard);
-
-         .section {
-            width: 100%;
-
-            &:not(.rich-text) {
-               padding-bottom: var(--titan-spacing-large);
-
-               &:not(.tags) {
-                  padding-top: var(--titan-spacing-large);
-               }
-            }
-
-            &:not(:first-child) {
-               @include border-top;
-            }
-
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-
-               flex-wrap: wrap;
-
-               .tag {
-                  @include tag-container-child-margin;
-               }
-            }
-
-            &:not(.tags) {
-               @include flex-column;
-               @include flex-group-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
-            }
-         }
-      }
-   }
-</style>
+      <!--Custom Traits-->
+      {#each item.system.customTrait as trait}
+         <div class="tag">
+            <Tag tooltip={trait.description}>
+               {trait.name}
+            </Tag>
+         </div>
+      {/each}
+   </div>
+</CharacterSheetItem>
