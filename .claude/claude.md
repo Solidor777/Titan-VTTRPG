@@ -8,19 +8,22 @@ good documentation.
 # Project Resources
 
 This project is coded in Javascript, Svelte, and SCSS. It makes particular use of the TyphonJS Ruyntime Library Foundry
-VTT, documented at https://typhonjs-fvtt-lib.github.io/api-docs/.
+VTT, documented at https://typhonjs-fvtt-lib.github.io/api-docs/. Everything that is built is stored inthe ~/src/
+directory. The build output is stored in the root. Nothing that is not built should be stored in the ~/src/ directory.
 
 # Code Style
 
 The wrap limit is 120 characters. All function declarations should have comments describing the function's purpose. All
-variables, properties, and parameters should be properly typed and wrapped in {} bracces. Optional parameters or
+variables, properties, and parameters should be properly typed and wrapped in {} braces. Optional parameters or
 properties should use [] braces. Properties and parameters should have a - between the type and name of the property.
+All variable declarations should be typed and have a comment explaining what is being done or what the variable is for.
 All class declarations should be properly typed. All object definitions should use @extends and @typedef as appropriate.
 @typof should be used as appropriate. All functions should have a typed return value, and a description if they return
 other than void, or if they return after an async opertation. All function declaration comments should be multiline. All
 variable declarations should be single-line is they can fit within the wrap limit. All objects should be multiline if
 they have more than one property. All arrays should be multiline if they have more than one entry. All svelte components
-should be multiline if they have more than one property, with the > or /> on a newline.
+should be multiline if they have more than one property, with the > or /> on a newline. All conditional code should
+be wrapped in multiline {}. All comments should have proper grammar, spelling, punctuation, and indentation.
 
 # Response to instructions
 

@@ -137,7 +137,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
 
    /**
     * Apply transformations of derivations to the values of the source data object.
-    * Compute data fields whose values are not stored to the database.
+    * Compute data fields whose values are not stored in the database.
     */
    prepareDerivedData() {
       this._prepareComponentDerivedData();
