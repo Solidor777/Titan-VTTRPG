@@ -3,17 +3,19 @@
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { REGAIN_RESOLVE_ICON } from '~/system/Icons.js';
-   import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   import ChatMessageResourceModButton
+      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
-    * Calculates the tooltip HTML for the resolve regain button.
+    * Builds the tooltip HTML for the button, including optional source breakdowns.
+    * @returns {string} The tooltip HTML string.
     */
    function getTooltip() {
-      // Base label.
+      /** @type {string} The tooltip HTML being built. */
       let retVal = `<p>${localize('resolveRegain.desc')}</p>`;
 
       // Equipment.
@@ -35,36 +37,30 @@
    }
 
    /**
-    * Applies resolve regain to the chat message owner and updates the message.
+    * Applies resolve regain to the character that owns this chat message and updates the message accordingly.
     */
-   async function confirmResolveRegain() {
+   async function confirm() {
       // If we own this chat message and the associated actor.
       if (assert(
-         document?.isOwner,
+         $document?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor.
+            // Restore resolve to the actor.
             await actor.system.regainResolve(
                $document.flags.titan.resolveRegain.total,
-               {
-                  report: false,
-               },
+               { report: false },
             );
 
             // Update the chat message.
             await $document.update({
                flags: {
                   titan: {
-                     resolveRegain: {
-                        confirmed: true,
-                     },
-                     resolve: {
-                        value: actor.system.resource.resolve.value,
-                     },
+                     resolveRegain: { confirmed: true },
+                     resolve: { value: actor.system.resource.resolve.value },
                   },
                },
             });
@@ -73,10 +69,9 @@
    }
 </script>
 
-<ChatMessageButton on:click={() => confirmResolveRegain()} tooltip={getTooltip()}>
-   <i class={REGAIN_RESOLVE_ICON}/>
-   {localize('regainX%Resolve').replace(
-      'X%',
-      $document.flags.titan.resolveRegain.total,
-   )}
-</ChatMessageButton>
+<ChatMessageResourceModButton
+   icon={REGAIN_RESOLVE_ICON}
+   label={localize('regainX%Resolve').replace('X%', $document.flags.titan.resolveRegain.total)}
+   tooltip={getTooltip()}
+   confirmFn={confirm}
+/>

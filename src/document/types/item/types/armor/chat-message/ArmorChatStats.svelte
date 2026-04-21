@@ -8,7 +8,7 @@
    import { ARMOR_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type {TitanItem} The Item this component belongs to. */
+   /** @type {object} Data for the Item this component belongs to. */
    export let item = void 0;
 
    /** @type {Record<string, string>} Map of armor trait names to their description localization keys. */
@@ -18,9 +18,9 @@
 <div class="stats">
    <div class="stat">
       <IconStatTag
-         tooltip={'armor.desc'}
          icon={ARMOR_ICON}
          stat={localize('armor')}
+         tooltip={'armor.desc'}
          value={item.system.armor.value === item.system.armor.max
             ? item.system.armor.value
             : `${item.system.armor.value} / ${item.system.armor.max}`}

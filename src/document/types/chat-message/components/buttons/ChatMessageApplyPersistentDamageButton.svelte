@@ -3,17 +3,19 @@
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { PERSISTENT_DAMAGE_ICON } from '~/system/Icons.js';
-   import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   import ChatMessageResourceModButton
+      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
-    * Calculates the tooltip HTML for the persistent damage button.
+    * Builds the tooltip HTML for the button, including optional source breakdowns.
+    * @returns {string} The tooltip HTML string.
     */
    function getTooltip() {
-      // Base label.
+      /** @type {string} The tooltip HTML being built. */
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment.
@@ -35,9 +37,9 @@
    }
 
    /**
-    * Applies damage to the character that owns this chat message and updates the message accordingly
+    * Applies damage to the character that owns this chat message and updates the message accordingly.
     */
-   async function confirmPersistentDamage() {
+   async function confirm() {
       // If we own this chat message and the associated actor.
       if (assert(
          $document?.isOwner,
@@ -47,7 +49,7 @@
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor.
+            // Apply persistent damage to the actor, bypassing armor.
             await actor.system.applyDamage(
                $document.flags.titan.persistentDamage.total,
                {
@@ -57,36 +59,23 @@
             );
 
             // Update the chat message.
-            const updateData = {
+            await $document.update({
                flags: {
                   titan: {
-                     persistentDamage: {
-                        confirmed: true,
-                     },
-                     stamina: {
-                        value: actor.system.resource.stamina.value,
-                     },
-                     wounds: {
-                        value: actor.system.resource.wounds.value,
-                     },
+                     persistentDamage: { confirmed: true },
+                     stamina: { value: actor.system.resource.stamina.value },
+                     wounds: { value: actor.system.resource.wounds.value },
                   },
                },
-            };
-            if ($document.flags.titan.wounds) {
-               updateData.flags.titan.wounds = {
-                  value: actor.system.resource.wounds.value,
-               };
-            }
-            await $document.update(updateData);
+            });
          }
       }
    }
 </script>
 
-<ChatMessageButton on:click={() => confirmPersistentDamage()} tooltip={getTooltip()}>
-   <i class={PERSISTENT_DAMAGE_ICON}/>
-   {localize('applyX%Damage').replace(
-      'X%',
-      $document.flags.titan.persistentDamage.total,
-   )}
-</ChatMessageButton>
+<ChatMessageResourceModButton
+   icon={PERSISTENT_DAMAGE_ICON}
+   label={localize('applyX%Damage').replace('X%', $document.flags.titan.persistentDamage.total)}
+   tooltip={getTooltip()}
+   confirmFn={confirm}
+/>

@@ -2,88 +2,55 @@
    import { getContext } from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
+   import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
    import ShieldChatStats from '~/document/types/item/types/shield/chat-message/ShieldChatStats.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} The titan flags data for the item. */
    const item = $document.flags.titan;
 </script>
 
-<div class="item-chat-message">
-   <!--Header-->
-   <div class="header">
-      <ItemChatLabel {item}/>
+<ItemChatMessageShell {item}>
+   <!--Shield stats-->
+   <div class="section">
+      <ShieldChatStats {item}/>
    </div>
 
-   <div class="sections">
-      <!--Shield stats-->
-      <div class="section tags">
-         <ShieldChatStats {item}/>
+   <!--Description-->
+   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+      <div class="section rich-text">
+         <RichText value={item.system.description}/>
       </div>
+   {/if}
 
-      <!--Description-->
-      {#if item.system.description !== '' && item.system.description !== '<p></p>'}
-         <div class="section rich-text">
-            <RichText value={item.system.description}/>
-         </div>
-      {/if}
-
-      <!--Checks-->
-      {#if item.system.check.length > 0}
-         <div class="section">
-            <ItemChatChecks {item}/>
-         </div>
-      {/if}
-   </div>
-</div>
+   <!--Checks-->
+   {#if item.system.check.length > 0}
+      <div class="section">
+         <ItemChatChecks {item}/>
+      </div>
+   {/if}
+</ItemChatMessageShell>
 
 <style lang="scss">
-   .item-chat-message {
+   .section {
       @include flex-column;
-      @include font-size-normal;
+      @include flex-group-top;
 
-      align-items: flex-start;
-      justify-content: center;
+      padding-top: var(--titan-spacing-large);
       width: 100%;
 
-      .sections {
-         @include flex-column;
-         @include flex-group-top;
+      &:not(.rich-text) {
+         padding-bottom: var(--titan-spacing-large);
+      }
 
-         width: 100%;
+      &:last-child {
+         padding-bottom: var(--titan-spacing-standard);
+      }
 
-         .section {
-            width: 100%;
-
-            &:not(.rich-text) {
-               padding-bottom: var(--titan-spacing-large);
-
-               &:not(.tags) {
-                  padding-top: var(--titan-spacing-large);
-               }
-            }
-
-            &:last-child {
-               padding-bottom: var(--titan-spacing-standard);
-            }
-
-            &:not(:first-child) {
-               @include border-top;
-            }
-
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-
-               flex-wrap: wrap;
-            }
-
-            &:not(.tags) {
-               @include flex-column;
-               @include flex-group-top;
-            }
-         }
+      &:not(:first-child) {
+         @include border-top;
       }
    }
 </style>

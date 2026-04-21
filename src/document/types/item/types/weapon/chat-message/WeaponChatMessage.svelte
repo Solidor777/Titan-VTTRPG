@@ -4,130 +4,107 @@
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
-   import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
+   import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
    import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} The Titan-specific flags data for this document. */
+   /** @type {object} The titan flags data for the item. */
    const item = $document.flags.titan;
 </script>
 
-<div class="item-chat-message">
-   <!--Header-->
-   <div class="header">
-      <ItemChatLabel {item}/>
+<ItemChatMessageShell {item}>
+   <!--Attacks-->
+   <div class="section">
+      <WeaponChatAttacks {item}/>
    </div>
 
-   <div class="sections">
-      <!--Attacks-->
+   <!--Attack Notes-->
+   {#if item.attackNotes !== '' && item.attackNotes !== '<p></p>'}
+      <div class="section rich-text">
+         <RichText value={item.attackNotes}/>
+      </div>
+   {/if}
+
+   <!--Description-->
+   {#if item.description && item.description !== '' && item.description !== '<p></p>'}
+      <div class="section rich-text">
+         <RichText value={item.description}/>
+      </div>
+   {/if}
+
+   <!--Checks-->
+   {#if item.check.length > 0}
       <div class="section">
-         <WeaponChatAttacks {item}/>
+         <ItemChatChecks {item}/>
+      </div>
+   {/if}
+
+   <!--Footer-->
+   <div class="section tags small-text">
+      <!--Rarity-->
+      <div class="tag">
+         <RarityTag rarity={item.rarity}/>
       </div>
 
-      <!--Attack Notes-->
-      {#if item.attackNotes !== '' && item.attackNotes !== '<p></p>'}
-         <div class="section rich-text">
-            <RichText value={item.attackNotes}/>
-         </div>
-      {/if}
-
-      <!--Description-->
-      {#if item.description && item.description !== '' && item.description !== '<p></p>'}
-         <div class="section rich-text">
-            <RichText value={item.description}/>
-         </div>
-      {/if}
-
-      <!--Checks-->
-      {#if item.check.length > 0}
-         <div class="section">
-            <ItemChatChecks {item}/>
-         </div>
-      {/if}
-
-      <!--Footer-->
-      <div class="section tags small-text">
-         <!--Rarity-->
+      <!--Value-->
+      {#if item.value}
          <div class="tag">
-            <RarityTag rarity={item.rarity}/>
+            <ValueTag value={item.value}/>
          </div>
+      {/if}
 
-         <!--Value-->
-         {#if item.value}
-            <div class="tag">
-               <ValueTag value={item.value}/>
-            </div>
-         {/if}
-
-         <!--Custom Traits-->
-         {#each item.customTrait as trait}
-            <div class="tag">
-               <Tag tooltip={trait.description}>
-                  {trait.name}
-               </Tag>
-            </div>
-         {/each}
-      </div>
+      <!--Custom Traits-->
+      {#each item.customTrait as trait}
+         <div class="tag">
+            <Tag tooltip={trait.description}>
+               {trait.name}
+            </Tag>
+         </div>
+      {/each}
    </div>
-</div>
+</ItemChatMessageShell>
 
 <style lang="scss">
-   .item-chat-message {
-      @include flex-column;
-      @include font-size-normal;
-
-      align-items: flex-start;
-      justify-content: center;
+   .section {
       width: 100%;
 
-      .sections {
+      &:not(.rich-text) {
+         padding-bottom: var(--titan-spacing-large);
+
+         &:not(.tags) {
+            padding-top: var(--titan-spacing-large);
+         }
+      }
+
+      &:last-child {
+         padding-bottom: var(--titan-spacing-standard);
+      }
+
+      &:not(:first-child) {
+         @include border-top;
+      }
+
+      &.tags {
+         @include flex-row;
+         @include flex-group-center;
+
+         flex-wrap: wrap;
+
+         .tag {
+            @include tag-container-child-margin;
+         }
+      }
+
+      &:not(.tags) {
          @include flex-column;
          @include flex-group-top;
+      }
 
-         width: 100%;
-
-         .section {
-            width: 100%;
-
-            &:not(.rich-text) {
-               padding-bottom: var(--titan-spacing-large);
-
-               &:not(.tags) {
-                  padding-top: var(--titan-spacing-large);
-               }
-            }
-
-            &:last-child {
-               padding-bottom: var(--titan-spacing-standard);
-            }
-
-            &:not(:first-child) {
-               @include border-top;
-            }
-
-            &.tags {
-               @include flex-row;
-               @include flex-group-center;
-
-               flex-wrap: wrap;
-
-               .tag {
-                  @include tag-container-child-margin;
-               }
-            }
-
-            &:not(.tags) {
-               @include flex-column;
-               @include flex-group-top;
-            }
-
-            &.small-text {
-               @include font-size-small;
-            }
-         }
+      &.small-text {
+         @include font-size-small;
       }
    }
 </style>

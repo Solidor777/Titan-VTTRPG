@@ -3,17 +3,19 @@
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { HEALING_ICON } from '~/system/Icons.js';
-   import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   import ChatMessageResourceModButton
+      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
-    * Calculates the tooltip HTML for the revert persistent damage button.
+    * Builds the tooltip HTML for the button, including optional source breakdowns.
+    * @returns {string} The tooltip HTML string.
     */
    function getTooltip() {
-      // Base label.
+      /** @type {string} The tooltip HTML being built. */
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment.
@@ -37,7 +39,7 @@
    /**
     * Applies healing equal to the persistent damage total, reverting the damage, and marks the button as confirmed.
     */
-   async function confirmRevertPersistentDamage() {
+   async function confirm() {
       if (assert(
          $document?.isOwner,
          'Cannot modify document %s if not owner.',
@@ -56,12 +58,8 @@
             await $document.update({
                flags: {
                   titan: {
-                     persistentDamageRevert: {
-                        confirmed: true,
-                     },
-                     stamina: {
-                        value: actor.system.resource.stamina.value,
-                     },
+                     persistentDamageRevert: { confirmed: true },
+                     stamina: { value: actor.system.resource.stamina.value },
                   },
                },
             });
@@ -70,10 +68,9 @@
    }
 </script>
 
-<ChatMessageButton on:click={() => confirmRevertPersistentDamage()} tooltip={getTooltip()}>
-   <i class={HEALING_ICON}/>
-   {localize('revertX%PersistentDamage').replace(
-      'X%',
-      $document.flags.titan.persistentDamageRevert.total,
-   )}
-</ChatMessageButton>
+<ChatMessageResourceModButton
+   icon={HEALING_ICON}
+   label={localize('revertX%PersistentDamage').replace('X%', $document.flags.titan.persistentDamageRevert.total)}
+   tooltip={getTooltip()}
+   confirmFn={confirm}
+/>

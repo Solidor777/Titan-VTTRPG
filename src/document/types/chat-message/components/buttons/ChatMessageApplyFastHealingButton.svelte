@@ -3,17 +3,19 @@
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { HEALING_ICON } from '~/system/Icons.js';
-   import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   import ChatMessageResourceModButton
+      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
-    * Calculates the tooltip HTML for the fast healing button.
+    * Builds the tooltip HTML for the button, including optional source breakdowns.
+    * @returns {string} The tooltip HTML string.
     */
    function getTooltip() {
-      // Base label.
+      /** @type {string} The tooltip HTML being built. */
       let retVal = `<p>${localize('fastHealing.desc')}</p>`;
 
       // Equipment.
@@ -35,9 +37,9 @@
    }
 
    /**
-    * Applies healing to the character that owns this chat message and updates the message accordingly
+    * Applies healing to the character that owns this chat message and updates the message accordingly.
     */
-   async function confirmFastHealing() {
+   async function confirm() {
       // If we own this chat message and the associated actor.
       if (assert(
          $document?.isOwner,
@@ -47,7 +49,7 @@
          const actor = getActorFromSpeaker($document.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Update the actor.
+            // Apply healing to the actor.
             await actor.system.applyHealing(
                $document.flags.titan.fastHealing.total,
                { report: false },
@@ -57,12 +59,8 @@
             await $document.update({
                flags: {
                   titan: {
-                     fastHealing: {
-                        confirmed: true,
-                     },
-                     stamina: {
-                        value: actor.system.resource.stamina.value,
-                     },
+                     fastHealing: { confirmed: true },
+                     stamina: { value: actor.system.resource.stamina.value },
                   },
                },
             });
@@ -71,10 +69,9 @@
    }
 </script>
 
-<ChatMessageButton on:click={() => confirmFastHealing()} tooltip={getTooltip()}>
-   <i class={HEALING_ICON}/>
-   {localize('healX%Damage').replace(
-      'X%',
-      $document.flags.titan.fastHealing.total,
-   )}
-</ChatMessageButton>
+<ChatMessageResourceModButton
+   icon={HEALING_ICON}
+   label={localize('healX%Damage').replace('X%', $document.flags.titan.fastHealing.total)}
+   tooltip={getTooltip()}
+   confirmFn={confirm}
+/>
