@@ -2,6 +2,7 @@
    import applyRendToTargets from '~/helpers/utility-functions/ApplyRendToTargets.js';
    import applyRepairsToTargets from '~/helpers/utility-functions/ApplyRepairsToTarget.js';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import { REND_ICON, REPAIR_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
@@ -20,7 +21,7 @@
          tooltip={localize('rendArmor')}
       >
          <i class={REND_ICON}/>
-         <div>{localize('rend')}</div>
+         <div><Text text="rend"/></div>
       </ChatMessageButton>
    </div>
 
@@ -31,7 +32,7 @@
          tooltip={localize('repairArmor')}
       >
          <i class={REPAIR_ICON}/>
-         <div>{localize('repair')}</div>
+         <div><Text text="repair"/></div>
       </ChatMessageButton>
    </div>
 </div>

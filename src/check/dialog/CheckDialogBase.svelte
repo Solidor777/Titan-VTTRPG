@@ -1,5 +1,5 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
@@ -44,11 +44,11 @@
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <Button on:click={onRoll}>{localize('roll')}</Button>
+         <Button on:click={onRoll}><Text text="roll"/></Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}>{localize('cancel')}</Button>
+         <Button on:click={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
@@ -69,7 +69,7 @@
 
                   <!--Label-->
                   <div class="label">
-                     {localize('addCustomAspect')}
+                     <Text text="addCustomAspect"/>
                   </div>
                </div>
             </DocumentOwnerButton>

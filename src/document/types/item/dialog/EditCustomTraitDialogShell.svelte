@@ -2,6 +2,7 @@
 
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
@@ -76,7 +77,7 @@
                editTrait();
             }}
          >
-            {localize('applyEdits')}
+            <Text text="applyEdits"/>
          </Button>
       </div>
 
@@ -87,7 +88,7 @@
                application.close();
             }}
          >
-            {localize('cancel')}
+            <Text text="cancel"/>
          </Button>
       </div>
    </div>

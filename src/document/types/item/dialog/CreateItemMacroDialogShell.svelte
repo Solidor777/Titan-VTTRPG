@@ -1,5 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
@@ -282,12 +283,12 @@
    <div class="row">
       <div class="button">
          <Button on:click={onCreateMacro}>
-            {localize('createMacro')}
+            <Text text="createMacro"/>
          </Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}>{localize('cancel')}</Button>
+         <Button on:click={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

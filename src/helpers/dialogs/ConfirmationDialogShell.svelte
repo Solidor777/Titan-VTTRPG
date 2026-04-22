@@ -1,7 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
@@ -54,7 +54,7 @@
          on:click={() => {
             application.close();
          }}
-      >{localize('cancel')}
+      ><Text text="cancel"/>
       </Button>
    </div>
 </div>

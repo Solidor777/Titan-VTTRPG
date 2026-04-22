@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import getActorFromSpeaker from '~/helpers/utility-functions/GetActorFromSpeaker.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import { REMOVE_TEMP_EFFECTS_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
@@ -41,5 +41,5 @@
 
 <ChatMessageButton on:click={() => removeExpiredEffects()}>
    <i class={REMOVE_TEMP_EFFECTS_ICON}/>
-   {localize('removeExpiredEffects')}
+   <Text text="removeExpiredEffects"/>
 </ChatMessageButton>

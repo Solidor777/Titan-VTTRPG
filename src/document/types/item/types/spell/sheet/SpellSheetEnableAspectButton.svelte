@@ -1,5 +1,5 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
@@ -31,7 +31,7 @@
       <div class="cost">
          <!--Label-->
          <div class="cost-label">
-            {localize('cost')}:
+            <Text text="cost"/>:
          </div>
 
          <!--Value-->

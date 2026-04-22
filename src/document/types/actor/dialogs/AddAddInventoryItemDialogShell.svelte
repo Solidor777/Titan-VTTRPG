@@ -1,7 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import InventoryItemTypeSelect from '~/helpers/svelte-components/input/select/InventoryItemTypeSelect.svelte';
@@ -45,14 +45,14 @@
    <!--Confirmed button-->
    <div class="button">
       <Button on:click={onConfirmed}>
-         {localize('addNewItem')}
+         <Text text="addNewItem"/>
       </Button>
    </div>
 
    <!--Canceled button-->
    <div class="button">
       <Button on:click={onCanceled}>
-         {localize('cancel')}
+         <Text text="cancel"/>
       </Button>
    </div>
 </div>

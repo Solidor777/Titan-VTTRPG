@@ -1,6 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import { slide } from 'svelte/transition';
    import ScrollingContainer
       from '~/helpers/svelte-components/ScrollingContainer.svelte';
@@ -56,7 +56,7 @@
 
                <!--Label-->
                <div class="label">
-                  {localize('addRulesElement')}
+                  <Text text="addRulesElement"/>
                </div>
             </div>
          </DocumentOwnerButton>

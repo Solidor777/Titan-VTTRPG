@@ -1,5 +1,5 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import { getContext } from 'svelte';
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import {
@@ -20,7 +20,7 @@
    <div class="button-inner">
       <i class={item.system.multiAttack ? MULTI_ATTACK_ICON : NO_MULTI_ATTCK_ICON}/>
       <div class="label">
-         {localize('multiAttack')}
+         <Text text="multiAttack"/>
       </div>
       <i
          class={item.system.multiAttack

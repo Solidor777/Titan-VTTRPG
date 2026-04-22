@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import Text from '~/helpers/svelte-components/Text.svelte';
    import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
@@ -205,7 +206,7 @@
                         }}
                      >
                         <i class={EDIT_ICON}/>
-                        {localize('editTraits')}
+                        <Text text="editTraits"/>
                      </DocumentOwnerButton>
                   </div>
 
@@ -217,7 +218,7 @@
                         }}
                      >
                         <i class={CREATE_ICON}/>
-                        {localize('addCustomTrait')}
+                        <Text text="addCustomTrait"/>
                      </DocumentOwnerButton>
                   </div>
                </div>
