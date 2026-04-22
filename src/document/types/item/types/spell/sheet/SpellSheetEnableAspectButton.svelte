@@ -1,6 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
    // Value to toggle.
@@ -16,7 +16,7 @@
    export let cost = void 0;
 </script>
 
-<Button on:click>
+<DocumentOwnerButton on:click>
    <div class="button-content">
       <!--Label-->
       <div class="aspect-label">
@@ -42,7 +42,7 @@
    </div>
 
    <div class="spacer"/>
-</Button>
+</DocumentOwnerButton>
 
 <style lang="scss">
    .button-content {

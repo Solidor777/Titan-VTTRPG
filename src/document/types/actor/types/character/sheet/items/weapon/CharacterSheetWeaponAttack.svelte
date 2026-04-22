@@ -2,7 +2,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import TraitTag from '~/helpers/svelte-components/tag/TraitTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
@@ -90,7 +90,7 @@
    <!--Header-->
    <div class="header {attack.attribute}">
       {#if item.system.equipped}
-         <Button
+         <DocumentOwnerButton
             on:click={() =>
                $document.system.requestAttackCheck({
                   itemId: item._id,
@@ -101,7 +101,7 @@
                class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
             />
             {attack.label}
-         </Button>
+         </DocumentOwnerButton>
       {:else}
          <div class="label">
             <i

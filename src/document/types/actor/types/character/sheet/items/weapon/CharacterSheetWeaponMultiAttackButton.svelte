@@ -1,7 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import {
       CHECKED_ICON,
       MULTI_ATTACK_ICON,
@@ -16,7 +16,7 @@
    const document = getContext('document');
 </script>
 
-<Button on:click={() => $document.system.toggleMultiAttack(item._id)}>
+<DocumentOwnerButton on:click={() => $document.system.toggleMultiAttack(item._id)}>
    <div class="button-inner">
       <i class={item.system.multiAttack ? MULTI_ATTACK_ICON : NO_MULTI_ATTCK_ICON}/>
       <div class="label">
@@ -28,7 +28,7 @@
             : UNCHECKED_ICON}
       />
    </div>
-</Button>
+</DocumentOwnerButton>
 
 <style lang="scss">
    .button-inner {

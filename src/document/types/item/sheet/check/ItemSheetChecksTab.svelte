@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
@@ -56,7 +56,7 @@
 
          <!--Add check Button-->
          <div class="add-entry-button">
-            <Button
+            <DocumentOwnerButton
                on:click={() => {
                   $document.addCheck();
                }}
@@ -71,7 +71,7 @@
                      {localize('addCheck')}
                   </div>
                </div>
-            </Button>
+            </DocumentOwnerButton>
          </div>
       </div>
    </ScrollingContainer>

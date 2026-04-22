@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import SpellSheetCustomAspectSettings
       from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
@@ -57,7 +57,7 @@
 
          <!--Add Entry Button-->
          <div class="add-entry-button">
-            <Button
+            <DocumentOwnerButton
                on:click={() => {
                   $document.system.addCustomAspect();
                }}
@@ -72,7 +72,7 @@
                      {localize('addCustomAspect')}
                   </div>
                </div>
-            </Button>
+            </DocumentOwnerButton>
          </div>
       </div>
    </ScrollingContainer>

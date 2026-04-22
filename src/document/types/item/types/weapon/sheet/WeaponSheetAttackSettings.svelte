@@ -11,7 +11,7 @@
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import {
       COLLAPSED_ICON,
       CREATE_ICON,
@@ -199,26 +199,26 @@
                <div class="traits-header">
                   <!--Edit Traits-->
                   <div class="button">
-                     <Button
+                     <DocumentOwnerButton
                         on:click={() => {
                            $document.system.editAttackTraits(idx);
                         }}
                      >
                         <i class={EDIT_ICON}/>
                         {localize('editTraits')}
-                     </Button>
+                     </DocumentOwnerButton>
                   </div>
 
                   <!--Custom Traits-->
                   <div class="button">
-                     <Button
+                     <DocumentOwnerButton
                         on:click={() => {
                            $document.system.addCustomAttackTrait(idx);
                         }}
                      >
                         <i class={CREATE_ICON}/>
                         {localize('addCustomTrait')}
-                     </Button>
+                     </DocumentOwnerButton>
                   </div>
                </div>
                {#if attack.trait.length > 0 || attack.customTrait.length > 0}

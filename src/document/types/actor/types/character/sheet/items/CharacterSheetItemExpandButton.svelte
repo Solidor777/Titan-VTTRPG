@@ -1,5 +1,5 @@
 <script>
-   import Button from '~/helpers/svelte-components/button/Button.svelte';
+   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
    /** @type {boolean} Whether this Item is currently expanded. */
@@ -14,7 +14,7 @@
 </script>
 
 <div class="button">
-   <Button
+   <DocumentOwnerButton
       on:click={() => {
          if (item && !item.isMarkedForDeletion) {
             isExpanded = !isExpanded;
@@ -28,7 +28,7 @@
          <!--Icon-->
          <i class={isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}/>
       </div>
-   </Button>
+   </DocumentOwnerButton>
 </div>
 
 <style lang="scss">
