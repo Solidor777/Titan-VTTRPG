@@ -43,7 +43,8 @@
 
          width: 100%;
          font-weight: bold;
-         padding-right: var(--titan-spacing-large);
+
+         @include padding-right-large;
       }
 
       .value {
@@ -52,8 +53,7 @@
          .tag {
             @include border;
             @include tag;
-
-            margin-left: var(--titan-spacing-large);
+            @include margin-left-large;
          }
       }
    }

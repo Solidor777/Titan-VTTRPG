@@ -29,13 +29,12 @@
 
       .label {
          @include border-right;
-
-         margin-right: var(--titan-spacing-large);
-         padding-right: var(--titan-spacing-large);
+         @include margin-right-large;
+         @include padding-right-large;
       }
 
       i {
-         margin-right: var(--titan-spacing-large);
+         @include margin-right-large;
       }
    }
 </style>

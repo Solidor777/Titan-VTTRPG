@@ -63,7 +63,7 @@
             @include flex-group-center;
 
             .button {
-               margin-left: var(--titan-spacing-standard);
+               @include margin-left-standard;
             }
          }
 
@@ -72,10 +72,6 @@
             @include flex-group-right;
 
             height: 100%;
-
-            :global(.button:not(:first-child)) {
-               margin-left: var(--titan-spacing-standard);
-            }
          }
       }
 
@@ -87,51 +83,6 @@
 
          width: calc(100% - 16px);
          padding: 0 var(--titan-spacing-standard);
-
-         :global(.section) {
-            width: 100%;
-         }
-
-         :global(.section:not(.rich-text)) {
-            padding-bottom: var(--titan-spacing-large);
-         }
-
-         :global(.section:not(.rich-text):not(.tags)) {
-            padding-top: var(--titan-spacing-large);
-         }
-
-         :global(.section:not(:first-child)) {
-            @include border-top;
-         }
-
-         :global(.section.tags) {
-            @include flex-row;
-            @include flex-group-center;
-
-            flex-wrap: wrap;
-         }
-
-         :global(.section.tags .tag) {
-            @include tag-container-child-margin;
-         }
-
-         :global(.section:not(.tags):not(.buttons)) {
-            @include flex-column;
-            @include flex-group-top;
-         }
-
-         :global(.section.buttons) {
-            @include flex-row;
-            @include flex-group-center;
-         }
-
-         :global(.section.buttons .button:not(:first-child)) {
-            margin-left: var(--titan-spacing-standard);
-         }
-
-         :global(.section.small-text) {
-            @include font-size-small;
-         }
       }
    }
 </style>

@@ -96,7 +96,7 @@
          height: 100%;
 
          .fas {
-            margin-right: var(--titan-spacing-standard);
+            @include margin-right-standard;
          }
       }
 
@@ -107,7 +107,7 @@
          height: 100%;
 
          :not(:first-child) {
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
          }
 
          .input {

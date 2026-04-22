@@ -48,7 +48,8 @@
          @include flex-group-top-left;
 
          width: calc(100% - 88px);
-         margin-left: var(--titan-spacing-large);
+
+         @include margin-left-large;
 
          .name {
             @include flex-row;
@@ -60,60 +61,9 @@
          .secondary-stats {
             @include flex-row;
             @include flex-group-left;
+            @include margin-top-large;
 
-            margin-top: var(--titan-spacing-large);
             width: 100%;
-
-            :global(.stat) {
-               @include flex-row;
-               @include flex-group-left;
-            }
-
-            :global(.stat:not(:first-child)) {
-               @include border-left;
-
-               margin-left: var(--titan-spacing-large);
-               padding-left: var(--titan-spacing-large);
-            }
-
-            :global(.stat i) {
-               margin-right: var(--titan-spacing-standard);
-            }
-
-            :global(.stat .label) {
-               @include flex-row;
-               @include flex-group-left;
-
-               font-weight: bold;
-               margin-right: var(--titan-spacing-standard);
-            }
-
-            :global(.stat .input) {
-               @include flex-row;
-               @include flex-group-center;
-            }
-
-            :global(.stat .input.number) {
-               --titan-input-width: 32px;
-            }
-
-            :global(.stat .input.large-number) {
-               --titan-input-width: 80px;
-            }
-
-            :global(.stat .divider) {
-               margin-left: var(--titan-spacing-standard);
-               margin-right: var(--titan-spacing-standard);
-            }
-
-            :global(.stat.text) {
-               flex: 1;
-               width: 100%;
-            }
-
-            :global(.stat.text .input) {
-               width: 100%;
-            }
          }
       }
    }

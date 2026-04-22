@@ -79,9 +79,8 @@
 
          &:not(:first-child) {
             @include border-top;
-
-            margin-top: var(--titan-spacing-standard);
-            padding-top: var(--titan-spacing-standard);
+            @include margin-top-standard;
+            @include padding-top-standard;
          }
 
          .column {
@@ -91,15 +90,12 @@
             width: 100%;
 
             &:not(:first-child) {
-               @include border-left;
-
-               margin-left: var(--titan-spacing-standard);
-               padding-left: var(--titan-spacing-standard);
+               @include separator-left;
             }
          }
 
          .stat {
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
 
             &.text {
                flex-grow: 1;
@@ -108,8 +104,7 @@
             &.xp {
                @include flex-row;
                @include flex-group-center;
-
-               margin-right: var(--titan-spacing-standard);
+               @include margin-right-standard;
 
                .available {
                   @include flex-row;
@@ -128,8 +123,8 @@
                .earned {
                   @include flex-row;
                   @include flex-group-center;
+                  @include margin-right-large;
 
-                  margin-right: var(--titan-spacing-large);
                   width: 40px;
                }
 

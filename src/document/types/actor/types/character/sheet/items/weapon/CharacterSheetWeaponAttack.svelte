@@ -237,7 +237,7 @@
          }
 
          i {
-            margin-right: var(--titan-spacing-standard);
+            @include margin-right-standard;
          }
       }
 

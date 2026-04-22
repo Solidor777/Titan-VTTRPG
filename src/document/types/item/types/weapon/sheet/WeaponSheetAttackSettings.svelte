@@ -296,14 +296,13 @@
          .row {
             @include flex-row;
             @include flex-group-center;
+            @include padding-top-large;
 
-            padding-top: var(--titan-spacing-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
-
-               margin-top: var(--titan-spacing-large);
+               @include margin-top-large;
             }
 
             .field {
@@ -311,14 +310,11 @@
                @include flex-group-center;
 
                &:not(:first-child) {
-                  @include border-left;
-
-                  margin-left: var(--titan-spacing-large);
-                  padding-left: var(--titan-spacing-large);
+                  @include separator-left-large;
                }
 
                i {
-                  margin-right: var(--titan-spacing-standard);
+                  @include margin-right-standard;
                }
 
                .label {
@@ -331,9 +327,7 @@
                .input {
                   @include flex-row;
                   @include flex-group-center;
-
-                  margin-left: var(--titan-spacing-standard);
-
+                  @include margin-left-standard;
                   @include font-size-normal;
 
                   &.number {
@@ -347,8 +341,9 @@
             @include border-top;
 
             width: 100%;
-            margin-top: var(--titan-spacing-standard);
-            padding-top: var(--titan-spacing-standard);
+
+            @include margin-top-standard;
+            @include padding-top-standard;
 
             .traits-header {
                @include flex-row;
@@ -359,7 +354,7 @@
                   --titan-button-line-height: 20px;
 
                   &:not(:first-child) {
-                     margin-left: var(--titan-spacing-standard);
+                     @include margin-left-standard;
                   }
                }
             }
@@ -370,7 +365,8 @@
 
                flex-wrap: wrap;
                width: 100%;
-               margin-bottom: var(--titan-spacing-standard);
+
+               @include margin-bottom-standard;
 
                .trait {
                   margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);

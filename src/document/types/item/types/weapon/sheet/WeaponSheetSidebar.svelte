@@ -52,8 +52,7 @@
 
          &:not(:first-child) {
             @include border-top;
-
-            margin-top: var(--titan-spacing-large);
+            @include margin-top-large;
          }
       }
    }

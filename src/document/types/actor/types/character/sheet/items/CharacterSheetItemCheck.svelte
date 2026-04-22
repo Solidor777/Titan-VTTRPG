@@ -187,7 +187,7 @@
          @include flex-row;
 
          .resolve-cost-button {
-            margin-left: var(--titan-spacing-large);
+            @include margin-left-large;
          }
       }
 

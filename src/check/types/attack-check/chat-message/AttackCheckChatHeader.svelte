@@ -36,3 +36,15 @@
       {`${localize('damage')}: ${$document.flags.titan.results.damage + $document.flags.titan.parameters.damageMod}${$document.flags.titan.parameters.plusExtraSuccessDamage ? ` + ${localize('extraSuccesses.short')}` : ''}`}
    </div>
 </CheckChatMessageItemHeader>
+
+<style lang="scss">
+   .label {
+      @include flex-row;
+      @include font-size-large;
+   }
+
+   .sub-label {
+      @include flex-row;
+      @include font-size-small;
+   }
+</style>

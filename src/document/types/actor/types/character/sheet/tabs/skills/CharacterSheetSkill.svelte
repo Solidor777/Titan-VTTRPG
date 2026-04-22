@@ -210,7 +210,7 @@
             @include flex-group-top;
 
             &:not(:first-child) {
-               margin-left: var(--titan-spacing-large);
+               @include margin-left-large;
 
                .row {
                   @include flex-row;
@@ -220,9 +220,8 @@
 
                   &:not(:first-child) {
                      @include border-top;
-
-                     padding-top: var(--titan-spacing-standard);
-                     margin-top: var(--titan-spacing-standard);
+                     @include padding-top-standard;
+                     @include margin-top-standard;
                   }
 
                   .label {
@@ -232,10 +231,11 @@
 
                      height: 100%;
                      font-weight: bold;
-                     margin-right: var(--titan-spacing-standard);
+
+                     @include margin-right-standard;
 
                      i {
-                        margin-right: var(--titan-spacing-standard);
+                        @include margin-right-standard;
                      }
                   }
 
@@ -245,7 +245,8 @@
 
                      height: 100%;
                      width: 28px;
-                     margin-left: var(--titan-spacing-standard);
+
+                     @include margin-left-standard;
                   }
 
                   .value {
@@ -255,7 +256,8 @@
                      font-weight: normal;
                      height: 100%;
                      width: 28px;
-                     margin-left: var(--titan-spacing-standard);
+
+                     @include margin-left-standard;
                   }
 
                   .symbol {
@@ -263,7 +265,8 @@
                      @include flex-group-center;
 
                      height: 100%;
-                     margin-left: var(--titan-spacing-standard);
+
+                     @include margin-left-standard;
                   }
                }
 
@@ -283,7 +286,7 @@
                      font-weight: bold;
 
                      i {
-                        margin-right: var(--titan-spacing-standard);
+                        @include margin-right-standard;
                      }
                   }
 

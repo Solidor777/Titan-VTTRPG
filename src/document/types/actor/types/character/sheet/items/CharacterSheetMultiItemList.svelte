@@ -120,14 +120,15 @@
          @include flex-space-between;
 
          width: 100%;
-         margin-top: var(--titan-spacing-large);
+
+         @include margin-top-large;
 
          &.drag-hovered {
             background: var(--titan-highlighted-background);
          }
 
          &:last-child {
-            margin-bottom: var(--titan-spacing-large);
+            @include margin-bottom-large;
          }
       }
    }

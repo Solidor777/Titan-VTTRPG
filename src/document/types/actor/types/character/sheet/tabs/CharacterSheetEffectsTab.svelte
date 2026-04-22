@@ -101,12 +101,13 @@
             width: 100%;
 
             &:not(:first-child) {
-               margin-top: var(--titan-spacing-standard);
+               @include margin-top-standard;
             }
 
             .label {
                font-weight: bold;
-               margin-right: var(--titan-spacing-standard);
+
+               @include margin-right-standard;
             }
 
             .input {
@@ -114,7 +115,7 @@
             }
 
             .button {
-               margin-left: var(--titan-spacing-standard);
+               @include margin-left-standard;
             }
          }
       }
@@ -131,7 +132,8 @@
             @include flex-group-top;
 
             width: 100%;
-            margin-top: var(--titan-spacing-large);
+
+            @include margin-top-large;
          }
       }
    }

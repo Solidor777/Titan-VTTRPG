@@ -40,10 +40,7 @@
       }
 
       .value {
-         @include border-left;
-
-         padding-left: var(--titan-spacing-standard);
-         margin-left: var(--titan-spacing-standard);
+         @include separator-left;
       }
    }
 </style>

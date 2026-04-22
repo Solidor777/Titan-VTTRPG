@@ -72,14 +72,13 @@
 
             &:not(.tags) {
                &:not(.rich-text) {
-                  padding-top: var(--titan-spacing-large);
+                  @include padding-top-large;
                }
             }
 
             &:not(:first-child) {
                @include border-top;
-
-               margin-top: var(--titan-spacing-large);
+               @include margin-top-large;
             }
 
             .tag {

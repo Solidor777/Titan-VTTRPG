@@ -34,8 +34,7 @@
 <style lang="scss">
    .button {
       @include flex-row;
-
-      margin-right: var(--titan-spacing-large);
+      @include margin-right-large;
 
       .button-inner {
          @include flex-row;
@@ -51,7 +50,8 @@
 
          i {
             width: 20px;
-            margin-left: var(--titan-spacing-standard);
+
+            @include margin-left-standard;
          }
       }
    }

@@ -48,7 +48,8 @@
 
          height: 100%;
          width: 100%;
-         margin-top: var(--titan-spacing-large);
+
+         @include margin-top-large;
 
          .sidebar {
             @include panel-1;
@@ -56,8 +57,8 @@
 
          .tabs {
             @include panel-1;
+            @include margin-left-large;
 
-            margin-left: var(--titan-spacing-large);
             width: 100%;
          }
       }

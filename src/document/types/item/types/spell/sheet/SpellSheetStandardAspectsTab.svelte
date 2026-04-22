@@ -89,7 +89,8 @@
                @include flex-group-center;
 
                width: 100%;
-               margin-top: var(--titan-spacing-large);
+
+               @include margin-top-large;
             }
          }
       }

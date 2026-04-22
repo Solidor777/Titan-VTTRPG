@@ -45,14 +45,16 @@
 
          width: 100%;
          font-weight: bold;
-         margin-right: var(--titan-spacing-large);
+
+         @include margin-right-large;
       }
 
       .input {
          @include flex-group-left;
 
          width: 100%;
-         margin-left: var(--titan-spacing-large);
+
+         @include margin-left-large;
 
          --titan-input-height: 28px;
          --titan-input-padding: 0 8px;

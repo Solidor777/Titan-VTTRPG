@@ -34,9 +34,8 @@
 
          &:not(:first-child) {
             @include border-top;
-
-            margin-top: var(--titan-spacing-standard);
-            padding-top: var(--titan-spacing-standard);
+            @include margin-top-standard;
+            @include padding-top-standard;
          }
       }
    }

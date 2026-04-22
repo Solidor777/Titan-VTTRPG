@@ -99,7 +99,7 @@
          height: 100%;
 
          &:not(:first-child) {
-            margin-top: var(--titan-spacing-standard);
+            @include margin-top-standard;
          }
 
          .side {

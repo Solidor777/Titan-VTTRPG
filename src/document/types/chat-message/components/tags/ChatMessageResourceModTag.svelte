@@ -74,14 +74,13 @@
       }
 
       i {
-         margin-right: var(--titan-spacing-standard);
+         @include margin-right-standard;
       }
 
       .label {
          @include border-right;
-
-         padding-right: var(--titan-spacing-standard);
-         margin-right: var(--titan-spacing-standard);
+         @include padding-right-standard;
+         @include margin-right-standard;
       }
    }
 </style>

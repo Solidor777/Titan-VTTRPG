@@ -32,10 +32,7 @@
       @include flex-group-center;
 
       &:not(:first-child) {
-         @include border-left;
-
-         margin-left: var(--titan-spacing-standard);
-         padding-left: var(--titan-spacing-standard);
+         @include separator-left;
       }
 
       &.main {

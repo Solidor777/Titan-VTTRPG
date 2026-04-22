@@ -150,8 +150,7 @@
 
          &:not(:first-child) {
             @include border-top;
-
-            margin-top: var(--titan-spacing-large);
+            @include margin-top-large;
          }
 
          .header {
@@ -179,8 +178,7 @@
                i {
                   @include flex-row;
                   @include flex-group-center;
-
-                  margin-right: var(--titan-spacing-standard);
+                  @include margin-right-standard;
                }
             }
 

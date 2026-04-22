@@ -45,7 +45,8 @@
          @include border;
 
          width: 80px;
-         margin-bottom: var(--titan-spacing-large);
+
+         @include margin-bottom-large;
       }
 
       .label {
@@ -68,7 +69,7 @@
             flex-wrap: wrap;
 
             i {
-               margin-right: var(--titan-spacing-standard);
+               @include margin-right-standard;
             }
          }
 

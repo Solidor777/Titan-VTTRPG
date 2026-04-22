@@ -49,8 +49,7 @@
 
          &:not(:first-child) {
             @include border-top;
-
-            padding-top: var(--titan-spacing-standard);
+            @include padding-top-standard;
          }
       }
    }

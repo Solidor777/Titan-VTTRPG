@@ -69,8 +69,10 @@
 
          &:not(:first-child) {
             border-top: solid;
-            padding-top: var(--titan-spacing-standard);
-            margin-top: var(--titan-spacing-standard);
+
+            @include padding-top-standard;
+            @include margin-top-standard;
+
             border-width: var(--titan-border-width);
          }
 
@@ -78,10 +80,11 @@
             @include flex-row;
 
             width: 100%;
-            margin-top: var(--titan-spacing-large);
+
+            @include margin-top-large;
 
             &:not(:first-child) {
-               margin-left: var(--titan-spacing-standard);
+               @include margin-left-standard;
             }
          }
       }

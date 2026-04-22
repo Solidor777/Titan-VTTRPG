@@ -109,20 +109,18 @@
       @include large-tag;
 
       .time {
-         @include border-left;
-
-         margin-left: var(--titan-spacing-standard);
-         padding-left: var(--titan-spacing-standard);
+         @include separator-left;
       }
 
       img {
          width: 24px;
          border: none;
-         margin-right: var(--titan-spacing-standard);
+
+         @include margin-right-standard;
       }
 
       i {
-         margin-left: var(--titan-spacing-standard);
+         @include margin-left-standard;
       }
    }
 </style>

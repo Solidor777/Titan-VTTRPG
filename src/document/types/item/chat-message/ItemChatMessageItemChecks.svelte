@@ -153,9 +153,8 @@
 
          &:not(:first-child) {
             @include border-top;
-
-            margin-top: var(--titan-spacing-large);
-            padding-top: var(--titan-spacing-large);
+            @include margin-top-large;
+            @include padding-top-large;
          }
 
          .button {
@@ -163,7 +162,7 @@
             @include flex-group-center;
 
             &:not(:first-child) {
-               margin-top: var(--titan-spacing-large);
+               @include margin-top-large;
             }
          }
 

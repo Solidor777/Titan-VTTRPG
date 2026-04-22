@@ -98,7 +98,7 @@
 
          &:not(:first-child, .tags, .rich-text, .rich-text + section
             ) {
-            margin-top: var(--titan-spacing-large);
+            @include margin-top-large;
          }
       }
    }

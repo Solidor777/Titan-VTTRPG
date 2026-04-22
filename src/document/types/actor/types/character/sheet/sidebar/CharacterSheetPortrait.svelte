@@ -97,8 +97,8 @@
          @include flex-column;
          @include flex-space-between;
          @include border-left;
+         @include padding-left-standard;
 
-         padding-left: var(--titan-spacing-standard);
          height: 160px;
       }
    }

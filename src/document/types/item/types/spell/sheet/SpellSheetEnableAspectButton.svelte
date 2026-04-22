@@ -55,14 +55,12 @@
       .aspect-label {
          @include flex-row;
          @include flex-group-left;
-
-         margin-left: var(--titan-spacing-large);
+         @include margin-left-large;
 
          .icon {
             @include flex-row;
             @include flex-group-right;
-
-            margin-left: var(--titan-spacing-large);
+            @include margin-left-large;
          }
       }
 
@@ -71,7 +69,8 @@
          @include flex-group-right;
 
          font-weight: bold;
-         margin-right: var(--titan-spacing-large);
+
+         @include margin-right-large;
 
          .value {
             @include flex-row;
@@ -81,7 +80,8 @@
 
             height: 24px;
             width: 24px;
-            margin-left: var(--titan-spacing-standard);
+
+            @include margin-left-standard;
          }
       }
    }

@@ -38,7 +38,7 @@
       height: 100%;
 
       :not(:first-child) {
-         margin-left: var(--titan-spacing-standard);
+         @include margin-left-standard;
       }
    }
 </style>

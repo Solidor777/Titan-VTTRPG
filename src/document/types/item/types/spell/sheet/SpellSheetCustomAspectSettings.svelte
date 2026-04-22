@@ -204,14 +204,13 @@
          .row {
             @include flex-row;
             @include flex-group-center;
+            @include padding-top-large;
 
-            padding-top: var(--titan-spacing-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
-
-               margin-top: var(--titan-spacing-large);
+               @include margin-top-large;
             }
 
             .field {
@@ -219,14 +218,11 @@
                @include flex-group-center;
 
                &:not(:first-child) {
-                  @include border-left;
-
-                  margin-left: var(--titan-spacing-large);
-                  padding-left: var(--titan-spacing-large);
+                  @include separator-left-large;
                }
 
                i {
-                  margin-right: var(--titan-spacing-standard);
+                  @include margin-right-standard;
                }
 
                .label {
@@ -242,7 +238,7 @@
                   @include font-size-normal;
 
                   &:not(.checkbox) {
-                     margin-left: var(--titan-spacing-standard);
+                     @include margin-left-standard;
                   }
 
                   &.number {

@@ -33,3 +33,15 @@
       </div>
    {/if}
 </CheckChatMessageItemHeader>
+
+<style lang="scss">
+   .label {
+      @include flex-row;
+      @include font-size-large;
+   }
+
+   .sub-label {
+      @include flex-row;
+      @include font-size-small;
+   }
+</style>

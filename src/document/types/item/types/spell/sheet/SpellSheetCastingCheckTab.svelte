@@ -160,16 +160,16 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--titan-spacing-large);
+
+         @include margin-top-large;
 
          &:not(:first-child) {
             @include border-top;
-
-            padding-top: var(--titan-spacing-large);
+            @include padding-top-large;
          }
 
          &:last-child {
-            margin-bottom: var(--titan-spacing-large);
+            @include margin-bottom-large;
          }
       }
 
@@ -194,8 +194,8 @@
 
                height: 100%;
                font-weight: bold;
-               margin-right: var(--titan-spacing-standard);
 
+               @include margin-right-standard;
                @include font-size-small;
             }
 
@@ -219,8 +219,9 @@
             @include border-left;
 
             height: 100%;
-            margin-left: var(--titan-spacing-large);
-            padding-right: var(--titan-spacing-large);
+
+            @include margin-left-large;
+            @include padding-right-large;
          }
       }
 
@@ -235,9 +236,9 @@
             @include flex-row;
             @include flex-group-center;
             @include border-bottom;
+            @include padding-bottom-standard;
+            @include margin-top-large;
 
-            padding-bottom: var(--titan-spacing-standard);
-            margin-top: var(--titan-spacing-large);
             width: 100%;
             font-weight: bold;
          }

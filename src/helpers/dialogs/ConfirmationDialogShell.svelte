@@ -88,7 +88,8 @@
          @include flex-group-center;
 
          width: 100%;
-         margin-top: var(--titan-spacing-standard);
+
+         @include margin-top-standard;
 
          --titan-button-border-radius: var(--titan-button-border-radius);
       }

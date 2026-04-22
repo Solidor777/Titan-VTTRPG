@@ -79,7 +79,7 @@
          font-weight: bold;
 
          i {
-            margin-right: var(--titan-spacing-standard);
+            @include margin-right-standard;
          }
       }
 
@@ -87,8 +87,7 @@
          @include flex-column;
          @include flex-group-top;
          @include font-size-small;
-
-         margin-top: var(--titan-spacing-large);
+         @include margin-top-large;
 
          .label {
             @include flex-row;
@@ -100,8 +99,7 @@
          .value {
             @include flex-row;
             @include flex-group-center;
-
-            margin-top: var(--titan-spacing-standard);
+            @include margin-top-standard;
          }
       }
    }

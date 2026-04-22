@@ -52,10 +52,11 @@
          @include panel-1;
 
          width: 80px;
-         margin-bottom: var(--titan-spacing-standard);
+
+         @include margin-bottom-standard;
 
          &:not(:first-child) {
-            margin-left: var(--titan-spacing-large);
+            @include margin-left-large;
          }
       }
 
@@ -76,7 +77,7 @@
             flex-wrap: wrap;
 
             i {
-               margin-right: var(--titan-spacing-standard);
+               @include margin-right-standard;
             }
          }
 
@@ -88,7 +89,7 @@
             flex-wrap: wrap;
 
             &:not(:first-child) {
-               margin-top: var(--titan-spacing-standard);
+               @include margin-top-standard;
             }
          }
       }

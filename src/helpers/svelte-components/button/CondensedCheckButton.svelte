@@ -111,14 +111,11 @@
             @include flex-group-center;
 
             &:not(:first-child) {
-               @include border-left;
-
-               padding-left: var(--titan-spacing-standard);
-               margin-left: var(--titan-spacing-standard);
+               @include separator-left;
             }
 
             i {
-               margin-right: var(--titan-spacing-standard);
+               @include margin-right-standard;
             }
          }
       }

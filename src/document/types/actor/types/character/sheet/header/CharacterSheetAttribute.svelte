@@ -71,10 +71,11 @@
          @include flex-group-center;
 
          height: 100%;
-         margin-left: var(--titan-spacing-large);
+
+         @include margin-left-large;
 
          :not(:first-child) {
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
          }
 
          .input {

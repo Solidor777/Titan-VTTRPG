@@ -38,7 +38,10 @@
 
    {#if $document.system.duration.type === 'custom'}
       <!--Custom Duration Label-->
-      <div class="stat text" transition:slide|local>
+      <div
+         class="stat text"
+         transition:slide|local
+      >
          <div class="input text">
             <DocumentTextInput
                bind:value={$document.system.duration.custom}
@@ -46,7 +49,10 @@
          </div>
       </div>
    {:else if $document.system.duration.type === 'initiative'}
-      <div class="stat" transition:slide|local>
+      <div
+         class="stat"
+         transition:slide|local
+      >
          <div class="input number">
             <DocumentIntegerInput
                min={0}
@@ -58,7 +64,10 @@
 
    <!--Duration Remaining-->
    {#if $document.system.duration.type !== 'permanent'}
-      <div class="stat" transition:slide|local>
+      <div
+         class="stat"
+         transition:slide|local
+      >
          <div class="label">
             {localize('remaining')}
          </div>
@@ -71,3 +80,41 @@
       </div>
    {/if}
 </ItemSheetHeader>
+
+<style lang="scss">
+   .stat {
+      @include flex-row;
+      @include flex-group-left;
+
+      &:not(:first-child) {
+         @include separator-left-large;
+      }
+
+      &.text {
+         flex: 1;
+         width: 100%;
+      }
+
+      .label {
+         @include flex-row;
+         @include flex-group-left;
+
+         font-weight: bold;
+
+         @include margin-right-standard;
+      }
+
+      .input {
+         @include flex-row;
+         @include flex-group-center;
+
+         &.number {
+            --titan-input-width: 32px;
+         }
+
+         &.text {
+            width: 100%;
+         }
+      }
+   }
+</style>

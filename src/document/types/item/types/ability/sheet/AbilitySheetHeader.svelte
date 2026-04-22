@@ -118,7 +118,7 @@
                @include flex-group-right;
 
                &:not(:first-child) {
-                  padding-top: var(--titan-spacing-standard);
+                  @include padding-top-standard;
                }
             }
          }

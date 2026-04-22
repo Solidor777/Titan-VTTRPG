@@ -41,22 +41,13 @@
          img {
             width: 32px;
             border: none;
-            margin-right: var(--titan-spacing-standard);
+
+            @include margin-right-standard;
          }
 
          .labels {
             @include flex-column;
             @include flex-group-top-left;
-
-            :global(.label) {
-               @include flex-row;
-               @include font-size-large;
-            }
-
-            :global(.sub-label) {
-               @include flex-row;
-               @include font-size-small;
-            }
          }
       }
    }

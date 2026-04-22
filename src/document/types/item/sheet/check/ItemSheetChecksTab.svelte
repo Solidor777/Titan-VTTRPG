@@ -105,14 +105,15 @@
             @include flex-group-center;
 
             width: 100%;
-            margin-top: var(--titan-spacing-large);
+
+            @include margin-top-large;
 
             .button-content {
                @include flex-row;
                @include flex-group-center;
 
                i {
-                  margin-right: var(--titan-spacing-standard);
+                  @include margin-right-standard;
                }
             }
          }

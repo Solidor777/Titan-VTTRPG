@@ -69,8 +69,10 @@
       box-shadow: inset 0 -1px 1px rgb(255 255 255 / 0.3);
       display: flex;
       height: 24px;
-      margin-left: var(--titan-spacing-standard);
-      margin-right: var(--titan-spacing-standard);
+
+      @include margin-left-standard;
+      @include margin-right-standard;
+
       padding: 3px;
       width: 100%;
 

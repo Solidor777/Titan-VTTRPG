@@ -47,7 +47,8 @@
 
       height: 100%;
       width: 100%;
-      margin-bottom: var(--titan-spacing-standard);
+
+      @include margin-bottom-standard;
 
       li {
          @include flex-row;
@@ -61,8 +62,7 @@
 
          &:not(:last-child) {
             @include border-bottom;
-
-            margin-bottom: var(--titan-spacing-large);
+            @include margin-bottom-large;
          }
       }
    }

@@ -89,3 +89,54 @@
       </div>
    {/if}
 </CharacterSheetItem>
+
+<style lang="scss">
+   .button:not(:first-child) {
+      @include margin-left-standard;
+   }
+
+   .section {
+      width: 100%;
+
+      &:not(.rich-text) {
+         @include padding-bottom-large;
+      }
+
+      &:not(.rich-text, .tags) {
+         @include padding-top-large;
+      }
+
+      &:not(:first-child) {
+         @include border-top;
+      }
+
+      &.tags {
+         @include flex-row;
+         @include flex-group-center;
+
+         flex-wrap: wrap;
+
+         .tag {
+            @include tag-container-child-margin;
+         }
+      }
+
+      &:not(.tags, .buttons) {
+         @include flex-column;
+         @include flex-group-top;
+      }
+
+      &.buttons {
+         @include flex-row;
+         @include flex-group-center;
+
+         .button:not(:first-child) {
+            @include margin-left-standard;
+         }
+      }
+
+      &.small-text {
+         @include font-size-small;
+      }
+   }
+</style>

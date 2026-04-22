@@ -70,8 +70,8 @@
       .label {
          @include flex-row;
          @include flex-group-center;
+         @include margin-left-standard;
 
-         margin-left: var(--titan-spacing-standard);
          height: 100%;
       }
 
@@ -96,7 +96,7 @@
          }
 
          :not(:first-child) {
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
          }
 
          .input {

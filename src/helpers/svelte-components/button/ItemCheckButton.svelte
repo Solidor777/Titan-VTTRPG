@@ -46,7 +46,7 @@
          @include font-size-normal;
 
          i {
-            margin-right: var(--titan-spacing-standard);
+            @include margin-right-standard;
          }
 
          .resolve {
@@ -55,8 +55,9 @@
             @include flex-group-center;
 
             border-color: var(--titan-button-border-color);
-            margin-left: var(--titan-spacing-standard);
-            padding-left: var(--titan-spacing-standard);
+
+            @include margin-left-standard;
+            @include padding-left-standard;
          }
       }
    }

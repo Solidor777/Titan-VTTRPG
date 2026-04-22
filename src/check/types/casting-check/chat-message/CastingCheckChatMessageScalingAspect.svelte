@@ -228,15 +228,12 @@
          height: 100%;
 
          i {
-            margin-right: var(--titan-spacing-standard);
+            @include margin-right-standard;
          }
       }
 
       .value {
-         @include border-left;
-
-         margin-left: var(--titan-spacing-standard);
-         padding-left: var(--titan-spacing-standard);
+         @include separator-left;
       }
 
       .header {
@@ -245,14 +242,15 @@
 
          width: 100%;
          flex-wrap: wrap;
-         margin-right: var(--titan-spacing-large);
+
+         @include margin-right-large;
       }
 
       .controls {
          @include flex-row;
          @include flex-group-center;
+         @include margin-top-standard;
 
-         margin-top: var(--titan-spacing-standard);
          width: 100%;
 
          --titan-button-border-radius: var(--titan-button-border-radius);
@@ -262,14 +260,14 @@
             @include flex-group-center;
 
             height: 100%;
-            margin-right: var(--titan-spacing-large);
+
+            @include margin-right-large;
          }
 
          .control {
             @include flex-row;
             @include flex-group-center;
-
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
 
             .button-inner {
                @include flex-row;

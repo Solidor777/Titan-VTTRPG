@@ -23,11 +23,12 @@ other than void, or if they return after an async operation. All function declar
 variable declarations should be single-line is they can fit within the wrap limit. All objects should be multiline if
 they have more than one property. All arrays should be multiline if they have more than one entry. All svelte components
 should be multiline if they have more than one property, with the > or /> on a newline. All conditional code should
-be scoped in multiline {}. All comments should have proper grammar, spelling, punctuation, and indentation.
+be scoped in multiline {}. All comments should have proper grammar, spelling, punctuation, and indentation. :global
+style selectors are forbidden.
 
 # Response to instructions
 
-On start, check for any incomplete tasks and ask whether you should resume them. When I ask you to do something, first
-ask me any necessary clarifying questions before doing the work. Then analyze the situation and give me a clear and
-concise description of your plan for handling the task. Save that plan to a file for future reference. Then confirm with
-me whether you should proceed. If the task has multiple steps or options, confirm with me which ones you should perform.
+When I ask you to do something, first ask me any necessary clarifying questions before doing the work. Then analyze the
+situation and give me a clear and concise description of your plan for handling the task. Save that plan to a file for
+future reference. Then confirm with me whether you should proceed. If the task has multiple steps or options, confirm
+with me which ones you should perform.

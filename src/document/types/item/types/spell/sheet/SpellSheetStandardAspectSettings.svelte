@@ -198,16 +198,15 @@
             width: 100%;
 
             &:first-child:not(.tags) {
-               margin-top: var(--titan-spacing-standard);
+               @include margin-top-standard;
             }
 
             &:not(:first-child) {
                @include border-top;
-
-               margin-top: var(--titan-spacing-standard);
+               @include margin-top-standard;
 
                &:not(.tags) {
-                  padding-top: var(--titan-spacing-standard);
+                  @include padding-top-standard;
                }
             }
 
@@ -222,7 +221,7 @@
                }
 
                .input {
-                  margin-left: var(--titan-spacing-standard);
+                  @include margin-left-standard;
                }
             }
 

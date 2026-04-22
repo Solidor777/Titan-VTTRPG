@@ -74,14 +74,13 @@
       .button {
          @include flex-row;
          @include flex-group-center;
-
-         margin-top: var(--titan-spacing-large);
+         @include margin-top-large;
 
          --titan-button-font-size: var(--titan-font-size-small);
          --titan-button-line-height: 20px;
 
          &:not(:first-child) {
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
          }
       }
 

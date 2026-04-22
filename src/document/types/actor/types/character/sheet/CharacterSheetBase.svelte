@@ -43,8 +43,7 @@
 
       .sidebar {
          @include panel-1;
-
-         margin-right: var(--titan-spacing-large);
+         @include margin-right-large;
       }
 
       .body {
@@ -54,7 +53,8 @@
          flex-grow: 1;
 
          .tabs {
-            margin-top: var(--titan-spacing-large);
+            @include margin-top-large;
+
             flex-grow: 1;
          }
       }

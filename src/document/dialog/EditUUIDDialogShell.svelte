@@ -96,8 +96,7 @@
 
          .name {
             @include font-size-large;
-
-            margin-left: var(--titan-spacing-large);
+            @include margin-left-large;
          }
       }
 
@@ -116,10 +115,11 @@
             @include flex-row;
 
             width: 100%;
-            margin-top: var(--titan-spacing-large);
+
+            @include margin-top-large;
 
             &:not(:first-child) {
-               margin-left: var(--titan-spacing-standard);
+               @include margin-left-standard;
             }
          }
       }

@@ -30,7 +30,8 @@
 
       .label {
          font-weight: bold;
-         margin-left: var(--titan-spacing-standard);
+
+         @include margin-left-standard;
       }
    }
 

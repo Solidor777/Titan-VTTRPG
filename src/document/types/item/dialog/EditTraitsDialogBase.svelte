@@ -118,12 +118,14 @@
 
          width: 100%;
          height: 40px;
-         margin-bottom: var(--titan-spacing-large);
+
+         @include margin-bottom-large;
+
          font-weight: bold;
          break-inside: avoid;
 
          &:not(:first-child) {
-            margin-top: var(--titan-spacing-large);
+            @include margin-top-large;
          }
 
          .label {
@@ -149,7 +151,8 @@
       @include flex-group-center;
 
       width: 100%;
-      margin-top: var(--titan-spacing-standard);
+
+      @include margin-top-standard;
 
       .button {
          @include flex-row;
@@ -160,7 +163,7 @@
          --titan-button-border-radius: var(--titan-button-border-radius);
 
          &:not(:first-child) {
-            margin-left: var(--titan-spacing-standard);
+            @include margin-left-standard;
          }
       }
    }

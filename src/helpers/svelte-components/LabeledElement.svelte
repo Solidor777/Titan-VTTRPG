@@ -43,7 +43,8 @@
 
       .element {
          flex-grow: 1;
-         margin-left: var(--titan-spacing-standard);
+
+         @include margin-left-standard;
       }
    }
 </style>

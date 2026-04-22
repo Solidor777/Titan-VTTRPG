@@ -57,3 +57,45 @@
       </div>
    </div>
 </ItemSheetHeader>
+
+<style lang="scss">
+   .stat {
+      @include flex-row;
+      @include flex-group-left;
+
+      &:not(:first-child) {
+         @include separator-left-large;
+      }
+
+      i {
+         @include margin-right-standard;
+      }
+
+      .label {
+         @include flex-row;
+         @include flex-group-left;
+
+         font-weight: bold;
+
+         @include margin-right-standard;
+      }
+
+      .input {
+         @include flex-row;
+         @include flex-group-center;
+
+         &.number {
+            --titan-input-width: 32px;
+         }
+
+         &.large-number {
+            --titan-input-width: 80px;
+         }
+      }
+
+      .divider {
+         @include margin-left-standard;
+         @include margin-right-standard;
+      }
+   }
+</style>

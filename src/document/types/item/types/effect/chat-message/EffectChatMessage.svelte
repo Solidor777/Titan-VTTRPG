@@ -41,11 +41,11 @@
       width: 100%;
 
       &:not(.rich-text) {
-         padding-bottom: var(--titan-spacing-large);
+         @include padding-bottom-large;
       }
 
       &:last-child {
-         padding-bottom: var(--titan-spacing-standard);
+         @include padding-bottom-standard;
       }
 
       &:not(:first-child) {

@@ -320,14 +320,13 @@
             @include flex-row;
             @include flex-group-center;
             @include border-separated-row;
+            @include padding-top-large;
 
-            padding-top: var(--titan-spacing-large);
             width: 100%;
 
             &:not(:first-child) {
                @include border-top;
-
-               margin-top: var(--titan-spacing-large);
+               @include margin-top-large;
             }
 
             .field {

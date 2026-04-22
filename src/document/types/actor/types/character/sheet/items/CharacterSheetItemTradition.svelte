@@ -29,7 +29,7 @@
       background: var(--titan-tag-background);
 
       .label {
-         margin-right: var(--titan-spacing-standard);
+         @include margin-right-standard;
       }
    }
 </style>

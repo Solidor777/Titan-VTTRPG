@@ -61,7 +61,7 @@
          width: 100%;
 
          &:not(:first-child, .tags) {
-            margin-top: var(--titan-spacing-large);
+            @include margin-top-large;
          }
       }
    }

@@ -67,14 +67,11 @@
       }
 
       &:not(:first-child) {
-         @include border-left;
-
-         margin-left: var(--titan-spacing-standard);
-         padding-left: var(--titan-spacing-standard);
+         @include separator-left;
       }
 
       i {
-         margin-right: var(--titan-spacing-standard);
+         @include margin-right-standard;
       }
    }
 </style>

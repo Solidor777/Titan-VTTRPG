@@ -34,7 +34,9 @@
          @include border-right;
 
          font-weight: bold;
-         padding-right: var(--titan-spacing-standard);
+
+         @include padding-right-standard;
+
          margin: 0 var(--titan-spacing-standard);
       }
    }

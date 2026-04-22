@@ -32,8 +32,8 @@
 
          &:not(:first-child) {
             @include border-top;
+            @include padding-top-large;
 
-            padding-top: var(--titan-spacing-large);
             margin-top: 8px;
          }
       }

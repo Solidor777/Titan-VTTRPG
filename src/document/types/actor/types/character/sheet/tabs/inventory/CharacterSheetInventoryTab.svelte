@@ -176,19 +176,20 @@
             width: 100%;
 
             &:not(:first-child) {
-               margin-top: var(--titan-spacing-standard);
+               @include margin-top-standard;
             }
 
             .reset {
                --titan-button-font-size: var(--titan-font-size-small);
                --titan-icon-button-radius: 28px;
 
-               margin-left: var(--titan-spacing-standard);
+               @include margin-left-standard;
             }
 
             .label {
                font-weight: bold;
-               margin-right: var(--titan-spacing-standard);
+
+               @include margin-right-standard;
             }
 
             .input {
@@ -197,12 +198,12 @@
 
             .option {
                &:not(:first-child) {
-                  margin-left: var(--titan-spacing-standard);
+                  @include margin-left-standard;
                }
             }
 
             .add-entry-button {
-               margin-left: var(--titan-spacing-standard);
+               @include margin-left-standard;
             }
          }
       }
