@@ -437,6 +437,22 @@ export default function registerSystemSettings() {
       type: Number,
    });
 
+   // Migration Mode.
+   game.settings.register('titan', 'migrationMode', {
+      choices: {
+         prompt: 'SETTINGS.migrationMode.prompt',
+         automatic: 'SETTINGS.migrationMode.automatic',
+         disabled: 'SETTINGS.migrationMode.disabled',
+      },
+      config: true,
+      default: 'prompt',
+      hint: 'SETTINGS.migrationMode.hint',
+      name: 'SETTINGS.migrationMode.text',
+      restricted: true,
+      scope: 'world',
+      type: String,
+   });
+
    // Whether to confirm requests to regenerate a Document's Unique Identifier.
    game.settings.register('titan', 'confirmRegenerateUUID', {
       config: true,

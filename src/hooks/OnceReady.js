@@ -1,5 +1,5 @@
 import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
-import { worldNeedsMigration } from '~/helpers/migration/MigrateWorld.js';
+import { worldNeedsMigration, migrateWorld } from '~/helpers/migration/MigrateWorld.js';
 import ConfirmMigrateWorldDialog from '~/helpers/migration/ConfirmMigrateWorldDialog.js';
 
 /**
@@ -7,9 +7,15 @@ import ConfirmMigrateWorldDialog from '~/helpers/migration/ConfirmMigrateWorldDi
  * Prompts the GM to migrate world documents if any are out of date, and sets up hot-bar dropping.
  */
 export default function onceReady() {
-   // Prompt the GM to migrate if any documents are out of date.
+   // Handle migration based on the configured migration mode setting.
    if (game.user.isGM && worldNeedsMigration()) {
-      new ConfirmMigrateWorldDialog().render(true);
+      const mode = game.settings.get('titan', 'migrationMode');
+      if (mode === 'automatic') {
+         migrateWorld();
+      }
+      else if (mode === 'prompt') {
+         new ConfirmMigrateWorldDialog().render(true);
+      }
    }
 
    // Register sub-hooks.
