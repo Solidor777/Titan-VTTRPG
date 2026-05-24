@@ -6,9 +6,9 @@ The full path from user intent to actor mutation:
 
 **1. Trigger — `CharacterDataModel` (src/document/types/actor/types/character/CharacterDataModel.js)**
 A sheet button or macro calls `requestAttributeCheck(options)` (or the equivalent for attack / resistance /
-item / casting checks). This method reads the `titan.shouldGetCheckOptions` system setting. If the setting
-requires user confirmation it creates an `AttributeCheckDialog`; otherwise it calls `rollAttributeCheck`
-directly.
+item / casting checks). This method calls the `shouldGetCheckOptions()` helper, which reads the
+`titan.getCheckOptions` setting (and inverts it when a modifier key is held). If the setting requires
+user confirmation it creates an `AttributeCheckDialog`; otherwise it calls `rollAttributeCheck` directly.
 
 **2. Dialog (optional) — `AttributeCheckDialog` + `CheckDialogShell.svelte` +
 `AttributeCheckDialogShell.svelte`**
