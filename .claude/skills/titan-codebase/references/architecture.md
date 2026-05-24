@@ -2,29 +2,26 @@
 
 ## Top-level src/ layout
 
-- `src/index.js` — Module entry point; imports global SCSS and registers most Foundry hooks via `Hooks.on` / `Hooks.once`
-  (the `hotbarDrop` hook is registered lazily at ready-time inside `src/hooks/OnceReady.js`).
+- `src/index.js` — Build and module entry point; imports global SCSS and registers Foundry hooks.
 - `src/check/` — Dice-check engine: base `Check.js` + `CheckResults.js`, a shared dialog and chat-message shell, and
   five concrete check types (`attack-check`, `attribute-check`, `casting-check`, `item-check`, `resistance-check`),
   each owning its own dialog and chat-message subcomponents.
 - `src/document/` — All Foundry document classes, data models, and sheets. Contains a shared base layer
   (`data-model/`, `sheet/`, `dialog/`, `svelte-components/`) plus per-type implementations under `types/`
   (actor, item, chat-message, combat).
-- `src/helpers/` — Shared utilities consumed across the whole codebase: ~60 single-function files in
+- `src/helpers/` — Shared utilities consumed across the whole codebase: many single-function files in
   `utility-functions/`, reusable Svelte components in `svelte-components/`, system settings definitions in `Settings/`,
   Svelte actions in `svelte-actions/`, world-migration logic in `migration/`, and shared dialog helpers in `dialogs/`.
-- `src/hooks/` — One file per Foundry hook; each file exports a single function. Most are registered in `src/index.js`;
-  `hotbarDrop` is registered at ready-time inside `OnceReady.js`. Covered hooks include, e.g.: `init`, `setup`,
-  `ready`, combat turn progression, chat-message rendering (`renderChatMessageHTML`, `preDeleteChatMessage`),
-  chat-log context menus (`getChatLogEntryContext`), directory context menus, hotbar dropping, and journal sheet
-  rendering.
+- `src/hooks/` — One file per Foundry hook, each exporting a single handler. See "## Module boundaries" for
+  specifics on which hooks are wired and when.
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), CSS custom-property variables
   (`Variables.scss`), global resets (`Global.scss`), a prepended `Root.scss` (injected into every Svelte component
   via svelte-preprocess), and a `Mixins/` folder of per-domain SCSS mixin files covering flex, font, border, button,
   panel, tag, input, label, list, margin, padding, rarity, resistance, separator, system, and attribute domains.
-- `src/system/` — System-wide constants and registrations: ~20 JS files covering attributes, skills, conditions,
-  icons, settings registration (`SystemSettings.js`), initiative formula (`Initiative.js`), macros (`Macros.js`),
-  trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances, resources, speeds, etc.).
+- `src/system/` — System-wide constants and registrations: constant and registration modules covering attributes,
+  skills, conditions, icons, settings registration (`SystemSettings.js`), initiative formula (`Initiative.js`),
+  macros (`Macros.js`), trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
+  resources, speeds, etc.).
 
 ## Module boundaries
 
