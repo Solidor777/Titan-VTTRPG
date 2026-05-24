@@ -71,8 +71,8 @@ SCSS mixins are the deliberate, preferred styling mechanism — a codebase-wide 
 `MarginMixins.scss`, `PaddingMixins.scss`, `PanelMixins.scss`, `RarityMixins.scss`,
 `ResistanceMixins.scss`, `SeparatorMixins.scss`, `SystemMixins.scss`, `TagMixins.scss`.
 
-**`Root.scss`** (`src/styles/Root.scss`) `@forward`s all sixteen mixin files plus `Variables.scss`. It is
-auto-prepended into every Svelte component's `<style lang="scss">` block by `svelte-preprocess`
+**`Root.scss`** (`src/styles/Root.scss`) `@forward`s all mixin files in `src/styles/Mixins/` plus
+`Variables.scss`. It is auto-prepended into every Svelte component's `<style lang="scss">` block by `svelte-preprocess`
 (`prependData: '@use "src/styles/Root.scss" as *;'` in `vite.config.mjs`). This means component style blocks
 can call any mixin directly without an explicit `@use`, e.g.:
 
@@ -103,9 +103,10 @@ with `"TITAN | "`. It returns the boolean result so callers can use it in a guar
 if (assert(someCondition, 'Error message')) { ... }
 ```
 
-There is no `game.titan.assert()` — the global `game.titan` namespace does expose `game.titan.error` (used
-in `CharacterDataModel`) and `game.titan.socketManager`, but `assert` is always imported locally from the
-helpers module.
+`game.titan` (registered during the `init` hook in `src/hooks/OnceInit.js`) exposes the full namespace
+`{ macros, assert, warn, log, error, socketManager }` — so `game.titan.assert` does exist and is the same
+underlying function. Throughout the codebase the convention is to prefer the locally-imported form over the
+`game.titan.*` accessors; reading `CLAUDE.md` and the code-review standards will confirm this preference.
 
 ## Other gotchas
 
@@ -117,8 +118,9 @@ helpers module.
   paths (`./`, `../`) are only used for imports within the same immediate directory.
 
 - **`game.titan` namespace** — Registered during the Foundry `init` hook in `src/hooks/OnceInit.js`. It
-  exposes `assert` is NOT on this object; only `error`, `socketManager`, `macros`, and similar system-level
-  singletons are. Do not expect `game.titan.assert` to exist.
+  exposes `{ macros, assert, warn, log, error, socketManager }`. The codebase convention (see `CLAUDE.md`)
+  is to use the locally-imported helpers (e.g. `import assert from '~/helpers/utility-functions/Assert.js'`)
+  rather than going through `game.titan.*`.
 
 - **Svelte context protocol** — `document` (a `TJSDocument` store) and `applicationState` (a writable store)
   are set into context by `DocumentSheetShell.svelte`. All descendant components must use `getContext` to
@@ -128,8 +130,9 @@ helpers module.
   (`__dirname`), not a `dist/` folder. Source lives in `src/`; build artifacts such as `index.js` land at the
   top level. See `architecture.md` for the full directory layout.
 
-- **`svelte:options accessors={true}`** — `DocumentSheetShell.svelte` uses this to allow `SvelteApplication`
-  to read and write component props after mount (required by the TyphonJS application shell contract).
+- **`svelte:options accessors={true}`** — The app/dialog shells (e.g. `DocumentSheetShell.svelte`) use this
+  to allow `SvelteApplication` to read and write component props after mount (required by the TyphonJS
+  application shell contract).
 
 ## Style rules live in CLAUDE.md
 
