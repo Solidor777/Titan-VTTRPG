@@ -20,6 +20,10 @@ import { TJSDocument }       from '@typhonjs-fvtt/runtime/svelte/store/fvtt/docu
 import { TJSProseMirror }    from '@typhonjs-fvtt/standard/component/fvtt/editor';
 ```
 
+Note: the two editor-input components import the standard package under divergent specifiers —
+`DocumentBoundEditorInput.svelte` uses `@typhonjs-fvtt/standard/component/fvtt/editor` while
+`DocumentEditorInput.svelte` uses `@typhonjs-fvtt/svelte-standard/component`.
+
 The `~/` path alias (configured in `vite.config.mjs` as a Vite `resolve.alias` pointing at `src/`) **is**
 used everywhere for intra-project imports, e.g.:
 
