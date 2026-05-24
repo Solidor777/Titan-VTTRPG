@@ -19,15 +19,16 @@ src/check/types/attribute-check/dialog/AttributeCheckDialogShell.svelte)
 `checkParameters`) as props to `CheckDialogShell.svelte`, which sets them into Svelte context and delegates
 rendering to the type-specific shell (`AttributeCheckDialogShell`). The inner shell runs a reactive block
 (`$:`) that calls `actor.system.getAttributeCheckParameters($checkOptions)` on every options change to keep
-the displayed totals live. When the Roll button fires, the shell calls
-`actor.system.rollAttributeCheck($checkOptions)` and the dialog closes.
+the displayed totals live. When the Roll button fires, the inner shell calls
+`actor.system.rollAttributeCheck($checkOptions)` directly on the actor's data model, and the dialog closes.
 
-**3. Parameters & check instantiation — `CharacterDataModel._createAttributeCheckDialog` /
-`rollAttributeCheck`**
-`rollAttributeCheck` validates the options, calls `initializeAttributeCheckOptions` to apply defaults, calls
-`getAttributeCheckParameters` to produce the typed `CheckParameters` object, constructs
-`new AttributeCheck(checkParameters)`, collects any narrative messages via `_getAttributeCheckMessages`, then
-delegates to `_rollCheck`.
+**3. Parameters & check instantiation — `CharacterDataModel.rollAttributeCheck`**
+`rollAttributeCheck` is the entry point for the actual roll. It validates the options, calls
+`initializeAttributeCheckOptions` to apply defaults, calls `getAttributeCheckParameters` to produce the
+typed `CheckParameters` object, constructs `new AttributeCheck(checkParameters)`, collects any narrative
+messages via `_getAttributeCheckMessages`, then delegates to `_rollCheck`. (The dialog factory
+`_createAttributeCheckDialog` is invoked earlier by `requestAttributeCheck` only when user confirmation of
+options is needed; once the dialog's Roll button fires, it hands off directly to `rollAttributeCheck`.)
 
 **4. Roll & evaluate — `TitanCheck.evaluateCheck` (src/check/Check.js)**
 `_rollCheck` optionally spends Resolve via `_expendCheckResolve`, then calls `check.sendToChat()`.
@@ -64,9 +65,8 @@ Two button patterns coexist:
   document.
 - **Report confirm buttons** (`ReportConfirmApplyDamageButton.svelte`, src/document/types/chat-message/
   report/components/ReportConfirmApplyDamageButton.svelte): owned-actor flow. Calls
-  `actor.system.applyDamage(total, { ignoreArmor: true, report: false })`, then updates the chat document
-  via `$document.update({ flags: { titan: { damageApplied: { confirmed: true }, stamina: {...},
-  wounds: {...} } } })` so the message reflects the new resource values.
+  `actor.system.applyDamage(total, { ignoreArmor: true, report: false })`, then updates the chat message's
+  `flags.titan` to mark the damage confirmed and persist the new resource values.
 
 ---
 
@@ -205,6 +205,7 @@ used by `ChatMessageShell.svelte` to select the correct report component from th
 `selectComponent()`. Report messages are visible only to document owners plus the GM.
 
 **5. Revert — `TitanCombat.previousTurn` / `onCombatPreviousTurn`**
+Each revert handler is the inverse of its forward counterpart (see the turn-start/turn-end steps above).
 `previousTurn()` mirrors `nextTurn()` — stores the displaced combatant, calls `super.previousTurn()`, then
 emits `'combatPreviousTurn'` via socket. The `onCombatPreviousTurn` hook handler calls:
   - `actor.system.onInitiativeReverted(...)` on every character combatant — increments the `remaining`
@@ -215,11 +216,9 @@ emits `'combatPreviousTurn'` via socket. The `onCombatPreviousTurn` hook handler
     reverts Fast Healing, Persistent Damage, and Resolve Regain; sends a `turnStartRevertReport` chat
     message.
 
-**Report chat components** (src/document/types/chat-message/report/types/):
-`TurnStartReportChatMessage.svelte`, `TurnEndReportChatMessage.svelte`,
-`TurnStartRevertReportChatMessage.svelte`, `TurnEndRevertReportChatMessage.svelte`,
-`EffectsExpiredReportChatMessage.svelte` — each reads from `$document.flags.titan` and displays the
-relevant changed resources or effect names. Revert report components include buttons
-(`ReportConfirmApplyDamageButton`, `ReportConfirmResolveRegainButton`) allowing owners to
-confirm/re-apply the changes, which call the appropriate `actor.system.*` method and update the chat
-document flags to reflect the new resource state.
+**Report chat components** (see `abstractions.md` → Chat messages & reports for the full component list):
+All turn reports are whispered to document owners only. Each report component reads from
+`$document.flags.titan` and displays the relevant changed resources or effect names. Revert report
+components include buttons (`ReportConfirmApplyDamageButton`, `ReportConfirmResolveRegainButton`) allowing
+owners to confirm/re-apply the changes, which call the appropriate `actor.system.*` method and update the
+chat document flags to reflect the new resource state.
