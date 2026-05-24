@@ -87,4 +87,4 @@ extended by every concrete type under `document/types/`.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `effect`, `equipment`,
   `shield`, `spell`, `weapon`), ChatMessage (`testChat`).
 - `"socket": true` enables the system socket used by `SocketManager`.
-- Foundry compatibility: minimum v11, verified v13.
+- Foundry compatibility (`system.json`): minimum v11, verified v13, maximum v13.
