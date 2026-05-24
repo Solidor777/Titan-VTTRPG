@@ -2,7 +2,8 @@
 
 ## Top-level src/ layout
 
-- `src/index.js` — Module entry point; imports global SCSS and registers all Foundry hooks via `Hooks.on` / `Hooks.once`.
+- `src/index.js` — Module entry point; imports global SCSS and registers most Foundry hooks via `Hooks.on` / `Hooks.once`
+  (the `hotbarDrop` hook is registered lazily at ready-time inside `src/hooks/OnceReady.js`).
 - `src/check/` — Dice-check engine: base `Check.js` + `CheckResults.js`, a shared dialog and chat-message shell, and
   five concrete check types (`attack-check`, `attribute-check`, `casting-check`, `item-check`, `resistance-check`),
   each owning its own dialog and chat-message subcomponents.
@@ -12,12 +13,15 @@
 - `src/helpers/` — Shared utilities consumed across the whole codebase: ~60 single-function files in
   `utility-functions/`, reusable Svelte components in `svelte-components/`, system settings definitions in `Settings/`,
   Svelte actions in `svelte-actions/`, world-migration logic in `migration/`, and shared dialog helpers in `dialogs/`.
-- `src/hooks/` — One file per Foundry hook; each file exports a single function that is registered in `src/index.js`.
-  Covers `init`, `setup`, `ready`, combat turn progression, chat-message rendering, directory context menus,
-  hotbar dropping, and journal sheet rendering.
+- `src/hooks/` — One file per Foundry hook; each file exports a single function. Most are registered in `src/index.js`;
+  `hotbarDrop` is registered at ready-time inside `OnceReady.js`. Covered hooks include, e.g.: `init`, `setup`,
+  `ready`, combat turn progression, chat-message rendering (`renderChatMessageHTML`, `preDeleteChatMessage`),
+  chat-log context menus (`getChatLogEntryContext`), directory context menus, hotbar dropping, and journal sheet
+  rendering.
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), CSS custom-property variables
   (`Variables.scss`), global resets (`Global.scss`), a prepended `Root.scss` (injected into every Svelte component
-  via svelte-preprocess), and a `Mixins/` folder with 13 mixin files (flex, font, button, border, panel, tag, etc.).
+  via svelte-preprocess), and a `Mixins/` folder of per-domain SCSS mixin files covering flex, font, border, button,
+  panel, tag, input, label, list, margin, padding, rarity, resistance, separator, system, and attribute domains.
 - `src/system/` — System-wide constants and registrations: ~20 JS files covering attributes, skills, conditions,
   icons, settings registration (`SystemSettings.js`), initiative formula (`Initiative.js`), macros (`Macros.js`),
   trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances, resources, speeds, etc.).
@@ -26,7 +30,8 @@
 
 **Entry point:** `src/index.js` is the single ES-module entry. It:
 1. Imports and applies the three global SCSS files.
-2. Imports every hook handler from `src/hooks/` and binds them to Foundry's `Hooks` API.
+2. Imports most hook handlers from `src/hooks/` and binds them to Foundry's `Hooks` API. The `hotbarDrop` hook is
+   the exception — it is registered lazily inside `OnceReady.js` at ready-time.
 
 **`src/hooks/` wiring:**
 - `OnceInit.js` (Foundry `init` hook) does all heavy registration: creates `game.titan` namespace, calls
@@ -40,6 +45,8 @@
   `onInitiativeAdvanced`) on `TitanActor`.
 - `OnRenderChatMessageHTML.js` mounts `ChatMessageShell.svelte` (from `src/document/types/chat-message/`) onto
   titan-flagged chat messages using a `TJSDocument` store from `@typhonjs-fvtt/runtime`.
+- `OnPreDeleteChatMessage.js` fires before a chat message is deleted (e.g., to clean up associated data).
+- `OnGetChatLogEntryContext.js` adds custom entries to the chat-log context menu.
 - Directory-context hooks (`OnGetActorDirectoryEntryContext`, `OnGetItemDirectoryEntryContext`) add UUID
   management options via helpers in `src/helpers/utility-functions/`.
 
@@ -71,8 +78,9 @@ extended by every concrete type under `document/types/`.
 - `outDir` is the repo root (`__dirname`); `emptyOutDir: false` to avoid wiping non-built files.
 - CSS is extracted and emitted as `style.css` at repo root (PostCSS via
   `@typhonjs-fvtt/runtime/rollup`'s `postcssConfig`).
-- SCSS preprocessing: `svelte-preprocess` with `api: 'modern'` prepends `@use "src/styles/Root.scss" as *;`
-  to every Svelte component's `<style lang="scss">` block automatically.
+- SCSS preprocessing uses two paths: `svelte-preprocess` (Svelte component styles) uses `api: 'modern'` and
+  prepends `@use "src/styles/Root.scss" as *;` to every `<style lang="scss">` block automatically; the global
+  `css.preprocessorOptions.scss` path uses `api: 'modern-compiler'`.
 - Compression (`s_COMPRESS`) is `false` by default; source maps (`s_SOURCEMAPS`) are enabled.
 - Target: `es2022` for both esbuild and Rollup/Terser.
 
