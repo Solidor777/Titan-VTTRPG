@@ -61,15 +61,11 @@ import { slideFade } from '@typhonjs-fvtt/runtime/svelte/transition';
 
 ## Styling
 
-SCSS mixins are the deliberate, preferred styling mechanism — a codebase-wide refactor
-(commit `fe11cca0`: "Removed use of global styles, and propagated the use of mixins") replaced all
-`:global` selector usage with mixins. As of that commit, no `:global` occurrences remain in `src/`.
+SCSS mixins are the deliberate, preferred styling mechanism — a codebase-wide refactor replaced all
+`:global` selector usage with mixins, and no `:global` occurrences remain in `src/`.
 
-**Where mixins live:** `src/styles/Mixins/` contains per-domain files:
-`AttributeMixins.scss`, `BorderMixins.scss`, `ButtonMixins.scss`, `FlexMixins.scss`,
-`FontMixins.scss`, `InputMixins.scss`, `LabelMixins.scss`, `ListMixins.scss`,
-`MarginMixins.scss`, `PaddingMixins.scss`, `PanelMixins.scss`, `RarityMixins.scss`,
-`ResistanceMixins.scss`, `SeparatorMixins.scss`, `SystemMixins.scss`, `TagMixins.scss`.
+**Where mixins live:** `src/styles/Mixins/` contains per-domain files (see `architecture.md`,
+`src/styles/` section, for the full mixin file list).
 
 **`Root.scss`** (`src/styles/Root.scss`) `@forward`s all mixin files in `src/styles/Mixins/` plus
 `Variables.scss`. It is auto-prepended into every Svelte component's `<style lang="scss">` block by `svelte-preprocess`
@@ -106,7 +102,7 @@ if (assert(someCondition, 'Error message')) { ... }
 `game.titan` (registered during the `init` hook in `src/hooks/OnceInit.js`) exposes the full namespace
 `{ macros, assert, warn, log, error, socketManager }` — so `game.titan.assert` does exist and is the same
 underlying function. Throughout the codebase the convention is to prefer the locally-imported form over the
-`game.titan.*` accessors; reading `CLAUDE.md` and the code-review standards will confirm this preference.
+`game.titan.*` accessors (see `CLAUDE.md`).
 
 ## Other gotchas
 
@@ -114,13 +110,8 @@ underlying function. Throughout the codebase the convention is to prefer the loc
   calling `game.i18n.localize` directly. It automatically prepends `"LOCAL."` and appends `".text"` to the key,
   so `localize('attackCheck')` resolves to `game.i18n.localize('LOCAL.attackCheck.text')`.
 
-- **`~/` alias vs relative paths** — Cross-directory imports always use `~/` (resolves to `src/`). Relative
-  paths (`./`, `../`) are only used for imports within the same immediate directory.
-
-- **`game.titan` namespace** — Registered during the Foundry `init` hook in `src/hooks/OnceInit.js`. It
-  exposes `{ macros, assert, warn, log, error, socketManager }`. The codebase convention (see `CLAUDE.md`)
-  is to use the locally-imported helpers (e.g. `import assert from '~/helpers/utility-functions/Assert.js'`)
-  rather than going through `game.titan.*`.
+- **`~/` alias vs relative paths** — The codebase uses the `~/` alias for cross-directory imports;
+  relative paths (`./`, `../`) appear only within the same immediate directory.
 
 - **Svelte context protocol** — `document` (a `TJSDocument` store) and `applicationState` (a writable store)
   are set into context by `DocumentSheetShell.svelte`. All descendant components must use `getContext` to
