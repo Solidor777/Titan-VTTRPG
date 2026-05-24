@@ -16,9 +16,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   `_getInitialPrototypeTokenData`), and the `postAddItem` / `preDeleteItem` / `postDeleteItem`
   lifecycle hooks that subclasses override.
 - `CharacterDataModel` (`src/document/types/actor/types/character/CharacterDataModel.js`) extends
-  `TitanActorDataModel`. The primary character model: owns check-rolling methods (attribute,
-  attack, casting, item, resistance), resource management (stamina, wounds, resolve), rest/regen
-  automation, and effect-duration tracking.
+  `TitanActorDataModel`. The primary character model; coordinates check rolling, resource
+  management, rest/regen automation, and effect-duration tracking.
 - `PlayerDataModel` (`src/document/types/actor/types/character/types/player/PlayerDataModel.js`)
   extends `CharacterDataModel`. Adds XP tracking and an `inspiration` flag.
 - `NPCDataModel` (`src/document/types/actor/types/character/types/npc/NPCDataModel.js`) extends
@@ -60,10 +59,9 @@ expertise, and computing type-specific results.
 
 **Base class**
 
-- `TitanCheck` (`src/check/Check.js`) — named `TitanCheck` in source (file is `Check.js`).
-  Constructor stores a `CheckParameters` object. `evaluateCheck()` calls `rollCheckDice`,
-  `_applyExpertise`, then `_calculateResults`. Subclasses override `_calculateResults` (and
-  optionally `_applyExpertise`) for type-specific logic.
+- `TitanCheck` (`src/check/Check.js`) — constructor stores a `CheckParameters` object.
+  `evaluateCheck()` calls `rollCheckDice`, `_applyExpertise`, then `_calculateResults`. Subclasses
+  override `_calculateResults` (and optionally `_applyExpertise`) for type-specific logic.
 
 **Subtypes** (all extend `TitanCheck`; each lives in `src/check/types/<name>/`):
 
@@ -85,11 +83,12 @@ options before constructing parameters.
 
 **Results**
 
-`CheckResults` (`src/check/CheckResults.js`) is a plain-object typedef and a factory function
-(`calculateCheckResults`) that counts successes, critical successes/failures, and extra successes
-from sorted dice and parameters. Each check type's `calculate<Name>CheckResults` function extends
-the base output. `recalculateCheckResults` (`src/check/chat-message/RecalculateCheckResults.js`)
-re-runs the appropriate calculator from stored chat-message data.
+The `CheckResults` typedef (`src/check/CheckResults.js`) describes the result shape;
+`calculateCheckResults` is the factory that builds it, counting successes, critical
+successes/failures, and extra successes from sorted dice and parameters. Each check type's
+`calculate<Name>CheckResults` function extends the base output. `recalculateCheckResults`
+(`src/check/chat-message/RecalculateCheckResults.js`) re-runs the appropriate calculator from
+stored chat-message data.
 
 
 ## Chat messages & reports
@@ -97,8 +96,8 @@ re-runs the appropriate calculator from stored chat-message data.
 **Document**
 
 - `TitanChatMessage` (`src/document/types/chat-message/ChatMessage.js`) extends Foundry's
-  `ChatMessage`. Currently a thin subclass; system data is stored in `flags.titan` and read by
-  Svelte components.
+  `ChatMessage`. A thin subclass; system data is stored in `flags.titan` and read by Svelte
+  components.
 
 **Svelte shell**
 
@@ -222,40 +221,34 @@ damage on the GM's behalf).
 
 Standalone pure or near-pure functions imported individually throughout the codebase. Grouped by
 domain:
-- Schema field factories: `CreateStringField`, `CreateIntegerField`, `CreateNumberField`,
-  `CreateBooleanField`, `CreateArrayField`, `CreateObjectField`, `CreateSchemaField`.
-- Token / actor queries: `GetControlledTokens`, `GetTargetedTokens`, `GetControlledCharacters`,
-  `GetTargetedCharacters`, `GetBestPlayerOwner`, `GetBestCharactersToUpdate`,
-  `IsCurrentUserBestOwner`.
-- Apply/revert automation: `ApplyDamageToTargets`, `ApplyHealingToTargets`,
-  `ApplyRendToTargets`, `ApplyRepairsToTarget`.
-- Label / tooltip builders: `CreateCheckLabel`, `CreateAttributeCheckLabel`,
-  `CreateModifiableStatTooltip`, `GetAttributeCheckParametersTooltip`,
-  `GetItemCheckParametersTooltip`, `GetResistanceCheckParametersTooltip`.
-- Settings accessors: each system setting has its own getter module (e.g., `GetSetting`,
-  `ShouldGetCheckOptions`, `ShouldConfirmDeletingItems`).
-- String helpers: `Camelize`, `Capitalize`, `FormatString`, `Localize`, `Paragraphize`.
-- Misc: `GenerateUUID`, `RollCheckDice`, `Log`, `Assert`, `Delay`, `Clamp`, `DeepFreeze`.
+- **Schema field factories** — thin wrappers around Foundry field constructors for consistent
+  schema definitions (e.g., `CreateStringField`, `CreateIntegerField`).
+- **Token / actor queries** — resolve the best owner or target set for a given operation
+  (e.g., `GetBestPlayerOwner`, `IsCurrentUserBestOwner`).
+- **Apply/revert automation** — entry points for applying or reverting damage, healing, rend, and
+  repairs to one or more targets (e.g., `ApplyDamageToTargets`).
+- **Label / tooltip builders** — construct localised display strings and modifier breakdowns for
+  checks and stats (e.g., `CreateCheckLabel`, `CreateModifiableStatTooltip`).
+- **Settings accessors** — each system setting has its own getter module (e.g., `GetSetting`,
+  `ShouldGetCheckOptions`).
+- **String helpers** — general-purpose text formatting (`Localize`, `Capitalize`, and others).
+- **Misc** — small utilities used across layers (`GenerateUUID`, `Log`, `Assert`, `Clamp`, and
+  others).
 
 **`svelte-components/`** (`src/helpers/svelte-components/`)
 
 Reusable Svelte UI primitives consumed by sheet and chat-message components. Categories:
-- **Buttons**: `Button`, `IconButton`, `IconLabelButton`, `MiniButton`, `MiniIconButton`,
-  `ToggleButton`, `ToggleOptionButton`, `AttributeButton`, `ResistanceButton`,
-  `ResistanceCheckButton`, `SpendResolveButton`, `ExpandButton`, `CondensedCheckButton`,
-  `ItemCheckButton`, `ImageButton`.
-- **Inputs**: `TextInput`, `TextAreaInput`, `NumberInput`, `IntegerInput`,
-  `IntegerIncrementInput`, `CheckboxInput`, `ImagePicker`, `LabeledTextInput`, `AttributeInput`,
-  `ResistanceInput`, `RarityInput`, `TopFilter`, and a set of `Select` components for every
-  selectable field type.
-- **Labels**: `Label`, `TextLabel`, `IconLabel`, `ModifiedValueLabel`,
-  `ModifiableStatValueLabel`.
-- **Tags**: `Tag`, `TraitTag`, `ValueTag`, `LabelTag`, `RarityTag`, `AttributeTag`,
-  `ResistanceTag`, `AttributeCheckTag`, `StatTag`, `IconStatTag`, `IconTag`, `DurationTag`,
-  `OpposedCheckTag`, `EditDeleteTag`, `ResistedByTag`, `TagContainer`, spell-aspect tags, and
-  effect-state tags.
-- **Layout**: `Tabs`, `ScrollingContainer`, `BorderedColumnList`, `FilteredList`,
-  `LabeledElement`, `Meter`, `RichText`, `Text`.
+- **Buttons** — clickable controls ranging from full icon-label buttons to compact mini variants
+  and domain-specific actions (e.g., `Button`, `IconLabelButton`, `ToggleButton`, and others).
+- **Inputs** — bound form controls for text, numbers, checkboxes, images, and domain-specific
+  fields such as attributes and resistances (e.g., `TextInput`, `IntegerIncrementInput`,
+  `CheckboxInput`, and others).
+- **Labels** — read-only display elements, including modified-value variants that show stat
+  breakdowns (e.g., `TextLabel`, `ModifiableStatValueLabel`, and others).
+- **Tags** — compact inline badges for traits, ratings, durations, and check metadata
+  (e.g., `TraitTag`, `DurationTag`, `TagContainer`, and others).
+- **Layout** — structural primitives: tab containers, scrolling wrappers, filtered lists, meters,
+  and rich-text renderers (e.g., `Tabs`, `FilteredList`, `Meter`, and others).
 
 **`svelte-actions/`** (`src/helpers/svelte-actions/`)
 
