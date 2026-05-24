@@ -44,12 +44,12 @@ management). Data model classes hold the schema, field validation, and derived-d
   `deleteRulesElement`. Item types that carry rules elements extend this class.
 - Concrete item data models and which base they extend:
   - `AbilityDataModel` — `RulesElementItemDataModel` (adds xpCost, rarity)
-  - `ArmorDataModel` — `RulesElementItemDataModel` (adds armor value, traits)
+  - `ArmorDataModel` — `RulesElementItemDataModel` (adds rarity, value, armor value schema, traits)
   - `EffectDataModel` — `RulesElementItemDataModel` (adds duration, turn tracking)
-  - `EquipmentDataModel` — `RulesElementItemDataModel` (adds quantity, bulk, equip state)
-  - `ShieldDataModel` — `RulesElementItemDataModel` (adds defense bonus, traits)
+  - `EquipmentDataModel` — `RulesElementItemDataModel` (adds rarity, value, equipped state)
+  - `ShieldDataModel` — `RulesElementItemDataModel` (adds rarity, value, defense bonus, traits)
   - `WeaponDataModel` — `RulesElementItemDataModel` (adds attacks array, weapon traits)
-  - `CommodityDataModel` — `TitanItemDataModel` (quantity/value only, no rules elements)
+  - `CommodityDataModel` — `TitanItemDataModel` (rarity, value, quantity; no rules elements)
   - `SpellDataModel` — `TitanItemDataModel` (aspects, custom aspects; no rules elements)
 
 
