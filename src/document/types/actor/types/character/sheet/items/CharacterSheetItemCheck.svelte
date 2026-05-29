@@ -71,7 +71,7 @@
                attribute={checkParameters.attribute}
                disabled={!$document.isOwner}
                resolveCost={checkParameters.resolveCost}
-               on:click={() => rollItemCheck()}
+               onclick={() => rollItemCheck()}
             />
          {:else}
             <!--Check Button-->
@@ -80,7 +80,7 @@
                   label={checkParameters.checkLabel}
                   attribute={checkParameters.attribute}
                   disabled={!$document.isOwner}
-                  on:click={() => rollItemCheck()}
+                  onclick={() => rollItemCheck()}
                />
             </div>
 
@@ -88,7 +88,7 @@
             <div class="resolve-cost-button">
                <SpendResolveButton
                   resolveCost={checkParameters.resolveCost}
-                  on:click={() => $document.system.spendResolve(checkParameters.resolveCost)}
+                  onclick={() => $document.system.spendResolve(checkParameters.resolveCost)}
                />
             </div>
          {/if}
@@ -99,7 +99,7 @@
             attribute={checkParameters.attribute}
             disabled={!$document.isOwner}
             resolveCost={checkParameters.resolveCost}
-            on:click={() => rollItemCheck()}
+            onclick={() => rollItemCheck()}
          />
       {/if}
    </div>

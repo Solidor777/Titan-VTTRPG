@@ -62,7 +62,7 @@
                      label={check.label}
                      attribute={check.attribute}
                      resolveCost={check.resolveCost}
-                     on:click={() => rollItemCheck(idx)}
+                     onclick={() => rollItemCheck(idx)}
                   />
                </div>
             {:else}
@@ -71,7 +71,7 @@
                   <ItemCheckButton
                      label={check.label}
                      attribute={check.attribute}
-                     on:click={() => rollItemCheck(idx)}
+                     onclick={() => rollItemCheck(idx)}
                   />
                </div>
 
@@ -79,14 +79,14 @@
                <div class="button">
                   <SpendResolveButton
                      resolveCost={check.resolveCost}
-                     on:click={() => spendResolve(check.resolveCost)}
+                     onclick={() => spendResolve(check.resolveCost)}
                   />
                </div>
             {/if}
          {:else}
             <!--Check Button-->
             <div class="button">
-               <ItemCheckButton {check} on:click={() => rollItemCheck(idx)}/>
+               <ItemCheckButton {check} onclick={() => rollItemCheck(idx)}/>
             </div>
          {/if}
 

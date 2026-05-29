@@ -2,21 +2,27 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { DICE_ICON, SPEND_RESOLVE_ICON } from '~/system/Icons.js';
 
-   /** @type {string} The Label for the check. */
-   export let label = void 0;
+   /**
+    * @typedef {object} ItemCheckButtonProps
+    * @property {string} [label] - The Label for the check.
+    * @property {string} [attribute] - The Attribute to use for the check.
+    * @property {number} [resolveCost] - The Resolve cost of rolling the check, if any.
+    * @property {boolean} [disabled] - Whether the button should be disabled.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    */
 
-   /** @type {string} The Attribute to use for the check. */
-   export let attribute = void 0;
-
-   /** @type {number} The Resolve cost of rolling the check, if any. */
-   export let resolveCost = void 0;
-
-   /** @type {boolean} Whether the button should be disabled. */
-   export let disabled = void 0;
+   /** @type {ItemCheckButtonProps} */
+   const {
+      label = void 0,
+      attribute = void 0,
+      resolveCost = void 0,
+      disabled = void 0,
+      onclick = void 0,
+   } = $props();
 </script>
 
 <div class="item-check-button {attribute}">
-   <Button {disabled} on:click>
+   <Button {disabled} on:click={onclick}>
       <div class="button-inner">
          <i class={DICE_ICON}/>
          <div>
