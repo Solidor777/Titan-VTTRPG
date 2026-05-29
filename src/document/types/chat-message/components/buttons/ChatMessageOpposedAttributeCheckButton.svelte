@@ -3,20 +3,23 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {string} The Attribute to use for the opposed check. */
-   export let attribute = 'body';
+   /**
+    * @typedef {object} ChatMessageOpposedAttributeCheckButtonProps
+    * @property {string} [attribute] The Attribute to use for the opposed check.
+    * @property {string} [skill] The Skill to use for the opposed check.
+    * @property {number} [difficulty] The Difficulty of the opposed check.
+    * @property {number} [complexity] The Complexity of the opposed check.
+    * @property {number} [damageToReduce] Damage to be reduced by the check, if any.
+    */
 
-   /** @type {string} The Skill to use for the opposed check. */
-   export let skill = 'arcana';
-
-   /** @type {number} The Difficulty of the opposed check. */
-   export let difficulty = 4;
-
-   /** @type {number} The Complexity of the opposed check. */
-   export let complexity = 1;
-
-   /** @type {number} Damage to be reduced by the check, if any. */
-   export let damageToReduce = 0;
+   /** @type {ChatMessageOpposedAttributeCheckButtonProps} */
+   const {
+      attribute = 'body',
+      skill = 'arcana',
+      difficulty = 4,
+      complexity = 1,
+      damageToReduce = 0,
+   } = $props();
 
    /**
     * Rolls opposed Attribute Checks for all targeted characters.

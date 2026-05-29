@@ -6,18 +6,21 @@
    import { REND_ICON, REPAIR_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type {number} Amount of Rend to apply. */
-   export let rend = void 0;
+   /**
+    * @typedef {object} ChatMessageRendButtonsProps
+    * @property {number} [rend] Amount of Rend to apply.
+    * @property {boolean} [magical] Whether the attack inflicting the Rend is Magical.
+    */
 
-   /** @type {boolean} Whether the attack inflicting the Rend is Magical. */
-   export let magical = false;
+   /** @type {ChatMessageRendButtonsProps} */
+   const { rend = void 0, magical = false } = $props();
 </script>
 
 <div class="damage-buttons">
    <!--Apply Rend button-->
    <div class="button">
       <ChatMessageButton
-         on:click={() => applyRendToTargets(rend, { magical })}
+         onclick={() => applyRendToTargets(rend, { magical })}
          tooltip={localize('rendArmor')}
       >
          <i class={REND_ICON}/>
@@ -28,7 +31,7 @@
    <!--Repair Rend button-->
    <div class="button">
       <ChatMessageButton
-         on:click={() => applyRepairsToTargets(rend)}
+         onclick={() => applyRepairsToTargets(rend)}
          tooltip={localize('repairArmor')}
       >
          <i class={REPAIR_ICON}/>

@@ -39,7 +39,7 @@
    }
 </script>
 
-<ChatMessageButton on:click={() => removeExpiredEffects()}>
+<ChatMessageButton onclick={() => removeExpiredEffects()}>
    <i class={REMOVE_TEMP_EFFECTS_ICON}/>
    <Text text="removeExpiredEffects"/>
 </ChatMessageButton>

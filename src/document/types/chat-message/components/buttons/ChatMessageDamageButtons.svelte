@@ -10,14 +10,15 @@
       IGNORE_ARMOR_ICON,
    } from '~/system/Icons.js';
 
-   /** @type {number} The amount of damage to apply. */
-   export let damage = void 0;
+   /**
+    * @typedef {object} ChatMessageDamageButtonsProps
+    * @property {number} [damage] The amount of damage to apply.
+    * @property {boolean} [ineffective] Whether the attack is ineffective (deals half damage).
+    * @property {boolean} [penetrating] Whether the attack is penetrating (ignores some armor).
+    */
 
-   /** @type {boolean} Whether the attack is ineffective (deals half damage). */
-   export let ineffective = false;
-
-   /** @type {boolean} Whether the attack is penetrating (ignores some armor). */
-   export let penetrating = false;
+   /** @type {ChatMessageDamageButtonsProps} */
+   const { damage = void 0, ineffective = false, penetrating = false } = $props();
 </script>
 
 <div class="damage-buttons">
