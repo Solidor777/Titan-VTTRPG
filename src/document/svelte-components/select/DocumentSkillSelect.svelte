@@ -23,6 +23,6 @@
    {allowNone}
    bind:value
    disabled={disabled || !$document?.isOwner}
-   on:change={()=> refreshSystemDocument($document, disabled)}
+   onchange={()=> refreshSystemDocument($document, disabled)}
    {tooltip}
 />

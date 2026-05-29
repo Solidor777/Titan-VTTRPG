@@ -108,6 +108,6 @@
 <RulesElementOperationSelect
    bind:value={$document.system.rulesElement[idx].operation}
    disabled={disabled || !$document?.isOwner}
-   on:change={() => onRulesElementOperationChanged()}
+   onchange={() => onRulesElementOperationChanged()}
    {tooltip}
 />

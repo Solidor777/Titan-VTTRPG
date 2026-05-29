@@ -1,11 +1,21 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
-   /** @type {number} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} CheckDifficultySelectProps
+    * @property {number} [value] - The value that this input should modify.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {(event: Event) => void} [onchange] - Callback fired when the selected value changes.
+    */
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = void 0;
+   /** @type {CheckDifficultySelectProps} */
+   let {
+      value = $bindable(void 0),
+      disabled = void 0,
+      tooltip = void 0,
+      onchange = void 0,
+   } = $props();
 
    /** @type {number[]} Options for the select. */
    const options = [
@@ -16,15 +26,12 @@
       5,
       6
    ];
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
 </script>
 
 <Select
    bind:value
    {disabled}
-   on:change
+   on:change={onchange}
    {options}
    {tooltip}
 />

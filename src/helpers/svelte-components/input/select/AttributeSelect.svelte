@@ -3,32 +3,39 @@
    import { ATTRIBUTES } from '~/system/Attributes.js';
    import AttributeInput from '~/helpers/svelte-components/input/AttributeInput.svelte';
 
-   /** @type {string} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} AttributeSelectProps
+    * @property {string} [value] - The value that this input should modify.
+    * @property {boolean} [allowNone] - Whether to allow None as an option.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {(event: Event) => void} [onchange] - Callback fired when the selected value changes.
+    */
 
-   /** @type {boolean} Whether to allow None as an option. */
-   export let allowNone = false;
+   /** @type {AttributeSelectProps} */
+   let {
+      value = $bindable(void 0),
+      allowNone = false,
+      disabled = false,
+      tooltip = void 0,
+      onchange = void 0,
+   } = $props();
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {string[]} Options for the Select Svelte component. */
-   const options = structuredClone(ATTRIBUTES);
-
-   // Add none option if appropriate.
-   if (allowNone) {
-      options.push('none');
-   }
+   /** @type {string[]} Options for the Select Svelte component, derived to include None when allowed. */
+   const options = $derived.by(() => {
+      const list = structuredClone(ATTRIBUTES);
+      if (allowNone) {
+         list.push('none');
+      }
+      return list;
+   });
 </script>
 
 <AttributeInput attribute={value}>
    <Select
       bind:value
       {disabled}
-      on:change
+      on:change={onchange}
       {options}
       {tooltip}
    />
