@@ -1,4 +1,5 @@
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store/fvtt/document';
+import { mount } from 'svelte';
+import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import darkModeChatMessages from '~/helpers/Settings/DarkModeChatMessages.js';
 import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.svelte';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
@@ -54,14 +55,17 @@ export default function onRenderChatMessageHTML(message, html) {
          html.classList.add('titan-dark-mode');
       }
 
-      // Add the Svelte components.
-      const document = new TJSDocument(message);
-      message._svelteComponent = new ChatMessageShell({
+      // Add the Svelte component.
+      const bridge = new ReactiveDocument(message);
+      const handle = mount(ChatMessageShell, {
          target: html.querySelector('.message-content'),
          props: {
-            documentStore: document,
+            documentStore: bridge,
          },
       });
+
+      // Store the mount handle and bridge for teardown on delete.
+      message._svelteComponent = { handle, bridge };
    }
 
    // If this is not a titan message, but dark mode is enabled for all messages,.
