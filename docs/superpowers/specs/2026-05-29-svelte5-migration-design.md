@@ -112,8 +112,21 @@ export default class ReactiveDocument {
       });
    }
 
-   /** Read inside a component or $derived to opt in to reactivity. */
+   /** Read inside a component or $derived to opt in to reactivity (runes-idiomatic, end-state). */
    get data() { this.#subscribe(); return this.#snapshot; }
+
+   /**
+    * TEMPORARY store-compat shim. Lets legacy ($document) components keep working through the
+    * atomic cutover. Removed in the final phase once no `$document` readers remain.
+    */
+   subscribe(run) {
+      run(this.doc);
+      const id = Hooks.on(`update${this.doc.documentName}`, () => run(this.doc));
+      this.#shimHooks.push(id);
+      return () => Hooks.off(`update${this.doc.documentName}`, id);
+   }
+   destroy() { this.#shimHooks.forEach((id) => Hooks.off(`update${this.doc.documentName}`, id)); }
+   #shimHooks = [];
 
    #refresh(changed, options, update) {
       if (options?.diff === false) { return; }
@@ -134,6 +147,10 @@ export default class ReactiveDocument {
 
 - **Context protocol preserved:** components still `getContext('document')`. Only the read shape
   changes: `$document.system.foo` → `doc.data.system.foo` (used inside `$derived`).
+- **Transition shim (temporary):** the bridge also implements Svelte's store contract
+  (`subscribe`/`destroy`), so legacy components reading `$document` keep working unchanged through
+  the atomic cutover. Leaf components are converted from `$document` → `doc.data` in later batches;
+  the shim is deleted in the final phase. End-state remains fully runes-idiomatic.
 - **Derived data:** `doc.system` already holds the rules-element-derived values at read time, so the
   snapshot captures TITAN's heavy `prepareDerivedData` output correctly.
 - **Writes:** through `doc.update({ 'system.path': value })`, in event handlers — never by mutating
@@ -174,26 +191,59 @@ Mechanical, repeated, batchable:
 
 ## 8. Build config changes
 
-- **`package.json`:** add `svelte ^5`, `@sveltejs/vite-plugin-svelte ^5`; remove
-  `@typhonjs-fvtt/runtime`, `@typhonjs-fvtt/standard`, `@typhonjs-fvtt/svelte-standard`, and the
-  `#runtime` / `#standard` import maps. Keep `svelte-preprocess` (the `Root.scss` prepend stays).
+- **`package.json`:** add `svelte ^5`, bump `@sveltejs/vite-plugin-svelte` `^3` → **`^4`** (v4 is the
+  line that supports Svelte 5 while remaining compatible with the project's Vite 5; plugin v5 would
+  force a Vite 6 bump, deliberately avoided to isolate Plan 1's risk). Remove `@typhonjs-fvtt/runtime`,
+  `@typhonjs-fvtt/standard`, `@typhonjs-fvtt/svelte-standard`, and the `#runtime` / `#standard` import
+  maps. Keep `svelte-preprocess` (the `Root.scss` prepend stays).
 - **`vite.config.mjs`:** replace `postcssConfig` / `terserConfig` from
   `@typhonjs-fvtt/runtime/rollup` with direct `autoprefixer` + terser. Everything else (root `src/`,
   `~/` alias, ES output to repo root, dev-server proxy) is unchanged.
 - **`system.json`:** raise `compatibility` to v14.
 
-## 9. Staging plan (horizontal, with an early gate)
+## 9. Staging plan
 
-1. **Infra layer** — `ReactiveDocument.svelte.js`; the AppV2 sheet base (`TitanDocumentSheet`);
-   dialog base; `<prose-mirror>` wrapper; transition swap; build config. No components converted.
-2. **🚦 Smoke-test gate** — convert exactly one tiny item sheet (e.g. Commodity) end-to-end and
-   confirm it opens, reads, and writes in a live v14 world. Locks conventions before mass change.
-   (Mitigates horizontal sequencing's "unproven until late" risk.)
-3. **Shared primitives** — the ~50 `src/helpers/svelte-components/` (buttons, inputs, labels, tags,
-   layout). Everything depends on these.
-4. **Bulk conversion by area** — actor sheets, item sheets, check dialogs, chat/check messages,
-   report components.
-5. **Decommission** — remove TyphonJS deps, dead shells, `accessors`, `#runtime`/`#standard` maps.
+### Hard constraint that shapes the staging
+
+`@typhonjs-fvtt/runtime` 0.3.0-next.4 declares `peerDependencies` of `svelte ">=4.x.x <5"` and
+`@sveltejs/vite-plugin-svelte ">=3.x.x <4"` — it is **incompatible with Svelte 5 by declaration**.
+Svelte's compiler version is global to a build, so there is no window where some sheets run on
+TyphonJS + Svelte 4 while others run on AppV2 + Svelte 5. **Adopting Svelte 5 forces removal of all
+TyphonJS in one atomic step.**
+
+What stays gradual: Svelte 5 runs Svelte-4-syntax components in backward-compatible **legacy mode**
+(`export let`, `on:`, `$:`, `<slot>`, `createEventDispatcher`, stores all keep working). Only the
+Svelte-4 **imperative component API** (`new Component()`, `$destroy`, `$set`, `$on`) is hard-removed —
+in TITAN that is a single site (the chat-message mount in `OnRenderChatMessageHTML.js` + its teardown
+in `OnPreDeleteChatMessage.js`). The transition shim (§5) keeps `$document` readers working, so the
+237-file document-read conversion is **not** dragged into the atomic step.
+
+### Phase 1 — Foundation cutover (atomic; the only phase that must land whole)
+
+Removes all TyphonJS and lands the new stack while leaving all 417 leaf components legacy:
+`ReactiveDocument.svelte.js` (with the `subscribe`/`destroy` shim); the AppV2 sheet base
+(`TitanDocumentSheet` → `DocumentSheetV2`, mount/header-controls/drag-drop); the new root shell
+(replacing `DocumentSheetShell` + `ApplicationShell`); the ~14 per-type sheet classes rewired off the
+`svelte: {…}` options; chat mount/unmount (`mount()`/`unmount()`); dialog base (`TitanDialog` →
+AppV2); the two ProseMirror components → `<prose-mirror>`; the `slideFade` → built-in `slide` swap;
+and the build config (§8) + `system.json` v14 bump. **Exit criterion:** clean `npm run build`, and in
+a live v14 world every sheet opens, every check rolls, combat turns advance — all leaf components
+untouched and reading through the shim. Verified Commodity-first, then across all sheet types.
+
+### Phase 2…N — Leaf runes conversion (gradual, batched by area)
+
+Convert leaf components from legacy → runes and from `$document` → `doc.data`, area by area
+(shared `src/helpers/svelte-components/` primitives first, since everything depends on them; then
+actor sheets, item sheets, check dialogs, chat/check messages, report components). The system builds
+and runs after every batch. Each batch applies the §6 transform catalog.
+
+### Final phase — Shim removal & decommission
+
+Once no `$document` readers remain, delete the `subscribe`/`destroy` shim from `ReactiveDocument`,
+remove any dead shells and `svelte:options accessors`, and confirm the `#runtime`/`#standard` import
+maps and all TyphonJS deps are gone.
+
+Each phase after Phase 1 gets its own implementation plan, written once Phase 1 locks the conventions.
 
 ## 10. Verification
 
@@ -204,8 +254,9 @@ No unit-test harness exists; verification is **behavioral in a live v14 world** 
 - Advance and revert combat turns (report messages + reactivity).
 - Run a world migration.
 
-The smoke-test gate (step 2) and per-area checks (step 4) are the checkpoints. Each phase ends with
-a clean `npm run build`, `npm run eslint`, and `npm run stylelint`.
+The Phase 1 exit criterion (§9) and the per-batch checks in later phases are the checkpoints. Each
+phase ends with a clean `npm run build`, `npm run eslint`, and `npm run stylelint`. Within the
+atomic Phase 1, an intermediate red build is expected; the build must be green by the phase's end.
 
 ## 11. Risks & mitigations
 
