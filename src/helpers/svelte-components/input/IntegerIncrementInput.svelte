@@ -54,7 +54,7 @@
       <MiniIconButton
          {disabled}
          icon={DECREMENT_ICON}
-         on:click={decrementInput}
+         onclick={decrementInput}
       />
    </div>
    <IntegerInput
@@ -67,7 +67,7 @@
       <MiniIconButton
          {disabled}
          icon={INCREMENT_ICON}
-         on:click={incrementInput}
+         onclick={incrementInput}
       />
    </div>
 </div>

@@ -1,18 +1,25 @@
 <script>
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
 
-   /** @type {string} The icon class to display for this button. */
-   export let icon = void 0;
+   /**
+    * @typedef {object} MiniIconButtonProps Props for the MiniIconButton component.
+    * @property {string | undefined} icon - The icon class to display for this button.
+    * @property {boolean} disabled - Whether this button is disabled.
+    * @property {string | TooltipAction | undefined} tooltip - The tooltip to display for this element, if any.
+    * @property {((event: MouseEvent) => void) | undefined} onclick - Callback invoked when the button is clicked.
+    */
 
-   /** @type {boolean} Whether this input is disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {MiniIconButtonProps} */
+   const {
+      icon = void 0,
+      disabled = false,
+      tooltip = void 0,
+      onclick = void 0,
+   } = $props();
 </script>
 
 <div class="button">
-   <IconButton {disabled} {icon} on:click {tooltip}/>
+   <IconButton {disabled} {icon} on:click={onclick} {tooltip}/>
 </div>
 
 <style lang="scss">
