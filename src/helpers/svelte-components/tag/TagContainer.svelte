@@ -5,20 +5,27 @@
     * @typedef {object} Tag
     * Object used to store data for a Tag.
     * @property {*} id - Identifier to use for ordering the tags.
-    * @property {SvelteComponent} component - Component to use for this tag.
+    * @property {import('svelte').Component} component - Component to use for this tag.
     * @property {object} props - Props to use with the component.
     */
 
-   /** @type {Tag[]} List of tags to place in the container. */
-   export let tags = void 0;
+   /**
+    * @typedef {object} TagContainerProps
+    * @property {Tag[]} [tags] - List of tags to place in the container.
+    */
+
+   /** @type {TagContainerProps} */
+   let { tags = undefined } = $props();
 </script>
+
 <!--Tag Container-->
 <div class="tag-container">
    <!--Each Tag-->
    {#each tags as tag (tag.id)}
-      <div class="tag" transition:slide|local>
+      {@const TagComponent = tag.component}
+      <div class="tag" transition:slide>
          <!--Tag Component-->
-         <svelte:component this={tag.component} {...tag.props}/>
+         <TagComponent {...tag.props}/>
       </div>
    {/each}
 </div>

@@ -5,17 +5,22 @@
     * Object for storing tab information.
     * @typedef {object} Tab
     * @property {string} id - The ID to use for the type.
-    * @property {object} component - The Svelte component to use for the Tab.
+    * @property {object} component - The Svelte component to use for the tab.
     */
 
-   /** @type {Tab[]} Array of Tab objects. */
-   export let tabs = [];
+   /**
+    * @typedef {object} TabsProps
+    * @property {Tab[]} [tabs] - Array of Tab objects.
+    * @property {string} [activeTab] - The ID of the active Tab object.
+    * @property {boolean} [border] - Whether the tabs should be bordered.
+    */
 
-   /** @type {string} The ID of the active Tab object. */
-   export let activeTab = void 0;
-
-   /** @type {boolean} Whether the tabs should be bordered. */
-   export let border = false;
+   /** @type {TabsProps} */
+   let {
+      tabs = [],
+      activeTab = $bindable(undefined),
+      border = false,
+   } = $props();
 </script>
 
 <!--List of tabs-->
@@ -36,7 +41,8 @@
    <div class="tab-content">
       {#each tabs as tab}
          {#if tab.id === activeTab}
-            <svelte:component this={tab.component}/>
+            {@const TabComponent = tab.component}
+            <TabComponent/>
          {/if}
       {/each}
    </div>

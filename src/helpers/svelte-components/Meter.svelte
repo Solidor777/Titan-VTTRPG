@@ -1,27 +1,30 @@
 <script>
-   /** @type {number} The maximum value of the meter. */
-   export let max = 1;
+   /**
+    * @typedef {object} MeterProps
+    * @property {number} [max] - The maximum value of the meter.
+    * @property {number} [min] - The minimum value of the meter.
+    * @property {number} [value] - The current value of the meter.
+    * @property {number} [meterScaleSpeed] - The speed at which the meter should animate, in percent per second.
+    * @property {number} [updateInterval] - The interval between meter updates, in milliseconds.
+    */
 
-   /** @type {number} The minimum value of the meter. */
-   export let min = 0;
-
-   /** @type {number} The current value of the meter. */
-   export let value = void 0;
-
-   /** @type {number} The speed at which the meter should animate, in percent per second. */
-   export let meterScaleSpeed = 10;
-
-   /** @type {number} The interval between meter updates, in milliseconds. */
-   export let updateInterval = 10;
+   /** @type {MeterProps} */
+   let {
+      max = 1,
+      min = 0,
+      value = undefined,
+      meterScaleSpeed = 10,
+      updateInterval = 10,
+   } = $props();
 
    /** @type {number} The calculated percent of the meter. */
-   let meterPercentWidth = (value / max - min) * 100;
+   let meterPercentWidth = $state(0);
 
    /** @type {number | null} Handle ID of the meter update function that fires on interval. */
-   let updateHandle = null;
+   let updateHandle = $state(null);
 
    /** @type {number} The desired percent width of the meter. */
-   let targetMeterPercentWidth = meterPercentWidth;
+   let targetMeterPercentWidth = $state(0);
 
    /**
     * Updates the meter width percent.
@@ -37,8 +40,7 @@
          meterPercentWidth = Math.max(meterPercentWidth - meterScaleSpeed, targetMeterPercentWidth);
       }
 
-      // If the meter percent width is equal to the target, clear the update.
-      // handle.
+      // If the meter percent width is equal to the target, clear the update handle.
       else {
          clearInterval(updateHandle);
          updateHandle = null;
@@ -46,20 +48,22 @@
    }
 
    // Update the meter in response to changes.
-   $: {
-      // Update the target percent width.
-      targetMeterPercentWidth = (value / max - min) * 100;
+   $effect(() => {
+      // Capture reactive dependencies inside the effect.
+      const newTarget = (value / max - min) * 100;
 
-      // If the target width and current width are different, begin updating the.
-      // meter.
-      if (meterPercentWidth !== targetMeterPercentWidth && updateHandle === null) {
+      // Update the target percent width.
+      targetMeterPercentWidth = newTarget;
+
+      // If the target width and current width are different, begin updating the meter.
+      if (meterPercentWidth !== newTarget && updateHandle === null) {
          updateHandle = setInterval(updateMeterWidth, updateInterval);
       }
-   }
+   });
 </script>
 
 <div class="meter">
-   <span style={`width: ${meterPercentWidth}%`}/>
+   <span style={`width: ${meterPercentWidth}%`}></span>
 </div>
 
 <style lang="scss">

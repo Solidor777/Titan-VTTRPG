@@ -2,41 +2,44 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { DELETE_ICON, EDIT_ICON } from '~/system/Icons.js';
 
-   /** @type {function} Callback for when the Delete button is clicked. */
-   export let deleteFunction = void 0;
+   /**
+    * @typedef {object} EditDeleteTagProps
+    * @property {Function} [deleteFunction] - Callback for when the Delete button is clicked.
+    * @property {Function} [editFunction] - Callback for when the Edit button is clicked.
+    * @property {string} [label] - The text to display for this element.
+    * @property {string} [labelTooltip] - The tooltip to display when the Label is hovered.
+    * @property {string} [deleteTooltip] - The tooltip to display when the Delete Icon is hovered.
+    * @property {string} [editTooltip] - The tooltip to display when the Edit Icon is hovered.
+    */
 
-   /** @type {function} Callback for when the Edit button is clicked. */
-   export let editFunction = void 0;
-
-   /** @type {string} The text to display for this element. */
-   export let label = void 0;
-
-   /** @type {string} The Tooltip to display when the Label is hovered. */
-   export let labelTooltip = void 0;
-
-   /** @type {string} The Tooltip to display when the Delete Icon is hovered. */
-   export let deleteTooltip = void 0;
-
-   /** @type {string} The Tooltip to display when the Edit Icon is hovered. */
-   export let editTooltip = void 0;
+   /** @type {EditDeleteTagProps} */
+   let {
+      deleteFunction = undefined,
+      editFunction = undefined,
+      label = undefined,
+      labelTooltip = undefined,
+      deleteTooltip = undefined,
+      editTooltip = undefined,
+   } = $props();
 </script>
 
 <div class="tag">
    <!--Edit Icon-->
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
+   <!-- svelte-ignore a11y_consider_explicit_label -->
    <a
       class={EDIT_ICON}
-      on:click={() => {
+      onclick={() => {
          editFunction();
       }}
-      on:keypress={() => {
+      onkeypress={() => {
          editFunction();
       }}
       role="button"
       tabindex="0"
       use:tooltipAction={editTooltip}
-   />
+   ></a>
 
    <!--Label-->
    <div use:tooltipAction={labelTooltip}>
@@ -46,18 +49,19 @@
    <!--Delete Icon-->
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
+   <!-- svelte-ignore a11y_consider_explicit_label -->
    <a
       class={DELETE_ICON}
-      on:click={() => {
+      onclick={() => {
          deleteFunction();
       }}
-      on:keypress={() => {
+      onkeypress={() => {
          deleteFunction();
       }}
       role="button"
       tabindex="0"
       use:tooltipAction={deleteTooltip}
-   />
+   ></a>
 </div>
 
 <style lang="scss">
