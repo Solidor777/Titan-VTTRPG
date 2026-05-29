@@ -2,9 +2,8 @@
    import { INITIATIVE_ICON } from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /** @type {InitiativeEffectData} Data for this tag's Effect. */
-   export let effect = void 0;
-
+   /** @type {{ effect: InitiativeEffectData }} Data for this tag's Effect. */
+   let { effect = void 0 } = $props();
 </script>
 
 <div class="tag">

@@ -58,19 +58,19 @@
     */
 
    /**
-    * @type {CustomEffectData | ExpiredEffectData | InitiativeEffectData |
-    *    PermanentEffectData | TurnEffectData | ConditionEffectData}
-    * Object containing the essential data for this effect.
+    * @type {{
+    *    effect: CustomEffectData | ExpiredEffectData | InitiativeEffectData
+    *       | PermanentEffectData | TurnEffectData | ConditionEffectData,
+    *    icon?: string
+    * }}
+    * Props for this component.
     */
-   export let effect = void 0;
+   let { effect = void 0, icon = void 0 } = $props();
 
-   /** @type {string} The icon to show for the Effect. */
-   export let icon = void 0;
-
-   /** @type {string} Calculated tooltipAction depending on whether the effect has a description */
-   const tooltip = !isHTMLBlank(effect.description) ?
+   /** @type {string} Calculated tooltip depending on whether the effect has a description. */
+   const tooltip = $derived(!isHTMLBlank(effect.description) ?
       `${localize('effect.custom.desc')}${effect.description}` :
-      localize('effect.custom.desc');
+      localize('effect.custom.desc'));
 </script>
 
 <div class="tag" use:tooltipAction={tooltip}>
