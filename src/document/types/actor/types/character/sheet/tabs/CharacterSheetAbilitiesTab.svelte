@@ -30,7 +30,7 @@
                <ToggleOptionButton
                   label={localize(key)}
                   enabled={$appState.tabs.abilities.filterOptions[key]}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.abilities.filterOptions[key] =
                         !$appState.tabs.abilities.filterOptions[key];
                   }}

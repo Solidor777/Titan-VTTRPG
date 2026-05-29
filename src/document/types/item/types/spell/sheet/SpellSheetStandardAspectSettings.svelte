@@ -142,7 +142,7 @@
                            enabled={$document.system.aspect[idx].option.indexOf(
                               option,
                            ) !== -1}
-                           on:click={() => {
+                           onclick={() => {
                               const optionIdx =
                                  $document.system.aspect[idx].option.indexOf(
                                     option,
