@@ -14,6 +14,6 @@
 </script>
 
 <ChatMessageButton onclick={() => applyHealingToTargets(healing)} tooltip={localize('applyHealing')}>
-   <i class={HEALING_ICON}/>
+   <i class={HEALING_ICON}></i>
    {localize('healX%Damage').replace('X%', healing)}
 </ChatMessageButton>

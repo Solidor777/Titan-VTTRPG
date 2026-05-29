@@ -12,7 +12,7 @@
 </script>
 
 <div class="resource">
-   <i class={icon}/>
+   <i class={icon}></i>
    <div class="label">{label}</div>
    <div>
       {`${value} / ${max}`}

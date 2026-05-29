@@ -36,7 +36,7 @@
 
       <!--Main Header-->
       <div class="main">
-         <i class={headerIcon}/>
+         <i class={headerIcon}></i>
          {headerLabel}
       </div>
    </div>

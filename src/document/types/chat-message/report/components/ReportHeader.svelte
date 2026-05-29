@@ -28,7 +28,7 @@
       <!--Main Header-->
       <div class="main">
          <!--Icon-->
-         <i class={icon}/>
+         <i class={icon}></i>
          {label}
       </div>
    </div>

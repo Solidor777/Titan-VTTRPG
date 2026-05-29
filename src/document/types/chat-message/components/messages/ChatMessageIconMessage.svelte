@@ -10,7 +10,7 @@
 </script>
 
 <div class="message">
-   <i class={icon}/>
+   <i class={icon}></i>
    <div>{message}</div>
 </div>
 

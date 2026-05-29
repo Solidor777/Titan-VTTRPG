@@ -52,7 +52,8 @@
    /** @type {ChatMessageShellProps} */
    const { documentStore = void 0 } = $props();
 
-   // Setup.
+   // These captures are intentional: documentStore is stable for this component's lifetime.
+   // svelte-ignore state_referenced_locally
    setContext('document', documentStore);
 
    /** @type {object} Reference to the reactive Document store. */

@@ -23,7 +23,7 @@
          onclick={() => applyRendToTargets(rend, { magical })}
          tooltip={localize('rendArmor')}
       >
-         <i class={REND_ICON}/>
+         <i class={REND_ICON}></i>
          <div><Text text="rend"/></div>
       </ChatMessageButton>
    </div>
@@ -34,7 +34,7 @@
          onclick={() => applyRepairsToTargets(rend)}
          tooltip={localize('repairArmor')}
       >
-         <i class={REPAIR_ICON}/>
+         <i class={REPAIR_ICON}></i>
          <div><Text text="repair"/></div>
       </ChatMessageButton>
    </div>

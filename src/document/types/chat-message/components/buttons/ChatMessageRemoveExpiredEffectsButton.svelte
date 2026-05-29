@@ -40,6 +40,6 @@
 </script>
 
 <ChatMessageButton onclick={() => removeExpiredEffects()}>
-   <i class={REMOVE_TEMP_EFFECTS_ICON}/>
+   <i class={REMOVE_TEMP_EFFECTS_ICON}></i>
    <Text text="removeExpiredEffects"/>
 </ChatMessageButton>

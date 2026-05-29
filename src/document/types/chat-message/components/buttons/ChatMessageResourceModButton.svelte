@@ -15,6 +15,6 @@
 </script>
 
 <ChatMessageButton onclick={() => confirmFn()} {tooltip}>
-   <i class={icon}/>
+   <i class={icon}></i>
    {label}
 </ChatMessageButton>
