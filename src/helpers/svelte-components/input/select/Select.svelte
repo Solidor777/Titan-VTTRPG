@@ -1,7 +1,6 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Text from '~/helpers/svelte-components/Text.svelte';
-   import { createEventDispatcher } from 'svelte';
 
    /**
     * Object used to store data for an Option within a Select Svelte component.
@@ -13,60 +12,32 @@
     */
 
    /**
-    * Options for the Select Svelte component.
-    * @template T
-    * @type {(SelectOption<T> | string | number)[]}
+    * @typedef {object} SelectProps
+    * @property {(SelectOption<*> | string | number)[]} [options] - Options for the select element.
+    * @property {*} [value] - The value that this input should modify.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {() => void} [onchange] - Callback fired when the selected value changes.
     */
-   export let options = void 0;
 
-   /** @type {*} The value that this input should modify. */
-   export let value = void 0;
+   /** @type {SelectProps} */
+   let { options = void 0, value = $bindable(void 0), disabled = false, tooltip = void 0, onchange } = $props();
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {EventDispatcher} Dispatcher for component Events. */
-   const eventDispatcher = createEventDispatcher();
-
-   // Ensure the value is within range of the options available.
-   $: if (options?.length > 0) {
-      switch (typeof options[0]) {
-         case 'number':
-         case 'string': {
-            if (!options.includes(value)) {
-               value = options[0];
-               eventDispatcher('change');
-            }
-            break;
-         }
-         case 'object': {
-            if (!options.find(option => option.value === value)) {
-               value = options[0].value;
-               eventDispatcher('change');
-            }
-            break;
-         }
-         default: {
-            break;
-         }
+   // Clamp value into the available options. Guarded so it converges (no loop): only writes when out
+   // of range, which makes the next run's guard false.
+   $effect(() => {
+      if (!(options?.length > 0)) { return; }
+      const first = options[0];
+      if (typeof first === 'object') {
+         if (!options.find((o) => o.value === value)) { value = first.value; onchange?.(); }
       }
-   }
+      else if (!options.includes(value)) { value = first; onchange?.(); }
+   });
 </script>
 
-<select
-   bind:value
-   {disabled}
-   on:change={() => eventDispatcher('change')}
-   use:tooltipAction={tooltip}
->
+<select bind:value {disabled} onchange={() => onchange?.()} use:tooltipAction={tooltip}>
    {#each options as option}
-      <option
-         value={option.value ?? option}
-         use:tooltipAction={option.tooltip}
-      >
+      <option value={option.value ?? option} use:tooltipAction={option.tooltip}>
          <Text text={option.label ?? option.value ?? option}/>
       </option>
    {/each}

@@ -45,7 +45,7 @@
 <Select
    bind:value
    {disabled}
-   on:change={onchange}
+   onchange={onchange}
    {options}
    {tooltip}
 />
