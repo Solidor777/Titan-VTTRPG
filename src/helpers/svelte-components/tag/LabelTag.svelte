@@ -1,11 +1,8 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {string} The text to display for this element. */
-   export let label = void 0;
+   /** @type {{ tooltip?: string | TooltipAction, label?: string }} Props for this component. */
+   let { tooltip = void 0, label = void 0 } = $props();
 </script>
 
 <div class="tag" use:tooltipAction={tooltip}>

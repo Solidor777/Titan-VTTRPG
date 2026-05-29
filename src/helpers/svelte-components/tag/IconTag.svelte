@@ -1,14 +1,8 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The text to display for this element. */
-   export let label = void 0;
-
-   /** @type {string} The icon class to display for this element. */
-   export let icon = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {{ label?: string, icon?: string, tooltip?: string | TooltipAction }} Props for this component. */
+   let { label = void 0, icon = void 0, tooltip = void 0 } = $props();
 </script>
 
 <div
