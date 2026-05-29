@@ -15,7 +15,7 @@
 
 <div class="button">
    <DocumentOwnerButton
-      on:click={() => {
+      onclick={() => {
          if (item && !item.isMarkedForDeletion) {
             isExpanded = !isExpanded;
          }

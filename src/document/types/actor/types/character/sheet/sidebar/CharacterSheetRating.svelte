@@ -25,7 +25,7 @@
    {#if typeof onClick == "function"}
       <!--Display a button if onClick is a function.-->
       <div class="button">
-         <DocumentOwnerButton on:click={onClick} tooltip={`${rating}.desc`}>
+         <DocumentOwnerButton onclick={onClick} tooltip={`${rating}.desc`}>
             <!--Icon-->
             <i class={icon}/>
 

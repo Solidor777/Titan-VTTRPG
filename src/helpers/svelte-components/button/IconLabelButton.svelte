@@ -23,7 +23,7 @@
 
 <Button
    {disabled}
-   on:click={onclick}
+   {onclick}
    {tooltip}
 >
    <IconLabel

@@ -18,7 +18,7 @@
 </script>
 
 <div class="spend-resolve-button">
-   <Button {disabled} on:click={onclick}>
+   <Button {disabled} {onclick}>
       <div class="button-inner">
          <i class="fa fa-bolt"/>
          <div>

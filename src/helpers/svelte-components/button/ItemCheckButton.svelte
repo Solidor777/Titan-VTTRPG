@@ -22,7 +22,7 @@
 </script>
 
 <div class="item-check-button {attribute}">
-   <Button {disabled} on:click={onclick}>
+   <Button {disabled} {onclick}>
       <div class="button-inner">
          <i class={DICE_ICON}/>
          <div>

@@ -44,11 +44,11 @@
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <Button on:click={onRoll}><Text text="roll"/></Button>
+         <Button onclick={onRoll}><Text text="roll"/></Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}><Text text="cancel"/></Button>
+         <Button onclick={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

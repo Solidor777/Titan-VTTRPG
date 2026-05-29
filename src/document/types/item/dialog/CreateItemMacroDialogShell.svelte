@@ -282,13 +282,13 @@
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <Button on:click={onCreateMacro}>
+         <Button onclick={onCreateMacro}>
             <Text text="createMacro"/>
          </Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}><Text text="cancel"/></Button>
+         <Button onclick={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

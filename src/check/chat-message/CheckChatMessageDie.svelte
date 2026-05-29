@@ -68,7 +68,7 @@
    text: dieTooltip,
    localize: false,
 }}>
-   <Button {disabled} on:click={applyExpertise}>
+   <Button {disabled} onclick={applyExpertise}>
       {label}
    </Button>
 </div>

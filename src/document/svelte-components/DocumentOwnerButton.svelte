@@ -8,11 +8,14 @@
    /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
+   /** @type {((event: MouseEvent) => void) | undefined} Callback invoked when the button is clicked. */
+   export let onclick = void 0;
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
 </script>
 
-<Button disabled={disabled || !$document.isOwner} on:click {tooltip}>
+<Button disabled={disabled || !$document.isOwner} {onclick} {tooltip}>
    <slot/>
 </Button>

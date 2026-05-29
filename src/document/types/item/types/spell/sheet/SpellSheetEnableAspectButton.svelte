@@ -14,9 +14,12 @@
    // Cost of the aspect.
    /** @type {number} */
    export let cost = void 0;
+
+   /** @type {((event: MouseEvent) => void) | undefined} Callback invoked when the button is clicked. */
+   export let onclick = void 0;
 </script>
 
-<DocumentOwnerButton on:click>
+<DocumentOwnerButton {onclick}>
    <div class="button-content">
       <!--Label-->
       <div class="aspect-label">

@@ -91,7 +91,7 @@
    <div class="header {attack.attribute}">
       {#if item.system.equipped}
          <DocumentOwnerButton
-            on:click={() =>
+            onclick={() =>
                $document.system.requestAttackCheck({
                   itemId: item._id,
                   attackIdx: attackIdx,

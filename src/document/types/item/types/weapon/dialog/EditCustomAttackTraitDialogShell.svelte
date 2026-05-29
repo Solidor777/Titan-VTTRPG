@@ -77,7 +77,7 @@
       <!--Add Trait Button-->
       <div class="button">
          <Button
-            on:click={() => {
+            onclick={() => {
                editTrait();
             }}
          >
@@ -88,7 +88,7 @@
       <!--Cancel Button-->
       <div class="button">
          <Button
-            on:click={() => {
+            onclick={() => {
                application.close();
             }}
          >

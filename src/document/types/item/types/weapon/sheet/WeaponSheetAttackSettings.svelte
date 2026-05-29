@@ -201,7 +201,7 @@
                   <!--Edit Traits-->
                   <div class="button">
                      <DocumentOwnerButton
-                        on:click={() => {
+                        onclick={() => {
                            $document.system.editAttackTraits(idx);
                         }}
                      >
@@ -213,7 +213,7 @@
                   <!--Custom Traits-->
                   <div class="button">
                      <DocumentOwnerButton
-                        on:click={() => {
+                        onclick={() => {
                            $document.system.addCustomAttackTrait(idx);
                         }}
                      >

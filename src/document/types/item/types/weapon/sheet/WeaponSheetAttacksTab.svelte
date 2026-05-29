@@ -56,7 +56,7 @@
          <!--Add Attack Button-->
          <div class="add-entry-button">
             <DocumentOwnerButton
-               on:click={() => {
+               onclick={() => {
                   $document.system.addAttack();
                }}
             >

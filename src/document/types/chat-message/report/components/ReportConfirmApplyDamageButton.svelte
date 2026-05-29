@@ -54,7 +54,7 @@
 
 <!--Apply damage button-->
 <div class="button">
-   <Button on:click={() => confirmDamageApplied()}>
+   <Button onclick={() => confirmDamageApplied()}>
       <i class={REGAIN_RESOLVE_ICON}/>
       {localize('applyX%Damage').replace(
          'X%',

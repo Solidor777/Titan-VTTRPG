@@ -45,7 +45,7 @@
 
 <!--Regain resolve button-->
 <div class="button">
-   <Button on:click={() => confirmRegainResolve()}>
+   <Button onclick={() => confirmRegainResolve()}>
       <i class={REGAIN_RESOLVE_ICON}/>
       {localize('regainX%Resolve').replace(
          'X%',

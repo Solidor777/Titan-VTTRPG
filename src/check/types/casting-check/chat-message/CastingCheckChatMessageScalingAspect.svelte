@@ -172,7 +172,7 @@
       <div class="control">
          <Button
             disabled={aspect.currentValue <= aspect.initialValue}
-            on:click={resetAspect}
+            onclick={resetAspect}
          >
             <div class="button-inner">
                <i class={RESET_ICON}/>
@@ -184,7 +184,7 @@
       <div class="control">
          <Button
             disabled={aspect.currentValue <= aspect.initialValue}
-            on:click={decreaseAspect}
+            onclick={decreaseAspect}
          >
             <div class="button-inner">
                <i class={DECREMENT_ICON}/>
@@ -197,7 +197,7 @@
          <Button
             disabled={$document.flags.titan.results.extraSuccessesRemaining <
                aspect.cost}
-            on:click={increaseAspect}
+            onclick={increaseAspect}
          >
             <div class="button-inner">
                <i class={INCREMENT_ICON}/>

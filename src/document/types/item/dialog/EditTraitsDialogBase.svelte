@@ -89,14 +89,14 @@
 
    <!--Apply Trait Edits Button-->
    <div class="button">
-      <Button on:click={() => applyTraitEdits()}>
+      <Button onclick={() => applyTraitEdits()}>
          <Text text="applyEdits"/>
       </Button>
    </div>
 
    <!--Cancel Button-->
    <div class="button">
-      <Button on:click={() => application.close()}>
+      <Button onclick={() => application.close()}>
          <Text text="cancel"/>
       </Button>
    </div>

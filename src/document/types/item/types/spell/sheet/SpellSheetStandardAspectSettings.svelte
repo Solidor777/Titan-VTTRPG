@@ -52,7 +52,7 @@
       cost={idx === -1 ? 0 : $document.system.aspect[idx].cost}
       enabled={idx !== -1}
       label={localize(aspectOptions.template.label)}
-      on:click={() => {
+      onclick={() => {
          toggleAspect(idx);
       }}
    />

@@ -46,7 +46,7 @@
 <div class="button {resistance}">
    <Button
       {disabled}
-      on:click={() => requestResistanceCheck()}
+      onclick={() => requestResistanceCheck()}
       tooltip={localize(`${resistance}.desc`)}
    >
       {`${localize(resistance)} ${difficulty}:${complexity}`}

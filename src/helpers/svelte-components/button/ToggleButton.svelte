@@ -21,7 +21,7 @@
    } = $props();
 </script>
 
-<Button {disabled} on:click={onclick} {tooltip}>
+<Button {disabled} {onclick} {tooltip}>
    <div class="button-inner">
       <div class="label">
          {label}

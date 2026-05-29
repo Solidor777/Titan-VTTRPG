@@ -42,7 +42,7 @@
    <!--Confirm Button-->
    <div class="button">
       <Button
-         on:click={onConfirmed}
+         onclick={onConfirmed}
       >
          {confirmLabel}
       </Button>
@@ -51,7 +51,7 @@
    <!--Cancel button-->
    <div class="button">
       <Button
-         on:click={() => {
+         onclick={() => {
             application.close();
          }}
       ><Text text="cancel"/>

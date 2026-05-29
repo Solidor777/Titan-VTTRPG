@@ -28,7 +28,7 @@
    <!--Apply damage button-->
    <div class="button" use:tooltipAction={'applyDamage'}>
       <Button
-         on:click={() => {
+         onclick={() => {
             applyDamageToTargets(damage, {
                ineffective: ineffective,
                penetrating: penetrating,
@@ -45,7 +45,7 @@
          use:tooltipAction={'applyCleaveDamage'}
       >
          <Button
-            on:click={() => {
+            onclick={() => {
                applyDamageToTargets(cleave, {
                   ineffective: ineffective,
                   penetrating: penetrating,
@@ -63,7 +63,7 @@
       use:tooltipAction={'applyDamageIgnoreArmor'}
    >
       <Button
-         on:click={() => {
+         onclick={() => {
             applyDamageToTargets(damage, {
                ineffective: ineffective,
                penetrating: penetrating,
@@ -77,7 +77,7 @@
    <!--Apply half damage button-->
    <div class="button" use:tooltipAction={'applyHalfDamage'}>
       <Button
-         on:click={() => {
+         onclick={() => {
             applyDamageToTargets(Math.max(Math.floor(damage / 2), 1), {
                ineffective: ineffective,
                penetrating: penetrating,
@@ -90,7 +90,7 @@
 
    <!--Apply healing button-->
    <div class="button" use:tooltipAction={'applyHealing'}>
-      <Button on:click={() => applyHealingToTargets(damage)}>
+      <Button onclick={() => applyHealingToTargets(damage)}>
          <i class={HEALING_ICON}/>
       </Button>
    </div>

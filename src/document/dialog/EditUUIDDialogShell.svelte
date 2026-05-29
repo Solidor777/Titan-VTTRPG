@@ -67,13 +67,13 @@
    <!--Buttons-->
    <div class="buttons">
       <div class="button">
-         <Button on:click={onApplyEdits}>
+         <Button onclick={onApplyEdits}>
             {localize('applyEdits')}
          </Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}>{localize('cancel')}</Button>
+         <Button onclick={onCancel}>{localize('cancel')}</Button>
       </div>
    </div>
 </div>

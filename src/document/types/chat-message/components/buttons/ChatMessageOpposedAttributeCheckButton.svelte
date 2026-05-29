@@ -38,7 +38,7 @@
 
 <!--Opposed check button-->
 <div class="opposed-check-button {attribute}">
-   <Button on:click={() => rollOpposedCheck()}>
+   <Button onclick={() => rollOpposedCheck()}>
       {#if skill && skill !== 'none'}
          {`${localize(attribute)} (${localize(skill)}) ${difficulty}:${complexity}`}
       {:else}

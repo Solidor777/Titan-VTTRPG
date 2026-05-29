@@ -44,14 +44,14 @@
 
    <!--Confirmed button-->
    <div class="button">
-      <Button on:click={onConfirmed}>
+      <Button onclick={onConfirmed}>
          <Text text="addNewItem"/>
       </Button>
    </div>
 
    <!--Canceled button-->
    <div class="button">
-      <Button on:click={onCanceled}>
+      <Button onclick={onCanceled}>
          <Text text="cancel"/>
       </Button>
    </div>

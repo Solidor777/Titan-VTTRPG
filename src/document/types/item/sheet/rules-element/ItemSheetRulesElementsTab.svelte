@@ -45,7 +45,7 @@
       <!--Add Element Button-->
       <div class="add-entry-button">
          <DocumentOwnerButton
-            on:click={() => {
+            onclick={() => {
                $document.system.addRulesElement();
             }}
          >

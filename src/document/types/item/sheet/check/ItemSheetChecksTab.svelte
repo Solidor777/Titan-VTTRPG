@@ -57,7 +57,7 @@
          <!--Add check Button-->
          <div class="add-entry-button">
             <DocumentOwnerButton
-               on:click={() => {
+               onclick={() => {
                   $document.addCheck();
                }}
             >
