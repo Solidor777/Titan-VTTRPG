@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import CharacterSheetSkill
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkill.svelte';
-   import { slideFade } from '@typhonjs-fvtt/runtime/svelte/transition';
+   import { slide } from 'svelte/transition';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -31,7 +31,7 @@
 
 <ol>
    {#each filteredList as [key]}
-      <li transition:slideFade|local>
+      <li transition:slide|local>
          <CharacterSheetSkill {key}/>
       </li>
    {/each}
