@@ -45,7 +45,7 @@
    import RepairsReportChatMessageShell
       from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageShell.svelte';
 
-   /** @type {TJSDocument} The reactive Document store for this chat message. */
+   /** @type {import('~/document/reactive/ReactiveDocument.svelte.js').default} The reactive Document store for this chat message. */
    export let documentStore = void 0;
 
    // Setup.
