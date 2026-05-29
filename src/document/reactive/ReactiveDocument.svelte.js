@@ -30,11 +30,11 @@ export default class ReactiveDocument {
       // Register reactivity: refresh the snapshot whenever Foundry updates this document.
       this.#subscribe = createSubscriber((update) => {
          const name = doc.documentName;
-         const onUpdate = Hooks.on(`update${name}`, (changed, _diff, options) => {
+         const onUpdate = Hooks.on(`update${name}`, (updatedDoc, _change, options) => {
             if (options?.diff === false) {
                return;
             }
-            if (changed?.id !== this.doc.id) {
+            if (updatedDoc?.id !== this.doc.id) {
                return;
             }
             Object.assign(this.#snapshot, this.#capture());

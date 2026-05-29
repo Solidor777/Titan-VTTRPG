@@ -13,7 +13,10 @@
    // Expose the document bridge and UI state to all descendant components via context.
    // 'document' is the ReactiveDocument bridge: legacy children read `$document` (store shim),
    // converted children read `document.data` (runes).
+   // These captures are intentional: both values are stable for the component's lifetime.
+   // svelte-ignore state_referenced_locally
    setContext('document', document);
+   // svelte-ignore state_referenced_locally
    setContext('applicationState', applicationState);
 </script>
 
