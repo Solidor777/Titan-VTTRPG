@@ -36,9 +36,21 @@ No unit runner. Per button (task): `npm run build` GREEN and `npm run eslint` no
 **When converting a BASE button, also rebridge its runes-wrapper consumers:**
 - A base's consumers include both legacy components (change `on:click={h}` → `onclick={h}`) AND any already-converted runes wrapper buttons that currently bridge via `on:click={onclick}` — change those to `onclick={onclick}`. Do both in the base's lockstep commit. (E.g. converting `IconButton` must update `MiniIconButton`'s `on:click={onclick}` → `onclick={onclick}`; converting `Button` must update `IconLabelButton`/`ItemCheckButton`/`ResistanceCheckButton`/`SpendResolveButton`/`ToggleButton` once they are runes.)
 
+**Two kinds of consumer — handle each correctly (THIS is where the first attempt broke and shipped non-functional check buttons):**
+
+A consumer either *attaches a handler* or *bare-forwards*. Bare-forwarders form CHAINS that must ALL be fixed in the same lockstep, or the click silently dies at the legacy→runes boundary (build stays green; the button just does nothing).
+
+- **Handler-attaching consumer** — `<Btn on:click={someHandler}>`: change to `<Btn onclick={someHandler}>`. (Works from a legacy parent — plain prop pass to the runes child.)
+- **Bare-forwarding intermediary** — `<Btn on:click>` (no `=`; re-emits its own click). A bare `on:click` does NOT survive into a runes child's `onclick` callback prop (the runes child emits no component event). FIX: give the intermediary its own `onclick` and pass it down:
+  - Intermediary is **legacy** (not converting yet): add `export let onclick = void 0;` and change `<Btn on:click ...>` → `<Btn {onclick} ...>` (Btn is runes) or keep `on:click={onclick}` (Btn still legacy — runes-parent→legacy-child bridge).
+  - Intermediary is **runes**: add `onclick` to `$props()` and pass down per the wrap rules.
+  - Then ITS own consumers are the next link — repeat up the chain to the handler-attaching origin (`onclick={fn}`).
+
+> **Known bare-forwarding wrappers** (`grep -rnE "on:click([ />}]|$)" src --include=*.svelte`): the whole `src/document/svelte-components/DocumentOwner*Button.svelte` layer (→Button/AttributeButton/ResistanceButton/IconButton); shared wrappers `ItemCheckButton`/`SpendResolveButton`/`ToggleButton`→Button, `ToggleOptionButton`→MiniButton; plus `SpellSheetEnableAspectButton`→DocumentOwnerButton, `CharacterSheetTabHeaderButton`→MiniButton, `ChatMessageButton` (native). When converting a base (Button/IconButton/MiniButton/AttributeButton/ResistanceButton) you MUST fix the full bare-forward chain above it in the same lockstep. (AttributeButton/ResistanceButton chains were repaired in commit `2011c00a` — use it as the worked reference.)
+
 **For EACH consumer (lockstep, same commit):**
-6. Find consumers: `grep -rn "<ButtonName" src --include=*.svelte` (exclude the button's own file).
-7. In each consumer, change the event directive on that button component: `on:click={h}` → `onclick={h}`. Leave everything else.
+6. Find consumers: `grep -rn "<ButtonName" src --include=*.svelte` (exclude the button's own file) AND bare forwards: `grep -rnE "on:click([ />}]|$)" src --include=*.svelte`.
+7. Apply the correct fix per consumer kind (handler-attaching vs bare-forwarding); trace every bare-forward chain to its handler origin and fix all links.
 8. **Event modifiers:** if a consumer uses a modifier (`on:click|preventDefault={h}`, `on:click|stopPropagation`, `on:click|once`), runes have no modifiers — wrap the handler instead (e.g. `onclick={(e) => { e.preventDefault(); h(e); }}`). Flag every such case in the report.
 9. **Unexpected events:** if a consumer passes `on:mousedown`/`on:contextmenu`/etc. to the button (the survey says only `on:click` is forwarded), STOP and report — the button may need to forward that event too.
 
