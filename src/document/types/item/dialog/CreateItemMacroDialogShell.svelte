@@ -216,7 +216,7 @@
    <div class="row">
       <!--Image-->
       <div class="image">
-         <ImagePicker bind:src={img}/>
+         <ImagePicker bind:value={img}/>
       </div>
 
       <!--Name-->

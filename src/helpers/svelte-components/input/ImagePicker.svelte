@@ -1,22 +1,24 @@
 <script>
-   import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import ImageButton from '~/helpers/svelte-components/button/ImageButton.svelte';
 
-   /** @type {string} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} ImagePickerProps
+    * @property {string} [value] - The image path value to bind to.
+    * @property {string} [alt] - Text to display if the value is not a path to a valid image.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {Function} [onchange] - Callback invoked after a new image path is selected.
+    */
 
-   /** @type {string} Text to display if the value is not a path to valid image. */
-   export let alt = 'img';
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {EventDispatcher} Dispatcher for component Events. */
-   const eventDispatcher = createEventDispatcher();
+   /** @type {ImagePickerProps} */
+   let {
+      value = $bindable(void 0),
+      alt = 'img',
+      disabled = false,
+      tooltip = void 0,
+      onchange = void 0,
+   } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
@@ -30,12 +32,12 @@
             current: current,
             callback: async (newPath) => {
                value = newPath;
-               eventDispatcher('change');
+               onchange?.();
             },
             position: {
                top: application.position.top + 40,
                left: application.position.left + (application.position.width - application.options.width) + 10,
-            }
+            },
          });
          filePicker.browse();
       }
