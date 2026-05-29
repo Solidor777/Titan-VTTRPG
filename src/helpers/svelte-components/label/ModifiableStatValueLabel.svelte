@@ -1,5 +1,4 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import createModifiableStatTooltip from '~/helpers/utility-functions/CreateModifiableStatTooltip.js';
 
