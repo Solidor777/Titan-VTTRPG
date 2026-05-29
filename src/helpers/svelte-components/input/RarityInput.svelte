@@ -1,11 +1,19 @@
-<script xmlns="http://www.w3.org/1999/html">
+<script>
+   /**
+    * @typedef {object} RarityInputProps
+    * @property {string} [rarity] - The Rarity to use for coloring this element.
+    * @property {import('svelte').Snippet} [children] - Child content to render inside the wrapper.
+    */
 
-   /** @type {string} The Rarity to use for coloring this element. */
-   export let rarity = void 0;
+   /** @type {RarityInputProps} */
+   let {
+      rarity = void 0,
+      children = void 0,
+   } = $props();
 </script>
 
 <div class="rarity-input {rarity}">
-   <slot></slot>
+   {@render children?.()}
 </div>
 
 <style lang="scss">
