@@ -3,14 +3,19 @@
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {boolean} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} DocumentCheckboxInputProps
+    * @property {boolean} [value] - The boolean value to bind to.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {boolean} [disabled] - Whether editing this input should be disabled.
+    */
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {boolean} Whether editing this input should be disabled. */
-   export let disabled = false;
+   /** @type {DocumentCheckboxInputProps} */
+   let {
+      value = $bindable(void 0),
+      tooltip = void 0,
+      disabled = false,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -19,6 +24,6 @@
 <CheckboxInput
    bind:value
    disabled={disabled || !$document?.isOwner}
-   on:editor:save={() => refreshSystemDocument($document, disabled)}
+   onchange={() => refreshSystemDocument($document, disabled)}
    {tooltip}
 />

@@ -1,36 +1,39 @@
 <script>
-   import { createEventDispatcher } from 'svelte';
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {EventDispatcher} Dispatcher for component Events. */
-   const eventDispatcher = createEventDispatcher();
+   /**
+    * @typedef {object} CheckboxInputProps
+    * @property {boolean} [value] - The boolean value to bind to.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {Function} [onchange] - Callback invoked after the value is toggled.
+    */
 
-   /** @type {boolean} The boolean value to bind to. */
-   export let value;
+   /** @type {CheckboxInputProps} */
+   let {
+      value = $bindable(false),
+      disabled = false,
+      tooltip = void 0,
+      onchange = void 0,
+   } = $props();
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** Toggles the value and broadcasts the change event. */
+   /** Toggles the value and invokes the onchange callback. */
    function onClick() {
       value = !value;
-      eventDispatcher('change');
+      onchange?.();
    }
 </script>
 
 <button
    {disabled}
-   on:click={onClick}
-   on:mousedown={preventDefault}
-   use:tooltipAction={tooltip}>
+   onclick={onClick}
+   onmousedown={preventDefault}
+   use:tooltipAction={tooltip}
+>
    {#if value === true}
-      <i class="fas fa-check"/>
+      <i class="fas fa-check"></i>
    {/if}
-
 </button>
 
 <style lang="scss">
