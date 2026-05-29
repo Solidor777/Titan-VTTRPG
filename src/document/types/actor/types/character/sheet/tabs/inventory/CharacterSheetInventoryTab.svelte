@@ -94,7 +94,7 @@
                disabled={!$document.isOwner}
                icon={CREATE_ICON}
                label={localize('addNewItem')}
-               on:click={() => {
+               onclick={() => {
                   $document.system.addInventoryItem();
                }}
             />

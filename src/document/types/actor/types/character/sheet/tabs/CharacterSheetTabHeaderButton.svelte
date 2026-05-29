@@ -7,12 +7,15 @@
    export let icon = void 0;
    /** @type {boolean} */
    export let disabled = void 0;
+
+   /** @type {((event: MouseEvent) => void) | undefined} Callback invoked when the button is clicked. */
+   export let onclick = void 0;
 </script>
 
-<MiniButton {disabled} on:click>
+<MiniButton {disabled} {onclick}>
    <div class="label">
       {#if icon}
-         <i class={icon}/>
+         <i class={icon}></i>
       {/if}
       <div>
          {label}

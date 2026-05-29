@@ -21,7 +21,7 @@
 </script>
 
 <div class="toggle {enabled ? 'enabled' : 'disabled'}">
-   <MiniButton {disabled} on:click={onclick} {tooltip}>
+   <MiniButton {disabled} {onclick} {tooltip}>
       {label}
    </MiniButton>
 </div>

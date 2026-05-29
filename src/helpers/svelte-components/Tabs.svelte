@@ -25,7 +25,7 @@
       <!--For each tab-->
       {#each tabs as tab}
          <div class={`button${activeTab === tab.id ? ' active' : ''}`}>
-            <MiniButton on:click={() => activeTab = tab.id}>
+            <MiniButton onclick={() => activeTab = tab.id}>
                {tab.label}
             </MiniButton>
          </div>

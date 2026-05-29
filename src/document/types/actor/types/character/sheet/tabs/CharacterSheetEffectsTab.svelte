@@ -27,7 +27,7 @@
             <CharacterSheetTabHeaderButton
                icon={CREATE_ICON}
                label={localize('addNewEffect')}
-               on:click={() => {
+               onclick={() => {
                   $document.createItemFromType('effect');
                }}
             />
@@ -39,7 +39,7 @@
             <CharacterSheetTabHeaderButton
                icon={REMOVE_TEMP_EFFECTS_ICON}
                label={localize('removeExpiredEffects')}
-               on:click={() => {
+               onclick={() => {
                   $document.system.requestRemoveExpiredEffects();
                }}
             />

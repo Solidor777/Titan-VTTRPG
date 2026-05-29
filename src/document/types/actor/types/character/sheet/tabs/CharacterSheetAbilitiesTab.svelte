@@ -68,7 +68,7 @@
             <CharacterSheetTabHeaderButton
                icon={CREATE_ICON}
                label={localize('addNewAbility')}
-               on:click={() => {
+               onclick={() => {
                   $document.createItemFromType('ability');
                }}
             />
