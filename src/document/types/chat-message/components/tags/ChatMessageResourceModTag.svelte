@@ -6,17 +6,19 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The Key of the resource to display information for. */
-   export let key = void 0;
+   /**
+    * @typedef {object} ChatMessageResourceModTagProps
+    * @property {string} [key] The Key of the resource to display information for.
+    * @property {string} [icon] The icon class to use for the tag.
+    * @property {string} [styleClass] The style class to use for the tag.
+    */
 
-   /** @type {string} The icon class to use for the tag. */
-   export let icon = void 0;
-
-   /** @type {string} The style class to use for the tag. */
-   export let styleClass = void 0;
+   /** @type {ChatMessageResourceModTagProps} */
+   const { key = void 0, icon = void 0, styleClass = void 0 } = $props();
 
    /**
     * Calculates the tooltip HTML for the resource mod tag.
+    * @returns {string} The tooltip HTML string.
     */
    function getTooltip() {
       // Base label.

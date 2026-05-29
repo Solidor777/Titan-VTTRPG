@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import { getContext, setContext } from 'svelte';
    import WeaponChatMessage from '~/document/types/item/types/weapon/chat-message/WeaponChatMessage.svelte';
@@ -46,10 +44,13 @@
       from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageShell.svelte';
 
    /**
-    * @type {import('~/document/reactive/ReactiveDocument.svelte.js').default} The reactive
+    * @typedef {object} ChatMessageShellProps
+    * @property {import('~/document/reactive/ReactiveDocument.svelte.js').default} [documentStore] The reactive
     * Document store for this chat message.
     */
-   export let documentStore = void 0;
+
+   /** @type {ChatMessageShellProps} */
+   const { documentStore = void 0 } = $props();
 
    // Setup.
    setContext('document', documentStore);
@@ -59,6 +60,7 @@
 
    /**
     * Selects the correct chat message component based on the message type.
+    * @returns {object | undefined} The Svelte component constructor for the current message type.
     */
    function selectComponent() {
       if (game.user.isGM || !$document.blind) {
@@ -95,8 +97,12 @@
       return PrivateRollChatMessage;
    }
 </script>
+
 {#if $document}
-   <div>
-      <svelte:component this={selectComponent()}/>
-   </div>
+   {@const SelectedComponent = selectComponent()}
+   {#if SelectedComponent}
+      <div>
+         <SelectedComponent/>
+      </div>
+   {/if}
 {/if}

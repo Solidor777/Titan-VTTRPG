@@ -4,11 +4,14 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The icon class to display in the header. */
-   export let icon = void 0;
+   /**
+    * @typedef {object} ReportHeaderProps
+    * @property {string} [icon] The icon class to display in the header.
+    * @property {string} [label] The localized label to display in the header.
+    */
 
-   /** @type {string} The localized label to display in the header. */
-   export let label = void 0;
+   /** @type {ReportHeaderProps} */
+   const { icon = void 0, label = void 0 } = $props();
 </script>
 
 <div class="header">
