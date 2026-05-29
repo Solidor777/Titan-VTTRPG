@@ -2,18 +2,27 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Resistance that this component represents. */
-   export let resistance;
+   /**
+    * @typedef {object} ResistanceButtonProps
+    * @property {string} resistance - The Resistance that this component represents.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {import('svelte').Snippet} [children] - Content to render inside the button.
+    */
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {ResistanceButtonProps} */
+   const {
+      resistance,
+      disabled = false,
+      tooltip = void 0,
+      onclick = void 0,
+      children,
+   } = $props();
 </script>
 
-<button class={resistance} {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>
-   <slot/>
+<button class={resistance} {disabled} {onclick} onmousedown={preventDefault} use:tooltipAction={tooltip}>
+   {@render children?.()}
 </button>
 
 <style lang="scss">
@@ -22,4 +31,3 @@
       @include resistance-button;
    }
 </style>
-
