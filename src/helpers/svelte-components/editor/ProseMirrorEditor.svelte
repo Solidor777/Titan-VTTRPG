@@ -3,51 +3,38 @@
 
    /**
     * @type {{
-    *   document: foundry.abstract.Document,
-    *   fieldName: string,
     *   value?: string,
     *   editable?: boolean,
     *   toggled?: boolean,
-    *   enriched?: string,
+    *   enriched?: string
     * }}
     */
    let {
-      document,
-      fieldName,
-      value = '',
+      value = $bindable(''),
       editable = true,
       toggled = false,
-      enriched = undefined,
+      enriched = void 0,
    } = $props();
 
-   /** @type {HTMLElement} The container the prose-mirror element is appended into. */
+   /** @type {HTMLElement} The container the <prose-mirror> element is appended into. */
    let container;
 
    onMount(() => {
-      // Build Foundry's native ProseMirror custom element.
-      // `create()` accepts `name` directly in the config object and sets it as a property.
-      // `documentUUID` in config causes the factory to populate both dataset keys used by
-      // the element's internal `fromUuid` lookup (dataset.documentUuid / dataset.documentUUID).
-      const editor = foundry.applications.elements.HTMLProseMirrorElement.create({
-         name: fieldName,
-         value,
-         toggled,
-         enriched,
-         ...(document?.uuid ? { documentUUID: document.uuid } : {}),
-      });
-
+      // Build Foundry's native ProseMirror element seeded with the current value.
+      const config = { value, toggled };
+      if (enriched !== void 0) {
+         config.enriched = enriched;
+      }
+      const editor = foundry.applications.elements.HTMLProseMirrorElement.create(config);
       if (!editable) {
          editor.setAttribute('disabled', '');
       }
 
-      // `change` is dispatched by `save()` only when the value has actually changed,
-      // after `_value` has been updated — `editor.value` holds the committed HTML at
-      // that point.
+      // Write committed edits back through the two-way binding.
       const onChange = () => {
-         document.update({ [fieldName]: editor.value });
+         value = editor.value;
       };
       editor.addEventListener('change', onChange);
-
       container.appendChild(editor);
 
       return () => {

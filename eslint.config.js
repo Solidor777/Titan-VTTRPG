@@ -11,7 +11,7 @@ export default [
       },
       rules: {
          'svelte/no-at-html-tags': 'off',
-         'svelte/html-quotes/dynamic/quoted': 'false',
+         'svelte/html-quotes/dynamic/quoted': 'off',
          'svelte/no-unused-svelte-ignore': 'off',
          'jsdoc/check-access': 1, // Recommended
          'jsdoc/check-alignment': 1, // Recommended
@@ -62,7 +62,7 @@ export default [
          'jsdoc/sort-tags': 1,
          'jsdoc/tag-lines': 1, // Recommended
          // 'jsdoc/valid-types': 1 // Recommended
-         'capitalized-comments': 'ignorePattern'
+         'capitalized-comments': 'off'
       },
    },
    {
