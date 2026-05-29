@@ -20,7 +20,7 @@
    <IntegerInput
       bind:value={$document.system.xpCost}
       disabled={disabled || !$document?.isOwner}
-      on:change={() => $document.update({system: {xpCost: $document.system.xpCost}})}
+      onchange={() => $document.update({system: {xpCost: $document.system.xpCost}})}
    />
 </LabeledElement>
 

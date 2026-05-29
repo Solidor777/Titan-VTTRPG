@@ -39,7 +39,7 @@
                   <IntegerInput
                      min={0}
                      bind:value={item.system.duration.initiative}
-                     on:change={() => {
+                     onchange={() => {
                            item.update({
                               system: {
                                  duration: {

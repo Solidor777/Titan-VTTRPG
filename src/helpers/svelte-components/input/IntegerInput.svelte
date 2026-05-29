@@ -1,23 +1,29 @@
 <script>
    import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 
-   /** @type {number} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} IntegerInputProps
+    * @property {number}        [value=undefined]   - The value that this input should modify.
+    * @property {number|boolean}[min=false]         - The minimum value of the input.
+    * @property {number|boolean}[max=false]         - The maximum value of the input.
+    * @property {number|boolean}[maxDigits=false]   - The maximum number of digits this input can display.
+    * @property {boolean}       [disabled=false]    - Whether the input should currently be disabled.
+    * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
+    * @property {Function}      [onchange]          - Callback forwarded from the native change event.
+    * @property {Function}      [onkeyup]           - Callback forwarded from the native keyup event.
+    */
 
-   /** @type {number | boolean} The minimum value of the input. */
-   export let min = false;
-
-   /** @type {number | boolean} The maximum value of the input. */
-   export let max = false;
-
-   /** @type {number | boolean} The maximum number of digits this input can display. */
-   export let maxDigits = false;
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {IntegerInputProps} */
+   let {
+      value     = $bindable(undefined),
+      min       = false,
+      max       = false,
+      maxDigits = false,
+      disabled  = false,
+      tooltip   = undefined,
+      onchange  = undefined,
+      onkeyup   = undefined,
+   } = $props();
 </script>
 
 <NumberInput
@@ -27,6 +33,7 @@
    {max}
    {maxDigits}
    {min}
-   on:change
+   {onchange}
+   {onkeyup}
    {tooltip}
 />
