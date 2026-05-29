@@ -53,7 +53,7 @@
 </script>
 
 <DocumentOwnerResistanceButton
-   on:click={() => $document.system.requestResistanceCheck({resistance: resistance})}
+   onclick={() => $document.system.requestResistanceCheck({resistance: resistance})}
    {resistance}
    {tooltip}>
    <div class="button-inner">

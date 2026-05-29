@@ -41,7 +41,7 @@
    attribute={checkParameters.attribute}
    complexity={checkParameters.complexity}
    difficulty={checkParameters.difficulty}
-   on:click={() => $document.system.requestItemCheck(checkOptions)}
+   onclick={() => $document.system.requestItemCheck(checkOptions)}
    resolveCost={checkParameters.resolveCost}
    {tooltip}
    totalDice={checkParameters.totalDice}

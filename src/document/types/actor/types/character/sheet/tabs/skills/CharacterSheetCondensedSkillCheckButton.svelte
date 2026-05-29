@@ -18,7 +18,7 @@
 <CondensedCheckButton
    attribute={checkParameters.attribute}
    label={localize(checkParameters.skill)}
-   on:click={() => $document.system.requestAttributeCheck({skill: checkParameters.skill})}
+   onclick={() => $document.system.requestAttributeCheck({skill: checkParameters.skill})}
    {tooltip}
    totalDice={checkParameters.totalDice}
 />

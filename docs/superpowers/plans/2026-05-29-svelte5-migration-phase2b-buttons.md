@@ -28,6 +28,14 @@ No unit runner. Per button (task): `npm run build` GREEN and `npm run eslint` no
 4. In the markup `<button>`: replace bare forwarded `on:click` with `{onclick}`. Rewrite any INTERNAL handler directive `on:event={fn}` → `onevent={fn}` (e.g. `on:mousedown={preventDefault}` → `onmousedown={preventDefault}`). Keep `use:` actions (`use:tooltipAction`) unchanged.
 5. Do NOT change SCSS or behavior.
 
+**Wrapping another button component (interop bridge — VALIDATED in pilot):**
+- If the button you're converting WRAPS another button that is **still legacy** (e.g. `MiniIconButton` wraps `IconButton`, `IconLabelButton` wraps `Button`), you CANNOT pass `onclick={onclick}` as a prop to that legacy child (it declares no such prop and would silently no-op). Instead bridge with the event directive on the legacy child: `<LegacyChildButton on:click={onclick} .../>`. Svelte 5 supports `on:` on a legacy child from a runes parent for gradual migration.
+- This is why **wrappers convert before bases**. When the wrapped base later converts to runes, update the wrapper's bridge `on:click={onclick}` → `onclick={onclick}` (a one-line edit) as part of the BASE's lockstep — see next rule.
+- If the wrapped child is ALREADY runes, pass `onclick={onclick}` directly.
+
+**When converting a BASE button, also rebridge its runes-wrapper consumers:**
+- A base's consumers include both legacy components (change `on:click={h}` → `onclick={h}`) AND any already-converted runes wrapper buttons that currently bridge via `on:click={onclick}` — change those to `onclick={onclick}`. Do both in the base's lockstep commit. (E.g. converting `IconButton` must update `MiniIconButton`'s `on:click={onclick}` → `onclick={onclick}`; converting `Button` must update `IconLabelButton`/`ItemCheckButton`/`ResistanceCheckButton`/`SpendResolveButton`/`ToggleButton` once they are runes.)
+
 **For EACH consumer (lockstep, same commit):**
 6. Find consumers: `grep -rn "<ButtonName" src --include=*.svelte` (exclude the button's own file).
 7. In each consumer, change the event directive on that button component: `on:click={h}` → `onclick={h}`. Leave everything else.

@@ -41,7 +41,7 @@
 <div class="check-button {attribute}">
    <DocumentOwnerAttributeButton
       {attribute}
-      on:click
+      {onclick}
       tooltip={tooltip}
    >
       <div class="button-inner">

@@ -36,7 +36,7 @@
 
 <DocumentOwnerAttributeButton
    {attribute}
-   on:click={() => $document.system.requestAttributeCheck({attribute: attribute})}
+   onclick={() => $document.system.requestAttributeCheck({attribute: attribute})}
    {tooltip}>
    <div class="button-inner">
       <!--Icon-->

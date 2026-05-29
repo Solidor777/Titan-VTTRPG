@@ -11,11 +11,14 @@
    /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
    export let tooltip = void 0;
 
+   /** @type {(event: MouseEvent) => void} Callback fired when the button is clicked. */
+   export let onclick = void 0;
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
 </script>
 
-<AttributeButton {attribute} disabled={disabled || !$document.isOwner} on:click {tooltip}>
+<AttributeButton {attribute} disabled={disabled || !$document.isOwner} {onclick} {tooltip}>
    <slot/>
 </AttributeButton>
