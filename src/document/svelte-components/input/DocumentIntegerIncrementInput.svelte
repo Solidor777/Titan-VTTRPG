@@ -48,7 +48,7 @@
    {max}
    {min}
    {modifierIncrement}
-   on:change={updateDocument}
-   on:keyup={updateDocument}
+   onchange={updateDocument}
+   onkeyup={updateDocument}
    {tooltip}
 />

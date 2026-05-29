@@ -66,7 +66,7 @@
                <IntegerIncrementInput
                   min={0}
                   bind:value={item.system.duration.remaining}
-                  on:change={() => {
+                  onchange={() => {
                         item.update({
                            system: {
                               duration: {

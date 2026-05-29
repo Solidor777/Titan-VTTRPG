@@ -30,7 +30,7 @@
       <div class="field">
          <IntegerIncrementInput
             bind:value={item.system.quantity}
-            on:change={() => {
+            onchange={() => {
                   item.update({
                      system: {
                         quantity: item.system.quantity,
