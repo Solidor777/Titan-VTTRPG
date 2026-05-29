@@ -2,19 +2,20 @@
    import Label from '~/helpers/svelte-components/label/Label.svelte';
    import Text from '~/helpers/svelte-components/Text.svelte';
 
-   /** @type {string | TextData} The text label to display for this element. */
-   export let label = void 0;
+   /**
+    * @typedef {object} IconLabelProps
+    * @property {string | TextData} [label] - The text label to display for this element.
+    * @property {string} [icon] - The icon class to display for this element.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {string} The icon class to display for this element. */
-   export let icon = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {IconLabelProps} */
+   let { label = void 0, icon = void 0, tooltip = void 0 } = $props();
 </script>
 
 <Label {tooltip}>
    <!--Icon-->
-   <i class={icon}/>
+   <i class={icon}></i>
 
    <!--Text-->
    <div class="text">

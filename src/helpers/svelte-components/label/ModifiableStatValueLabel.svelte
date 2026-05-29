@@ -3,39 +3,36 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import createModifiableStatTooltip from '~/helpers/utility-functions/CreateModifiableStatTooltip.js';
 
-   /** @type {number} The base value of the stat before any modifiers are applied. */
-   export let baseValue = void 0;
+   /**
+    * @typedef {object} ModifiableStatValueLabelProps
+    * @property {number} [baseValue] - The base value of the stat before any modifiers are applied.
+    * @property {number} [value] - The value of the stat after any modifiers are applied.
+    * @property {number} [valueOverride] - Override for the value of the stat after any modifiers are applied.
+    * @property {number} [abilityMod] - Bonuses and penalties from Abilities.
+    * @property {number} [effectMod] - Bonuses and penalties from Effects.
+    * @property {number} [equipmentMod] - Bonuses and penalties from Equipment.
+    * @property {number} [staticMod] - Bonuses and penalties from Static modifiers.
+    * @property {string} [baseTooltip] - Label for the base value of the stat in the tooltip.
+    */
 
-   /** @type {number} The value of the stat after any modifiers are applied. */
-   export let value = void 0;
+   /** @type {ModifiableStatValueLabelProps} */
+   let {
+      baseValue = void 0,
+      value = void 0,
+      valueOverride = void 0,
+      abilityMod = void 0,
+      effectMod = void 0,
+      equipmentMod = void 0,
+      staticMod = void 0,
+      baseTooltip = void 0,
+   } = $props();
 
-   /** @type {number} Override for the value of the stat after any modifiers are applied. */
-   export let valueOverride = void 0;
-
-   /** @type {number} Bonuses and penalties from Abilities. */
-   export let abilityMod = void 0;
-
-   /** @type {number} Bonuses and penalties from Effects. */
-   export let effectMod = void 0;
-
-   /** @type {number} Bonuses and penalties from Equipment. */
-   export let equipmentMod = void 0;
-
-   /** @type {number} Bonuses and penalties from Static modifiers. */
-   export let staticMod = void 0;
-
-   /** @type {string} Label for the base value of the stat in the tooltip. */
-   export let baseTooltip = void 0;
-
-   /** @type {string} Calculated tooltip for the stat. */
-   let tooltip = `<p>${baseTooltip ?? localize('base')}: ${baseValue}</p>`;
-
-   /** @type {string} Calculated class to use for styling the label. */
-   let styleClass = 'label';
-
-   $: {
-      // Calculate the normal value by adding the ability and equipment mods to.
-      // the base value.
+   /**
+    * The class to use for styling the label, derived reactively from prop values.
+    * @type {string}
+    */
+   let styleClass = $derived.by(() => {
+      // Calculate the normal value by adding the ability and equipment mods to the base value.
       let normalValue = baseValue;
       if (abilityMod) {
          normalValue += abilityMod;
@@ -44,33 +41,35 @@
          normalValue += equipmentMod;
       }
 
-      let realValue = valueOverride ?? value;
-
-      // Update the style class in response to changes.
-      styleClass = 'label';
+      const realValue = valueOverride ?? value;
 
       // Add a bonus class if normal value < current value.
       if (normalValue < realValue) {
-         styleClass += ' bonus';
+         return 'label bonus';
       }
 
       // Add a penalty class if normal value > current value.
-      else if (normalValue > realValue) {
-         styleClass += ' penalty';
+      if (normalValue > realValue) {
+         return 'label penalty';
       }
 
-      // Update the tooltip in response to changes.
-      tooltip = createModifiableStatTooltip(
-         baseValue,
-         value,
-         abilityMod,
-         effectMod,
-         equipmentMod,
-         staticMod,
-         valueOverride ? valueOverride - value : 0,
-         baseTooltip
-      );
-   }
+      return 'label';
+   });
+
+   /**
+    * The calculated tooltip for the stat, derived reactively from prop values.
+    * @type {string}
+    */
+   let tooltip = $derived.by(() => createModifiableStatTooltip(
+      baseValue,
+      value,
+      abilityMod,
+      effectMod,
+      equipmentMod,
+      staticMod,
+      valueOverride ? valueOverride - value : 0,
+      baseTooltip
+   ));
 </script>
 
 <!--Total Value-->

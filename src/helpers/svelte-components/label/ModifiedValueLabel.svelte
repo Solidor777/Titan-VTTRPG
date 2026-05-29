@@ -1,25 +1,29 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {number} The Base value of the stat before any modifiers are applied. */
-   export let baseValue = void 0;
+   /**
+    * @typedef {object} ModifiedValueLabelProps
+    * @property {number} [baseValue] - The Base value of the stat before any modifiers are applied.
+    * @property {number} [currentValue] - The Current value of the stat after modifiers are applied.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {number} The Current value of the stat after modifiers are applied. */
-   export let currentValue = void 0;
+   /** @type {ModifiedValueLabelProps} */
+   let { baseValue = void 0, currentValue = void 0, tooltip = void 0 } = $props();
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {string} The class to use for styling the label. */
-   let styleClass = 'label';
-
-   // Adjust the style class, depending on whether this stat has been modified.
-   if (baseValue < currentValue) {
-      styleClass += ' bonus';
-   }
-   else if (baseValue > currentValue) {
-      styleClass += ' penalty';
-   }
+   /**
+    * The class to use for styling the label, derived reactively from baseValue and currentValue.
+    * @type {string}
+    */
+   let styleClass = $derived.by(() => {
+      if (baseValue < currentValue) {
+         return 'label bonus';
+      }
+      if (baseValue > currentValue) {
+         return 'label penalty';
+      }
+      return 'label';
+   });
 </script>
 
 <!--Total Value-->
