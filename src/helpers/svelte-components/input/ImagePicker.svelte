@@ -44,7 +44,7 @@
 
 <ImageButton
    {alt}
-   on:click={onEditImage}
+   onclick={onEditImage}
    src={value}
    {tooltip}
 />
