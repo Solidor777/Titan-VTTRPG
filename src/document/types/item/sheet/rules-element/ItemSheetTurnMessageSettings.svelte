@@ -34,6 +34,7 @@
    <!--Message text-->
    <div class="message">
       <DocumentBoundEditorInput
+         path={`system.rulesElement.${idx}.message`}
          bind:value={$document.system.rulesElement[idx].message}
       />
    </div>

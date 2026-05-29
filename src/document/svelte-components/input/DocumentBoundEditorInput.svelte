@@ -1,11 +1,13 @@
 <script>
    import { getContext } from 'svelte';
-   import { TJSProseMirror } from '@typhonjs-fvtt/standard/component/fvtt/editor';
-   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
+   import ProseMirrorEditor from '~/helpers/svelte-components/editor/ProseMirrorEditor.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {string} Path to the document field this input modifies, required by the editor wrapper. */
+   export let path = void 0;
 
    /** @type {string} The value that this input should modify. */
    export let value = void 0;
@@ -21,10 +23,11 @@
    class={$document.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}
    use:tooltipAction={tooltip}
 >
-   <TJSProseMirror
-      bind:content={value}
-      on:editor:save={() => refreshSystemDocument($document, disabled)}
-      options={{editable: $document.isOwner && !disabled}}
+   <ProseMirrorEditor
+      document={$document}
+      fieldName={path}
+      value={value}
+      editable={$document.isOwner && !disabled}
    />
 </div>
 

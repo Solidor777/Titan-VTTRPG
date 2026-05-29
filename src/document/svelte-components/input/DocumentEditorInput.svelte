@@ -1,5 +1,5 @@
 <script>
-   import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
+   import ProseMirrorEditor from '~/helpers/svelte-components/editor/ProseMirrorEditor.svelte';
    import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
@@ -20,11 +20,12 @@
    class={$document.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}
    use:tooltipAction={tooltip}
 >
-   <TJSProseMirror options={{
-      document: $document,
-      fieldName: path,
-      editable: $document.isOwner && !disabled
-   }}/>
+   <ProseMirrorEditor
+      document={$document}
+      fieldName={path}
+      value={foundry.utils.getProperty($document, path)}
+      editable={$document.isOwner && !disabled}
+   />
 </div>
 
 <style lang="scss">
