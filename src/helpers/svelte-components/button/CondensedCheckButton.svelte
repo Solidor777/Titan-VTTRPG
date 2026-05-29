@@ -10,32 +10,33 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The Attribute to be used for the check. */
-   export let attribute = void 0;
+   /**
+    * @typedef {object} CondensedCheckButtonProps
+    * @property {string} [attribute] - The Attribute to be used for the check.
+    * @property {number} [difficulty] - The Difficulty of the check.
+    * @property {number} [complexity] - The Complexity of the check.
+    * @property {number} [totalDice] - The total Dice for the check.
+    * @property {number} [totalExpertise] - The total Expertise for the check.
+    * @property {number} [resolveCost] - The Resolve Cost for the check.
+    * @property {string} [checkIcon] - Icon to show in front of the check.
+    * @property {string} [label] - The display Label of the check.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    */
 
-   /** @type {number} The Difficulty of the check. */
-   export let difficulty = void 0;
-
-   /** @type {number} The Complexity of the check. */
-   export let complexity = void 0;
-
-   /** @type {number} The total Dice for the check. */
-   export let totalDice = void 0;
-
-   /** @type {number} The total Expertise for the check. */
-   export let totalExpertise = void 0;
-
-   /** @type {number} The Resolve Cost for the check. */
-   export let resolveCost = void 0;
-
-   /** @type {string} Icon to show in front of the check. */
-   export let checkIcon = void 0;
-
-   /** @type {string} The display Label of the check. */
-   export let label = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {CondensedCheckButtonProps} */
+   const {
+      attribute = void 0,
+      difficulty = void 0,
+      complexity = void 0,
+      totalDice = void 0,
+      totalExpertise = void 0,
+      resolveCost = void 0,
+      checkIcon = void 0,
+      label = void 0,
+      tooltip = void 0,
+      onclick = void 0,
+   } = $props();
 </script>
 
 <div class="check-button {attribute}">
