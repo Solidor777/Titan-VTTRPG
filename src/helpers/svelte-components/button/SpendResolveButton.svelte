@@ -2,15 +2,23 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   /** @type {number} The amount of resolve to spend. */
-   export let resolveCost = void 0;
+   /**
+    * @typedef {object} SpendResolveButtonProps
+    * @property {number} [resolveCost] - The amount of resolve to spend.
+    * @property {boolean} [disabled] - Whether the button should be disabled.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    */
 
-   /** @type {boolean} Whether the button should be disabled. */
-   export let disabled = void 0;
+   /** @type {SpendResolveButtonProps} */
+   const {
+      resolveCost = void 0,
+      disabled = void 0,
+      onclick = void 0,
+   } = $props();
 </script>
 
 <div class="spend-resolve-button">
-   <Button {disabled} on:click>
+   <Button {disabled} on:click={onclick}>
       <div class="button-inner">
          <i class="fa fa-bolt"/>
          <div>
