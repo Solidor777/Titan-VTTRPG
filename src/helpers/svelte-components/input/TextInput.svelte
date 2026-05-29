@@ -1,21 +1,30 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} TextInputProps
+    * @property {string}        [value=undefined]   - The value that this input should modify.
+    * @property {boolean}       [disabled=false]    - Whether the input should currently be disabled.
+    * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
+    * @property {Function}      [onchange]          - Callback forwarded from the native change event.
+    * @property {Function}      [onkeyup]           - Callback forwarded from the native keyup event.
+    */
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {TextInputProps} */
+   let {
+      value    = $bindable(undefined),
+      disabled = false,
+      tooltip  = undefined,
+      onchange = undefined,
+      onkeyup  = undefined,
+   } = $props();
 </script>
 
 <input
    bind:value
    {disabled}
-   on:change
-   on:keyup
+   {onchange}
+   {onkeyup}
    use:tooltipAction={tooltip}
 />
 

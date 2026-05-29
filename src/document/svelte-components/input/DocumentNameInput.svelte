@@ -31,8 +31,8 @@
    <TextInput
       bind:value={value}
       disabled={disabled || !$document?.isOwner}
-      on:change={updateDocument}
-      on:keyup={updateDocument}
+      onchange={updateDocument}
+      onkeyup={updateDocument}
       {tooltip}
    />
 </div>
