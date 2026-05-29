@@ -41,7 +41,7 @@
          <IconLabelButton
             icon={EDIT_ICON}
             label={localize('editTraits')}
-            on:click={() => {editTraits()}}
+            onclick={() => {editTraits()}}
          />
       </div>
    {/if}
@@ -51,7 +51,7 @@
       <IconLabelButton
          icon={CREATE_ICON}
          label={'addCustomTrait'}
-         on:click={() => {$document.addCustomTrait()}}
+         onclick={() => {$document.addCustomTrait()}}
       />
    </div>
 
