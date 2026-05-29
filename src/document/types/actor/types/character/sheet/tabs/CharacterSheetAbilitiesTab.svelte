@@ -42,7 +42,7 @@
          <div class="reset">
             <IconButton
                icon={RESET_ICON}
-               on:click={() => {
+               onclick={() => {
                   $appState.tabs.abilities.filterOptions.action = false;
                   $appState.tabs.abilities.filterOptions.reaction = false;
                   $appState.tabs.abilities.filterOptions.passive = false;

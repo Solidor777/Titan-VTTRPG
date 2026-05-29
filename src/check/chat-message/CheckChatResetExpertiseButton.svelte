@@ -34,5 +34,5 @@
 <IconButton
    disabled={!$document.isOwner}
    icon={RESET_ICON}
-   on:click={resetExpertise}
+   onclick={resetExpertise}
 />

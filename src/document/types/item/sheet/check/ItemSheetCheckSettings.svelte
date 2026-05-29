@@ -48,7 +48,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.checks.isExpanded[idx] = false;
                   }}
                />
@@ -56,7 +56,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.checks.isExpanded[idx] = true;
                   }}
                />
@@ -72,7 +72,7 @@
          <div>
             <IconButton
                icon={DELETE_ICON}
-               on:click={async () => {
+               onclick={async () => {
                   $document.deleteCheck(idx);
                }}
             />

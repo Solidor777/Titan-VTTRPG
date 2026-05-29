@@ -39,7 +39,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.customAspects.isExpanded[idx] = false;
                   }}
                />
@@ -47,7 +47,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.customAspects.isExpanded[idx] = true;
                   }}
                />
@@ -64,7 +64,7 @@
             <!--Delete button-->
             <IconButton
                icon={DELETE_ICON}
-               on:click={() => {
+               onclick={() => {
                   $document.system.removeCustomAspect(idx);
                }}
             />
@@ -105,7 +105,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class={DAMAGE_ICON}/>
+                  <i class={DAMAGE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('damage')}</div>
@@ -119,7 +119,7 @@
                <!--Healing-->
                <div class="field">
                   <!--Icon-->
-                  <i class={HEALING_ICON}/>
+                  <i class={HEALING_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('healing')}</div>

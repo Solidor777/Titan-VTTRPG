@@ -81,7 +81,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.attacks.isExpanded[idx] = false;
                   }}
                />
@@ -89,7 +89,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.attacks.isExpanded[idx] = true;
                   }}
                />
@@ -106,7 +106,7 @@
             <!--Delete button-->
             <IconButton
                icon={DELETE_ICON}
-               on:click={() => {
+               onclick={() => {
                   $document.system.deleteAttack(idx);
                }}
             />
@@ -134,7 +134,7 @@
                <!--Range-->
                <div class="field">
                   <!--Icon-->
-                  <i class={RANGE_ICON}/>
+                  <i class={RANGE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('range')}</div>
@@ -150,7 +150,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class={DAMAGE_ICON}/>
+                  <i class={DAMAGE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('damage')}</div>
@@ -205,7 +205,7 @@
                            $document.system.editAttackTraits(idx);
                         }}
                      >
-                        <i class={EDIT_ICON}/>
+                        <i class={EDIT_ICON}></i>
                         <Text text="editTraits"/>
                      </DocumentOwnerButton>
                   </div>
@@ -217,7 +217,7 @@
                            $document.system.addCustomAttackTrait(idx);
                         }}
                      >
-                        <i class={CREATE_ICON}/>
+                        <i class={CREATE_ICON}></i>
                         <Text text="addCustomTrait"/>
                      </DocumentOwnerButton>
                   </div>

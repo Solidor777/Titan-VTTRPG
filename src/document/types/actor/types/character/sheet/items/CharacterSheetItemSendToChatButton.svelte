@@ -9,6 +9,6 @@
 
 <IconButton
    icon={SEND_TO_CHAT_ICON}
-   on:click={() => item.sendToChat()}
+   onclick={() => item.sendToChat()}
    tooltip={localize('sendToChat')}
 />

@@ -19,7 +19,7 @@
 </script>
 
 <div class="button">
-   <IconButton {disabled} {icon} on:click={onclick} {tooltip}/>
+   <IconButton {disabled} {icon} {onclick} {tooltip}/>
 </div>
 
 <style lang="scss">

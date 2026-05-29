@@ -29,7 +29,7 @@
       >
          <DocumentOwnerIconButton
             icon={LONG_REST_ICON}
-            on:click={() => {
+            onclick={() => {
             $document.system.longRest();
          }}
          />
@@ -42,7 +42,7 @@
       >
          <DocumentOwnerIconButton
             icon={SHORT_REST_ICON}
-            on:click={() => {
+            onclick={() => {
             $document.system.shortRest();
          }}
          />
@@ -55,7 +55,7 @@
       >
          <DocumentOwnerIconButton
             icon={REMOVE_TEMP_EFFECTS_ICON}
-            on:click={() => {
+            onclick={() => {
             $document.system.removeCombatEffects();
          }}
          />
@@ -71,7 +71,7 @@
       >
          <DocumentOwnerIconButton
             icon={SPEND_RESOLVE_ICON}
-            on:click={() => {
+            onclick={() => {
             $document.system.spendResolve(1);
          }}
          />

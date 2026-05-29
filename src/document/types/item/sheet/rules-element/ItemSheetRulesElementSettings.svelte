@@ -92,7 +92,7 @@
          <div class="delete-button">
             <DocumentOwnerIconButton
                icon={DELETE_ICON}
-               on:click={() => {
+               onclick={() => {
                $document.system.deleteRulesElement(idx);
             }}
             />

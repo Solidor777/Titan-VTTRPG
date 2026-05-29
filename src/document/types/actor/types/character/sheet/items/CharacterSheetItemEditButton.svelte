@@ -13,6 +13,6 @@
 
 <IconButton
    icon={$document.isOwner ? EDIT_ICON : SHEET_ICON}
-   on:click={() => item.sheet.render(true)}
+   onclick={() => item.sheet.render(true)}
    tooltip={localize($document.isOwner ? 'editItem' : 'viewItemSheet')}
 />

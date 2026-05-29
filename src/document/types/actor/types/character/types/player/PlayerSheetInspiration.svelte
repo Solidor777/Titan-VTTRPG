@@ -11,7 +11,7 @@
    <IconButton
       tooltip={'inspiration.desc'}
       icon={$document.system.inspiration ? INSPIRATION_ICON: ''}
-      on:click={() => {
+      onclick={() => {
          $document.system.toggleInspiration();
       }}
    />
