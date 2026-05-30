@@ -1,3 +1,8 @@
+import AddCustomTraitDialog from '~/document/types/item/dialog/AddCustomTraitDialog.js';
+import EditCustomTraitDialog from '~/document/types/item/dialog/EditCustomTraitDialog.js';
+import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
+import assert from '~/helpers/utility-functions/Assert.js';
+
 /**
  * Extends the base ActiveEffect class to implement system-specific logic for Titan.
  * The 'effect' subtype carries Rules Elements, a custom duration, item-check templates, and custom traits via
@@ -109,6 +114,111 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
     */
    getRollData() {
       return this.system.getRollData();
+   }
+
+   /**
+    * Adds a new Check to this Active Effect.
+    * @returns {Promise<void>}
+    */
+   async addCheck() {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
+         this.system.check.push(createItemCheckTemplate());
+         await this.update({
+            system: {
+               check: structuredClone(this.system.check),
+            },
+         });
+
+         // Notify the sheet of the added check.
+         if (this.sheet) {
+            this.sheet.postAddCheck();
+         }
+      }
+   }
+
+   /**
+    * Removes a Check from this Active Effect.
+    * @param {number} idx - The index of the Check in this Active Effect's Checks array.
+    * @returns {Promise<void>}
+    */
+   async deleteCheck(idx) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
+         // Notify the sheet before deletion.
+         if (this.sheet) {
+            this.sheet.preDeleteCheck(idx);
+         }
+
+         this.system.check.splice(idx, 1);
+         await this.update({
+            system: {
+               check: structuredClone(this.system.check),
+            },
+         });
+      }
+   }
+
+   /**
+    * Creates a dialog for adding a new Custom Trait to this Active Effect.
+    * @returns {void}
+    */
+   addCustomTrait() {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
+         /** @type {AddCustomTraitDialog} - The dialog used to add a new Custom Trait to this Active Effect. */
+         const dialog = new AddCustomTraitDialog(this);
+         dialog.render(true);
+      }
+   }
+
+   /**
+    * Creates a dialog for editing an existing Custom Trait belonging to this Active Effect.
+    * @param {number} traitIdx - The index of the Custom Trait in this Active Effect's Custom Traits array.
+    * @returns {void}
+    */
+   editCustomTrait(traitIdx) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
+         /** @type {EditCustomTraitDialog} - The dialog used to edit an existing Custom Trait on this Active Effect. */
+         const dialog = new EditCustomTraitDialog(
+            this,
+            traitIdx,
+         );
+         dialog.render(true);
+      }
+   }
+
+   /**
+    * Removes a Custom Trait from this Active Effect.
+    * @param {number} traitIdx - The index of the Custom Trait in this Active Effect's Custom Traits array.
+    * @returns {Promise<void>}
+    */
+   async deleteCustomTrait(traitIdx) {
+      if (assert(
+         this.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.name,
+      )) {
+         this.system.customTrait.splice(traitIdx, 1);
+         await this.update({
+            system: {
+               customTrait: structuredClone(this.system.customTrait),
+            },
+         });
+      }
    }
 
    /**
