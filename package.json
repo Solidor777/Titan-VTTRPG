@@ -11,6 +11,7 @@
       "tippy.js": "^6.3.7"
    },
    "devDependencies": {
+      "@playwright/test": "^1.60.0",
       "@rollup/plugin-node-resolve": "^16.0.3",
       "@sveltejs/vite-plugin-svelte": "^4.0.0",
       "@testing-library/jest-dom": "^6.9.1",

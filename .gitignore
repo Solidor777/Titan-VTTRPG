@@ -9,3 +9,5 @@ node_modules/
 /index.js.map
 /style.css
 titan.zip
+test-results/
+playwright-report/
