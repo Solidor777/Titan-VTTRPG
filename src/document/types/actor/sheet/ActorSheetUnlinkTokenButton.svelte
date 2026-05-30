@@ -22,7 +22,7 @@
 <!--Unlink Button-->
 <button aria-label="Unlink Token"
         class="header-control icon unlink-token-button"
-        on:click={() => unlinkToken()}
+        onclick={() => unlinkToken()}
         use:tooltipAction={'unlinkTokenButton.desc'}>
    <i class="linked {LINKED_ICON}"></i>
 </button>

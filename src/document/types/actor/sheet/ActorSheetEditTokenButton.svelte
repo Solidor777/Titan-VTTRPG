@@ -28,7 +28,7 @@
 <!--Edit Token Button-->
 <button aria-label="Edit Token"
         class="header-control icon edit-token-button"
-        on:click={() => editToken()}
+        onclick={() => editToken()}
         use:tooltipAction={
            (application.token?.actorLink
            || application.token === null && document.data.prototypeToken?.actorLink)

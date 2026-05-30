@@ -9,7 +9,7 @@ under "Accepted debt" are documented decisions to NOT change, with rationale.
 
 ## Apply now (low-risk)
 
-- [ ] **`on:click` → `onclick`** (Svelte 5 attribute form) in the four actor header buttons:
+- [x] **`on:click` → `onclick`** (Svelte 5 attribute form) in the four actor header buttons:
   - `src/document/types/actor/sheet/ActorSheetEditTokenButton.svelte`
   - `src/document/types/actor/sheet/ActorSheetImportActorButton.svelte`
   - `src/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte`

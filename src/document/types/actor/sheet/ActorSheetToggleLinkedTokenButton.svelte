@@ -17,7 +17,7 @@
 <!--Toggle Linked Button-->
 <button aria-label="Toggle Token Link"
         class="header-control icon toggle-token-linked-button"
-        on:click={toggleLinkedToken}
+        onclick={toggleLinkedToken}
         use:tooltipAction={ document.data?.prototypeToken?.actorLink
            ? 'toggleTokenUnlinkedButton.desc'
            : 'toggleTokenLinkedButton.desc'}

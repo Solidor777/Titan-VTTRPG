@@ -15,7 +15,7 @@
 <!--Import Actor Button-->
 <button aria-label="Import Actor to World"
         class="header-control icon edit-token-button"
-        on:click={() => importActor()}
+        onclick={() => importActor()}
         use:tooltipAction={'importActorToWorld'}>
    <i class={IMPORT_ICON}></i>
 </button>
