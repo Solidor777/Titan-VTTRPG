@@ -14,6 +14,7 @@ import equipmentMigrations from '~/helpers/migration/item/EquipmentMigrations.js
 import shieldMigrations from '~/helpers/migration/item/ShieldMigrations.js';
 import spellMigrations from '~/helpers/migration/item/SpellMigrations.js';
 import weaponMigrations from '~/helpers/migration/item/WeaponMigrations.js';
+import convertEffectItemsToActiveEffects from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 
 /**
  * A migration entry describing how to upgrade a document's schema to a specific system version.
@@ -223,6 +224,11 @@ export async function migrateWorld() {
    if (!game.user.isGM) {
       return;
    }
+
+   // Convert legacy effect Items to native Active Effects. This is a one-shot, idempotent converter that runs
+   // independently of the version-chain migration below, so it must execute before the worldNeedsMigration check.
+   await convertEffectItemsToActiveEffects();
+
    if (!worldNeedsMigration()) {
       return;
    }
