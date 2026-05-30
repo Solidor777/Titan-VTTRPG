@@ -2,80 +2,85 @@ import { createSubscriber } from 'svelte/reactivity';
 
 /**
  * @class ReactiveDocument
- * Bridges a Foundry Document into Svelte 5 reactivity. Reads go through `.data` (a $state snapshot
- * refreshed from Foundry update hooks). Writes go through `doc.update(...)`. A temporary store-compat
- * shim (`subscribe`/`destroy`) lets legacy `$document` components keep working during the migration;
- * remove the shim once no `$document` readers remain.
+ * Bridges a Foundry Document into Svelte 5 reactivity. `.data` returns the LIVE document; when read
+ * inside a component or `$derived` it subscribes to the document's update hooks (including embedded
+ * item/effect CRUD), so reactive readers re-run whenever the document changes. Because `.data` is the
+ * live document, reactive reads (`.data.system.x`), writes (`.data.update(...)`), collections
+ * (`.data.items`), and methods (`.data.system.someMethod()`) all work through the same accessor.
  */
 export default class ReactiveDocument {
-   /** @type {object} The reactive snapshot of document data. */
-   #snapshot = $state({});
-
    /** @type {() => void} Subscriber registration returned by createSubscriber. */
    #subscribe;
 
-   /** @type {number[]} Hook ids registered by the store-compat shim. */
+   /** @type {number[]} Hook ids registered by the temporary store-compat shim. */
    #shimHooks = [];
 
    /**
     * @param {foundry.abstract.Document} doc - The Document to wrap.
     */
    constructor(doc) {
-      /** @type {foundry.abstract.Document} The live Document; source of truth for writes. */
+      /** @type {foundry.abstract.Document} The live Document; source of truth for reads and writes. */
       this.doc = doc;
 
-      // Seed the snapshot so components never read an empty object on first render.
-      Object.assign(this.#snapshot, this.#capture());
-
-      // Register reactivity: refresh the snapshot whenever Foundry updates this document.
+      // Register reactivity: invalidate reactive readers whenever this document — or one of its
+      // embedded items/effects — changes. createSubscriber tears these hooks down automatically when
+      // the last reactive reader unsubscribes (i.e. when the consuming UI unmounts).
       this.#subscribe = createSubscriber((update) => {
          const name = doc.documentName;
-         const onUpdate = Hooks.on(`update${name}`, (updatedDoc, _change, options) => {
+
+         /**
+          * Invalidate when this document itself updates.
+          * @param {foundry.abstract.Document} changed - The updated document.
+          * @param {object} _diff - The change diff (unused).
+          * @param {object} options - Update options.
+          */
+         const onUpdate = (changed, _diff, options) => {
             if (options?.diff === false) {
                return;
             }
-            if (updatedDoc?.id !== this.doc.id) {
-               return;
+            if (changed?.id === this.doc.id) {
+               update();
             }
-            Object.assign(this.#snapshot, this.#capture());
-            update();
-         });
-
-         return () => {
-            Hooks.off(`update${name}`, onUpdate);
          };
+
+         /**
+          * Invalidate when an embedded item/effect belonging to this document changes.
+          * @param {foundry.abstract.Document} embedded - The embedded document.
+          */
+         const onEmbedded = (embedded) => {
+            const parent = embedded?.parent;
+            if (parent?.id === this.doc.id || parent?.parent?.id === this.doc.id) {
+               update();
+            }
+         };
+
+         const registered = [
+            [`update${name}`, Hooks.on(`update${name}`, onUpdate)],
+            ['createItem', Hooks.on('createItem', onEmbedded)],
+            ['updateItem', Hooks.on('updateItem', onEmbedded)],
+            ['deleteItem', Hooks.on('deleteItem', onEmbedded)],
+            ['createActiveEffect', Hooks.on('createActiveEffect', onEmbedded)],
+            ['updateActiveEffect', Hooks.on('updateActiveEffect', onEmbedded)],
+            ['deleteActiveEffect', Hooks.on('deleteActiveEffect', onEmbedded)],
+         ];
+
+         return () => registered.forEach(([hook, id]) => Hooks.off(hook, id));
       });
    }
 
    /**
-    * The reactive data snapshot. Read inside a component or `$derived` to opt in to reactivity.
-    * @returns {object} The reactive snapshot.
+    * The live document, made reactive when read in a component or `$derived`: reading it subscribes
+    * to the document's update hooks so the reader re-runs on change.
+    * @returns {foundry.abstract.Document} The live document.
     */
    get data() {
       this.#subscribe();
-      return this.#snapshot;
+      return this.doc;
    }
 
    /**
-    * Builds a plain snapshot of the document's reactive fields. `doc.system` already holds derived
-    * data at read time, so this captures TITAN's prepared values.
-    * @returns {object} A plain snapshot.
-    * @protected
-    */
-   #capture() {
-      return {
-         name: this.doc.name,
-         img: this.doc.img,
-         isOwner: this.doc.isOwner,
-         system: foundry.utils.deepClone(this.doc.system),
-         flags: foundry.utils.deepClone(this.doc.flags),
-      };
-   }
-
-   /**
-    * TEMPORARY store-compat shim. Implements Svelte's store contract so legacy components that read
-    * `$document` keep working through the migration. Pushes the live document on every relevant
-    * update hook. Remove this method (and `destroy`) in the final phase.
+    * TEMPORARY store-compat shim. Lets not-yet-migrated components that read `$document` keep working
+    * during the `$document`→`document.data` migration. Removed once no `$document` readers remain.
     * @param {(value: foundry.abstract.Document) => void} run - Svelte store subscriber callback.
     * @returns {() => void} Unsubscribe function.
     */
@@ -90,7 +95,8 @@ export default class ReactiveDocument {
    }
 
    /**
-    * Tears down all store-compat shim hooks. Call when the consuming UI is destroyed.
+    * Tears down the temporary store-compat shim hooks. The `.data` subscriber tears down its own
+    * hooks automatically when the last reactive reader unsubscribes; this only cleans up the shim.
     */
    destroy() {
       const name = this.doc.documentName;
