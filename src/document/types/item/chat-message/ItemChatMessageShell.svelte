@@ -1,8 +1,14 @@
 <script>
    import ItemChatLabel from '~/document/types/item/chat-message/ItemChatLabel.svelte';
 
-   /** @type {object} The titan flags data for the item. */
-   export let item = void 0;
+   /**
+    * @typedef {object} ItemChatMessageShellProps
+    * @property {object} [item] - The titan flags data for the item.
+    * @property {import('svelte').Snippet} [children] - Content to render in the sections area.
+    */
+
+   /** @type {ItemChatMessageShellProps} */
+   const { item = void 0, children } = $props();
 </script>
 
 <div class="item-chat-message">
@@ -12,7 +18,7 @@
    </div>
 
    <div class="sections">
-      <slot/>
+      {@render children?.()}
    </div>
 </div>
 

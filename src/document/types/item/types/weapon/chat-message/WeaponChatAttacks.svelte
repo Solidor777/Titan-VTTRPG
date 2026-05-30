@@ -13,8 +13,15 @@
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {TitanItem} */
-   export let item = void 0;
+   /**
+    * @typedef {object} WeaponChatAttacksProps
+    * @property {object} [item] - The titan flags data for the item.
+    */
+
+   /** @type {WeaponChatAttacksProps} */
+   const { item = void 0 } = $props();
+
+   /** @type {Record<string, string>} Map of attack trait names to their description strings. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
@@ -25,7 +32,7 @@
          <div class="row header">
             <!--Attack Button-->
             <div class="attack-name">
-               <i class={attack.type === 'melee'? MELEE_ICON: ACCURACY_ICON}/>
+               <i class={attack.type === 'melee'? MELEE_ICON: ACCURACY_ICON}></i>
                {attack.label}
             </div>
          </div>
