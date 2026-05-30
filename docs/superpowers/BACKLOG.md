@@ -54,3 +54,26 @@ split off to keep that spec focused.
   https://git.gay/Zhell/visual-active-effects
 - **Depends on:** The "Effects → TitanActiveEffect" spec (effects are native AEs
   with native `description`).
+
+### 4. Effect check-rolling from the character-sheet row
+
+- **What:** Effect rows on the character sheet no longer render inline
+  check-roll buttons. The item-check roll path (`getItemCheckParameters` /
+  `requestItemCheck`, resolving via `actor.items.get(id)`) is item-collection
+  coupled, so rolling an effect's `system.check[]` from the row would crash.
+  Effects still carry `check[]` (editable on the AE sheet, posted via
+  `sendToChat`); only the inline roll-from-row affordance is missing.
+- **To do:** Add an effect-scoped check path on `CharacterDataModel`
+  (parallel to the item-check path — `getEffectCheckParameters` /
+  `requestEffectCheck`, resolving via `actor.effects.get(id)`) and render the
+  check buttons on `CharacterSheetEffect`.
+- **Depends on:** The "Effects → TitanActiveEffect" spec.
+
+### 5. Confirm-delete dialog for effects
+
+- **What:** Effect deletion uses native `effect.delete()` (owner-gated) with no
+  confirmation dialog. The "confirm deleting items" setting and
+  `ConfirmDeleteItemDialog` are item-only, so effects bypass it.
+- **To do:** Add a `requestEffectDeletion` path mirroring the item
+  confirm-delete dialog, honoring the delete-confirm setting.
+- **Depends on:** The "Effects → TitanActiveEffect" spec.
