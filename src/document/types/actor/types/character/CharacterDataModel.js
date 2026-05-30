@@ -5384,20 +5384,20 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Retrieves the Effect Report Data for an array of Effect items.
-    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
+    * Retrieves the Effect Report Data for an array of Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
     * @returns {EffectReportData[]} Array of objects containing the report data for the effect.
     */
-   _getEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
+   _getEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
          const retVal = {
-            label: effectItem.name,
-            img: effectItem.img,
+            label: effect.name,
+            img: effect.img,
          };
 
          // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effectItem.system.description)) {
-            retVal.description = effectItem.system.description;
+         if (!isHTMLBlank(effect.description)) {
+            retVal.description = effect.description;
          }
 
          return retVal;
@@ -5405,21 +5405,21 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Retrieves the Effect Report Data for an array of Turn Start or Turn End Effect items.
-    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
+    * Retrieves the Effect Report Data for an array of Turn Start or Turn End Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
     * @returns {TurnEffectReportData[]} Array of objects containing the report data for the effect.
     */
-   _getTurnEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
+   _getTurnEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
          const retVal = {
-            label: effectItem.name,
-            img: effectItem.img,
-            remaining: effectItem.system.duration.remaining,
+            label: effect.name,
+            img: effect.img,
+            remaining: effect.system.duration.remaining,
          };
 
          // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effectItem.system.description)) {
-            retVal.description = effectItem.system.description;
+         if (!isHTMLBlank(effect.description)) {
+            retVal.description = effect.description;
          }
 
          return retVal;
@@ -5427,22 +5427,22 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Retrieves the Effect Report Data for an array of Initiative Effect items.
-    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
+    * Retrieves the Effect Report Data for an array of Initiative Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
     * @returns {InitiativeEffectReportData[]} Array of objects containing the report data for the effect.
     */
-   _getInitiativeEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
+   _getInitiativeEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
          const retVal = {
-            label: effectItem.name,
-            img: effectItem.img,
-            remaining: effectItem.system.duration.remaining,
-            initiative: effectItem.system.duration.initiative,
+            label: effect.name,
+            img: effect.img,
+            remaining: effect.system.duration.remaining,
+            initiative: effect.system.duration.initiative,
          };
 
          // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effectItem.system.description)) {
-            retVal.description = effectItem.system.description;
+         if (!isHTMLBlank(effect.description)) {
+            retVal.description = effect.description;
          }
 
          return retVal;
@@ -5450,22 +5450,22 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Retrieves the Effect Report Data for an array of Custom Effect items.
-    * @param {TitanItem[]} effectItems - The Effect items to get report data for.
+    * Retrieves the Effect Report Data for an array of Custom Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
     * @returns {CustomEffectReportData[]} Array of objects containing the report data for the effect.
     */
-   _getCustomEffectReportData(effectItems) {
-      return effectItems.sort((a, b) => sortAscending(a.name, b.name)).map((effectItem) => {
+   _getCustomEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
          const retVal = {
-            label: effectItem.name,
-            img: effectItem.img,
-            remaining: effectItem.system.duration.remaining,
-            custom: effectItem.system.duration.custom,
+            label: effect.name,
+            img: effect.img,
+            remaining: effect.system.duration.remaining,
+            custom: effect.system.duration.custom,
          };
 
          // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effectItem.system.description)) {
-            retVal.description = effectItem.system.description;
+         if (!isHTMLBlank(effect.description)) {
+            retVal.description = effect.description;
          }
 
          return retVal;
