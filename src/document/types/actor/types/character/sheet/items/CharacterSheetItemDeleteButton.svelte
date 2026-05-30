@@ -7,8 +7,13 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item this button is for. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemDeleteButtonProps
+    * @property {string} [itemId] The ID of the item this button is for.
+    */
+
+   /** @type {CharacterSheetItemDeleteButtonProps} */
+   const { itemId = undefined } = $props();
 </script>
 
 <DocumentOwnerIconButton

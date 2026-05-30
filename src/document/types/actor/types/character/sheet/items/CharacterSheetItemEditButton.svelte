@@ -7,8 +7,13 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {Item} The Item this button is for. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemEditButtonProps
+    * @property {Item} [item] The Item this button is for.
+    */
+
+   /** @type {CharacterSheetItemEditButtonProps} */
+   const { item = undefined } = $props();
 </script>
 
 <IconButton

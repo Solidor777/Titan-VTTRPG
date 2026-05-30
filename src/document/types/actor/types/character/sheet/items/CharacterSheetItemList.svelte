@@ -3,35 +3,41 @@
    import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
-   // Component class for the item.
-   /** @type {typeof import("svelte").SvelteComponent} */
-   export let itemComponent = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemListProps
+    * @property {typeof import('svelte').SvelteComponent} [itemComponent] Component class for the item.
+    * @property {Function} [filterFunction] Filter function for the items.
+    * @property {string} [filter] Optional filter for the items.
+    * @property {object} [isExpandedMap] Map of item IDs to their expanded state.
+    */
 
-   // Filter function.
-   /** @type {Function} */
-   export let filterFunction = void 0;
-
-   // Optional filter for the items.
-   /** @type {string} */
-   export let filter = '';
-
-   // Is expanded map.
-   /** @type {object} */
-   export let isExpandedMap = void 0;
+   /** @type {CharacterSheetItemListProps} */
+   const { itemComponent = undefined, filterFunction = undefined, filter = '', isExpandedMap = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    // Currently drag hovered state.
-   /** @type {boolean} */
-   let isDragHovering = false;
-   /** @type {string} */
-   let hoveredItemId = '';
+   /** @type {boolean} Whether a drag is currently in progress. */
+   let isDragHovering = $state(false);
+   /** @type {string} The ID of the item currently being drag-hovered. */
+   let hoveredItemId = $state('');
+
+   // Sort and filter items.
+   /** @type {*[]} The filtered and sorted list of items to display. */
+   let items = $derived(
+      $document.items.filter((item) => {
+         return (
+            filterFunction(item) &&
+            item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+         );
+      }).sort((a, b) => sortAscending(a.sort, b.sort))
+   );
 
    // Drag item start.
    /**
-    * @param event
-    * @param id
+    * @param {DragEvent} event - The drag event.
+    * @param {string} id - The ID of the item being dragged.
     */
    function onDragStart(event, id) {
       const item = $document.items.get(id);
@@ -49,7 +55,7 @@
 
    // Drag item hovered.
    /**
-    * @param id
+    * @param {string} id - The ID of the item being hovered over.
     */
    function onDragEnter(id) {
       if (isDragHovering) {
@@ -64,18 +70,6 @@
       hoveredItemId = '';
       isDragHovering = false;
    }
-
-   // Sort and filter items.
-   /** @type {*[]} */
-   let items = [];
-   $: {
-      items = $document.items.filter((item) => {
-         return (
-            filterFunction(item) &&
-            item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
-         );
-      }).sort((a, b) => sortAscending(a.sort, b.sort));
-   }
 </script>
 
 <!--Item List-->
@@ -87,22 +81,23 @@
             class="item{hoveredItemId === item._id ? ' drag-hovered' : ''}"
             data-item-id={item._id}
             draggable={true}
-            on:dragstart={(event) => {
+            ondragstart={(event) => {
                onDragStart(event, item._id, 'item');
             }}
-            on:dragenter={() => {
+            ondragenter={() => {
                onDragEnter(item._id, 'item');
             }}
-            on:dragend={() => {
+            ondragend={() => {
                onDragEnd();
             }}
             transition:slide|local
          >
-            <svelte:component
-               this={itemComponent}
-               {item}
-               bind:isExpanded={isExpandedMap[item._id]}
-            />
+            {#each [itemComponent] as ItemComponent}
+               <ItemComponent
+                  {item}
+                  bind:isExpanded={isExpandedMap[item._id]}
+               />
+            {/each}
          </li>
       {/each}
    </ol>

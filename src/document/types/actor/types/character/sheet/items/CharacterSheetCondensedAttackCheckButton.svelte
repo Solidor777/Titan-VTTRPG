@@ -4,8 +4,13 @@
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
 
-   /** @type {string} The ID of the Item to get the check from. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetCondensedAttackCheckButtonProps
+    * @property {string} [itemId] The ID of the Item to get the check from.
+    */
+
+   /** @type {CharacterSheetCondensedAttackCheckButtonProps} */
+   const { itemId = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -16,33 +21,29 @@
    };
 
    /** @type {AttackCheckParameters} Calculated check parameters. */
-   let checkParameters;
-
-   /** @type {string} Calculated check icon. */
-   let icon;
-
-   /** @type {string} Calculated tooltipAction. */
-   let tooltip;
-
-   // Update parameters in response to changes.
-   $: {
+   let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
       const item = $document.items.get(itemId);
       if (item?.system.attack.length > 0) {
 
          // Update the parameters.
-         checkParameters = $document.system.getAttackCheckParameters(
+         return $document.system.getAttackCheckParameters(
             $document.system.initializeAttackCheckOptions(checkOptions)
          );
-
-         // Update the icon.
-         icon = checkParameters.type === 'melee' ? MELEE_ICON : ACCURACY_ICON;
-
-         // Update the tooltipAction.
-         tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
-   }
+      return undefined;
+   });
+
+   /** @type {string} Calculated check icon. */
+   let icon = $derived(
+      checkParameters?.type === 'melee' ? MELEE_ICON : ACCURACY_ICON
+   );
+
+   /** @type {string} Calculated tooltipAction. */
+   let tooltip = $derived(
+      checkParameters ? getAttributeCheckParametersTooltip(checkParameters) : undefined
+   );
 </script>
 <CondensedCheckButton
    attribute={checkParameters.attribute}

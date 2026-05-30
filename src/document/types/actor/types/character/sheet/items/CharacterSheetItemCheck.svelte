@@ -18,11 +18,14 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemCheckProps
+    * @property {string} [itemId] The ID of the item to get the check from.
+    * @property {number} [checkIdx] The index of the check in the checks array.
+    */
 
-   /** @type {number} The index of the check in the checks array. */
-   export let checkIdx = void 0;
+   /** @type {CharacterSheetItemCheckProps} */
+   const { itemId = undefined, checkIdx = undefined } = $props();
 
    /** @type {ItemCheckOptions} Options for the check. */
    const checkOptions = {
@@ -34,22 +37,19 @@
    const autoSpendResolve = autoSpendResolveChecks();
 
    /** @type {ItemCheckParameters} Calculated item check parameters. */
-   let checkParameters;
-
-   // Update the svelte-components in response to changes.
-   $: {
+   let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
       const item = $document.items.get(itemId);
-      if (item?.system.check.length > checkIdx
-      ) {
+      if (item?.system.check.length > checkIdx) {
 
          // Update the check parameters.
-         checkParameters = $document.system.getItemCheckParameters(
+         return $document.system.getItemCheckParameters(
             $document.system.initializeItemCheckOptions(checkOptions)
          );
       }
-   }
+      return undefined;
+   });
 
    /**
     * Rolls the Item Check.

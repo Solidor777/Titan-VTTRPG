@@ -3,8 +3,13 @@
    import { SEND_TO_CHAT_ICON } from '~/system/Icons.js';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {Item} The Item this button is for. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemSendToChatButtonProps
+    * @property {Item} [item] The Item this button is for.
+    */
+
+   /** @type {CharacterSheetItemSendToChatButtonProps} */
+   const { item = undefined } = $props();
 </script>
 
 <IconButton
