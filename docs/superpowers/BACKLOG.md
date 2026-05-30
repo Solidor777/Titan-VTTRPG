@@ -77,3 +77,12 @@ split off to keep that spec focused.
 - **To do:** Add a `requestEffectDeletion` path mirroring the item
   confirm-delete dialog, honoring the delete-confirm setting.
 - **Depends on:** The "Effects → TitanActiveEffect" spec.
+
+### 6. Convert effect Items inside compendium-packed actors
+
+- **What:** The `convertEffectItemsToActiveEffects` migration handles world
+  actors and unlinked token actors, but NOT actors stored inside compendium
+  packs. Those actors keep their legacy `effect` Items.
+- **To do:** Extend the converter (or add a one-shot tool) to iterate unlocked
+  actor compendium packs and convert their effect Items, then re-lock.
+- **Depends on:** The "Effects → TitanActiveEffect" spec.

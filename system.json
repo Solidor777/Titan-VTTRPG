@@ -51,6 +51,19 @@
          "weapon": {}
       }
    },
+   "packs": [
+      {
+         "name": "effects",
+         "label": "TITAN Effects",
+         "path": "packs/effects",
+         "type": "ActiveEffect",
+         "system": "titan",
+         "ownership": {
+            "PLAYER": "OBSERVER",
+            "ASSISTANT": "OWNER"
+         }
+      }
+   ],
    "grid": {
       "units": "sp",
       "diagonals": 4
