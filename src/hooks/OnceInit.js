@@ -34,6 +34,7 @@ import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js'
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
+import TitanActiveEffectSheet from '~/document/types/active-effect/sheet/TitanActiveEffectSheet.js';
 
 /**
  * Attached to the Init Hook.
@@ -162,6 +163,15 @@ export default function onceInit() {
          types: ['weapon'],
          makeDefault: true,
          label: localize('defaultWeaponSheet'),
+      },
+   );
+
+   // Register the Active Effect sheet for the 'effect' subtype.
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(
+      foundry.documents.ActiveEffect, 'titan', TitanActiveEffectSheet, {
+         types: ['effect'],
+         makeDefault: true,
+         label: localize('defaultEffectSheet'),
       },
    );
 
