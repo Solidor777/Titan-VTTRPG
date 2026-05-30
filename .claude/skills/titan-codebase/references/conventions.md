@@ -227,6 +227,23 @@ it catches v14 API breaks that the mocked Vitest tier cannot.
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above.
 
+**Quench in-client tier** — `src/quench/RegisterQuenchTests.js` exports a default
+`registerQuenchTests()` function that calls `Hooks.on('quenchReady', (quench) => { ... })`. This
+listener is COMPLETELY INERT unless the Quench module (v0.10+) is installed and enabled; Quench fires
+`quenchReady` only from its own `setup` hook. `registerQuenchTests()` is called unconditionally at
+module level in `src/index.js` (after the other `Hooks.once` registrations). Two batches are
+registered:
+- `titan.render.player-sheet` (`displayName: 'TITAN: Player sheet render smoke test'`) — uses
+  `before`/`after` plus `describe`/`it`/`assert` from the Quench context object; finds a
+  `player`-type actor via `game.actors.find(a => a.type === 'player')`, renders its sheet, asserts
+  `actor.sheet.element` is present, and closes the sheet in `after`. Skips gracefully via
+  `this.skip()` inside each `it` if no player actor exists.
+- `titan.checks.accuracy` (`displayName: 'TITAN: Check result accuracy (placeholder)'`) — a single
+  `it` that immediately calls `this.skip()`, reserving the slot for future check-result accuracy
+  tests.
+The Quench batch API (`quench.registerBatch(key, (context) => { ... }, { displayName })`) was
+confirmed from `modules/quench/README.md`. `this.skip()` (Mocha) marks a test pending at runtime.
+
 ## Style rules live in CLAUDE.md
 
 `.claude/CLAUDE.md` is the single authority for all code-style, formatting, and documentation rules for this
