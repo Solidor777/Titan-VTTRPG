@@ -18,7 +18,7 @@ under "Accepted debt" are documented decisions to NOT change, with rationale.
   mode to runes mode — they currently use neither `$props` nor `$state`):
   - `src/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte`
   - `src/document/types/item/types/spell/sheet/SpellSheetCustomAspectsTab.svelte`
-- [ ] **Add `aria-label`** to the icon controls and drop the now-satisfied
+- [x] **Add `aria-label`** to the icon controls and drop the now-satisfied
   `a11y_consider_explicit_label` suppressions:
   - `src/helpers/svelte-components/tag/EditDeleteTag.svelte` — the two icon `<a>` elements.
   - `src/helpers/svelte-components/button/IconButton.svelte` — add an optional `label` prop wired to

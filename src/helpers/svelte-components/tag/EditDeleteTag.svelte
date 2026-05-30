@@ -27,8 +27,8 @@
    <!--Edit Icon-->
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
-   <!-- svelte-ignore a11y_consider_explicit_label -->
    <a
+      aria-label="Edit"
       class={EDIT_ICON}
       onclick={() => {
          editFunction();
@@ -49,8 +49,8 @@
    <!--Delete Icon-->
    <!-- svelte-ignore a11y-missing-attribute -->
    <!-- svelte-ignore a11y-missing-content -->
-   <!-- svelte-ignore a11y_consider_explicit_label -->
    <a
+      aria-label="Delete"
       class={DELETE_ICON}
       onclick={() => {
          deleteFunction();
