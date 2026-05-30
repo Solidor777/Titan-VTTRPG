@@ -42,6 +42,7 @@
          <div class="reset">
             <IconButton
                icon={RESET_ICON}
+               label={localize('resetFilter')}
                onclick={() => {
                   $appState.tabs.abilities.filterOptions.action = false;
                   $appState.tabs.abilities.filterOptions.reaction = false;

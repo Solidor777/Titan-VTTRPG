@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { INSPIRATION_ICON } from '~/system/Icons.js';
 
@@ -10,6 +11,7 @@
 <div class="button">
    <IconButton
       tooltip={'inspiration.desc'}
+      label={localize('toggleInspiration')}
       icon={document.data.system.inspiration ? INSPIRATION_ICON: ''}
       onclick={() => {
          document.data.system.toggleInspiration();

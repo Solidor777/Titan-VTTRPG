@@ -67,6 +67,7 @@
          <div class="reset">
             <IconButton
                icon={RESET_ICON}
+               label={localize('resetFilter')}
                onclick={() => {
                   $appState.tabs.inventory.filterOptions.weapon = false;
                   $appState.tabs.inventory.filterOptions.armor = false;
