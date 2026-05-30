@@ -537,20 +537,22 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Gets all the Effect items affecting this Character that have Expired.
-    * @returns {TitanItem[]|boolean} Array of Expired Effect items affecting this character, or false if there are none.
+    * Gets all the Effect Active Effects affecting this Character that have Expired.
+    * @returns {ActiveEffect[]|boolean} Array of Expired Effect Active Effects affecting this character, or false if
+    *    there are none.
     */
-   getExpiredEffectItems() {
-      const effects = this.parent.items.filter((item) => item.type === 'effect' && item.system.isExpired);
+   getExpiredEffects() {
+      const effects = this.parent.effects.filter((effect) => effect.type === 'effect' && effect.system.isExpired);
       return effects.length > 0 ? effects : false;
    }
 
    /**
-    * Gets all the Effect items affecting this character, sorted by their Duration type, and whether they have Expired.
-    * @returns {object|boolean} Object containing the sorted Effect items, or false if there are none.
+    * Gets all the Effect Active Effects affecting this character, sorted by their Duration type, and whether they have
+    * Expired.
+    * @returns {object|boolean} Object containing the sorted Effect Active Effects, or false if there are none.
     */
-   getSortedEffectItems() {
-      const effects = this.parent.items.filter((item) => item.type === 'effect');
+   getSortedEffects() {
+      const effects = this.parent.effects.filter((effect) => effect.type === 'effect');
       if (effects.length > 0) {
          return sortObjectsIntoContainerByFunctionValue(effects, (effect) => {
             return effect.system.isExpired ? 'expired' : effect.system.duration.type;
@@ -4644,7 +4646,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.isOwner,
          'Cannot modify document %s if not owner.',
          this.parent.name,
-      ) && this.parent.items.some((item) => item.type === 'effect' && item.system.isExpired)) {
+      ) && this.parent.effects.some((effect) => effect.type === 'effect' && effect.system.isExpired)) {
 
          // Remove effects if removal does not need to be confirmed.
          if (!shouldConfirmDeletingItems()) {
@@ -4668,11 +4670,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
          'Cannot modify document %s if not owner.',
          this.parent.name,
       )) {
-         const expiredEffects = this.getExpiredEffectItems();
+         const expiredEffects = this.getExpiredEffects();
          if (expiredEffects) {
-            for (const effect of expiredEffects) {
-               await this.parent.deleteItem(effect._id);
-            }
+            // Collect the IDs first, then delete in a single batch to avoid mutating the live collection while
+            // iterating over it.
+            /** @type {string[]} The IDs of the expired Effect Active Effects to delete. */
+            const expiredEffectIds = expiredEffects.map((effect) => effect.id);
+            await this.parent.deleteEmbeddedDocuments('ActiveEffect', expiredEffectIds);
          }
       }
    }
@@ -4691,10 +4695,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
          'Cannot modify document %s if not owner.',
          this.parent.name,
       )) {
-         // Delete all combat effect items.
-         const combatEffects = this.parent.items.filter((item) => item.system.isCombatEffect);
-         for (const effect of combatEffects) {
-            await this.parent.deleteItem(effect._id);
+         // Delete all combat Effect Active Effects.
+         const combatEffects = this.parent.effects.filter((effect) =>
+            effect.type === 'effect' && effect.system.isCombatEffect);
+         if (combatEffects.length > 0) {
+            // Collect the IDs first, then delete in a single batch to avoid mutating the live collection while
+            // iterating over it.
+            /** @type {string[]} The IDs of the combat Effect Active Effects to delete. */
+            const combatEffectIds = combatEffects.map((effect) => effect.id);
+            await this.parent.deleteEmbeddedDocuments('ActiveEffect', combatEffectIds);
          }
 
          // Reset static mods.
@@ -4863,8 +4872,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Decrease the duration of effects with the Initiative duration type.
          if (autoDecreaseEffectDuration()) {
-            let initiativeEffects = this.parent.items.filter((item) =>
-               item.type === 'effect' && item.system.duration.type === 'initiative');
+            let initiativeEffects = this.parent.effects.filter((effect) =>
+               effect.type === 'effect' && effect.system.duration.type === 'initiative');
             if (initiativeEffects) {
 
                // Calculate which effects to advance.
@@ -5030,13 +5039,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // effects.
          const reportEffects = reportEffects();
          const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
-         const expiredEffects = this.getExpiredEffectItems();
+         const expiredEffects = this.getExpiredEffects();
 
          // If report effects is true, add all effects to the report.
          if (reportEffects) {
 
             // Get sorted effects.
-            const sortedEffects = this.getSortedEffectItems();
+            const sortedEffects = this.getSortedEffects();
             if (sortedEffects) {
                reportData.effects = {};
 
@@ -5148,7 +5157,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // effects.
          const reportEffects = reportEffects();
          const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
-         const expiredEffects = this.getExpiredEffectItems();
+         const expiredEffects = this.getExpiredEffects();
 
          // Otherwise, add expired effects to the report if appropriate.
          if (expiredEffects && (reportEffects || autoRemoveExpiredEffects === 'showButton')) {
@@ -5185,8 +5194,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async _decreaseTurnEffectDuration(reportData, selector) {
       // Decrease effect duration if appropriate.
       if (autoDecreaseEffectDuration()) {
-         const turnEffects = this.parent.items.filter((item) =>
-            item.type === 'effect' && item.system.duration.type === selector);
+         const turnEffects = this.parent.effects.filter((effect) =>
+            effect.type === 'effect' && effect.system.duration.type === selector);
          if (turnEffects.length > 0) {
             for (const effect of turnEffects) {
                effect.system.duration.remaining -= 1;
@@ -5211,8 +5220,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async _increaseTurnEffectDuration(selector) {
       // Increase effect duration if appropriate.
       if (autoDecreaseEffectDuration()) {
-         const turnEffects = this.parent.items.filter((item) =>
-            item.type === 'effect' && item.system.duration.type === selector);
+         const turnEffects = this.parent.effects.filter((effect) =>
+            effect.type === 'effect' && effect.system.duration.type === selector);
          if (turnEffects.length > 0) {
             for (const effect of turnEffects) {
                effect.system.duration.remaining += 1;
@@ -5239,8 +5248,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    async onInitiativeReverted(currentInitiative, previousInitiative, isNewRound) {
       if (isCurrentUserBestOwner(this.parent)) {
          if (autoDecreaseEffectDuration()) {
-            const initiativeEffects = this.parent.items.filter((item) =>
-               item.type === 'effect' && item.system.duration.type === 'initiative');
+            const initiativeEffects = this.parent.effects.filter((effect) =>
+               effect.type === 'effect' && effect.system.duration.type === 'initiative');
             if (initiativeEffects) {
 
                // Calculate which effects to revert using the same filter as onInitiativeAdvanced.
@@ -5467,7 +5476,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Processes effects that have expired, either by removing them from the character, or adding a button to the report
     * data.
     * @param {string} autoRemoveExpiredEffects - The setting for automatically removing expired effects.
-    * @param {TitanItem[]} expiredEffects - The expired effects items for this character.
+    * @param {ActiveEffect[]} expiredEffects - The expired Effect Active Effects for this character.
     * @param {object} reportData - Report data object for storing the result of removing expired effects,
     *    such as whether they were removed, or whether a button should be shown to remove them.
     * @returns {Promise<void>}
@@ -5478,9 +5487,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
             // Delete each expired effect if appropriate.
             case 'enabled': {
                reportData.expiredEffectsRemoved = true;
-               for (const effect of expiredEffects) {
-                  await this.parent.deleteItem(effect.id);
-               }
+
+               // Collect the IDs first, then delete in a single batch to avoid mutating the live collection while
+               // iterating over it.
+               /** @type {string[]} The IDs of the expired Effect Active Effects to delete. */
+               const expiredEffectIds = expiredEffects.map((effect) => effect.id);
+               await this.parent.deleteEmbeddedDocuments('ActiveEffect', expiredEffectIds);
                break;
             }
 
@@ -5936,25 +5948,22 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Toggles the active state of an Effect Item.
-    * @param {string} itemId - The ID of the item to toggle the active state for.
+    * Toggles the active state of an Effect Active Effect by flipping its native disabled flag.
+    * @param {string} effectId - The ID of the Effect Active Effect to toggle the active state for.
     * @returns {Promise<void>}
     */
-   async toggleEffectActive(itemId) {
+   async toggleEffectActive(effectId) {
       if (assert(
          this.parent.isOwner,
          'Cannot modify document %s if not owner.',
          this.parent.name,
       )) {
 
-         // Update the item if valid.
-         const item = this.parent.items.get(itemId);
-         if (item && item.type === 'effect') {
-            item.system.active = !item.system.active;
-            await item.update({
-               system: {
-                  active: item.system.active,
-               },
+         // Update the Effect Active Effect if valid.
+         const effect = this.parent.effects.get(effectId);
+         if (effect && effect.type === 'effect') {
+            await effect.update({
+               disabled: !effect.disabled,
             });
          }
       }
