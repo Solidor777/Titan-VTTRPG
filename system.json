@@ -30,6 +30,9 @@
       }
    ],
    "documentTypes": {
+      "ActiveEffect": {
+         "effect": {}
+      },
       "Actor": {
          "player": {},
          "npc": {}

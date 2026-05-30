@@ -32,6 +32,8 @@ import TitanCombat from '~/document/types/combat/TitanCombat.js';
 import SocketManager from '~/helpers/SocketManager.js';
 import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
+import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
+import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 
 /**
  * Attached to the Init Hook.
@@ -75,6 +77,12 @@ export default function onceInit() {
       shield: ShieldDataModel,
       spell: SpellDataModel,
       weapon: WeaponDataModel,
+   };
+
+   // Configure Active Effects.
+   CONFIG.ActiveEffect.documentClass = TitanActiveEffect;
+   CONFIG.ActiveEffect.dataModels = {
+      effect: TitanActiveEffectDataModel,
    };
 
    // Configure Chat Messages.
