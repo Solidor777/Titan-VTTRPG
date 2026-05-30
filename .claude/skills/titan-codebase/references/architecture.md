@@ -36,7 +36,8 @@
   `CONFIG.Item`, `CONFIG.ChatMessage`, and `CONFIG.Combat` document classes and data models from `src/document/`,
   and registers all sheet classes.
 - `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`.
-- `OnceReady.js` (Foundry `ready` hook) triggers world migration if needed (from `src/helpers/migration/`) and
+- `OnceReady.js` (Foundry `ready` hook), for the GM, unconditionally runs the one-shot effect-item→Active-Effect
+  converter, then runs the version-chain migration if needed (both from `src/helpers/migration/`); for all users it
   registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js`.
 - `OnCombatNextTurn.js` / `OnCombatPreviousTurn.js` delegate to actor system methods (`onTurnStart`, `onTurnEnd`,
   `onInitiativeAdvanced`) on `TitanActor`.
@@ -53,9 +54,10 @@ document state. `OnceInit.js` is the only consumer that calls its registrations 
 
 **`src/helpers/` provides to everyone:** Stateless utility functions (`Localize`, `Log`, `Assert`, `Warn`, `Error`,
 combat-effect appliers, token/actor getters); reusable Svelte UI components (`BorderedColumnList`, `Tabs`, `Meter`,
-`Text`, `RichText`, `ScrollingContainer`, generic buttons/inputs/selects/labels/tags); the `SocketManager` and
-`ActionQueue` for cross-client communication; `TransientDefinitions` for runtime-only data; and the `Settings/`
-folder of per-setting accessor functions consumed throughout.
+`Text`, `RichText`, `ScrollingContainer`, generic buttons/inputs/selects/labels/tags); the `SocketManager` for
+cross-client communication and the `ActionQueue` serial task queue for sequencing racy async mutations;
+`TransientDefinitions` for runtime-only data; and the `Settings/` folder of per-setting accessor functions
+consumed throughout.
 
 **`src/check/` depends on:** `src/helpers/utility-functions/RollCheckDice.js` for dice rolling, and
 `src/document/` actor/item system data for deriving check parameters. Check dialogs and chat-message components are

@@ -50,8 +50,10 @@ Every document in TITAN — actor, item, chat message, combat — is a pair: a F
 schema, field validation, and derived-data logic. `TitanDataModel` introduces a frozen `#components` map for
 composable derived-data, a `documentVersion` field, and version-aware `migrateData`. Actor data models form a
 hierarchy (`TitanActorDataModel` → `CharacterDataModel` → `PlayerDataModel` / `NPCDataModel`); item data models
-branch at `RulesElementItemDataModel` for the six item types that carry rules elements (Ability, Armor, Effect,
-Equipment, Shield, Weapon).
+branch at `RulesElementItemDataModel` for the five item types that carry rules elements (Ability, Armor,
+Equipment, Shield, Weapon). Effects are native Active Effects, not items: `TitanActiveEffectDataModel` carries
+rules elements via the same shared `RulesElementMixin`, and `TitanActiveEffect` is registered as
+`CONFIG.ActiveEffect.documentClass`.
 
 When a character performs a check, `CharacterDataModel` reads derived stats built from owned items' rules
 elements, constructs a typed `CheckParameters` object, optionally opens a `TitanDialog`-based check dialog for
@@ -72,10 +74,10 @@ helper. The `~/` Vite alias (→ `src/`) is the intra-project import mechanism; 
 Report chat messages close the loop between automation and actor state: confirm/apply buttons in report Svelte
 components call back into `CharacterDataModel` methods (routed via `SocketManager` when the acting user does not
 own the document) to commit outcomes like damage or healing, then update `flags.titan` on the chat document to
-reflect the final resource state. `ActionQueue` serialises concurrent async mutations within data-model
-automation paths; `SocketManager` mirrors Foundry Hooks across all connected clients via the `system.titan`
-socket so turn-start/end effects, Fast Healing, Persistent Damage, and Resolve Regain are processed uniformly
-regardless of who advanced the combat turn.
+reflect the final resource state. `ActionQueue` is a serial task queue for sequencing racy async mutations,
+lazily created per actor but currently without callers; `SocketManager` mirrors Foundry Hooks across all
+connected clients via the `system.titan` socket so turn-start/end effects, Fast Healing, Persistent Damage, and
+Resolve Regain are processed uniformly regardless of who advanced the combat turn.
 
 ## Self-update protocol — run at the end of every task in this codebase
 

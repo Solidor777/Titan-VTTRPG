@@ -20,11 +20,14 @@ management). Data model classes hold the schema, field validation, and derived-d
   management, rest/regen automation, and effect-duration tracking. The duration/combat/expiry
   methods (`getExpiredEffects`, `getSortedEffects`, `onInitiativeAdvanced`/`Reverted`,
   `onTurnStart`/`End` and their reverts, `_decreaseTurnEffectDuration`/`_increaseTurnEffectDuration`,
-  `_processExpiredEffects`, `removeCombatEffects`, `removeExpiredEffects`, `toggleEffectActive`) read
-  effect-subtype Active Effects from `this.parent.effects` (filtered by `effect.type === 'effect'`,
-  which excludes conditions), mutate `effect.system.duration.remaining` via `effect.update(...)`,
-  flip native `disabled` for the active toggle, and batch-delete expired/combat effects via
-  `this.parent.deleteEmbeddedDocuments('ActiveEffect', ids)`.
+  `_processExpiredEffects`, `removeCombatEffects`, `requestRemoveExpiredEffects`, `removeExpiredEffects`,
+  `toggleEffectActive`) read effect-subtype Active Effects from `this.parent.effects` (filtered by
+  `effect.type === 'effect'`, which excludes conditions), mutate `effect.system.duration.remaining` via
+  `effect.update(...)`, flip native `disabled` for the active toggle, and batch-delete expired/combat
+  effects via `this.parent.deleteEmbeddedDocuments('ActiveEffect', ids)`. The four report-data builders
+  (`_getEffectReportData`, `_getTurnEffectReportData`, `_getInitiativeEffectReportData`,
+  `_getCustomEffectReportData`) read effect AEs (including the native `description`) into the turn/expiry
+  report payloads.
 - `PlayerDataModel` (`src/document/types/actor/types/character/types/player/PlayerDataModel.js`)
   extends `CharacterDataModel`. Adds XP tracking and an `inspiration` flag.
 - `NPCDataModel` (`src/document/types/actor/types/character/types/npc/NPCDataModel.js`) extends
@@ -60,35 +63,36 @@ management). Data model classes hold the schema, field validation, and derived-d
 **Active Effect side**
 
 - `TitanActiveEffect` (`src/document/types/active-effect/TitanActiveEffect.js`) extends
-  `foundry.documents.ActiveEffect`. Registered as `CONFIG.ActiveEffect.documentClass`. All
-  type-specific logic is guarded by `this.type === 'effect'` so conditions (default subtype,
-  `flags.titan.type === 'condition'`) and other Active Effects are unaffected. On `_preCreate` of an
-  `effect` it runs `this.system.onPreCreate(data)`, forces `showIcon` to
-  `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS` (2), and seeds `flags['visual-active-effects'].data.content`
-  with the enriched native `description`; on `_preUpdate` it re-syncs that flag whenever `description`
-  changes. Enrichment uses `foundry.applications.ux.TextEditor.implementation.enrichHTML(html,
-  { secrets: true })` (v14 async API; no `async` option). `sendToChat` spreads `getRollData()` flat into
-  `flags.titan`, then sets `type: 'effect'` and `description` — matching the flat item `sendToChat` shape
-  (`TitanItem.sendToChat` sets `flags.titan = getRollData()` directly). This puts `check`, `customTrait`,
-  and `duration` at the `flags.titan` root, where both the effect chat components and the item-check roll
-  path (`CharacterDataModel.initializeItemCheckOptions` reads `itemRollData.check`/`itemRollData.customTrait`)
-  resolve them. The effect chat components (`EffectChatMessage.svelte`, `EffectChatStats.svelte`, in
-  `src/document/types/active-effect/chat-message/`) read these fields at the `item` root, like the working item
-  chat cards; `ChatMessageShell.svelte` maps the `effect` chat-card type to `EffectChatMessage`. It also carries
-  the same check and
-  custom-trait mutators as `TitanItem` (`addCheck` / `deleteCheck` / `addCustomTrait` / `editCustomTrait`
-  / `deleteCustomTrait`), ported inline (not via a shared mixin) with identical bodies; they operate on
-  `system.check` / `system.customTrait` via `this.update(...)`, notify the sheet through
-  `this.sheet.postAddCheck()` / `preDeleteCheck(idx)`, and reuse the item `AddCustomTraitDialog` /
-  `EditCustomTraitDialog` (passed `this`). These are invoked by the reused item Checks tab and
-  Custom-Traits sidebar via `document.data.*`.
+  `foundry.documents.ActiveEffect`. Registered as `CONFIG.ActiveEffect.documentClass`. Conditions are
+  instances of this same class (default subtype, `flags.titan.type === 'condition'`); effects are the
+  `effect` subtype. Its `_preCreate` / `_preUpdate` overrides guard their work on `this.type === 'effect'`
+  so conditions and other subtypes are unaffected: `_preCreate` runs `this.system.onPreCreate(data)`,
+  forces `showIcon` to `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS` (2), and seeds
+  `flags['visual-active-effects'].data.content` with the enriched native `description`; `_preUpdate`
+  re-syncs that flag whenever `description` changes. Enrichment uses
+  `foundry.applications.ux.TextEditor.implementation.enrichHTML(html, { secrets: true })` (v14 async API).
+  `sendToChat` spreads `getRollData()` flat into `flags.titan`, then sets `type: 'effect'` and
+  `description` — matching the flat item `sendToChat` shape (`TitanItem.sendToChat` sets
+  `flags.titan = getRollData()` directly). This puts `check`, `customTrait`, and `duration` at the
+  `flags.titan` root, where both the effect chat components and the item-check roll path resolve them.
+  The class also carries check and custom-trait mutators with the same bodies as `TitanItem` (`addCheck`
+  / `deleteCheck` / `addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`), ported inline (not via a
+  shared mixin); they operate on `system.check` / `system.customTrait` via `this.update(...)`, notify the
+  sheet through `this.sheet.postAddCheck()` / `preDeleteCheck(idx)`, and reuse the item
+  `AddCustomTraitDialog` / `EditCustomTraitDialog` (passed `this`). They are invoked by the reused item
+  Checks tab and Custom-Traits sidebar via `document.data.*`. Effect chat components
+  (`EffectChatMessage.svelte`, `EffectChatStats.svelte`) live in
+  `src/document/types/active-effect/chat-message/`; `ChatMessageShell.svelte` maps the `effect` chat-card
+  type to `EffectChatMessage`.
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
-  Schema adds a custom `duration` ({ type, remaining, initiative, custom }), a `check` array, and a
-  `customTrait` array; provides `isExpired` / `isActive` / `isCombatEffect` getters and
+  Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
+  initiative, custom }), a `check` array, and a `customTrait` array; it provides `isExpired` /
+  `isActive` (`!parent?.disabled`, for all duration types) / `isCombatEffect` getters and
   `_getInitialDocumentData` (captures the owning actor's active-combat initiative). Active/inactive
-  state is the native `disabled` field; rich text is the native `description` field. The `effect`
-  ActiveEffect subtype is declared in `system.json` `documentTypes.ActiveEffect`.
+  state is the native `disabled` field (the universal gate); rich text is the native `description`
+  field. The `effect` ActiveEffect subtype is declared in `system.json`
+  `documentTypes.ActiveEffect.effect`.
 
 
 ## Checks
@@ -196,12 +200,17 @@ functions in `src/document/types/item/rules-element/` create default instances:
 | `createRollMessageElement`       | `rollMessage`                | Display a message when a matching check is rolled. |
 | `createTurnMessageElement`       | `turnMessage`                | Display a message at the character's turn start/end|
 
-Items that can carry rules elements: Ability, Armor, Equipment, Shield, Weapon (all extend
-`RulesElementItemDataModel`). Commodity and Spell do not. Effect Active Effects also carry rules elements via
-`TitanActiveEffectDataModel` (which mixes in `RulesElementMixin`), not as an item type.
+The shared `rulesElement` array plus its `addRulesElement` / `deleteRulesElement` mutators come from
+`RulesElementMixin` (`src/document/types/item/rules-element/RulesElementMixin.js`), used by both
+`RulesElementItemDataModel` and `TitanActiveEffectDataModel`. Items that carry rules elements: Ability,
+Armor, Equipment, Shield, Weapon (all extend `RulesElementItemDataModel`); Commodity and Spell do not.
+Effect Active Effects carry rules elements via the same mixin on `TitanActiveEffectDataModel`, not as an
+item type.
 
-`CharacterDataModel.prepareDerivedData` iterates the actor's owned items, reads each item's
-`rulesElement` array, and applies the elements to the character's derived stats.
+`CharacterDataModel._applyRulesElements` (called from `prepareDerivedData`) applies rules elements from
+two sources: every owned item's `rulesElement` array, plus a pass over the actor's `effect`-subtype Active
+Effects (`this.parent.effects`, skipping conditions/other subtypes and any `disabled` effect). Both feed the
+character's derived stats.
 
 
 ## Sheets
@@ -236,12 +245,12 @@ and one or more inner Svelte component trees.
 - `TitanNPCSheet` (`src/document/types/actor/types/character/types/npc/NPCSheet.js`) extends
   `TitanCharacterSheet`. Mounts `NPCSheetShell.svelte`.
 - Effects tab (`CharacterSheetEffectsTab.svelte`) creates, lists, and drags effect **Active
-  Effects** (not items). Its create button calls
+  Effects** (not items), backed by its own `tabs.effects` slot in `CharacterSheetState` (filter,
+  filter options, per-effect expanded map, scroll position). Its create button calls
   `document.data.createEmbeddedDocuments('ActiveEffect', [{ name, type: 'effect' }])`. It uses a
   dedicated `CharacterSheetEffectList.svelte` (sibling of the item-only `CharacterSheetItemList`)
-  that iterates `document.data.effects` filtered to `type === 'effect'` (a sibling of the item-only
-  `CharacterSheetItemList`), handles drag-out via the effect's native `toDragData()`, and renders each via
-  `CharacterSheetEffect.svelte`.
+  that iterates `document.data.effects` filtered to `type === 'effect'`, handles actor→actor drag-out
+  via the effect's native `toDragData()`, and renders each via `CharacterSheetEffect.svelte`.
   `CharacterSheetEffect` takes an `effect` prop, reuses the generic `CharacterSheetItem` shell, and
   exposes a `CharacterSheetEffectToggleActiveButton.svelte` (active = `effect.system.isActive`,
   toggled via `document.data.system.toggleEffectActive(effect.id)`) shown for all duration types.
@@ -274,9 +283,13 @@ and one or more inner Svelte component trees.
 
 **`ActionQueue`** (`src/helpers/ActionQueue.js`)
 
-A serial task queue. Because Foundry actor updates are asynchronous and can race, components
-enqueue callbacks with a unique `key`; duplicate-key entries are deduplicated. Used by
-`CharacterDataModel` effect-duration automation and other automation paths to sequence updates safely.
+A serial task queue. Because Foundry actor updates are asynchronous and can race, callers may
+enqueue callbacks with a unique `key`; duplicate-key entries are deduplicated. A queue is lazily
+created on each actor (`this.parent.actionQueue`) during `CharacterDataModel.prepareDerivedData`
+when the current user is the best owner, but no path in `src/` currently calls `enqueue` — the
+effect-duration automation now mutates `actor.effects` directly via `effect.update(...)` /
+`deleteEmbeddedDocuments` rather than through the queue. The infrastructure remains available for
+sequencing future racy mutations.
 
 **`SocketManager`** (`src/helpers/SocketManager.js`)
 
@@ -353,6 +366,7 @@ document reactively available to the entire sheet component tree via Svelte cont
 `PlayerSheetShell.svelte`) and an `applicationState` store for UI-only state (open tabs, expanded
 sections) that does not need to be persisted.
 
-`ActionQueue` serializes async mutations within `CharacterDataModel` automation paths so
-that concurrent Foundry updates do not interleave. `SocketManager` bridges client boundaries,
-forwarding automation triggers as Hooks so non-owner clients can request owner-side operations.
+`ActionQueue` is a serial task queue lazily created per actor for sequencing racy async mutations;
+it is currently initialized but unused (no `enqueue` callers remain). `SocketManager` bridges client
+boundaries, forwarding automation triggers as Hooks so non-owner clients can request owner-side
+operations.

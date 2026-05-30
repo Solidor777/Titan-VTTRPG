@@ -147,27 +147,33 @@ Some sheet rows hold a local reference to an embedded document and call
 - `actor/` — `ActorMigrations.js`, `CharacterMigrations.js`, `PlayerMigrations.js`, `NpcMigrations.js`.
 - `item/` — one file per item type (`WeaponMigrations.js`, `SpellMigrations.js`, etc.).
 - `ConfirmMigrateWorldDialog.js` — prompt dialog that calls `migrateWorld` on confirm.
-- `ConvertEffectItemsToActiveEffects.js` — one-shot, idempotent converter (separate from the version chain) that
-  turns legacy `effect`-type Items into native `effect`-subtype Active Effects. `migrateWorld()` awaits its default
-  export before the `worldNeedsMigration()` early-return, so it always runs on load.
+- `ConvertEffectItemsToActiveEffects.js` — one-shot, idempotent converter that turns legacy `effect`-type Items into
+  native `effect`-subtype Active Effects. It is fully decoupled from `migrateWorld()` (which is purely the
+  version-chain migrator) and is awaited directly from `onceReady` for the GM, unconditionally, before the
+  version-chain step.
 
 **What triggers it — `onceReady` (src/hooks/OnceReady.js)**
-Registered with `Hooks.once('ready', onceReady)` in `src/index.js`. On the `ready` hook, for the GM, the system
-reads the `titan.migrationMode` system setting and the version-chain state:
-- `'prompt'` mode AND `worldNeedsMigration()` is `true` → renders a `ConfirmMigrateWorldDialog` which calls
-  `migrateWorld()` on GM confirmation (deferring the version chain to the prompt).
-- Otherwise (`'automatic'` mode, or `'prompt'` with no pending version migration) → awaits `migrateWorld()`
-  directly so the one-shot effect converter always runs even when no version migration is pending.
+Registered with `Hooks.once('ready', onceReady)` in `src/index.js`. On the `ready` hook, for the GM only:
+1. It first `await`s `convertEffectItemsToActiveEffects()` unconditionally — the one-shot effect converter always
+   runs on load, independent of migration mode and the version chain (the converter self-guards on GM and is
+   idempotent).
+2. It then reads the `titan.migrationMode` system setting and gates only the version chain:
+   - `'prompt'` mode AND `worldNeedsMigration()` is `true` → renders a `ConfirmMigrateWorldDialog` which calls
+     `migrateWorld()` on GM confirmation (deferring the version chain to the prompt).
+   - Otherwise (`'automatic'` mode, or `'prompt'` with no pending version migration) → awaits `migrateWorld()`
+     directly.
 
 **Effect Item → Active Effect conversion — `convertEffectItemsToActiveEffects`**
 GM-only. Iterates `game.actors` and the actors of unlinked tokens across `game.scenes`, calling `convertActor` on
-each. `convertActor` first batch-deletes stale cosmetic "mirror" AEs (base subtype, `flags.titan.type === 'effect'`),
-then for each `effect`-type Item builds AE creation data via `buildEffectData` (native `name`/`img`/`description`,
-`disabled` mapped as `duration.type === 'permanent' ? !active : false`, deep-cloned `system.rulesElement`/`duration`/
-`check`/`customTrait`), creates the AEs, then batch-deletes the source Items (create-before-delete). The migrated
-`duration.initiative` is carried through, so `TitanActiveEffect._preCreate` does not override combat initiative.
-`buildEffectData` does NOT set `showIcon` or the Visual Active Effects flag — `_preCreate` seeds those. Idempotent
-once no `effect` Items remain. Compendium-packed actors are NOT converted.
+each. For each `effect`-type Item, `convertActor` builds AE creation data via `buildEffectData` (native
+`name`/`img`/`description`, `disabled` mapped as `duration.type === 'permanent' ? !active : false`, deep-cloned
+`system.rulesElement`/`duration`/`check`/`customTrait`); it creates the replacement AEs first, then batch-deletes the
+source Items, then batch-deletes any stale cosmetic "mirror" AEs (base subtype, `flags.titan.type === 'effect'`) last
+(create-before-delete, so no effect data is lost if creation fails). The migrated `duration.initiative` is carried
+through, so `TitanActiveEffect._preCreate` does not override combat initiative.
+`buildEffectData` does NOT set `showIcon` or the Visual Active Effects flag — `_preCreate` seeds those. Each actor's
+conversion is wrapped in its own try/catch (`convertActorIsolated`), so a failure on one actor is logged and the
+remaining actors still process. Idempotent once no `effect` Items remain. Compendium-packed actors are NOT converted.
 
 **Version comparison — `documentNeedsMigration`**
 Each document stores its current schema version in `system.documentVersion` (a numeric field defined in
