@@ -23,8 +23,10 @@ export default class TitanItemSheet extends TitanDocumentSheet {
 
       super(/** @type {foundry.abstract.Document} */ sheetDocument, options);
 
+      // Read the resolved document from the base getter; `sheetDocument` may be the v14 `{ document }` options
+      // object rather than the document itself.
       /** @property {TitanItem} item - The Item this sheet represents. */
-      this.item = sheetDocument;
+      this.item = this.document;
    }
 
    /**

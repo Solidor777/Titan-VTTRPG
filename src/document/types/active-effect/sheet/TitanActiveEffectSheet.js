@@ -35,8 +35,10 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
 
       super(/** @type {foundry.abstract.Document} */ sheetDocument, options);
 
+      // Read the resolved document from the base getter; `sheetDocument` may be the v14 `{ document }` options
+      // object rather than the document itself.
       /** @property {TitanActiveEffect} effect - The Active Effect this sheet represents. */
-      this.effect = sheetDocument;
+      this.effect = this.document;
    }
 
    /**

@@ -1,6 +1,7 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
 import warn from '~/helpers/utility-functions/Warn.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDocumentSheetArguments.js';
 import ActorSheetToggleLinkedTokenButton from '~/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte';
 import ActorSheetUnlinkTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkTokenButton.svelte';
 import ActorSheetUnlinkedTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkedTokenButton.svelte';
@@ -17,17 +18,22 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
+      // Resolve the polymorphic constructor arguments before inspecting the document (Foundry v14 passes
+      // `{ document }`; TITAN callers may pass it positionally).
+      const { document: resolvedDocument, options: resolvedOptions } =
+         resolveDocumentSheetArguments(sheetDocument, options);
+
       // Calculate whether this sheet's Actor is a token or a proxy.
-      const actor = sheetDocument.isToken ? sheetDocument.parent.actor : sheetDocument;
-      options.token ??= null;
+      const actor = resolvedDocument.isToken ? resolvedDocument.parent.actor : resolvedDocument;
+      resolvedOptions.token ??= null;
 
       // Add sheet classes.
       const classes = ['titan-actor-sheet'];
-      options.classes = options.classes
-         ? mergeArrays(classes, options.classes)
+      resolvedOptions.classes = resolvedOptions.classes
+         ? mergeArrays(classes, resolvedOptions.classes)
          : classes;
 
-      super(actor, options);
+      super(actor, resolvedOptions);
 
       /** @type {TitanActor} The Actor this sheet belongs to. */
       this.actor = actor;

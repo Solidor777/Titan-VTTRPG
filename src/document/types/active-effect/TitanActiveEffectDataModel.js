@@ -7,6 +7,7 @@ import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
 import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
+import createDataField from '~/helpers/utility-functions/CreateDataField.js';
 
 /**
  * The typed system data model for Titan Active Effects (subtype 'effect').
@@ -39,6 +40,20 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
 
       // Custom Traits.
       schema.customTrait = createArrayField(createObjectField(() => createCustomItemTraitTemplate()));
+
+      // Changes.
+      // Foundry v14 requires every ActiveEffect type data model to define `changes` as an ArrayField whose
+      // element is a SchemaField defining a numeric `priority` and string `type`/`phase` (see
+      // Game##verifyActiveEffectModels). We keep our own permissive change shape — without core's restrictive
+      // `type` validator or `blank: false` constraints — and supply those required fields so the verifier passes.
+      schema.changes = createArrayField(createSchemaField({
+         key: createStringField(),
+         value: createDataField(''),
+         mode: createIntegerField(0),
+         priority: createIntegerField(0),
+         type: createStringField(),
+         phase: createStringField(),
+      }));
 
       return schema;
    }

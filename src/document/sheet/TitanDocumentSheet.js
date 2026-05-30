@@ -2,6 +2,7 @@ import { mount, unmount } from 'svelte';
 import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDocumentSheetArguments.js';
 import darkModeSheets from '~/helpers/Settings/DarkModeSheets.js';
 
 const { DocumentSheetV2 } = foundry.applications.api;
@@ -23,19 +24,28 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
     * @param {object} [options={}] - Application configuration options.
     */
    constructor(sheetDocument, options = {}) {
+      // Resolve the polymorphic constructor arguments. Foundry v14 constructs DocumentSheetV2 applications as
+      // `new Sheet({ document })`, while TITAN subclasses pass the document positionally; both must work.
+      const { document: resolvedDocument, options: resolvedOptions } =
+         resolveDocumentSheetArguments(sheetDocument, options);
+
       // Add default and dark-mode classes.
       const classes = ['titan', 'titan-document-sheet'];
       if (darkModeSheets()) {
          classes.push('titan-dark-mode');
       }
-      options.classes = options.classes ? mergeArrays(classes, options.classes) : classes;
+      resolvedOptions.classes = resolvedOptions.classes
+         ? mergeArrays(classes, resolvedOptions.classes)
+         : classes;
 
       // DocumentSheetV2 expects the document on the options object and exposes it via `this.document`
-      // (a getter — do NOT assign to it).
-      super(foundry.utils.mergeObject(options, { document: sheetDocument }));
+      // (a getter — do NOT assign to it). Assign the reference directly; deep-merging it would recurse into
+      // the document's read-only collections (items, effects) and throw.
+      resolvedOptions.document = resolvedDocument;
+      super(resolvedOptions);
 
       // Build the reactive bridge and the UI-only application state store.
-      this.#bridge = new ReactiveDocument(sheetDocument);
+      this.#bridge = new ReactiveDocument(resolvedDocument);
       this.applicationState = this._createReactiveState();
    }
 
