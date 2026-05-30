@@ -54,19 +54,19 @@
 
          <!--Input-->
          <div class="input">
-            <TextInput bind:value={$appState.tabs.abilities.filter}/>
+            <TextInput bind:value={$appState.tabs.effects.filter}/>
          </div>
       </div>
    </div>
 
    <!--Scrolling Containers-->
    <div class="scrolling-content">
-      <ScrollingContainer bind:scrollTop={$appState.tabs.abilities.scrollTop}>
+      <ScrollingContainer bind:scrollTop={$appState.tabs.effects.scrollTop}>
          <!--Effects List-->
          <div class="list">
             <CharacterSheetEffectList
-               filter={$appState.tabs.abilities.filter}
-               isExpandedMap={$appState.tabs.abilities.isExpanded}
+               filter={$appState.tabs.effects.filter}
+               isExpandedMap={$appState.tabs.effects.isExpanded}
             />
          </div>
       </ScrollingContainer>

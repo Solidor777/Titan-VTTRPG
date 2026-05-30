@@ -14,6 +14,18 @@
  * @property {Object.<string, boolean>} tabs.abilities.isExpanded - Object of booleans representing whether an Ability
  *    is expanded, arranged by Item ID.
  * @property {number} tabs.abilities.scrollTop - The current top of the scrollbar for the Abilities tab.
+ * @property {object} tabs.effects - State for the Effects tab.
+ * @property {string} tabs.effects.filter - The current filter text for the Effects tab.
+ * @property {object} tabs.effects.filterOptions - Object containing the state of the filter options for the
+ *    Effects tab.
+ * @property {boolean} tabs.effects.filterOptions.action - Whether to filter the Effects tab for Action effects.
+ * @property {boolean} tabs.effects.filterOptions.reaction - Whether to filter the Effects tab for Reaction
+ *    effects.
+ * @property {boolean} tabs.effects.filterOptions.passive - Whether to filter the Effects tab for Passive
+ *    effects.
+ * @property {Object.<string, boolean>} tabs.effects.isExpanded - Object of booleans representing whether an Effect
+ *    is expanded, arranged by Active Effect ID.
+ * @property {number} tabs.effects.scrollTop - The current top of the scrollbar for the Effects tab.
  * @property {object} tabs.inventory - State for the Inventory tab.
  * @property {string} tabs.inventory.filter - The current filter text for the Inventory tab.
  * @property {object} tabs.inventory.filterOptions - Object containing the state of the filter options for the
@@ -51,6 +63,16 @@ export default function createCharacterSheetData(actor) {
       tabs: {
          activeTab: 'skills',
          abilities: {
+            filter: '',
+            filterOptions: {
+               action: false,
+               reaction: false,
+               passive: false,
+            },
+            isExpanded: {},
+            scrollTop: 0,
+         },
+         effects: {
             filter: '',
             filterOptions: {
                action: false,
