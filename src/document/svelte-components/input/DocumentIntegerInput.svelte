@@ -31,13 +31,13 @@
     * @returns {void}
     */
    function updateDocument() {
-      refreshSystemDocument($document, disabled);
+      refreshSystemDocument(document.data, disabled);
    }
 </script>
 
 <IntegerInput
    bind:value
-   disabled={disabled || !$document?.isOwner}
+   disabled={disabled || !document.data?.isOwner}
    {max}
    {maxDigits}
    {min}

@@ -24,6 +24,6 @@
    const document = getContext('document');
 </script>
 
-<AttributeButton {attribute} disabled={disabled || !$document.isOwner} {onclick} {tooltip}>
+<AttributeButton {attribute} disabled={disabled || !document.data.isOwner} {onclick} {tooltip}>
    {@render children?.()}
 </AttributeButton>

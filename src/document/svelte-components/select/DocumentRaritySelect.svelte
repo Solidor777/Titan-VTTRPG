@@ -23,7 +23,7 @@
 
 <RaritySelect
    bind:value
-   disabled={disabled || !$document?.isOwner}
-   onchange={() => refreshSystemDocument($document, disabled)}
+   disabled={disabled || !document.data?.isOwner}
+   onchange={() => refreshSystemDocument(document.data, disabled)}
    {tooltip}
 />

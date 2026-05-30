@@ -18,7 +18,7 @@
    const document = getContext('document');
 
    /** @type {string} The name of the document. */
-   let value = $state($document.name);
+   let value = $state(document.data.name);
 
    /**
     * Updates the document name when the input changes.
@@ -26,7 +26,7 @@
     */
    function updateDocument() {
       if (value.length > 0) {
-         $document.update({
+         document.data.update({
             name: value,
          });
       }
@@ -36,7 +36,7 @@
 <div class="document-name">
    <TextInput
       bind:value={value}
-      disabled={disabled || !$document?.isOwner}
+      disabled={disabled || !document.data?.isOwner}
       onchange={updateDocument}
       onkeyup={updateDocument}
       {tooltip}

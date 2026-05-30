@@ -22,12 +22,12 @@
    const document = getContext('document');
 
    /** @type {string} Input value resolved from the document path on mount. */
-   let value = $state(untrack(() => resolveObjectPath($document, path)));
+   let value = $state(untrack(() => resolveObjectPath(document.data, path)));
 </script>
 
 <RaritySelect
    bind:value
-   disabled={disabled || !$document?.isOwner}
-   onchange={() => refreshSystemDocument($document, disabled)}
+   disabled={disabled || !document.data?.isOwner}
+   onchange={() => refreshSystemDocument(document.data, disabled)}
    {tooltip}
 />

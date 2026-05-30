@@ -24,6 +24,6 @@
    const document = getContext('document');
 </script>
 
-<ResistanceButton disabled={disabled || !$document.isOwner} {onclick} {resistance} {tooltip}>
+<ResistanceButton disabled={disabled || !document.data.isOwner} {onclick} {resistance} {tooltip}>
    {@render children?.()}
 </ResistanceButton>

@@ -21,9 +21,9 @@
 
    /** Updates the document icon in response to image picker changes. */
    async function updateDocument() {
-      if (!disabled && $document?.isOwner) {
-         $document.update({
-            img: $document.img,
+      if (!disabled && document.data?.isOwner) {
+         document.data.update({
+            img: document.data.img,
          });
       }
    }
@@ -31,8 +31,8 @@
 
 <ImagePicker
    {alt}
-   bind:value={$document.img}
-   disabled={disabled || !$document?.isOwner}
+   bind:value={document.data.img}
+   disabled={disabled || !document.data?.isOwner}
    onchange={updateDocument}
    {tooltip}
 />

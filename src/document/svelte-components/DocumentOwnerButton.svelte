@@ -22,6 +22,6 @@
    const document = getContext('document');
 </script>
 
-<Button disabled={disabled || !$document.isOwner} {onclick} {tooltip}>
+<Button disabled={disabled || !document.data.isOwner} {onclick} {tooltip}>
    {@render children?.()}
 </Button>

@@ -22,4 +22,4 @@
    const document = getContext('document');
 </script>
 
-<IconButton disabled={disabled || !$document.isOwner} {icon} {onclick} {tooltip}/>
+<IconButton disabled={disabled || !document.data.isOwner} {icon} {onclick} {tooltip}/>
