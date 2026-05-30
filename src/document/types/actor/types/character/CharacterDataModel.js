@@ -701,17 +701,27 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const rulesElements = [];
 
       /**
+       * Copies a source array of Rules Elements into the shared Rules Elements array, tagging each with the
+       * provided category type. Shared by the owned-item pass and the effect Active Effect pass.
+       * @param {object[]} sourceElements - The source Rules Elements array to copy from.
+       * @param {string} type - The type by which to categorize the Rules Elements (ability, equipment, or effect).
+       */
+      function processElements(sourceElements, type) {
+         const copiedElements = structuredClone(sourceElements);
+         for (const element of copiedElements) {
+            element.type = type;
+         }
+         rulesElements.push(...copiedElements);
+      }
+
+      /**
        * Copies the Rules Elements from an item to the Rules Elements array.
        * @param {TitanItem} item - The Item to copy the Rules Elements from.
        * @param {string} type - The type by which to categorize the items Rules Elements (ability, equipment, or
        *    effect).
        */
       function processItemElements(item, type) {
-         const copiedElements = structuredClone(item.system.rulesElement);
-         for (const element of copiedElements) {
-            element.type = type;
-         }
-         rulesElements.push(...copiedElements);
+         processElements(item.system.rulesElement, type);
       }
 
       this.parent.items.forEach((item) => {
@@ -754,6 +764,19 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   break;
                }
             }
+         }
+      });
+
+      // Also process Rules Elements from the actor's effect Active Effects. Only the 'effect' subtype carries
+      // Rules Elements; conditions and other subtypes are skipped. Disabled effects contribute nothing.
+      this.parent.effects.forEach((effect) => {
+         if (
+            effect.type === 'effect' &&
+            !effect.disabled &&
+            effect.system.rulesElement &&
+            effect.system.rulesElement.length > 0
+         ) {
+            processElements(effect.system.rulesElement, 'effect');
          }
       });
 
