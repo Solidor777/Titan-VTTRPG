@@ -17,9 +17,9 @@ exists, where it lives, and how to fit new work in. It is **descriptive, not pre
 - **Pure Svelte 5 (runes)** mounted directly into Foundry **v14** `ApplicationV2` — no UI
   middleware. TyphonJS was fully removed in the v14 migration. Intra-project imports use the `~/`
   Vite alias (resolves to `src/`); `$fonts/` aliases the repo `fonts/` directory.
-- Foundry **v14** (`system.json` compatibility: minimum 13 / verified 14 / maximum 14). Note: the
-  `@league-of-foundry-developers/foundry-vtt-types` dev dependency is still **v13** — a known
-  type-package/runtime version mismatch, not a code issue.
+- Foundry **v14** (`system.json` compatibility: minimum 13 / verified 14 / maximum 14). Editor types
+  come from the live Foundry install — `jsconfig.json` includes `../../../../foundry/common/**` and
+  `foundry/public/scripts/**`; there is no `foundry-vtt-types` dependency.
 - Build: Vite 5 with `@sveltejs/vite-plugin-svelte`. Source lives in `src/`; build output goes to
   the repo root.
 
