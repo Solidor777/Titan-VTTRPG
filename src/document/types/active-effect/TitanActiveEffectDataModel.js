@@ -57,7 +57,7 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
     * @returns {boolean} Whether this effect is currently active.
     */
    get isActive() {
-      return !this.parent.disabled || this.duration.type !== 'permanent';
+      return !this.parent?.disabled || this.duration.type !== 'permanent';
    }
 
    /**
