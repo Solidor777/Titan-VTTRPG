@@ -9,21 +9,22 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 
-   /** @type {string} Key for the Skill to show stats for. */
-   export let key;
+   /**
+    * @typedef {object} CharacterSheetSkillProps
+    * @property {string} key Key for the Skill to show stats for.
+    */
+
+   /** @type {CharacterSheetSkillProps} */
+   const { key } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {AttributeCheckParameters} Calculated check parameters. */
-   let checkParameters = $document.system.getAttributeCheckParameters(
-      $document.system.initializeAttributeCheckOptions({ skill: key }));
-
-   /** @type {string} Tooltip for the total Training value. */
-   let totalTrainingTooltip = '';
-
-   /** @type {string} Tooltip for the total Expertise value. */
-   let totalExpertiseTooltip = '';
+   let checkParameters = $derived(
+      $document.system.getAttributeCheckParameters(
+         $document.system.initializeAttributeCheckOptions({ skill: key }))
+   );
 
    /**
     * Calculates the tooltipAction for the total Training or Expertise value.
@@ -59,24 +60,21 @@
       return retVal;
    }
 
-   // Update calculated data in response to changes.
-   $: {
-      // Update check parameters.
-      checkParameters = $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({ skill: key }));
-
-      // Update total training tooltip.
-      totalTrainingTooltip = getTotalValueTooltip(
+   /** @type {string} Tooltip for the total Training value. */
+   let totalTrainingTooltip = $derived(
+      getTotalValueTooltip(
          $document.system.skill[key].training,
          checkParameters.trainingMod
-      );
+      )
+   );
 
-      // Update total expertise tooltipAction.
-      totalExpertiseTooltip = getTotalValueTooltip(
+   /** @type {string} Tooltip for the total Expertise value. */
+   let totalExpertiseTooltip = $derived(
+      getTotalValueTooltip(
          $document.system.skill[key].expertise,
          checkParameters.expertiseMod
-      );
-   }
+      )
+   );
 </script>
 
 <div class="skill">
@@ -101,7 +99,7 @@
             <div class="label" use:tooltipAction={'training.desc'}>
 
                <!--Icon-->
-               <i class={EXPERTISE_ICON}/>
+               <i class={EXPERTISE_ICON}></i>
 
                <!--Inner Label-->
                <div class="inner-label">
@@ -142,7 +140,7 @@
             <div class="label" use:tooltipAction={'expertise.desc'}>
 
                <!--Icon-->
-               <i class={TRAINING_ICON}/>
+               <i class={TRAINING_ICON}></i>
 
                <!--Inner Label-->
                <div class="inner-label">

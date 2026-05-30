@@ -4,15 +4,22 @@
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {AttributeCheckParameters} The Parameters of the Check this component represents. */
-   export let checkParameters = void 0;
+   /**
+    * @typedef {object} CharacterSheetCondensedSkillCheckButtonProps
+    * @property {AttributeCheckParameters} [checkParameters] The Parameters of the Check this component represents.
+    */
+
+   /** @type {CharacterSheetCondensedSkillCheckButtonProps} */
+   const { checkParameters = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {string} Calculated tooltip. */
-   let tooltip = localize(`${checkParameters.skill}.desc`);
-   tooltip += getAttributeCheckParametersTooltip(checkParameters);
+   let tooltip = $derived(
+      localize(`${checkParameters.skill}.desc`) +
+      getAttributeCheckParametersTooltip(checkParameters)
+   );
 </script>
 
 <CondensedCheckButton

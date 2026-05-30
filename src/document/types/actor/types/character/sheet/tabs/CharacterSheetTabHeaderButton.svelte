@@ -1,15 +1,16 @@
 <script>
    import MiniButton from '~/helpers/svelte-components/button/MiniButton.svelte';
 
-   /** @type {string} */
-   export let label = void 0;
-   /** @type {string} */
-   export let icon = void 0;
-   /** @type {boolean} */
-   export let disabled = void 0;
+   /**
+    * @typedef {object} CharacterSheetTabHeaderButtonProps
+    * @property {string} [label] The label text for the button.
+    * @property {string} [icon] The icon class for the button.
+    * @property {boolean} [disabled] Whether the button is disabled.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] Callback invoked when the button is clicked.
+    */
 
-   /** @type {((event: MouseEvent) => void) | undefined} Callback invoked when the button is clicked. */
-   export let onclick = void 0;
+   /** @type {CharacterSheetTabHeaderButtonProps} */
+   const { label = undefined, icon = undefined, disabled = undefined, onclick = undefined } = $props();
 </script>
 
 <MiniButton {disabled} {onclick}>
