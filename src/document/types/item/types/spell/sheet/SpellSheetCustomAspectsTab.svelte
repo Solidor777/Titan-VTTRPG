@@ -15,21 +15,23 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Initialize filtered entries.
+   // Indices of custom aspects matching the filter, recomputed on document/filter change.
    /** @type {*[]} */
-   let filteredEntries = [];
-   $: {
-      filteredEntries = [];
+   const filteredEntries = $derived.by(() => {
+      /** @type {*[]} The matching indices. */
+      const result = [];
       document.data.system.customAspect.forEach((entry, idx) => {
          if (
             entry.label
                .toLowerCase()
                .indexOf($appState.tabs.customAspects.filter.toLowerCase()) !== -1
          ) {
-            filteredEntries.push(idx);
+            result.push(idx);
          }
       });
-   }
+
+      return result;
+   });
 </script>
 
 <div class="tab">

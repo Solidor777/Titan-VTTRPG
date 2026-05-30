@@ -14,7 +14,7 @@ under "Accepted debt" are documented decisions to NOT change, with rationale.
   - `src/document/types/actor/sheet/ActorSheetImportActorButton.svelte`
   - `src/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte`
   - `src/document/types/actor/sheet/ActorSheetUnlinkTokenButton.svelte`
-- [ ] **`$:` reactive block → `$derived.by(...)`** (also flips these two components from legacy
+- [x] **`$:` reactive block → `$derived.by(...)`** (also flips these two components from legacy
   mode to runes mode — they currently use neither `$props` nor `$state`):
   - `src/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte`
   - `src/document/types/item/types/spell/sheet/SpellSheetCustomAspectsTab.svelte`

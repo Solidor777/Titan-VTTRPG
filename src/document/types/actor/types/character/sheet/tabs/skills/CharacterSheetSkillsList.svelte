@@ -11,22 +11,22 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Filtered Skill list.
+   // Filtered Skill list, recomputed whenever the document or the skills filter changes.
    /** @type {*[]} */
-   let filteredList = [];
-   $: {
+   const filteredList = $derived.by(() => {
       // Get skills whose name matches the filter.
       const skillList = Object.entries(document.data.system.skill);
       const filter = $appState.tabs.skills.filter.toLowerCase();
-      filteredList = skillList.filter(([key]) => localize(key).toLowerCase().includes(filter));
+      let result = skillList.filter(([key]) => localize(key).toLowerCase().includes(filter));
 
-      // If no skill names match, look for skills with matching default.
-      // attributes.
-      if (filteredList.length === 0) {
-         filteredList = skillList.filter((skill) =>
+      // If no skill names match, look for skills with matching default attributes.
+      if (result.length === 0) {
+         result = skillList.filter((skill) =>
             localize(skill.defaultAttribute).toLowerCase().includes(filter));
       }
-   }
+
+      return result;
+   });
 </script>
 
 <ol>
