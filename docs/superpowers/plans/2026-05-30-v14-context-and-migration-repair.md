@@ -674,7 +674,35 @@ Append the findings as a checklist to this plan under "Audit Findings" (below). 
 
 ### Audit Findings
 
-_(Populated by Task 7. Each item: `file:line` — description — fix.)_
+Confirmed against v14 source unless noted. Checkboxes track Task 8 fixes.
+
+**Category 5 — Hook renames (high impact; hooks never fire in v14, bodies use jQuery):**
+- [ ] `src/index.js:19` + `src/hooks/OnGetActorDirectoryEntryContext.js` — `getActorDirectoryEntryContext` → **`getActorContextOptions`**; replace jQuery `element.data('document-id')` with `element.closest('[data-entry-id]').dataset.entryId`.
+- [ ] `src/index.js:21` + `src/hooks/OnGetItemDirectoryEntryContext.js` — `getItemDirectoryEntryContext` → **`getItemContextOptions`**; same id/jQuery fix.
+- [ ] `src/index.js:20` + `src/hooks/OnGetChatLogEntryContext.js` — `getChatLogEntryContext` → **`getChatMessageContextOptions`**; callback receives HTMLElement `<li>`.
+- [ ] `src/index.js:24` + `src/hooks/OnRenderJournalSheet.js` — `renderJournalSheet` → **`renderJournalEntrySheet`**; jQuery `.find/.addClass` → `element.closest`/`classList.add`.
+- [ ] `src/index.js:25` + `src/hooks/OnRenderJournalTextPageSheet.js` — `renderJournalTextPageSheet` → **`renderJournalEntryPageProseMirrorSheet`**; jQuery → DOM.
+
+**Category 4 — AppV1 patterns on AppV2 sheets:**
+- [x] `src/document/types/actor/sheet/TitanActorSheet.js:48` — V1 `static get defaultOptions()` ignored by AppV2 (width 750 lost) → `static DEFAULT_OPTIONS = { position: { width: 750 } }`. **[user-reported: sheets too small]**
+- [x] `src/document/types/item/sheet/TitanItemSheet.js:38` — same (height 650 lost) → `static DEFAULT_OPTIONS = { position: { height: 650 } }`. **[user-reported]**
+- [x] `src/document/types/actor/sheet/TitanActorSheet.js:128` — `close()` assigns `this.options.token = null`; v14 freezes `this.options` → "token is read-only". **[user-reported: compendium sheet won't close]**
+- [ ] `TitanActorSheet._getHeaderButtons` / `TitanItemSheet._getHeaderButtons` — AppV2 has no `_getHeaderButtons`; header API is `_getHeaderControls()`. Custom header buttons (token edit/link/unlink, import, send-to-chat) are absent. The `{ svelte: { class } }` button shape has no v14 consumer — needs re-implementation (header controls or in-shell). *Larger fix; needs design.*
+- [ ] `src/document/types/actor/sheet/ActorSheetEditTokenButton.svelte:18,24` — calls `application.getDialogRenderOptions()` (undefined) → throws once the button is wired.
+
+**Category 3 — TextEditor / enrichHTML (high impact — all rich text broken):**
+- [ ] `src/helpers/svelte-components/RichText.svelte:16` — `TextEditor.enrichHTML(...,{async:false})` is async in v14 → renders `[object Promise]`. Enrich in an `$effect`/await into `$state`; use `foundry.applications.ux.TextEditor.implementation.enrichHTML`.
+- [ ] `src/helpers/svelte-components/RichText.svelte:16`, `src/document/types/actor/sheet/TitanActorSheet.js:299` — bare global `TextEditor` is a deprecation shim → use `foundry.applications.ux.TextEditor.implementation.*`.
+
+**Category 2 — FilePicker:**
+- [ ] `src/helpers/svelte-components/input/ImagePicker.svelte:30` — `new foundry.applications.apps.FilePicker(...)` → `...FilePicker.implementation(...)`.
+- [ ] `src/helpers/svelte-components/input/ImagePicker.svelte:39` — `application.options.width` is undefined on AppV2 → use `application.position.width`.
+
+**Category 8 — Other:**
+- [ ] `src/system/Conditions.js:13-64` — status effects use `icon:`; v14 removed the `icon` fallback and reads `status.img` → condition icons don't render. Rename `icon:` → `img:`.
+
+**Latent (not a current break):**
+- [ ] `src/hooks/OnRenderChatMessageHTML.js:60` — chat mount provides no `application` context. Safe today (no chat consumer of `getApplication()`); add defensively if any chat component starts using it.
 
 ---
 
