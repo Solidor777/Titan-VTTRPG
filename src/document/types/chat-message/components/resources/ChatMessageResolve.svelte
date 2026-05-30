@@ -11,6 +11,6 @@
 <ChatResource
    icon={RESOLVE_ICON}
    label={localize('resolve')}
-   max={$document.flags.titan.resolve.max}
-   value={$document.flags.titan.resolve.value}
+   max={document.data.flags.titan.resolve.max}
+   value={document.data.flags.titan.resolve.value}
 />

@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('resolveRegain.desc')}</p>`;
 
       // Equipment.
-      if ($document.flags.titan.resolveRegain.equipment) {
-         retVal += `<p>${localize('equipment')}: ${$document.flags.titan.resolveRegain.equipment}</p>`;
+      if (document.data.flags.titan.resolveRegain.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.resolveRegain.equipment}</p>`;
       }
 
       // Abilities.
-      if ($document.flags.titan.resolveRegain.ability) {
-         retVal += `<p>${localize('abilities')}: ${$document.flags.titan.resolveRegain.ability}</p>`;
+      if (document.data.flags.titan.resolveRegain.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.resolveRegain.ability}</p>`;
       }
 
       // Effects.
-      if ($document.flags.titan.resolveRegain.effect) {
-         retVal += `<p>${localize('effects')}: ${$document.flags.titan.resolveRegain.effect}</p>`;
+      if (document.data.flags.titan.resolveRegain.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.resolveRegain.effect}</p>`;
       }
 
       return retVal;
@@ -42,21 +42,21 @@
    async function confirm() {
       // If we own this chat message and the associated actor.
       if (assert(
-         $document?.isOwner,
+         document.data?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Restore resolve to the actor.
             await actor.system.regainResolve(
-               $document.flags.titan.resolveRegain.total,
+               document.data.flags.titan.resolveRegain.total,
                { report: false },
             );
 
             // Update the chat message.
-            await $document.update({
+            await document.data.update({
                flags: {
                   titan: {
                      resolveRegain: { confirmed: true },
@@ -71,7 +71,7 @@
 
 <ChatMessageResourceModButton
    icon={REGAIN_RESOLVE_ICON}
-   label={localize('regainX%Resolve').replace('X%', $document.flags.titan.resolveRegain.total)}
+   label={localize('regainX%Resolve').replace('X%', document.data.flags.titan.resolveRegain.total)}
    tooltip={getTooltip()}
    confirmFn={confirm}
 />

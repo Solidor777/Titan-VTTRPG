@@ -11,6 +11,6 @@
 <ChatResource
    icon={ARMOR_ICON}
    label={localize('armor')}
-   max={$document.flags.titan.armor.max}
-   value={$document.flags.titan.armor.value}
+   max={document.data.flags.titan.armor.max}
+   value={document.data.flags.titan.armor.value}
 />

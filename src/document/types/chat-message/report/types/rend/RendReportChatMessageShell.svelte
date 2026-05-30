@@ -15,7 +15,7 @@
    const sections = [];
 
    // Add wounds if appropriate.
-   if ($document.flags.titan.armor) {
+   if (document.data.flags.titan.armor) {
       sections.push(ChatMessageArmor);
    }
 </script>

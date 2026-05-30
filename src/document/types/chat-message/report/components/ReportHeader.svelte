@@ -16,13 +16,13 @@
 
 <div class="header">
    <!--Img-->
-   <img alt="img" src={$document.flags.titan.img}/>
+   <img alt="img" src={document.data.flags.titan.img}/>
 
    <!--Header-->
    <div class="label">
       <!--Sub Header-->
       <div class="name">
-         {$document.flags.titan.name}
+         {document.data.flags.titan.name}
       </div>
 
       <!--Main Header-->

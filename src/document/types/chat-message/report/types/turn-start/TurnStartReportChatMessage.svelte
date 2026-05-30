@@ -37,29 +37,29 @@
    const sections = [];
 
    // Add Stamina if appropriate.
-   if ($document.flags.titan.stamina) {
+   if (document.data.flags.titan.stamina) {
       sections.push(ChatMessageStamina);
    }
 
    // Add Wounds if appropriate.
-   if ($document.flags.titan.wounds) {
+   if (document.data.flags.titan.wounds) {
       sections.push(ChatMessageWounds);
    }
 
    // Add Resolve if appropriate.
-   if ($document.flags.titan.resolve) {
+   if (document.data.flags.titan.resolve) {
       sections.push(ChatMessageResolve);
    }
 
    // Add effects.
-   if ($document.flags.titan.effects) {
+   if (document.data.flags.titan.effects) {
       sections.push({
          component: ChatMessageEffectsTags,
          isTags: true,
       });
 
       // Add message if the expired effects were removed.
-      if ($document.flags.titan.expiredEffectsRemoved === true) {
+      if (document.data.flags.titan.expiredEffectsRemoved === true) {
          sections.push(ChatMessageExpiredEffectsRemovedMessage);
       }
 
@@ -70,10 +70,10 @@
    }
 
    // Add fast healing information if appropriate.
-   if ($document.flags.titan.fastHealing) {
+   if (document.data.flags.titan.fastHealing) {
 
       // Add fast healing Tag if confirmed.
-      if ($document.flags.titan.fastHealing.confirmed) {
+      if (document.data.flags.titan.fastHealing.confirmed) {
          sections.push(ChatMessageFastHealingTag);
       }
 
@@ -84,10 +84,10 @@
    }
 
    // Add fast persistent damage information if appropriate.
-   if ($document.flags.titan.persistentDamage) {
+   if (document.data.flags.titan.persistentDamage) {
 
       // Add persistent damage Tag if confirmed.
-      if ($document.flags.titan.persistentDamage.confirmed) {
+      if (document.data.flags.titan.persistentDamage.confirmed) {
          sections.push(ChatMessagePersistentDamageTag);
       }
 
@@ -98,10 +98,10 @@
    }
 
    // Add resolve regain information if appropriate.
-   if ($document.flags.titan.resolveRegain) {
+   if (document.data.flags.titan.resolveRegain) {
 
       // Add resolve regain Tag if confirmed.
-      if ($document.flags.titan.resolveRegain.confirmed) {
+      if (document.data.flags.titan.resolveRegain.confirmed) {
          sections.push(ChatMessageResolveRegainTag);
       }
 
@@ -112,7 +112,7 @@
    }
 
    // Add messages if appropriate.
-   if ($document.flags.titan.message) {
+   if (document.data.flags.titan.message) {
       sections.push({
          component: ChatMessageRichTextMessages,
          isRichText: true,

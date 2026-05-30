@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment.
-      if ($document.flags.titan.persistentDamage.equipment) {
-         retVal += `<p>${localize('equipment')}: ${$document.flags.titan.persistentDamage.equipment}</p>`;
+      if (document.data.flags.titan.persistentDamage.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.persistentDamage.equipment}</p>`;
       }
 
       // Abilities.
-      if ($document.flags.titan.persistentDamage.ability) {
-         retVal += `<p>${localize('abilities')}: ${$document.flags.titan.persistentDamage.ability}</p>`;
+      if (document.data.flags.titan.persistentDamage.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.persistentDamage.ability}</p>`;
       }
 
       // Effects.
-      if ($document.flags.titan.persistentDamage.effect) {
-         retVal += `<p>${localize('effects')}: ${$document.flags.titan.persistentDamage.effect}</p>`;
+      if (document.data.flags.titan.persistentDamage.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.persistentDamage.effect}</p>`;
       }
 
       return retVal;
@@ -42,16 +42,16 @@
    async function confirm() {
       // If we own this chat message and the associated actor.
       if (assert(
-         $document?.isOwner,
+         document.data?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Apply persistent damage to the actor, bypassing armor.
             await actor.system.applyDamage(
-               $document.flags.titan.persistentDamage.total,
+               document.data.flags.titan.persistentDamage.total,
                {
                   report: false,
                   ignoreArmor: true,
@@ -59,7 +59,7 @@
             );
 
             // Update the chat message.
-            await $document.update({
+            await document.data.update({
                flags: {
                   titan: {
                      persistentDamage: { confirmed: true },
@@ -75,7 +75,7 @@
 
 <ChatMessageResourceModButton
    icon={PERSISTENT_DAMAGE_ICON}
-   label={localize('applyX%Damage').replace('X%', $document.flags.titan.persistentDamage.total)}
+   label={localize('applyX%Damage').replace('X%', document.data.flags.titan.persistentDamage.total)}
    tooltip={getTooltip()}
    confirmFn={confirm}
 />

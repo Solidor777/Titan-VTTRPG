@@ -8,7 +8,7 @@
 
 <div class="effects">
    <!--Expired Effects-->
-   {#each $document.flags.titan.effects.expired as effect}
+   {#each document.data.flags.titan.effects.expired as effect}
       <div class="effect">
          <ChatExpiredEffectTag
             label={effect.label}

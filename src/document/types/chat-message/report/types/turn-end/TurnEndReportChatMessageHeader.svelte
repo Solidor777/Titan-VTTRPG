@@ -11,6 +11,6 @@
 <ReportChatMessageHeader
    headerIcon={TURN_END_ICON}
    headerLabel={localize('turnEnd')}
-   images={[$document.flags.titan.actorImg]}
-   subHeaderLabels={[$document.flags.titan.actorName]}
+   images={[document.data.flags.titan.actorImg]}
+   subHeaderLabels={[document.data.flags.titan.actorName]}
 />

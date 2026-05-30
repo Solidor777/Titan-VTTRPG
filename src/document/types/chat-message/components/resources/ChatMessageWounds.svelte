@@ -11,6 +11,6 @@
 <ChatResource
    icon={WOUNDS_ICON}
    label={localize('wounds')}
-   max={$document.flags.titan.wounds.max}
-   value={$document.flags.titan.wounds.value}
+   max={document.data.flags.titan.wounds.max}
+   value={document.data.flags.titan.wounds.value}
 />

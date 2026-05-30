@@ -16,8 +16,8 @@
    const sections = [ChatMessageResolve];
 
    // Add resolve shortage message if appropriate.
-   if ($document.flags.titan.resolveShortage) {
-      sections.unshift(localize('needX%MoreResolve').replace('X%', $document.flags.titan.resolveShortage));
+   if (document.data.flags.titan.resolveShortage) {
+      sections.unshift(localize('needX%MoreResolve').replace('X%', document.data.flags.titan.resolveShortage));
    }
 </script>
 

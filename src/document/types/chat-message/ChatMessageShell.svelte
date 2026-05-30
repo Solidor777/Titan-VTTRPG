@@ -64,7 +64,7 @@
     * @returns {object | undefined} The Svelte component constructor for the current message type.
     */
    function selectComponent() {
-      if (game.user.isGM || !$document.blind) {
+      if (game.user.isGM || !document.data.blind) {
          const chatComponents = {
             attributeCheck: AttributeCheckChatMessage,
             resistanceCheck: ResistanceCheckChatMessage,
@@ -93,13 +93,13 @@
             rendReport: RendReportChatMessage,
             repairsReport: RepairsReportChatMessageShell,
          };
-         return chatComponents[$document.flags.titan.type];
+         return chatComponents[document.data.flags.titan.type];
       }
       return PrivateRollChatMessage;
    }
 </script>
 
-{#if $document}
+{#if document.data}
    {@const SelectedComponent = selectComponent()}
    {#if SelectedComponent}
       <div>

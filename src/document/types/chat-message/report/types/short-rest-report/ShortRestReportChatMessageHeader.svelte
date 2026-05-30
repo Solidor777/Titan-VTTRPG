@@ -14,6 +14,6 @@
 <ReportChatMessageHeader
    headerIcon={SHORT_REST_ICON}
    {headerLabel}
-   images={[$document.flags.titan.actorImg]}
-   subHeaderLabels={[$document.flags.titan.actorName]}
+   images={[document.data.flags.titan.actorImg]}
+   subHeaderLabels={[document.data.flags.titan.actorName]}
 />
