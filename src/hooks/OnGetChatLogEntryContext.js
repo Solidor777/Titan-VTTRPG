@@ -23,7 +23,7 @@ export default function onGetChatLogEntryContext(_application, options) {
    // Re-roll Failures (Spend Resolve).
    const reRollFailureOptions = [
       {
-         name: localize('reRollFailuresSpendResolve'),
+         label: localize('reRollFailuresSpendResolve'),
          icon: `<i class="${DICE_ICON}"></i>`,
          visible: canReRollFailures,
          onClick: (_event, li) => reRollFailures(li, true),
@@ -33,7 +33,7 @@ export default function onGetChatLogEntryContext(_application, options) {
    // Re-roll Failures without spending resolve.
    if (game.user.isGM || !autoSpendResolveReRollFailuresEnabled) {
       reRollFailureOptions.unshift({
-         name: localize('reRollFailures'),
+         label: localize('reRollFailures'),
          icon: `<i class="${DICE_ICON}"></i>`,
          visible: canReRollFailures,
          onClick: (_event, li) => reRollFailures(li, false),
@@ -43,7 +43,7 @@ export default function onGetChatLogEntryContext(_application, options) {
    // Double Expertise (Spend Resolve).
    const doubleExpertiseOptions = [
       {
-         name: localize('doubleExpertiseSpendResolve'),
+         label: localize('doubleExpertiseSpendResolve'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
          visible: canDoubleExpertise,
          onClick: (_event, li) => doubleExpertise(li, true),
@@ -53,7 +53,7 @@ export default function onGetChatLogEntryContext(_application, options) {
    // Double Expertise without spending resolve.
    if (game.user.isGM || !autoSpendResolveDoubleExpertiseEnabled) {
       doubleExpertiseOptions.unshift({
-         name: localize('doubleExpertise'),
+         label: localize('doubleExpertise'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
          visible: canDoubleExpertise,
          onClick: (_event, li) => doubleExpertise(li, false),
@@ -63,7 +63,7 @@ export default function onGetChatLogEntryContext(_application, options) {
    // Double Training (Spend Resolve).
    const doubleTrainingOptions = [
       {
-         name: localize('doubleTrainingSpendResolve'),
+         label: localize('doubleTrainingSpendResolve'),
          icon: `<i class="${TRAINING_ICON}"></i>`,
          visible: canDoubleTraining,
          onClick: (_event, li) => doubleTraining(li, true),
@@ -73,7 +73,7 @@ export default function onGetChatLogEntryContext(_application, options) {
    // Double Training without spending resolve.
    if (game.user.isGM || !autoSpendResolveDoubleTrainingEnabled) {
       doubleTrainingOptions.push({
-         name: localize('doubleTraining'),
+         label: localize('doubleTraining'),
          icon: `<i class="${TRAINING_ICON}"></i>`,
          visible: canDoubleTraining,
          onClick: (_event, li) => doubleTraining(li, false),

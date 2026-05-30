@@ -14,7 +14,7 @@ export default function onGetItemDirectoryEntryContext(_application, options) {
 
    // Regenerate UUID.
    options.push({
-      name: localize('regenerateUUID'),
+      label: localize('regenerateUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
       visible: (li) => isItemOwner(li),
       onClick: (_event, li) => onRegenerateDocumentUUID(getItem(li)),
@@ -22,7 +22,7 @@ export default function onGetItemDirectoryEntryContext(_application, options) {
 
    // Edit UUID.
    options.push({
-      name: localize('editUUID'),
+      label: localize('editUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
       visible: (li) => isItemOwner(li),
       onClick: (_event, li) => onEditDocumentUUID(getItem(li)),
