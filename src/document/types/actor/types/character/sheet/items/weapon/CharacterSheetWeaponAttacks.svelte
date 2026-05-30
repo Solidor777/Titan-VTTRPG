@@ -2,8 +2,13 @@
    import CharacterSheetWeaponAttack
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte';
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetWeaponAttacksProps
+    * @property {TitanItem} [item] The Item this component belongs to.
+    */
+
+   /** @type {CharacterSheetWeaponAttacksProps} */
+   const { item = undefined } = $props();
 </script>
 
 <!--Attacks list-->

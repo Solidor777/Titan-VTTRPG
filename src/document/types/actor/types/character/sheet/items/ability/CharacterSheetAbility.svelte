@@ -18,15 +18,18 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetAbilityProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetAbilityProps} */
+   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
-   <svelte:fragment slot="controls">
+   {#snippet controls()}
       <!--Check-->
       {#if item.system.check.length > 0}
          <div class="button">
@@ -48,7 +51,7 @@
       <div class="button">
          <CharacterSheetItemDeleteButton itemId={item._id}/>
       </div>
-   </svelte:fragment>
+   {/snippet}
 
    <!--Item Checks-->
    {#if item.system.check.length > 0}

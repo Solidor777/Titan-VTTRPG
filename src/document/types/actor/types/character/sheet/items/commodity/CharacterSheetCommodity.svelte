@@ -17,15 +17,18 @@
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetCommodityProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetCommodityProps} */
+   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
-   <svelte:fragment slot="controls">
+   {#snippet controls()}
       <!--Quantity-->
       <div class="field">
          <IntegerIncrementInput
@@ -54,7 +57,7 @@
       <div class="button">
          <CharacterSheetItemDeleteButton itemId={item._id}/>
       </div>
-   </svelte:fragment>
+   {/snippet}
 
    <!--Item Checks-->
    {#if item.system.check.length > 0}

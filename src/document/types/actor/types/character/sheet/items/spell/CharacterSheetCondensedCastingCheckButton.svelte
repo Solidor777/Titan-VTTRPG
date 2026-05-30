@@ -3,8 +3,13 @@
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
 
-   /** @type {string} The ID of the Item to get the check from. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetCondensedCastingCheckButtonProps
+    * @property {string} [itemId] The ID of the Item to get the check from.
+    */
+
+   /** @type {CharacterSheetCondensedCastingCheckButtonProps} */
+   const { itemId = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -15,25 +20,23 @@
    };
 
    /** @type {CastingCheckParameters} Calculated check parameters. */
-   let checkParameters;
+   let checkParameters = $derived.by(() => {
 
-   /** @type {string} Calculated tooltipAction. */
-   let tooltip;
-
-   // Update the svelte-components in response to changes.
-   $: {
       // Ensure the item is valid.
       if ($document.items.get(itemId)) {
 
          // Update the parameters.
-         checkParameters = $document.system.getCastingCheckParameters(
+         return $document.system.getCastingCheckParameters(
             $document.system.initializeCastingCheckOptions(checkOptions)
          );
-
-         // Update the tooltipAction.
-         tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
-   }
+      return undefined;
+   });
+
+   /** @type {string} Calculated tooltipAction. */
+   let tooltip = $derived(
+      checkParameters ? getAttributeCheckParametersTooltip(checkParameters) : undefined
+   );
 </script>
 <CondensedCheckButton
    attribute={checkParameters.attribute}

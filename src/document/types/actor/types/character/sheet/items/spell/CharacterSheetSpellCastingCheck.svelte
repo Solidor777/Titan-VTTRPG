@@ -9,8 +9,13 @@
    } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetSpellCastingCheckProps
+    * @property {TitanItem} [item] The Item this component belongs to.
+    */
+
+   /** @type {CharacterSheetSpellCastingCheckProps} */
+   const { item = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -21,19 +26,18 @@
    };
 
    /** @type {CastingCheckParameters} Calculated check parameters. */
-   let checkParameters;
+   let checkParameters = $derived.by(() => {
 
-   // Update the svelte-components in response to changes.
-   $: {
       // Ensure the item is still valid.
       if ($document.items.get(item._id)) {
 
          // Update the parameters.
-         checkParameters = $document.system.getCastingCheckParameters(
+         return $document.system.getCastingCheckParameters(
             $document.system.initializeCastingCheckOptions(checkOptions)
          );
       }
-   }
+      return undefined;
+   });
 </script>
 
 <div class="check">

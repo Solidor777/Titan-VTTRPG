@@ -20,25 +20,21 @@
    import CharacterSheetCondensedCastingCheckButton
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetSpellProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetSpellProps} */
+   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 
    /** @type {SpellAspect[]} List of enabled Spell Aspects. */
-   let enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
-
-   // Update enabled aspects in response to changes.
-   $: {
-      if (item) {
-         enabledAspects = item.system.aspect.filter((aspect) => aspect.enabled);
-      }
-   }
+   let enabledAspects = $derived(item.system.aspect.filter((aspect) => aspect.enabled));
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
-   <svelte:fragment slot="controls">
+   {#snippet controls()}
       <!--Cast Spell-->
       <div class="button">
          <CharacterSheetCondensedCastingCheckButton itemId={item._id}/>
@@ -58,7 +54,7 @@
       <div class="button">
          <CharacterSheetItemDeleteButton itemId={item._id}/>
       </div>
-   </svelte:fragment>
+   {/snippet}
 
    <!--Item Check Data-->
    <div class="section tags">

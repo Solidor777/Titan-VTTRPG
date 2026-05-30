@@ -9,8 +9,13 @@
       UNCHECKED_ICON,
    } from '~/system/Icons.js';
 
-   /** @type {TitanItem} The Item this component belongs to. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetWeaponMultiAttackButtonProps
+    * @property {TitanItem} [item] The Item this component belongs to.
+    */
+
+   /** @type {CharacterSheetWeaponMultiAttackButtonProps} */
+   const { item = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -18,7 +23,7 @@
 
 <DocumentOwnerButton onclick={() => $document.system.toggleMultiAttack(item._id)}>
    <div class="button-inner">
-      <i class={item.system.multiAttack ? MULTI_ATTACK_ICON : NO_MULTI_ATTCK_ICON}/>
+      <i class={item.system.multiAttack ? MULTI_ATTACK_ICON : NO_MULTI_ATTCK_ICON}></i>
       <div class="label">
          <Text text="multiAttack"/>
       </div>
@@ -26,7 +31,7 @@
          class={item.system.multiAttack
             ? CHECKED_ICON
             : UNCHECKED_ICON}
-      />
+      ></i>
    </div>
 </DocumentOwnerButton>
 
