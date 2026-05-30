@@ -15,12 +15,14 @@ user confirmation it creates an `AttributeCheckDialog`; otherwise it calls `roll
 (src/check/types/attribute-check/dialog/AttributeCheckDialog.js,
 src/check/dialog/CheckDialogShell.svelte,
 src/check/types/attribute-check/dialog/AttributeCheckDialogShell.svelte)
-`AttributeCheckDialog` extends `TitanDialog`; it passes two `writable` stores (`checkOptions`,
-`checkParameters`) as props to `CheckDialogShell.svelte`, which sets them into Svelte context and delegates
-rendering to the type-specific shell (`AttributeCheckDialogShell`). The inner shell runs a reactive block
-(`$:`) that calls `actor.system.getAttributeCheckParameters($checkOptions)` on every options change to keep
-the displayed totals live. When the Roll button fires, the inner shell calls
-`actor.system.rollAttributeCheck($checkOptions)` directly on the actor's data model, and the dialog closes.
+`AttributeCheckDialog` extends `TitanDialog` (a `foundry.applications.api.ApplicationV2`); it passes
+`content: { class: CheckDialogShell, props: { shell, actor, checkOptions: writable(...),
+checkParameters: writable(...) } }`. On first render `TitanDialog._replaceHTML` mounts `CheckDialogShell`
+with Svelte 5 `mount()`. `CheckDialogShell` sets the two stores into Svelte context and delegates rendering
+to the type-specific shell (`AttributeCheckDialogShell`). The inner shell recomputes the displayed totals
+from `actor.system.getAttributeCheckParameters($checkOptions)` whenever the options change. When the Roll
+button fires, the inner shell calls `actor.system.rollAttributeCheck($checkOptions)` directly on the actor's
+data model, and the dialog closes.
 
 **3. Parameters & check instantiation — `CharacterDataModel.rollAttributeCheck`**
 `rollAttributeCheck` is the entry point for the actual roll. It validates the options, calls
@@ -44,16 +46,19 @@ calls `ChatMessage.create({ flags: { titan: messageData }, ... })`. All check da
 `flags.titan`.
 
 **6. Chat render — `onRenderChatMessageHTML` hook (src/hooks/OnRenderChatMessageHTML.js)**
-Foundry fires `renderChatMessageHTML` after inserting the message HTML. The hook checks
-`message.flags.titan.type`; if it is a known Titan type, it wraps the document in a `TJSDocument` store and
-mounts `ChatMessageShell.svelte` (src/document/types/chat-message/ChatMessageShell.svelte) into the
-`.message-content` element. The shell sets the store into context as `'document'` and calls
-`selectComponent()` to look up the correct component for the type (e.g. `AttributeCheckChatMessage`), then
-renders it via `<svelte:component this={...}/>`.
+Foundry fires `renderChatMessageHTML` (v13+) after inserting the message HTML. The hook checks
+`message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches, it builds a
+`new ReactiveDocument(message)` bridge and mounts `ChatMessageShell.svelte`
+(src/document/types/chat-message/ChatMessageShell.svelte) into the `.message-content` element via Svelte 5
+`mount()`, passing the bridge as the `documentStore` prop. The mount handle and bridge are stored on
+`message._svelteComponent = { handle, bridge }` for teardown in `OnPreDeleteChatMessage.js`. The shell sets
+the bridge into context as `'document'` and `selectComponent()` looks up the correct component for the type
+(e.g. `AttributeCheckChatMessage`), which is then rendered via `{@const}` (not `<svelte:component>`).
 
 **7. Check chat component — e.g. `AttributeCheckChatMessage.svelte`**
 (src/check/types/attribute-check/chat-message/AttributeCheckChatMessage.svelte)
-Reads `$document.flags.titan.results` and `$document.flags.titan.parameters` from context. Composes the
+Reads `document.data.flags.titan.results` and `document.data.flags.titan.parameters` from the `document`
+context bridge. Composes the
 header, dice display (`CheckChatMessageDice.svelte`), results (`CheckChatResults.svelte`), and — when
 relevant — action buttons.
 
@@ -74,52 +79,54 @@ Two button patterns coexist:
 
 **1. Application construction — `TitanDocumentSheet` → subclass chain**
 (src/document/sheet/TitanDocumentSheet.js)
-`TitanDocumentSheet` extends TyphonJS `SvelteApplication`. In its constructor it calls `super(options)` with
-`svelte: { class: DocumentSheetShell, target: document.body, props: { document: null, applicationState: null } }`.
-It then wraps the raw Foundry document in `new TJSDocument(document, { delete: this.close.bind(this) })` and
-stores it in `options.svelte.props.document`. It also calls `_createReactiveState()` (overridden in
-`TitanCharacterSheet`) and stores the result in `options.svelte.props.applicationState`.
+`TitanDocumentSheet` extends Foundry v14 `DocumentSheetV2`. Its constructor calls
+`super(foundry.utils.mergeObject(options, { document: sheetDocument }))` (DocumentSheetV2 exposes the
+document via the read-only `this.document` getter), then builds `this.#bridge = new ReactiveDocument(
+sheetDocument)` and `this.applicationState = this._createReactiveState()`. The inner shell component is
+supplied by the per-type subclass on `this.options.svelte.props.shell`.
 
 Subclass constructors extend this chain:
 `TitanPlayerSheet` → `TitanCharacterSheet` → `TitanActorSheet` → `TitanDocumentSheet`.
-`TitanPlayerSheet` adds `props.shell = PlayerSheetShell` to the svelte options so the
-`DocumentSheetShell` knows which inner component to render.
+`TitanPlayerSheet` sets `props.shell = PlayerSheetShell` so `DocumentSheetShell` knows which inner
+component to render.
 
-**2. Reactive state — `CharacterSheetState` (src/document/types/actor/types/character/sheet/
+**2. Reactive UI state — `CharacterSheetState` (src/document/types/actor/types/character/sheet/
 CharacterSheetState.js)**
-`TitanCharacterSheet._createReactiveState()` calls `createCharacterSheetState(actor)` which returns a plain
-Svelte `writable` store augmented with `postAddItem` / `preDeleteItem` methods. The store is passed into the
-Svelte tree as the `applicationState` prop and made available to all children via
-`setContext('applicationState', applicationState)` inside `DocumentSheetShell.svelte`.
+`TitanCharacterSheet._createReactiveState()` calls `createCharacterSheetState(actor)`, which returns a
+plain Svelte `writable` store augmented with `postAddItem` / `preDeleteItem` methods (still a store, not a
+rune). It is passed into the Svelte tree as the `applicationState` prop and made available to all children
+via `setContext('applicationState', applicationState)` inside `DocumentSheetShell.svelte`.
 
-**3. Mount — `DocumentSheetShell.svelte` (src/document/sheet/DocumentSheetShell.svelte)**
-TyphonJS instantiates this as the root component. It receives `document` (the `TJSDocument` store) and
-`applicationState` and calls `setContext('document', document)` / `setContext('applicationState',
-applicationState)` so every child component in the tree can read them via `getContext`. It wraps everything
-in `<ApplicationShell>` (TyphonJS runtime component that manages the window chrome) and renders
-`<svelte:component this={shell}/>` where `shell` is the type-specific sheet component.
+**3. Mount — `_replaceHTML` → `DocumentSheetShell.svelte`**
+On first render (`options.isFirstRender`), `TitanDocumentSheet._replaceHTML` calls Svelte 5 `mount(
+DocumentSheetShell, { target: content, props: { document: this.#bridge, applicationState, shell } })` and
+stores the handle. Subsequent ApplicationV2 renders are no-ops — reactivity is driven by the
+`ReactiveDocument` bridge, not the render cycle. `DocumentSheetShell` sets `document` (the bridge) and
+`applicationState` into context, then renders the shell via `{#if shell}{@const Shell = shell}<Shell />{/if}`.
 
 **4. Sheet body — e.g. `CharacterSheetBase.svelte`**
-Reads `$document` from context, gates all rendering behind `{#if $document}`, and composes the sidebar and
-body (`CharacterSheetSidebar`, `CharacterSheetTabs`). Tab/sidebar sub-components also call `getContext` to
-access the same `document` and `applicationState` stores.
+Reads the bridge with `const document = getContext('document')`, gates rendering behind
+`{#if document.data}`, and composes the sidebar and body (`CharacterSheetSidebar`, `CharacterSheetTabs`).
+Sub-components likewise call `getContext` and read `document.data.*`.
 
-**5. TJSDocument reactivity**
-`TJSDocument` is a TyphonJS wrapper around a Foundry document. Any time Foundry updates the document (via
-`document.update(...)`) the `TJSDocument` store notifies all Svelte subscribers automatically, causing
-reactive blocks and `$document` references to re-evaluate and the UI to re-render.
+**5. ReactiveDocument reactivity**
+`ReactiveDocument.data` registers a `createSubscriber()` reader and returns the live Foundry document. Any
+Foundry update (`document.data.update(...)`) — or an embedded item/effect CRUD operation — fires the hooks
+the subscriber registered (`update<DocumentName>`, `create/update/deleteItem`,
+`create/update/deleteActiveEffect`), invalidating every reactive reader so `document.data.*` references and
+`$derived` blocks re-run and the UI re-renders. Hooks tear down automatically when the sheet unmounts.
 
-**6. Subscription for title update**
-`TitanDocumentSheet.render()` subscribes to the `TJSDocument` store via `document.subscribe(
-_onDocumentUpdated)`, which keeps `this.reactive.title` in sync with the document name. On `close()`, it
-unsubscribes.
+**6. Teardown — `_onClose`**
+`TitanDocumentSheet._onClose` calls `super._onClose(options)`, `unmount(this.#mountHandle, { outro: true })`,
+and `this.#bridge?.destroy()` (a no-op — the subscriber already removed its hooks on unmount).
 
 **7. User edits flowing back to the document — two patterns**
 
 *Document-bound inputs* (src/document/svelte-components/input/):
 Components like `DocumentIntegerInput.svelte` and `DocumentBoundEditorInput.svelte` use `bind:value` to
-mirror the `$document.system.*` field, then call `refreshSystemDocument($document, disabled)`
-(src/helpers/utility-functions/RefreshSystemDocumentData.js) on `change` / `keyup`. That helper runs
+mirror the `document.data.system.*` field, then call `refreshSystemDocument(document.data, disabled)`
+(src/helpers/utility-functions/RefreshSystemDocumentData.js) on `change` / `keyup`. That helper guards on
+`!disabled && document?.isOwner`, then runs
 `document.update({ system: structuredClone(document.system), flags: structuredClone(document.flags) })`,
 writing the entire mutated system blob back to Foundry in one call.
 
@@ -218,7 +225,7 @@ emits `'combatPreviousTurn'` via socket. The `onCombatPreviousTurn` hook handler
 
 **Report chat components** (see `abstractions.md` → Chat messages & reports for the full component list):
 All turn reports are whispered to document owners only. Each report component reads from
-`$document.flags.titan` and displays the relevant changed resources or effect names. Revert report
+`document.data.flags.titan` and displays the relevant changed resources or effect names. Revert report
 components include buttons (`ReportConfirmApplyDamageButton`, `ReportConfirmResolveRegainButton`) allowing
 owners to confirm/re-apply the changes, which call the appropriate `actor.system.*` method and update the
 chat document flags to reflect the new resource state.
