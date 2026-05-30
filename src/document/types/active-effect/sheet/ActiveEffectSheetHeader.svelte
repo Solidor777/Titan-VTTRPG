@@ -23,7 +23,8 @@
    ];
 
    /**
-    * Whether this permanent effect is currently active, derived from the native disabled flag.
+    * Whether this effect is currently active, derived from the native disabled flag. Applies to every
+    * duration type; duration governs expiry only.
     * @type {boolean}
     */
    let isActive = $derived(!document.data.disabled);
@@ -96,24 +97,21 @@
             />
          </div>
       </div>
-   {:else}
-      <!--Active Toggle (permanent effects only)-->
-      <div
-         class="stat"
-         transition:slide|local
-      >
-         <div class="label">
-            {localize('active')}
-         </div>
-         <div class="input">
-            <CheckboxInput
-               disabled={!document.data.isOwner}
-               onchange={() => onToggleActive(!isActive)}
-               value={isActive}
-            />
-         </div>
-      </div>
    {/if}
+
+   <!--Active Toggle (all duration types)-->
+   <div class="stat">
+      <div class="label">
+         {localize('active')}
+      </div>
+      <div class="input">
+         <CheckboxInput
+            disabled={!document.data.isOwner}
+            onchange={() => onToggleActive(!isActive)}
+            value={isActive}
+         />
+      </div>
+   </div>
 </ItemSheetHeader>
 
 <style lang="scss">
