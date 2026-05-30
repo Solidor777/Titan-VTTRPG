@@ -5,20 +5,25 @@
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   /** @type {string[]} Header lines. */
-   export let headers = void 0;
+   /**
+    * @typedef {object} ConfirmationDialogShellProps
+    * @property {string[]} [headers] Header lines.
+    * @property {string} [message] Message explaining the dialog.
+    * @property {string} [confirmLabel] Label for the confirmation button.
+    */
 
-   /** @type {string} Message explaining the dialog. */
-   export let message = void 0;
-
-   /** @type {string} Label for the confirmation button. */
-   export let confirmLabel = void 0;
+   /** @type {ConfirmationDialogShellProps} */
+   const {
+      headers = undefined,
+      message = undefined,
+      confirmLabel = undefined,
+   } = $props();
 
    /** @type {ConfirmationDialog} The Svelte Component's Application. */
    const application = getApplication();
 
    /**
-    * Called when the confirmation button is clicked. /*.
+    * Called when the confirmation button is clicked.
     */
    function onConfirmed() {
       application.confirmationCallback();

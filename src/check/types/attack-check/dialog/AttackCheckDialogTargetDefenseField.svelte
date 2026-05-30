@@ -16,6 +16,5 @@
    input={IntegerInput}
    {inputProps}
    label={localize('targetDefense')}
-   on:change
    tooltip={'check.targetDefense.desc'}
 />

@@ -8,23 +8,26 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
-   /** @type {TitanItem} The Item being edited. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CreateItemMacroDialogShellProps
+    * @property {TitanItem} [item] The Item being edited.
+    * @property {number} [slot] Slot on the hotbar that the macro will be assigned to.
+    * @property {string} [uuid] UUID of the item that was dropped.
+    */
 
-   // Slot on the hotbar that the macro will be assigned to.
-   /** @type {number} */
-   export let slot = void 0;
-
-   // UUID of the item that was dropped.
-   /** @type {string} */
-   export let uuid = void 0;
+   /** @type {CreateItemMacroDialogShellProps} */
+   const {
+      item = undefined,
+      slot = undefined,
+      uuid = undefined,
+   } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    // Macro type.
    /** @type {string} */
-   let macroType = 'toggleDocumentSheet';
+   let macroType = $state('toggleDocumentSheet');
    const macroTypeOptions = [
       {
          value: 'toggleDocumentSheet',
@@ -34,11 +37,11 @@
 
    // Item check.
    /** @type {number} */
-   let itemCheckIdx = 0;
+   let itemCheckIdx = $state(0);
    /** @type {*[]} */
    const itemCheckOptions = [];
    // If the item has item checks.
-   if (item.system.check.length > 0) {
+   if (item?.system.check.length > 0) {
       // Add item check to the macro type options.
       macroTypeOptions.push({
          value: 'itemCheck',
@@ -57,10 +60,10 @@
 
    // Type-specific macro type.
    /** @type {number} */
-   let attackIdx = 0;
+   let attackIdx = $state(0);
    /** @type {*[]} */
    const attackOptions = [];
-   switch (item.type) {
+   switch (item?.type) {
       case 'weapon': {
          // If the item has attacks.
          if (item.system.attack.length > 0) {
@@ -112,7 +115,7 @@
 
    // ID method.
    /** @type {string} */
-   let idMethod = 'uuid';
+   let idMethod = $state('uuid');
    const idMethodOptions = [
       {
          value: 'uuid',
@@ -129,13 +132,16 @@
    ];
 
    // Macro image.
-   let img = item.img;
+   /** @type {string} */
+   let img = $state(item?.img);
 
    // Macro name.
-   let name = item.name;
+   /** @type {string} */
+   let name = $state(item?.name);
 
    /**
     * Creates the macro based on the current settings and assigns it to the hotbar slot.
+    * @returns {Promise<void>} Resolves when the macro is created and the dialog closes.
     */
    async function onCreateMacro() {
       let macro;

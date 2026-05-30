@@ -4,21 +4,27 @@
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   /** @type {TitanItem | TitanActor} The document to edit the UUID for. */
-   export let document = void 0;
+   /**
+    * @typedef {object} EditUUIDDialogShellProps
+    * @property {TitanItem | TitanActor} [document] The document to edit the UUID for.
+    */
+
+   /** @type {EditUUIDDialogShellProps} */
+   const { document: doc = undefined } = $props();
 
    /** @type {string | undefined} The UUID of the document. */
-   let uuid = document.flags?.titan?.uuid;
+   let uuid = $state(doc?.flags?.titan?.uuid);
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    /**
     * Applies the edited UUID to the document and closes the dialog.
+    * @returns {Promise<void>} Resolves when the update and close are complete.
     */
    async function onApplyEdits() {
-      if (document) {
-         document.update({
+      if (doc) {
+         doc.update({
             flags: {
                titan: {
                   uuid: uuid,
@@ -29,7 +35,7 @@
       ui.notifications.info(
          localize('editedUUIDForDocumentX%').replace(
             'X%',
-            document.name,
+            doc.name,
          ),
       );
       return application.close();
@@ -37,6 +43,7 @@
 
    /**
     * Cancels the edit and closes the dialog.
+    * @returns {Promise<void>} Resolves when the application closes.
     */
    async function onCancel() {
       return application.close();
@@ -47,11 +54,11 @@
    <!--Header-->
    <div class="header">
       <!--Image-->
-      <img alt={document.img} src={document.img}/>
+      <img alt={doc?.img} src={doc?.img}/>
 
       <!--Name-->
       <div class="name">
-         {document.name}
+         {doc?.name}
       </div>
    </div>
 

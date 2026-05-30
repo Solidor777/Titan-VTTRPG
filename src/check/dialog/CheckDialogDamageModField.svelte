@@ -12,6 +12,5 @@
    bind:value={$checkOptions.damageMod}
    input={IntegerInput}
    label={'damageMod'}
-   on:change
    tooltip={'check.damageMod.desc'}
 />

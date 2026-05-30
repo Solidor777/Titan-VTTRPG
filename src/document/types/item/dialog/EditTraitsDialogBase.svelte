@@ -9,28 +9,34 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 
-   /** @type {Item} The Item to edit the Traits of. */
-   export let item = void 0;
+   /**
+    * @typedef {object} EditTraitsDialogBaseProps
+    * @property {Item} [item] The Item to edit the Traits of.
+    * @property {object[]} [documentTraits] The traits to be edited.
+    * @property {object[]} [traitOptions] The traits to select from.
+    * @property {object} [traitDescriptions] Object containing a mapping of each trait to its description.
+    */
 
-   /** @type {object[]} The traits to be edited. */
-   export let documentTraits = void 0;
-
-   /** @type {object[]} The traits to select from. */
-   export let traitOptions = void 0;
-
-   /** @type {object} Object containing a mapping of each trait to its description. */
-   export let traitDescriptions = void 0;
+   /** @type {EditTraitsDialogBaseProps} */
+   let {
+      item = undefined,
+      documentTraits = $bindable(undefined),
+      traitOptions = $bindable(undefined),
+      traitDescriptions = undefined,
+   } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   // Initialize the value of each trait option to the current value of the.
+   // Initialize the value of each trait option to the current value of the
    // document's matching trait.
-   for (const trait of documentTraits) {
-      for (let idx = 0; idx < traitOptions.length; idx++) {
-         if (traitOptions[idx].name === trait.name) {
-            traitOptions[idx].value = trait.value;
-            break;
+   if (documentTraits && traitOptions) {
+      for (const trait of documentTraits) {
+         for (let idx = 0; idx < traitOptions.length; idx++) {
+            if (traitOptions[idx].name === trait.name) {
+               traitOptions[idx].value = trait.value;
+               break;
+            }
          }
       }
    }
@@ -42,8 +48,7 @@
       // If the document and traits are still valid.
       if (item && documentTraits) {
 
-         // Set the document's traits to equal the active traits from the trait.
-         // options.
+         // Set the document's traits to equal the active traits from the trait options.
          documentTraits = traitOptions.filter((trait) =>
             (typeof (trait.value) === 'boolean' && trait.value === true) ||
             (typeof (trait.value) === 'number' && trait.value > 0),
@@ -63,7 +68,7 @@
 <ol>
    {#each traitOptions as trait, idx}
       <!--Trait-->
-      <li use:tooltipAction={traitDescriptions[trait.name]}>
+      <li use:tooltipAction={traitDescriptions?.[trait.name]}>
 
          <!--Label-->
          <div class="label">

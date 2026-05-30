@@ -3,20 +3,28 @@
 <script>
    import { setContext } from 'svelte';
 
-   /** @type {writable} Store for the Check Options. */
-   export let checkOptions = void 0;
+   /**
+    * @typedef {object} CheckDialogShellProps
+    * @property {import('svelte/store').Writable} [checkOptions] Store for the Check Options.
+    * @property {import('svelte/store').Writable} [checkParameters] Store for the Check Parameters.
+    * @property {typeof import('svelte').SvelteComponent} [shell] Svelte component to attach to this dialog.
+    * @property {TitanActor} [actor] The actor that will roll the check.
+    */
 
-   /** @type {writable} Store for the Check Parameters. */
-   export let checkParameters = void 0;
-
-   /** @type {*} Svelte component to attach to this dialog. */
-   export let shell = void 0;
-
-   /** @type {TitanActor} The actor that will roll the check. */
-   export let actor = void 0;
+   /** @type {CheckDialogShellProps} */
+   const {
+      checkOptions = undefined,
+      checkParameters = undefined,
+      shell = undefined,
+      actor = undefined,
+   } = $props();
 
    // Setup context objects.
    setContext('checkOptions', checkOptions);
    setContext('checkParameters', checkParameters);
 </script>
-<svelte:component {actor} this={shell}/>
+
+{#if shell}
+   {@const Shell = shell}
+   <Shell {actor}/>
+{/if}

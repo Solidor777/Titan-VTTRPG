@@ -23,20 +23,25 @@
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import CheckDialogDamageModField from '~/check/dialog/CheckDialogDamageModField.svelte';
 
-   /** @type {TitanActor} The Actor that will roll the Check. */
-   export let actor = void 0;
+   /**
+    * @typedef {object} AttackCheckDialogShellProps
+    * @property {TitanActor} [actor] The Actor that will roll the Check.
+    */
 
-   /** @type {object} Reference to the Check Options store. */
+   /** @type {AttackCheckDialogShellProps} */
+   const { actor = undefined } = $props();
+
+   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {object} Reference to calculated Check Parameters Store. */
+   /** @type {import('svelte/store').Writable} Reference to calculated Check Parameters Store. */
    const checkParameters = getContext('checkParameters');
 
    /** @type {AttackCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {*[]} Components for changing the options and displaying the parameters. */
-   const rows = [
+   /** @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the parameters. */
+   let rows = $state([
       AttackCheckDialogMeleeField,
       AttackCheckDialogDefenseField,
       AttackCheckDialogAttackTypeField,
@@ -50,9 +55,11 @@
       CheckDialogDoubleExpertiseField,
       CheckDialogTotalDiceSummary,
       CheckDialogTotalExpertiseSummary,
-   ];
+   ]);
 
-   /** @type {Function} Called when the check becomes invalid. */
+   /**
+    * Called when the check becomes invalid.
+    */
    function onCheckInvalid() {
       ui.notifications.info(localize('attackCheckNoLongerValid'));
       warn(
@@ -63,7 +70,9 @@
       application.close();
    }
 
-   /** @type {Function} Called when the Roll button is clicked. */
+   /**
+    * Called when the Roll button is clicked.
+    */
    function onRoll() {
       if (actor?.system.validateAttackCheckOptions($checkOptions)) {
          actor.system.rollAttackCheck($checkOptions);
@@ -73,19 +82,21 @@
       }
    }
 
-   // Update the parameters whenever the check options are displayed.
-   $: {
+   // Update the parameters whenever the check options change.
+   $effect(() => {
       if (actor?.system.validateAttackCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getAttackCheckParameters($checkOptions);
       }
       else {
          onCheckInvalid();
       }
-   }
+   });
 
    // Update the first row whenever the attack type is changed.
-   $: rows[0] = $checkOptions.type === 'melee' ? AttackCheckDialogMeleeField : AttackCheckDialogAccuracyField;
+   $effect(() => {
+      rows[0] = $checkOptions.type === 'melee' ? AttackCheckDialogMeleeField : AttackCheckDialogAccuracyField;
+   });
 
 </script>
 
-<CheckDialogBase on:roll={onRoll} {rows}/>
+<CheckDialogBase onroll={onRoll} {rows}/>

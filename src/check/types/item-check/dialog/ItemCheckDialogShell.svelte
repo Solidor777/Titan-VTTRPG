@@ -16,19 +16,24 @@
    import warn from '~/helpers/utility-functions/Warn.js';
    import { getContext } from 'svelte';
 
-   /** @type {TitanActor} The Actor that will roll the Check. */
-   export let actor = void 0;
+   /**
+    * @typedef {object} ItemCheckDialogShellProps
+    * @property {TitanActor} [actor] The Actor that will roll the Check.
+    */
 
-   /** @type {object} Reference to the Check Options store. */
+   /** @type {ItemCheckDialogShellProps} */
+   const { actor = undefined } = $props();
+
+   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {object} Reference to calculated Check Parameters. */
+   /** @type {import('svelte/store').Writable} Reference to calculated Check Parameters. */
    const checkParameters = getContext('checkParameters');
 
    /** @type {ItemCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {*[]} Components for changing the options and displaying the parameters. */
+   /** @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the parameters. */
    const rows = [
       CheckDialogAttributeField,
       CheckDialogSkillField,
@@ -43,7 +48,9 @@
       CheckDialogTotalExpertiseSummary,
    ];
 
-   /** @type {Function} Called when the check becomes invalid. */
+   /**
+    * Called when the check becomes invalid.
+    */
    function onCheckInvalid() {
       ui.notifications.info(localize('itemCheckNoLongerValid'));
       warn(
@@ -54,7 +61,9 @@
       application.close();
    }
 
-   /** @type {Function} Called when the Roll button is clicked. */
+   /**
+    * Called when the Roll button is clicked.
+    */
    function onRoll() {
       if (actor?.system.validateItemCheckOptions($checkOptions)) {
          actor.system.rollItemCheck($checkOptions);
@@ -64,16 +73,16 @@
       }
    }
 
-   // Update the parameters whenever the check options are displayed.
-   $: {
+   // Update the parameters whenever the check options change.
+   $effect(() => {
       if (actor?.system.validateItemCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getItemCheckParameters($checkOptions);
       }
       else {
          onCheckInvalid();
       }
-   }
+   });
 
 </script>
 
-<CheckDialogBase on:roll={onRoll} {rows}/>
+<CheckDialogBase onroll={onRoll} {rows}/>

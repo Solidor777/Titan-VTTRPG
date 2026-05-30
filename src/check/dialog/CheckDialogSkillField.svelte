@@ -15,6 +15,5 @@
    input={SkillSelect}
    {inputProps}
    label={'skill'}
-   on:change
    tooltip={'check.skill.desc'}
 />

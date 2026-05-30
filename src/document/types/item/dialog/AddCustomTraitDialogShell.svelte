@@ -9,20 +9,25 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 
-   // The document owning the trait.
-   /** @type {TitanItem} */
-   export let item = void 0;
+   /**
+    * @typedef {object} AddCustomTraitDialogShellProps
+    * @property {TitanItem} [item] The document owning the trait.
+    */
+
+   /** @type {AddCustomTraitDialogShellProps} */
+   const { item = undefined } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   const newTrait = createCustomItemTraitTemplate();
+   /** @type {object} The new trait template being populated. */
+   let newTrait = $state(createCustomItemTraitTemplate());
 
    /**
     * Adds the new trait to the item and closes the dialog.
     */
    function addTrait() {
-      const customTrait = item.system.customTrait;
+      const customTrait = item?.system.customTrait;
 
       if (customTrait) {
          customTrait.push(newTrait);

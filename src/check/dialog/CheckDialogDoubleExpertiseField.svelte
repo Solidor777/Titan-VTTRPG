@@ -12,6 +12,5 @@
    bind:value={$checkOptions.doubleExpertise}
    input={CheckboxInput}
    label={'doubleExpertise'}
-   on:change
    tooltip={'check.doubleExpertise.desc'}
 />
