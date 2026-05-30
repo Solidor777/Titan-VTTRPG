@@ -21,17 +21,17 @@
    </div>
 
    <!--Attack Notes-->
-   {#if $document.flags.titan.parameters.attackNotes !==
+   {#if document.data.flags.titan.parameters.attackNotes !==
    '' &&
-   $document.flags.titan.parameters.attackNotes !==
+   document.data.flags.titan.parameters.attackNotes !==
    '<p></p>'}
       <div class="section rich-text">
-         <RichText value={$document.flags.titan.parameters.attackNotes}/>
+         <RichText value={document.data.flags.titan.parameters.attackNotes}/>
       </div>
    {/if}
 
    <!--Chat Messages-->
-   {#if $document.flags.titan.message}
+   {#if document.data.flags.titan.message}
       <div class="section">
          <CheckChatMessages/>
       </div>
@@ -52,30 +52,30 @@
       <CheckChatResults/>
    </div>
 
-   {#if $document.flags.titan.results.succeeded}
+   {#if document.data.flags.titan.results.succeeded}
       <!--Damage Buttons-->
       <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.results.damage && game.user.isGM}
+      {#if document.data.flags.titan.results.damage && game.user.isGM}
          <div class="section">
             <AttackCheckChatDamageButtons
-               damage={$document.flags.titan.results.damage}
-               ineffective={$document.flags.titan.parameters.ineffective ??
+               damage={document.data.flags.titan.results.damage}
+               ineffective={document.data.flags.titan.parameters.ineffective ??
                   false}
-               penetrating={$document.flags.titan.parameters.penetrating ??
+               penetrating={document.data.flags.titan.parameters.penetrating ??
                   false}
-               cleave={$document.flags.titan.parameters.cleave
-                  ? $document.flags.titan.results.criticalSuccesses
+               cleave={document.data.flags.titan.parameters.cleave
+                  ? document.data.flags.titan.results.criticalSuccesses
                   : 0}
             />
          </div>
       {/if}
 
       <!--Critical Success Effects-->
-      {#if $document.flags.titan.results.criticalSuccesses && $document.flags.titan.parameters.rend}
+      {#if document.data.flags.titan.results.criticalSuccesses && document.data.flags.titan.parameters.rend}
          <div class="section">
             <ChatRendButtons
-               rend={$document.flags.titan.results.criticalSuccesses}
-               magical={$document.flags.titan.parameters.magical ?? false}
+               rend={document.data.flags.titan.results.criticalSuccesses}
+               magical={document.data.flags.titan.parameters.magical ?? false}
             />
          </div>
       {/if}

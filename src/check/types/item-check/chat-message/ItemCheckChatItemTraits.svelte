@@ -8,7 +8,7 @@
 
 <div class="stats">
    <!--Item Traits-->
-   {#each $document.flags.titan.parameters.itemTrait as trait}
+   {#each document.data.flags.titan.parameters.itemTrait as trait}
       <div class="stat">
          <Tag tooltip={trait.description}>
             {trait.name}

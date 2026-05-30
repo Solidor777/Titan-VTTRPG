@@ -27,15 +27,15 @@
    /** @type {string} The class to affect the appearance of the die. */
    const result = $derived(
       die.final >= 6 ? 'critical-success' :
-         die.final >= $document.flags.titan.parameters.difficulty ? 'success' :
+         die.final >= document.data.flags.titan.parameters.difficulty ? 'success' :
             die.final <= 1 ? 'critical-failure' :
                'failure',
    );
 
    /** @type {boolean} Whether applying Expertise to the die should be disabled. */
    const disabled = $derived(
-      !$document.isOwner ||
-      $document.flags.titan.results.expertiseRemaining === 0 ||
+      !document.data.isOwner ||
+      document.data.flags.titan.results.expertiseRemaining === 0 ||
       die.final >= 6,
    );
 
@@ -56,24 +56,24 @@
     */
    function applyExpertise() {
       // If expertise can be applied.
-      if ($document.flags.titan.results.expertiseRemaining > 0 &&
+      if (document.data.flags.titan.results.expertiseRemaining > 0 &&
          die.final < 6
       ) {
          // Add the expertise and decrement it from those remaining.
          die.final += 1;
          die.expertiseApplied += 1;
-         $document.flags.titan.results.expertiseRemaining -= 1;
+         document.data.flags.titan.results.expertiseRemaining -= 1;
 
          // Recalculate the results.
-         $document.flags.titan.results = recalculateCheckResults(
-            $document.flags.titan,
+         document.data.flags.titan.results = recalculateCheckResults(
+            document.data.flags.titan,
          );
 
          // Update the document.
-         $document.update({
+         document.data.update({
             flags: {
                titan: {
-                  results: structuredClone($document.flags.titan.results),
+                  results: structuredClone(document.data.flags.titan.results),
                },
             },
          });

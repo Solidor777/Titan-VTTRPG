@@ -12,16 +12,16 @@
     */
    function resetExpertise() {
       // Remove the expertise from each die.
-      for (const die of $document.flags.titan.results.dice) {
+      for (const die of document.data.flags.titan.results.dice) {
          die.final = die.base;
          die.expertiseApplied = 0;
       }
 
       // Reset the expertise available and recalculate the check results.
-      $document.flags.titan.results.expertiseRemaining = $document.flags.titan.parameters.totalExpertise;
-      const newResults = recalculateCheckResults($document.flags.titan);
+      document.data.flags.titan.results.expertiseRemaining = document.data.flags.titan.parameters.totalExpertise;
+      const newResults = recalculateCheckResults(document.data.flags.titan);
 
-      $document.update({
+      document.data.update({
          flags: {
             titan: {
                results: structuredClone(newResults),
@@ -32,7 +32,7 @@
 </script>
 
 <IconButton
-   disabled={!$document.isOwner}
+   disabled={!document.data.isOwner}
    icon={RESET_ICON}
    onclick={resetExpertise}
 />

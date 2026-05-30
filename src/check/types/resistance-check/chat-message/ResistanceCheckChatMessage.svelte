@@ -10,7 +10,7 @@
    const document = getContext('document');
 
    /** @type {object} The Titan-specific flags data for this document. */
-   const check = $document.flags.titan;
+   const check = document.data.flags.titan;
 </script>
 
 <div class="check-chat-message">
@@ -20,7 +20,7 @@
    </div>
 
    <!--Chat Messages-->
-   {#if $document.flags.titan.message}
+   {#if document.data.flags.titan.message}
       <div class="section">
          <CheckChatMessages/>
       </div>
@@ -38,10 +38,10 @@
 
    <!--Damage Buttons-->
    <!-- svelte-ignore missing-declaration -->
-   {#if $document.flags.titan.results.damageTaken && game.user.isGM}
+   {#if document.data.flags.titan.results.damageTaken && game.user.isGM}
       <div class="section">
          <ChatDamageButtons
-            damage={$document.flags.titan.results.damageTaken}
+            damage={document.data.flags.titan.results.damageTaken}
          />
       </div>
    {/if}

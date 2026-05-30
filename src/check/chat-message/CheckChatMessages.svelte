@@ -7,7 +7,7 @@
 </script>
 
 <div class="messages">
-   {#each $document.flags.titan.message as message}
+   {#each document.data.flags.titan.message as message}
       <div class="section">
          <RichText value={message}/>
       </div>
