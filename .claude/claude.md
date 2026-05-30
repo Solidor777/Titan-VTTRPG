@@ -7,8 +7,8 @@ good documentation.
 
 # Project Resources
 
-This project is coded in JavaScript, Svelte, and SCSS. It makes particular use of the TyphonJS Runtime Library Foundry
-VTT, documented at https://typhonjs-fvtt-lib.github.io/api-docs/. Everything that is built is stored in the ~/src/
+This project is coded in JavaScript, Svelte, and SCSS. It is built with pure Svelte 5 (runes) mounted directly into
+Foundry v14 ApplicationV2 (no TyphonJS / UI middleware). Everything that is built is stored in the ~/src/
 directory. The build output is stored in the root. Nothing that is not built should be stored in the ~/src/ directory.
 
 # Code Style
@@ -25,6 +25,19 @@ they have more than one property. All arrays should be multiline if they have mo
 should be multiline if they have more than one property, with the > or /> on a newline. All conditional code should
 be scoped in multiline {}. All comments should have proper grammar, spelling, punctuation, and indentation. :global
 style selectors are forbidden.
+
+# Delegating JavaScript & Svelte work
+
+For any JavaScript or Svelte work in this project — writing, refactoring, reviewing, or debugging
+`.js` / `.svelte` / `.svelte.js` files — use the `titan-svelte-dev` subagent
+(`.claude/agents/titan-svelte-dev.md`). It always loads the `svelte-5`, `foundry-vtt`, and
+`foundry-svelte` skills before working, and follows the code-style rules above.
+
+# Keeping the codebase skill current
+
+Whenever we execute a spec or implementation plan, it must include updating the `titan-codebase`
+skill (`.claude/skills/titan-codebase/`) to reflect any code changes. This is not a changelog of
+what changed or why — the skill must describe only the current state of the codebase ("what is").
 
 # Response to instructions
 
