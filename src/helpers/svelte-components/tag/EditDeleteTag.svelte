@@ -1,6 +1,7 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { DELETE_ICON, EDIT_ICON } from '~/system/Icons.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
 
    /**
     * @typedef {object} EditDeleteTagProps
@@ -25,21 +26,15 @@
 
 <div class="tag">
    <!--Edit Icon-->
-   <!-- svelte-ignore a11y-missing-attribute -->
-   <!-- svelte-ignore a11y-missing-content -->
-   <a
-      aria-label="Edit"
+   <button
+      type="button"
+      aria-label={localize('edit')}
       class={EDIT_ICON}
       onclick={() => {
          editFunction();
       }}
-      onkeypress={() => {
-         editFunction();
-      }}
-      role="button"
-      tabindex="0"
       use:tooltipAction={editTooltip}
-   ></a>
+   ></button>
 
    <!--Label-->
    <div use:tooltipAction={labelTooltip}>
@@ -47,21 +42,15 @@
    </div>
 
    <!--Delete Icon-->
-   <!-- svelte-ignore a11y-missing-attribute -->
-   <!-- svelte-ignore a11y-missing-content -->
-   <a
-      aria-label="Delete"
+   <button
+      type="button"
+      aria-label={localize('delete')}
       class={DELETE_ICON}
       onclick={() => {
          deleteFunction();
       }}
-      onkeypress={() => {
-         deleteFunction();
-      }}
-      role="button"
-      tabindex="0"
       use:tooltipAction={deleteTooltip}
-   ></a>
+   ></button>
 </div>
 
 <style lang="scss">
@@ -70,6 +59,21 @@
 
       :not(:first-child) {
          @include separator-left;
+      }
+
+      // Reset native button chrome so the icon buttons render identically to the previous anchors.
+      // font-family is intentionally NOT reset, so the FontAwesome glyph class keeps its font.
+      button {
+         appearance: none;
+         background: none;
+         border: none;
+         margin: 0;
+         padding: 0;
+         color: inherit;
+         font-size: inherit;
+         font-weight: inherit;
+         line-height: inherit;
+         cursor: pointer;
       }
    }
 </style>
