@@ -1,6 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import ChatExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
+   import ExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -8,15 +8,15 @@
 
 <div class="effects">
    <!--Expired Effects-->
-   {#each document.data.flags.titan.effects.expired as effect}
-      <div class="effect">
-         <ChatExpiredEffectTag
-            label={effect.label}
-            img={effect.img}
-            description={effect.description}
-         />
-      </div>
-   {/each}
+   {#if document.data.flags.titan.effects.expired}
+      {#each document.data.flags.titan.effects.expired as effect}
+         <div class="effect">
+            <ExpiredEffectTag
+               {effect}
+            />
+         </div>
+      {/each}
+   {/if}
 </div>
 
 <style lang="scss">
