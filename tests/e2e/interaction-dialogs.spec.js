@@ -185,8 +185,10 @@ test.describe('v14 interaction dialogs', () => {
       await entry.scrollIntoViewIfNeeded();
       await entry.click({ button: 'right' });
 
-      // Click the "Edit UUID" entry in the context menu.
-      await page.locator('#context-menu li.context-item, .context-menu .context-item', { hasText: 'Edit UUID' })
+      // Click the Edit-UUID entry in the context menu. The TITAN `getActorContextOptions` hook
+      // (OnGetActorDirectoryEntryContext.js) labels it via the `editUUID` localization, which
+      // resolves to "Edit Unique ID" in lang/en.json - not the literal "Edit UUID".
+      await page.locator('#context-menu li.context-item, .context-menu .context-item', { hasText: 'Edit Unique ID' })
          .first()
          .click();
 

@@ -100,13 +100,32 @@ test.describe('v14 interaction rolls', () => {
                name: 'E2E Ability',
                type: 'ability',
                system: {
+                  // A COMPLETE item check entry mirroring createItemCheckTemplate()
+                  // (src/check/types/item-check/ItemCheckTemplate.js). The template module is not
+                  // importable in the browser context, so the full default object is inlined here;
+                  // omitting fields like opposedCheck causes getItemCheckParameters to throw when it
+                  // reads checkData.opposedCheck.enabled. attribute/skill/label are overridden for
+                  // the test, the remaining fields hold the template defaults.
                   check: [
                      {
                         attribute: 'body',
-                        skill: 'arcana',
-                        label: 'E2E Check',
-                        difficulty: 4,
                         complexity: 1,
+                        damageReducedBy: 'none',
+                        difficulty: 4,
+                        initialValue: 1,
+                        isDamage: false,
+                        isHealing: false,
+                        label: 'E2E Check',
+                        opposedCheck: {
+                           attribute: 'body',
+                           enabled: false,
+                           skill: 'athletics',
+                        },
+                        resistanceCheck: 'none',
+                        resolveCost: 0,
+                        scaling: true,
+                        skill: 'arcana',
+                        uuid: 'e2e0e2e0-e2e0-4e2e-8e2e-e2e0e2e0e2e0',
                      },
                   ],
                },
