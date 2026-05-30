@@ -1,0 +1,111 @@
+import TitanDataModel from '~/document/data-model/TitanDataModel.js';
+import RulesElementMixin from '~/document/types/item/rules-element/RulesElementMixin.js';
+import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
+import createStringField from '~/helpers/utility-functions/CreateStringField.js';
+import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
+import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
+import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
+import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
+import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
+
+/**
+ * The typed system data model for Titan Active Effects (subtype 'effect').
+ * Carries the Rules Elements, the custom Titan duration, item-check templates, and custom traits.
+ * Active/inactive state is the native ActiveEffect.disabled field; the rich description is the native
+ * ActiveEffect.description field.
+ * @extends {TitanDataModel}
+ * @property {TitanActiveEffect} parent - The Active Effect that owns this data model.
+ */
+export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanDataModel) {
+   /**
+    * Defines the data schema for Titan Active Effect documents.
+    * @returns {object} The document schema.
+    * @override
+    * @protected
+    */
+   static _defineDocumentSchema() {
+      const schema = super._defineDocumentSchema();
+
+      // Duration.
+      schema.duration = createSchemaField({
+         type: createStringField('turnStart'),
+         remaining: createIntegerField(1),
+         initiative: createIntegerField(1),
+         custom: createStringField(),
+      });
+
+      // Checks.
+      schema.check = createArrayField(createObjectField(() => createItemCheckTemplate()));
+
+      // Custom Traits.
+      schema.customTrait = createArrayField(createObjectField(() => createCustomItemTraitTemplate()));
+
+      return schema;
+   }
+
+   /**
+    * Whether this effect's duration has expired. Permanent effects never expire.
+    * @returns {boolean} Whether this effect's duration has expired.
+    */
+   get isExpired() {
+      return this.duration.type !== 'permanent' && this.duration.remaining <= 0;
+   }
+
+   /**
+    * Whether this effect is currently active. Permanent effects can be toggled via the native disabled
+    * flag; non-permanent effects are always active.
+    * @returns {boolean} Whether this effect is currently active.
+    */
+   get isActive() {
+      return !this.parent.disabled || this.duration.type !== 'permanent';
+   }
+
+   /**
+    * Whether this effect is a Combat Effect. Permanent and custom-duration effects are not Combat Effects.
+    * @returns {boolean} Whether this effect is a Combat Effect.
+    */
+   get isCombatEffect() {
+      return this.duration.type !== 'permanent' && this.duration.type !== 'custom';
+   }
+
+   /**
+    * Captures the owning actor's active-combat initiative onto a new effect, if applicable.
+    * @param {object} data - The initial document data.
+    * @returns {object | undefined} Initial data overrides, or undefined if none.
+    * @override
+    * @protected
+    */
+   _getInitialDocumentData(data) {
+      let retVal = super._getInitialDocumentData(data);
+
+      // The AE's parent is the ActiveEffect; its parent is the owning Actor.
+      const actor = this.parent?.parent;
+      if (actor && actor.documentName === 'Actor' && !actor.pack && actor.id &&
+         typeof data?.system?.duration?.initiative !== 'number') {
+         /** @type {number | null | undefined} - The owning actor's first active-combat initiative. */
+         const initiative = actor.getFirstActiveCombat()?.initiative;
+         if (initiative !== null && initiative !== undefined) {
+            retVal ??= {};
+            retVal.system ??= {};
+            retVal.system.duration ??= {};
+            retVal.system.duration.initiative = initiative;
+         }
+      }
+
+      return retVal;
+   }
+
+   /**
+    * Returns the roll data for this effect.
+    * @returns {object} The roll data.
+    * @override
+    */
+   getRollData() {
+      const retVal = super.getRollData();
+      retVal.duration = structuredClone(this.duration);
+      retVal.check = structuredClone(this.check);
+      retVal.customTrait = structuredClone(this.customTrait);
+
+      return retVal;
+   }
+}
