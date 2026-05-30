@@ -2,17 +2,23 @@
    import { getContext } from 'svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
+   /**
+    * @typedef {object} DocumentNameInputProps
+    * @property {boolean} [disabled] - Whether editing should be disabled for this component.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    */
+
+   /** @type {DocumentNameInputProps} */
+   let {
+      disabled = false,
+      tooltip = void 0,
+   } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {boolean} Whether editing should be disabled for this component. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
    /** @type {string} The name of the document. */
-   let value = $document.name;
+   let value = $state($document.name);
 
    /**
     * Updates the document name when the input changes.

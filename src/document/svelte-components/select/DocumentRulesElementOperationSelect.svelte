@@ -1,20 +1,24 @@
 <script>
    import { getContext } from 'svelte';
-   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
    import RulesElementOperationSelect
       from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
+   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {string} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} DocumentRulesElementOperationSelectProps
+    * @property {string} [value] - The value that this input should modify.
+    * @property {boolean} [allowNone] - Whether to allow None as an option.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {boolean} Whether to allow None as an option. */
-   export let allowNone = false;
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {DocumentRulesElementOperationSelectProps} */
+   let {
+      value = $bindable(void 0),
+      allowNone = false,
+      disabled = false,
+      tooltip = void 0,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -24,6 +28,6 @@
    {allowNone}
    bind:value
    disabled={disabled || !$document?.isOwner}
-   onchange={()=> refreshSystemDocument($document, disabled)}
+   onchange={() => refreshSystemDocument($document, disabled)}
    {tooltip}
 />

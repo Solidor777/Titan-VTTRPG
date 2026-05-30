@@ -3,26 +3,28 @@
    import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {number} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} DocumentNumberInputProps
+    * @property {number} [value] - The value that this input should modify.
+    * @property {number | boolean} [min] - The minimum value of the input.
+    * @property {number | boolean} [max] - The maximum value of the input.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {boolean} [isInteger] - Whether the input should be an Integer. If false, it will be a Float.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {number | boolean} The minimum value of the input. */
-   export let min = false;
-
-   /** @type {number | boolean} The maximum value of the input. */
-   export let max = false;
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {boolean} Whether the input should be an Integer. If False, it will be a Float. */
-   export let isInteger = false;
+   /** @type {DocumentNumberInputProps} */
+   let {
+      value = $bindable(void 0),
+      min = false,
+      max = false,
+      disabled = false,
+      isInteger = false,
+      tooltip = void 0,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
 
    /**
     * Updates the document data when the input changes.
