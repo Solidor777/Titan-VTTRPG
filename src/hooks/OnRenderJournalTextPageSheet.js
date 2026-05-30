@@ -1,14 +1,15 @@
 import darkModeJournals from '~/helpers/Settings/DarkModeJournals.js';
 
 /**
- * Called before a Journal Text Page Sheet is rendered to add the dark mode class if appropriate.
- * @param {JournalSheet} journalSheet - The Journal Text Page Sheet being rendered.
- * @param {Element} element - The Element of the Journal Text Page Sheet being rendered.
+ * Called when a Journal Entry Page ProseMirror Sheet is rendered to add the dark mode class if appropriate.
+ * In Foundry v14 the hook signature is (application, element, context, options) where element
+ * is an HTMLElement; the class is applied directly to the root element.
+ * @param {ApplicationV2} _application - The JournalEntryPageProseMirrorSheet ApplicationV2 instance.
+ * @param {HTMLElement} element - The root HTMLElement of the rendered Journal Text Page Sheet.
  */
-export default function onRenderJournalTextPageSheet(journalSheet, element) {
-   // If dark mode journals are enabled, add the titan dark mode class.
+export default function onRenderJournalTextPageSheet(_application, element) {
+   // If dark mode journals are enabled, add the titan dark mode class directly to the root element.
    if (darkModeJournals()) {
-      const journal = element.find('journal-entry').prevObject;
-      journal.addClass('titan-dark-mode');
+      element.classList.add('titan-dark-mode');
    }
 }
