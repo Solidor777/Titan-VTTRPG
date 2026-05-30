@@ -61,9 +61,13 @@ management). Data model classes hold the schema, field validation, and derived-d
   `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS` (2), and seeds `flags['visual-active-effects'].data.content`
   with the enriched native `description`; on `_preUpdate` it re-syncs that flag whenever `description`
   changes. Enrichment uses `foundry.applications.ux.TextEditor.implementation.enrichHTML(html,
-  { secrets: true })` (v14 async API; no `async` option). `sendToChat` packages
-  `{ id, name, img, type: 'effect', system: { ...getRollData(), description } }` into `flags.titan` and
-  calls `ChatMessage.create`, producing the same card the effect chat components render.
+  { secrets: true })` (v14 async API; no `async` option). `sendToChat` spreads `getRollData()` flat into
+  `flags.titan`, then sets `type: 'effect'` and `description` — matching the flat item `sendToChat` shape
+  (`TitanItem.sendToChat` sets `flags.titan = getRollData()` directly). This puts `check`, `customTrait`,
+  and `duration` at the `flags.titan` root, where both the effect chat components and the item-check roll
+  path (`CharacterDataModel.initializeItemCheckOptions` reads `itemRollData.check`/`itemRollData.customTrait`)
+  resolve them. The effect chat components (`EffectChatMessage.svelte`, `EffectChatStats.svelte`) read these
+  fields at the `item` root, like the working item chat cards.
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Schema adds a custom `duration` ({ type, remaining, initiative, custom }), a `check` array, and a

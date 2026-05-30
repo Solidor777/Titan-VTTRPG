@@ -16,20 +16,20 @@
    <!--Duration-->
    <div class="stat">
       <DurationTag
-         remaining={item.system.duration.remaining}
-         type={item.system.duration.type}
+         remaining={item.duration.remaining}
+         type={item.duration.type}
       />
    </div>
 
    <!--Expired-->
-   {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
+   {#if item.duration.type !== 'permanent' && item.duration.remaining <= 0}
       <div class="stat">
          <Tag>{localize('expired')}</Tag>
       </div>
    {/if}
 
    <!--Custom Traits-->
-   {#each item.system.customTrait as trait}
+   {#each item.customTrait as trait}
       <div class="stat">
          <Tag tooltip={trait.description}>
             {trait.name}

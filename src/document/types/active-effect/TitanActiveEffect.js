@@ -113,24 +113,20 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
 
    /**
     * Creates a Chat Message containing this effect's data and sends it to chat.
-    * Packages the data model roll data and native description under the 'system' key of the titan flags so the
-    * effect chat components render the same card the legacy effect item produced.
+    * Spreads the data model roll data flat onto the titan flags (matching the working item sendToChat shape) so the
+    * shared item chat card and the item-check roll path both resolve check/customTrait at the flags root, then forces
+    * the effect chat card via the 'effect' type flag and attaches the native description.
     * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat() {
       /** @type {Actor|undefined} - The owning actor, used for the chat speaker when available. */
       const actor = this.parent?.documentName === 'Actor' ? this.parent : void 0;
 
-      /** @type {object} - The titan flags payload, matching the effect chat component's expected shape. */
+      /** @type {object} - The titan flags payload, matching the flat item chat shape (check/customTrait at root). */
       const messageData = {
-         id: this.id,
-         name: this.name,
-         img: this.img,
+         ...this.getRollData(),
          type: 'effect',
-         system: {
-            ...this.getRollData(),
-            description: this.description,
-         },
+         description: this.description,
       };
 
       // Create and post the message.

@@ -14,16 +14,16 @@
 
 <ItemChatMessageShell {item}>
    <!--Checks-->
-   {#if item.system.check.length > 0}
+   {#if item.check.length > 0}
       <div class="section">
          <ItemChatChecks {item}/>
       </div>
    {/if}
 
    <!--Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   {#if item.description && item.description !== '' && item.description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={item.description}/>
       </div>
    {/if}
 
