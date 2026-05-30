@@ -67,7 +67,13 @@ management). Data model classes hold the schema, field validation, and derived-d
   and `duration` at the `flags.titan` root, where both the effect chat components and the item-check roll
   path (`CharacterDataModel.initializeItemCheckOptions` reads `itemRollData.check`/`itemRollData.customTrait`)
   resolve them. The effect chat components (`EffectChatMessage.svelte`, `EffectChatStats.svelte`) read these
-  fields at the `item` root, like the working item chat cards.
+  fields at the `item` root, like the working item chat cards. It also carries the same check and
+  custom-trait mutators as `TitanItem` (`addCheck` / `deleteCheck` / `addCustomTrait` / `editCustomTrait`
+  / `deleteCustomTrait`), ported inline (not via a shared mixin) with identical bodies; they operate on
+  `system.check` / `system.customTrait` via `this.update(...)`, notify the sheet through
+  `this.sheet.postAddCheck()` / `preDeleteCheck(idx)`, and reuse the item `AddCustomTraitDialog` /
+  `EditCustomTraitDialog` (passed `this`). These are invoked by the reused item Checks tab and
+  Custom-Traits sidebar via `document.data.*`.
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Schema adds a custom `duration` ({ type, remaining, initiative, custom }), a `check` array, and a
