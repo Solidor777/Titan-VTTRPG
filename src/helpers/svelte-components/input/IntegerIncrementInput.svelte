@@ -1,5 +1,6 @@
 <script>
    import isModifierActive from '~/helpers/utility-functions/IsModifierActive.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
    import { DECREMENT_ICON, INCREMENT_ICON } from '~/system/icons.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
@@ -53,6 +54,7 @@
       <MiniIconButton
          {disabled}
          icon={DECREMENT_ICON}
+         label={localize('decrement')}
          onclick={decrementInput}
       />
    </div>
@@ -67,6 +69,7 @@
       <MiniIconButton
          {disabled}
          icon={INCREMENT_ICON}
+         label={localize('increment')}
          onclick={incrementInput}
       />
    </div>

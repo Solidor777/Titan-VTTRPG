@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import { DELETE_ICON } from '~/system/Icons.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
@@ -87,6 +88,7 @@
          <div class="delete-button">
             <DocumentOwnerIconButton
                icon={DELETE_ICON}
+               label={localize('delete')}
                onclick={() => {
                document.data.system.deleteRulesElement(idx);
             }}

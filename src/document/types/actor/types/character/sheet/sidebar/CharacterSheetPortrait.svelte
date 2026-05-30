@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import {
@@ -29,6 +30,7 @@
       >
          <DocumentOwnerIconButton
             icon={LONG_REST_ICON}
+            label={localize('longRest')}
             onclick={() => {
             document.data.system.longRest();
          }}
@@ -42,6 +44,7 @@
       >
          <DocumentOwnerIconButton
             icon={SHORT_REST_ICON}
+            label={localize('shortRest')}
             onclick={() => {
             document.data.system.shortRest();
          }}
@@ -55,6 +58,7 @@
       >
          <DocumentOwnerIconButton
             icon={REMOVE_TEMP_EFFECTS_ICON}
+            label={localize('removeCombatEffects')}
             onclick={() => {
             document.data.system.removeCombatEffects();
          }}
@@ -71,6 +75,7 @@
       >
          <DocumentOwnerIconButton
             icon={SPEND_RESOLVE_ICON}
+            label={localize('spendResolve')}
             onclick={() => {
             document.data.system.spendResolve(1);
          }}
