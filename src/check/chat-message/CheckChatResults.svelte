@@ -61,7 +61,7 @@
    <!--Expertise Remaining-->
    {#if $document.flags.titan.parameters.totalExpertise}
       <div class="stat">
-         <i class={EXPERTISE_ICON}/>
+         <i class={EXPERTISE_ICON}></i>
          {localize('expertiseRemaining')}:
          {$document.flags.titan.results.expertiseRemaining}
 
@@ -78,7 +78,7 @@
       <!--Damage-->
       {#if $document.flags.titan.results.damage}
          <div class="stat">
-            <i class={DAMAGE_ICON}/>
+            <i class={DAMAGE_ICON}></i>
             {localize('damage')}:
             {$document.flags.titan.results.damage}
          </div>
@@ -87,7 +87,7 @@
       <!--Healing-->
       {#if $document.flags.titan.results.healing > 0}
          <div class="stat">
-            <i class={HEALING_ICON}/>
+            <i class={HEALING_ICON}></i>
             {localize('healing')}:
             {$document.flags.titan.results.healing}
          </div>
@@ -96,7 +96,7 @@
       <!--Rend-->
       {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
          <div class="stat" use:tooltipAction={'attack.rend.desc'}>
-            <i class={REND_ICON}/>
+            <i class={REND_ICON}></i>
             {localize('rend')}:
             {$document.flags.titan.results.criticalSuccesses}
          </div>
@@ -105,7 +105,7 @@
       <!--Cleave-->
       {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
          <div class="stat" use:tooltipAction={'attack.cleave.desc'}>
-            <i class={CLEAVE_ICON}/>
+            <i class={CLEAVE_ICON}></i>
             {localize('cleave')}:
             {$document.flags.titan.results.criticalSuccesses}
          </div>
@@ -115,7 +115,7 @@
    <!--Damage Taken-->
    {#if $document.flags.titan.results.damageTaken}
       <div class="stat">
-         <i class={DAMAGE_ICON}/>
+         <i class={DAMAGE_ICON}></i>
          {localize('damageTaken')}:
          {$document.flags.titan.results.damageTaken}
       </div>
@@ -124,7 +124,7 @@
    <!--Rerolled failures-->
    {#if $document.flags.titan.failuresReRolled}
       <div class="stat">
-         <i class={DICE_ICON}/>
+         <i class={DICE_ICON}></i>
          {localize('failuresReRolled')}
       </div>
    {/if}
@@ -132,7 +132,7 @@
    <!--Training Doubled-->
    {#if $document.flags.titan.parameters.doubleTraining && $document.flags.titan.parameters.totalTrainingDice > 0}
       <div class="stat">
-         <i class={TRAINING_ICON}/>
+         <i class={TRAINING_ICON}></i>
          {localize('trainingDoubled')}
       </div>
    {/if}
@@ -140,7 +140,7 @@
    <!--Expertise Doubled-->
    {#if $document.flags.titan.parameters.doubleExpertise && $document.flags.titan.parameters.totalExpertise > 0}
       <div class="stat">
-         <i class={EXPERTISE_ICON}/>
+         <i class={EXPERTISE_ICON}></i>
          {localize('expertiseDoubled')}
       </div>
    {/if}

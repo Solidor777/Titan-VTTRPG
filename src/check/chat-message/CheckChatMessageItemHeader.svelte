@@ -1,9 +1,17 @@
 <script>
-   /** @type {string} The attribute key, used for attribute coloring CSS class. */
-   export let attribute = void 0;
+   /**
+    * @typedef {object} CheckChatMessageItemHeaderProps
+    * @property {string} [attribute] - The attribute key, used for attribute coloring CSS class.
+    * @property {string} [img] - The item image URL.
+    * @property {import('svelte').Snippet} [children] - Content to render inside the labels area.
+    */
 
-   /** @type {string} The item image URL. */
-   export let img = void 0;
+   /** @type {CheckChatMessageItemHeaderProps} */
+   let {
+      attribute = undefined,
+      img = undefined,
+      children,
+   } = $props();
 </script>
 
 <div class="label">
@@ -16,7 +24,7 @@
 
       <!--Labels-->
       <div class="labels">
-         <slot />
+         {@render children?.()}
       </div>
    </div>
 </div>
