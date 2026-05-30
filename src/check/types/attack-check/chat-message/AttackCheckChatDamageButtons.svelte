@@ -11,17 +11,21 @@
       IGNORE_ARMOR_ICON,
    } from '~/system/Icons.js';
 
-   /** @type {number} The amount of damage dealt by the attack. */
-   export let damage = void 0;
+   /**
+    * @typedef {object} AttackCheckChatDamageButtonsProps
+    * @property {number} [damage] - The amount of damage dealt by the attack.
+    * @property {boolean} [ineffective] - Whether the attack is ineffective (deals half damage).
+    * @property {boolean} [penetrating] - Whether the attack is penetrating (ignores some armor).
+    * @property {number} [cleave] - The number of cleave hits from critical successes.
+    */
 
-   /** @type {boolean} Whether the attack is ineffective (deals half damage). */
-   export let ineffective = false;
-
-   /** @type {boolean} Whether the attack is penetrating (ignores some armor). */
-   export let penetrating = false;
-
-   /** @type {number} The number of cleave hits from critical successes. */
-   export let cleave = 0;
+   /** @type {AttackCheckChatDamageButtonsProps} */
+   const {
+      damage = undefined,
+      ineffective = false,
+      penetrating = false,
+      cleave = 0,
+   } = $props();
 </script>
 
 <div class="damage-buttons">
@@ -34,7 +38,7 @@
                penetrating: penetrating,
             });
          }}
-      ><i class={DAMAGE_ICON}/>
+      ><i class={DAMAGE_ICON}></i>
       </Button>
    </div>
 
@@ -52,7 +56,7 @@
                });
             }}
          >
-            <i class={CLEAVE_ICON}/>
+            <i class={CLEAVE_ICON}></i>
          </Button>
       </div>
    {/if}
@@ -70,7 +74,7 @@
                ignoreArmor: true,
             });
          }}
-      ><i class={IGNORE_ARMOR_ICON}/>
+      ><i class={IGNORE_ARMOR_ICON}></i>
       </Button>
    </div>
 
@@ -84,14 +88,14 @@
             });
          }}
       >
-         <i class={HALF_DAMAGE_ICON}/>
+         <i class={HALF_DAMAGE_ICON}></i>
       </Button>
    </div>
 
    <!--Apply healing button-->
    <div class="button" use:tooltipAction={'applyHealing'}>
       <Button onclick={() => applyHealingToTargets(damage)}>
-         <i class={HEALING_ICON}/>
+         <i class={HEALING_ICON}></i>
       </Button>
    </div>
 </div>

@@ -16,11 +16,12 @@
    const document = getContext('document');
 
    /** @type {boolean} Whether to show the scaling aspect controls. */
-   $: scalingAspect =
+   const scalingAspect = $derived(
       $document.flags.titan.results.scalingAspect &&
       $document.flags.titan.results.scalingAspect.length > 0 &&
       $document.flags.titan.results.extraSuccesses &&
-      $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
+      $document.constructor.getSpeakerActor($document.speaker)?.isOwner,
+   );
 </script>
 
 <div class="check-chat-message">

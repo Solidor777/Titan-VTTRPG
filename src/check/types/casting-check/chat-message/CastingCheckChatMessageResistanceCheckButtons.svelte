@@ -6,7 +6,7 @@
    const document = getContext('document');
 
    /** @type {number} Calculated Complexity of the Resistance checks. */
-   const complexity = $document.flags.titan.results.extraSuccesses + 1;
+   const complexity = $derived($document.flags.titan.results.extraSuccesses + 1);
 </script>
 
 <div class="buttons">

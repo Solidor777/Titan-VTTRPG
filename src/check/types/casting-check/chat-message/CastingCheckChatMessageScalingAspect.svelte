@@ -4,35 +4,40 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { DAMAGE_ICON, DECREMENT_ICON, HEALING_ICON, INCREMENT_ICON, RESET_ICON, } from '~/system/Icons.js';
 
-   /** @type {number} Index of the Scaling Aspect in the Scaling Aspects array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} CastingCheckChatMessageScalingAspectProps
+    * @property {number} [idx] - Index of the Scaling Aspect in the Scaling Aspects array.
+    */
+
+   /** @type {CastingCheckChatMessageScalingAspectProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {ScalingAspect} Reference to the scaling aspect. */
-   let aspect = $document.flags.titan.results.scalingAspect[idx];
+   const aspect = $derived($document.flags.titan.results.scalingAspect[idx]);
 
    /** @type {number} Calculated scaling cost of the aspect. */
-   const aspectIncrement = Math.max(aspect.initialValue, 1);
+   const aspectIncrement = $derived(Math.max(aspect.initialValue, 1));
 
-   /** @type {string[]} Calculated aspect icons */
-   const icons = [];
+   /** @type {string[]} Calculated aspect icons. */
+   const icons = $derived.by(() => {
+      // Build the icons array for this aspect.
+      const result = [];
 
-   // Add damage icon if appropriate.
-   if (aspect.isDamage) {
-      icons.push(DAMAGE_ICON);
-   }
+      // Add damage icon if appropriate.
+      if (aspect.isDamage) {
+         result.push(DAMAGE_ICON);
+      }
 
-   // Add healing icon if appropriate.
-   if (aspect.isHealing) {
-      icons.push(HEALING_ICON);
-   }
+      // Add healing icon if appropriate.
+      if (aspect.isHealing) {
+         result.push(HEALING_ICON);
+      }
 
-   // Update the aspect in response to changes.
-   $: {
-      aspect = $document.flags.titan.results.scalingAspect[idx];
-   }
+      return result;
+   });
 
    /**
     * Increases the aspect by the increment and updates the total cost.
@@ -140,7 +145,7 @@
 
          <!--Each Icon-->
          {#each icons as icon}
-            <i class={icon}/>
+            <i class={icon}></i>
          {/each}
 
          <!--Label Text-->
@@ -175,7 +180,7 @@
             onclick={resetAspect}
          >
             <div class="button-inner">
-               <i class={RESET_ICON}/>
+               <i class={RESET_ICON}></i>
             </div>
          </Button>
       </div>
@@ -187,7 +192,7 @@
             onclick={decreaseAspect}
          >
             <div class="button-inner">
-               <i class={DECREMENT_ICON}/>
+               <i class={DECREMENT_ICON}></i>
             </div>
          </Button>
       </div>
@@ -200,7 +205,7 @@
             onclick={increaseAspect}
          >
             <div class="button-inner">
-               <i class={INCREMENT_ICON}/>
+               <i class={INCREMENT_ICON}></i>
             </div>
          </Button>
       </div>
