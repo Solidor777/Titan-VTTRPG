@@ -8,6 +8,7 @@
     * @property {boolean} [disabled] - Whether this input is disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
+    * @property {string} label - Accessible label, forwarded to the inner IconButton.
     */
 
    /** @type {DocumentOwnerIconButtonProps} */
@@ -16,10 +17,11 @@
       disabled = false,
       tooltip = void 0,
       onclick = void 0,
+      label,
    } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 
-<IconButton disabled={disabled || !document.data.isOwner} {icon} {onclick} {tooltip}/>
+<IconButton disabled={disabled || !document.data.isOwner} {icon} {label} {onclick} {tooltip}/>

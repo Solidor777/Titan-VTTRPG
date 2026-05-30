@@ -6,7 +6,7 @@
     * @typedef {object} IconButtonProps Props for the IconButton component.
     * @property {string | undefined} [icon] - The icon class to display for this button.
     * @property {boolean} [disabled] - Whether this button is currently disabled.
-    * @property {string | undefined} [label] - Accessible label for this icon-only button.
+    * @property {string} label - Accessible label for this icon-only button (required).
     * @property {string | object | undefined} [tooltip] - The tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
     */
@@ -15,13 +15,12 @@
    const {
       icon = void 0,
       disabled = false,
-      label = void 0,
+      label,
       tooltip = void 0,
       onclick = void 0,
    } = $props();
 </script>
 
-<!-- svelte-ignore a11y_consider_explicit_label -->
 <button
    aria-label={label}
    {disabled}

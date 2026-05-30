@@ -7,6 +7,7 @@
     * @property {boolean} disabled - Whether this button is disabled.
     * @property {string | TooltipAction | undefined} tooltip - The tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} onclick - Callback invoked when the button is clicked.
+    * @property {string} label - Accessible label, forwarded to the inner IconButton.
     */
 
    /** @type {MiniIconButtonProps} */
@@ -15,11 +16,12 @@
       disabled = false,
       tooltip = void 0,
       onclick = void 0,
+      label,
    } = $props();
 </script>
 
 <div class="button">
-   <IconButton {disabled} {icon} {onclick} {tooltip}/>
+   <IconButton {disabled} {icon} {label} {onclick} {tooltip}/>
 </div>
 
 <style lang="scss">
