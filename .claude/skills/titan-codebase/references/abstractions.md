@@ -17,7 +17,14 @@ management). Data model classes hold the schema, field validation, and derived-d
   lifecycle hooks that subclasses override.
 - `CharacterDataModel` (`src/document/types/actor/types/character/CharacterDataModel.js`) extends
   `TitanActorDataModel`. The primary character model; coordinates check rolling, resource
-  management, rest/regen automation, and effect-duration tracking.
+  management, rest/regen automation, and effect-duration tracking. The duration/combat/expiry
+  methods (`getExpiredEffects`, `getSortedEffects`, `onInitiativeAdvanced`/`Reverted`,
+  `onTurnStart`/`End` and their reverts, `_decreaseTurnEffectDuration`/`_increaseTurnEffectDuration`,
+  `_processExpiredEffects`, `removeCombatEffects`, `removeExpiredEffects`, `toggleEffectActive`) read
+  effect-subtype Active Effects from `this.parent.effects` (filtered by `effect.type === 'effect'`,
+  which excludes conditions), mutate `effect.system.duration.remaining` via `effect.update(...)`,
+  flip native `disabled` for the active toggle, and batch-delete expired/combat effects via
+  `this.parent.deleteEmbeddedDocuments('ActiveEffect', ids)`.
 - `PlayerDataModel` (`src/document/types/actor/types/character/types/player/PlayerDataModel.js`)
   extends `CharacterDataModel`. Adds XP tracking and an `inspiration` flag.
 - `NPCDataModel` (`src/document/types/actor/types/character/types/npc/NPCDataModel.js`) extends
