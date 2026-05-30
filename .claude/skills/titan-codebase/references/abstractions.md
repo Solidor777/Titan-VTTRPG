@@ -91,7 +91,11 @@ management). Data model classes hold the schema, field validation, and derived-d
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
-  initiative, custom }), a `check` array, and a `customTrait` array; it provides `isExpired` /
+  initiative, custom }), a `check` array, a `customTrait` array, and a `changes` ArrayField whose
+  element is a `SchemaField` ({ key, value, mode, priority, type, phase }) — Foundry v14's
+  `Game##verifyActiveEffectModels` requires every ActiveEffect type data model to define `changes` as
+  an ArrayField of SchemaField exposing a numeric `priority` and string `type`/`phase`; TITAN keeps a
+  permissive shape (no core `type` validator) while satisfying that verifier. It provides `isExpired` /
   `isActive` (`!parent?.disabled`, for all duration types) / `isCombatEffect` getters and
   `_getInitialDocumentData` (captures the owning actor's active-combat initiative via
   `actor.getCombatant()?.initiative`). Active/inactive
@@ -226,8 +230,12 @@ and one or more inner Svelte component trees.
 **Base layer**
 
 - `TitanDocumentSheet` (`src/document/sheet/TitanDocumentSheet.js`) extends Foundry v14
-  `DocumentSheetV2`. In its constructor it builds a `ReactiveDocument` bridge around the document
-  (`this.#bridge`) and the UI-only `applicationState` store (`_createReactiveState()`); applies
+  `DocumentSheetV2`. Foundry v14 constructs document sheets as `new cls({ document })` (a single
+  options object), while TITAN subclasses pass the document positionally — `resolveDocumentSheetArguments`
+  (`src/helpers/utility-functions/ResolveDocumentSheetArguments.js`) normalizes both forms, and the
+  document is assigned onto the options object (never `mergeObject`-ed in, which would recurse into the
+  document's read-only collections). In its constructor it builds a `ReactiveDocument` bridge around the
+  document (`this.#bridge`) and the UI-only `applicationState` store (`_createReactiveState()`); applies
   default + dark-mode classes; and on first render (`_replaceHTML`, `options.isFirstRender`) mounts
   `DocumentSheetShell.svelte` via Svelte 5 `mount()`, passing `{ document: bridge, applicationState,
   shell }` as props. `_onClose` calls `unmount(handle, { outro: true })`.

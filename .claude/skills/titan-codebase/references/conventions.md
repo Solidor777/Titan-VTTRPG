@@ -148,9 +148,10 @@ Hook signature: `(application: ApplicationV2, menuItems: ContextMenuEntry[])`.
 `renderJournalEntryPageProseMirrorSheet` (was `renderJournalTextPageSheet`). Both follow the standard
 AppV2 render hook signature: `(application, element: HTMLElement, context, options)`.
 
-**ContextMenuEntry shape (v14)** — `{ name, icon, visible(li: HTMLElement), onClick(event, li: HTMLElement) }`.
-The old v13 shape used `condition` and `callback(entry)` (one argument); v14 renames these and passes
-two arguments to `onClick`. Directory entry `li` elements carry `li.dataset.entryId`; chat message
+**ContextMenuEntry shape (v14)** — `{ label, icon, visible(li: HTMLElement), onClick(event, li: HTMLElement) }`.
+The old v13 shape used `name`, `condition`, and `callback(entry)` (one argument); v14 renames them to
+`label` / `visible` / `onClick` (passing two arguments to `onClick`). The v13 names still work via a
+deprecation shim (removed in v16); TITAN's hooks use the v14 names. Directory entry `li` elements carry `li.dataset.entryId`; chat message
 `li` elements carry `li.dataset.messageId` (confirmed in `document-directory.mjs` line 237 and
 `chat.mjs` line 338). `li.closest('[data-entry-id]')?.dataset.entryId` is the safe accessor pattern
 (same as used in `_getEntryContextOptions` at `document-directory.mjs:237`).
@@ -214,8 +215,17 @@ test code under `src/`.
 - `globalThis.Hooks` — a `HooksMock` instance reinstalled fresh `beforeEach` test so hook registrations
   never leak across tests. Supports `on(name, fn)`, `off(name, fn)`, and `call(name, ...args)`.
 
+**Playwright E2E** — `npm run test:e2e` runs `playwright test` against a running Foundry world
+(`playwright.config.mjs`, `baseURL: http://localhost:30000`; env `FOUNDRY_USER` / optional
+`FOUNDRY_PASSWORD`). Specs live in `tests/e2e/`: `render-smoke.spec.js` (renders every document type's
+sheet, asserts zero uncaught page errors), `interaction-rolls.spec.js` (each `roll<Type>Check` posts a
+chat message of the expected `flags.titan.type` and the card renders), and `interaction-dialogs.spec.js`
+(check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/fixtures.js` provides `login`, `renderSheet`,
+and `ensureDocument` (creates missing world fixtures). Drives the real built system at the repo root, so
+it catches v14 API breaks that the mocked Vitest tier cannot.
+
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
-mode; `npm run test:e2e` is reserved for Playwright (not yet wired up).
+mode; `npm run test:e2e` runs the Playwright suite above.
 
 ## Style rules live in CLAUDE.md
 
