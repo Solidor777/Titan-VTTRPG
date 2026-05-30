@@ -12,9 +12,6 @@ export default class ReactiveDocument {
    /** @type {() => void} Subscriber registration returned by createSubscriber. */
    #subscribe;
 
-   /** @type {number[]} Hook ids registered by the temporary store-compat shim. */
-   #shimHooks = [];
-
    /**
     * @param {foundry.abstract.Document} doc - The Document to wrap.
     */
@@ -79,28 +76,11 @@ export default class ReactiveDocument {
    }
 
    /**
-    * TEMPORARY store-compat shim. Lets not-yet-migrated components that read `$document` keep working
-    * during the `$document`→`document.data` migration. Removed once no `$document` readers remain.
-    * @param {(value: foundry.abstract.Document) => void} run - Svelte store subscriber callback.
-    * @returns {() => void} Unsubscribe function.
-    */
-   subscribe(run) {
-      run(this.doc);
-      const name = this.doc.documentName;
-      const id = Hooks.on(`update${name}`, () => run(this.doc));
-      this.#shimHooks.push(id);
-      return () => {
-         Hooks.off(`update${name}`, id);
-      };
-   }
-
-   /**
-    * Tears down the temporary store-compat shim hooks. The `.data` subscriber tears down its own
-    * hooks automatically when the last reactive reader unsubscribes; this only cleans up the shim.
+    * Cleanup hook invoked by consumers on teardown (sheet close, chat-message delete). The `.data`
+    * subscriber tears down its own hooks automatically when the last reactive reader unsubscribes
+    * (on unmount), so this is a no-op retained for caller compatibility.
     */
    destroy() {
-      const name = this.doc.documentName;
-      this.#shimHooks.forEach((id) => Hooks.off(`update${name}`, id));
-      this.#shimHooks = [];
+      // Intentionally empty — createSubscriber handles hook teardown on unsubscribe.
    }
 }
