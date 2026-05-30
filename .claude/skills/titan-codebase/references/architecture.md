@@ -41,7 +41,8 @@
 - `OnCombatNextTurn.js` / `OnCombatPreviousTurn.js` delegate to actor system methods (`onTurnStart`, `onTurnEnd`,
   `onInitiativeAdvanced`) on `TitanActor`.
 - `OnRenderChatMessageHTML.js` mounts `ChatMessageShell.svelte` (from `src/document/types/chat-message/`) onto
-  titan-flagged chat messages using a `TJSDocument` store from `@typhonjs-fvtt/runtime`.
+  titan-flagged chat messages via Svelte 5 `mount()`, passing a `ReactiveDocument` bridge as the `documentStore`
+  prop.
 - `OnPreDeleteChatMessage.js` fires before a chat message is deleted (e.g., to clean up associated data).
 - `OnGetChatLogEntryContext.js` adds custom entries to the chat-log context menu.
 - Directory-context hooks (`OnGetActorDirectoryEntryContext`, `OnGetItemDirectoryEntryContext`) add UUID
@@ -69,12 +70,13 @@ extended by every concrete type under `document/types/`.
 
 **Vite configuration** (`vite.config.mjs`):
 - `root` is set to `src/` — all source paths resolve from there.
-- Path alias `~/` maps to `src/`, used throughout for imports (e.g. `~/helpers/…`).
+- Path aliases: `~/` maps to `src/` (used throughout, e.g. `~/helpers/…`); `$fonts/` maps to the repo `fonts/`
+  directory.
 - Build entry: `src/index.js` (referenced as `./index.js` relative to root).
 - Output format: ES module (`formats: ['es']`), output file named `index` → `index.js` at repo root.
 - `outDir` is the repo root (`__dirname`); `emptyOutDir: false` to avoid wiping non-built files.
-- CSS is extracted and emitted as `style.css` at repo root (PostCSS via
-  `@typhonjs-fvtt/runtime/rollup`'s `postcssConfig`).
+- CSS is extracted and emitted as `style.css` at repo root; PostCSS runs `autoprefixer` (configured directly in
+  `vite.config.mjs`, no TyphonJS rollup config).
 - SCSS preprocessing uses two paths: `svelte-preprocess` (Svelte component styles) uses `api: 'modern'` and
   prepends `@use "src/styles/Root.scss" as *;` to every `<style lang="scss">` block automatically; the global
   `css.preprocessorOptions.scss` path uses `api: 'modern-compiler'`.
@@ -87,4 +89,4 @@ extended by every concrete type under `document/types/`.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `effect`, `equipment`,
   `shield`, `spell`, `weapon`), ChatMessage (`testChat`).
 - `"socket": true` enables the system socket used by `SocketManager`.
-- Foundry compatibility (`system.json`): minimum v11, verified v13, maximum v13.
+- Foundry compatibility (`system.json`): minimum v13, verified v14, maximum v14.
