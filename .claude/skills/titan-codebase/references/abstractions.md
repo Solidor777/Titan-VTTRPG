@@ -230,6 +230,20 @@ and one or more inner Svelte component trees.
   `TitanSpellSheet`, `TitanShieldSheet`, `TitanAbilitySheet`, `TitanEquipmentSheet`,
   `TitanCommoditySheet`, `TitanEffectSheet`. Each mounts its own `*SheetShell.svelte`.
 
+**Active Effect sheet**
+
+- `TitanActiveEffectSheet` (`src/document/types/active-effect/sheet/TitanActiveEffectSheet.js`)
+  extends `TitanDocumentSheet` directly (NOT `TitanItemSheet`, to avoid item-only send-to-chat/import
+  header buttons). Reuses `createRulesElementItemSheetState` (document-agnostic) and exposes
+  `postAddCheck`/`preDeleteCheck`. Registered as the default sheet for `ActiveEffect` subtype
+  `effect` via `foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.ActiveEffect, …)`
+  in `OnceInit.js`. Mounts `ActiveEffectSheetShell.svelte`, which composes the generic
+  `ItemSheetBase` + `ItemSheetSidebar` with `ActiveEffectSheetHeader` (duration controls plus a
+  native-`disabled` active toggle for permanent effects) and `ActiveEffectSheetTabs` (Description /
+  Checks / Rules Elements). The Description tab (`ActiveEffectSheetDescriptionTab.svelte`) edits the
+  NATIVE `description` field, persisting via `document.data.update({ description })`; the Checks and
+  Rules Elements tabs reuse the item `ItemSheet*` components unchanged.
+
 
 ## Shared helpers
 
