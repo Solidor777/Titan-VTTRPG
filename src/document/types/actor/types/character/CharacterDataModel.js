@@ -772,7 +772,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       this.parent.effects.forEach((effect) => {
          if (
             effect.type === 'effect' &&
-            !effect.disabled &&
+            effect.system.isActive &&
             effect.system.rulesElement &&
             effect.system.rulesElement.length > 0
          ) {
