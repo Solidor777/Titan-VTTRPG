@@ -5842,7 +5842,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const message = {
          user: userId,
          speaker: this.parent.getSpeaker(),
-         type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+         style: CONST.CHAT_MESSAGE_STYLES.OTHER,
          whisper: getOwners(this.parent),
          flags: {
             titan: messageData,

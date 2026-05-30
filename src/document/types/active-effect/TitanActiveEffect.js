@@ -245,7 +245,7 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
             {
                user: game.user.id,
                speaker: actor?.getSpeaker() ?? ChatMessage.getSpeaker(),
-               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+               style: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.notification,
                flags: {
                   titan: messageData,

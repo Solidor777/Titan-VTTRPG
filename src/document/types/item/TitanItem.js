@@ -45,7 +45,7 @@ export default class TitanItem extends Item {
             {
                user: game.user.id,
                speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
-               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+               style: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.notification,
                flags: {
                   titan: messageData,

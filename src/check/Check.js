@@ -206,7 +206,7 @@ export default class TitanCheck {
             {
                user: game.user.id,
                speaker: options?.speaker ?? ChatMessage.getSpeaker(),
-               type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+               style: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.dice,
                flags: {
                   titan: messageData,
