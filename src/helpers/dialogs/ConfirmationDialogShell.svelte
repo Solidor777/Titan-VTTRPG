@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import Text from '~/helpers/svelte-components/Text.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
