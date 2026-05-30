@@ -171,12 +171,16 @@ and one or more inner Svelte component trees.
 
 **Base layer**
 
-- `TitanDocumentSheet` (`src/document/sheet/TitanDocumentSheet.js`) extends
-  `SvelteApplication` (TyphonJS). Wraps the document in a `TJSDocument` reactive store,
-  mounts `DocumentSheetShell.svelte` as the root Svelte component, injects the document and
-  `applicationState` stores via Svelte context, and applies dark-mode class handling.
-- `DocumentSheetShell.svelte` — the `ApplicationShell` wrapper; it receives `document`,
-  `applicationState`, and a `shell` prop, then mounts the shell with `<svelte:component>`.
+- `TitanDocumentSheet` (`src/document/sheet/TitanDocumentSheet.js`) extends Foundry v14
+  `DocumentSheetV2`. In its constructor it builds a `ReactiveDocument` bridge around the document
+  (`this.#bridge`) and the UI-only `applicationState` store (`_createReactiveState()`); applies
+  default + dark-mode classes; and on first render (`_replaceHTML`, `options.isFirstRender`) mounts
+  `DocumentSheetShell.svelte` via Svelte 5 `mount()`, passing `{ document: bridge, applicationState,
+  shell }` as props. `_onClose` calls `unmount(handle, { outro: true })`.
+- `DocumentSheetShell.svelte` — receives `{ document, applicationState, shell }` as `$props()`, sets
+  `document` (the `ReactiveDocument` bridge) and `applicationState` into Svelte context, and renders
+  the type-specific shell via `{#if shell}{@const Shell = shell}<Shell />{/if}` (not
+  `<svelte:component>`).
 
 **Actor sheets**
 
@@ -278,11 +282,12 @@ confirm/apply buttons that call back into `CharacterDataModel` methods (via `Soc
 the acting user is not the document owner) to commit automation outcomes such as damage or
 healing.
 
-`TitanDocumentSheet` (extending TyphonJS `SvelteApplication`) wraps the document in a
-`TJSDocument` store and mounts `DocumentSheetShell.svelte`, making the document reactively
-available to the entire sheet component tree via Svelte context. Sheet subclasses supply their
-own shell Svelte component (e.g., `PlayerSheetShell.svelte`) and an `applicationState` store for
-UI-only state (open tabs, expanded sections) that does not need to be persisted.
+`TitanDocumentSheet` (extending Foundry v14 `DocumentSheetV2`) wraps the document in a
+`ReactiveDocument` bridge and mounts `DocumentSheetShell.svelte` with Svelte 5 `mount()`, making the
+document reactively available to the entire sheet component tree via Svelte context (children read
+`document.data.*`). Sheet subclasses supply their own shell Svelte component (e.g.,
+`PlayerSheetShell.svelte`) and an `applicationState` store for UI-only state (open tabs, expanded
+sections) that does not need to be persisted.
 
 `ActionQueue` serializes async mutations within `EffectDataModel` and other automation paths so
 that concurrent Foundry updates do not interleave. `SocketManager` bridges client boundaries,
