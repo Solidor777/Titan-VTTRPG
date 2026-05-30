@@ -5,8 +5,13 @@
    import ItemSheetRulesElementOperationSelect
       from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetPersistentDamageSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetPersistentDamageSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

@@ -13,14 +13,15 @@
    import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
    import error from '~/helpers/utility-functions/Error.js';
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
+   /**
+    * @typedef {object} ItemSheetRulesElementOperationSelectProps
+    * @property {boolean} [disabled] Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] The Tooltip to display for this element, if any.
+    * @property {number} [idx] The index of the Rules Element in the rules elements array.
+    */
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {number} The index of the Rules Element in the rules elements array. */
-   export let idx = void 0;
+   /** @type {ItemSheetRulesElementOperationSelectProps} */
+   const { disabled = false, tooltip = undefined, idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

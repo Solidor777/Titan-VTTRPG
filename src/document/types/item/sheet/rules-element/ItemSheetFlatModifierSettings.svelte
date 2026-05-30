@@ -11,12 +11,17 @@
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetFlatModifierSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetFlatModifierSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-   
+
    /** @type {string[]} Options for selecting the stat the flat modifier applies to. */
    const selectorOptions = [
       'attribute',
@@ -124,14 +129,17 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].selector}
-         on:change={onSelectorChange}
+         onchange={onSelectorChange}
          options={selectorOptions}
       />
    </div>
 
    <!--Key-->
    <div class="field select">
-      <svelte:component bind:value={$document.system.rulesElement[idx].key} this={getKeySelect()}/>
+      {#if getKeySelect()}
+         {@const KeySelect = getKeySelect()}
+         <KeySelect bind:value={$document.system.rulesElement[idx].key}/>
+      {/if}
    </div>
 
    <!--Value-->

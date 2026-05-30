@@ -9,14 +9,19 @@
    import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
    import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
 
+   /**
+    * @typedef {object} ItemSheetSidebarCheckProps
+    * @property {number} [idx] Index of the Check in the item's system data.
+    */
+
+   /** @type {ItemSheetSidebarCheckProps} */
+   const { idx = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-   /** @type {number} Index of the Check in the item's system data. */
-   export let idx = void 0;
 </script>
 
 {#if $document?.system.check[idx]}
@@ -113,7 +118,7 @@
    </div>
 {/if}
 
-<div/>
+<div></div>
 
 <style lang="scss">
    .check {

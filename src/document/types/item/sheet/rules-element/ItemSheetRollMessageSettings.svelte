@@ -11,15 +11,19 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetRollMessageSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetRollMessageSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
+   const element = $derived($document?.system.rulesElement[idx]);
 
    /** @type {{label: string, value: string}[]} Options for the type of check that triggers the roll message. */
    const checkTypeOptions = [
@@ -190,12 +194,12 @@
 
    <!--Operation Fields-->
    <div class="fields">
-      
+
       <!--Type-->
       <div class="field select">
          <DocumentSelect
             bind:value={$document.system.rulesElement[idx].checkType}
-            on:change={onCheckTypeChange}
+            onchange={onCheckTypeChange}
             options={checkTypeOptions}
          />
       </div>
@@ -204,7 +208,7 @@
       <div class="field select">
          <DocumentSelect
             bind:value={$document.system.rulesElement[idx].selector}
-            on:change={onSelectorChange}
+            onchange={onSelectorChange}
             options={selectorOptions[element.checkType]}
          />
       </div>
@@ -213,10 +217,10 @@
       {#if element.selector !== 'multiAttack'
       && element.selector !== 'any'}
          <div class="field select">
-            <svelte:component
-               this={getSelector()}
-               bind:value={$document.system.rulesElement[idx].key}
-            />
+            {#if getSelector()}
+               {@const Selector = getSelector()}
+               <Selector bind:value={$document.system.rulesElement[idx].key}/>
+            {/if}
          </div>
       {/if}
    </div>

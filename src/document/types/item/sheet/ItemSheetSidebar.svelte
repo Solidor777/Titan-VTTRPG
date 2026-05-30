@@ -8,18 +8,19 @@
    const document = getContext('document');
 
    /**
-    * @type {object[]}
     * Each section of the Sidebar.
     * Only includes the Checks section if the item has checks.
     * Always includes the Traits section since custom traits are added from the Sidebar.
+    * @type {object[]}
     */
-   $: sections =
+   const sections = $derived(
       $document.system.check.length > 0
          ? [
             ItemSheetSidebarTraits,
             ItemSheetSidebarChecks,
          ]
-         : [ItemSheetSidebarTraits];
+         : [ItemSheetSidebarTraits]
+   );
 </script>
 
 <DocumentSheetScrollingSidebar {sections}/>

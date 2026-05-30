@@ -3,6 +3,14 @@
    import DocumentImagePicker from '~/document/svelte-components/input/DocumentImagePicker.svelte';
    import DocumentNameInput from '~/document/svelte-components/input/DocumentNameInput.svelte';
 
+   /**
+    * @typedef {object} ItemSheetHeaderProps
+    * @property {import('svelte').Snippet} [children] Optional secondary stats content rendered inside the header.
+    */
+
+   /** @type {ItemSheetHeaderProps} */
+   const { children } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
@@ -22,7 +30,7 @@
 
       <!--Secondary Stats-->
       <div class="secondary-stats">
-         <slot/>
+         {@render children?.()}
       </div>
    </div>
 </div>

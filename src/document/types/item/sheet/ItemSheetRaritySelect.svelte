@@ -3,11 +3,16 @@
    import { getContext } from 'svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
+   /**
+    * @typedef {object} ItemSheetRaritySelectProps
+    * @property {boolean} [disabled] Whether the input should currently be disabled.
+    */
+
+   /** @type {ItemSheetRaritySelectProps} */
+   const { disabled = false } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
 </script>
 
 <LabeledElement
@@ -20,4 +25,3 @@
       onchange={() => $document.update({system: {rarity: $document.system.rarity}})}
    />
 </LabeledElement>
-

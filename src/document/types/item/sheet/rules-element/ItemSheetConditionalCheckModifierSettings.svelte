@@ -9,15 +9,16 @@
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetConditionalCheckModifierSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetConditionalCheckModifierSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
 
    /** @type {string[]} Options for the type of value the modifier applies to. */
    const modifierTypeOptions = [
@@ -128,7 +129,8 @@
       if (
          $document.system.rulesElement[idx].selector !== 'customTrait' &&
          $document.system.rulesElement[idx].selector !== 'attribute' &&
-         !($document.system.rulesElement[idx].checkType !== 'any' && element.selector === 'skill')
+         !($document.system.rulesElement[idx].checkType !== 'any' &&
+           $document.system.rulesElement[idx].selector === 'skill')
       ) {
          $document.system.rulesElement[idx].selector = 'any';
          onSelectorChange();
@@ -217,7 +219,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].modifierType}
-         on:change={onModifierTypeChanged}
+         onchange={onModifierTypeChanged}
          options={modifierTypeOptions}
       />
    </div>
@@ -226,7 +228,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].checkType}
-         on:change={onCheckTypeChange}
+         onchange={onCheckTypeChange}
          options={$document.system.rulesElement[idx].modifierType === 'healing'
                   ? healingCheckTypeOptions
                   : checkTypeOptions}
@@ -237,7 +239,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].selector}
-         on:change={onSelectorChange}
+         onchange={onSelectorChange}
          options={selectorOptions[$document.system.rulesElement[idx].checkType]}
       />
    </div>
@@ -245,10 +247,10 @@
    <!--Key-->
    {#if $document.system.rulesElement[idx].selector !== 'any'}
       <div class="field select">
-         <svelte:component
-            this={getSelector()}
-            bind:value={$document.system.rulesElement[idx].key}
-         />
+         {#if getSelector()}
+            {@const Selector = getSelector()}
+            <Selector bind:value={$document.system.rulesElement[idx].key}/>
+         {/if}
       </div>
    {/if}
 

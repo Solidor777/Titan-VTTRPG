@@ -3,8 +3,13 @@
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetFastHealingSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetFastHealingSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

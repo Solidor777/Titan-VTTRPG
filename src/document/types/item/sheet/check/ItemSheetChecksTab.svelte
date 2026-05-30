@@ -14,21 +14,6 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-   /** @type {number[]} The filtered list of check indices to display. */
-   let filteredEntries;
-   $: {
-      filteredEntries = [];
-      for (const [idx, entry] of $document.system.check.entries()) {
-         if (
-            entry.label
-               .toLowerCase()
-               .indexOf($appState.tabs.checks.filter.toLowerCase()) !== -1
-         ) {
-            filteredEntries.push(idx);
-         }
-      }
-   }
 </script>
 
 <div class="tab">
@@ -64,7 +49,7 @@
                <!--Button Content-->
                <div class="button-content">
                   <!--Icon-->
-                  <i class={CREATE_ICON}/>
+                  <i class={CREATE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">

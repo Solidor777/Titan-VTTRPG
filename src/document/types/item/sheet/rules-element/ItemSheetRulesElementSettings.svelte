@@ -23,57 +23,52 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetRulesElementSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetRulesElementSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object | undefined} The operation-specific settings component for this Rules Element. */
-   let operationSettingsComponent;
-   $: {
+   /**
+    * The operation-specific settings component for this Rules Element.
+    * @type {object | undefined}
+    */
+   const operationSettingsComponent = $derived.by(() => {
       switch ($document?.system.rulesElement[idx]?.operation) {
          case 'conditionalCheckModifier': {
-            operationSettingsComponent =
-               ItemSheetConditionalCheckModifierSettings;
-            break;
+            return ItemSheetConditionalCheckModifierSettings;
          }
          case 'conditionalRatingModifier': {
-            operationSettingsComponent =
-               ItemSheetConditionalRatingModifierSettings;
-            break;
+            return ItemSheetConditionalRatingModifierSettings;
          }
          case 'fastHealing': {
-            operationSettingsComponent = ItemSheetFastHealingSettings;
-            break;
+            return ItemSheetFastHealingSettings;
          }
          case 'flatModifier': {
-            operationSettingsComponent = ItemSheetFlatModifierSettings;
-            break;
+            return ItemSheetFlatModifierSettings;
          }
          case 'mulBase': {
-            operationSettingsComponent = ItemSheetMulBaseSettings;
-            break;
+            return ItemSheetMulBaseSettings;
          }
          case 'persistentDamage': {
-            operationSettingsComponent = ItemSheetPersistentDamageSettings;
-            break;
+            return ItemSheetPersistentDamageSettings;
          }
          case 'rollMessage': {
-            operationSettingsComponent = ItemSheetRollMessageSettings;
-            break;
+            return ItemSheetRollMessageSettings;
          }
          case 'turnMessage': {
-            operationSettingsComponent = ItemSheetTurnMessageSettings;
-            break;
+            return ItemSheetTurnMessageSettings;
          }
          default: {
-            operationSettingsComponent = ItemSheetInvalidRulesElement;
-            break;
+            return ItemSheetInvalidRulesElement;
          }
       }
-   }
-
+   });
 </script>
 
 <!--Rules Element Settings-->
@@ -101,10 +96,9 @@
 
       <!--Operation Specific settings.-->
       <div class="row operation-settings">
-         <svelte:component
-            this={operationSettingsComponent}
-            {idx}
-         />
+         {#each [operationSettingsComponent] as OpSettings}
+            <OpSettings {idx}/>
+         {/each}
       </div>
    </div>
 {/if}

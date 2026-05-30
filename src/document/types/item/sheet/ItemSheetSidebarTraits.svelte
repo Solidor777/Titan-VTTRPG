@@ -7,23 +7,26 @@
    import { slide } from 'svelte/transition';
    import IconLabelButton from '~/helpers/svelte-components/button/IconLabelButton.svelte';
 
+   /**
+    * @typedef {object} ItemSheetSidebarTraitsProps
+    * @property {object[]} [itemTypeTraits] An optional input array of traits converted into Tags.
+    * @property {Function | undefined} [editTraits] An optional function to start editing item-type specific traits.
+    */
+
+   /** @type {ItemSheetSidebarTraitsProps} */
+   const { itemTypeTraits = [], editTraits = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object[]} An optional input array of traits converted into Tags. */
-   export let itemTypeTraits = [];
-
-   /** @type {function | undefined} An optional function to start editing item-type specific traits. */
-   export let editTraits = void 0;
-
-   /** @type {object[]} The complete list of traits converted into tags. */
-   let tags;
-
-   // Add Custom Traits to the tags list.
-   $: {
-      tags = [...itemTypeTraits];
+   /**
+    * The complete list of traits converted into tags.
+    * @type {object[]}
+    */
+   const tags = $derived.by(() => {
+      const result = [...itemTypeTraits];
       for (const [idx] in $document.system.customTrait) {
-         tags.push({
+         result.push({
             id: $document.system.customTrait[idx].uuid,
             component: ItemSheetCustomTraitTag,
             props: {
@@ -31,7 +34,8 @@
             }
          });
       }
-   }
+      return result;
+   });
 </script>
 
 <div class="traits">

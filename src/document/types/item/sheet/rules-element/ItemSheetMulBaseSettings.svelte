@@ -11,8 +11,13 @@
    import assert from '~/helpers/utility-functions/Assert.js';
    import DocumentNumberInput from '~/document/svelte-components/input/DocumentNumberInput.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetMulBaseSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetMulBaseSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -123,14 +128,17 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].selector}
-         on:change={onSelectorChange}
+         onchange={onSelectorChange}
          options={selectorOptions}
       />
    </div>
 
    <!--Key-->
    <div class="field select">
-      <svelte:component bind:value={$document.system.rulesElement[idx].key} this={getSelector()}/>
+      {#if getSelector()}
+         {@const Selector = getSelector()}
+         <Selector bind:value={$document.system.rulesElement[idx].key}/>
+      {/if}
    </div>
 
    <!--Value-->

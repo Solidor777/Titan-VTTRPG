@@ -1,14 +1,15 @@
 <script>
    import { getContext } from 'svelte';
 
-   /** @type {object | undefined} The Header component for the sheet. */
-   export let header = void 0;
+   /**
+    * @typedef {object} ItemSheetBaseProps
+    * @property {object | undefined} [header] The Header component for the sheet.
+    * @property {object | undefined} [sidebar] The Sidebar component for the sheet.
+    * @property {object | undefined} [tabs] The Tabs component for the sheet.
+    */
 
-   /** @type {object | undefined} The Sidebar component for the sheet. */
-   export let sidebar = void 0;
-
-   /** @type {object | undefined} The Tabs component for the sheet. */
-   export let tabs = void 0;
+   /** @type {ItemSheetBaseProps} */
+   const { header = undefined, sidebar = undefined, tabs = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -18,7 +19,11 @@
    <div class="titan-sheet">
       <!--Header-->
       <div class="header">
-         <svelte:component this={header}/>
+         {#if header}
+            {#each [header] as Header}
+               <Header/>
+            {/each}
+         {/if}
       </div>
 
       <!--Sheet body-->
@@ -26,12 +31,20 @@
 
          <!--Sidebar-->
          <div class="sidebar">
-            <svelte:component this={sidebar}/>
+            {#if sidebar}
+               {#each [sidebar] as Sidebar}
+                  <Sidebar/>
+               {/each}
+            {/if}
          </div>
 
          <!--Tabs-->
          <div class="tabs">
-            <svelte:component this={tabs}/>
+            {#if tabs}
+               {#each [tabs] as TabsComp}
+                  <TabsComp/>
+               {/each}
+            {/if}
          </div>
       </div>
    </div>

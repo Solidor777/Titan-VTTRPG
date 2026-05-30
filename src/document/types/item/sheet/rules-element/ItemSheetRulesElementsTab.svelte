@@ -16,8 +16,6 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-
 </script>
 
 <div class="tab">
@@ -52,7 +50,7 @@
             <!--Button Content-->
             <div class="button-content">
                <!--Icon-->
-               <i class={CREATE_ICON}/>
+               <i class={CREATE_ICON}></i>
 
                <!--Label-->
                <div class="label">

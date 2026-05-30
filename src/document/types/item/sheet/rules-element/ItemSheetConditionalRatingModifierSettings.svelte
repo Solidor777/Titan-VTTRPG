@@ -9,8 +9,13 @@
    import DocumentShieldTraitSelect from '~/document/svelte-components/select/DocumentShieldTraitSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetConditionalRatingModifierSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetConditionalRatingModifierSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -135,7 +140,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].rating}
-         on:change={onRatingChange}
+         onchange={onRatingChange}
          options={ratingOptions}
       />
    </div>
@@ -144,7 +149,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={$document.system.rulesElement[idx].selector}
-         on:change={onSelectorChange}
+         onchange={onSelectorChange}
          options={$document.system.rulesElement[idx].rating === 'defense'
                   ? defenseSelectorOptions
                   : attackSelectorOptions}
@@ -153,7 +158,10 @@
 
    <!--Key-->
    <div class="field select">
-      <svelte:component bind:value={$document.system.rulesElement[idx].key} this={getSelector()}/>
+      {#if getSelector()}
+         {@const Selector = getSelector()}
+         <Selector bind:value={$document.system.rulesElement[idx].key}/>
+      {/if}
    </div>
 
    <!--Value-->
@@ -175,4 +183,3 @@
       }
    }
 </style>
-

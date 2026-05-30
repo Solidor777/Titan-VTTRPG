@@ -3,18 +3,23 @@
    import { slide } from 'svelte/transition';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
 
+   /**
+    * @typedef {object} DocumentSheetScrollingSidebarProps
+    * @property {object[] | undefined} [sections] List of Svelte Components that make up the sections of the sidebar.
+    */
+
+   /** @type {DocumentSheetScrollingSidebarProps} */
+   const { sections = undefined } = $props();
+
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-   /** @type {SvelteComponent[]} List of Svelte Components that make up the sections of the sidebar. */
-   export let sections = void 0;
 </script>
 
 <div class="sidebar">
    <ScrollingContainer bind:scrollTop={$appState.sidebar.scrollTop}>
-      {#each sections as section}
+      {#each sections as Section}
          <div class="section" transition:slide|local>
-            <svelte:component this={section}/>
+            <Section/>
          </div>
       {/each}
    </ScrollingContainer>
