@@ -26,20 +26,22 @@ under "Accepted debt" are documented decisions to NOT change, with rationale.
   - `src/helpers/svelte-components/button/IconButton.svelte` — add an optional `label` prop wired to
     `aria-label`.
 
+## Resolved (2026-05-30)
+
+- **`EditDeleteTag.svelte` anchors-as-buttons — DONE.** The edit/delete icons are now real
+  `<button type="button">` with a scoped chrome reset (font-family deliberately untouched so the
+  FontAwesome glyph keeps its font; the separator/layout is unchanged). All three a11y suppressions
+  removed. Foundry's core `button` styles are `@layer`-ed, so the unlayered `.tag button` reset wins
+  the cascade and should render identically (final in-Foundry visual sign-off pending).
+- **`IconButton.svelte` generic icon button — DONE.** `label` is now a required prop and the
+  `a11y_consider_explicit_label` suppression is removed. Every path that reaches `IconButton`
+  (direct sites, the `MiniIconButton`/`DocumentOwnerIconButton` wrappers, and the 5 extra consumers
+  surfaced by audit) supplies `label={localize('…')}`. As part of this, every `aria-label` in `src/`
+  was converted to `localize()` and the needed `lang/en.json` keys were added. See
+  `2026-05-30-a11y-localized-aria-labels.md`.
+
 ## Accepted debt (no action — documented decisions)
 
-- **`EditDeleteTag.svelte` anchors-as-buttons.** The edit/delete icons are
-  `<a role="button" tabindex="0">` with no `href` and no text content, so `a11y_missing_attribute`
-  and `a11y_missing_content` remain suppressed even after adding `aria-label`. The clean fix is to
-  convert them to `<button type="button">`, but the `tag` mixin provides no button reset, so a bare
-  `<button>` would inherit browser chrome and need new reset CSS — a visual-regression risk that is
-  out of scope for a mechanical cleanup. Note: those two suppression comments use the old
-  hyphenated Svelte 4 names (`a11y-missing-attribute`, `a11y-missing-content`); modernize to the
-  underscore Svelte 5 names if/when this component is reworked.
-- **`IconButton.svelte` generic icon button.** After adding the optional `label` prop, the
-  `a11y_consider_explicit_label` suppression stays as a fallback because not every call site passes
-  a label. Fully retiring it requires auditing all `IconButton` consumers to pass a `label`; tracked
-  as follow-up, not done here.
 - **~21 `svelte-ignore state_referenced_locally`.** On intentional, lifetime-stable `setContext(...)`
   captures (e.g. `DocumentSheetShell.svelte`, `CheckDialogShell.svelte`, and many check-button
   components). The values never change for the component's life, so the warning is a false positive;
