@@ -20,7 +20,7 @@
 <div class="spend-resolve-button">
    <Button {disabled} {onclick}>
       <div class="button-inner">
-         <i class="fa fa-bolt"/>
+         <i class="fa fa-bolt"></i>
          <div>
             {localize('spendX%Resolve').replace('X%', resolveCost.toString())}
          </div>

@@ -100,7 +100,7 @@
 
    <!--Icon-->
    {#if icon}
-      <i class={icon}/>
+      <i class={icon}></i>
    {/if}
 </div>
 

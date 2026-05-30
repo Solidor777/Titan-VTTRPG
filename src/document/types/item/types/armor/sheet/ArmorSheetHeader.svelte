@@ -23,7 +23,7 @@
 
    <!--Value-->
    <div class="stat">
-      <i class={CURRENCY_ICON}/>
+      <i class={CURRENCY_ICON}></i>
       <div class="label">
          {localize('value')}
       </div>
@@ -37,7 +37,7 @@
 
    <!--Armor-->
    <div class="stat">
-      <i class="{ARMOR_ICON}e"/>
+      <i class="{ARMOR_ICON}e"></i>
       <div class="label">
          {localize('armor')}
       </div>

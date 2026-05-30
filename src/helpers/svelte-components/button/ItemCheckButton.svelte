@@ -24,14 +24,14 @@
 <div class="item-check-button {attribute}">
    <Button {disabled} {onclick}>
       <div class="button-inner">
-         <i class={DICE_ICON}/>
+         <i class={DICE_ICON}></i>
          <div>
             {label}
          </div>
 
          {#if resolveCost}
             <div class="resolve">
-               <i class={SPEND_RESOLVE_ICON}/>
+               <i class={SPEND_RESOLVE_ICON}></i>
                <div>
                   {resolveCost}
                </div>

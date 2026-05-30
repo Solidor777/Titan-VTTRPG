@@ -110,7 +110,7 @@
             </div>
 
             <!--DC-->
-            <div class="stat label"/>
+            <div class="stat label"></div>
 
             <!--Resolve Cost-->
             {#if check.resolveCost > 0}

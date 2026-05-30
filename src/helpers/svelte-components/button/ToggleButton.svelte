@@ -26,7 +26,7 @@
       <div class="label">
          {label}
       </div>
-      <i class={active ? CHECKED_ICON : UNCHECKED_ICON}/>
+      <i class={active ? CHECKED_ICON : UNCHECKED_ICON}></i>
    </div>
 </Button>
 

@@ -35,7 +35,7 @@
             </div>
          </div>
 
-         <div class="divider"/>
+         <div class="divider"></div>
 
          <!--Skill-->
          <div class="stat">
@@ -86,7 +86,7 @@
             </div>
          </div>
 
-         <div class="divider"/>
+         <div class="divider"></div>
 
          <!--Complexity-->
          <div class="stat">

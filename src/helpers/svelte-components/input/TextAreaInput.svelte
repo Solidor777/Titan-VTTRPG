@@ -23,7 +23,7 @@
    {disabled}
    {onchange}
    use:tooltipAction={tooltip}
-/>
+></textarea>
 
 <style lang="scss">
    textarea {

@@ -29,7 +29,7 @@
    <div class="stat label">
       <!--Icon-->
       {#if labelIcons[aspect.label]}
-         <i class={labelIcons[aspect.label]}/>
+         <i class={labelIcons[aspect.label]}></i>
       {/if}
 
       <!--Label or Units-->

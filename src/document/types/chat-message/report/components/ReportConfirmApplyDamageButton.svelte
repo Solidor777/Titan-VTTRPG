@@ -55,7 +55,7 @@
 <!--Apply damage button-->
 <div class="button">
    <Button onclick={() => confirmDamageApplied()}>
-      <i class={REGAIN_RESOLVE_ICON}/>
+      <i class={REGAIN_RESOLVE_ICON}></i>
       {localize('applyX%Damage').replace(
          'X%',
          document.data.flags.titan.damageApplied.total,

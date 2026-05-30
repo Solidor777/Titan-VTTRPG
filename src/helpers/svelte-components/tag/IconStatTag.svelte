@@ -19,7 +19,7 @@
    use:tooltipAction={tooltip}
 >
    <!--Icon-->
-   <i class={icon}/>
+   <i class={icon}></i>
 
    <!--Label-->
    <div class="label">

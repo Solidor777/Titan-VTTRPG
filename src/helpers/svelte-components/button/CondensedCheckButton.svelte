@@ -52,7 +52,7 @@
 
                <!-- Check Icon-->
                {#if checkIcon}
-                  <i class={checkIcon}/>
+                  <i class={checkIcon}></i>
                {/if}
 
                <!--Label-->
@@ -74,7 +74,7 @@
          <!--Total Dice-->
          {#if totalDice}
             <div class="stat">
-               <i class={DICE_ICON}/>
+               <i class={DICE_ICON}></i>
                {totalDice}
             </div>
          {/if}
@@ -82,7 +82,7 @@
          <!--Total Expertise-->
          {#if totalExpertise}
             <div class="stat">
-               <i class={EXPERTISE_ICON}/>
+               <i class={EXPERTISE_ICON}></i>
                {totalExpertise}
             </div>
          {/if}
@@ -90,7 +90,7 @@
          <!--Resolve Cost-->
          {#if resolveCost}
             <div class="stat">
-               <i class={SPEND_RESOLVE_ICON}/>
+               <i class={SPEND_RESOLVE_ICON}></i>
                {resolveCost}
             </div>
          {/if}

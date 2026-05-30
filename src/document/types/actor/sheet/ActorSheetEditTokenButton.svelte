@@ -26,12 +26,13 @@
 </script>
 
 <!--Edit Token Button-->
-<button class="header-control icon edit-token-button"
+<button aria-label="Edit Token"
+        class="header-control icon edit-token-button"
         on:click={() => editToken()}
         use:tooltipAction={
            (application.token?.actorLink
            || application.token === null && document.data.prototypeToken?.actorLink)
         ? 'editLinkedToken.desc'
         : 'editUnlinkedToken.desc'}>
-   <i class={EDIT_TOKEN_ICON}/>
+   <i class={EDIT_TOKEN_ICON}></i>
 </button>

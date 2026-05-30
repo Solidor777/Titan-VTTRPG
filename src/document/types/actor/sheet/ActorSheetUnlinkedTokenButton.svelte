@@ -5,8 +5,8 @@
 
 <!--Unlink Button-->
 <div class="inactive-button" use:tooltipAction={'unlinkedTokenButton.desc'}>
-   <button class="header-control icon" disabled={true}>
-      <i class="unlinked {UNLINKED_ICON}"/>
+   <button aria-label="Token Unlinked" class="header-control icon" disabled={true}>
+      <i class="unlinked {UNLINKED_ICON}"></i>
    </button>
 </div>
 

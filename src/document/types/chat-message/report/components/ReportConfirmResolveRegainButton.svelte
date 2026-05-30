@@ -46,7 +46,7 @@
 <!--Regain resolve button-->
 <div class="button">
    <Button onclick={() => confirmRegainResolve()}>
-      <i class={REGAIN_RESOLVE_ICON}/>
+      <i class={REGAIN_RESOLVE_ICON}></i>
       {localize('regainX%Resolve').replace(
          'X%',
          document.data.flags.titan.resolveRegain.total,

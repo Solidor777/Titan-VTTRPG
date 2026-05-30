@@ -20,10 +20,11 @@
 </script>
 
 <!--Unlink Button-->
-<button class="header-control icon unlink-token-button"
+<button aria-label="Unlink Token"
+        class="header-control icon unlink-token-button"
         on:click={() => unlinkToken()}
         use:tooltipAction={'unlinkTokenButton.desc'}>
-   <i class="linked {LINKED_ICON}"/>
+   <i class="linked {LINKED_ICON}"></i>
 </button>
 
 <style lang="scss">
