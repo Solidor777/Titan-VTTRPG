@@ -51,7 +51,6 @@ management). Data model classes hold the schema, field validation, and derived-d
 - Concrete item data models and which base they extend:
   - `AbilityDataModel` — `RulesElementItemDataModel` (adds xpCost, rarity)
   - `ArmorDataModel` — `RulesElementItemDataModel` (adds rarity, value, armor value schema, traits)
-  - `EffectDataModel` — `RulesElementItemDataModel` (adds duration, turn tracking)
   - `EquipmentDataModel` — `RulesElementItemDataModel` (adds rarity, value, equipped state)
   - `ShieldDataModel` — `RulesElementItemDataModel` (adds rarity, value, defense bonus, traits)
   - `WeaponDataModel` — `RulesElementItemDataModel` (adds attacks array, weapon traits)
@@ -73,8 +72,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   (`TitanItem.sendToChat` sets `flags.titan = getRollData()` directly). This puts `check`, `customTrait`,
   and `duration` at the `flags.titan` root, where both the effect chat components and the item-check roll
   path (`CharacterDataModel.initializeItemCheckOptions` reads `itemRollData.check`/`itemRollData.customTrait`)
-  resolve them. The effect chat components (`EffectChatMessage.svelte`, `EffectChatStats.svelte`) read these
-  fields at the `item` root, like the working item chat cards. It also carries the same check and
+  resolve them. The effect chat components (`EffectChatMessage.svelte`, `EffectChatStats.svelte`, in
+  `src/document/types/active-effect/chat-message/`) read these fields at the `item` root, like the working item
+  chat cards; `ChatMessageShell.svelte` maps the `effect` chat-card type to `EffectChatMessage`. It also carries
+  the same check and
   custom-trait mutators as `TitanItem` (`addCheck` / `deleteCheck` / `addCustomTrait` / `editCustomTrait`
   / `deleteCustomTrait`), ported inline (not via a shared mixin) with identical bodies; they operate on
   `system.check` / `system.customTrait` via `this.update(...)`, notify the sheet through
@@ -195,8 +196,9 @@ functions in `src/document/types/item/rules-element/` create default instances:
 | `createRollMessageElement`       | `rollMessage`                | Display a message when a matching check is rolled. |
 | `createTurnMessageElement`       | `turnMessage`                | Display a message at the character's turn start/end|
 
-Items that can carry rules elements: Ability, Armor, Effect, Equipment, Shield, Weapon (all
-extend `RulesElementItemDataModel`). Commodity and Spell do not.
+Items that can carry rules elements: Ability, Armor, Equipment, Shield, Weapon (all extend
+`RulesElementItemDataModel`). Commodity and Spell do not. Effect Active Effects also carry rules elements via
+`TitanActiveEffectDataModel` (which mixes in `RulesElementMixin`), not as an item type.
 
 `CharacterDataModel.prepareDerivedData` iterates the actor's owned items, reads each item's
 `rulesElement` array, and applies the elements to the character's derived stats.
@@ -237,8 +239,9 @@ and one or more inner Svelte component trees.
   Effects** (not items). Its create button calls
   `document.data.createEmbeddedDocuments('ActiveEffect', [{ name, type: 'effect' }])`. It uses a
   dedicated `CharacterSheetEffectList.svelte` (sibling of the item-only `CharacterSheetItemList`)
-  that iterates `document.data.effects` filtered to `type === 'effect'`, handles drag-out via the
-  effect's native `toDragData()`, and renders each via `CharacterSheetEffect.svelte`.
+  that iterates `document.data.effects` filtered to `type === 'effect'` (a sibling of the item-only
+  `CharacterSheetItemList`), handles drag-out via the effect's native `toDragData()`, and renders each via
+  `CharacterSheetEffect.svelte`.
   `CharacterSheetEffect` takes an `effect` prop, reuses the generic `CharacterSheetItem` shell, and
   exposes a `CharacterSheetEffectToggleActiveButton.svelte` (active = `effect.system.isActive`,
   toggled via `document.data.system.toggleEffectActive(effect.id)`) shown for all duration types.
@@ -250,7 +253,7 @@ and one or more inner Svelte component trees.
   `RulesElementItemSheetState` for items that carry rules elements.
 - Per-type item sheets all extend `TitanItemSheet`: `TitanWeaponSheet`, `TitanArmorSheet`,
   `TitanSpellSheet`, `TitanShieldSheet`, `TitanAbilitySheet`, `TitanEquipmentSheet`,
-  `TitanCommoditySheet`, `TitanEffectSheet`. Each mounts its own `*SheetShell.svelte`.
+  `TitanCommoditySheet`. Each mounts its own `*SheetShell.svelte`.
 
 **Active Effect sheet**
 
@@ -273,7 +276,7 @@ and one or more inner Svelte component trees.
 
 A serial task queue. Because Foundry actor updates are asynchronous and can race, components
 enqueue callbacks with a unique `key`; duplicate-key entries are deduplicated. Used by
-`EffectDataModel` and other automation paths to sequence updates safely.
+`CharacterDataModel` effect-duration automation and other automation paths to sequence updates safely.
 
 **`SocketManager`** (`src/helpers/SocketManager.js`)
 
@@ -350,6 +353,6 @@ document reactively available to the entire sheet component tree via Svelte cont
 `PlayerSheetShell.svelte`) and an `applicationState` store for UI-only state (open tabs, expanded
 sections) that does not need to be persisted.
 
-`ActionQueue` serializes async mutations within `EffectDataModel` and other automation paths so
+`ActionQueue` serializes async mutations within `CharacterDataModel` automation paths so
 that concurrent Foundry updates do not interleave. `SocketManager` bridges client boundaries,
 forwarding automation triggers as Hooks so non-owner clients can request owner-side operations.

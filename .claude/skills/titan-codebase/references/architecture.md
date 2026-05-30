@@ -86,7 +86,7 @@ extended by every concrete type under `document/types/`.
 **Manifest wiring** (`system.json`):
 - `"esmodules": ["index.js"]` — Foundry loads the compiled ES module from the repo root.
 - `"styles": ["style.css"]` — Foundry loads the compiled CSS from the repo root.
-- Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `effect`, `equipment`,
-  `shield`, `spell`, `weapon`), ChatMessage (`testChat`).
+- Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `equipment`,
+  `shield`, `spell`, `weapon`), ActiveEffect (`effect`), ChatMessage (`testChat`).
 - `"socket": true` enables the system socket used by `SocketManager`.
 - Foundry compatibility (`system.json`): minimum v13, verified v14, maximum v14.
