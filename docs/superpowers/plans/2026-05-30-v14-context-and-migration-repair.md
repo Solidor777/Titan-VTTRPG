@@ -676,6 +676,12 @@ Append the findings as a checklist to this plan under "Audit Findings" (below). 
 
 Confirmed against v14 source unless noted. Checkboxes track Task 8 fixes.
 
+**FIXED this session (commits):** ChatMessage `type`→`style` (`7113b9b6`, user-reported, blocked all rolls); sheet sizes + frozen-options close (`549910e8`, user-reported); async `enrichHTML` + `FilePicker.implementation` + AppV2 `position.width` + status `icon`→`img` (`1169e7f9`); 5 directory/chat/journal hook renames + jQuery→DOM (`7042b05f`, `6f1168ab`).
+
+**NEW finding (user-reported, fixed):** ChatMessage in v14 has document subtypes — `type` is a `DocumentTypeField` (string, default `"base"`); the numeric message style moved to `style`. Setting `type: CONST.CHAT_MESSAGE_STYLES.OTHER` failed validation.
+
+**REMAINING polish (works via shim; do in runtime walk):** context-menu entries still use `name` (deprecated since v14, removed v16) → rename to `label` in `OnGet{Actor,Item}DirectoryEntryContext.js` + `OnGetChatLogEntryContext.js` for consistency with the `visible`/`onClick` shape already applied.
+
 **Category 5 — Hook renames (high impact; hooks never fire in v14, bodies use jQuery):**
 - [ ] `src/index.js:19` + `src/hooks/OnGetActorDirectoryEntryContext.js` — `getActorDirectoryEntryContext` → **`getActorContextOptions`**; replace jQuery `element.data('document-id')` with `element.closest('[data-entry-id]').dataset.entryId`.
 - [ ] `src/index.js:21` + `src/hooks/OnGetItemDirectoryEntryContext.js` — `getItemDirectoryEntryContext` → **`getItemContextOptions`**; same id/jQuery fix.
