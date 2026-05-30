@@ -14,7 +14,6 @@ import equipmentMigrations from '~/helpers/migration/item/EquipmentMigrations.js
 import shieldMigrations from '~/helpers/migration/item/ShieldMigrations.js';
 import spellMigrations from '~/helpers/migration/item/SpellMigrations.js';
 import weaponMigrations from '~/helpers/migration/item/WeaponMigrations.js';
-import convertEffectItemsToActiveEffects from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 
 /**
  * A migration entry describing how to upgrade a document's schema to a specific system version.
@@ -217,17 +216,14 @@ async function migrateDocument(document, chain) {
 
 /**
  * Migrates all Actor and Item documents in the world to the latest schema version, including items embedded within
- * actors. Only runs for the GM. Skips documents that are already up to date.
+ * actors. Only runs for the GM. Skips documents that are already up to date. This is purely the version-chain
+ * migrator; the one-shot legacy-effect converter is run separately from the Ready hook.
  * @returns {Promise<void>}
  */
 export async function migrateWorld() {
    if (!game.user.isGM) {
       return;
    }
-
-   // Convert legacy effect Items to native Active Effects. This is a one-shot, idempotent converter that runs
-   // independently of the version-chain migration below, so it must execute before the worldNeedsMigration check.
-   await convertEffectItemsToActiveEffects();
 
    if (!worldNeedsMigration()) {
       return;
