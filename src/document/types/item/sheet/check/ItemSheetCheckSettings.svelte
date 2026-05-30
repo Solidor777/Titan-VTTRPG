@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
@@ -53,6 +54,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
+                  label={localize('collapse')}
                   onclick={() => {
                      $appState.tabs.checks.isExpanded[idx] = false;
                   }}
@@ -61,6 +63,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
+                  label={localize('expand')}
                   onclick={() => {
                      $appState.tabs.checks.isExpanded[idx] = true;
                   }}
@@ -77,6 +80,7 @@
          <div>
             <IconButton
                icon={DELETE_ICON}
+               label={localize('delete')}
                onclick={async () => {
                   document.data.deleteCheck(idx);
                }}

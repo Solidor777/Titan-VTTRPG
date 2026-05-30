@@ -48,6 +48,7 @@
                   <!--Collapse button-->
                   <IconButton
                      icon={EXPANDED_ICON}
+                     label={localize('collapse')}
                      onclick={() => {
                         $appState.sidebar.attacks.isExpanded[idx] = false;
                      }}
@@ -56,6 +57,7 @@
                   <!--Expand button-->
                   <IconButton
                      icon={COLLAPSED_ICON}
+                     label={localize('expand')}
                      onclick={() => {
                         $appState.sidebar.attacks.isExpanded[idx] = true;
                      }}

@@ -87,6 +87,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
+                  label={localize('collapse')}
                   onclick={() => {
                      $appState.attacks.isExpanded[idx] = false;
                   }}
@@ -95,6 +96,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
+                  label={localize('expand')}
                   onclick={() => {
                      $appState.attacks.isExpanded[idx] = true;
                   }}
@@ -112,6 +114,7 @@
             <!--Delete button-->
             <IconButton
                icon={DELETE_ICON}
+               label={localize('delete')}
                onclick={() => {
                   document.data.system.deleteAttack(idx);
                }}

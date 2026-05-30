@@ -49,6 +49,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
+                  label={localize('collapse')}
                   onclick={() => {
                      $appState.sidebar.castingCheck.isExpanded = false;
                   }}
@@ -57,6 +58,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
+                  label={localize('expand')}
                   onclick={() => {
                      $appState.sidebar.castingCheck.isExpanded = true;
                   }}

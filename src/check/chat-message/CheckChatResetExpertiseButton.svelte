@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults.js';
    import { RESET_ICON } from '~/system/Icons.js';
 
@@ -34,5 +35,6 @@
 <IconButton
    disabled={!document.data.isOwner}
    icon={RESET_ICON}
+   label={localize('resetExpertise')}
    onclick={resetExpertise}
 />
