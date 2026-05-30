@@ -20,7 +20,7 @@
 </script>
 
 <div
-   class={$document.isOwner ? 'rich-text' : 'rich-text not-owner'}>
+   class={document.data.isOwner ? 'rich-text' : 'rich-text not-owner'}>
    {@html displayText}
 </div>
 
