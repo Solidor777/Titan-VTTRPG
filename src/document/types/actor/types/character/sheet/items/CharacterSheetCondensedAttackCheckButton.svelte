@@ -15,6 +15,9 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   // itemId is fixed per mounted instance (keyed list items do not change their ID); capturing
+   // once in checkOptions is intentional.
+   // svelte-ignore state_referenced_locally
    /** @type {AttackCheckOptions} Base options for the Check. */
    const checkOptions = {
       itemId: itemId,

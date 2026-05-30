@@ -28,6 +28,8 @@
       getAttributeCheckParametersTooltip(checkParameters)
    );
 
+   // attribute is a fixed prop for this button's lifetime; capturing once for the icon is correct.
+   // svelte-ignore state_referenced_locally
    /** @type {string} Calculated icon. */
    const icon = getIcon(attribute);
 </script>

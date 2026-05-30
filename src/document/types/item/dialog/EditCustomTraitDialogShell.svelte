@@ -21,6 +21,9 @@
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
+   // Capture initial trait data from the dialog's fixed props to seed the editable state.
+   // This is a one-time dialog initialisation — item and traitIdx never change while mounted.
+   // svelte-ignore state_referenced_locally
    /** @type {object} The custom trait being edited. */
    let trait = $state(item?.system.customTrait[traitIdx] ?? {});
 

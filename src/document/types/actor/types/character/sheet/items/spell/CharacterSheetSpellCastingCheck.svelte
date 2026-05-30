@@ -20,6 +20,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   // item is fixed per mounted instance; capturing item._id once in checkOptions is intentional.
+   // svelte-ignore state_referenced_locally
    /** @type {CastingCheckOptions} Base options for the Casting Check. */
    const checkOptions = {
       itemId: item._id,

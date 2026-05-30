@@ -18,7 +18,10 @@
    } = $props();
 
    // Setup context objects.
+   // These captures are intentional: both stores are stable for the dialog's lifetime.
+   // svelte-ignore state_referenced_locally
    setContext('checkOptions', checkOptions);
+   // svelte-ignore state_referenced_locally
    setContext('checkParameters', checkParameters);
 </script>
 

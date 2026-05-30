@@ -14,6 +14,8 @@
    /** @type {CharacterSheetSpeedProps} */
    const { speed } = $props();
 
+   // speed is a fixed prop for this component's lifetime; capturing once for the icon is correct.
+   // svelte-ignore state_referenced_locally
    /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(speed);
 

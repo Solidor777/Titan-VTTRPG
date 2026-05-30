@@ -12,6 +12,9 @@
    /** @type {EditUUIDDialogShellProps} */
    const { document: doc = undefined } = $props();
 
+   // Capture doc's initial UUID to seed the editable state — this is a one-time dialog
+   // initialisation, so reading doc at the top level is intentional.
+   // svelte-ignore state_referenced_locally
    /** @type {string | undefined} The UUID of the document. */
    let uuid = $state(doc?.flags?.titan?.uuid);
 

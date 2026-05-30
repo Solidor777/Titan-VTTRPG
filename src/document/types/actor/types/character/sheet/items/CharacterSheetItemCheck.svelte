@@ -27,6 +27,9 @@
    /** @type {CharacterSheetItemCheckProps} */
    const { itemId = undefined, checkIdx = undefined } = $props();
 
+   // itemId and checkIdx are fixed props for this component's lifetime; the checkOptions object
+   // is intentionally built once and reused across derived reads and event handlers.
+   // svelte-ignore state_referenced_locally
    /** @type {ItemCheckOptions} Options for the check. */
    const checkOptions = {
       itemId: itemId,

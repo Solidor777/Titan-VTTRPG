@@ -19,6 +19,9 @@
    /** @type {object} The Svelte Component's Application. */
    const application = getApplication();
 
+   // Capture a snapshot of the trait data to seed the editable state; all three props are
+   // fixed for this dialog's lifetime — intentional one-time capture.
+   // svelte-ignore state_referenced_locally
    /** @type {object} The trait being edited (snapshot). */
    const trait = $state({ ...document.system.attack[attackIdx].customTrait[traitIdx] });
 
