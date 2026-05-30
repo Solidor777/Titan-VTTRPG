@@ -24,9 +24,11 @@
       return false;
    }
 
-   $: aspectsEnabled =
+   /** @type {boolean} True when the spell has any enabled aspect or at least one custom aspect. */
+   const aspectsEnabled = $derived(
       areAspectsEnabled(document.data.system.aspect) ||
-      document.data.system.customAspect.length > 0;
+      document.data.system.customAspect.length > 0,
+   );
 </script>
 
 <!--Casting Check-->

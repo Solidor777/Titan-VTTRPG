@@ -35,12 +35,14 @@
       commodity: CharacterSheetCommodity,
    };
 
-   $: noOptions =
+   /** @type {boolean} True when no inventory filter options are enabled, meaning show all items. */
+   const noOptions = $derived(
       $appState.tabs.inventory.filterOptions.weapon === false &&
       $appState.tabs.inventory.filterOptions.armor === false &&
       $appState.tabs.inventory.filterOptions.shield === false &&
       $appState.tabs.inventory.filterOptions.equipment === false &&
-      $appState.tabs.inventory.filterOptions.commodity === false;
+      $appState.tabs.inventory.filterOptions.commodity === false,
+   );
 </script>
 
 <div class="tab">

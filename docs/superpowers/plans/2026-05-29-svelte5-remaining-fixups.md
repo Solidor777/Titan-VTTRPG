@@ -14,10 +14,12 @@ under "Accepted debt" are documented decisions to NOT change, with rationale.
   - `src/document/types/actor/sheet/ActorSheetImportActorButton.svelte`
   - `src/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte`
   - `src/document/types/actor/sheet/ActorSheetUnlinkTokenButton.svelte`
-- [x] **`$:` reactive block → `$derived.by(...)`** (also flips these two components from legacy
-  mode to runes mode — they currently use neither `$props` nor `$state`):
+- [x] **`$:` reactive block → `$derived` / `$derived.by(...)`** (also flips these components from
+  legacy mode to runes mode — they used neither `$props` nor `$state`):
   - `src/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte`
   - `src/document/types/item/types/spell/sheet/SpellSheetCustomAspectsTab.svelte`
+  - `src/document/types/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryTab.svelte`
+  - `src/document/types/item/types/spell/sheet/SpellSheetSidebarCastingCheck.svelte`
 - [x] **Add `aria-label`** to the icon controls and drop the now-satisfied
   `a11y_consider_explicit_label` suppressions:
   - `src/helpers/svelte-components/tag/EditDeleteTag.svelte` — the two icon `<a>` elements.
