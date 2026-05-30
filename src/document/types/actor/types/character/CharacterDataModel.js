@@ -6176,9 +6176,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const initiative = this.rating.initiative.value;
 
       // Get the initiative formula.
-      const initiativeFormula = initiativeFormula();
+      const formula = initiativeFormula();
 
-      return new Roll(`${initiative}${initiativeFormula}`);
+      return new Roll(`${initiative}${formula}`);
    }
 
    /**
