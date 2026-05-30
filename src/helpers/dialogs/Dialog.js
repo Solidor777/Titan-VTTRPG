@@ -81,6 +81,7 @@ export default class TitanDialog extends ApplicationV2 {
          this.#mountHandle = mount(this.#content.class, {
             target: content,
             props: this.#content.props,
+            context: new Map([['application', this]]),
          });
       }
    }

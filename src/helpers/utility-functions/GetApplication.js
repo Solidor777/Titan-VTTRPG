@@ -1,9 +1,10 @@
 import { getContext } from 'svelte';
 
 /**
- * Helper function for a Svelte Component's Application.
- * @returns {SvelteApp} The Svelte Component's Application.
+ * Helper to read the owning Application from Svelte context. The application is provided at the mount
+ * site (sheet or dialog) via the `application` context key.
+ * @returns {object | undefined} The owning Application, or undefined if mounted without one (e.g. chat).
  */
 export default function getApplication() {
-   return getContext('#external').application;
+   return getContext('application');
 }

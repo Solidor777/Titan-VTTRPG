@@ -99,6 +99,7 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
                applicationState: this.applicationState,
                shell,
             },
+            context: new Map([['application', this]]),
          });
       }
    }
