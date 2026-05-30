@@ -9,8 +9,11 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   $: enabledAspects = $document.system.aspect.filter(
-      (aspect) => aspect.enabled === true,
+   /** @type {object[]} The enabled standard aspects. */
+   const enabledAspects = $derived(
+      $document.system.aspect.filter(
+         (aspect) => aspect.enabled === true,
+      )
    );
 </script>
 

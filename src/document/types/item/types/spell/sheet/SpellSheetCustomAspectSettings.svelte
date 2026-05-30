@@ -15,18 +15,25 @@
       HEALING_ICON,
    } from '~/system/Icons.js';
 
+   /**
+    * @typedef {object} SpellSheetCustomAspectSettingsProps
+    * @property {number} [idx] Index of the custom aspect being represented.
+    */
+
+   /** @type {SpellSheetCustomAspectSettingsProps} */
+   const { idx = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Idx of the custom aspect being represented.
-   /** @type {number} */
-   export let idx = void 0;
+   /** @type {object} The custom aspect data. */
+   const aspect = $derived($document.system.customAspect[idx]);
 
-   $: aspect = $document.system.customAspect[idx];
-   $: isExpanded = $appState.tabs.customAspects.isExpanded[idx];
+   /** @type {boolean} Whether this component is currently expanded. */
+   const isExpanded = $derived($appState.tabs.customAspects.isExpanded[idx]);
 </script>
 
 {#if aspect}

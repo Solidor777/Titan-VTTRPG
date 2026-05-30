@@ -9,23 +9,29 @@
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
 
-   /** @type {object} */
-   export let aspectOptions = void 0;
-   /** @type {number} */
-   let idx = 0;
+   /**
+    * @typedef {object} SpellSheetStandardAspectSettingsProps
+    * @property {object} [aspectOptions] The aspect options configuration object.
+    */
+
+   /** @type {SpellSheetStandardAspectSettingsProps} */
+   const { aspectOptions = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /**
     * Returns whether the aspect has additional configurable settings.
+    * @returns {boolean} True if the aspect has detail settings.
     */
    function hasDetails() {
       return aspectOptions.settings || aspectOptions.template.resistanceCheck;
    }
 
    /**
-    * @param idx
+    * Toggles the standard aspect on/off by adding or removing it from the document.
+    * @param {number} idx - The index of the aspect in the document, or -1 if not yet added.
+    * @returns {void}
     */
    function toggleAspect(idx) {
       if ($document?.isOwner) {
@@ -39,11 +45,14 @@
       }
    }
 
-   $: if ($document) {
-      idx = $document.system.aspect.findIndex((aspect) => {
-         return aspect.label === aspectOptions.template.label;
-      });
-   }
+   /** @type {number} The index of the aspect in the document's aspect array, or -1 if not enabled. */
+   const idx = $derived(
+      $document
+         ? $document.system.aspect.findIndex((aspect) => {
+            return aspect.label === aspectOptions.template.label;
+         })
+         : -1
+   );
 </script>
 
 <div class="aspect">

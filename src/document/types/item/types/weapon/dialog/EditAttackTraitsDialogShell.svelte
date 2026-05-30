@@ -4,17 +4,20 @@
    import { ATTACK_TRAIT_DESCRIPTIONS, ATTACK_TRAITS, } from '~/document/types/item/types/weapon/AttackTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
 
-   // The weapon document owning the attack.
-   /** @type {TitanItem} */
-   export let item = void 0;
+   /**
+    * @typedef {object} EditAttackTraitsDialogShellProps
+    * @property {object} [item] The weapon document owning the attack.
+    * @property {number} [attackIdx] The attack index.
+    */
 
-   // The attack idx.
-   /** @type {number} */
-   export let attackIdx = void 0;
+   /** @type {EditAttackTraitsDialogShellProps} */
+   const { item = undefined, attackIdx = undefined } = $props();
 
-   // Trait options.
-   let traitOptions = structuredClone(ATTACK_TRAITS);
-   let traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
+   /** @type {object[]} Trait options for the attack. */
+   let traitOptions = $state(structuredClone(ATTACK_TRAITS));
+
+   /** @type {Record<string, string>} Map of attack trait names to their description localization keys. */
+   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="edit-traits-dialog">

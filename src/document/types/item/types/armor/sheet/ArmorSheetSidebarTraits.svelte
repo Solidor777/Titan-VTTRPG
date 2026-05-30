@@ -8,14 +8,14 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {Tag[]} List of traits converted into tags. */
-   let itemTypeTraits;
-
-   // Populate the tags list.
-   $: {
-      itemTypeTraits = [];
+   /**
+    * List of traits converted into tags.
+    * @type {object[]}
+    */
+   const itemTypeTraits = $derived.by(() => {
+      const result = [];
       for (const [idx] in $document.system.trait) {
-         itemTypeTraits.push({
+         result.push({
             id: $document.system.trait[idx].name,
             component: LabelTag,
             props: {
@@ -24,7 +24,8 @@
             }
          });
       }
-   }
+      return result;
+   });
 </script>
 
 <ItemSheetSidebarTraits

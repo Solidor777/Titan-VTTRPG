@@ -15,19 +15,19 @@
    const appState = getContext('applicationState');
 
    /** @type {number[]} The filtered list of attack indices to display. */
-   let filteredEntries = [];
-   $: {
-      filteredEntries = [];
+   const filteredEntries = $derived.by(() => {
+      const result = [];
       $document.system.attack.forEach((entry, idx) => {
          if (
             entry.label
                .toLowerCase()
                .indexOf($appState.tabs.attacks.filter.toLowerCase()) !== -1
          ) {
-            filteredEntries.push(idx);
+            result.push(idx);
          }
       });
-   }
+      return result;
+   });
 </script>
 
 <div class="tab">
@@ -63,7 +63,7 @@
                <!--Button Content-->
                <div class="button-content">
                   <!--Icon-->
-                  <i class={CREATE_ICON}/>
+                  <i class={CREATE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">

@@ -9,7 +9,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   $: sections =
+   /** @type {object[]} Sidebar sections, conditionally including checks. */
+   const sections = $derived(
       $document.system.check.length > 0
          ? [
             ItemSheetSidebarTraits,
@@ -19,7 +20,8 @@
          : [
             ItemSheetSidebarTraits,
             SpellSheetSidebarCastingCheck,
-         ];
+         ]
+   );
 </script>
 
 <ItemSheetSidebarSections {sections}/>

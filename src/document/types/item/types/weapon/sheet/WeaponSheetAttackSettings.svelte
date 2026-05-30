@@ -26,26 +26,32 @@
    import WeaponSheetAttackCustomTraitTag
       from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
 
-   /** @type {number} The index of the attack in the weapon's attack array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} WeaponSheetAttackSettingsProps
+    * @property {number} [idx] The index of the attack in the weapon's attack array.
+    */
+
+   /** @type {WeaponSheetAttackSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
    /** @type {Record<string, string>} Map of attack trait names to their description localization keys. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    /** @type {object} The attack data for this component. */
-   $: attack = $document.system.attack[idx];
+   const attack = $derived($document.system.attack[idx]);
 
    /** @type {boolean} Whether this attack component is currently expanded. */
-   $: isExpanded = $appState.attacks.isExpanded[idx];
+   const isExpanded = $derived($appState.attacks.isExpanded[idx]);
 
    /**
     * Updates the attack skill when the attack type changes.
-    * @returns {Promise<void>}
+    * @returns {Promise<void>} Returns after the document update completes if needed.
     */
    async function updateAttackSkill() {
       if ($document?.isOwner && attack) {
@@ -126,7 +132,7 @@
                   <div class="input">
                      <DocumentAttackTypeSelect
                         bind:value={attack.type}
-                        on:change={updateAttackSkill}
+                        onchange={updateAttackSkill}
                      />
                   </div>
                </div>

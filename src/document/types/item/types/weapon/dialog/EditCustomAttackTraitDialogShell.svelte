@@ -8,25 +8,25 @@
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   // The weapon document owning the attack.
-   /** @type {TitanItem|TitanActor} */
-   export let document = void 0;
+   /**
+    * @typedef {object} EditCustomAttackTraitDialogShellProps
+    * @property {object} [document] The weapon document owning the attack.
+    * @property {number} [attackIdx] The attack index.
+    * @property {number} [traitIdx] The trait index.
+    */
 
-   // The attack idx.
-   /** @type {number} */
-   export let attackIdx = void 0;
+   /** @type {EditCustomAttackTraitDialogShellProps} */
+   const { document = undefined, attackIdx = undefined, traitIdx = undefined } = $props();
 
-   // The trait idx.
-   /** @type {number} */
-   export let traitIdx = void 0;
-
-   /** @type {SvelteApp} The Svelte Component's Application. */
+   /** @type {object} The Svelte Component's Application. */
    const application = getApplication();
 
-   const trait = document.system.attack[attackIdx].customTrait[traitIdx];
+   /** @type {object} The trait being edited (snapshot). */
+   const trait = $state({ ...document.system.attack[attackIdx].customTrait[traitIdx] });
 
    /**
     * Saves the edited custom attack trait and closes the dialog.
+    * @returns {void}
     */
    function editTrait() {
       const attack = document.system.attack[attackIdx];

@@ -21,6 +21,14 @@
    } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
+   /**
+    * @typedef {object} SpellSheetSidebarStandardAspectProps
+    * @property {object} [aspect] The standard aspect data to display.
+    */
+
+   /** @type {SpellSheetSidebarStandardAspectProps} */
+   const { aspect = undefined } = $props();
+
    /** @type {Record<string, string>} Map of aspect label keys to their icon classes. */
    const labelIcons = {
       damage: DAMAGE_ICON,
@@ -43,9 +51,6 @@
       initiative: INITIATIVE_ICON,
       melee: MELEE_ICON,
    };
-
-   /** @type {object} The standard aspect data to display. */
-   export let aspect = void 0;
 </script>
 
 {#if aspect}
@@ -53,7 +58,7 @@
       <div class="label">
          <!--Icon-->
          {#if labelIcons[aspect.label]}
-            <i class={labelIcons[aspect.label]}/>
+            <i class={labelIcons[aspect.label]}></i>
          {/if}
 
          {localize(aspect.unit ?? aspect.label)}
