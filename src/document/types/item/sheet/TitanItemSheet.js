@@ -30,17 +30,13 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Default Application options.
+    * Default Application options. AppV2 merges `DEFAULT_OPTIONS` down the class chain onto the base
+    * defined in TitanDocumentSheet, so only the item-specific height override is needed here.
     * @override
-    * @returns {object} Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
     */
-   static get defaultOptions() {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         baseApplication: 'ItemSheet',
-         height: 650,
-      });
-   }
+   static DEFAULT_OPTIONS = {
+      position: { height: 650 },
+   };
 
    /**
     * Overridable function for creating the reactive state store for this sheet.

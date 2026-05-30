@@ -40,18 +40,13 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Default Application options.
+    * Default Application options. AppV2 merges `DEFAULT_OPTIONS` down the class chain onto the base
+    * defined in TitanDocumentSheet, so only the actor-specific width override is needed here.
     * @override
-    * @returns {object} Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
     */
-   static get defaultOptions() {
-      let parentOptions = super.defaultOptions;
-      return foundry.utils.mergeObject(parentOptions, {
-         baseApplication: 'ActorSheet',
-         width: 750,
-      });
-   }
+   static DEFAULT_OPTIONS = {
+      position: { width: 750 },
+   };
 
    /**
     * Get the header buttons for the sheet.
@@ -114,19 +109,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
          });
       }
       return buttons;
-   }
-
-   /**
-    * Closes the sheet.
-    * @override
-    * @param {object} [options={}] - Close options.
-    * @returns {Promise<void>}
-    */
-   async close(options = {}) {
-      // Clear the token reference so it is not held in memory after the sheet.
-      // closes.
-      this.options.token = null;
-      return super.close(options);
    }
 
    /**
