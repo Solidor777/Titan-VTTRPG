@@ -15,8 +15,9 @@
    }
 </script>
 
-<!--Import Actor Button-->
-<button class="header-control icon edit-token-button"
+<!--Import Item Button-->
+<button aria-label="Import Item to World"
+        class="header-control icon edit-token-button"
         onclick={() => importItem()}
         use:tooltipAction={'importItemToWorld'}>
    <i class={IMPORT_ICON}></i>

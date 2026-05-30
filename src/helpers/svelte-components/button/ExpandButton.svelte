@@ -19,6 +19,7 @@
 </script>
 
 <button
+   aria-label={expanded ? 'Collapse' : 'Expand'}
    {disabled}
    onclick={() => (expanded = !expanded)}
    onmousedown={preventDefault}
