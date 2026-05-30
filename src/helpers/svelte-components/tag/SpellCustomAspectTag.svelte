@@ -3,8 +3,8 @@
    import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
-   /** @type {SpellCustomAspect} The Spell Custom Aspect represented by this element. */
-   export let aspect = void 0;
+   /** @type {{ aspect: SpellCustomAspect }} The Spell Custom Aspect represented by this element. */
+   let { aspect = void 0 } = $props();
 </script>
 
 <ResistanceTag resistance={aspect.resistanceCheck ?? ''}>
@@ -12,12 +12,12 @@
    <div class="stat label">
       <!--Damage Icon-->
       {#if aspect.isDamage}
-         <i class={DAMAGE_ICON}/>
+         <i class={DAMAGE_ICON}></i>
       {/if}
 
       <!--Healing Icon-->
       {#if aspect.isHealing}
-         <i class={HEALING_ICON}/>
+         <i class={HEALING_ICON}></i>
       {/if}
 
       <!--Label-->

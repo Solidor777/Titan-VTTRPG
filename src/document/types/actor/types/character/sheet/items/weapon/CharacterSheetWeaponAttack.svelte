@@ -21,25 +21,28 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetWeaponAttackProps
+    * @property {TitanItem} [item] The Item this component belongs to.
+    * @property {number} [attackIdx] The index of the attack in the attacks array.
+    */
 
-   // Reference to the attack idx.
-   /** @type {number} */
-   export let attackIdx = void 0;
+   /** @type {CharacterSheetWeaponAttackProps} */
+   const { item = undefined, attackIdx = undefined } = $props();
 
    // Attack reference.
-   $: attack = item.system.attack[attackIdx];
+   /** @type {object} The current attack data. */
+   let attack = $derived(item.system.attack[attackIdx]);
 
    // Calculate dice pool.
-   /** @type {number} */
-   let dicePool = 0;
-   $: {
+   /** @type {number} Calculated total dice pool for the attack. */
+   let dicePool = $derived.by(() => {
+
       // Get base dice.
-      dicePool =
-         $document.system.attribute[attack.attribute].value +
-         $document.system.skill[attack.skill].training.value +
-         $document.system.getAttackCheckMod(
+      let pool =
+         document.data.system.attribute[attack.attribute].value +
+         document.data.system.skill[attack.skill].training.value +
+         document.data.system.getAttackCheckMod(
             'expertise',
             item,
             attack,
@@ -49,7 +52,7 @@
       // Cut the dice in half if multi attacking.
       if (item.system.multiAttack) {
          // Round up or down, depending on the flurry trait.
-         /** @type {boolean} */
+         /** @type {boolean} Whether the flurry trait is active. */
          let flurry = false;
          for (const trait of attack.trait) {
             if (trait.name === flurry) {
@@ -57,20 +60,22 @@
             }
          }
 
-         dicePool = flurry
-            ? Math.ceil(dicePool * 0.5)
-            : Math.floor(dicePool * 0.5);
+         pool = flurry
+            ? Math.ceil(pool * 0.5)
+            : Math.floor(pool * 0.5);
       }
-   }
+
+      return pool;
+   });
 
    // Calculate expertise.
-   /** @type {number} */
-   let expertise = 0;
-   $: {
+   /** @type {number} Calculated total expertise for the attack. */
+   let expertise = $derived.by(() => {
+
       // Get base expertise.
-      expertise =
-         $document.system.skill[attack.skill].expertise.value +
-         $document.system.getAttackCheckMod(
+      let exp =
+         document.data.system.skill[attack.skill].expertise.value +
+         document.data.system.getAttackCheckMod(
             'expertise',
             item,
             attack,
@@ -79,10 +84,13 @@
 
       // Cut the expertise in half if multi attacking.
       if (item.system.multiAttack) {
-         expertise = Math.floor(expertise * 0.5);
+         exp = Math.floor(exp * 0.5);
       }
-   }
 
+      return exp;
+   });
+
+   /** @type {object} Descriptions of each attack trait. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
@@ -91,22 +99,22 @@
    <div class="header {attack.attribute}">
       {#if item.system.equipped}
          <DocumentOwnerButton
-            on:click={() =>
-               $document.system.requestAttackCheck({
+            onclick={() =>
+               document.data.system.requestAttackCheck({
                   itemId: item._id,
                   attackIdx: attackIdx,
                })}
          >
             <i
                class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
-            />
+            ></i>
             {attack.label}
          </DocumentOwnerButton>
       {:else}
          <div class="label">
             <i
                class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
-            />
+            ></i>
             <div>{attack.label}</div>
          </div>
       {/if}
@@ -130,7 +138,7 @@
             label={localize('damage')}
             value={`${
                attack.damage +
-               $document.system.getAttackCheckMod(
+               document.data.system.getAttackCheckMod(
                   'damage',
                   item,
                   attack,
@@ -145,11 +153,11 @@
       </div>
 
       <!--Training-->
-      {#if $document.system.skill[attack.skill].training.value !== 0}
+      {#if document.data.system.skill[attack.skill].training.value !== 0}
          <div class="stat">
             <IconStatTag
                label={localize('training')}
-               value={$document.system.skill[attack.skill].training.value}
+               value={document.data.system.skill[attack.skill].training.value}
                icon={TRAINING_ICON}
             />
          </div>

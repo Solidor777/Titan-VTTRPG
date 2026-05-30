@@ -8,26 +8,27 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {Tag[]} List of traits converted into tags. */
-   let itemTypeTraits;
-
-   // Populate the tags list.
-   $: {
-      itemTypeTraits = [];
-      for (const [idx] in $document.system.trait) {
-         itemTypeTraits.push({
-            id: $document.system.trait[idx].name,
+   /**
+    * List of traits converted into tags.
+    * @type {object[]}
+    */
+   const itemTypeTraits = $derived.by(() => {
+      const result = [];
+      for (const [idx] in document.data.system.trait) {
+         result.push({
+            id: document.data.system.trait[idx].name,
             component: LabelTag,
             props: {
-               tooltip: localize(getShieldTraitDescription($document.system.trait[idx].name)),
-               label: localize($document.system.trait[idx].name),
+               tooltip: localize(getShieldTraitDescription(document.data.system.trait[idx].name)),
+               label: localize(document.data.system.trait[idx].name),
             }
          });
       }
-   }
+      return result;
+   });
 </script>
 
 <ItemSheetSidebarTraits
-   editTraits={() => $document.system.editShieldTraits()}
+   editTraits={() => document.data.system.editShieldTraits()}
    {itemTypeTraits}
 />

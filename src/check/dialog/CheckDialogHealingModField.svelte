@@ -12,6 +12,5 @@
    bind:value={$checkOptions.healingMod}
    input={IntegerInput}
    label={'healingMod'}
-   on:change
    tooltip={'check.healingMod.desc'}
 />

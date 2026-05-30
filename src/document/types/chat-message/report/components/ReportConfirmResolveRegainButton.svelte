@@ -19,14 +19,14 @@
          document?.name,
       )) {
          // Get the actor.
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Update the actor.
-            await actor.system.regainResolve($document.flags.titan.resolveRegain.total);
+            await actor.system.regainResolve(document.data.flags.titan.resolveRegain.total);
 
             // Update the chat document.
-            $document.update({
+            document.data.update({
                flags: {
                   titan: {
                      resolveRegain: {
@@ -45,11 +45,11 @@
 
 <!--Regain resolve button-->
 <div class="button">
-   <Button on:click={() => confirmRegainResolve()}>
-      <i class={REGAIN_RESOLVE_ICON}/>
+   <Button onclick={() => confirmRegainResolve()}>
+      <i class={REGAIN_RESOLVE_ICON}></i>
       {localize('regainX%Resolve').replace(
          'X%',
-         $document.flags.titan.resolveRegain.total,
+         document.data.flags.titan.resolveRegain.total,
       )}
    </Button>
 </div>

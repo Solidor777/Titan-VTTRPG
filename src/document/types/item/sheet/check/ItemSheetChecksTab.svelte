@@ -14,26 +14,11 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-   /** @type {number[]} The filtered list of check indices to display. */
-   let filteredEntries;
-   $: {
-      filteredEntries = [];
-      for (const [idx, entry] of $document.system.check.entries()) {
-         if (
-            entry.label
-               .toLowerCase()
-               .indexOf($appState.tabs.checks.filter.toLowerCase()) !== -1
-         ) {
-            filteredEntries.push(idx);
-         }
-      }
-   }
 </script>
 
 <div class="tab">
    <!--Filter-->
-   {#if $document.system.check.length > 0}
+   {#if document.data.system.check.length > 0}
       <div class="filter" transition:slide|local>
          <TopFilter bind:value={$appState.tabs.checks.filter}/>
       </div>
@@ -45,7 +30,7 @@
          <!--Checks List-->
          <FiltereedList
             componentFunction={() => ItemSheetCheckSettings}
-            entries={$document.system.check}
+            entries={document.data.system.check}
             filterFunction={(entry) => entry.label.toLowerCase().includes($appState.tabs.checks.filter.toLowerCase())}
             idFunction={(entry) => entry.uuid}
             mapFunction={(entry, idx) => idx}
@@ -57,14 +42,14 @@
          <!--Add check Button-->
          <div class="add-entry-button">
             <DocumentOwnerButton
-               on:click={() => {
-                  $document.addCheck();
+               onclick={() => {
+                  document.data.addCheck();
                }}
             >
                <!--Button Content-->
                <div class="button-content">
                   <!--Icon-->
-                  <i class={CREATE_ICON}/>
+                  <i class={CREATE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">

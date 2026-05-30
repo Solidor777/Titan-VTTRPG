@@ -5,11 +5,16 @@
    import CharacterSheetItemExpandButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    * @property {import('svelte').Snippet} [controls] Controls content rendered in the header controls area.
+    * @property {import('svelte').Snippet} [children] Expandable content rendered when the item is expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetItemProps} */
+   let { item = undefined, isExpanded = $bindable(undefined), controls, children } = $props();
 </script>
 
 <div class="item">
@@ -29,14 +34,14 @@
 
       <!--Controls-->
       <div class="controls">
-         <slot name="controls"/>
+         {@render controls?.()}
       </div>
    </div>
 
    <!--Expandable content-->
    {#if isExpanded === true}
       <div class="expandable-content" transition:slide|local>
-         <slot/>
+         {@render children?.()}
       </div>
    {/if}
 </div>

@@ -1,19 +1,18 @@
 <script>
-   /** @type {number} The maximum value of the resource. */
-   export let max = void 0;
+   /**
+    * @typedef {object} ChatMessageResourceProps
+    * @property {number} [max] The maximum value of the resource.
+    * @property {number} [value] The current value of the resource.
+    * @property {string} [icon] The icon class to display for this resource.
+    * @property {string} [label] The localized label to display for this resource.
+    */
 
-   /** @type {number} The current value of the resource. */
-   export let value = void 0;
-
-   /** @type {string} The icon class to display for this resource. */
-   export let icon = void 0;
-
-   /** @type {string} The localized label to display for this resource. */
-   export let label = void 0;
+   /** @type {ChatMessageResourceProps} */
+   const { max = void 0, value = void 0, icon = void 0, label = void 0 } = $props();
 </script>
 
 <div class="resource">
-   <i class={icon}/>
+   <i class={icon}></i>
    <div class="label">{label}</div>
    <div>
       {`${value} / ${max}`}

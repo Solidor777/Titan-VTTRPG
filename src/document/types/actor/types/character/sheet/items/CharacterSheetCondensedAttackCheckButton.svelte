@@ -4,50 +4,54 @@
    import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
    import getAttributeCheckParametersTooltip from '~/helpers/utility-functions/GetAttributeCheckParametersTooltip.js';
 
-   /** @type {string} The ID of the Item to get the check from. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetCondensedAttackCheckButtonProps
+    * @property {string} [itemId] The ID of the Item to get the check from.
+    */
+
+   /** @type {CharacterSheetCondensedAttackCheckButtonProps} */
+   const { itemId = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   // itemId is fixed per mounted instance (keyed list items do not change their ID); capturing
+   // once in checkOptions is intentional.
+   // svelte-ignore state_referenced_locally
    /** @type {AttackCheckOptions} Base options for the Check. */
    const checkOptions = {
       itemId: itemId,
    };
 
    /** @type {AttackCheckParameters} Calculated check parameters. */
-   let checkParameters;
-
-   /** @type {string} Calculated check icon. */
-   let icon;
-
-   /** @type {string} Calculated tooltipAction. */
-   let tooltip;
-
-   // Update parameters in response to changes.
-   $: {
+   let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = $document.items.get(itemId);
+      const item = document.data.items.get(itemId);
       if (item?.system.attack.length > 0) {
 
          // Update the parameters.
-         checkParameters = $document.system.getAttackCheckParameters(
-            $document.system.initializeAttackCheckOptions(checkOptions)
+         return document.data.system.getAttackCheckParameters(
+            document.data.system.initializeAttackCheckOptions(checkOptions)
          );
-
-         // Update the icon.
-         icon = checkParameters.type === 'melee' ? MELEE_ICON : ACCURACY_ICON;
-
-         // Update the tooltipAction.
-         tooltip = getAttributeCheckParametersTooltip(checkParameters);
       }
-   }
+      return undefined;
+   });
+
+   /** @type {string} Calculated check icon. */
+   let icon = $derived(
+      checkParameters?.type === 'melee' ? MELEE_ICON : ACCURACY_ICON
+   );
+
+   /** @type {string} Calculated tooltipAction. */
+   let tooltip = $derived(
+      checkParameters ? getAttributeCheckParametersTooltip(checkParameters) : undefined
+   );
 </script>
 <CondensedCheckButton
    attribute={checkParameters.attribute}
    checkIcon={icon}
-   on:click={() => $document.system.requestAttackCheck(checkOptions)}
+   onclick={() => document.data.system.requestAttackCheck(checkOptions)}
    {tooltip}
    totalDice={checkParameters.totalDice}
    totalExpertise={checkParameters.totalExpertise}

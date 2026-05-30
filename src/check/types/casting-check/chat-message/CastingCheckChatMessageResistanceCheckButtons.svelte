@@ -6,12 +6,12 @@
    const document = getContext('document');
 
    /** @type {number} Calculated Complexity of the Resistance checks. */
-   const complexity = $document.flags.titan.results.extraSuccesses + 1;
+   const complexity = $derived(document.data.flags.titan.results.extraSuccesses + 1);
 </script>
 
 <div class="buttons">
    <!--Reflexes-->
-   {#if $document.flags.titan.parameters.reflexesCheck}
+   {#if document.data.flags.titan.parameters.reflexesCheck}
       <div class="button">
          <ResistanceCheckButton
             resistance={'reflexes'}
@@ -21,7 +21,7 @@
    {/if}
 
    <!--Resilience-->
-   {#if $document.flags.titan.parameters.resilienceCheck}
+   {#if document.data.flags.titan.parameters.resilienceCheck}
       <div class="button">
          <ResistanceCheckButton
             resistance={'resilience'}
@@ -31,7 +31,7 @@
    {/if}
 
    <!--Willpower-->
-   {#if $document.flags.titan.parameters.willpowerCheck}
+   {#if document.data.flags.titan.parameters.willpowerCheck}
       <div class="button">
          <ResistanceCheckButton
             resistance={'willpower'}

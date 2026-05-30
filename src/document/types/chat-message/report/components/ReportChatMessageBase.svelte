@@ -1,17 +1,21 @@
 <script>
-   /** @type {SvelteComponent} The header Svelte component to render. */
-   export let header = void 0;
+   /**
+    * @typedef {object} ReportChatMessageBaseProps
+    * @property {object} [header] The header Svelte component to render.
+    * @property {Array<object|string>} [sections] Array of sections to include in the report.
+    * @property {object[]} [tags] Array of tag Svelte components to append to the report.
+    */
 
-   /** @type {object[] | string[]} Array of sections to include in the report. */
-   export let sections = void 0;
-
-   /** @type {object[]} Array of tag Svelte components to append to the report. */
-   export let tags = void 0;
+   /** @type {ReportChatMessageBaseProps} */
+   const { header = void 0, sections = void 0, tags = void 0 } = $props();
 </script>
 
 <div class="report">
    <!--Header-->
-   <svelte:component this={header}/>
+   {#if header}
+      {@const HeaderComp = header}
+      <HeaderComp/>
+   {/if}
 
    <!--Sections-->
    <div class="sections">
@@ -25,7 +29,8 @@
                   {section}
                {:else}
                   <!--Component Message-->
-                  <svelte:component this={section.component ?? section} {...section.props}/>
+                  {@const SectionComp = section.component ?? section}
+                  <SectionComp {...(section.props ?? {})}/>
                {/if}
             </div>
          {/each}
@@ -38,9 +43,11 @@
                <!--For tags that can disappear-->
                <div class="tag">
                   {#if tag.component}
-                     <svelte:component this={tag.component} {...tag.props}/>
+                     {@const TagComp = tag.component}
+                     <TagComp {...(tag.props ?? {})}/>
                   {:else}
-                     <svelte:component this={tag}/>
+                     {@const TagComp = tag}
+                     <TagComp/>
                   {/if}
                </div>
             {/each}

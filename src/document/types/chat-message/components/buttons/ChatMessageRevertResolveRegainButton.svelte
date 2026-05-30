@@ -15,21 +15,21 @@
     */
    async function confirm() {
       if (assert(
-         $document?.isOwner,
+         document.data?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Regain resolve to undo the spend.
             await actor.system.regainResolve(
-               $document.flags.titan.resolveRegainRevert.total,
+               document.data.flags.titan.resolveRegainRevert.total,
                { report: false },
             );
 
             // Update the chat message.
-            await $document.update({
+            await document.data.update({
                flags: {
                   titan: {
                      resolveRegainRevert: { confirmed: true },
@@ -44,6 +44,6 @@
 
 <ChatMessageResourceModButton
    icon={SPEND_RESOLVE_ICON}
-   label={localize('revertX%ResolveRegain').replace('X%', $document.flags.titan.resolveRegainRevert.total)}
+   label={localize('revertX%ResolveRegain').replace('X%', document.data.flags.titan.resolveRegainRevert.total)}
    confirmFn={confirm}
 />

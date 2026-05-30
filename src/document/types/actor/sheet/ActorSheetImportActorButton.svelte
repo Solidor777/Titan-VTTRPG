@@ -8,13 +8,14 @@
 
    /** Imports the actor from a compendium sheet. */
    async function importActor() {
-      return $document.collection.importFromCompendium($document.compendium, $document.id);
+      return document.data.collection.importFromCompendium(document.data.compendium, document.data.id);
    }
 </script>
 
 <!--Import Actor Button-->
-<button class="header-control icon edit-token-button"
+<button aria-label="Import Actor to World"
+        class="header-control icon edit-token-button"
         on:click={() => importActor()}
         use:tooltipAction={'importActorToWorld'}>
-   <i class={IMPORT_ICON}/>
+   <i class={IMPORT_ICON}></i>
 </button>

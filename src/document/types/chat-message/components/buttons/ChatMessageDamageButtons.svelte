@@ -10,60 +10,61 @@
       IGNORE_ARMOR_ICON,
    } from '~/system/Icons.js';
 
-   /** @type {number} The amount of damage to apply. */
-   export let damage = void 0;
+   /**
+    * @typedef {object} ChatMessageDamageButtonsProps
+    * @property {number} [damage] The amount of damage to apply.
+    * @property {boolean} [ineffective] Whether the attack is ineffective (deals half damage).
+    * @property {boolean} [penetrating] Whether the attack is penetrating (ignores some armor).
+    */
 
-   /** @type {boolean} Whether the attack is ineffective (deals half damage). */
-   export let ineffective = false;
-
-   /** @type {boolean} Whether the attack is penetrating (ignores some armor). */
-   export let penetrating = false;
+   /** @type {ChatMessageDamageButtonsProps} */
+   const { damage = void 0, ineffective = false, penetrating = false } = $props();
 </script>
 
 <div class="damage-buttons">
    <!--Apply damage button-->
    <div class="button" use:tooltipAction={'applyDamage'}>
       <Button
-         on:click={() => {
+         onclick={() => {
             applyDamageToTargets(damage, {
                ineffective: ineffective,
                penetrating: penetrating,
             });
          }}
-      ><i class={DAMAGE_ICON}/>
+      ><i class={DAMAGE_ICON}></i>
       </Button>
    </div>
 
    <!--Apply damage ignore armor button-->
    <div class="button" use:tooltipAction={'applyDamageIgnoreArmor'}>
       <Button
-         on:click={() =>
+         onclick={() =>
             applyDamageToTargets(damage, {
                ignoreArmor: true,
                ineffective: ineffective,
                penetrating: penetrating,
             })}
-      ><i class={IGNORE_ARMOR_ICON}/>
+      ><i class={IGNORE_ARMOR_ICON}></i>
       </Button>
    </div>
 
    <!--Apply half damage button-->
    <div class="button" use:tooltipAction={'applyHalfDamage'}>
       <Button
-         on:click={() =>
+         onclick={() =>
             applyDamageToTargets(Math.floor(damage / 2), {
                ineffective: ineffective,
                penetrating: penetrating,
             })}
       >
-         <i class={HALF_DAMAGE_ICON}/>
+         <i class={HALF_DAMAGE_ICON}></i>
       </Button>
    </div>
 
    <!--Apply healing button-->
    <div class="button" use:tooltipAction={'applyHealing'}>
-      <Button on:click={() => applyHealingToTargets(damage)}>
-         <i class={HEALING_ICON}/>
+      <Button onclick={() => applyHealingToTargets(damage)}>
+         <i class={HEALING_ICON}></i>
       </Button>
    </div>
 </div>

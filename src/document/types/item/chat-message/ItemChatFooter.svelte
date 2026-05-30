@@ -1,5 +1,15 @@
+<script>
+   /**
+    * @typedef {object} ItemChatFooterProps
+    * @property {import('svelte').Snippet} [children] - Content to render inside the footer.
+    */
+
+   /** @type {ItemChatFooterProps} */
+   const { children } = $props();
+</script>
+
 <div class="footer">
-   <slot/>
+   {@render children?.()}
 </div>
 
 <style lang="scss">

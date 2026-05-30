@@ -16,7 +16,7 @@
    const sections = [ChatMessageStamina];
 
    // Add wounds if appropriate.
-   if ($document.flags.titan.wounds) {
+   if (document.data.flags.titan.wounds) {
       sections.push(ChatMessageWounds);
    }
 </script>

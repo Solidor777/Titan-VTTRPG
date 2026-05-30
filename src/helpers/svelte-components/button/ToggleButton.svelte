@@ -2,25 +2,31 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
-   /** @type {string} The label to display for the option. */
-   export let label = void 0;
+   /**
+    * @typedef {object} ToggleButtonProps
+    * @property {string} [label] - The label to display for the option.
+    * @property {boolean} [disabled] - Whether the button should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {boolean} [active] - Whether the toggle is currently active.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    */
 
-   /** @type {boolean} Whether the button should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {boolean} Whether the toggle is currently active. */
-   export let active = void 0;
+   /** @type {ToggleButtonProps} */
+   const {
+      label = void 0,
+      disabled = false,
+      tooltip = void 0,
+      active = void 0,
+      onclick = void 0,
+   } = $props();
 </script>
 
-<Button {disabled} on:click {tooltip}>
+<Button {disabled} {onclick} {tooltip}>
    <div class="button-inner">
       <div class="label">
          {label}
       </div>
-      <i class={active ? CHECKED_ICON : UNCHECKED_ICON}/>
+      <i class={active ? CHECKED_ICON : UNCHECKED_ICON}></i>
    </div>
 </Button>
 

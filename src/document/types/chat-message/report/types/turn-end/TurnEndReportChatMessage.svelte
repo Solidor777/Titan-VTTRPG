@@ -33,17 +33,17 @@
    const sections = [];
 
    // Add Stamina if appropriate.
-   if ($document.flags.titan.stamina) {
+   if (document.data.flags.titan.stamina) {
       sections.push(ChatMessageStamina);
    }
 
    // Add Wounds if appropriate.
-   if ($document.flags.titan.wounds) {
+   if (document.data.flags.titan.wounds) {
       sections.push(ChatMessageWounds);
    }
 
    // Cache whether the report has expired effects.
-   const hasExpiredEffects = !!$document.flags.titan.effects?.expired;
+   const hasExpiredEffects = !!document.data.flags.titan.effects?.expired;
 
    // Add expired effects.
    if (hasExpiredEffects) {
@@ -53,7 +53,7 @@
       });
 
       // Add message if the expired effects were removed.
-      if ($document.flags.titan.expiredEffectsRemoved === true) {
+      if (document.data.flags.titan.expiredEffectsRemoved === true) {
          sections.push(ChatMessageExpiredEffectsRemovedMessage);
       }
 
@@ -64,10 +64,10 @@
    }
 
    // Add fast healing information if appropriate.
-   if ($document.flags.titan.fastHealing) {
+   if (document.data.flags.titan.fastHealing) {
 
       // Add fast healing Tag if confirmed.
-      if ($document.flags.titan.fastHealing.confirmed) {
+      if (document.data.flags.titan.fastHealing.confirmed) {
          sections.push(ChatMessageFastHealingTag);
       }
 
@@ -78,10 +78,10 @@
    }
 
    // Add fast persistent damage information if appropriate.
-   if ($document.flags.titan.persistentDamage) {
+   if (document.data.flags.titan.persistentDamage) {
 
       // Add persistent damage Tag if confirmed.
-      if ($document.flags.titan.persistentDamage.confirmed) {
+      if (document.data.flags.titan.persistentDamage.confirmed) {
          sections.push(ChatMessagePersistentDamageTag);
       }
 
@@ -92,7 +92,7 @@
    }
 
    // Add messages if appropriate.
-   if ($document.flags.titan.message) {
+   if (document.data.flags.titan.message) {
       sections.push({
          component: ChatMessageRichTextMessages,
          isRichText: true,

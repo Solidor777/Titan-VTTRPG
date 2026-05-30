@@ -16,11 +16,12 @@
    const document = getContext('document');
 
    /** @type {boolean} Whether to show the scaling aspect controls. */
-   $: scalingAspect =
-      $document.flags.titan.results.scalingAspect &&
-      $document.flags.titan.results.scalingAspect.length > 0 &&
-      $document.flags.titan.results.extraSuccesses &&
-      $document.constructor.getSpeakerActor($document.speaker)?.isOwner;
+   const scalingAspect = $derived(
+      document.data.flags.titan.results.scalingAspect &&
+      document.data.flags.titan.results.scalingAspect.length > 0 &&
+      document.data.flags.titan.results.extraSuccesses &&
+      document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner,
+   );
 </script>
 
 <div class="check-chat-message">
@@ -30,27 +31,27 @@
    </div>
 
    <!--Chat Messages-->
-   {#if $document.flags.titan.message}
+   {#if document.data.flags.titan.message}
       <div class="section">
          <CheckChatMessages/>
       </div>
    {/if}
 
    <!--Item Traits-->
-   {#if $document.flags.titan.parameters.itemTrait}
+   {#if document.data.flags.titan.parameters.itemTrait}
       <div class="section tags">
          <ItemCheckChatItemTraits/>
       </div>
    {/if}
 
    <!--Description-->
-   {#if $document.flags.titan.results.succeeded &&
-   $document.flags.titan.parameters.itemDescription !==
+   {#if document.data.flags.titan.results.succeeded &&
+   document.data.flags.titan.parameters.itemDescription !==
    '' &&
-   $document.flags.titan.parameters.itemDescription !==
+   document.data.flags.titan.parameters.itemDescription !==
    '<p></p>'}
       <div class="section rich-text">
-         <RichText value={$document.flags.titan.parameters.itemDescription}/>
+         <RichText value={document.data.flags.titan.parameters.itemDescription}/>
       </div>
    {/if}
 
@@ -64,7 +65,7 @@
       <CheckChatResults/>
    </div>
 
-   {#if $document.flags.titan.results.succeeded}
+   {#if document.data.flags.titan.results.succeeded}
       <!--Scaling Aspects-->
       {#if scalingAspect}
          <div class="section">
@@ -74,27 +75,27 @@
 
       <!--Damage Buttons-->
       <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.results.damage && game.user.isGM}
+      {#if document.data.flags.titan.results.damage && game.user.isGM}
          <div class="section">
-            <ChatDamageButtons damage={$document.flags.titan.results.damage}/>
+            <ChatDamageButtons damage={document.data.flags.titan.results.damage}/>
          </div>
       {/if}
 
       <!--Healing Button-->
       <!-- svelte-ignore missing-declaration -->
-      {#if $document.flags.titan.results.healing && game.user.isGM}
+      {#if document.data.flags.titan.results.healing && game.user.isGM}
          <div class="section">
             <ChatHealingButton
-               healing={$document.flags.titan.results.healing}
+               healing={document.data.flags.titan.results.healing}
             />
          </div>
       {/if}
 
       <!--Resistance Check Buttons-->
       {#if
-         $document.flags.titan.parameters.reflexesCheck ||
-         $document.flags.titan.parameters.resilienceCheck ||
-         $document.flags.titan.parameters.willpowerCheck
+         document.data.flags.titan.parameters.reflexesCheck ||
+         document.data.flags.titan.parameters.resilienceCheck ||
+         document.data.flags.titan.parameters.willpowerCheck
       }
          <div class="section tags">
             <CastingCheckChatMessageResistanceCheckButtons/>

@@ -12,6 +12,5 @@
    bind:value={$checkOptions.doubleTraining}
    input={CheckboxInput}
    label={'doubleTraining'}
-   on:change
    tooltip={'check.doubleTraining.desc'}
 />

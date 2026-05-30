@@ -9,21 +9,22 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 
-   /** @type {string} Key for the Skill to show stats for. */
-   export let key;
+   /**
+    * @typedef {object} CharacterSheetSkillProps
+    * @property {string} key Key for the Skill to show stats for.
+    */
+
+   /** @type {CharacterSheetSkillProps} */
+   const { key } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {AttributeCheckParameters} Calculated check parameters. */
-   let checkParameters = $document.system.getAttributeCheckParameters(
-      $document.system.initializeAttributeCheckOptions({ skill: key }));
-
-   /** @type {string} Tooltip for the total Training value. */
-   let totalTrainingTooltip = '';
-
-   /** @type {string} Tooltip for the total Expertise value. */
-   let totalExpertiseTooltip = '';
+   let checkParameters = $derived(
+      document.data.system.getAttributeCheckParameters(
+         document.data.system.initializeAttributeCheckOptions({ skill: key }))
+   );
 
    /**
     * Calculates the tooltipAction for the total Training or Expertise value.
@@ -59,24 +60,21 @@
       return retVal;
    }
 
-   // Update calculated data in response to changes.
-   $: {
-      // Update check parameters.
-      checkParameters = $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({ skill: key }));
-
-      // Update total training tooltip.
-      totalTrainingTooltip = getTotalValueTooltip(
-         $document.system.skill[key].training,
+   /** @type {string} Tooltip for the total Training value. */
+   let totalTrainingTooltip = $derived(
+      getTotalValueTooltip(
+         document.data.system.skill[key].training,
          checkParameters.trainingMod
-      );
+      )
+   );
 
-      // Update total expertise tooltipAction.
-      totalExpertiseTooltip = getTotalValueTooltip(
-         $document.system.skill[key].expertise,
+   /** @type {string} Tooltip for the total Expertise value. */
+   let totalExpertiseTooltip = $derived(
+      getTotalValueTooltip(
+         document.data.system.skill[key].expertise,
          checkParameters.expertiseMod
-      );
-   }
+      )
+   );
 </script>
 
 <div class="skill">
@@ -88,7 +86,7 @@
    <div class="columns">
       <!--Default Attribute-->
       <div class="column" use:tooltipAction={'defaultAttribute.desc'}>
-         <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute}/>
+         <DocumentAttributeSelect bind:value={document.data.system.skill[key].defaultAttribute}/>
       </div>
 
       <!--Training and Expertise-->
@@ -101,7 +99,7 @@
             <div class="label" use:tooltipAction={'training.desc'}>
 
                <!--Icon-->
-               <i class={EXPERTISE_ICON}/>
+               <i class={EXPERTISE_ICON}></i>
 
                <!--Inner Label-->
                <div class="inner-label">
@@ -111,13 +109,13 @@
 
             <!--Base Value-->
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue}/>
+               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.baseValue}/>
             </div>
 
             <!--Static Mod-->
             <div class="symbol">+</div>
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.skill[key].training.mod.static}/>
+               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
             </div>
 
             <!--Total Value-->
@@ -125,9 +123,9 @@
             <div class="value">
                <ModifiedValueLabel
                   baseValue={
-                     $document.system.skill[key].training.baseValue +
-                     $document.system.skill[key].training.mod.ability +
-                     $document.system.skill[key].training.mod.equipment +
+                     document.data.system.skill[key].training.baseValue +
+                     document.data.system.skill[key].training.mod.ability +
+                     document.data.system.skill[key].training.mod.equipment +
                      checkParameters.trainingMod
                   }
                   currentValue={checkParameters.totalTrainingDice}
@@ -142,7 +140,7 @@
             <div class="label" use:tooltipAction={'expertise.desc'}>
 
                <!--Icon-->
-               <i class={TRAINING_ICON}/>
+               <i class={TRAINING_ICON}></i>
 
                <!--Inner Label-->
                <div class="inner-label">
@@ -153,14 +151,14 @@
             <!--Base Value-->
             <div class="input">
                <DocumentIntegerInput
-                  bind:value={$document.system.skill[key].expertise.baseValue}
+                  bind:value={document.data.system.skill[key].expertise.baseValue}
                />
             </div>
 
             <!--Static Mod-->
             <div class="symbol">+</div>
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.mod.static}/>
+               <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
             </div>
 
             <!--Total Value-->
@@ -168,9 +166,9 @@
             <div class="value">
                <ModifiedValueLabel
                   baseValue={
-                     $document.system.skill[key].expertise.baseValue +
-                     $document.system.skill[key].expertise.mod.ability +
-                     $document.system.skill[key].expertise.mod.equipment +
+                     document.data.system.skill[key].expertise.baseValue +
+                     document.data.system.skill[key].expertise.mod.ability +
+                     document.data.system.skill[key].expertise.mod.equipment +
                      checkParameters.expertiseMod
                   }
                   currentValue={checkParameters.totalExpertise}

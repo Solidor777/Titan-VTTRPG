@@ -1,28 +1,33 @@
 <script>
+   import { getContext, untrack } from 'svelte';
    import RaritySelect from '~/helpers/svelte-components/input/select/RaritySelect.svelte';
-   import { getContext } from 'svelte';
    import resolveObjectPath from '~/helpers/utility-functions/ResolveObjectPath.js';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {string} Path to the value that this input should modify. */
-   export let path = 'system.rarity';
+   /**
+    * @typedef {object} DocumentPathRaritySelectProps
+    * @property {string} [path] - Path to the value that this input should modify.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {DocumentPathRaritySelectProps} */
+   let {
+      path = 'system.rarity',
+      disabled = false,
+      tooltip = void 0,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} Input value. */
-   let value = resolveObjectPath($document, path);
+   /** @type {string} Input value resolved from the document path on mount. */
+   let value = $state(untrack(() => resolveObjectPath(document.data, path)));
 </script>
 
 <RaritySelect
    bind:value
-   disabled={disabled || !$document?.isOwner}
-   on:change={()=> refreshSystemDocument($document, disabled)}
+   disabled={disabled || !document.data?.isOwner}
+   onchange={() => refreshSystemDocument(document.data, disabled)}
    {tooltip}
 />

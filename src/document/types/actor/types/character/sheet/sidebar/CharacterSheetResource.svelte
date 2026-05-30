@@ -7,11 +7,14 @@
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type {string} The Resource that this component represents. */
-   export let resource = void 0;
+   /**
+    * @typedef {object} CharacterSheetResourceProps
+    * @property {string} [resource] The Resource that this component represents.
+    * @property {string} [icon] The Icon that represents this stat.
+    */
 
-   /** @type {string} The Icon that represents this stat. */
-   export let icon = getIcon(resource);
+   /** @type {CharacterSheetResourceProps} */
+   const { resource = undefined, icon = getIcon(resource) } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -22,13 +25,13 @@
    <div class="row">
 
       <!--Icon-->
-      <i class={`${icon} side`}/>
+      <i class={`${icon} side`}></i>
 
       <!--Label-->
       <div class="middle" use:tooltipAction={`${resource}.desc`}>
 
          <!--Spacer to center the label-->
-         <div class="side"/>
+         <div class="side"></div>
 
          <!--Label-->
          <div class="label">
@@ -42,7 +45,7 @@
       <!--Static Mod-->
       <div class="side">
          <DocumentIntegerInput
-            bind:value={$document.system.resource[resource].mod.static}
+            bind:value={document.data.system.resource[resource].mod.static}
          />
       </div>
    </div>
@@ -53,7 +56,7 @@
       <!--Current Value Input-->
       <div class="side">
          <DocumentIntegerInput
-            bind:value={$document.system.resource[resource].value}
+            bind:value={document.data.system.resource[resource].value}
          />
       </div>
 
@@ -63,21 +66,21 @@
          use:tooltipAction={`${resource}.desc`}
       >
          <Meter
-            max={$document.system.resource[resource].max}
-            value={$document.system.resource[resource].value}
+            max={document.data.system.resource[resource].max}
+            value={document.data.system.resource[resource].value}
          />
       </div>
 
       <!--Max Value-->
       <div class="side">
          <ModifiableStatValueLabel
-            abilityMod={$document.system.resource[resource].mod.ability}
+            abilityMod={document.data.system.resource[resource].mod.ability}
             baseTooltip={localize(`${resource}.maxValue`)}
-            baseValue={$document.system.resource[resource].maxBase}
-            effectMod={$document.system.resource[resource].mod.effect}
-            equipmentMod={$document.system.resource[resource].mod.equipment}
-            staticMod={$document.system.resource[resource].mod.static}
-            value={$document.system.resource[resource].max}
+            baseValue={document.data.system.resource[resource].maxBase}
+            effectMod={document.data.system.resource[resource].mod.effect}
+            equipmentMod={document.data.system.resource[resource].mod.equipment}
+            staticMod={document.data.system.resource[resource].mod.static}
+            value={document.data.system.resource[resource].max}
          />
       </div>
    </div>

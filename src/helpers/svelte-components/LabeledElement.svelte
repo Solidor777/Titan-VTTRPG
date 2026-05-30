@@ -3,14 +3,21 @@
    import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
    import TextLabel from '~/helpers/svelte-components/label/TextLabel.svelte';
 
-   /** @type {string} Label to display. */
-   export let label = void 0;
+   /**
+    * @typedef {object} LabeledElementProps
+    * @property {string} [label] - Label to display.
+    * @property {string} [icon] - Optional icon to display.
+    * @property {string | import('~/helpers/svelte-actions/TooltipAction.js').TooltipAction} [tooltip] - The tooltip to display for this element, if any.
+    * @property {import('svelte').Snippet} [children] - Content to render inside the element area.
+    */
 
-   /** @type {string} Optional Icon to display. */
-   export let icon = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {LabeledElementProps} */
+   let {
+      label = undefined,
+      icon = undefined,
+      tooltip = undefined,
+      children,
+   } = $props();
 </script>
 
 <div
@@ -31,7 +38,7 @@
 
    <!--Element-->
    <div class="element">
-      <slot></slot>
+      {@render children?.()}
    </div>
 </div>
 

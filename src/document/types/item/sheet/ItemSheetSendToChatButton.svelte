@@ -5,12 +5,12 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
 </script>
 
-<!--Import Actor Button-->
-<button class="header-control icon edit-token-button"
-        on:click={() => $document.sendToChat()}
+<!--Send to Chat Button-->
+<button aria-label="Send to Chat"
+        class="header-control icon edit-token-button"
+        onclick={() => document.data.sendToChat()}
         use:tooltipAction={'importActorToWorld'}>
-   <i class={SEND_TO_CHAT_ICON}/>
+   <i class={SEND_TO_CHAT_ICON}></i>
 </button>

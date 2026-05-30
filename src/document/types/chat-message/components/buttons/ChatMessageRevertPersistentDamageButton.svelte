@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment.
-      if ($document.flags.titan.persistentDamageRevert.equipment) {
-         retVal += `<p>${localize('equipment')}: ${$document.flags.titan.persistentDamageRevert.equipment}</p>`;
+      if (document.data.flags.titan.persistentDamageRevert.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.persistentDamageRevert.equipment}</p>`;
       }
 
       // Abilities.
-      if ($document.flags.titan.persistentDamageRevert.ability) {
-         retVal += `<p>${localize('abilities')}: ${$document.flags.titan.persistentDamageRevert.ability}</p>`;
+      if (document.data.flags.titan.persistentDamageRevert.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.persistentDamageRevert.ability}</p>`;
       }
 
       // Effects.
-      if ($document.flags.titan.persistentDamageRevert.effect) {
-         retVal += `<p>${localize('effects')}: ${$document.flags.titan.persistentDamageRevert.effect}</p>`;
+      if (document.data.flags.titan.persistentDamageRevert.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.persistentDamageRevert.effect}</p>`;
       }
 
       return retVal;
@@ -41,21 +41,21 @@
     */
    async function confirm() {
       if (assert(
-         $document?.isOwner,
+         document.data?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Apply healing to undo the damage.
             await actor.system.applyHealing(
-               $document.flags.titan.persistentDamageRevert.total,
+               document.data.flags.titan.persistentDamageRevert.total,
                { report: false },
             );
 
             // Update the chat message.
-            await $document.update({
+            await document.data.update({
                flags: {
                   titan: {
                      persistentDamageRevert: { confirmed: true },
@@ -70,7 +70,7 @@
 
 <ChatMessageResourceModButton
    icon={HEALING_ICON}
-   label={localize('revertX%PersistentDamage').replace('X%', $document.flags.titan.persistentDamageRevert.total)}
+   label={localize('revertX%PersistentDamage').replace('X%', document.data.flags.titan.persistentDamageRevert.total)}
    tooltip={getTooltip()}
    confirmFn={confirm}
 />

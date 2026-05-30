@@ -12,6 +12,5 @@
    bind:value={$checkOptions.expertiseMod}
    input={IntegerInput}
    label={'expertiseMod'}
-   on:change
    tooltip={'check.expertiseMod.desc'}
 />

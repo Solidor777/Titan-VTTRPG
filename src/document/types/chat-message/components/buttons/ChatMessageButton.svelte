@@ -2,15 +2,20 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {boolean} Whether this button is disabled. */
-   export let disabled = false;
+   /**
+    * @typedef {object} ChatMessageButtonProps
+    * @property {boolean} [disabled] Whether this button is disabled.
+    * @property {string | object} [tooltip] The Tooltip to display for this element, if any.
+    * @property {Function} [onclick] Click handler callback.
+    * @property {import('svelte').Snippet} [children] Child content to render inside the button.
+    */
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {ChatMessageButtonProps} */
+   const { disabled = false, tooltip = void 0, onclick, children } = $props();
 </script>
 
-<button {disabled} on:click on:mousedown={preventDefault} use:tooltipAction={tooltip}>
-   <slot/>
+<button {disabled} {onclick} onmousedown={preventDefault} use:tooltipAction={tooltip}>
+   {@render children?.()}
 </button>
 
 <style lang="scss">
@@ -20,4 +25,3 @@
       --titan-button-border-radius: var(--titan-button-border-radius);
    }
 </style>
-

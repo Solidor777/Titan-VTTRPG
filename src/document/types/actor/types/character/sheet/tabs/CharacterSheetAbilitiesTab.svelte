@@ -30,7 +30,7 @@
                <ToggleOptionButton
                   label={localize(key)}
                   enabled={$appState.tabs.abilities.filterOptions[key]}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.abilities.filterOptions[key] =
                         !$appState.tabs.abilities.filterOptions[key];
                   }}
@@ -42,7 +42,7 @@
          <div class="reset">
             <IconButton
                icon={RESET_ICON}
-               on:click={() => {
+               onclick={() => {
                   $appState.tabs.abilities.filterOptions.action = false;
                   $appState.tabs.abilities.filterOptions.reaction = false;
                   $appState.tabs.abilities.filterOptions.passive = false;
@@ -68,8 +68,8 @@
             <CharacterSheetTabHeaderButton
                icon={CREATE_ICON}
                label={localize('addNewAbility')}
-               on:click={() => {
-                  $document.createItemFromType('ability');
+               onclick={() => {
+                  document.data.createItemFromType('ability');
                }}
             />
          </div>

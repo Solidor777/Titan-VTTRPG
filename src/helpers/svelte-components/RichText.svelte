@@ -1,30 +1,26 @@
 <script>
    import { getContext } from 'svelte';
 
+   /**
+    * @typedef {object} RichTextProps
+    * @property {string} [value] - The raw HTML to display.
+    */
+
+   /** @type {RichTextProps} */
+   let { value = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The raw html to display. */
-   export let value = void 0;
-
    /** @type {string} Enriched HTML to display. */
-   let displayText = TextEditor.enrichHTML(value, {
+   let displayText = $derived(TextEditor.enrichHTML(value, {
       async: false,
       secrets: true,
-   });
-
-   // Update display text in response to changes.
-   $: {
-      displayText = TextEditor.enrichHTML(value, {
-         async: false,
-         secrets: true,
-      });
-   }
-
+   }));
 </script>
 
 <div
-   class={$document.isOwner ? 'rich-text' : 'rich-text not-owner'}>
+   class={document.data.isOwner ? 'rich-text' : 'rich-text not-owner'}>
    {@html displayText}
 </div>
 

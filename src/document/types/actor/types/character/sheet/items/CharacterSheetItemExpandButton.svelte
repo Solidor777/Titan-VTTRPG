@@ -2,20 +2,20 @@
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemExpandButtonProps
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    * @property {TitanItem} [item] The Item this component belongs to.
+    * @property {boolean} [name] Optional override for the name text.
+    */
 
-   /** @type {TitanItem} The Item this component belongs to. */
-   export let item = void 0;
-
-   // Optional override for the name text.
-   /** @type {boolean} */
-   export let name = false;
+   /** @type {CharacterSheetItemExpandButtonProps} */
+   let { isExpanded = $bindable(undefined), item = undefined, name = false } = $props();
 </script>
 
 <div class="button">
    <DocumentOwnerButton
-      on:click={() => {
+      onclick={() => {
          if (item && !item.isMarkedForDeletion) {
             isExpanded = !isExpanded;
          }
@@ -26,7 +26,7 @@
          <div class="name">{name === false ? item.name : name}</div>
 
          <!--Icon-->
-         <i class={isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}/>
+         <i class={isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}></i>
       </div>
    </DocumentOwnerButton>
 </div>

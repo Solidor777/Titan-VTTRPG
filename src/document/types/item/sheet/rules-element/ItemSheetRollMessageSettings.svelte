@@ -11,15 +11,19 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetRollMessageSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetRollMessageSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   let element;
-   $: element = $document?.system.rulesElement[idx];
+   const element = $derived(document.data?.system.rulesElement[idx]);
 
    /** @type {{label: string, value: string}[]} Options for the type of check that triggers the roll message. */
    const checkTypeOptions = [
@@ -145,8 +149,8 @@
             }
          }
 
-         $document.update({
-            system: structuredClone($document.system),
+         document.data.update({
+            system: structuredClone(document.data.system),
          });
       }
    }
@@ -190,12 +194,12 @@
 
    <!--Operation Fields-->
    <div class="fields">
-      
+
       <!--Type-->
       <div class="field select">
          <DocumentSelect
-            bind:value={$document.system.rulesElement[idx].checkType}
-            on:change={onCheckTypeChange}
+            bind:value={document.data.system.rulesElement[idx].checkType}
+            onchange={onCheckTypeChange}
             options={checkTypeOptions}
          />
       </div>
@@ -203,8 +207,8 @@
       <!--Selector-->
       <div class="field select">
          <DocumentSelect
-            bind:value={$document.system.rulesElement[idx].selector}
-            on:change={onSelectorChange}
+            bind:value={document.data.system.rulesElement[idx].selector}
+            onchange={onSelectorChange}
             options={selectorOptions[element.checkType]}
          />
       </div>
@@ -213,10 +217,10 @@
       {#if element.selector !== 'multiAttack'
       && element.selector !== 'any'}
          <div class="field select">
-            <svelte:component
-               this={getSelector()}
-               bind:value={$document.system.rulesElement[idx].key}
-            />
+            {#if getSelector()}
+               {@const Selector = getSelector()}
+               <Selector bind:value={document.data.system.rulesElement[idx].key}/>
+            {/if}
          </div>
       {/if}
    </div>
@@ -224,7 +228,7 @@
    <!--Message text-->
    <div class="message">
       <DocumentBoundEditorInput
-         bind:value={$document.system.rulesElement[idx].message}
+         bind:value={document.data.system.rulesElement[idx].message}
       />
    </div>
 </div>

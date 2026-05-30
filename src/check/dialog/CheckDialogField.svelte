@@ -2,24 +2,27 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Text from '~/helpers/svelte-components/Text.svelte';
 
-   /** @type {string | TextData} The text label to display for this element. */
-   export let label = void 0;
+   /**
+    * @typedef {object} CheckDialogFieldProps
+    * @property {string | TextData} [label] The text label to display for this element.
+    * @property {*} [value] The value that this input should modify.
+    * @property {typeof import('svelte').SvelteComponent} [input] The input Svelte component to bind the value to.
+    * @property {string | TextData} [tooltip] The tooltip to display when the element is hovered.
+    * @property {*} [inputProps] Properties for the input Svelte component.
+    */
 
-   /** @type {*} The value that this input should modify. */
-   export let value = void 0;
-
-   /** @type {SvelteComponent} The input svelte component to bind the value to. */
-   export let input = void 0;
-
-   /** @type {string | TextData} The tooltip to display when the element is hovered. */
-   export let tooltip = void 0;
-
-   /** @type {*} Properties for the input svelte components. */
-   export let inputProps = void 0;
+   /** @type {CheckDialogFieldProps} */
+   let {
+      label = undefined,
+      value = $bindable(undefined),
+      input = undefined,
+      tooltip = undefined,
+      inputProps = undefined,
+   } = $props();
 </script>
 
 <!--Field-->
-<div class="field" on:change use:tooltipAction={tooltip}>
+<div class="field" use:tooltipAction={tooltip}>
 
    <!--Label-->
    <div class="label">
@@ -27,8 +30,11 @@
    </div>
 
    <!--Input-->
-   <div class="input" on:change>
-      <svelte:component {...inputProps} bind:value this={input}/>
+   <div class="input">
+      {#if input}
+         {@const Comp = input}
+         <Comp {...(inputProps ?? {})} bind:value/>
+      {/if}
    </div>
 </div>
 

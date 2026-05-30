@@ -36,8 +36,8 @@
          <CharacterSheetTabHeaderButton
             icon={CREATE_ICON}
             label={localize('addNewSpell')}
-            on:click={() => {
-               $document.createItemFromType('spell');
+            onclick={() => {
+               document.data.createItemFromType('spell');
             }}
          />
       </div>

@@ -18,15 +18,18 @@
    import CharacterSheetItemToggleActiveButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetEffectProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetEffectProps} */
+   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
-   <svelte:fragment slot="controls">
+   {#snippet controls()}
       <!--Duration-->
       {#if item.system.duration.type !== 'permanent'}
          {#if item.system.duration.type === 'initiative'}
@@ -39,7 +42,7 @@
                   <IntegerInput
                      min={0}
                      bind:value={item.system.duration.initiative}
-                     on:change={() => {
+                     onchange={() => {
                            item.update({
                               system: {
                                  duration: {
@@ -66,7 +69,7 @@
                <IntegerIncrementInput
                   min={0}
                   bind:value={item.system.duration.remaining}
-                  on:change={() => {
+                  onchange={() => {
                         item.update({
                            system: {
                               duration: {
@@ -97,7 +100,7 @@
       <div class="button">
          <CharacterSheetItemDeleteButton itemId={item._id}/>
       </div>
-   </svelte:fragment>
+   {/snippet}
 
    <!--Item Checks-->
    {#if item.system.check.length > 0}

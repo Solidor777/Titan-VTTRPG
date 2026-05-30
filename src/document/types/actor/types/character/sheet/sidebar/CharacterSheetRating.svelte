@@ -7,12 +7,17 @@
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Rating that this component represents. */
-   export let rating = void 0;
+   /**
+    * @typedef {object} CharacterSheetRatingProps
+    * @property {string} [rating] The Rating that this component represents.
+    * @property {Function} [onClick] Callback for when the rating button is clicked.
+    */
 
-   /** @type {Function} Callback for when the rating button is clicked. */
-   export let onClick = void 0;
+   /** @type {CharacterSheetRatingProps} */
+   const { rating = undefined, onClick = undefined } = $props();
 
+   // rating is a fixed prop for this component's lifetime; capturing once for the icon is correct.
+   // svelte-ignore state_referenced_locally
    /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(rating);
 
@@ -25,9 +30,9 @@
    {#if typeof onClick == "function"}
       <!--Display a button if onClick is a function.-->
       <div class="button">
-         <DocumentOwnerButton on:click={onClick} tooltip={`${rating}.desc`}>
+         <DocumentOwnerButton onclick={onClick} tooltip={`${rating}.desc`}>
             <!--Icon-->
-            <i class={icon}/>
+            <i class={icon}></i>
 
             <!--Label-->
             <div class="label">
@@ -40,7 +45,7 @@
       <!--Otherwise, display a label.-->
       <div class="label" use:tooltipAction={`${rating}.desc`}>
          <!--Icon-->
-         <i class={icon}/>
+         <i class={icon}></i>
 
          {localize(rating)}
       </div>
@@ -55,7 +60,7 @@
       <!--Static Mod-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.rating[rating].mod.static}
+            bind:value={document.data.system.rating[rating].mod.static}
          />
       </div>
 
@@ -65,13 +70,13 @@
       <!--Total Value-->
       <div class="value">
          <ModifiableStatValueLabel
-            abilityMod={$document.system.rating[rating].mod.ability}
+            abilityMod={document.data.system.rating[rating].mod.ability}
             baseTooltip={localize(`${rating}.baseValue`)}
-            baseValue={$document.system.rating[rating].baseValue}
-            effectMod={$document.system.rating[rating].mod.effect}
-            equipmentMod={$document.system.rating[rating].mod.equipment}
-            staticMod={$document.system.rating[rating].mod.static}
-            value={$document.system.rating[rating].value}
+            baseValue={document.data.system.rating[rating].baseValue}
+            effectMod={document.data.system.rating[rating].mod.effect}
+            equipmentMod={document.data.system.rating[rating].mod.equipment}
+            staticMod={document.data.system.rating[rating].mod.static}
+            value={document.data.system.rating[rating].value}
          />
       </div>
    </div>

@@ -3,31 +3,36 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
-   /** @type {string} The value that this input should modify. */
-   export let value = void 0;
+   /**
+    * @typedef {object} DocumentTextInputProps
+    * @property {string} [value] - The value that this input should modify.
+    * @property {boolean} [disabled] - Whether editing this input should be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {boolean} Whether editing this input should be disabled. */
-   export let disabled = false;
+   /** @type {DocumentTextInputProps} */
+   let {
+      value = $bindable(void 0),
+      disabled = false,
+      tooltip = void 0,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
 
    /**
     * Updates the document data when the input changes.
     * @returns {void}
     */
    function updateDocument() {
-      refreshSystemDocument($document, disabled);
+      refreshSystemDocument(document.data, disabled);
    }
 </script>
 
 <TextInput
    bind:value
-   disabled={disabled || !$document?.isOwner}
-   on:change={updateDocument}
-   on:keyup={updateDocument}
+   disabled={disabled || !document.data?.isOwner}
+   onchange={updateDocument}
+   onkeyup={updateDocument}
    {tooltip}
 />

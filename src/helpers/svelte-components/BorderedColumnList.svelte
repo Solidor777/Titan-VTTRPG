@@ -1,10 +1,15 @@
 <script>
+   /**
+    * @typedef {object} BorderedColumnListProps
+    * @property {object} [entryComponent] - The Svelte component to use for each object in the list.
+    * @property {Array<*>} [entries] - The properties for each entry in the list.
+    */
 
-   /** @type {object} The Svelte Component to use for each object in the list. */
-   export let entryComponent = void 0;
-
-   /** @type {*[]} The properties for each entry in the list. */
-   export let entries = void 0;
+   /** @type {BorderedColumnListProps} */
+   let {
+      entryComponent = undefined,
+      entries = undefined,
+   } = $props();
 </script>
 
 <!--Entries-->
@@ -12,10 +17,11 @@
 
    <!--Each Entry-->
    {#each entries as entry}
+      {@const EntryComponent = entryComponent}
 
       <!--Entry Component using the Entry as props-->
       <div class="entry">
-         <svelte:component this={entryComponent} {...entry}/>
+         <EntryComponent {...entry}/>
       </div>
    {/each}
 </div>

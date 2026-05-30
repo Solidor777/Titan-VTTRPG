@@ -3,14 +3,17 @@
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 
+   /**
+    * @typedef {object} ItemSheetXPCostInputProps
+    * @property {boolean} [disabled] Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] The Tooltip to display for this element, if any.
+    */
+
+   /** @type {ItemSheetXPCostInputProps} */
+   const { disabled = false, tooltip = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
 </script>
 
 <LabeledElement
@@ -18,9 +21,8 @@
    {tooltip}
 >
    <IntegerInput
-      bind:value={$document.system.xpCost}
-      disabled={disabled || !$document?.isOwner}
-      on:change={() => $document.update({system: {xpCost: $document.system.xpCost}})}
+      bind:value={document.data.system.xpCost}
+      disabled={disabled || !document.data?.isOwner}
+      onchange={() => document.data.update({system: {xpCost: document.data.system.xpCost}})}
    />
 </LabeledElement>
-

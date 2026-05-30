@@ -13,14 +13,15 @@
    import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
    import error from '~/helpers/utility-functions/Error.js';
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
+   /**
+    * @typedef {object} ItemSheetRulesElementOperationSelectProps
+    * @property {boolean} [disabled] Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] The Tooltip to display for this element, if any.
+    * @property {number} [idx] The index of the Rules Element in the rules elements array.
+    */
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
-   /** @type {number} The index of the Rules Element in the rules elements array. */
-   export let idx = void 0;
+   /** @type {ItemSheetRulesElementOperationSelectProps} */
+   const { disabled = false, tooltip = undefined, idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -30,75 +31,75 @@
     * @returns {Promise<void>} Returns after the item owning the Rules Element has been updated.
     */
    async function onRulesElementOperationChanged() {
-      if ($document && idx < $document?.system.rulesElement.length) {
-         switch ($document.system.rulesElement[idx].operation) {
+      if (document.data && idx < document.data?.system.rulesElement.length) {
+         switch (document.data.system.rulesElement[idx].operation) {
             case 'flatModifier': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createFlatModifierElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'mulBase': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createMulBaseElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'fastHealing': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createFastHealingElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'persistentDamage': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createPersistentDamageElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'turnMessage': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createTurnMessageElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'rollMessage': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createRollMessageElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'conditionalRatingModifier': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createConditionalRatingModifierElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             case 'conditionalCheckModifier': {
-               $document.system.rulesElement[idx] =
+               document.data.system.rulesElement[idx] =
                   createConditionalCheckModifierElement(
-                     $document.system.rulesElement[idx],
+                     document.data.system.rulesElement[idx],
                   );
                break;
             }
             default: {
                const op =
-                        $document.system.rulesElement[idx].operation;
+                        document.data.system.rulesElement[idx].operation;
                error(`Invalid Rules Element operation ${op}`);
                return;
             }
          }
 
-         await $document.update({
+         await document.data.update({
             system: {
-               rulesElement: structuredClone($document.system.rulesElement),
+               rulesElement: structuredClone(document.data.system.rulesElement),
             },
          });
       }
@@ -106,8 +107,8 @@
 </script>
 
 <RulesElementOperationSelect
-   bind:value={$document.system.rulesElement[idx].operation}
-   disabled={disabled || !$document?.isOwner}
-   on:change={() => onRulesElementOperationChanged()}
+   bind:value={document.data.system.rulesElement[idx].operation}
+   disabled={disabled || !document.data?.isOwner}
+   onchange={() => onRulesElementOperationChanged()}
    {tooltip}
 />

@@ -23,8 +23,8 @@
    ];
 
    // Add wounds to the messages if appropriate.
-   if ($document.flags.titan.woundsHealed) {
-      sections.push(localize('healedX%Wounds').replace('X%', $document.flags.titan.woundsHealed));
+   if (document.data.flags.titan.woundsHealed) {
+      sections.push(localize('healedX%Wounds').replace('X%', document.data.flags.titan.woundsHealed));
       sections.push(ChatMessageWounds);
    }
 </script>

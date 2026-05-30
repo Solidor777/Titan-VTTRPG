@@ -7,12 +7,17 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {Item} The Item this button is for. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemEditButtonProps
+    * @property {Item} [item] The Item this button is for.
+    */
+
+   /** @type {CharacterSheetItemEditButtonProps} */
+   const { item = undefined } = $props();
 </script>
 
 <IconButton
-   icon={$document.isOwner ? EDIT_ICON : SHEET_ICON}
-   on:click={() => item.sheet.render(true)}
-   tooltip={localize($document.isOwner ? 'editItem' : 'viewItemSheet')}
+   icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
+   onclick={() => item.sheet.render(true)}
+   tooltip={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
 />

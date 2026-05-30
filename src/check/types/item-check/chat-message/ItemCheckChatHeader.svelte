@@ -8,28 +8,28 @@
 </script>
 
 <CheckChatMessageItemHeader
-   attribute={$document.flags.titan.parameters.attribute}
-   img={$document.flags.titan.parameters.img}
+   attribute={document.data.flags.titan.parameters.attribute}
+   img={document.data.flags.titan.parameters.img}
 >
    <!--Label-->
    <div class="label">
-      {$document.flags.titan.parameters.checkLabel}
+      {document.data.flags.titan.parameters.checkLabel}
    </div>
 
    <!--Check Label-->
    <div class="sub-label">
-      {$document.flags.titan.parameters.itemName}
+      {document.data.flags.titan.parameters.itemName}
    </div>
 
    <!--Type Label-->
    <div class="sub-label">
-      {`${localize($document.flags.titan.parameters.attribute)} (${localize($document.flags.titan.parameters.skill)})`}
+      {`${localize(document.data.flags.titan.parameters.attribute)} (${localize(document.data.flags.titan.parameters.skill)})`}
    </div>
 
    <!--Resolve Cost-->
-   {#if $document.flags.titan.parameters.resolveCost}
+   {#if document.data.flags.titan.parameters.resolveCost}
       <div class="sub-label">
-         {`${localize('resolveCost')}: ${$document.flags.titan.parameters.resolveCost}`}
+         {`${localize('resolveCost')}: ${document.data.flags.titan.parameters.resolveCost}`}
       </div>
    {/if}
 </CheckChatMessageItemHeader>

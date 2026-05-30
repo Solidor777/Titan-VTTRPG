@@ -1,7 +1,11 @@
 <script>
-   // Chat context reference.
-   /** @type {TitanItem} */
-   export let item = void 0;
+   /**
+    * @typedef {object} ItemChatLabelProps
+    * @property {object} [item] - The titan flags data for the item.
+    */
+
+   /** @type {ItemChatLabelProps} */
+   const { item = void 0 } = $props();
 </script>
 
 <div class="label">

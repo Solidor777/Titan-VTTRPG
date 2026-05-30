@@ -3,8 +3,13 @@
    import { getContext } from 'svelte';
    import ToggleButton from '~/helpers/svelte-components/button/ToggleButton.svelte';
 
-   /** @type {TitanItem} The Item this component belongs to. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemToggleActiveButtonProps
+    * @property {TitanItem} [item] The Item this component belongs to.
+    */
+
+   /** @type {CharacterSheetItemToggleActiveButtonProps} */
+   const { item = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -13,5 +18,5 @@
 <ToggleButton
    active={item.system.active}
    label={localize('active')}
-   on:click={() => $document.system.toggleEffectActive(item._id)}
+   onclick={() => document.data.system.toggleEffectActive(item._id)}
 />

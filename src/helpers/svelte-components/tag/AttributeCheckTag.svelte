@@ -2,20 +2,18 @@
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import createAttributeCheckLabel from '~/helpers/utility-functions/CreateAttributeCheckLabel.js';
 
-   /** @type {string} The Attribute to use for the Check. */
-   export let attribute = void 0;
+   /**
+    * @typedef {object} AttributeCheckTagProps
+    * Props for this component.
+    * @property {string} [attribute] - The Attribute to use for the Check.
+    * @property {string} [skill] - The Skill to use for the Check.
+    * @property {number} [difficulty] - The minimum roll on a die to achieve a Success.
+    * @property {number} [complexity] - The minimum number of Successes needed to succeed at the Check.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {string} The Skill to use for the Check. */
-   export let skill = void 0;
-
-   /** @type {number} The minimum roll on a die to achieve a Success. */
-   export let difficulty = void 0;
-
-   /** @type {number} The minimum number of Successes needed to succeed at the Check. */
-   export let complexity = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {AttributeCheckTagProps} */
+   let { attribute = void 0, skill = void 0, difficulty = void 0, complexity = void 0, tooltip = void 0 } = $props();
 </script>
 
 <AttributeTag {attribute} {tooltip}>

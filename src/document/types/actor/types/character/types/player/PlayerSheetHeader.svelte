@@ -38,7 +38,7 @@
          >
             <ModifiedValueLabel
                baseValue={0}
-               currentValue={$document.system.xp.available}
+               currentValue={document.data.system.xp.available}
             />
          </div>
 
@@ -47,7 +47,7 @@
 
          <!--XP Earned-->
          <div class="earned" use:tooltipAction={'xpEarned.desc'}>
-            <DocumentIntegerInput bind:value={$document.system.xp.earned}/>
+            <DocumentIntegerInput bind:value={document.data.system.xp.earned}/>
          </div>
 
          <!--Label-->

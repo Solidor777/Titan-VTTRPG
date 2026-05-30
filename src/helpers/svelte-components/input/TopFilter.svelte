@@ -2,17 +2,21 @@
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
-   /** @type {string} Label to display. */
-   export let label = 'filter';
+   /**
+    * @typedef {object} TopFilterProps
+    * @property {string}        [label='filter']    - Label to display.
+    * @property {string}        [icon=undefined]    - Optional Icon to display.
+    * @property {string}        [value=undefined]   - The value that this input should modify.
+    * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {string} Optional Icon to display. */
-   export let icon = void 0;
-
-   /** @type {string} The value that this input should modify. */
-   export let value = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {TopFilterProps} */
+   let {
+      label   = 'filter',
+      icon    = undefined,
+      value   = $bindable(undefined),
+      tooltip = undefined,
+   } = $props();
 </script>
 
 <!--Filter-->

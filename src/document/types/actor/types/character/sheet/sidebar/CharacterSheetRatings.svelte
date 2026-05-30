@@ -12,7 +12,7 @@
    entries={[
       {
          rating: 'initiative',
-         onClick: () => $document.system.requestInitiativeRoll(),
+         onClick: () => document.data.system.requestInitiativeRoll(),
       },
       {rating: 'awareness'},
       {rating: 'defense'},

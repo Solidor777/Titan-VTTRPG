@@ -2,11 +2,8 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Rarity to associate with the tag. */
-   export let rarity = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {{ rarity?: string, tooltip?: string | TooltipAction }} Props for this component. */
+   let { rarity = void 0, tooltip = void 0 } = $props();
 </script>
 
 <div

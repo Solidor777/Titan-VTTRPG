@@ -18,19 +18,24 @@
    import warn from '~/helpers/utility-functions/Warn.js';
    import { getContext } from 'svelte';
 
-   /** @type {TitanActor} The Actor that will roll the Check. */
-   export let actor = void 0;
+   /**
+    * @typedef {object} CastingCheckDialogShellProps
+    * @property {TitanActor} [actor] The Actor that will roll the Check.
+    */
 
-   /** @type {object} Reference to the Check Options store. */
+   /** @type {CastingCheckDialogShellProps} */
+   const { actor = undefined } = $props();
+
+   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {object} Reference to calculated Check Parameters Store. */
+   /** @type {import('svelte/store').Writable} Reference to calculated Check Parameters Store. */
    const checkParameters = getContext('checkParameters');
 
    /** @type {CastingCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {*[]} Base template for the svelte-components rows. */
+   /** @type {Array<typeof import('svelte').SvelteComponent>} Base template for the component rows. */
    const baseRows = [
       CheckDialogAttributeField,
       CheckDialogSkillField,
@@ -45,10 +50,12 @@
       CheckDialogTotalExpertiseSummary,
    ];
 
-   /** @type {*[]} Components for changing the options and displaying the parameters. */
-   let rows = baseRows;
+   /** @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the parameters. */
+   let rows = $state(baseRows);
 
-   /** @type {Function} Called when the check becomes invalid. */
+   /**
+    * Called when the check becomes invalid.
+    */
    function onCheckInvalid() {
       ui.notifications.info(localize('castingCheckNoLongerValid'));
       warn(
@@ -59,7 +66,9 @@
       application.close();
    }
 
-   /** @type {Function} Called when the Roll button is clicked. */
+   /**
+    * Called when the Roll button is clicked.
+    */
    function onRoll() {
       if (actor?.system.validateCastingCheckOptions($checkOptions)) {
          actor.system.rollCastingCheck($checkOptions);
@@ -69,20 +78,20 @@
       }
    }
 
-   // Update the parameters whenever the check options are changed.
-   $: {
+   // Update the parameters whenever the check options change.
+   $effect(() => {
       if (actor?.system.validateCastingCheckOptions($checkOptions)) {
          $checkParameters = actor.system.getCastingCheckParameters($checkOptions);
       }
       else {
          onCheckInvalid();
       }
-   }
+   });
 
    // Update whether Damage and Healing mod fields are displayed.
-   $: {
+   $effect(() => {
       // Reset the rows.
-      rows = baseRows;
+      rows = [...baseRows];
 
       // Add the Healing Mod field.
       if ($checkParameters.healing) {
@@ -101,8 +110,8 @@
             CheckDialogDamageModField,
          );
       }
-   }
+   });
 
 </script>
 
-<CheckDialogBase on:roll={onRoll} {rows}/>
+<CheckDialogBase onroll={onRoll} {rows}/>

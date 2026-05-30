@@ -15,6 +15,5 @@
    input={IntegerInput}
    {inputProps}
    label={'complexity'}
-   on:change
    tooltip={'check.complexity.desc'}
 />

@@ -34,7 +34,7 @@
             label={'type'}
             tooltip={'type.desc'}
          >
-            <DocumentTextInput bind:value={$document.system.bio.type}/>
+            <DocumentTextInput bind:value={document.data.system.bio.type}/>
          </LabeledElement>
       </div>
 
@@ -44,7 +44,7 @@
             label={'role'}
             tooltip={'role.desc'}
          >
-            <DocumentSelect bind:value={$document.system.role} options={roleOptions}/>
+            <DocumentSelect bind:value={document.data.system.role} options={roleOptions}/>
          </LabeledElement>
       </div>
 
@@ -53,7 +53,7 @@
          <StatTag
             label={'xp'}
             tooltip={'xpTotalCost.desc'}
-            value={$document.system.xp}/>
+            value={document.data.system.xp}/>
       </div>
    </div>
 

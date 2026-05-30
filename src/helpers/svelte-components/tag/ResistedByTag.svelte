@@ -2,11 +2,8 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
 
-   /** @type {string} The Resistance to associate with the tag. */
-   export let resistance = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {{ resistance?: string, tooltip?: string | TooltipAction }} Props for this component. */
+   let { resistance = void 0, tooltip = void 0 } = $props();
 </script>
 
 <ResistanceTag {resistance} {tooltip}>

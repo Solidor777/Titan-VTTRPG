@@ -3,20 +3,23 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import getBestCharactersToUpdate from '~/helpers/utility-functions/GetBestCharactersToUpdate.js';
 
-   /** @type {string} The Resistance to roll. */
-   export let resistance = void 0;
+   /**
+    * @typedef {object} ResistanceCheckButtonProps
+    * @property {string} [resistance] - The Resistance to roll.
+    * @property {number} [difficulty] - The Difficulty of the Check.
+    * @property {number} [complexity] - The Complexity of the Check.
+    * @property {number} [damageToReduce] - Damage to be reduced by the check, if any.
+    * @property {boolean} [disabled] - Whether the button should be disabled.
+    */
 
-   /** @type {number} The Difficulty of the Check. */
-   export let difficulty = 4;
-
-   /** @type {number} The Complexity of the Check. */
-   export let complexity = 1;
-
-   /** @type {number} Damage to be reduced by the check, if any. */
-   export let damageToReduce = 0;
-
-   /** @type {boolean} Whether the button should be disabled. */
-   export let disabled = false;
+   /** @type {ResistanceCheckButtonProps} */
+   const {
+      resistance = void 0,
+      difficulty = 4,
+      complexity = 1,
+      damageToReduce = 0,
+      disabled = false,
+   } = $props();
 
    /**
     * Requests a resistance check from each user target.
@@ -26,6 +29,7 @@
 
       // For each target.
       for (const target of userTargets) {
+
          // Roll a Resistance Check.
          await target.system.requestResistanceCheck(
             {
@@ -42,7 +46,7 @@
 <div class="button {resistance}">
    <Button
       {disabled}
-      on:click={() => requestResistanceCheck()}
+      onclick={() => requestResistanceCheck()}
       tooltip={localize(`${resistance}.desc`)}
    >
       {`${localize(resistance)} ${difficulty}:${complexity}`}

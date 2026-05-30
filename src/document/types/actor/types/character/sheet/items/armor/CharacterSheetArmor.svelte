@@ -18,24 +18,27 @@
    import CharacterSheetCondensedItemCheckButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetArmorProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetArmorProps} */
+   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
-   <svelte:fragment slot="controls">
+   {#snippet controls()}
       <!--Toggle Equipped button-->
-      {#if ($document.system.equipped.armor === item._id) === false || item.system.check.length === 0}
+      {#if (document.data.system.equipped.armor === item._id) === false || item.system.check.length === 0}
          <div class="button">
             <CharacterSheetItemEquipButton
                {item}
-               equipped={$document.system.equipped.armor === item._id}
+               equipped={document.data.system.equipped.armor === item._id}
             />
          </div>
       {:else if item.system.check.length > 0}
@@ -58,14 +61,14 @@
       <div class="button">
          <CharacterSheetItemDeleteButton itemId={item._id}/>
       </div>
-   </svelte:fragment>
+   {/snippet}
 
    <!--Equip button-->
    {#if item.system.check.length > 0}
       <div class="section">
          <CharacterSheetItemEquipButton
             {item}
-            equipped={$document.system.equipped.armor === item._id}
+            equipped={document.data.system.equipped.armor === item._id}
          />
       </div>
    {/if}

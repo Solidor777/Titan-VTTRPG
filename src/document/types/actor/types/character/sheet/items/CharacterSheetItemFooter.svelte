@@ -1,6 +1,16 @@
+<script>
+   /**
+    * @typedef {object} CharacterSheetItemFooterProps
+    * @property {import('svelte').Snippet} [children] Content rendered inside the footer.
+    */
+
+   /** @type {CharacterSheetItemFooterProps} */
+   const { children } = $props();
+</script>
+
 <!--Footer-->
 <div class="item-footer">
-   <slot />
+   {@render children?.()}
 </div>
 
 <style lang="scss">

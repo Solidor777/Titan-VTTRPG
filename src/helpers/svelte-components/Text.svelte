@@ -1,7 +1,12 @@
 <script>
    import processTextData from '~/helpers/ProcessTextData.js';
 
-   /** @type {string | TextData} The Text to display. */
-   export let text = void 0;
+   /**
+    * @typedef {object} TextProps
+    * @property {string | import('~/helpers/ProcessTextData.js').TextData} [text] - The text to display.
+    */
+
+   /** @type {TextProps} */
+   let { text = undefined } = $props();
 </script>
 {processTextData(text)}

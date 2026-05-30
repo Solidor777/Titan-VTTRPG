@@ -16,6 +16,5 @@
    input={IntegerInput}
    {inputProps}
    label={localize('attackerMelee')}
-   on:change
    tooltip={'check.attackerMelee.desc'}
 />

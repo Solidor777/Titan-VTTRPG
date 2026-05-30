@@ -1,11 +1,19 @@
-<script xmlns="http://www.w3.org/1999/html">
+<script>
+   /**
+    * @typedef {object} ResistanceInputProps
+    * @property {string} [resistance] - The Resistance to use for coloring this element.
+    * @property {import('svelte').Snippet} [children] - Child content to render inside the wrapper.
+    */
 
-   /** @type {string} The Resistance to use for coloring this element. */
-   export let resistance = void 0;
+   /** @type {ResistanceInputProps} */
+   let {
+      resistance = void 0,
+      children = void 0,
+   } = $props();
 </script>
 
 <div class="resistance-input {resistance}">
-   <slot></slot>
+   {@render children?.()}
 </div>
 
 <style lang="scss">

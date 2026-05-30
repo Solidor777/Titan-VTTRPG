@@ -26,44 +26,50 @@
    import WeaponSheetAttackCustomTraitTag
       from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
 
-   /** @type {number} The index of the attack in the weapon's attack array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} WeaponSheetAttackSettingsProps
+    * @property {number} [idx] The index of the attack in the weapon's attack array.
+    */
+
+   /** @type {WeaponSheetAttackSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
    /** @type {Record<string, string>} Map of attack trait names to their description localization keys. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    /** @type {object} The attack data for this component. */
-   $: attack = $document.system.attack[idx];
+   const attack = $derived(document.data.system.attack[idx]);
 
    /** @type {boolean} Whether this attack component is currently expanded. */
-   $: isExpanded = $appState.attacks.isExpanded[idx];
+   const isExpanded = $derived($appState.attacks.isExpanded[idx]);
 
    /**
     * Updates the attack skill when the attack type changes.
-    * @returns {Promise<void>}
+    * @returns {Promise<void>} Returns after the document update completes if needed.
     */
    async function updateAttackSkill() {
-      if ($document?.isOwner && attack) {
+      if (document.data?.isOwner && attack) {
          if (attack.type === 'melee') {
             if (attack.skill === 'rangedWeapons') {
                attack.skill = 'meleeWeapons';
-               $document.update({
+               document.data.update({
                   system: {
-                     attack: structuredClone($document.system.attack),
+                     attack: structuredClone(document.data.system.attack),
                   },
                });
             }
          }
          else if (attack.skill === 'meleeWeapons') {
             attack.skill = 'rangedWeapons';
-            $document.update({
+            document.data.update({
                system: {
-                  attack: structuredClone($document.system.attack),
+                  attack: structuredClone(document.data.system.attack),
                },
             });
          }
@@ -81,7 +87,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.attacks.isExpanded[idx] = false;
                   }}
                />
@@ -89,7 +95,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.attacks.isExpanded[idx] = true;
                   }}
                />
@@ -106,8 +112,8 @@
             <!--Delete button-->
             <IconButton
                icon={DELETE_ICON}
-               on:click={() => {
-                  $document.system.deleteAttack(idx);
+               onclick={() => {
+                  document.data.system.deleteAttack(idx);
                }}
             />
          </div>
@@ -126,7 +132,7 @@
                   <div class="input">
                      <DocumentAttackTypeSelect
                         bind:value={attack.type}
-                        on:change={updateAttackSkill}
+                        onchange={updateAttackSkill}
                      />
                   </div>
                </div>
@@ -134,7 +140,7 @@
                <!--Range-->
                <div class="field">
                   <!--Icon-->
-                  <i class={RANGE_ICON}/>
+                  <i class={RANGE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('range')}</div>
@@ -150,7 +156,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class={DAMAGE_ICON}/>
+                  <i class={DAMAGE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('damage')}</div>
@@ -201,11 +207,11 @@
                   <!--Edit Traits-->
                   <div class="button">
                      <DocumentOwnerButton
-                        on:click={() => {
-                           $document.system.editAttackTraits(idx);
+                        onclick={() => {
+                           document.data.system.editAttackTraits(idx);
                         }}
                      >
-                        <i class={EDIT_ICON}/>
+                        <i class={EDIT_ICON}></i>
                         <Text text="editTraits"/>
                      </DocumentOwnerButton>
                   </div>
@@ -213,11 +219,11 @@
                   <!--Custom Traits-->
                   <div class="button">
                      <DocumentOwnerButton
-                        on:click={() => {
-                           $document.system.addCustomAttackTrait(idx);
+                        onclick={() => {
+                           document.data.system.addCustomAttackTrait(idx);
                         }}
                      >
-                        <i class={CREATE_ICON}/>
+                        <i class={CREATE_ICON}></i>
                         <Text text="addCustomTrait"/>
                      </DocumentOwnerButton>
                   </div>

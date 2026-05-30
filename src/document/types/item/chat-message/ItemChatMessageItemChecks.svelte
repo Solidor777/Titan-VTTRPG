@@ -10,14 +10,21 @@
    import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {TitanItem} */
-   export let item = void 0;
+   /**
+    * @typedef {object} ItemChatMessageItemChecksProps
+    * @property {object} [item] - The titan flags data for the item.
+    */
 
+   /** @type {ItemChatMessageItemChecksProps} */
+   const { item = void 0 } = $props();
+
+   /** @type {boolean} Whether to automatically spend Resolve when rolling checks. */
    const autoSpendResolve = autoSpendResolveChecks();
 
    /**
     * Rolls a Check from the Item's roll data.
-    * @param {ItemCheckTemplate} idx - The idx of the Check in the Item's check array.
+    * @param {number} idx - The index of the Check in the Item's check array.
+    * @returns {Promise<void>}
     */
    async function rollItemCheck(idx) {
 
@@ -36,6 +43,7 @@
    /**
     * Spends the Resolve necessary to perform the Check.
     * @param {number} resolveSpent - Amount of Resolve to spend.
+    * @returns {Promise<void>}
     */
    async function spendResolve(resolveSpent) {
 
@@ -62,7 +70,7 @@
                      label={check.label}
                      attribute={check.attribute}
                      resolveCost={check.resolveCost}
-                     on:click={() => rollItemCheck(idx)}
+                     onclick={() => rollItemCheck(idx)}
                   />
                </div>
             {:else}
@@ -71,7 +79,7 @@
                   <ItemCheckButton
                      label={check.label}
                      attribute={check.attribute}
-                     on:click={() => rollItemCheck(idx)}
+                     onclick={() => rollItemCheck(idx)}
                   />
                </div>
 
@@ -79,14 +87,14 @@
                <div class="button">
                   <SpendResolveButton
                      resolveCost={check.resolveCost}
-                     on:click={() => spendResolve(check.resolveCost)}
+                     onclick={() => spendResolve(check.resolveCost)}
                   />
                </div>
             {/if}
          {:else}
             <!--Check Button-->
             <div class="button">
-               <ItemCheckButton {check} on:click={() => rollItemCheck(idx)}/>
+               <ItemCheckButton {check} onclick={() => rollItemCheck(idx)}/>
             </div>
          {/if}
 
@@ -102,7 +110,7 @@
             </div>
 
             <!--DC-->
-            <div class="stat label"/>
+            <div class="stat label"></div>
 
             <!--Resolve Cost-->
             {#if check.resolveCost > 0}

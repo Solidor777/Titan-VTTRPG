@@ -5,38 +5,38 @@
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type {string} The Attribute that this component represents. */
-   export let attribute;
+   /**
+    * @typedef {object} CharacterSheetAttributeCheckButtonProps
+    * @property {string} attribute The Attribute that this component represents.
+    */
+
+   /** @type {CharacterSheetAttributeCheckButtonProps} */
+   const { attribute } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {AttributeCheckParameters} Calculated check parameters. */
-   let checkParameters = $document.system.getAttributeCheckParameters(
-      $document.system.initializeAttributeCheckOptions({ attribute: attribute }));
+   let checkParameters = $derived(
+      document.data.system.getAttributeCheckParameters(
+         document.data.system.initializeAttributeCheckOptions({ attribute: attribute }))
+   );
 
    /** @type {string} Calculated tooltip. */
-   let tooltip = localize(`${checkParameters.attribute}.desc`);
-   tooltip += getAttributeCheckParametersTooltip(checkParameters);
+   let tooltip = $derived(
+      localize(`${checkParameters.attribute}.desc`) +
+      getAttributeCheckParametersTooltip(checkParameters)
+   );
 
+   // attribute is a fixed prop for this button's lifetime; capturing once for the icon is correct.
+   // svelte-ignore state_referenced_locally
    /** @type {string} Calculated icon. */
-   let icon = getIcon(attribute);
-
-   // Update data in response to changes.
-   $: {
-      // Update Check Parameters.
-      checkParameters = $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({ attribute: attribute }));
-
-      // Update Tooltip.
-      tooltip = localize(`${checkParameters.attribute}.desc`);
-      tooltip += getAttributeCheckParametersTooltip(checkParameters);
-   }
+   const icon = getIcon(attribute);
 </script>
 
 <DocumentOwnerAttributeButton
    {attribute}
-   on:click={() => $document.system.requestAttributeCheck({attribute: attribute})}
+   onclick={() => document.data.system.requestAttributeCheck({attribute: attribute})}
    {tooltip}>
    <div class="button-inner">
       <!--Icon-->

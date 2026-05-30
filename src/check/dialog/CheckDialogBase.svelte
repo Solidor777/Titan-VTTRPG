@@ -1,14 +1,19 @@
 <script>
    import Text from '~/helpers/svelte-components/Text.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
-   import { createEventDispatcher } from 'svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
 
-   /** @type {*[]} Components for changing the options and displaying the parameters. */
-   export let rows = void 0;
+   /**
+    * @typedef {object} CheckDialogBaseProps
+    * @property {Array<typeof import('svelte').SvelteComponent>} [rows] Components for changing the options and displaying the parameters.
+    * @property {Function} [onroll] Callback invoked when the Roll button is clicked.
+    */
 
-   /** @type {EventDispatcher} Dispatcher for component Events. */
-   const eventDispatcher = createEventDispatcher();
+   /** @type {CheckDialogBaseProps} */
+   const {
+      rows = undefined,
+      onroll = undefined,
+   } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
@@ -17,7 +22,7 @@
     * Rolls the check and closes the application.
     */
    function onRoll() {
-      eventDispatcher('roll', {});
+      onroll?.();
       application.close();
    }
 
@@ -30,25 +35,22 @@
 
 </script>
 
-<div class="check-dialog" on:change>
+<div class="check-dialog">
    <!--Fields-->
-   {#each rows as row}
+   {#each rows as Row}
       <div class="row">
-         <svelte:component
-            this={row}
-            on:change
-         />
+         <Row/>
       </div>
    {/each}
 
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <Button on:click={onRoll}><Text text="roll"/></Button>
+         <Button onclick={onRoll}><Text text="roll"/></Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}><Text text="cancel"/></Button>
+         <Button onclick={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

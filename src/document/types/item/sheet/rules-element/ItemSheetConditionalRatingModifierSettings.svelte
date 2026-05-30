@@ -9,8 +9,13 @@
    import DocumentShieldTraitSelect from '~/document/svelte-components/select/DocumentShieldTraitSelect.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetConditionalRatingModifierSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetConditionalRatingModifierSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -47,25 +52,25 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         switch ($document.system.rulesElement[idx].selector) {
+         switch (document.data.system.rulesElement[idx].selector) {
             case 'armorTrait':
             case 'shieldTrait': {
-               $document.system.rulesElement[idx].key = 'magical';
+               document.data.system.rulesElement[idx].key = 'magical';
                break;
             }
             case 'customArmorTrait':
             case 'customWeaponTrait':
             case 'customShieldTrait':
             case 'multiAttack': {
-               $document.system.rulesElement[idx].key = '';
+               document.data.system.rulesElement[idx].key = '';
                break;
             }
             case 'attackTrait': {
-               $document.system.rulesElement[idx].key = 'blast';
+               document.data.system.rulesElement[idx].key = 'blast';
                break;
             }
             case 'attackType': {
-               $document.system.rulesElement[idx].key = 'melee';
+               document.data.system.rulesElement[idx].key = 'melee';
                break;
             }
             default: {
@@ -73,8 +78,8 @@
             }
          }
 
-         $document.update({
-            system: structuredClone($document.system),
+         document.data.update({
+            system: structuredClone(document.data.system),
          });
       }
    }
@@ -84,13 +89,13 @@
     * @returns {void}
     */
    function onRatingChange() {
-      switch ($document.system.rulesElement[idx].rating) {
+      switch (document.data.system.rulesElement[idx].rating) {
          case 'defense': {
-            $document.system.rulesElement[idx].selector = 'armorTrait';
+            document.data.system.rulesElement[idx].selector = 'armorTrait';
             break;
          }
          default: {
-            $document.system.rulesElement[idx].selector = 'attackTrait';
+            document.data.system.rulesElement[idx].selector = 'attackTrait';
             break;
          }
       }
@@ -103,7 +108,7 @@
     * @returns {object} The Svelte component to use for the key field.
     */
    function getSelector() {
-      switch ($document.system.rulesElement[idx].selector) {
+      switch (document.data.system.rulesElement[idx].selector) {
          case 'attackTrait': {
             return DocumentAttackTraitSelect;
          }
@@ -134,8 +139,8 @@
    <!--Rating-->
    <div class="field select">
       <DocumentSelect
-         bind:value={$document.system.rulesElement[idx].rating}
-         on:change={onRatingChange}
+         bind:value={document.data.system.rulesElement[idx].rating}
+         onchange={onRatingChange}
          options={ratingOptions}
       />
    </div>
@@ -143,9 +148,9 @@
    <!--Selector-->
    <div class="field select">
       <DocumentSelect
-         bind:value={$document.system.rulesElement[idx].selector}
-         on:change={onSelectorChange}
-         options={$document.system.rulesElement[idx].rating === 'defense'
+         bind:value={document.data.system.rulesElement[idx].selector}
+         onchange={onSelectorChange}
+         options={document.data.system.rulesElement[idx].rating === 'defense'
                   ? defenseSelectorOptions
                   : attackSelectorOptions}
       />
@@ -153,12 +158,15 @@
 
    <!--Key-->
    <div class="field select">
-      <svelte:component bind:value={$document.system.rulesElement[idx].key} this={getSelector()}/>
+      {#if getSelector()}
+         {@const Selector = getSelector()}
+         <Selector bind:value={document.data.system.rulesElement[idx].key}/>
+      {/if}
    </div>
 
    <!--Value-->
    <div class="field number">
-      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value}/>
+      <DocumentIntegerInput bind:value={document.data.system.rulesElement[idx].value}/>
    </div>
 </div>
 
@@ -175,4 +183,3 @@
       }
    }
 </style>
-

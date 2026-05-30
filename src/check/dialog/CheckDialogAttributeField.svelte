@@ -12,6 +12,5 @@
    bind:value={$checkOptions.attribute}
    input={AttributeSelect}
    label={'attribute'}
-   on:change
    tooltip={'check.attribute.desc'}
 />

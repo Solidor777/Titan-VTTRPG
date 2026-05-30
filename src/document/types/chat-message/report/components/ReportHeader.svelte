@@ -4,28 +4,31 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The icon class to display in the header. */
-   export let icon = void 0;
+   /**
+    * @typedef {object} ReportHeaderProps
+    * @property {string} [icon] The icon class to display in the header.
+    * @property {string} [label] The localized label to display in the header.
+    */
 
-   /** @type {string} The localized label to display in the header. */
-   export let label = void 0;
+   /** @type {ReportHeaderProps} */
+   const { icon = void 0, label = void 0 } = $props();
 </script>
 
 <div class="header">
    <!--Img-->
-   <img alt="img" src={$document.flags.titan.img}/>
+   <img alt="img" src={document.data.flags.titan.img}/>
 
    <!--Header-->
    <div class="label">
       <!--Sub Header-->
       <div class="name">
-         {$document.flags.titan.name}
+         {document.data.flags.titan.name}
       </div>
 
       <!--Main Header-->
       <div class="main">
          <!--Icon-->
-         <i class={icon}/>
+         <i class={icon}></i>
          {label}
       </div>
    </div>

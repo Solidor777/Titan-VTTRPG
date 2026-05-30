@@ -9,51 +9,47 @@
    import DocumentOwnerResistanceButton from '~/document/svelte-components/DocumentOwnerResistanceButton.svelte';
    import getResistanceCheckParametersTooltip from '~/helpers/utility-functions/GetResistanceCheckParametersTooltip.js';
 
-   /** @type {string} The Attribute that this component represents. */
-   export let resistance;
+   /**
+    * @typedef {object} CharacterSheetResistanceCheckButtonProps
+    * @property {string} resistance The Resistance that this component represents.
+    */
+
+   /** @type {CharacterSheetResistanceCheckButtonProps} */
+   const { resistance } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {ResistanceCheckParameters} Calculated check parameters. */
-   let checkParameters = $document.system.getResistanceCheckParameters(
-      $document.system.initializeResistanceCheckOptions({ resistance: resistance }));
+   let checkParameters = $derived(
+      document.data.system.getResistanceCheckParameters(
+         document.data.system.initializeResistanceCheckOptions({ resistance: resistance }))
+   );
 
    /** @type {string} Calculated tooltip. */
-   let tooltip = localize(`${checkParameters.resistance}.desc`);
-   tooltip += getResistanceCheckParametersTooltip(checkParameters);
+   let tooltip = $derived(
+      localize(`${checkParameters.resistance}.desc`) +
+      getResistanceCheckParametersTooltip(checkParameters)
+   );
 
    /** @type {string} Calculated icon. */
-   let icon;
-   switch (resistance) {
-      case 'reflexes': {
-         icon = REFLEXES_ICON;
-         break;
+   const icon = (() => {
+      switch (resistance) {
+         case 'reflexes': {
+            return REFLEXES_ICON;
+         }
+         case 'resilience': {
+            return RESILIENCE_ICON;
+         }
+         default: {
+            return WILLPOWER_ICON;
+         }
       }
-      case 'resilience': {
-         icon = RESILIENCE_ICON;
-         break;
-      }
-      default: {
-         icon = WILLPOWER_ICON;
-         break;
-      }
-   }
-
-   // Update data in response to changes.
-   $: {
-      // Update Check Parameters.
-      checkParameters = $document.system.getResistanceCheckParameters(
-         $document.system.initializeResistanceCheckOptions({ resistance: resistance }));
-
-      // Update Tooltip.
-      tooltip = localize(`${checkParameters.resistance}.desc`);
-      tooltip += getResistanceCheckParametersTooltip(checkParameters);
-   }
+   })();
 </script>
 
 <DocumentOwnerResistanceButton
-   on:click={() => $document.system.requestResistanceCheck({resistance: resistance})}
+   onclick={() => document.data.system.requestResistanceCheck({resistance: resistance})}
    {resistance}
    {tooltip}>
    <div class="button-inner">

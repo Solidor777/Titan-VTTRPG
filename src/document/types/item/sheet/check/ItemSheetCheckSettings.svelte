@@ -22,8 +22,13 @@
    } from '~/system/Icons.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
-   /** @type {number} The index of the Check in the item's item checks array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetCheckSettingsProps
+    * @property {number} [idx] The index of the Check in the item's item checks array.
+    */
+
+   /** @type {ItemSheetCheckSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -32,10 +37,10 @@
    const appState = getContext('applicationState');
 
    /** @type {ItemCheck} The Check this component represents. */
-   $: check = $document.system.check[idx];
+   const check = $derived(document.data.system.check[idx]);
 
    /** @type {boolean} Whether this component is currently expanded. */
-   $: isExpanded = $appState.tabs.checks.isExpanded[idx];
+   const isExpanded = $derived($appState.tabs.checks.isExpanded[idx]);
 </script>
 
 {#if check}
@@ -48,7 +53,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.checks.isExpanded[idx] = false;
                   }}
                />
@@ -56,7 +61,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.checks.isExpanded[idx] = true;
                   }}
                />
@@ -72,8 +77,8 @@
          <div>
             <IconButton
                icon={DELETE_ICON}
-               on:click={async () => {
-                  $document.deleteCheck(idx);
+               onclick={async () => {
+                  document.data.deleteCheck(idx);
                }}
             />
          </div>

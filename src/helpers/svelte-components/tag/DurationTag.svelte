@@ -2,14 +2,8 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Duration unit type (permanent, initiative, turnStart, turnEnd, or custom). */
-   export let type = void 0;
-
-   /** @type {number} The remaining Duration units, if any. */
-   export let remaining = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {{ type?: string, remaining?: number, tooltip?: string | TooltipAction }} Props for this component. */
+   let { type = void 0, remaining = void 0, tooltip = void 0 } = $props();
 </script>
 
 <div class="tag" use:tooltipAction={tooltip}>

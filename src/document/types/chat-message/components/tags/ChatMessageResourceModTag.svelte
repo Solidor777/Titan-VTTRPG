@@ -6,35 +6,37 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The Key of the resource to display information for. */
-   export let key = void 0;
+   /**
+    * @typedef {object} ChatMessageResourceModTagProps
+    * @property {string} [key] The Key of the resource to display information for.
+    * @property {string} [icon] The icon class to use for the tag.
+    * @property {string} [styleClass] The style class to use for the tag.
+    */
 
-   /** @type {string} The icon class to use for the tag. */
-   export let icon = void 0;
-
-   /** @type {string} The style class to use for the tag. */
-   export let styleClass = void 0;
+   /** @type {ChatMessageResourceModTagProps} */
+   const { key = void 0, icon = void 0, styleClass = void 0 } = $props();
 
    /**
     * Calculates the tooltip HTML for the resource mod tag.
+    * @returns {string} The tooltip HTML string.
     */
    function getTooltip() {
       // Base label.
       let retVal = `<p>${localize(`${key}.desc`)}</p>`;
 
       // Equipment.
-      if ($document.flags.titan[key].equipment) {
-         retVal += `<p>${localize('equipment')}: ${$document.flags.titan[key].equipment}</p>`;
+      if (document.data.flags.titan[key].equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan[key].equipment}</p>`;
       }
 
       // Abilities.
-      if ($document.flags.titan[key].ability) {
-         retVal += `<p>${localize('abilities')}: ${$document.flags.titan[key].ability}</p>`;
+      if (document.data.flags.titan[key].ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan[key].ability}</p>`;
       }
 
       // Effects.
-      if ($document.flags.titan[key].effect) {
-         retVal += `<p>${localize('effects')}: ${$document.flags.titan[key].effect}</p>`;
+      if (document.data.flags.titan[key].effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.flags.titan[key].effect}</p>`;
       }
 
       return retVal;
@@ -46,7 +48,7 @@
    localize: false,
 }}>
    <!--Icon-->
-   <i class={icon}/>
+   <i class={icon}></i>
 
    <!--Label-->
    <div class="label">
@@ -54,7 +56,7 @@
    </div>
 
    <!--Value-->
-   <div>{$document.flags.titan[key].total}</div>
+   <div>{document.data.flags.titan[key].total}</div>
 </div>
 
 <style lang="scss">

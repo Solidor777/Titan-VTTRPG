@@ -3,27 +3,26 @@
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import { CHECKED_ICON, UNCHECKED_ICON } from '~/system/Icons.js';
 
-   // Value to toggle.
-   /** @type {boolean} */
-   export let enabled = void 0;
+   /**
+    * @typedef {object} SpellSheetEnableAspectButtonProps
+    * @property {boolean} [enabled] Value to toggle.
+    * @property {string} [label] Label to display.
+    * @property {number} [cost] Cost of the aspect.
+    * @property {Function | undefined} [onclick] Callback invoked when the button is clicked.
+    */
 
-   // Label to display.
-   /** @type {string} */
-   export let label = void 0;
-
-   // Cost of the aspect.
-   /** @type {number} */
-   export let cost = void 0;
+   /** @type {SpellSheetEnableAspectButtonProps} */
+   const { enabled = undefined, label = undefined, cost = undefined, onclick = undefined } = $props();
 </script>
 
-<DocumentOwnerButton on:click>
+<DocumentOwnerButton {onclick}>
    <div class="button-content">
       <!--Label-->
       <div class="aspect-label">
          {label}
          <!--Icon-->
          <div class="icon">
-            <i class={enabled ? CHECKED_ICON : UNCHECKED_ICON}/>
+            <i class={enabled ? CHECKED_ICON : UNCHECKED_ICON}></i>
          </div>
       </div>
 
@@ -41,7 +40,7 @@
       </div>
    </div>
 
-   <div class="spacer"/>
+   <div class="spacer"></div>
 </DocumentOwnerButton>
 
 <style lang="scss">

@@ -2,8 +2,13 @@
    import { getContext } from 'svelte';
    import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 
-   /** @type {number} The index of the Trait in the item's Custom Traits array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetCustomTraitTagProps
+    * @property {number} [idx] The index of the Trait in the item's Custom Traits array.
+    */
+
+   /** @type {ItemSheetCustomTraitTagProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -13,7 +18,7 @@
     * @returns {void}
     */
    function deleteFunction() {
-      $document.deleteCustomTrait(idx);
+      document.data.deleteCustomTrait(idx);
    }
 
    /**
@@ -21,17 +26,17 @@
     * @returns {void}
     */
    function editFunction() {
-      $document.editCustomTrait(idx);
+      document.data.editCustomTrait(idx);
    }
 </script>
 
-{#if $document.system.customTrait[idx]}
+{#if document.data.system.customTrait[idx]}
    <EditDeleteTag
       {deleteFunction}
       deleteTooltip={'deleteTrait'}
       {editFunction}
       editTooltip={'editTrait'}
-      label={$document.system.customTrait[idx].name}
-      labelTooltip={$document.system.customTrait[idx].description}
+      label={document.data.system.customTrait[idx].name}
+      labelTooltip={document.data.system.customTrait[idx].description}
    />
 {/if}

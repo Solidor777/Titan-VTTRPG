@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import { getContext, setContext } from 'svelte';
    import WeaponChatMessage from '~/document/types/item/types/weapon/chat-message/WeaponChatMessage.svelte';
@@ -45,10 +43,17 @@
    import RepairsReportChatMessageShell
       from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageShell.svelte';
 
-   /** @type {TJSDocument} The reactive Document store for this chat message. */
-   export let documentStore = void 0;
+   /**
+    * @typedef {object} ChatMessageShellProps
+    * @property {import('~/document/reactive/ReactiveDocument.svelte.js').default} [documentStore] The reactive
+    * Document store for this chat message.
+    */
 
-   // Setup.
+   /** @type {ChatMessageShellProps} */
+   const { documentStore = void 0 } = $props();
+
+   // These captures are intentional: documentStore is stable for this component's lifetime.
+   // svelte-ignore state_referenced_locally
    setContext('document', documentStore);
 
    /** @type {object} Reference to the reactive Document store. */
@@ -56,9 +61,10 @@
 
    /**
     * Selects the correct chat message component based on the message type.
+    * @returns {object | undefined} The Svelte component constructor for the current message type.
     */
    function selectComponent() {
-      if (game.user.isGM || !$document.blind) {
+      if (game.user.isGM || !document.data.blind) {
          const chatComponents = {
             attributeCheck: AttributeCheckChatMessage,
             resistanceCheck: ResistanceCheckChatMessage,
@@ -87,13 +93,17 @@
             rendReport: RendReportChatMessage,
             repairsReport: RepairsReportChatMessageShell,
          };
-         return chatComponents[$document.flags.titan.type];
+         return chatComponents[document.data.flags.titan.type];
       }
       return PrivateRollChatMessage;
    }
 </script>
-{#if $document}
-   <div>
-      <svelte:component this={selectComponent()}/>
-   </div>
+
+{#if document.data}
+   {@const SelectedComponent = selectComponent()}
+   {#if SelectedComponent}
+      <div>
+         <SelectedComponent/>
+      </div>
+   {/if}
 {/if}

@@ -6,9 +6,16 @@
    import { getIcon } from '~/system/Icons.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
-   /** @type {string} The Mod that this component represents. */
-   export let mod = void 0;
+   /**
+    * @typedef {object} CharacterSheetModProps
+    * @property {string} [mod] The Mod that this component represents.
+    */
 
+   /** @type {CharacterSheetModProps} */
+   const { mod = undefined } = $props();
+
+   // mod is a fixed prop for this component's lifetime; capturing once for the icon is correct.
+   // svelte-ignore state_referenced_locally
    /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(mod);
 
@@ -23,7 +30,7 @@
       use:tooltipAction={`${mod}.desc`}
    >
       <!--Icon-->
-      <i class={icon}/>
+      <i class={icon}></i>
 
       <!--Label Text-->
       {localize(mod)}
@@ -38,7 +45,7 @@
       <!--Static Mod-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.mod[mod].mod.static}
+            bind:value={document.data.system.mod[mod].mod.static}
          />
       </div>
 
@@ -50,10 +57,10 @@
          <ModifiableStatValueLabel
             baseTooltip={localize(`${mod}.baseValue`)}
             baseValue={0}
-            effectMod={$document.system.mod[mod].mod.effect}
-            equipmentMod={$document.system.mod[mod].mod.equipment}
-            staticMod={$document.system.mod[mod].mod.static}
-            value={$document.system.mod[mod].value}
+            effectMod={document.data.system.mod[mod].mod.effect}
+            equipmentMod={document.data.system.mod[mod].mod.equipment}
+            staticMod={document.data.system.mod[mod].mod.static}
+            value={document.data.system.mod[mod].value}
          />
       </div>
    </div>

@@ -7,31 +7,35 @@
    import { slide } from 'svelte/transition';
    import IconLabelButton from '~/helpers/svelte-components/button/IconLabelButton.svelte';
 
+   /**
+    * @typedef {object} ItemSheetSidebarTraitsProps
+    * @property {object[]} [itemTypeTraits] An optional input array of traits converted into Tags.
+    * @property {Function | undefined} [editTraits] An optional function to start editing item-type specific traits.
+    */
+
+   /** @type {ItemSheetSidebarTraitsProps} */
+   const { itemTypeTraits = [], editTraits = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object[]} An optional input array of traits converted into Tags. */
-   export let itemTypeTraits = [];
-
-   /** @type {function | undefined} An optional function to start editing item-type specific traits. */
-   export let editTraits = void 0;
-
-   /** @type {object[]} The complete list of traits converted into tags. */
-   let tags;
-
-   // Add Custom Traits to the tags list.
-   $: {
-      tags = [...itemTypeTraits];
-      for (const [idx] in $document.system.customTrait) {
-         tags.push({
-            id: $document.system.customTrait[idx].uuid,
+   /**
+    * The complete list of traits converted into tags.
+    * @type {object[]}
+    */
+   const tags = $derived.by(() => {
+      const result = [...itemTypeTraits];
+      for (const [idx] in document.data.system.customTrait) {
+         result.push({
+            id: document.data.system.customTrait[idx].uuid,
             component: ItemSheetCustomTraitTag,
             props: {
                idx: idx
             }
          });
       }
-   }
+      return result;
+   });
 </script>
 
 <div class="traits">
@@ -41,7 +45,7 @@
          <IconLabelButton
             icon={EDIT_ICON}
             label={localize('editTraits')}
-            on:click={() => {editTraits()}}
+            onclick={() => {editTraits()}}
          />
       </div>
    {/if}
@@ -51,7 +55,7 @@
       <IconLabelButton
          icon={CREATE_ICON}
          label={'addCustomTrait'}
-         on:click={() => {$document.addCustomTrait()}}
+         onclick={() => {document.data.addCustomTrait()}}
       />
    </div>
 

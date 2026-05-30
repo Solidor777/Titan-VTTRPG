@@ -23,13 +23,13 @@
 
    <!--Value-->
    <div class="stat">
-      <i class={CURRENCY_ICON}/>
+      <i class={CURRENCY_ICON}></i>
       <div class="label">
          {localize('value')}
       </div>
       <div class="input large-number">
          <DocumentIntegerInput
-            bind:value={$document.system.value}
+            bind:value={document.data.system.value}
             min={0}
          />
       </div>
@@ -37,13 +37,13 @@
 
    <!--Defense-->
    <div class="stat">
-      <i class={DEFENSE_ICON}/>
+      <i class={DEFENSE_ICON}></i>
       <div class="label">
          {localize('defense')}
       </div>
       <div class="input number">
          <DocumentIntegerInput
-            bind:value={$document.system.defense}
+            bind:value={document.data.system.defense}
             min={0}
          />
       </div>

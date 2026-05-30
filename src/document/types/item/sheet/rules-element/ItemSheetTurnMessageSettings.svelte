@@ -3,8 +3,13 @@
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
 
-   /** @type {number} The index of the rules element in the item's rules elements array. */
-   export let idx = void 0;
+   /**
+    * @typedef {object} ItemSheetTurnMessageSettingsProps
+    * @property {number} [idx] The index of the rules element in the item's rules elements array.
+    */
+
+   /** @type {ItemSheetTurnMessageSettingsProps} */
+   const { idx = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -25,7 +30,7 @@
       <!--Selector-->
       <div class="field select">
          <DocumentSelect
-            bind:value={$document.system.rulesElement[idx].selector}
+            bind:value={document.data.system.rulesElement[idx].selector}
             options={selectorOptions}
          />
       </div>
@@ -34,7 +39,7 @@
    <!--Message text-->
    <div class="message">
       <DocumentBoundEditorInput
-         bind:value={$document.system.rulesElement[idx].message}
+         bind:value={document.data.system.rulesElement[idx].message}
       />
    </div>
 </div>
@@ -62,4 +67,3 @@
       }
    }
 </style>
-

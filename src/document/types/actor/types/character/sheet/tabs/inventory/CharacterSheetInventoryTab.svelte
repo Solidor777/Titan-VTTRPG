@@ -53,7 +53,7 @@
                <ToggleOptionButton
                   label={localize(key)}
                   enabled={$appState.tabs.inventory.filterOptions[key]}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.inventory.filterOptions[key] =
                         !$appState.tabs.inventory.filterOptions[key];
                   }}
@@ -65,7 +65,7 @@
          <div class="reset">
             <IconButton
                icon={RESET_ICON}
-               on:click={() => {
+               onclick={() => {
                   $appState.tabs.inventory.filterOptions.weapon = false;
                   $appState.tabs.inventory.filterOptions.armor = false;
                   $appState.tabs.inventory.filterOptions.shield = false;
@@ -91,11 +91,11 @@
          <!--Add Item Button-->
          <div class="add-entry-button">
             <CharacterSheetTabHeaderButton
-               disabled={!$document.isOwner}
+               disabled={!document.data.isOwner}
                icon={CREATE_ICON}
                label={localize('addNewItem')}
-               on:click={() => {
-                  $document.system.addInventoryItem();
+               onclick={() => {
+                  document.data.system.addInventoryItem();
                }}
             />
          </div>

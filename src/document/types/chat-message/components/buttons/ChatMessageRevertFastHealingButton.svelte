@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('fastHealing.desc')}</p>`;
 
       // Equipment.
-      if ($document.flags.titan.fastHealingRevert.equipment) {
-         retVal += `<p>${localize('equipment')}: ${$document.flags.titan.fastHealingRevert.equipment}</p>`;
+      if (document.data.flags.titan.fastHealingRevert.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.fastHealingRevert.equipment}</p>`;
       }
 
       // Abilities.
-      if ($document.flags.titan.fastHealingRevert.ability) {
-         retVal += `<p>${localize('abilities')}: ${$document.flags.titan.fastHealingRevert.ability}</p>`;
+      if (document.data.flags.titan.fastHealingRevert.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.fastHealingRevert.ability}</p>`;
       }
 
       // Effects.
-      if ($document.flags.titan.fastHealingRevert.effect) {
-         retVal += `<p>${localize('effects')}: ${$document.flags.titan.fastHealingRevert.effect}</p>`;
+      if (document.data.flags.titan.fastHealingRevert.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.fastHealingRevert.effect}</p>`;
       }
 
       return retVal;
@@ -41,16 +41,16 @@
     */
    async function confirm() {
       if (assert(
-         $document?.isOwner,
+         document.data?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Apply damage to undo the healing, bypassing armor.
             await actor.system.applyDamage(
-               $document.flags.titan.fastHealingRevert.total,
+               document.data.flags.titan.fastHealingRevert.total,
                {
                   ignoreArmor: true,
                   report: false,
@@ -67,12 +67,12 @@
                   },
                },
             };
-            if ($document.flags.titan.wounds) {
+            if (document.data.flags.titan.wounds) {
                updateData.flags.titan.wounds = { value: actor.system.resource.wounds.value };
             }
 
             // Update the chat message.
-            await $document.update(updateData);
+            await document.data.update(updateData);
          }
       }
    }
@@ -80,7 +80,7 @@
 
 <ChatMessageResourceModButton
    icon={PERSISTENT_DAMAGE_ICON}
-   label={localize('revertX%FastHealing').replace('X%', $document.flags.titan.fastHealingRevert.total)}
+   label={localize('revertX%FastHealing').replace('X%', document.data.flags.titan.fastHealingRevert.total)}
    tooltip={getTooltip()}
    confirmFn={confirm}
 />

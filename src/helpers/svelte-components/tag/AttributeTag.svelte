@@ -1,15 +1,19 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Attribute that this tag should be styled for. */
-   export let attribute = void 0;
+   /**
+    * @typedef {object} AttributeTagProps
+    * @property {string} [attribute] - The Attribute that this tag should be styled for.
+    * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {import('svelte').Snippet} [children] - Default slot content.
+    */
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {AttributeTagProps} */
+   let { attribute = void 0, tooltip = void 0, children } = $props();
 </script>
 
 <div class="tag {attribute}" use:tooltipAction={tooltip}>
-   <slot/>
+   {@render children?.()}
 </div>
 
 <style lang="scss">

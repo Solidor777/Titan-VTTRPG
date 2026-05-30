@@ -11,13 +11,14 @@
     * @returns {Promise<Document>} The imported Document.
     */
    async function importItem() {
-      return $document.collection.importFromCompendium($document.compendium, $document.id);
+      return document.data.collection.importFromCompendium(document.data.compendium, document.data.id);
    }
 </script>
 
-<!--Import Actor Button-->
-<button class="header-control icon edit-token-button"
-        on:click={() => importItem()}
+<!--Import Item Button-->
+<button aria-label="Import Item to World"
+        class="header-control icon edit-token-button"
+        onclick={() => importItem()}
         use:tooltipAction={'importItemToWorld'}>
-   <i class={IMPORT_ICON}/>
+   <i class={IMPORT_ICON}></i>
 </button>

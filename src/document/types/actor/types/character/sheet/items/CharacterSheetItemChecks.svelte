@@ -3,8 +3,13 @@
    import CharacterSheetItemCheck
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemChecksProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    */
+
+   /** @type {CharacterSheetItemChecksProps} */
+   const { item = undefined } = $props();
 </script>
 
 <!--Checks-->

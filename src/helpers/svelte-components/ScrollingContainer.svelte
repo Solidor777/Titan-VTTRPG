@@ -1,13 +1,21 @@
 <script>
+   /**
+    * @typedef {object} ScrollingContainerProps
+    * @property {number} [scrollTop] - Initial scroll top of this container.
+    * @property {import('svelte').Snippet} [children] - Content to render inside the scrollable area.
+    */
 
-   /** @type {number} Initial scroll top of this container. */
-   export let scrollTop = 0;
+   /** @type {ScrollingContainerProps} */
+   let {
+      scrollTop = $bindable(0),
+      children,
+   } = $props();
 
    /** @type {boolean} Whether the container is overflowing its top. */
-   let isOverflowingTop = false;
+   let isOverflowingTop = $state(false);
 
    /** @type {boolean} Whether the container is overflowing its bottom. */
-   let isOverflowingBottom = false;
+   let isOverflowingBottom = $state(false);
 
    /** @type {number} The length of the scroll fade in pixels, if any. */
    const fadeLength = 12;
@@ -17,12 +25,10 @@
     * @param {Event} event - The DOM Event of the scroll input.
     */
    function onScroll(event) {
-
       // Update the scroll top state variable.
       scrollTop = event.target.scrollTop;
 
-      // Styling code for a blur at the top and bottom of an overflowing.
-      // element.
+      // Styling code for a blur at the top and bottom of an overflowing element.
       const element = event.target;
       updateOverflowingState(element);
    }
@@ -35,8 +41,7 @@
       // Initialize the element's scroll top.
       element.scrollTop = scrollTop;
 
-      // Styling code for a blur at the top and bottom of an overflowing.
-      // element.
+      // Styling code for a blur at the top and bottom of an overflowing element.
       updateOverflowingState(element);
    }
 
@@ -52,18 +57,18 @@
 
 <div class="container">
    <!--Content-->
-   <div class="content" on:scroll={onScroll} use:initialScroll>
-      <slot/>
+   <div class="content" onscroll={onScroll} use:initialScroll>
+      {@render children?.()}
    </div>
 
    <!--Top Overflowing Blur-->
    {#if isOverflowingTop}
-      <span class="overflow top"/>
+      <span class="overflow top"></span>
    {/if}
 
    <!--Bottom Overflowing Blur-->
    {#if isOverflowingBottom}
-      <span class="overflow bottom"/>
+      <span class="overflow bottom"></span>
    {/if}
 </div>
 

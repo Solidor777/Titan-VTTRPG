@@ -4,11 +4,16 @@
    import { HEALING_ICON } from '~/system/Icons.js';
    import ChatMessageButton from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
-   /** @type {number} Amount of Healing to apply. */
-   export let healing = void 0;
+   /**
+    * @typedef {object} ChatMessageHealingButtonProps
+    * @property {number} [healing] Amount of Healing to apply.
+    */
+
+   /** @type {ChatMessageHealingButtonProps} */
+   const { healing = void 0 } = $props();
 </script>
 
-<ChatMessageButton on:click={() => applyHealingToTargets(healing)} tooltip={localize('applyHealing')}>
-   <i class={HEALING_ICON}/>
+<ChatMessageButton onclick={() => applyHealingToTargets(healing)} tooltip={localize('applyHealing')}>
+   <i class={HEALING_ICON}></i>
    {localize('healX%Damage').replace('X%', healing)}
 </ChatMessageButton>

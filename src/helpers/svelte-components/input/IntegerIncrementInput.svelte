@@ -5,37 +5,35 @@
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {number} The value that this input should modify. */
-   export let value = void 0;
-
-   /** @type {number | boolean} The minimum value of the input. */
-   export let min = false;
-
-   /** @type {number | boolean} The maximum value of the input. */
-   export let max = false;
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
-
    /**
-    * @type {number}
-    * How much to increment or decrement the value when the increase or decrease
-    * buttons are pressed while the modifier is NOT active.
+    * @typedef {object} IntegerIncrementInputProps
+    * @property {number}        [value=undefined]         - The value that this input should modify.
+    * @property {number|boolean}[min=false]               - The minimum value of the input.
+    * @property {number|boolean}[max=false]               - The maximum value of the input.
+    * @property {boolean}       [disabled=false]          - Whether the input should currently be disabled.
+    * @property {string|object} [tooltip=undefined]       - The Tooltip to display for this element, if any.
+    * @property {number}        [increment=1]             - Amount to change the value per button press (no modifier).
+    * @property {number}        [modifierIncrement=10]    - Amount to change the value per button press (modifier active).
+    * @property {Function}      [onchange]                - Callback forwarded from the native change event.
+    * @property {Function}      [onkeyup]                 - Callback forwarded from the native keyup event.
     */
-   export let increment = 1;
 
-   /**
-    * @type {number}
-    * How much to increment or decrement the value when the increase or decrease
-    * buttons are pressed while the modifier IS active.
-    */
-   export let modifierIncrement = 10;
+   /** @type {IntegerIncrementInputProps} */
+   let {
+      value             = $bindable(undefined),
+      min               = false,
+      max               = false,
+      disabled          = false,
+      tooltip           = undefined,
+      increment         = 1,
+      modifierIncrement = 10,
+      onchange          = undefined,
+      onkeyup           = undefined,
+   } = $props();
 
    /**
     * Called when the decrement button is pressed to decrement the value.
+    * @returns {void}
     */
    function decrementInput() {
       value -= isModifierActive() ? modifierIncrement : increment;
@@ -43,6 +41,7 @@
 
    /**
     * Called when the increment button is pressed to increment the value.
+    * @returns {void}
     */
    function incrementInput() {
       value += isModifierActive() ? modifierIncrement : increment;
@@ -54,20 +53,21 @@
       <MiniIconButton
          {disabled}
          icon={DECREMENT_ICON}
-         on:click={decrementInput}
+         onclick={decrementInput}
       />
    </div>
    <IntegerInput
       bind:value
       {max}
       {min}
-      on:change
+      {onchange}
+      {onkeyup}
    />
    <div class="increment">
       <MiniIconButton
          {disabled}
          icon={INCREMENT_ICON}
-         on:click={incrementInput}
+         onclick={incrementInput}
       />
    </div>
 </div>

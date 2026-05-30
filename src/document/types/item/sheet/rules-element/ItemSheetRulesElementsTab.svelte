@@ -16,12 +16,10 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
-
-
 </script>
 
 <div class="tab">
-   {#if $document.system.rulesElement.length > 0}
+   {#if document.data.system.rulesElement.length > 0}
       <!--Filter-->
       <div class="filter" transition:slide|local>
          <TopFilter bind:value={$appState.tabs.rulesElements.filter}/>
@@ -31,10 +29,10 @@
    <!--Scrolling Content-->
    <ScrollingContainer>
       <!-- Rules Element List-->
-      {#if $document.system.rulesElement.length > 0}
+      {#if document.data.system.rulesElement.length > 0}
          <ol transition:slide|local>
             <!--Each Element-->
-            {#each $document.system.rulesElement as element, idx (element.uuid)}
+            {#each document.data.system.rulesElement as element, idx (element.uuid)}
                <li transition:slide|local>
                   <ItemSheetRulesElementSettings {idx}/>
                </li>
@@ -45,14 +43,14 @@
       <!--Add Element Button-->
       <div class="add-entry-button">
          <DocumentOwnerButton
-            on:click={() => {
-               $document.system.addRulesElement();
+            onclick={() => {
+               document.data.system.addRulesElement();
             }}
          >
             <!--Button Content-->
             <div class="button-content">
                <!--Icon-->
-               <i class={CREATE_ICON}/>
+               <i class={CREATE_ICON}></i>
 
                <!--Label-->
                <div class="label">

@@ -3,45 +3,50 @@
    import { getContext } from 'svelte';
    import getItemCheckParametersTooltip from '~/helpers/utility-functions/GetItemCheckParametersTooltip.js';
 
-   /** @type {string} The ID of the Item to get the check from. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetCondensedItemCheckButtonProps
+    * @property {string} [itemId] The ID of the Item to get the check from.
+    */
+
+   /** @type {CharacterSheetCondensedItemCheckButtonProps} */
+   const { itemId = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   // itemId is fixed per mounted instance (keyed list items do not change their ID); capturing
+   // once in checkOptions is intentional.
+   // svelte-ignore state_referenced_locally
    /** @type {ItemCheckOptions} Base options for the Item Check. */
    const checkOptions = {
       itemId: itemId,
    };
 
    /** @type {ItemCheckParameters} Calculated check parameters. */
-   let checkParameters;
-
-   /** @type {string} Calculated tooltipAction. */
-   let tooltip;
-
-   // Update parameters in response to changes.
-   $: {
+   let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = $document.items.get(itemId);
+      const item = document.data.items.get(itemId);
       if (item?.system.check.length > 0) {
 
          // Update the parameters.
-         checkParameters = $document.system.getItemCheckParameters(
-            $document.system.initializeItemCheckOptions(checkOptions)
+         return document.data.system.getItemCheckParameters(
+            document.data.system.initializeItemCheckOptions(checkOptions)
          );
-
-         // Update the tooltipAction.
-         tooltip = getItemCheckParametersTooltip(checkParameters);
       }
-   }
+      return undefined;
+   });
+
+   /** @type {string} Calculated tooltipAction. */
+   let tooltip = $derived(
+      checkParameters ? getItemCheckParametersTooltip(checkParameters) : undefined
+   );
 </script>
 <CondensedCheckButton
    attribute={checkParameters.attribute}
    complexity={checkParameters.complexity}
    difficulty={checkParameters.difficulty}
-   on:click={() => $document.system.requestItemCheck(checkOptions)}
+   onclick={() => document.data.system.requestItemCheck(checkOptions)}
    resolveCost={checkParameters.resolveCost}
    {tooltip}
    totalDice={checkParameters.totalDice}

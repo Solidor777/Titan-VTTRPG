@@ -1,8 +1,13 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {object} The Titan check flags data for this document. */
-   export let check = void 0;
+   /**
+    * @typedef {object} ResistanceCheckChatHeaderProps
+    * @property {object} [check] - The Titan check flags data for this document.
+    */
+
+   /** @type {ResistanceCheckChatHeaderProps} */
+   const { check = undefined } = $props();
 </script>
 
 <div class="label">

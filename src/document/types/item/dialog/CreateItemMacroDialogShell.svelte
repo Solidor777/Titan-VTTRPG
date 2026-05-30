@@ -8,23 +8,39 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 
-   /** @type {TitanItem} The Item being edited. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CreateItemMacroDialogShellProps
+    * @property {TitanItem} [item] The Item being edited.
+    * @property {number} [slot] Slot on the hotbar that the macro will be assigned to.
+    * @property {string} [uuid] UUID of the item that was dropped.
+    */
 
-   // Slot on the hotbar that the macro will be assigned to.
-   /** @type {number} */
-   export let slot = void 0;
-
-   // UUID of the item that was dropped.
-   /** @type {string} */
-   export let uuid = void 0;
+   /** @type {CreateItemMacroDialogShellProps} */
+   const {
+      item = undefined,
+      slot = undefined,
+      uuid = undefined,
+   } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
+   // Snapshot all three props into plain constants. item, slot, and uuid are fixed for this
+   // dialog's lifetime — the dialog is mounted once and immediately unmounted on close. All
+   // subsequent reads use these snapshots so the ignore below is applied exactly once.
+   // svelte-ignore state_referenced_locally
+   /** @type {TitanItem | undefined} Snapshot of the item prop for one-time dialog initialisation. */
+   const itemSnapshot = item;
+   // svelte-ignore state_referenced_locally
+   /** @type {string | undefined} Snapshot of the uuid prop for one-time dialog initialisation. */
+   const uuidSnapshot = uuid;
+   // svelte-ignore state_referenced_locally
+   /** @type {number | undefined} Snapshot of the slot prop for one-time dialog initialisation. */
+   const slotSnapshot = slot;
+
    // Macro type.
    /** @type {string} */
-   let macroType = 'toggleDocumentSheet';
+   let macroType = $state('toggleDocumentSheet');
    const macroTypeOptions = [
       {
          value: 'toggleDocumentSheet',
@@ -34,11 +50,11 @@
 
    // Item check.
    /** @type {number} */
-   let itemCheckIdx = 0;
+   let itemCheckIdx = $state(0);
    /** @type {*[]} */
    const itemCheckOptions = [];
    // If the item has item checks.
-   if (item.system.check.length > 0) {
+   if (itemSnapshot?.system.check.length > 0) {
       // Add item check to the macro type options.
       macroTypeOptions.push({
          value: 'itemCheck',
@@ -47,7 +63,7 @@
       macroType = 'itemCheck';
 
       // Add the item checks to the item check select options.
-      item.system.check.forEach((check, idx) => {
+      itemSnapshot.system.check.forEach((check, idx) => {
          itemCheckOptions.push({
             value: idx,
             label: `${check.label} (${idx + 1})`,
@@ -57,13 +73,13 @@
 
    // Type-specific macro type.
    /** @type {number} */
-   let attackIdx = 0;
+   let attackIdx = $state(0);
    /** @type {*[]} */
    const attackOptions = [];
-   switch (item.type) {
+   switch (itemSnapshot?.type) {
       case 'weapon': {
          // If the item has attacks.
-         if (item.system.attack.length > 0) {
+         if (itemSnapshot.system.attack.length > 0) {
             // Add Attack Check to the macro type options.
             macroTypeOptions.push({
                value: 'attackCheck',
@@ -72,7 +88,7 @@
             macroType = 'attackCheck';
 
             // Add the attacks to the attack options.
-            item.system.attack.forEach((attack, idx) => {
+            itemSnapshot.system.attack.forEach((attack, idx) => {
                attackOptions.push({
                   value: idx,
                   label: `${attack.label} (${idx + 1})`,
@@ -94,7 +110,7 @@
 
       case 'effect': {
          // If this is a permanent effect.
-         if (item.system.duration.type === 'permanent') {
+         if (itemSnapshot.system.duration.type === 'permanent') {
             // Add toggle active effect to the macro type options.
             macroTypeOptions.push({
                value: 'toggleEffectActive',
@@ -112,7 +128,7 @@
 
    // ID method.
    /** @type {string} */
-   let idMethod = 'uuid';
+   let idMethod = $state('uuid');
    const idMethodOptions = [
       {
          value: 'uuid',
@@ -129,20 +145,23 @@
    ];
 
    // Macro image.
-   let img = item.img;
+   /** @type {string} */
+   let img = $state(itemSnapshot?.img);
 
    // Macro name.
-   let name = item.name;
+   /** @type {string} */
+   let name = $state(itemSnapshot?.name);
 
    /**
     * Creates the macro based on the current settings and assigns it to the hotbar slot.
+    * @returns {Promise<void>} Resolves when the macro is created and the dialog closes.
     */
    async function onCreateMacro() {
       let macro;
       switch (macroType) {
          case 'attackCheck': {
             macro = await game.titan.macros.getAttackCheckMacro(
-               item,
+               itemSnapshot,
                name,
                img,
                idMethod,
@@ -153,7 +172,7 @@
 
          case 'castingCheck': {
             macro = await game.titan.macros.getCastingCheckMacro(
-               item,
+               itemSnapshot,
                name,
                img,
                idMethod,
@@ -163,7 +182,7 @@
 
          case 'itemCheck': {
             macro = await game.titan.macros.getItemCheckMacro(
-               item,
+               itemSnapshot,
                name,
                img,
                idMethod,
@@ -174,7 +193,7 @@
 
          case 'toggleEffectActive': {
             macro = await game.titan.macros.getToggleEffectActiveMacro(
-               item,
+               itemSnapshot,
                name,
                img,
                idMethod,
@@ -186,7 +205,7 @@
             macro = await game.titan.macros.getToggleDocumentSheetMacro(
                name,
                img,
-               uuid,
+               uuidSnapshot,
             );
             break;
          }
@@ -197,7 +216,7 @@
       }
 
       if (macro) {
-         game.user.assignHotbarMacro(macro, slot);
+         game.user.assignHotbarMacro(macro, slotSnapshot);
       }
 
       return application.close();
@@ -216,7 +235,7 @@
    <div class="row">
       <!--Image-->
       <div class="image">
-         <ImagePicker bind:src={img}/>
+         <ImagePicker bind:value={img}/>
       </div>
 
       <!--Name-->
@@ -282,13 +301,13 @@
    <!--Buttons-->
    <div class="row">
       <div class="button">
-         <Button on:click={onCreateMacro}>
+         <Button onclick={onCreateMacro}>
             <Text text="createMacro"/>
          </Button>
       </div>
 
       <div class="button">
-         <Button on:click={onCancel}><Text text="cancel"/></Button>
+         <Button onclick={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

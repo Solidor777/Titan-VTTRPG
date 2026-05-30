@@ -1,11 +1,19 @@
-<script xmlns="http://www.w3.org/1999/html">
+<script>
+   /**
+    * @typedef {object} AttributeInputProps
+    * @property {string} [attribute] - The Attribute to use for coloring this element.
+    * @property {import('svelte').Snippet} [children] - Child content to render inside the wrapper.
+    */
 
-   /** @type {string} The Attribute to use for coloring this element. */
-   export let attribute = void 0;
+   /** @type {AttributeInputProps} */
+   let {
+      attribute = void 0,
+      children = void 0,
+   } = $props();
 </script>
 
 <div class="attribute-input {attribute}">
-   <slot></slot>
+   {@render children?.()}
 </div>
 
 <style lang="scss">

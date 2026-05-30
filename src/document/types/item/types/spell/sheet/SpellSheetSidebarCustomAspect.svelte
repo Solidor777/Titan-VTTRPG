@@ -5,13 +5,19 @@
    import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
    import { DAMAGE_ICON, HEALING_ICON } from '~/system/Icons.js';
 
-   /** @type {number} */
-   export let idx = 0;
+   /**
+    * @typedef {object} SpellSheetSidebarCustomAspectProps
+    * @property {number} [idx] Index of the custom aspect in the document's customAspect array.
+    */
+
+   /** @type {SpellSheetSidebarCustomAspectProps} */
+   const { idx = 0 } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   $: aspect = $document.system.customAspect[idx];
+   /** @type {object} The custom aspect data. */
+   const aspect = $derived(document.data.system.customAspect[idx]);
 </script>
 
 {#if aspect}
@@ -19,12 +25,12 @@
       <div class="aspect-label">
          <!--Damage Icon-->
          {#if aspect.isDamage}
-            <i class={DAMAGE_ICON}/>
+            <i class={DAMAGE_ICON}></i>
          {/if}
 
          <!--Healing Icon-->
          {#if aspect.isHealing}
-            <i class={HEALING_ICON}/>
+            <i class={HEALING_ICON}></i>
          {/if}
 
          {aspect.label}

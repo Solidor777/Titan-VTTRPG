@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Text from '~/helpers/svelte-components/Text.svelte';
@@ -8,24 +6,33 @@
    import TextArea from '~/helpers/svelte-components/input/TextAreaInput.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
 
-   /** @type {TitanItem} The item owning the custom trait being edited. */
-   export let item = void 0;
+   /**
+    * @typedef {object} EditCustomTraitDialogShellProps
+    * @property {TitanItem} [item] The item owning the custom trait being edited.
+    * @property {number} [traitIdx] The index of the trait in the item's custom traits array.
+    */
+
+   /** @type {EditCustomTraitDialogShellProps} */
+   const {
+      item = undefined,
+      traitIdx = undefined,
+   } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {number} The index of the trait in the item's custom traits array. */
-   export let traitIdx = void 0;
-
+   // Capture initial trait data from the dialog's fixed props to seed the editable state.
+   // This is a one-time dialog initialisation — item and traitIdx never change while mounted.
+   // svelte-ignore state_referenced_locally
    /** @type {object} The custom trait being edited. */
-   const trait = item.system.customTrait[traitIdx];
+   let trait = $state(item?.system.customTrait[traitIdx] ?? {});
 
    /**
     * Saves the edited trait and closes the dialog.
     * @returns {void}
     */
    function editTrait() {
-      const customTrait = item.system.customTrait;
+      const customTrait = item?.system.customTrait;
 
       if (customTrait && customTrait[traitIdx]) {
          customTrait[traitIdx] = trait;
@@ -73,7 +80,7 @@
       <!--Add Trait Button-->
       <div class="button">
          <Button
-            on:click={() => {
+            onclick={() => {
                editTrait();
             }}
          >
@@ -84,7 +91,7 @@
       <!--Cancel Button-->
       <div class="button">
          <Button
-            on:click={() => {
+            onclick={() => {
                application.close();
             }}
          >

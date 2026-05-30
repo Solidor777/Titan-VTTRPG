@@ -3,14 +3,8 @@
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import createAttributeCheckLabel from '~/helpers/utility-functions/CreateAttributeCheckLabel.js';
 
-   /** @type {string} The Attribute to use for the Check. */
-   export let attribute = void 0;
-
-   /** @type {string} The Skill to use for the Check. */
-   export let skill = void 0;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {{ attribute?: string, skill?: string, tooltip?: string | TooltipAction }} Props for this component. */
+   let { attribute = void 0, skill = void 0, tooltip = void 0 } = $props();
 </script>
 
 <!--Check label-->

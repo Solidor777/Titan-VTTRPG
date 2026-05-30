@@ -29,25 +29,25 @@
    const sections = [];
 
    // Add Stamina if appropriate.
-   if ($document.flags.titan.stamina) {
+   if (document.data.flags.titan.stamina) {
       sections.push(ChatMessageStamina);
    }
 
    // Add Wounds if appropriate.
-   if ($document.flags.titan.wounds) {
+   if (document.data.flags.titan.wounds) {
       sections.push(ChatMessageWounds);
    }
 
    // Add Resolve if appropriate.
-   if ($document.flags.titan.resolve) {
+   if (document.data.flags.titan.resolve) {
       sections.push(ChatMessageResolve);
    }
 
    // Add fast healing revert information if appropriate.
-   if ($document.flags.titan.fastHealingRevert) {
+   if (document.data.flags.titan.fastHealingRevert) {
 
       // Add fast healing revert tag if confirmed.
-      if ($document.flags.titan.fastHealingRevert.confirmed) {
+      if (document.data.flags.titan.fastHealingRevert.confirmed) {
          sections.push(ChatMessageFastHealingRevertTag);
       }
 
@@ -58,10 +58,10 @@
    }
 
    // Add persistent damage revert information if appropriate.
-   if ($document.flags.titan.persistentDamageRevert) {
+   if (document.data.flags.titan.persistentDamageRevert) {
 
       // Add persistent damage revert tag if confirmed.
-      if ($document.flags.titan.persistentDamageRevert.confirmed) {
+      if (document.data.flags.titan.persistentDamageRevert.confirmed) {
          sections.push(ChatMessagePersistentDamageRevertTag);
       }
 
@@ -72,10 +72,10 @@
    }
 
    // Add resolve regain revert information if appropriate.
-   if ($document.flags.titan.resolveRegainRevert) {
+   if (document.data.flags.titan.resolveRegainRevert) {
 
       // Add resolve regain revert tag if confirmed.
-      if ($document.flags.titan.resolveRegainRevert.confirmed) {
+      if (document.data.flags.titan.resolveRegainRevert.confirmed) {
          sections.push(ChatMessageResolveRegainRevertTag);
       }
 

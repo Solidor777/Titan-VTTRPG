@@ -2,14 +2,19 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Text from '~/helpers/svelte-components/Text.svelte';
 
-   /** @type {string | TextData} The text label to display for this element. */
-   export let label = void 0;
+   /**
+    * @typedef {object} CheckDialogSummaryProps
+    * @property {string | TextData} [label] The text label to display for this element.
+    * @property {*} [value] The value to display.
+    * @property {string | TextData} [tooltip] The tooltip to display when the element is hovered.
+    */
 
-   /** @type {*} The value to display. */
-   export let value = void 0;
-
-   /** @type {string | TextData} The tooltip to display when the element is hovered. */
-   export let tooltip = void 0;
+   /** @type {CheckDialogSummaryProps} */
+   const {
+      label = undefined,
+      value = undefined,
+      tooltip = undefined,
+   } = $props();
 
 </script>
 

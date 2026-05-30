@@ -4,8 +4,13 @@
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type {object} The titan flags data for the item. */
-   export let item = void 0;
+   /**
+    * @typedef {object} AbilityChatStatsProps
+    * @property {object} [item] - The titan flags data for the item.
+    */
+
+   /** @type {AbilityChatStatsProps} */
+   const { item = void 0 } = $props();
 </script>
 
 <div class="stats">

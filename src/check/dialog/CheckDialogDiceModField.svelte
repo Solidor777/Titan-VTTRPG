@@ -12,6 +12,5 @@
    bind:value={$checkOptions.diceMod}
    input={IntegerInput}
    label={'diceMod'}
-   on:change
    tooltip={'check.diceMod.desc'}
 />

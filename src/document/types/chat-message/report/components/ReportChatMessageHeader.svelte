@@ -1,15 +1,19 @@
 <script>
-   /** @type {string} Main label for the header. */
-   export let headerLabel = void 0;
+   /**
+    * @typedef {object} ReportChatMessageHeaderProps
+    * @property {string} [headerLabel] Main label for the header.
+    * @property {string} [headerIcon] The icon class for the header.
+    * @property {string[]} [subHeaderLabels] Labels for the sub-headers.
+    * @property {string[]} [images] Images to display.
+    */
 
-   /** @type {string} The icon class for the header. */
-   export let headerIcon = void 0;
-
-   /** @type {string[]} Labels for the sub-headers. */
-   export let subHeaderLabels = void 0;
-
-   /** @type {string[]} Images to display. */
-   export let images = void 0;
+   /** @type {ReportChatMessageHeaderProps} */
+   const {
+      headerLabel = void 0,
+      headerIcon = void 0,
+      subHeaderLabels = void 0,
+      images = void 0,
+   } = $props();
 </script>
 
 <div class="header">
@@ -32,7 +36,7 @@
 
       <!--Main Header-->
       <div class="main">
-         <i class={headerIcon}/>
+         <i class={headerIcon}></i>
          {headerLabel}
       </div>
    </div>

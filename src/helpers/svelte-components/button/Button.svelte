@@ -2,19 +2,29 @@
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
+   /**
+    * @typedef {object} ButtonProps Props for the Button component.
+    * @property {boolean} [disabled] - Whether the button is currently disabled.
+    * @property {string | object | undefined} [tooltip] - The tooltip to display for this element, if any.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
+    * @property {import('svelte').Snippet | undefined} [children] - Default slot content.
+    */
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {ButtonProps} */
+   const {
+      disabled = false,
+      tooltip = void 0,
+      onclick = void 0,
+      children = void 0,
+   } = $props();
 </script>
 
 <button
    {disabled}
-   on:click
-   on:mousedown={preventDefault}
+   {onclick}
+   onmousedown={preventDefault}
    use:tooltipAction={tooltip}>
-   <slot/>
+   {@render children?.()}
 </button>
 
 <style lang="scss">
@@ -22,4 +32,3 @@
       @include button;
    }
 </style>
-

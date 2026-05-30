@@ -1,18 +1,25 @@
 <script>
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { getContext } from 'svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
 
-   /** @type {string} The icon class to display for this button. */
-   export let icon = void 0;
+   /**
+    * @typedef {object} DocumentOwnerIconButtonProps
+    * @property {string} [icon] - The icon class to display for this button.
+    * @property {boolean} [disabled] - Whether this input is disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
+    */
 
-   /** @type {boolean} Whether this input is disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {DocumentOwnerIconButtonProps} */
+   let {
+      icon = void 0,
+      disabled = false,
+      tooltip = void 0,
+      onclick = void 0,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
 
-<IconButton disabled={disabled || !$document.isOwner} {icon} on:click {tooltip}/>
+<IconButton disabled={disabled || !document.data.isOwner} {icon} {onclick} {tooltip}/>

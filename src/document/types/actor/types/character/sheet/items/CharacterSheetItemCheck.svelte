@@ -18,12 +18,18 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The ID of the item to get the check from. */
-   export let itemId = void 0;
+   /**
+    * @typedef {object} CharacterSheetItemCheckProps
+    * @property {string} [itemId] The ID of the item to get the check from.
+    * @property {number} [checkIdx] The index of the check in the checks array.
+    */
 
-   /** @type {number} The index of the check in the checks array. */
-   export let checkIdx = void 0;
+   /** @type {CharacterSheetItemCheckProps} */
+   const { itemId = undefined, checkIdx = undefined } = $props();
 
+   // itemId and checkIdx are fixed props for this component's lifetime; the checkOptions object
+   // is intentionally built once and reused across derived reads and event handlers.
+   // svelte-ignore state_referenced_locally
    /** @type {ItemCheckOptions} Options for the check. */
    const checkOptions = {
       itemId: itemId,
@@ -34,28 +40,25 @@
    const autoSpendResolve = autoSpendResolveChecks();
 
    /** @type {ItemCheckParameters} Calculated item check parameters. */
-   let checkParameters;
-
-   // Update the svelte-components in response to changes.
-   $: {
+   let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = $document.items.get(itemId);
-      if (item?.system.check.length > checkIdx
-      ) {
+      const item = document.data.items.get(itemId);
+      if (item?.system.check.length > checkIdx) {
 
          // Update the check parameters.
-         checkParameters = $document.system.getItemCheckParameters(
-            $document.system.initializeItemCheckOptions(checkOptions)
+         return document.data.system.getItemCheckParameters(
+            document.data.system.initializeItemCheckOptions(checkOptions)
          );
       }
-   }
+      return undefined;
+   });
 
    /**
     * Rolls the Item Check.
     */
    function rollItemCheck() {
-      $document.system.requestItemCheck(checkOptions);
+      document.data.system.requestItemCheck(checkOptions);
    }
 </script>
 
@@ -69,9 +72,9 @@
             <ItemCheckButton
                label={checkParameters.checkLabel}
                attribute={checkParameters.attribute}
-               disabled={!$document.isOwner}
+               disabled={!document.data.isOwner}
                resolveCost={checkParameters.resolveCost}
-               on:click={() => rollItemCheck()}
+               onclick={() => rollItemCheck()}
             />
          {:else}
             <!--Check Button-->
@@ -79,8 +82,8 @@
                <ItemCheckButton
                   label={checkParameters.checkLabel}
                   attribute={checkParameters.attribute}
-                  disabled={!$document.isOwner}
-                  on:click={() => rollItemCheck()}
+                  disabled={!document.data.isOwner}
+                  onclick={() => rollItemCheck()}
                />
             </div>
 
@@ -88,7 +91,7 @@
             <div class="resolve-cost-button">
                <SpendResolveButton
                   resolveCost={checkParameters.resolveCost}
-                  on:click={() => $document.system.spendResolve(checkParameters.resolveCost)}
+                  onclick={() => document.data.system.spendResolve(checkParameters.resolveCost)}
                />
             </div>
          {/if}
@@ -97,9 +100,9 @@
          <ItemCheckButton
             label={checkParameters.checkLabel}
             attribute={checkParameters.attribute}
-            disabled={!$document.isOwner}
+            disabled={!document.data.isOwner}
             resolveCost={checkParameters.resolveCost}
-            on:click={() => rollItemCheck()}
+            onclick={() => rollItemCheck()}
          />
       {/if}
    </div>

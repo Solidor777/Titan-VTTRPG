@@ -1,12 +1,18 @@
 <script>
-   /** @type {SvelteComponent[]} List of Svelte Components that make up the sections of the sidebar. */
-   export let sections = void 0;
+   /**
+    * @typedef {object} DocumentSheetSidebarProps
+    * @property {import('svelte').SvelteComponent[]} [sections] List of Svelte Components that make up the sections of
+    *    the sidebar.
+    */
+
+   /** @type {DocumentSheetSidebarProps} */
+   const { sections = undefined } = $props();
 </script>
 
 <div class="sidebar">
-   {#each sections as section}
+   {#each sections as Section}
       <div class="section">
-         <svelte:component this={section}/>
+         <Section/>
       </div>
    {/each}
 </div>

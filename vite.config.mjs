@@ -1,7 +1,6 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 import { sveltePreprocess } from 'svelte-preprocess';
-import { postcssConfig, terserConfig } from '@typhonjs-fvtt/runtime/rollup';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import autoprefixer from 'autoprefixer';
@@ -46,8 +45,9 @@ export default () => {
       },
 
       css: {
-         // Creates a standard configuration for PostCSS with autoprefixer & postcss-preset-env.
-         postcss: postcssConfig({ compress: s_COMPRESS, sourceMap: s_SOURCEMAPS }),
+         postcss: {
+            plugins: [autoprefixer()],
+         },
 
          // Use the modern compiler
          preprocessorOptions: {
@@ -95,7 +95,7 @@ export default () => {
          brotliSize: true,
          minify: s_COMPRESS ? 'terser' : false,
          target: ['es2022'],
-         terserOptions: s_COMPRESS ? { ...terserConfig(), ecma: 2022 } : void 0,
+         terserOptions: s_COMPRESS ? { ecma: 2022 } : void 0,
          lib: {
             entry: './index.js',
             formats: ['es'],

@@ -12,7 +12,7 @@
 
 <div class="tab">
    <ScrollingContainer bind:scrollTop={$appState.tabs.description.scrollTop}>
-      <DocumentBoundEditorInput bind:value={$document.system.description}/>
+      <DocumentBoundEditorInput bind:value={document.data.system.description}/>
    </ScrollingContainer>
 </div>
 

@@ -26,16 +26,16 @@
 </script>
 
 <ol>
-   {#each $document.system.attack as attack, idx (attack.uuid)}
+   {#each document.data.system.attack as attack, idx (attack.uuid)}
       <li transition:slide|local>
          <!--Label-->
          <div class="header">
-            <div class="spacer"/>
+            <div class="spacer"></div>
 
             <!--Label-->
             <div class="label">
                <!--Icon-->
-               <i class={attack.type === 'melee' ? MELEE_ICON : RANGE_ICON}/>
+               <i class={attack.type === 'melee' ? MELEE_ICON : RANGE_ICON}></i>
                <!-- Text-->
                <div class="text">
                   {attack.label}
@@ -48,7 +48,7 @@
                   <!--Collapse button-->
                   <IconButton
                      icon={EXPANDED_ICON}
-                     on:click={() => {
+                     onclick={() => {
                         $appState.sidebar.attacks.isExpanded[idx] = false;
                      }}
                   />
@@ -56,7 +56,7 @@
                   <!--Expand button-->
                   <IconButton
                      icon={COLLAPSED_ICON}
-                     on:click={() => {
+                     onclick={() => {
                         $appState.sidebar.attacks.isExpanded[idx] = true;
                      }}
                   />

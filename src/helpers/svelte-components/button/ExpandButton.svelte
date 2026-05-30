@@ -3,22 +3,28 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
-   /** @type {boolean} Whether the button should currently be expanded. */
-   export let expanded = false;
+   /**
+    * @typedef {object} ExpandButtonProps
+    * @property {boolean} [expanded] - Whether the button should currently be expanded.
+    * @property {boolean} [disabled] - Whether the input should currently be disabled.
+    * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    */
 
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
-
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {ExpandButtonProps} */
+   let {
+      expanded = $bindable(false),
+      disabled = false,
+      tooltip = void 0,
+   } = $props();
 </script>
 
 <button
+   aria-label={expanded ? 'Collapse' : 'Expand'}
    {disabled}
-   on:click={() => expanded = !expanded}
-   on:mousedown={preventDefault}
+   onclick={() => (expanded = !expanded)}
+   onmousedown={preventDefault}
    use:tooltipAction={tooltip}>
-   <i class={expanded ? EXPANDED_ICON : COLLAPSED_ICON}/>
+   <i class={expanded ? EXPANDED_ICON : COLLAPSED_ICON}></i>
 </button>
 
 <style lang="scss">
@@ -29,4 +35,3 @@
       --titan-button-line-height: var(--titan-expand-button-line-height);
    }
 </style>
-

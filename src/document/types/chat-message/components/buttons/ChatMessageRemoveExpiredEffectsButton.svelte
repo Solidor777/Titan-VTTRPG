@@ -19,15 +19,15 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Remove expired effects from the actor.
             await actor.system.removeExpiredEffects();
 
             // Update this document.
-            $document.flags.titan.expiredEffectsRemoved = true;
-            await $document.update({
+            document.data.flags.titan.expiredEffectsRemoved = true;
+            await document.data.update({
                flags: {
                   titan: {
                      expiredEffectsRemoved: true,
@@ -39,7 +39,7 @@
    }
 </script>
 
-<ChatMessageButton on:click={() => removeExpiredEffects()}>
-   <i class={REMOVE_TEMP_EFFECTS_ICON}/>
+<ChatMessageButton onclick={() => removeExpiredEffects()}>
+   <i class={REMOVE_TEMP_EFFECTS_ICON}></i>
    <Text text="removeExpiredEffects"/>
 </ChatMessageButton>

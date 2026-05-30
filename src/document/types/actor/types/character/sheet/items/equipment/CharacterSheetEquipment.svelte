@@ -18,15 +18,18 @@
    import CharacterSheetCondensedItemCheckButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
 
-   /** @type {TitanItem} Reference to the Item document. */
-   export let item = void 0;
+   /**
+    * @typedef {object} CharacterSheetEquipmentProps
+    * @property {TitanItem} [item] Reference to the Item document.
+    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    */
 
-   /** @type {boolean} Whether this Item is currently expanded. */
-   export let isExpanded = void 0;
+   /** @type {CharacterSheetEquipmentProps} */
+   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
-   <svelte:fragment slot="controls">
+   {#snippet controls()}
       <!--Toggle Equipped button-->
       {#if item.system.equipped === false || item.system.check.length === 0}
          <div class="button">
@@ -55,7 +58,7 @@
       <div class="button">
          <CharacterSheetItemDeleteButton itemId={item._id}/>
       </div>
-   </svelte:fragment>
+   {/snippet}
 
    <!--Equip button-->
    {#if item.system.check.length > 0}

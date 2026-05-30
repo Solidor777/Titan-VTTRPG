@@ -15,18 +15,25 @@
       HEALING_ICON,
    } from '~/system/Icons.js';
 
+   /**
+    * @typedef {object} SpellSheetCustomAspectSettingsProps
+    * @property {number} [idx] Index of the custom aspect being represented.
+    */
+
+   /** @type {SpellSheetCustomAspectSettingsProps} */
+   const { idx = undefined } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Idx of the custom aspect being represented.
-   /** @type {number} */
-   export let idx = void 0;
+   /** @type {object} The custom aspect data. */
+   const aspect = $derived(document.data.system.customAspect[idx]);
 
-   $: aspect = $document.system.customAspect[idx];
-   $: isExpanded = $appState.tabs.customAspects.isExpanded[idx];
+   /** @type {boolean} Whether this component is currently expanded. */
+   const isExpanded = $derived($appState.tabs.customAspects.isExpanded[idx]);
 </script>
 
 {#if aspect}
@@ -39,7 +46,7 @@
                <!--Collapse button-->
                <IconButton
                   icon={EXPANDED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.customAspects.isExpanded[idx] = false;
                   }}
                />
@@ -47,7 +54,7 @@
                <!--Expand button-->
                <IconButton
                   icon={COLLAPSED_ICON}
-                  on:click={() => {
+                  onclick={() => {
                      $appState.tabs.customAspects.isExpanded[idx] = true;
                   }}
                />
@@ -64,8 +71,8 @@
             <!--Delete button-->
             <IconButton
                icon={DELETE_ICON}
-               on:click={() => {
-                  $document.system.removeCustomAspect(idx);
+               onclick={() => {
+                  document.data.system.removeCustomAspect(idx);
                }}
             />
          </div>
@@ -105,7 +112,7 @@
                <!--Damage-->
                <div class="field">
                   <!--Icon-->
-                  <i class={DAMAGE_ICON}/>
+                  <i class={DAMAGE_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('damage')}</div>
@@ -119,7 +126,7 @@
                <!--Healing-->
                <div class="field">
                   <!--Icon-->
-                  <i class={HEALING_ICON}/>
+                  <i class={HEALING_ICON}></i>
 
                   <!--Label-->
                   <div class="label">{localize('healing')}</div>

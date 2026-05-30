@@ -21,37 +21,37 @@
    <!--Successes-->
    <div class="stat">
       <div class="border-right">
-         {`${localize('dc')} ${$document.flags.titan.parameters.difficulty}:${
-            $document.flags.titan.parameters.complexity
+         {`${localize('dc')} ${document.data.flags.titan.parameters.difficulty}:${
+            document.data.flags.titan.parameters.complexity
          }`}
       </div>
       <div>
-         {`${$document.flags.titan.results.successes} ${localize('successes')}`}
+         {`${document.data.flags.titan.results.successes} ${localize('successes')}`}
       </div>
    </div>
 
    <!--Succeeded-->
-   {#if $document.flags.titan.results.succeeded}
+   {#if document.data.flags.titan.results.succeeded}
       <div class="result succeeded">
          {localize('succeeded')}
       </div>
 
       <!--Extra Successes-->
-      {#if $document.flags.titan.results.extraSuccesses !== undefined}
-         {#if $document.flags.titan.results.extraSuccessesRemaining !== undefined}
+      {#if document.data.flags.titan.results.extraSuccesses !== undefined}
+         {#if document.data.flags.titan.results.extraSuccessesRemaining !== undefined}
             <div class="stat">
-               {localize('extraSuccesses')}: {$document.flags.titan.results
-               .extraSuccessesRemaining}/{$document.flags.titan.results
+               {localize('extraSuccesses')}: {document.data.flags.titan.results
+               .extraSuccessesRemaining}/{document.data.flags.titan.results
                .extraSuccesses}
             </div>
-         {:else if $document.flags.titan.results.extraSuccesses > 0}
+         {:else if document.data.flags.titan.results.extraSuccesses > 0}
             <div class="stat">
-               {localize('extraSuccesses')}: {$document.flags.titan.results
+               {localize('extraSuccesses')}: {document.data.flags.titan.results
                .extraSuccesses}
             </div>
          {/if}
       {/if}
-   {:else if $document.flags.titan.parameters.complexity > 0}
+   {:else if document.data.flags.titan.parameters.complexity > 0}
       <!--Failed-->
       <div class="result failed">
          {localize('failed')}
@@ -59,14 +59,14 @@
    {/if}
 
    <!--Expertise Remaining-->
-   {#if $document.flags.titan.parameters.totalExpertise}
+   {#if document.data.flags.titan.parameters.totalExpertise}
       <div class="stat">
-         <i class={EXPERTISE_ICON}/>
+         <i class={EXPERTISE_ICON}></i>
          {localize('expertiseRemaining')}:
-         {$document.flags.titan.results.expertiseRemaining}
+         {document.data.flags.titan.results.expertiseRemaining}
 
          <!--Reset Button-->
-         {#if $document.constructor.getSpeakerActor($document.speaker)?.isOwner}
+         {#if document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner}
             <div class="button">
                <CheckChatResetExpertiseButton/>
             </div>
@@ -74,73 +74,73 @@
       </div>
    {/if}
 
-   {#if $document.flags.titan.results.succeeded}
+   {#if document.data.flags.titan.results.succeeded}
       <!--Damage-->
-      {#if $document.flags.titan.results.damage}
+      {#if document.data.flags.titan.results.damage}
          <div class="stat">
-            <i class={DAMAGE_ICON}/>
+            <i class={DAMAGE_ICON}></i>
             {localize('damage')}:
-            {$document.flags.titan.results.damage}
+            {document.data.flags.titan.results.damage}
          </div>
       {/if}
 
       <!--Healing-->
-      {#if $document.flags.titan.results.healing > 0}
+      {#if document.data.flags.titan.results.healing > 0}
          <div class="stat">
-            <i class={HEALING_ICON}/>
+            <i class={HEALING_ICON}></i>
             {localize('healing')}:
-            {$document.flags.titan.results.healing}
+            {document.data.flags.titan.results.healing}
          </div>
       {/if}
 
       <!--Rend-->
-      {#if $document.flags.titan.parameters.rend && $document.flags.titan.results.criticalSuccesses}
+      {#if document.data.flags.titan.parameters.rend && document.data.flags.titan.results.criticalSuccesses}
          <div class="stat" use:tooltipAction={'attack.rend.desc'}>
-            <i class={REND_ICON}/>
+            <i class={REND_ICON}></i>
             {localize('rend')}:
-            {$document.flags.titan.results.criticalSuccesses}
+            {document.data.flags.titan.results.criticalSuccesses}
          </div>
       {/if}
 
       <!--Cleave-->
-      {#if $document.flags.titan.parameters.cleave && $document.flags.titan.results.criticalSuccesses}
+      {#if document.data.flags.titan.parameters.cleave && document.data.flags.titan.results.criticalSuccesses}
          <div class="stat" use:tooltipAction={'attack.cleave.desc'}>
-            <i class={CLEAVE_ICON}/>
+            <i class={CLEAVE_ICON}></i>
             {localize('cleave')}:
-            {$document.flags.titan.results.criticalSuccesses}
+            {document.data.flags.titan.results.criticalSuccesses}
          </div>
       {/if}
    {/if}
 
    <!--Damage Taken-->
-   {#if $document.flags.titan.results.damageTaken}
+   {#if document.data.flags.titan.results.damageTaken}
       <div class="stat">
-         <i class={DAMAGE_ICON}/>
+         <i class={DAMAGE_ICON}></i>
          {localize('damageTaken')}:
-         {$document.flags.titan.results.damageTaken}
+         {document.data.flags.titan.results.damageTaken}
       </div>
    {/if}
 
    <!--Rerolled failures-->
-   {#if $document.flags.titan.failuresReRolled}
+   {#if document.data.flags.titan.failuresReRolled}
       <div class="stat">
-         <i class={DICE_ICON}/>
+         <i class={DICE_ICON}></i>
          {localize('failuresReRolled')}
       </div>
    {/if}
 
    <!--Training Doubled-->
-   {#if $document.flags.titan.parameters.doubleTraining && $document.flags.titan.parameters.totalTrainingDice > 0}
+   {#if document.data.flags.titan.parameters.doubleTraining && document.data.flags.titan.parameters.totalTrainingDice > 0}
       <div class="stat">
-         <i class={TRAINING_ICON}/>
+         <i class={TRAINING_ICON}></i>
          {localize('trainingDoubled')}
       </div>
    {/if}
 
    <!--Expertise Doubled-->
-   {#if $document.flags.titan.parameters.doubleExpertise && $document.flags.titan.parameters.totalExpertise > 0}
+   {#if document.data.flags.titan.parameters.doubleExpertise && document.data.flags.titan.parameters.totalExpertise > 0}
       <div class="stat">
-         <i class={EXPERTISE_ICON}/>
+         <i class={EXPERTISE_ICON}></i>
          {localize('expertiseDoubled')}
       </div>
    {/if}

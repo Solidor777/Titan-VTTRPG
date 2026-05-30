@@ -30,12 +30,12 @@
 
             <div class="select">
                <DocumentAttributeSelect
-                  bind:value={$document.system.castingCheck.attribute}
+                  bind:value={document.data.system.castingCheck.attribute}
                />
             </div>
          </div>
 
-         <div class="divider"/>
+         <div class="divider"></div>
 
          <!--Skill-->
          <div class="stat">
@@ -45,7 +45,7 @@
 
             <div class="select">
                <DocumentSkillSelect
-                  bind:value={$document.system.castingCheck.skill}
+                  bind:value={document.data.system.castingCheck.skill}
                />
             </div>
          </div>
@@ -63,7 +63,7 @@
             <!--Checkbox-->
             <div class="casting-checkbox">
                <DocumentCheckboxInput
-                  bind:value={$document.system.castingCheck.autoCalculateDC}
+                  bind:value={document.data.system.castingCheck.autoCalculateDC}
                />
             </div>
          </div>
@@ -80,13 +80,13 @@
             <!--Select-->
             <div class="select">
                <DocumentCheckDifficultySelect
-                  bind:value={$document.system.castingCheck.difficulty}
-                  disabled={$document.system.castingCheck.autoCalculateDC}
+                  bind:value={document.data.system.castingCheck.difficulty}
+                  disabled={document.data.system.castingCheck.autoCalculateDC}
                />
             </div>
          </div>
 
-         <div class="divider"/>
+         <div class="divider"></div>
 
          <!--Complexity-->
          <div class="stat">
@@ -98,8 +98,8 @@
             <!--Input-->
             <div class="input">
                <DocumentIntegerInput
-                  bind:value={$document.system.castingCheck.complexity}
-                  disabled={$document.system.castingCheck.autoCalculateDC}
+                  bind:value={document.data.system.castingCheck.complexity}
+                  disabled={document.data.system.castingCheck.autoCalculateDC}
                   max={16}
                   min={1}
                />
@@ -117,14 +117,14 @@
 
             <!--Value-->
             <div class="value">
-               {$document.system.totalAspectCost}
+               {document.data.system.totalAspectCost}
             </div>
          </div>
       </div>
    </div>
 
    <!--Aspect Costs-->
-   {#if $document.aspect && $document.aspect.length > 0}
+   {#if document.data.aspect && document.data.aspect.length > 0}
       <div class="aspect-costs" transition:slide|local>
          <!--Header-->
          <div class="header">
@@ -135,7 +135,7 @@
             <!--Container-->
             <div class="costs-container" transition:slide|local>
                <!--Each Cost-->
-               {#each $document.aspect as aspect}
+               {#each document.data.aspect as aspect}
                   <div class="cost">
                      <StatTag label={aspect.label} value={aspect.cost}/>
                   </div>

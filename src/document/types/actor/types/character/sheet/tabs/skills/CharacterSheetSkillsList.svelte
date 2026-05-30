@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import CharacterSheetSkill
       from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkill.svelte';
-   import { slideFade } from '@typhonjs-fvtt/runtime/svelte/transition';
+   import { slide } from 'svelte/transition';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -16,7 +16,7 @@
    let filteredList = [];
    $: {
       // Get skills whose name matches the filter.
-      const skillList = Object.entries($document.system.skill);
+      const skillList = Object.entries(document.data.system.skill);
       const filter = $appState.tabs.skills.filter.toLowerCase();
       filteredList = skillList.filter(([key]) => localize(key).toLowerCase().includes(filter));
 
@@ -31,7 +31,7 @@
 
 <ol>
    {#each filteredList as [key]}
-      <li transition:slideFade|local>
+      <li transition:slide|local>
          <CharacterSheetSkill {key}/>
       </li>
    {/each}

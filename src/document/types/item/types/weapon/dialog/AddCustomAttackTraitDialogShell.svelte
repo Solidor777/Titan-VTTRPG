@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import Text from '~/helpers/svelte-components/Text.svelte';
@@ -9,25 +7,28 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 
-   // The weapon document owning the attack.
-   /** @type {TitanItem|TitanActor} */
-   export let document = void 0;
+   /**
+    * @typedef {object} AddCustomAttackTraitDialogShellProps
+    * @property {object} [document] The weapon document owning the attack.
+    * @property {number} [attackIdx] The attack index.
+    */
 
-   // The attack idx.
-   /** @type {number} */
-   export let attackIdx = void 0;
+   /** @type {AddCustomAttackTraitDialogShellProps} */
+   const { document = undefined, attackIdx = undefined } = $props();
 
-   /** @type {SvelteApp} The Svelte Component's Application. */
+   /** @type {object} The Svelte Component's Application. */
    const application = getApplication();
 
-   const newTrait = {
+   /** @type {object} The new trait being created. */
+   const newTrait = $state({
       name: localize('newTrait'),
       description: '',
       uuid: generateUUID(),
-   };
+   });
 
    /**
     * Adds the new custom trait to the attack and closes the dialog.
+    * @returns {void}
     */
    function addTrait() {
       const attack = document.system.attack[attackIdx];
@@ -78,7 +79,7 @@
       <!--Add Trait Button-->
       <div class="button">
          <Button
-            on:click={() => {
+            onclick={() => {
                addTrait();
             }}
          >
@@ -89,7 +90,7 @@
       <!--Cancel Button-->
       <div class="button">
          <Button
-            on:click={() => {
+            onclick={() => {
                application.close();
             }}
          >

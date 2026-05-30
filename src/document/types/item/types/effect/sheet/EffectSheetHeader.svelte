@@ -30,13 +30,13 @@
       </div>
       <div class="input">
          <DocumentSelect
-            bind:value={$document.system.duration.type}
+            bind:value={document.data.system.duration.type}
             options={durationOptions}
          />
       </div>
    </div>
 
-   {#if $document.system.duration.type === 'custom'}
+   {#if document.data.system.duration.type === 'custom'}
       <!--Custom Duration Label-->
       <div
          class="stat text"
@@ -44,11 +44,11 @@
       >
          <div class="input text">
             <DocumentTextInput
-               bind:value={$document.system.duration.custom}
+               bind:value={document.data.system.duration.custom}
             />
          </div>
       </div>
-   {:else if $document.system.duration.type === 'initiative'}
+   {:else if document.data.system.duration.type === 'initiative'}
       <div
          class="stat"
          transition:slide|local
@@ -56,14 +56,14 @@
          <div class="input number">
             <DocumentIntegerInput
                min={0}
-               bind:value={$document.system.duration.initiative}
+               bind:value={document.data.system.duration.initiative}
             />
          </div>
       </div>
    {/if}
 
    <!--Duration Remaining-->
-   {#if $document.system.duration.type !== 'permanent'}
+   {#if document.data.system.duration.type !== 'permanent'}
       <div
          class="stat"
          transition:slide|local
@@ -74,7 +74,7 @@
          <div class="input number">
             <DocumentIntegerIncrementInput
                min={0}
-               bind:value={$document.system.duration.remaining}
+               bind:value={document.data.system.duration.remaining}
             />
          </div>
       </div>

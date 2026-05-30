@@ -8,8 +8,13 @@
    import { ARMOR_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type {object} Data for the Item this component belongs to. */
-   export let item = void 0;
+   /**
+    * @typedef {object} ArmorChatStatsProps
+    * @property {object} [item] - Data for the Item this component belongs to.
+    */
+
+   /** @type {ArmorChatStatsProps} */
+   const { item = void 0 } = $props();
 
    /** @type {Record<string, string>} Map of armor trait names to their description localization keys. */
    const traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;

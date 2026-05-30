@@ -13,5 +13,4 @@
    bind:value={$checkOptions.resistance}
    input={ResistanceSelect}
    label={localize('resistance')}
-   on:change
 />

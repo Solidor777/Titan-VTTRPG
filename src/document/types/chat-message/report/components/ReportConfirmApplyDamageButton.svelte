@@ -19,12 +19,12 @@
          document?.name,
       )) {
          // Get the actor.
-         const actor = getActorFromSpeaker($document.speaker);
+         const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
             // Update the actor.
             await actor.system.applyDamage(
-               $document.flags.titan.damageApplied.total,
+               document.data.flags.titan.damageApplied.total,
                {
                   ignoreArmor: true,
                   report: false,
@@ -32,7 +32,7 @@
             );
 
             // Update the chat document.
-            await $document.update({
+            await document.data.update({
                flags: {
                   titan: {
                      damageApplied: {
@@ -54,11 +54,11 @@
 
 <!--Apply damage button-->
 <div class="button">
-   <Button on:click={() => confirmDamageApplied()}>
-      <i class={REGAIN_RESOLVE_ICON}/>
+   <Button onclick={() => confirmDamageApplied()}>
+      <i class={REGAIN_RESOLVE_ICON}></i>
       {localize('applyX%Damage').replace(
          'X%',
-         $document.flags.titan.damageApplied.total,
+         document.data.flags.titan.damageApplied.total,
       )}
    </Button>
 </div>

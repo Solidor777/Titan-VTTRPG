@@ -3,11 +3,16 @@
    import { getContext } from 'svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
 
+   /**
+    * @typedef {object} ItemSheetRaritySelectProps
+    * @property {boolean} [disabled] Whether the input should currently be disabled.
+    */
+
+   /** @type {ItemSheetRaritySelectProps} */
+   const { disabled = false } = $props();
+
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {boolean} Whether the input should currently be disabled. */
-   export let disabled = false;
 </script>
 
 <LabeledElement
@@ -15,9 +20,8 @@
    tooltip={'rarity.desc'}
 >
    <RaritySelect
-      bind:value={$document.system.rarity}
-      disabled={disabled || !$document?.isOwner}
-      on:change={() => $document.update({system: {rarity: $document.system.rarity}})}
+      bind:value={document.data.system.rarity}
+      disabled={disabled || !document.data?.isOwner}
+      onchange={() => document.data.update({system: {rarity: document.data.system.rarity}})}
    />
 </LabeledElement>
-

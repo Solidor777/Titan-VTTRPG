@@ -1,30 +1,46 @@
 <script>
-   import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
-   import { getContext } from 'svelte';
+   import { getContext, untrack } from 'svelte';
+   import ProseMirrorEditor from '~/helpers/svelte-components/editor/ProseMirrorEditor.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {object} Reference to the reactive Document store. */
-   const document = getContext('document');
+   /** @type {import('~/document/reactive/ReactiveDocument.svelte.js').default} The document bridge. */
+   const documentBridge = getContext('document');
 
-   /** @type {string} Path to the value that this input should modify. */
-   export let path = void 0;
+   /**
+    * @type {{
+    *   path: string,
+    *   disabled?: boolean,
+    *   tooltip?: (string | object)
+    * }}
+    */
+   let { path, disabled = false, tooltip = void 0 } = $props();
 
-   /** @type {boolean} Whether editing this input should be disabled. */
-   export let disabled = false;
+   /** @type {string} Local mirror of the edited field, two-way bound to the editor. */
+   let value = $state(untrack(() => foundry.utils.getProperty(documentBridge.doc, path)));
 
-   /** @type {string | TooltipAction} The Tooltip to display for this element, if any. */
-   export let tooltip = void 0;
+   /** @type {boolean} Guards the initial effect run so we do not persist on mount. */
+   let initialized = false;
+
+   // Persist committed edits to the document. The local mirror is not derived from the bridge, so
+   // the resulting update hook does not re-trigger this effect.
+   $effect(() => {
+      const newValue = value;
+      if (!initialized) {
+         initialized = true;
+         return;
+      }
+      documentBridge.doc.update({ [path]: newValue });
+   });
 </script>
 
 <div
-   class={$document.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}
+   class={documentBridge.data.isOwner ? 'editor rich-text' : 'editor rich-text not-owner'}
    use:tooltipAction={tooltip}
 >
-   <TJSProseMirror options={{
-      document: $document,
-      fieldName: path,
-      editable: $document.isOwner && !disabled
-   }}/>
+   <ProseMirrorEditor
+      bind:value
+      editable={documentBridge.data.isOwner && !disabled}
+   />
 </div>
 
 <style lang="scss">
