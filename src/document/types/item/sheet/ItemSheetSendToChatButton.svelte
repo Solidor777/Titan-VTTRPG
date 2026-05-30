@@ -1,4 +1,5 @@
 <script>
+   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { SEND_TO_CHAT_ICON } from '~/system/Icons.js';
    import { getContext } from 'svelte';
@@ -8,7 +9,7 @@
 </script>
 
 <!--Send to Chat Button-->
-<button aria-label="Send to Chat"
+<button aria-label={localize('sendToChat')}
         class="header-control icon edit-token-button"
         onclick={() => document.data.sendToChat()}
         use:tooltipAction={'importActorToWorld'}>

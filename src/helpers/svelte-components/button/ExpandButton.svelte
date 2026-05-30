@@ -1,4 +1,5 @@
 <script>
+   import localize from '~/helpers/utility-functions/Localize.js';
    import preventDefault from '~/helpers/svelte-actions/PreventDefault.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
@@ -19,7 +20,7 @@
 </script>
 
 <button
-   aria-label={expanded ? 'Collapse' : 'Expand'}
+   aria-label={expanded ? localize('collapse') : localize('expand')}
    {disabled}
    onclick={() => (expanded = !expanded)}
    onmousedown={preventDefault}

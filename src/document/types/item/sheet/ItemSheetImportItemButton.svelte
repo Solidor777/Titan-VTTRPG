@@ -1,4 +1,5 @@
 <script>
+   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { IMPORT_ICON } from '~/system/Icons.js';
    import { getContext } from 'svelte';
@@ -16,7 +17,7 @@
 </script>
 
 <!--Import Item Button-->
-<button aria-label="Import Item to World"
+<button aria-label={localize('importItem')}
         class="header-control icon edit-token-button"
         onclick={() => importItem()}
         use:tooltipAction={'importItemToWorld'}>

@@ -1,5 +1,6 @@
 <script>
    import { LINKED_ICON } from '~/system/Icons.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
@@ -20,7 +21,7 @@
 </script>
 
 <!--Unlink Button-->
-<button aria-label="Unlink Token"
+<button aria-label={localize('unlinkToken')}
         class="header-control icon unlink-token-button"
         onclick={() => unlinkToken()}
         use:tooltipAction={'unlinkTokenButton.desc'}>

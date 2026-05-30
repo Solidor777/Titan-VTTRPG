@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import { LINKED_ICON, UNLINKED_ICON } from '~/system/Icons.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -15,7 +16,7 @@
 </script>
 
 <!--Toggle Linked Button-->
-<button aria-label="Toggle Token Link"
+<button aria-label={localize('toggleTokenLink')}
         class="header-control icon toggle-token-linked-button"
         onclick={toggleLinkedToken}
         use:tooltipAction={ document.data?.prototypeToken?.actorLink

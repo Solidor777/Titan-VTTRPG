@@ -1,5 +1,6 @@
 <script>
    import { EDIT_TOKEN_ICON } from '~/system/Icons.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import { getContext } from 'svelte';
@@ -26,7 +27,7 @@
 </script>
 
 <!--Edit Token Button-->
-<button aria-label="Edit Token"
+<button aria-label={localize('editToken')}
         class="header-control icon edit-token-button"
         onclick={() => editToken()}
         use:tooltipAction={
