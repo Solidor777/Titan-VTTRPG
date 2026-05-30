@@ -50,7 +50,8 @@ Foundry fires `renderChatMessageHTML` (v13+) after inserting the message HTML. T
 `message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches, it builds a
 `new ReactiveDocument(message)` bridge and mounts `ChatMessageShell.svelte`
 (src/document/types/chat-message/ChatMessageShell.svelte) into the `.message-content` element via Svelte 5
-`mount()`, passing the bridge as the `documentStore` prop. The mount handle and bridge are stored on
+`mount()`, passing the bridge as the `documentStore` prop (a name retained from the old API — it is the
+`ReactiveDocument` bridge, not a Svelte store). The mount handle and bridge are stored on
 `message._svelteComponent = { handle, bridge }` for teardown in `OnPreDeleteChatMessage.js`. The shell sets
 the bridge into context as `'document'` and `selectComponent()` looks up the correct component for the type
 (e.g. `AttributeCheckChatMessage`), which is then rendered via `{@const}` (not `<svelte:component>`).
@@ -83,7 +84,8 @@ Two button patterns coexist:
 `super(foundry.utils.mergeObject(options, { document: sheetDocument }))` (DocumentSheetV2 exposes the
 document via the read-only `this.document` getter), then builds `this.#bridge = new ReactiveDocument(
 sheetDocument)` and `this.applicationState = this._createReactiveState()`. The inner shell component is
-supplied by the per-type subclass on `this.options.svelte.props.shell`.
+supplied by the per-type subclass on `this.options.svelte.props.shell` (a plain ApplicationV2 options object —
+the `svelte` key is a naming holdover, not TyphonJS middleware).
 
 Subclass constructors extend this chain:
 `TitanPlayerSheet` → `TitanCharacterSheet` → `TitanActorSheet` → `TitanDocumentSheet`.
@@ -100,7 +102,7 @@ via `setContext('applicationState', applicationState)` inside `DocumentSheetShel
 **3. Mount — `_replaceHTML` → `DocumentSheetShell.svelte`**
 On first render (`options.isFirstRender`), `TitanDocumentSheet._replaceHTML` calls Svelte 5 `mount(
 DocumentSheetShell, { target: content, props: { document: this.#bridge, applicationState, shell } })` and
-stores the handle. Subsequent ApplicationV2 renders are no-ops — reactivity is driven by the
+stores the handle. Subsequent ApplicationV2 renders do not re-mount the Svelte tree — reactivity is driven by the
 `ReactiveDocument` bridge, not the render cycle. `DocumentSheetShell` sets `document` (the bridge) and
 `applicationState` into context, then renders the shell via `{#if shell}{@const Shell = shell}<Shell />{/if}`.
 

@@ -35,7 +35,8 @@ import localize from '~/helpers/utility-functions/Localize.js';
 extends `foundry.applications.api.DocumentSheetV2`. It mounts the Svelte tree with Svelte 5's
 `mount()` (from `'svelte'`) inside `_replaceHTML()` **on first render only** (`options.isFirstRender`)
 and tears it down with `unmount(handle, { outro: true })` in `_onClose()`. `_renderHTML()` returns
-`{}`. The per-type subclass supplies the inner shell component via `this.options.svelte.props.shell`.
+`{}`. The per-type subclass supplies the inner shell component via `this.options.svelte.props.shell` (a plain
+ApplicationV2 options object — the `svelte` key is a naming holdover, not TyphonJS middleware).
 `TitanDialog` (`src/helpers/dialogs/Dialog.js`) follows the same lifecycle on a bare
 `foundry.applications.api.ApplicationV2`, mounting `options.content.class` with `options.content.props`.
 
