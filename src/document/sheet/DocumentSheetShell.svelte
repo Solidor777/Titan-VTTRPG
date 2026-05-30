@@ -11,8 +11,7 @@
    let { document, applicationState, shell } = $props();
 
    // Expose the document bridge and UI state to all descendant components via context.
-   // 'document' is the ReactiveDocument bridge: legacy children read `$document` (store shim),
-   // converted children read `document.data` (runes).
+   // 'document' is the ReactiveDocument bridge: all children read `document.data` (runes accessor).
    // These captures are intentional: both values are stable for the component's lifetime.
    // svelte-ignore state_referenced_locally
    setContext('document', document);
