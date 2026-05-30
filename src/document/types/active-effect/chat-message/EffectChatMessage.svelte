@@ -3,7 +3,7 @@
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
-   import EffectChatStats from '~/document/types/item/types/effect/chat-message/EffectChatStats.svelte';
+   import EffectChatStats from '~/document/types/active-effect/chat-message/EffectChatStats.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

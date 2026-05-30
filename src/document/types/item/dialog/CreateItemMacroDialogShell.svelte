@@ -108,19 +108,6 @@
          break;
       }
 
-      case 'effect': {
-         // If this is a permanent effect.
-         if (itemSnapshot.system.duration.type === 'permanent') {
-            // Add toggle active effect to the macro type options.
-            macroTypeOptions.push({
-               value: 'toggleEffectActive',
-               label: 'toggleEffectActive',
-            });
-            macroType = 'toggleEffectActive';
-         }
-
-         break;
-      }
       default: {
          break;
       }
@@ -187,16 +174,6 @@
                img,
                idMethod,
                itemCheckIdx,
-            );
-            break;
-         }
-
-         case 'toggleEffectActive': {
-            macro = await game.titan.macros.getToggleEffectActiveMacro(
-               itemSnapshot,
-               name,
-               img,
-               idMethod,
             );
             break;
          }

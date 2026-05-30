@@ -755,13 +755,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   }
                   break;
                }
-               case 'effect': {
-                  if (item.system.isActive) {
-                     processItemElements(item, 'effect');
-                  }
-
-                  break;
-               }
                default: {
                   break;
                }

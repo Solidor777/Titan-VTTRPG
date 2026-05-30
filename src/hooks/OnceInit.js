@@ -5,7 +5,6 @@ import TitanNPCSheet from '~/document/types/actor/types/character/types/npc/NPCS
 import TitanAbilitySheet from '~/document/types/item/types/ability/sheet/AbilitySheet.js';
 import TitanArmorSheet from '~/document/types/item/types/armor/sheet/ArmorSheet.js';
 import TitanCommoditySheet from '~/document/types/item/types/commodity/sheet/CommoditySheet.js';
-import TitanEffectSheet from '~/document/types/item/types/effect/sheet/EffectSheet.js';
 import TitanEquipmentSheet from '~/document/types/item/types/equipment/sheet/EquipmentSheet.js';
 import TitanShieldSheet from '~/document/types/item/types/shield/sheet/ShieldSheet.js';
 import TitanSpellSheet from '~/document/types/item/types/spell/sheet/SpellSheet.js';
@@ -22,7 +21,6 @@ import registerSystemSettings from '~/system/SystemSettings.js';
 import registerInitiativeFormula from '~/system/Initiative.js';
 import AbilityDataModel from '~/document/types/item/types/ability/AbilityDataModel.js';
 import CommodityDataModel from '~/document/types/item/types/commodity/CommodityDataModel.js';
-import EffectDataModel from '~/document/types/item/types/effect/EffectDataModel.js';
 import EquipmentDataModel from '~/document/types/item/types/equipment/EquipmentDataModel.js';
 import ShieldDataModel from '~/document/types/item/types/shield/ShieldDataModel.js';
 import SpellDataModel from '~/document/types/item/types/spell/SpellDataModel.js';
@@ -73,7 +71,6 @@ export default function onceInit() {
       ability: AbilityDataModel,
       armor: ArmorDataModel,
       commodity: CommodityDataModel,
-      effect: EffectDataModel,
       equipment: EquipmentDataModel,
       shield: ShieldDataModel,
       spell: SpellDataModel,
@@ -128,13 +125,6 @@ export default function onceInit() {
          types: ['commodity'],
          makeDefault: true,
          label: localize('defaultCommoditySheet'),
-      },
-   );
-   foundry.documents.collections.Items.registerSheet(
-      'titan', TitanEffectSheet, {
-         types: ['effect'],
-         makeDefault: true,
-         label: localize('defaultEffectSheet'),
       },
    );
    foundry.documents.collections.Items.registerSheet(

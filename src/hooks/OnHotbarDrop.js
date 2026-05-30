@@ -67,8 +67,7 @@ export default function onHotbarDrop(hotbar, data, slot) {
          break;
       }
 
-      case 'spell':
-      case 'effect': {
+      case 'spell': {
          const dialog = new CreateItemMacroDialog(
          macroItem,
          slot,

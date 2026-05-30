@@ -7,8 +7,6 @@ const CASTING_CHECK_MACRO_VERSION = 0;
 /** @type {number} */
 const ITEM_CHECK_MACRO_VERSION = 0;
 /** @type {number} */
-const TOGGLE_EFFECT_ACTIVE_MACRO_VERSION = 0;
-/** @type {number} */
 const TOGGLE_DOCUMENT_SHEET_MACRO_VERSION = 0;
 
 /**
@@ -84,26 +82,6 @@ export default class TitanMacros {
    }
 
    /**
-    * Toggles Active on an effect for each controlled Character using the provided Item.
-    * @param {string} id - The ID used to identify the Item.
-    * @param {string} idMethod - The method used to identify the Item (uuid, name, or documentId).
-    */
-   toggleEffectActive(id, idMethod) {
-      // For each controlled character actor.
-      const controlledCharacters = getControlledCharacters();
-      for (const actor of controlledCharacters) {
-
-         // Get the item.
-         const item = this.getMacroItemFromID(actor, id, idMethod);
-         if (item?.system.duration?.type === 'permanent') {
-
-            // Toggle active.
-            actor.system.toggleEffectActive(item._id);
-         }
-      }
-   }
-
-   /**
     * Creates Macro for rolling an Attack Check using provided Weapon Item and Attack idx.
     * @param {TitanItem} item - The Item to create the Macro for.
     * @param {string} name - The display name for the Macro.
@@ -174,31 +152,6 @@ export default class TitanMacros {
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'itemCheck', ITEM_CHECK_MACRO_VERSION);
-      }
-   }
-
-   /**
-    * Creates a Macro for toggling whether the provided Effect is active on a Character.
-    * @param {TitanItem} item - The Item to create the Macro for.
-    * @param {string} name - The display name for the Macro.
-    * @param {string} img - The path to the image to display for the Macro.
-    * @param {string} idMethod - The method used to identify the Item (uuid, name, or documentId).
-    * @returns {Macro} The newly created Macro.
-    */
-   async getToggleEffectActiveMacro(item, name, img, idMethod) {
-      // Check if the input is valid.
-      if (item?.isOwner && item.system.duration?.type === 'permanent') {
-
-         // Get the id depending on the id method.
-         const id = this.getMacroID(item, idMethod);
-
-         // Get the command.
-         /** @type {string} */
-         const command = `game.titan.macros.toggleEffectActive('${id}', '${idMethod}')`;
-
-         // Get or create the macro.
-         return this.getOrCreateMacro(
-            name, img, command, 'toggleEffectActive', TOGGLE_EFFECT_ACTIVE_MACRO_VERSION);
       }
    }
 

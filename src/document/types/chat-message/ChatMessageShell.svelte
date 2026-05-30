@@ -6,7 +6,7 @@
    import AbilityChatMesssage from '~/document/types/item/types/ability/chat-message/AbilityChatMesssage.svelte';
    import EquipmentChatMessage from '~/document/types/item/types/equipment/chat-message/EquipmentChatMessage.svelte';
    import CommodityChatMessage from '~/document/types/item/types/commodity/chat-message/CommodityChatMessage.svelte';
-   import EffectChatMessage from '~/document/types/item/types/effect/chat-message/EffectChatMessage.svelte';
+   import EffectChatMessage from '~/document/types/active-effect/chat-message/EffectChatMessage.svelte';
    import ShieldChatMessage from '~/document/types/item/types/shield/chat-message/ShieldChatMessage.svelte';
    import AttributeCheckChatMessage from '~/check/types/attribute-check/chat-message/AttributeCheckChatMessage.svelte';
    import ResistanceCheckChatMessage

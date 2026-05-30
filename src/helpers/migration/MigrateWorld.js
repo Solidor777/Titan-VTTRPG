@@ -9,7 +9,6 @@ import itemMigrations from '~/helpers/migration/item/ItemMigrations.js';
 import abilityMigrations from '~/helpers/migration/item/AbilityMigrations.js';
 import armorMigrations from '~/helpers/migration/item/ArmorMigrations.js';
 import commodityMigrations from '~/helpers/migration/item/CommodityMigrations.js';
-import effectMigrations from '~/helpers/migration/item/EffectMigrations.js';
 import equipmentMigrations from '~/helpers/migration/item/EquipmentMigrations.js';
 import shieldMigrations from '~/helpers/migration/item/ShieldMigrations.js';
 import spellMigrations from '~/helpers/migration/item/SpellMigrations.js';
@@ -60,10 +59,6 @@ const ITEM_MIGRATION_CHAINS = {
    commodity: [
       itemMigrations,
       commodityMigrations,
-   ],
-   effect: [
-      itemMigrations,
-      effectMigrations,
    ],
    equipment: [
       itemMigrations,
