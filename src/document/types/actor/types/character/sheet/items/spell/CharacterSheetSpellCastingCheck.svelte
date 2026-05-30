@@ -29,11 +29,11 @@
    let checkParameters = $derived.by(() => {
 
       // Ensure the item is still valid.
-      if ($document.items.get(item._id)) {
+      if (document.data.items.get(item._id)) {
 
          // Update the parameters.
-         return $document.system.getCastingCheckParameters(
-            $document.system.initializeCastingCheckOptions(checkOptions)
+         return document.data.system.getCastingCheckParameters(
+            document.data.system.initializeCastingCheckOptions(checkOptions)
          );
       }
       return undefined;

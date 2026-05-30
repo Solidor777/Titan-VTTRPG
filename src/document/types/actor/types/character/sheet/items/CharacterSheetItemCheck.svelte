@@ -40,12 +40,12 @@
    let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = $document.items.get(itemId);
+      const item = document.data.items.get(itemId);
       if (item?.system.check.length > checkIdx) {
 
          // Update the check parameters.
-         return $document.system.getItemCheckParameters(
-            $document.system.initializeItemCheckOptions(checkOptions)
+         return document.data.system.getItemCheckParameters(
+            document.data.system.initializeItemCheckOptions(checkOptions)
          );
       }
       return undefined;
@@ -55,7 +55,7 @@
     * Rolls the Item Check.
     */
    function rollItemCheck() {
-      $document.system.requestItemCheck(checkOptions);
+      document.data.system.requestItemCheck(checkOptions);
    }
 </script>
 
@@ -69,7 +69,7 @@
             <ItemCheckButton
                label={checkParameters.checkLabel}
                attribute={checkParameters.attribute}
-               disabled={!$document.isOwner}
+               disabled={!document.data.isOwner}
                resolveCost={checkParameters.resolveCost}
                onclick={() => rollItemCheck()}
             />
@@ -79,7 +79,7 @@
                <ItemCheckButton
                   label={checkParameters.checkLabel}
                   attribute={checkParameters.attribute}
-                  disabled={!$document.isOwner}
+                  disabled={!document.data.isOwner}
                   onclick={() => rollItemCheck()}
                />
             </div>
@@ -88,7 +88,7 @@
             <div class="resolve-cost-button">
                <SpendResolveButton
                   resolveCost={checkParameters.resolveCost}
-                  onclick={() => $document.system.spendResolve(checkParameters.resolveCost)}
+                  onclick={() => document.data.system.spendResolve(checkParameters.resolveCost)}
                />
             </div>
          {/if}
@@ -97,7 +97,7 @@
          <ItemCheckButton
             label={checkParameters.checkLabel}
             attribute={checkParameters.attribute}
-            disabled={!$document.isOwner}
+            disabled={!document.data.isOwner}
             resolveCost={checkParameters.resolveCost}
             onclick={() => rollItemCheck()}
          />

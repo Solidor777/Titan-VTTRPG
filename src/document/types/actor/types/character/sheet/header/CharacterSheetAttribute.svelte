@@ -29,7 +29,7 @@
       <!--Base Value-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.attribute[attribute].baseValue}
+            bind:value={document.data.system.attribute[attribute].baseValue}
          />
       </div>
 
@@ -39,7 +39,7 @@
       <!--Static Mod-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.attribute[attribute].mod.static}
+            bind:value={document.data.system.attribute[attribute].mod.static}
          />
       </div>
 
@@ -49,12 +49,12 @@
       <!--Total Value-->
       <div class="value">
          <ModifiableStatValueLabel
-            abilityMod={$document.system.attribute[attribute].mod.ability}
-            baseValue={$document.system.attribute[attribute].baseValue}
-            effectMod={$document.system.attribute[attribute].mod.effect}
-            equipmentMod={$document.system.attribute[attribute].mod.equipment}
-            staticMod={$document.system.attribute[attribute].mod.static}
-            value={$document.system.attribute[attribute].value}
+            abilityMod={document.data.system.attribute[attribute].mod.ability}
+            baseValue={document.data.system.attribute[attribute].baseValue}
+            effectMod={document.data.system.attribute[attribute].mod.effect}
+            equipmentMod={document.data.system.attribute[attribute].mod.equipment}
+            staticMod={document.data.system.attribute[attribute].mod.static}
+            value={document.data.system.attribute[attribute].value}
          />
       </div>
    </div>

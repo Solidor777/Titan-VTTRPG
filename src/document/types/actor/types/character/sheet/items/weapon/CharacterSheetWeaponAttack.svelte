@@ -40,9 +40,9 @@
 
       // Get base dice.
       let pool =
-         $document.system.attribute[attack.attribute].value +
-         $document.system.skill[attack.skill].training.value +
-         $document.system.getAttackCheckMod(
+         document.data.system.attribute[attack.attribute].value +
+         document.data.system.skill[attack.skill].training.value +
+         document.data.system.getAttackCheckMod(
             'expertise',
             item,
             attack,
@@ -74,8 +74,8 @@
 
       // Get base expertise.
       let exp =
-         $document.system.skill[attack.skill].expertise.value +
-         $document.system.getAttackCheckMod(
+         document.data.system.skill[attack.skill].expertise.value +
+         document.data.system.getAttackCheckMod(
             'expertise',
             item,
             attack,
@@ -100,7 +100,7 @@
       {#if item.system.equipped}
          <DocumentOwnerButton
             onclick={() =>
-               $document.system.requestAttackCheck({
+               document.data.system.requestAttackCheck({
                   itemId: item._id,
                   attackIdx: attackIdx,
                })}
@@ -138,7 +138,7 @@
             label={localize('damage')}
             value={`${
                attack.damage +
-               $document.system.getAttackCheckMod(
+               document.data.system.getAttackCheckMod(
                   'damage',
                   item,
                   attack,
@@ -153,11 +153,11 @@
       </div>
 
       <!--Training-->
-      {#if $document.system.skill[attack.skill].training.value !== 0}
+      {#if document.data.system.skill[attack.skill].training.value !== 0}
          <div class="stat">
             <IconStatTag
                label={localize('training')}
-               value={$document.system.skill[attack.skill].training.value}
+               value={document.data.system.skill[attack.skill].training.value}
                icon={TRAINING_ICON}
             />
          </div>

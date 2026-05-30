@@ -10,9 +10,9 @@
 <div class="button">
    <IconButton
       tooltip={'inspiration.desc'}
-      icon={$document.system.inspiration ? INSPIRATION_ICON: ''}
+      icon={document.data.system.inspiration ? INSPIRATION_ICON: ''}
       onclick={() => {
-         $document.system.toggleInspiration();
+         document.data.system.toggleInspiration();
       }}
    />
 </div>

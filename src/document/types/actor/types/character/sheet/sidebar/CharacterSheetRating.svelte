@@ -58,7 +58,7 @@
       <!--Static Mod-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.rating[rating].mod.static}
+            bind:value={document.data.system.rating[rating].mod.static}
          />
       </div>
 
@@ -68,13 +68,13 @@
       <!--Total Value-->
       <div class="value">
          <ModifiableStatValueLabel
-            abilityMod={$document.system.rating[rating].mod.ability}
+            abilityMod={document.data.system.rating[rating].mod.ability}
             baseTooltip={localize(`${rating}.baseValue`)}
-            baseValue={$document.system.rating[rating].baseValue}
-            effectMod={$document.system.rating[rating].mod.effect}
-            equipmentMod={$document.system.rating[rating].mod.equipment}
-            staticMod={$document.system.rating[rating].mod.static}
-            value={$document.system.rating[rating].value}
+            baseValue={document.data.system.rating[rating].baseValue}
+            effectMod={document.data.system.rating[rating].mod.effect}
+            equipmentMod={document.data.system.rating[rating].mod.equipment}
+            staticMod={document.data.system.rating[rating].mod.static}
+            value={document.data.system.rating[rating].value}
          />
       </div>
    </div>

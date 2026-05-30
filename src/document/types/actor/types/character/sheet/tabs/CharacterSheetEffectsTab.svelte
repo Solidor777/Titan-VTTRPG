@@ -28,7 +28,7 @@
                icon={CREATE_ICON}
                label={localize('addNewEffect')}
                onclick={() => {
-                  $document.createItemFromType('effect');
+                  document.data.createItemFromType('effect');
                }}
             />
          </div>
@@ -40,7 +40,7 @@
                icon={REMOVE_TEMP_EFFECTS_ICON}
                label={localize('removeExpiredEffects')}
                onclick={() => {
-                  $document.system.requestRemoveExpiredEffects();
+                  document.data.system.requestRemoveExpiredEffects();
                }}
             />
          </div>

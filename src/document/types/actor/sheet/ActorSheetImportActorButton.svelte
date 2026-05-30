@@ -8,7 +8,7 @@
 
    /** Imports the actor from a compendium sheet. */
    async function importActor() {
-      return $document.collection.importFromCompendium($document.compendium, $document.id);
+      return document.data.collection.importFromCompendium(document.data.compendium, document.data.id);
    }
 </script>
 

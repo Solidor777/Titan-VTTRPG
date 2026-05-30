@@ -91,11 +91,11 @@
          <!--Add Item Button-->
          <div class="add-entry-button">
             <CharacterSheetTabHeaderButton
-               disabled={!$document.isOwner}
+               disabled={!document.data.isOwner}
                icon={CREATE_ICON}
                label={localize('addNewItem')}
                onclick={() => {
-                  $document.system.addInventoryItem();
+                  document.data.system.addInventoryItem();
                }}
             />
          </div>

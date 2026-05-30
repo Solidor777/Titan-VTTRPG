@@ -8,8 +8,8 @@
 
    /** Toggles whether this Actor is linked to their Token. */
    function toggleLinkedToken() {
-      $document?.prototypeToken?.update({
-         actorLink: !$document.prototypeToken.actorLink
+      document.data?.prototypeToken?.update({
+         actorLink: !document.data.prototypeToken.actorLink
       });
    }
 </script>
@@ -17,13 +17,13 @@
 <!--Toggle Linked Button-->
 <button class="header-control icon toggle-token-linked-button"
         on:click={toggleLinkedToken}
-        use:tooltipAction={ $document?.prototypeToken?.actorLink
+        use:tooltipAction={ document.data?.prototypeToken?.actorLink
            ? 'toggleTokenUnlinkedButton.desc'
            : 'toggleTokenLinkedButton.desc'}
 >
    <i
       class={
-            $document?.prototypeToken?.actorLink
+            document.data?.prototypeToken?.actorLink
             ? `linked ${LINKED_ICON}`
             : `unlinked ${UNLINKED_ICON}`
          }

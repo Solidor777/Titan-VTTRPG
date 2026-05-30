@@ -34,11 +34,11 @@
 <CharacterSheetItem {item} bind:isExpanded>
    {#snippet controls()}
       <!--Toggle Equipped button-->
-      {#if ($document.system.equipped.armor === item._id) === false || item.system.check.length === 0}
+      {#if (document.data.system.equipped.armor === item._id) === false || item.system.check.length === 0}
          <div class="button">
             <CharacterSheetItemEquipButton
                {item}
-               equipped={$document.system.equipped.armor === item._id}
+               equipped={document.data.system.equipped.armor === item._id}
             />
          </div>
       {:else if item.system.check.length > 0}
@@ -68,7 +68,7 @@
       <div class="section">
          <CharacterSheetItemEquipButton
             {item}
-            equipped={$document.system.equipped.armor === item._id}
+            equipped={document.data.system.equipped.armor === item._id}
          />
       </div>
    {/if}

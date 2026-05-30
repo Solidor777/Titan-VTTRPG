@@ -23,12 +23,12 @@
    let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = $document.items.get(itemId);
+      const item = document.data.items.get(itemId);
       if (item?.system.check.length > 0) {
 
          // Update the parameters.
-         return $document.system.getItemCheckParameters(
-            $document.system.initializeItemCheckOptions(checkOptions)
+         return document.data.system.getItemCheckParameters(
+            document.data.system.initializeItemCheckOptions(checkOptions)
          );
       }
       return undefined;
@@ -43,7 +43,7 @@
    attribute={checkParameters.attribute}
    complexity={checkParameters.complexity}
    difficulty={checkParameters.difficulty}
-   onclick={() => $document.system.requestItemCheck(checkOptions)}
+   onclick={() => document.data.system.requestItemCheck(checkOptions)}
    resolveCost={checkParameters.resolveCost}
    {tooltip}
    totalDice={checkParameters.totalDice}

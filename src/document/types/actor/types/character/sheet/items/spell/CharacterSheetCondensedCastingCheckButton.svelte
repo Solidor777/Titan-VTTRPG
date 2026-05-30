@@ -23,11 +23,11 @@
    let checkParameters = $derived.by(() => {
 
       // Ensure the item is valid.
-      if ($document.items.get(itemId)) {
+      if (document.data.items.get(itemId)) {
 
          // Update the parameters.
-         return $document.system.getCastingCheckParameters(
-            $document.system.initializeCastingCheckOptions(checkOptions)
+         return document.data.system.getCastingCheckParameters(
+            document.data.system.initializeCastingCheckOptions(checkOptions)
          );
       }
       return undefined;
@@ -42,7 +42,7 @@
    attribute={checkParameters.attribute}
    complexity={checkParameters.complexity}
    difficulty={checkParameters.difficulty}
-   onclick={() => $document.system.requestCastingCheck(checkOptions)}
+   onclick={() => document.data.system.requestCastingCheck(checkOptions)}
    {tooltip}
    totalDice={checkParameters.totalDice}
    totalExpertise={checkParameters.totalExpertise}

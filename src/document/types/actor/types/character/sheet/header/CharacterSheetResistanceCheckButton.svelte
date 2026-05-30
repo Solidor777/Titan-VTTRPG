@@ -22,8 +22,8 @@
 
    /** @type {ResistanceCheckParameters} Calculated check parameters. */
    let checkParameters = $derived(
-      $document.system.getResistanceCheckParameters(
-         $document.system.initializeResistanceCheckOptions({ resistance: resistance }))
+      document.data.system.getResistanceCheckParameters(
+         document.data.system.initializeResistanceCheckOptions({ resistance: resistance }))
    );
 
    /** @type {string} Calculated tooltip. */
@@ -49,7 +49,7 @@
 </script>
 
 <DocumentOwnerResistanceButton
-   onclick={() => $document.system.requestResistanceCheck({resistance: resistance})}
+   onclick={() => document.data.system.requestResistanceCheck({resistance: resistance})}
    {resistance}
    {tooltip}>
    <div class="button-inner">

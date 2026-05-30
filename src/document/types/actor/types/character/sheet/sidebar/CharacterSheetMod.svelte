@@ -43,7 +43,7 @@
       <!--Static Mod-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.mod[mod].mod.static}
+            bind:value={document.data.system.mod[mod].mod.static}
          />
       </div>
 
@@ -55,10 +55,10 @@
          <ModifiableStatValueLabel
             baseTooltip={localize(`${mod}.baseValue`)}
             baseValue={0}
-            effectMod={$document.system.mod[mod].mod.effect}
-            equipmentMod={$document.system.mod[mod].mod.equipment}
-            staticMod={$document.system.mod[mod].mod.static}
-            value={$document.system.mod[mod].value}
+            effectMod={document.data.system.mod[mod].mod.effect}
+            equipmentMod={document.data.system.mod[mod].mod.equipment}
+            staticMod={document.data.system.mod[mod].mod.static}
+            value={document.data.system.mod[mod].value}
          />
       </div>
    </div>

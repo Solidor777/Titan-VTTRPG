@@ -21,7 +21,7 @@
    const document = getContext('document');
 </script>
 
-<DocumentOwnerButton onclick={() => $document.system.toggleMultiAttack(item._id)}>
+<DocumentOwnerButton onclick={() => document.data.system.toggleMultiAttack(item._id)}>
    <div class="button-inner">
       <i class={item.system.multiAttack ? MULTI_ATTACK_ICON : NO_MULTI_ATTCK_ICON}></i>
       <div class="label">

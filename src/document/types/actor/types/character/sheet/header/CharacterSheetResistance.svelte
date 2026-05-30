@@ -31,7 +31,7 @@
       <!--Base Value-->
       <div class="number">
          <div class='label'>
-            {$document.system.resistance[resistance].baseValue}
+            {document.data.system.resistance[resistance].baseValue}
          </div>
       </div>
 
@@ -41,7 +41,7 @@
       <!--Static Mod-->
       <div class="number">
          <DocumentIntegerInput
-            bind:value={$document.system.resistance[resistance].mod.static}
+            bind:value={document.data.system.resistance[resistance].mod.static}
          />
       </div>
 
@@ -51,13 +51,13 @@
       <!--Total Value-->
       <div class="number">
          <ModifiableStatValueLabel
-            abilityMod={$document.system.resistance[resistance].mod.ability}
+            abilityMod={document.data.system.resistance[resistance].mod.ability}
             baseTooltip={localize(`${resistance}.baseValue`)}
-            baseValue={$document.system.resistance[resistance].baseValue}
-            effectMod={$document.system.resistance[resistance].mod.effect}
-            equipmentMod={$document.system.resistance[resistance].mod.equipment}
-            staticMod={$document.system.resistance[resistance].mod.static}
-            value={$document.system.resistance[resistance].value}
+            baseValue={document.data.system.resistance[resistance].baseValue}
+            effectMod={document.data.system.resistance[resistance].mod.effect}
+            equipmentMod={document.data.system.resistance[resistance].mod.equipment}
+            staticMod={document.data.system.resistance[resistance].mod.static}
+            value={document.data.system.resistance[resistance].value}
          />
       </div>
    </div>

@@ -45,7 +45,7 @@
       <!--Static Mod-->
       <div class="side">
          <DocumentIntegerInput
-            bind:value={$document.system.resource[resource].mod.static}
+            bind:value={document.data.system.resource[resource].mod.static}
          />
       </div>
    </div>
@@ -56,7 +56,7 @@
       <!--Current Value Input-->
       <div class="side">
          <DocumentIntegerInput
-            bind:value={$document.system.resource[resource].value}
+            bind:value={document.data.system.resource[resource].value}
          />
       </div>
 
@@ -66,21 +66,21 @@
          use:tooltipAction={`${resource}.desc`}
       >
          <Meter
-            max={$document.system.resource[resource].max}
-            value={$document.system.resource[resource].value}
+            max={document.data.system.resource[resource].max}
+            value={document.data.system.resource[resource].value}
          />
       </div>
 
       <!--Max Value-->
       <div class="side">
          <ModifiableStatValueLabel
-            abilityMod={$document.system.resource[resource].mod.ability}
+            abilityMod={document.data.system.resource[resource].mod.ability}
             baseTooltip={localize(`${resource}.maxValue`)}
-            baseValue={$document.system.resource[resource].maxBase}
-            effectMod={$document.system.resource[resource].mod.effect}
-            equipmentMod={$document.system.resource[resource].mod.equipment}
-            staticMod={$document.system.resource[resource].mod.static}
-            value={$document.system.resource[resource].max}
+            baseValue={document.data.system.resource[resource].maxBase}
+            effectMod={document.data.system.resource[resource].mod.effect}
+            equipmentMod={document.data.system.resource[resource].mod.equipment}
+            staticMod={document.data.system.resource[resource].mod.static}
+            value={document.data.system.resource[resource].max}
          />
       </div>
    </div>

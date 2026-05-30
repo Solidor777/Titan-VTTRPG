@@ -18,8 +18,8 @@
 
    /** @type {AttributeCheckParameters} Calculated check parameters. */
    let checkParameters = $derived(
-      $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({ attribute: attribute }))
+      document.data.system.getAttributeCheckParameters(
+         document.data.system.initializeAttributeCheckOptions({ attribute: attribute }))
    );
 
    /** @type {string} Calculated tooltip. */
@@ -34,7 +34,7 @@
 
 <DocumentOwnerAttributeButton
    {attribute}
-   onclick={() => $document.system.requestAttributeCheck({attribute: attribute})}
+   onclick={() => document.data.system.requestAttributeCheck({attribute: attribute})}
    {tooltip}>
    <div class="button-inner">
       <!--Icon-->

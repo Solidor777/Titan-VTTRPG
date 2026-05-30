@@ -69,7 +69,7 @@
                icon={CREATE_ICON}
                label={localize('addNewAbility')}
                onclick={() => {
-                  $document.createItemFromType('ability');
+                  document.data.createItemFromType('ability');
                }}
             />
          </div>

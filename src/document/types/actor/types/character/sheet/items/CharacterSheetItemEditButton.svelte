@@ -17,7 +17,7 @@
 </script>
 
 <IconButton
-   icon={$document.isOwner ? EDIT_ICON : SHEET_ICON}
+   icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
    onclick={() => item.sheet.render(true)}
-   tooltip={localize($document.isOwner ? 'editItem' : 'viewItemSheet')}
+   tooltip={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
 />

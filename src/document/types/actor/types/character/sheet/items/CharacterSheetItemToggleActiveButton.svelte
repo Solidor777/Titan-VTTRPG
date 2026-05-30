@@ -18,5 +18,5 @@
 <ToggleButton
    active={item.system.active}
    label={localize('active')}
-   onclick={() => $document.system.toggleEffectActive(item._id)}
+   onclick={() => document.data.system.toggleEffectActive(item._id)}
 />

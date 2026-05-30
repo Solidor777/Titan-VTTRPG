@@ -37,7 +37,7 @@
             icon={CREATE_ICON}
             label={localize('addNewSpell')}
             onclick={() => {
-               $document.createItemFromType('spell');
+               document.data.createItemFromType('spell');
             }}
          />
       </div>

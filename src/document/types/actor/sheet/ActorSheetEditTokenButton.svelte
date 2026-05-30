@@ -30,7 +30,7 @@
         on:click={() => editToken()}
         use:tooltipAction={
            (application.token?.actorLink
-           || application.token === null && $document.prototypeToken?.actorLink)
+           || application.token === null && document.data.prototypeToken?.actorLink)
         ? 'editLinkedToken.desc'
         : 'editUnlinkedToken.desc'}>
    <i class={EDIT_TOKEN_ICON}/>

@@ -33,7 +33,7 @@
       <!--Base Value-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.speed[speed].baseValue}
+            bind:value={document.data.system.speed[speed].baseValue}
          />
       </div>
 
@@ -43,7 +43,7 @@
       <!--Static Mod-->
       <div class="input">
          <DocumentIntegerInput
-            bind:value={$document.system.speed[speed].mod.static}
+            bind:value={document.data.system.speed[speed].mod.static}
          />
       </div>
 
@@ -54,11 +54,11 @@
       <div class="value">
          <ModifiableStatValueLabel
             baseTooltip={localize(`${speed}.desc`)}
-            baseValue={$document.system.speed[speed].baseValue}
-            effectMod={$document.system.speed[speed].mod.effect}
-            equipmentMod={$document.system.speed[speed].mod.equipment}
-            staticMod={$document.system.speed[speed].mod.static}
-            value={$document.system.speed[speed].value}
+            baseValue={document.data.system.speed[speed].baseValue}
+            effectMod={document.data.system.speed[speed].mod.effect}
+            equipmentMod={document.data.system.speed[speed].mod.equipment}
+            staticMod={document.data.system.speed[speed].mod.static}
+            value={document.data.system.speed[speed].value}
          />
       </div>
    </div>

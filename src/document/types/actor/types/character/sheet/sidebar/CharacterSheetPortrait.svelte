@@ -17,7 +17,7 @@
 <div class="portrait">
    <!--Image Picker-->
    <div class="image">
-      <DocumentImagePicker alt={'character portrait'} bind:value={$document.img}/>
+      <DocumentImagePicker alt={'character portrait'} bind:value={document.data.img}/>
    </div>
 
    <!--Buttons for managing resources-->
@@ -30,7 +30,7 @@
          <DocumentOwnerIconButton
             icon={LONG_REST_ICON}
             onclick={() => {
-            $document.system.longRest();
+            document.data.system.longRest();
          }}
          />
       </div>
@@ -43,7 +43,7 @@
          <DocumentOwnerIconButton
             icon={SHORT_REST_ICON}
             onclick={() => {
-            $document.system.shortRest();
+            document.data.system.shortRest();
          }}
          />
       </div>
@@ -56,7 +56,7 @@
          <DocumentOwnerIconButton
             icon={REMOVE_TEMP_EFFECTS_ICON}
             onclick={() => {
-            $document.system.removeCombatEffects();
+            document.data.system.removeCombatEffects();
          }}
          />
       </div>
@@ -72,7 +72,7 @@
          <DocumentOwnerIconButton
             icon={SPEND_RESOLVE_ICON}
             onclick={() => {
-            $document.system.spendResolve(1);
+            document.data.system.spendResolve(1);
          }}
          />
       </div>

@@ -19,5 +19,5 @@
 <ToggleButton
    active={equipped}
    label={localize('equipped')}
-   onclick={() => $document.system.toggleEquipped(item._id)}
+   onclick={() => document.data.system.toggleEquipped(item._id)}
 />

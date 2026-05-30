@@ -26,7 +26,7 @@
    // Sort and filter items.
    /** @type {*[]} The filtered and sorted list of items to display. */
    let items = $derived(
-      $document.items
+      document.data.items
          .filter((item) => {
             return (
                filterFunction(item) &&
@@ -42,7 +42,7 @@
     * @param {string} id - The ID of the item being dragged.
     */
    function onDragStart(event, id) {
-      const item = $document.items.get(id);
+      const item = document.data.items.get(id);
       const dragData = item.toDragData();
 
       if (!dragData) {

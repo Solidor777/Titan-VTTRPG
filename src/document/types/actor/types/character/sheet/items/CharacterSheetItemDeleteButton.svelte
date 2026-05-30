@@ -18,6 +18,6 @@
 
 <DocumentOwnerIconButton
    icon={DELETE_ICON}
-   onclick={() => $document.system.requestItemDeletion(itemId)}
+   onclick={() => document.data.system.requestItemDeletion(itemId)}
    tooltip={localize('deleteItem')}
 />

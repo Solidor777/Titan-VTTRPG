@@ -22,8 +22,8 @@
 
    /** @type {AttributeCheckParameters} Calculated check parameters. */
    let checkParameters = $derived(
-      $document.system.getAttributeCheckParameters(
-         $document.system.initializeAttributeCheckOptions({ skill: key }))
+      document.data.system.getAttributeCheckParameters(
+         document.data.system.initializeAttributeCheckOptions({ skill: key }))
    );
 
    /**
@@ -63,7 +63,7 @@
    /** @type {string} Tooltip for the total Training value. */
    let totalTrainingTooltip = $derived(
       getTotalValueTooltip(
-         $document.system.skill[key].training,
+         document.data.system.skill[key].training,
          checkParameters.trainingMod
       )
    );
@@ -71,7 +71,7 @@
    /** @type {string} Tooltip for the total Expertise value. */
    let totalExpertiseTooltip = $derived(
       getTotalValueTooltip(
-         $document.system.skill[key].expertise,
+         document.data.system.skill[key].expertise,
          checkParameters.expertiseMod
       )
    );
@@ -86,7 +86,7 @@
    <div class="columns">
       <!--Default Attribute-->
       <div class="column" use:tooltipAction={'defaultAttribute.desc'}>
-         <DocumentAttributeSelect bind:value={$document.system.skill[key].defaultAttribute}/>
+         <DocumentAttributeSelect bind:value={document.data.system.skill[key].defaultAttribute}/>
       </div>
 
       <!--Training and Expertise-->
@@ -109,13 +109,13 @@
 
             <!--Base Value-->
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.skill[key].training.baseValue}/>
+               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.baseValue}/>
             </div>
 
             <!--Static Mod-->
             <div class="symbol">+</div>
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.skill[key].training.mod.static}/>
+               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
             </div>
 
             <!--Total Value-->
@@ -123,9 +123,9 @@
             <div class="value">
                <ModifiedValueLabel
                   baseValue={
-                     $document.system.skill[key].training.baseValue +
-                     $document.system.skill[key].training.mod.ability +
-                     $document.system.skill[key].training.mod.equipment +
+                     document.data.system.skill[key].training.baseValue +
+                     document.data.system.skill[key].training.mod.ability +
+                     document.data.system.skill[key].training.mod.equipment +
                      checkParameters.trainingMod
                   }
                   currentValue={checkParameters.totalTrainingDice}
@@ -151,14 +151,14 @@
             <!--Base Value-->
             <div class="input">
                <DocumentIntegerInput
-                  bind:value={$document.system.skill[key].expertise.baseValue}
+                  bind:value={document.data.system.skill[key].expertise.baseValue}
                />
             </div>
 
             <!--Static Mod-->
             <div class="symbol">+</div>
             <div class="input">
-               <DocumentIntegerInput bind:value={$document.system.skill[key].expertise.mod.static}/>
+               <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
             </div>
 
             <!--Total Value-->
@@ -166,9 +166,9 @@
             <div class="value">
                <ModifiedValueLabel
                   baseValue={
-                     $document.system.skill[key].expertise.baseValue +
-                     $document.system.skill[key].expertise.mod.ability +
-                     $document.system.skill[key].expertise.mod.equipment +
+                     document.data.system.skill[key].expertise.baseValue +
+                     document.data.system.skill[key].expertise.mod.ability +
+                     document.data.system.skill[key].expertise.mod.equipment +
                      checkParameters.expertiseMod
                   }
                   currentValue={checkParameters.totalExpertise}
