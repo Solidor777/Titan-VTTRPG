@@ -62,7 +62,7 @@ export default function RulesElementMixin(BaseClass) {
             this.rulesElement.splice(idx, 1);
             await this.parent.update({
                system: {
-                  rulesElement: this.parent.system.rulesElement,
+                  rulesElement: this.rulesElement,
                },
             });
          }
