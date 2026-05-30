@@ -7,11 +7,14 @@
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import { getIcon } from '~/system/Icons.js';
 
-   /** @type {string} The Resource that this component represents. */
-   export let resource = void 0;
+   /**
+    * @typedef {object} CharacterSheetResourceProps
+    * @property {string} [resource] The Resource that this component represents.
+    * @property {string} [icon] The Icon that represents this stat.
+    */
 
-   /** @type {string} The Icon that represents this stat. */
-   export let icon = getIcon(resource);
+   /** @type {CharacterSheetResourceProps} */
+   const { resource = undefined, icon = getIcon(resource) } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -22,13 +25,13 @@
    <div class="row">
 
       <!--Icon-->
-      <i class={`${icon} side`}/>
+      <i class={`${icon} side`}></i>
 
       <!--Label-->
       <div class="middle" use:tooltipAction={`${resource}.desc`}>
 
          <!--Spacer to center the label-->
-         <div class="side"/>
+         <div class="side"></div>
 
          <!--Label-->
          <div class="label">

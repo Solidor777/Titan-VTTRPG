@@ -6,14 +6,19 @@
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import InventoryItemTypeSelect from '~/helpers/svelte-components/input/select/InventoryItemTypeSelect.svelte';
 
-   /** @type {TitanActor} Reference to the Actor this dialog is for. */
-   export let actor = void 0;
+   /**
+    * @typedef {object} AddAddInventoryItemDialogShellProps
+    * @property {TitanActor} [actor] Reference to the Actor this dialog is for.
+    */
+
+   /** @type {AddAddInventoryItemDialogShellProps} */
+   const { actor = undefined } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
 
    /** @type {string} The currently selected item type. */
-   let value = 'armor';
+   let value = $state('armor');
 
    /**
     * Called when the selection is confirmed.

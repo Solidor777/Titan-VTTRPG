@@ -7,8 +7,13 @@
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
-   /** @type {string} The Resistance that this component represents. */
-   export let resistance;
+   /**
+    * @typedef {object} CharacterSheetResistanceProps
+    * @property {string} resistance The Resistance that this component represents.
+    */
+
+   /** @type {CharacterSheetResistanceProps} */
+   const { resistance } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

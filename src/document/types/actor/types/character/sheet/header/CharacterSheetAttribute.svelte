@@ -5,8 +5,13 @@
    import CharacterSheetCondensedAttributeCheckButton
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributeCheckButton.svelte';
 
-   /** @type {string} The Attribute that this component represents. */
-   export let attribute;
+   /**
+    * @typedef {object} CharacterSheetAttributeProps
+    * @property {string} attribute The Attribute that this component represents.
+    */
+
+   /** @type {CharacterSheetAttributeProps} */
+   const { attribute } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

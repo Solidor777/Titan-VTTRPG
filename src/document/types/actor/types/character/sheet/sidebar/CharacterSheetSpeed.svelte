@@ -6,8 +6,13 @@
    import { getIcon } from '~/system/Icons.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
-   /** @type {string} The Speed that this component represents. */
-   export let speed;
+   /**
+    * @typedef {object} CharacterSheetSpeedProps
+    * @property {string} speed The Speed that this component represents.
+    */
+
+   /** @type {CharacterSheetSpeedProps} */
+   const { speed } = $props();
 
    /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(speed);

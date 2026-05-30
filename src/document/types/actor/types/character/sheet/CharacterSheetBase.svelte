@@ -4,8 +4,13 @@
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
    import { getContext } from 'svelte';
 
-   /** @type {svelte}:component Header Component */
-   export let header = void 0;
+   /**
+    * @typedef {object} CharacterSheetBaseProps
+    * @property {object | undefined} [header] Header Component for the sheet.
+    */
+
+   /** @type {CharacterSheetBaseProps} */
+   const { header = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -22,7 +27,11 @@
       <div class="body">
          <!--Header -->
          <div class="header">
-            <svelte:component this={header}/>
+            {#if header}
+               {#each [header] as Header}
+                  <Header/>
+               {/each}
+            {/if}
          </div>
 
          <!--Tab Content-->

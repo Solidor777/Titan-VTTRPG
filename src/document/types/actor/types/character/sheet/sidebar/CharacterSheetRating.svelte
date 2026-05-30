@@ -7,11 +7,14 @@
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {string} The Rating that this component represents. */
-   export let rating = void 0;
+   /**
+    * @typedef {object} CharacterSheetRatingProps
+    * @property {string} [rating] The Rating that this component represents.
+    * @property {Function} [onClick] Callback for when the rating button is clicked.
+    */
 
-   /** @type {Function} Callback for when the rating button is clicked. */
-   export let onClick = void 0;
+   /** @type {CharacterSheetRatingProps} */
+   const { rating = undefined, onClick = undefined } = $props();
 
    /** @type {string} The Icon that represents this stat. */
    const icon = getIcon(rating);
@@ -27,7 +30,7 @@
       <div class="button">
          <DocumentOwnerButton onclick={onClick} tooltip={`${rating}.desc`}>
             <!--Icon-->
-            <i class={icon}/>
+            <i class={icon}></i>
 
             <!--Label-->
             <div class="label">
@@ -40,7 +43,7 @@
       <!--Otherwise, display a label.-->
       <div class="label" use:tooltipAction={`${rating}.desc`}>
          <!--Icon-->
-         <i class={icon}/>
+         <i class={icon}></i>
 
          {localize(rating)}
       </div>
