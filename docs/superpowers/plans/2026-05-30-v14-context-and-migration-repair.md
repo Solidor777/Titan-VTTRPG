@@ -772,6 +772,46 @@ git commit -m "docs(skill): record v14 context keys, sheet-constructor, and AE c
 
 ---
 
+## Task 10: Interaction-path automated walk (added after render walk passed 10/10)
+
+Render-smoke covers only sheet *render*. This task extends the Playwright walk to the **interaction**
+paths where v14 breaks have surfaced manually (rolling checks → chat; the ChatMessage `style` and
+initiative bugs were found this way). API-driven via `page.evaluate`, capturing `pageerror`, asserting
+outcomes — same robust style as render-smoke (no brittle UI clicks).
+
+**Prereq fixtures:** the E2E Player needs owned items to roll item/attack/casting checks. A `beforeAll`
+creates a purpose-built actor with one weapon, one spell, and one ability/equipment carrying a `check[]`
+(via `actor.createEmbeddedDocuments('Item', …)`), or reuses existing owned items if present.
+
+### 10a — Check-roll → chat path (primary; each check type)
+For each type, call the dialog-bypassing `roll<Type>Check` method directly, capture page errors, and
+assert a `ChatMessage` with the expected `flags.titan.type` was created:
+- `actor.system.rollAttributeCheck({ attribute: 'body' })` → `attributeCheck`
+- `actor.system.rollResistanceCheck({ resistance: 'reflexes' })` → `resistanceCheck`
+- `actor.system.rollAttackCheck({ itemId, checkIdx: 0 })` (weapon) → `attackCheck`
+- `actor.system.rollCastingCheck({ itemId, checkIdx: 0 })` (spell) → `castingCheck`
+- `actor.system.rollItemCheck({ itemId, checkIdx: 0 })` (item w/ check) → `itemCheck`
+
+(Implementer confirms exact option keys from `CharacterDataModel`.) Assert per roll: zero `pageerror`,
+and a new chat message of the expected type exists. Then mount each created chat card and assert it
+renders (the chat-card render path) with no error.
+
+### 10b — Dialog-render smoke (secondary)
+Render each dialog reachable in normal play and assert it mounts with zero errors: the check-options
+dialog (force `shouldGetCheckOptions` true, or construct `*CheckDialog` directly), the confirm-delete
+dialog, the add/edit custom-trait dialog, and the edit-UUID dialog. Implementer determines the
+construction/trigger for each (API-construct where possible).
+
+### 10c — Chat-card button interaction (deferred follow-up)
+Post an attack check, click the result card's apply-damage button, assert the target resource changed.
+Deferred unless 10a surfaces nothing and we want deeper coverage.
+
+### Fix loop
+Each discovered break → `titan-svelte-dev` fix (skills loaded) → re-run that test → iterate to a fully
+green interaction suite. Then re-run the full Playwright suite (render + interaction) and `npm test`.
+
+---
+
 ## Self-Review notes
 
 - **Spec coverage:** Phase 0 → Tasks 1-6; Phase 1 → Task 3; Phase 2 → Task 7; Phase 3 → Task 8; test tiers → Tasks 1-6; skill update → Task 9. All spec sections mapped.
