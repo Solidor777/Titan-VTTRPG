@@ -24,7 +24,7 @@
    const appState = getContext('applicationState');
 </script>
 
-{#if $document?.system.check[idx]}
+{#if document.data?.system.check[idx]}
    <div class="check">
       <!--Label-->
       <div class="label">
@@ -34,7 +34,7 @@
             <IconLabel
                icon={DICE_ICON}
                label={{
-                  text: $document.system.check[idx].label,
+                  text: document.data.system.check[idx].label,
                   localize: false,
                }}
             />
@@ -42,44 +42,44 @@
 
          <!--Rolled Stats-->
          <div class="rolled-stats">
-            {#if $document.system.check[idx].skill !== 'none'}
-               {`${localize($document.system.check[idx].attribute)} (${localize($document.system.check[idx].skill)}) ${
-                  $document.system.check[idx].difficulty
-               }:${$document.system.check[idx].complexity}`}
+            {#if document.data.system.check[idx].skill !== 'none'}
+               {`${localize(document.data.system.check[idx].attribute)} (${localize(document.data.system.check[idx].skill)}) ${
+                  document.data.system.check[idx].difficulty
+               }:${document.data.system.check[idx].complexity}`}
             {:else}
-               {`${localize($document.system.check[idx].attribute)} ${$document.system.check[idx].difficulty}:${
-                  $document.system.check[idx].complexity
+               {`${localize(document.data.system.check[idx].attribute)} ${document.data.system.check[idx].difficulty}:${
+                  document.data.system.check[idx].complexity
                }`}
             {/if}
          </div>
       </div>
 
       <!--Expand Button if there is anything to expand-->
-      {#if $document.system.check[idx].resolveCost > 0
-      || $document.system.check[idx].resistanceCheck !== 'none'
-      || $document.system.check[idx].opposedCheck.enabled === true}
+      {#if document.data.system.check[idx].resolveCost > 0
+      || document.data.system.check[idx].resistanceCheck !== 'none'
+      || document.data.system.check[idx].opposedCheck.enabled === true}
          <ExpandButton bind:expanded={$appState.sidebar.checks.isExpanded[idx]}/>
       {/if}
 
       <!--Advanced Details-->
       {#if $appState.sidebar.checks.isExpanded[idx]
-      && ($document.system.check[idx].resolveCost > 0
-         || $document.system.check[idx].resistanceCheck !== 'none'
-         || $document.system.check[idx].opposedCheck.enabled === true)}
+      && (document.data.system.check[idx].resolveCost > 0
+         || document.data.system.check[idx].resistanceCheck !== 'none'
+         || document.data.system.check[idx].opposedCheck.enabled === true)}
          <div class="advanced-details" transition:slide|local>
 
             <!--Resolve Cost-->
-            {#if $document.system.check[idx].resolveCost > 0}
+            {#if document.data.system.check[idx].resolveCost > 0}
                <div class="stat" transition:slide|local>
                   <StatTag
                      label={localize('resolveCost')}
-                     value={$document.system.check[idx].resolveCost}
+                     value={document.data.system.check[idx].resolveCost}
                   />
                </div>
             {/if}
 
             <!--Resistance Check-->
-            {#if $document.system.check[idx].resistanceCheck !== 'none'}
+            {#if document.data.system.check[idx].resistanceCheck !== 'none'}
                <div class="labeled-stat" transition:slide|local>
 
                   <!--Label-->
@@ -89,15 +89,15 @@
 
                   <!--Value-->
                   <div class="value">
-                     <ResistanceTag resistance={$document.system.check[idx].resistanceCheck}>
-                        {localize($document.system.check[idx].resistanceCheck)}
+                     <ResistanceTag resistance={document.data.system.check[idx].resistanceCheck}>
+                        {localize(document.data.system.check[idx].resistanceCheck)}
                      </ResistanceTag>
                   </div>
                </div>
             {/if}
 
             <!--Opposed Check-->
-            {#if $document.system.check[idx].opposedCheck.enabled === true}
+            {#if document.data.system.check[idx].opposedCheck.enabled === true}
                <div class="labeled-stat" transition:slide|local>
                   <!--Label-->
                   <div class="stat-label">
@@ -107,8 +107,8 @@
                   <!--Value-->
                   <div class="value stat">
                      <AttributeCheckTag
-                        attribute={$document.system.check[idx].opposedCheck.attribute}
-                        skill={$document.system.check[idx].opposedCheck.skill}
+                        attribute={document.data.system.check[idx].opposedCheck.attribute}
+                        skill={document.data.system.check[idx].opposedCheck.skill}
                      />
                   </div>
                </div>

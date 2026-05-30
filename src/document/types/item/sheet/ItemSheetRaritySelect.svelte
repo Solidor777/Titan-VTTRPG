@@ -20,8 +20,8 @@
    tooltip={'rarity.desc'}
 >
    <RaritySelect
-      bind:value={$document.system.rarity}
-      disabled={disabled || !$document?.isOwner}
-      onchange={() => $document.update({system: {rarity: $document.system.rarity}})}
+      bind:value={document.data.system.rarity}
+      disabled={disabled || !document.data?.isOwner}
+      onchange={() => document.data.update({system: {rarity: document.data.system.rarity}})}
    />
 </LabeledElement>

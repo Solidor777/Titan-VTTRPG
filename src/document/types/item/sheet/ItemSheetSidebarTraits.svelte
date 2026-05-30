@@ -25,9 +25,9 @@
     */
    const tags = $derived.by(() => {
       const result = [...itemTypeTraits];
-      for (const [idx] in $document.system.customTrait) {
+      for (const [idx] in document.data.system.customTrait) {
          result.push({
-            id: $document.system.customTrait[idx].uuid,
+            id: document.data.system.customTrait[idx].uuid,
             component: ItemSheetCustomTraitTag,
             props: {
                idx: idx
@@ -55,7 +55,7 @@
       <IconLabelButton
          icon={CREATE_ICON}
          label={'addCustomTrait'}
-         onclick={() => {$document.addCustomTrait()}}
+         onclick={() => {document.data.addCustomTrait()}}
       />
    </div>
 

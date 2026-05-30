@@ -28,7 +28,7 @@
       </div>
       <div class="input number">
          <DocumentIntegerInput
-            bind:value={$document.system.xpCost}
+            bind:value={document.data.system.xpCost}
             min={0}
          />
       </div>
@@ -40,7 +40,7 @@
          {localize('tradition')}
       </div>
       <div class="input text">
-         <DocumentTextInput bind:value={$document.system.tradition}/>
+         <DocumentTextInput bind:value={document.data.system.tradition}/>
       </div>
    </div>
 </ItemSheetHeader>

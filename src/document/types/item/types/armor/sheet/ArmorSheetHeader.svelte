@@ -29,7 +29,7 @@
       </div>
       <div class="input large-number">
          <DocumentIntegerInput
-            bind:value={$document.system.value}
+            bind:value={document.data.system.value}
             min={0}
          />
       </div>
@@ -43,15 +43,15 @@
       </div>
       <div class="input number">
          <DocumentIntegerInput
-            bind:value={$document.system.armor.value}
-            max={$document.system.armor.max}
+            bind:value={document.data.system.armor.value}
+            max={document.data.system.armor.max}
             min={0}
          />
       </div>
       <div class="divider">/</div>
       <div class="input number">
          <DocumentIntegerInput
-            bind:value={$document.system.armor.max}
+            bind:value={document.data.system.armor.max}
             min={0}
          />
       </div>

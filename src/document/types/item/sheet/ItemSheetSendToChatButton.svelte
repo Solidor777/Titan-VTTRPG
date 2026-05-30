@@ -9,7 +9,7 @@
 
 <!--Send to Chat Button-->
 <button class="header-control icon edit-token-button"
-        onclick={() => $document.sendToChat()}
+        onclick={() => document.data.sendToChat()}
         use:tooltipAction={'importActorToWorld'}>
    <i class={SEND_TO_CHAT_ICON}></i>
 </button>

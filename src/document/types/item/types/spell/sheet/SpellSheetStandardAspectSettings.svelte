@@ -34,21 +34,21 @@
     * @returns {void}
     */
    function toggleAspect(idx) {
-      if ($document?.isOwner) {
+      if (document.data?.isOwner) {
          // If disabled, add the aspect.
          if (idx === -1) {
-            $document.system.addStandardAspect(aspectOptions.template);
+            document.data.system.addStandardAspect(aspectOptions.template);
          }
          else {
-            $document.system.removeStandardAspect(idx);
+            document.data.system.removeStandardAspect(idx);
          }
       }
    }
 
    /** @type {number} The index of the aspect in the document's aspect array, or -1 if not enabled. */
    const idx = $derived(
-      $document
-         ? $document.system.aspect.findIndex((aspect) => {
+      document.data
+         ? document.data.system.aspect.findIndex((aspect) => {
             return aspect.label === aspectOptions.template.label;
          })
          : -1
@@ -58,7 +58,7 @@
 <div class="aspect">
    <!--Header Button-->
    <SpellSheetEnableAspectButton
-      cost={idx === -1 ? 0 : $document.system.aspect[idx].cost}
+      cost={idx === -1 ? 0 : document.data.system.aspect[idx].cost}
       enabled={idx !== -1}
       label={localize(aspectOptions.template.label)}
       onclick={() => {
@@ -73,7 +73,7 @@
             <div class="row">
                <div class="stat">
                   <DocumentSelect
-                     bind:value={$document.system.aspect[idx].initialValue}
+                     bind:value={document.data.system.aspect[idx].initialValue}
                      options={aspectOptions.settings.initialValueOptions}
                   />
                </div>
@@ -92,7 +92,7 @@
                   <!--Value-->
                   <div class="input">
                      <DocumentSelect
-                        bind:value={$document.system.aspect[idx].unit}
+                        bind:value={document.data.system.aspect[idx].unit}
                         options={aspectOptions.settings.unitOptions}
                      />
                   </div>
@@ -112,7 +112,7 @@
                   <!--Value-->
                   <div class="input">
                      <DocumentResistanceSelect
-                        bind:value={$document.system.aspect[idx]
+                        bind:value={document.data.system.aspect[idx]
                            .resistanceCheck}
                         allowNone={true}
                      />
@@ -122,8 +122,8 @@
          {/if}
 
          <!--All Options-->
-         {#if $document.system.aspect[idx].option}
-            {#if $document.system.aspect[idx].allOptions !== undefined}
+         {#if document.data.system.aspect[idx].option}
+            {#if document.data.system.aspect[idx].allOptions !== undefined}
                <div class="row">
                   <div class="stat">
                      <!--Label-->
@@ -134,7 +134,7 @@
                      <!--Value-->
                      <div class="input">
                         <DocumentCheckboxInput
-                           bind:value={$document.system.aspect[idx].allOptions}
+                           bind:value={document.data.system.aspect[idx].allOptions}
                         />
                      </div>
                   </div>
@@ -142,33 +142,33 @@
             {/if}
 
             <!--Option Toggles-->
-            {#if $document.system.aspect[idx].allOptions !== true}
+            {#if document.data.system.aspect[idx].allOptions !== true}
                <div class="row tags">
                   {#each aspectOptions.settings.option as option}
                      <div class="option">
                         <ToggleOptionButton
                            label={localize(option)}
-                           enabled={$document.system.aspect[idx].option.indexOf(
+                           enabled={document.data.system.aspect[idx].option.indexOf(
                               option,
                            ) !== -1}
                            onclick={() => {
                               const optionIdx =
-                                 $document.system.aspect[idx].option.indexOf(
+                                 document.data.system.aspect[idx].option.indexOf(
                                     option,
                                  );
                               if (optionIdx === -1) {
-                                 $document.system.aspect[idx].option.push(
+                                 document.data.system.aspect[idx].option.push(
                                     option,
                                  );
                               } else {
-                                 $document.system.aspect[idx].option.splice(
+                                 document.data.system.aspect[idx].option.splice(
                                     optionIdx,
                                     1,
                                  );
                               }
-                              $document.update({
+                              document.data.update({
                                  system: {
-                                    aspect: structuredClone($document.system.aspect),
+                                    aspect: structuredClone(document.data.system.aspect),
                                  },
                               });
                            }}

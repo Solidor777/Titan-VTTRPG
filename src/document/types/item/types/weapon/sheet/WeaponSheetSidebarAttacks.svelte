@@ -26,7 +26,7 @@
 </script>
 
 <ol>
-   {#each $document.system.attack as attack, idx (attack.uuid)}
+   {#each document.data.system.attack as attack, idx (attack.uuid)}
       <li transition:slide|local>
          <!--Label-->
          <div class="header">

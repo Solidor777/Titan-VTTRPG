@@ -39,7 +39,7 @@
     * @type {object | undefined}
     */
    const operationSettingsComponent = $derived.by(() => {
-      switch ($document?.system.rulesElement[idx]?.operation) {
+      switch (document.data?.system.rulesElement[idx]?.operation) {
          case 'conditionalCheckModifier': {
             return ItemSheetConditionalCheckModifierSettings;
          }
@@ -72,7 +72,7 @@
 </script>
 
 <!--Rules Element Settings-->
-{#if $document?.system.rulesElement[idx]}
+{#if document.data?.system.rulesElement[idx]}
    <div class="rules-element">
       <div class="row">
          <!--Operation Select-->
@@ -88,7 +88,7 @@
             <DocumentOwnerIconButton
                icon={DELETE_ICON}
                onclick={() => {
-               $document.system.deleteRulesElement(idx);
+               document.data.system.deleteRulesElement(idx);
             }}
             />
          </div>

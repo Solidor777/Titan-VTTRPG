@@ -10,8 +10,8 @@
    const appState = getContext('applicationState');
 </script>
 <ol class="checks">
-   {#each $document.system.check as check, idx (check.uuid)}
-      {#if $document.system.check[idx]}
+   {#each document.data.system.check as check, idx (check.uuid)}
+      {#if document.data.system.check[idx]}
          <li class="check" transition:slide|local>
             <ItemSheetSidebarCheck {idx}/>
          </li>

@@ -108,13 +108,13 @@
     */
    function onModifierTypeChanged() {
       if (
-         $document.system.rulesElement[idx].modifierType === 'healing' &&
-         $document.system.rulesElement[idx].checkType === 'attack'
+         document.data.system.rulesElement[idx].modifierType === 'healing' &&
+         document.data.system.rulesElement[idx].checkType === 'attack'
       ) {
-         $document.system.rulesElement[idx].checkType = 'any';
+         document.data.system.rulesElement[idx].checkType = 'any';
          if (onCheckTypeChange() !== true) {
-            $document.update({
-               system: structuredClone($document.system),
+            document.data.update({
+               system: structuredClone(document.data.system),
             });
          }
       }
@@ -127,12 +127,12 @@
     */
    function onCheckTypeChange() {
       if (
-         $document.system.rulesElement[idx].selector !== 'customTrait' &&
-         $document.system.rulesElement[idx].selector !== 'attribute' &&
-         !($document.system.rulesElement[idx].checkType !== 'any' &&
-           $document.system.rulesElement[idx].selector === 'skill')
+         document.data.system.rulesElement[idx].selector !== 'customTrait' &&
+         document.data.system.rulesElement[idx].selector !== 'attribute' &&
+         !(document.data.system.rulesElement[idx].checkType !== 'any' &&
+           document.data.system.rulesElement[idx].selector === 'skill')
       ) {
-         $document.system.rulesElement[idx].selector = 'any';
+         document.data.system.rulesElement[idx].selector = 'any';
          onSelectorChange();
 
          return true;
@@ -145,30 +145,30 @@
     * Updates the element key to a default value when the selector changes, then triggers a document update.
     */
    function onSelectorChange() {
-      switch ($document.system.rulesElement[idx].selector) {
+      switch (document.data.system.rulesElement[idx].selector) {
          case 'attribute': {
-            $document.system.rulesElement[idx].key = 'body';
+            document.data.system.rulesElement[idx].key = 'body';
             break;
          }
          case 'attackTrait': {
-            $document.system.rulesElement[idx].key = 'blast';
+            document.data.system.rulesElement[idx].key = 'blast';
             break;
          }
          case 'attackType': {
-            $document.system.rulesElement[idx].key = 'melee';
+            document.data.system.rulesElement[idx].key = 'melee';
             break;
          }
          case 'customTrait':
          case 'multiAttack': {
-            $document.system.rulesElement[idx].key = '';
+            document.data.system.rulesElement[idx].key = '';
             break;
          }
          case 'skill': {
-            $document.system.rulesElement[idx].key = 'arcana';
+            document.data.system.rulesElement[idx].key = 'arcana';
             break;
          }
          case 'spellTradition': {
-            $document.system.rulesElement[idx].key = localize('any');
+            document.data.system.rulesElement[idx].key = localize('any');
             break;
          }
          default: {
@@ -176,8 +176,8 @@
          }
       }
 
-      $document.update({
-         system: structuredClone($document.system),
+      document.data.update({
+         system: structuredClone(document.data.system),
       });
    }
 
@@ -186,7 +186,7 @@
     * @returns {object | undefined} The selector input component, or undefined if there is no valid case.
     */
    function getSelector() {
-      switch ($document.system.rulesElement[idx].selector) {
+      switch (document.data.system.rulesElement[idx].selector) {
          case 'attribute': {
             return DocumentAttributeSelect;
          }
@@ -218,7 +218,7 @@
    <!--Modifier Type-->
    <div class="field select">
       <DocumentSelect
-         bind:value={$document.system.rulesElement[idx].modifierType}
+         bind:value={document.data.system.rulesElement[idx].modifierType}
          onchange={onModifierTypeChanged}
          options={modifierTypeOptions}
       />
@@ -227,9 +227,9 @@
    <!--Check Type-->
    <div class="field select">
       <DocumentSelect
-         bind:value={$document.system.rulesElement[idx].checkType}
+         bind:value={document.data.system.rulesElement[idx].checkType}
          onchange={onCheckTypeChange}
-         options={$document.system.rulesElement[idx].modifierType === 'healing'
+         options={document.data.system.rulesElement[idx].modifierType === 'healing'
                   ? healingCheckTypeOptions
                   : checkTypeOptions}
       />
@@ -238,25 +238,25 @@
    <!--Selector-->
    <div class="field select">
       <DocumentSelect
-         bind:value={$document.system.rulesElement[idx].selector}
+         bind:value={document.data.system.rulesElement[idx].selector}
          onchange={onSelectorChange}
-         options={selectorOptions[$document.system.rulesElement[idx].checkType]}
+         options={selectorOptions[document.data.system.rulesElement[idx].checkType]}
       />
    </div>
 
    <!--Key-->
-   {#if $document.system.rulesElement[idx].selector !== 'any'}
+   {#if document.data.system.rulesElement[idx].selector !== 'any'}
       <div class="field select">
          {#if getSelector()}
             {@const Selector = getSelector()}
-            <Selector bind:value={$document.system.rulesElement[idx].key}/>
+            <Selector bind:value={document.data.system.rulesElement[idx].key}/>
          {/if}
       </div>
    {/if}
 
    <!--Value-->
    <div class="field number">
-      <DocumentIntegerInput bind:value={$document.system.rulesElement[idx].value}/>
+      <DocumentIntegerInput bind:value={document.data.system.rulesElement[idx].value}/>
    </div>
 </div>
 

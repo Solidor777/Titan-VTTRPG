@@ -10,7 +10,7 @@
    const document = getContext('document');
 
    /** @type {object} The titan flags data for the item. */
-   const item = $document.flags.titan;
+   const item = document.data.flags.titan;
 </script>
 
 <ItemChatMessageShell {item}>

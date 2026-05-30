@@ -43,34 +43,34 @@
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {
-         switch ($document.system.rulesElement[idx].selector) {
+         switch (document.data.system.rulesElement[idx].selector) {
             case 'attribute': {
-               $document.system.rulesElement[idx].key = 'body';
+               document.data.system.rulesElement[idx].key = 'body';
                break;
             }
             case 'training':
             case 'expertise': {
-               $document.system.rulesElement[idx].key = 'arcana';
+               document.data.system.rulesElement[idx].key = 'arcana';
                break;
             }
             case 'mod': {
-               $document.system.rulesElement[idx].key = 'armor';
+               document.data.system.rulesElement[idx].key = 'armor';
                break;
             }
             case 'rating': {
-               $document.system.rulesElement[idx].key = 'awareness';
+               document.data.system.rulesElement[idx].key = 'awareness';
                break;
             }
             case 'resistance': {
-               $document.system.rulesElement[idx].key = 'reflexes';
+               document.data.system.rulesElement[idx].key = 'reflexes';
                break;
             }
             case 'resource': {
-               $document.system.rulesElement[idx].key = 'resolve';
+               document.data.system.rulesElement[idx].key = 'resolve';
                break;
             }
             case 'speed': {
-               $document.system.rulesElement[idx].key = 'burrow';
+               document.data.system.rulesElement[idx].key = 'burrow';
                break;
             }
 
@@ -79,8 +79,8 @@
             }
          }
 
-         $document.update({
-            system: structuredClone($document.system),
+         document.data.update({
+            system: structuredClone(document.data.system),
          });
       }
    }
@@ -90,7 +90,7 @@
     * @returns {object | undefined} The select component, or undefined if no case matches.
     */
    function getSelector() {
-      switch ($document.system.rulesElement[idx].selector) {
+      switch (document.data.system.rulesElement[idx].selector) {
          case 'attribute': {
             return DocumentAttributeSelect;
          }
@@ -127,7 +127,7 @@
    <!--Selector-->
    <div class="field select">
       <DocumentSelect
-         bind:value={$document.system.rulesElement[idx].selector}
+         bind:value={document.data.system.rulesElement[idx].selector}
          onchange={onSelectorChange}
          options={selectorOptions}
       />
@@ -137,13 +137,13 @@
    <div class="field select">
       {#if getSelector()}
          {@const Selector = getSelector()}
-         <Selector bind:value={$document.system.rulesElement[idx].key}/>
+         <Selector bind:value={document.data.system.rulesElement[idx].key}/>
       {/if}
    </div>
 
    <!--Value-->
    <div class="field number">
-      <DocumentNumberInput bind:value={$document.system.rulesElement[idx].value}/>
+      <DocumentNumberInput bind:value={document.data.system.rulesElement[idx].value}/>
    </div>
 </div>
 

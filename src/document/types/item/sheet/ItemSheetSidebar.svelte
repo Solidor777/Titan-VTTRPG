@@ -14,7 +14,7 @@
     * @type {object[]}
     */
    const sections = $derived(
-      $document.system.check.length > 0
+      document.data.system.check.length > 0
          ? [
             ItemSheetSidebarTraits,
             ItemSheetSidebarChecks,

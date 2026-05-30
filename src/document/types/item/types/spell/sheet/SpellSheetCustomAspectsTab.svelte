@@ -20,7 +20,7 @@
    let filteredEntries = [];
    $: {
       filteredEntries = [];
-      $document.system.customAspect.forEach((entry, idx) => {
+      document.data.system.customAspect.forEach((entry, idx) => {
          if (
             entry.label
                .toLowerCase()
@@ -34,7 +34,7 @@
 
 <div class="tab">
    <!--Filter-->
-   {#if $document.system.customAspect && $document.system.customAspect.length > 0}
+   {#if document.data.system.customAspect && document.data.system.customAspect.length > 0}
       <div class="filter" transition:slide|local>
          <TopFilter bind:value={$appState.tabs.customAspects.filter}/>
       </div>
@@ -44,10 +44,10 @@
    <ScrollingContainer bind:scrollTop={$appState.tabs.customAspects.scrollTop}>
       <div class="scrolling-content">
          <!--Aspects List-->
-         {#if $document.system.customAspect.length > 0}
+         {#if document.data.system.customAspect.length > 0}
             <ol out:slide|local>
                <!--Each Aspect-->
-               {#each filteredEntries as idx ($document.system.customAspect[idx].uuid)}
+               {#each filteredEntries as idx (document.data.system.customAspect[idx].uuid)}
                   <li out:slide|local>
                      <SpellSheetCustomAspectSettings {idx}/>
                   </li>
@@ -59,7 +59,7 @@
          <div class="add-entry-button">
             <DocumentOwnerButton
                onclick={() => {
-                  $document.system.addCustomAspect();
+                  document.data.system.addCustomAspect();
                }}
             >
                <!--Button Content-->

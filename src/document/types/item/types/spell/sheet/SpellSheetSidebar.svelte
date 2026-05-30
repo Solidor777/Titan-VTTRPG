@@ -11,7 +11,7 @@
 
    /** @type {object[]} Sidebar sections, conditionally including checks. */
    const sections = $derived(
-      $document.system.check.length > 0
+      document.data.system.check.length > 0
          ? [
             ItemSheetSidebarTraits,
             SpellSheetSidebarCastingCheck,

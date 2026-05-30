@@ -27,7 +27,7 @@
       </div>
 
       <!--Checks-->
-      {#if $document.system.check.length > 0}
+      {#if document.data.system.check.length > 0}
          <div class="section" transition:slide|local>
             <ItemSheetSidebarChecks/>
          </div>

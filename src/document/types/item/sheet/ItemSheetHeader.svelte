@@ -19,7 +19,7 @@
 <div class="header">
    <!--Portrait-->
    <div class="portrait">
-      <DocumentImagePicker alt={'item portrait'} bind:value={$document.img}/>
+      <DocumentImagePicker alt={'item portrait'} bind:value={document.data.img}/>
    </div>
 
    <!--Name and Stats-->

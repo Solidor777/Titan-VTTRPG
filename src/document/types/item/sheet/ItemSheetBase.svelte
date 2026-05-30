@@ -14,7 +14,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 </script>
-{#if $document}
+{#if document.data}
    <!--Sheet-->
    <div class="titan-sheet">
       <!--Header-->

@@ -18,7 +18,7 @@
     * @returns {void}
     */
    function deleteFunction() {
-      $document.deleteCustomTrait(idx);
+      document.data.deleteCustomTrait(idx);
    }
 
    /**
@@ -26,17 +26,17 @@
     * @returns {void}
     */
    function editFunction() {
-      $document.editCustomTrait(idx);
+      document.data.editCustomTrait(idx);
    }
 </script>
 
-{#if $document.system.customTrait[idx]}
+{#if document.data.system.customTrait[idx]}
    <EditDeleteTag
       {deleteFunction}
       deleteTooltip={'deleteTrait'}
       {editFunction}
       editTooltip={'editTrait'}
-      label={$document.system.customTrait[idx].name}
-      labelTooltip={$document.system.customTrait[idx].description}
+      label={document.data.system.customTrait[idx].name}
+      labelTooltip={document.data.system.customTrait[idx].description}
    />
 {/if}

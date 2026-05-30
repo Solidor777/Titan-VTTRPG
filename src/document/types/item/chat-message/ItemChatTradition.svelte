@@ -5,7 +5,7 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-   const titanFlags = $document.flags.titan;
+   const titanFlags = document.data.flags.titan;
 </script>
 
 <StatTag label={localize('tradition')} value={titanFlags.system.tradition}/>

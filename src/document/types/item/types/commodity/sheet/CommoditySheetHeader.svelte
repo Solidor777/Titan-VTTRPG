@@ -31,7 +31,7 @@
       </div>
       <div class="input large-number">
          <DocumentIntegerInput
-            bind:value={$document.system.value}
+            bind:value={document.data.system.value}
             min={0}
          />
       </div>
@@ -44,7 +44,7 @@
       </div>
       <div class="input large-number">
          <DocumentIntegerIncrementInput
-            bind:value={$document.system.quantity}
+            bind:value={document.data.system.quantity}
             min={0}
          />
       </div>

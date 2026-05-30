@@ -19,7 +19,7 @@
     * @returns {void}
     */
    function deleteFunction() {
-      $document.deleteCustomAttackTrait(attackIdx, traitIdx);
+      document.data.deleteCustomAttackTrait(attackIdx, traitIdx);
    }
 
    /**
@@ -27,7 +27,7 @@
     * @returns {void}
     */
    function editFunction() {
-      $document.editCustomAttackTrait(attackIdx, traitIdx);
+      document.data.editCustomAttackTrait(attackIdx, traitIdx);
    }
 </script>
 
@@ -36,6 +36,6 @@
    deleteTooltip={'deleteTrait'}
    {editFunction}
    editTooltip={'editTrait'}
-   label={$document.system.attack[attackIdx].customTrait[traitIdx].name}
-   labelTooltip={$document.system.attack[attackIdx].customTrait[traitIdx].description}
+   label={document.data.system.attack[attackIdx].customTrait[traitIdx].name}
+   labelTooltip={document.data.system.attack[attackIdx].customTrait[traitIdx].description}
 />

@@ -19,7 +19,7 @@
 </script>
 
 <div class="tab">
-   {#if $document.system.rulesElement.length > 0}
+   {#if document.data.system.rulesElement.length > 0}
       <!--Filter-->
       <div class="filter" transition:slide|local>
          <TopFilter bind:value={$appState.tabs.rulesElements.filter}/>
@@ -29,10 +29,10 @@
    <!--Scrolling Content-->
    <ScrollingContainer>
       <!-- Rules Element List-->
-      {#if $document.system.rulesElement.length > 0}
+      {#if document.data.system.rulesElement.length > 0}
          <ol transition:slide|local>
             <!--Each Element-->
-            {#each $document.system.rulesElement as element, idx (element.uuid)}
+            {#each document.data.system.rulesElement as element, idx (element.uuid)}
                <li transition:slide|local>
                   <ItemSheetRulesElementSettings {idx}/>
                </li>
@@ -44,7 +44,7 @@
       <div class="add-entry-button">
          <DocumentOwnerButton
             onclick={() => {
-               $document.system.addRulesElement();
+               document.data.system.addRulesElement();
             }}
          >
             <!--Button Content-->

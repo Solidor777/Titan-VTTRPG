@@ -52,7 +52,7 @@
                label={'action'}
                tooltip={'abilityAction.desc'}
             >
-               <DocumentCheckboxInput value={$document.system.action}/>
+               <DocumentCheckboxInput value={document.data.system.action}/>
             </LabeledElement>
          </div>
       </div>
@@ -64,7 +64,7 @@
                label={'reaction'}
                tooltip={'abilityReaction.desc'}
             >
-               <DocumentCheckboxInput value={$document.system.reaction}/>
+               <DocumentCheckboxInput value={document.data.system.reaction}/>
             </LabeledElement>
          </div>
       </div>
@@ -76,7 +76,7 @@
                label={'passive'}
                tooltip={'abilityPassive.desc'}
             >
-               <DocumentCheckboxInput value={$document.system.passive}/>
+               <DocumentCheckboxInput value={document.data.system.passive}/>
             </LabeledElement>
          </div>
       </div>

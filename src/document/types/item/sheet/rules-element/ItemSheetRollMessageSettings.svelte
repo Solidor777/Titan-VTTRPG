@@ -23,7 +23,7 @@
    const document = getContext('document');
 
    /** @type {object} Reference to the Rules Element object. */
-   const element = $derived($document?.system.rulesElement[idx]);
+   const element = $derived(document.data?.system.rulesElement[idx]);
 
    /** @type {{label: string, value: string}[]} Options for the type of check that triggers the roll message. */
    const checkTypeOptions = [
@@ -149,8 +149,8 @@
             }
          }
 
-         $document.update({
-            system: structuredClone($document.system),
+         document.data.update({
+            system: structuredClone(document.data.system),
          });
       }
    }
@@ -198,7 +198,7 @@
       <!--Type-->
       <div class="field select">
          <DocumentSelect
-            bind:value={$document.system.rulesElement[idx].checkType}
+            bind:value={document.data.system.rulesElement[idx].checkType}
             onchange={onCheckTypeChange}
             options={checkTypeOptions}
          />
@@ -207,7 +207,7 @@
       <!--Selector-->
       <div class="field select">
          <DocumentSelect
-            bind:value={$document.system.rulesElement[idx].selector}
+            bind:value={document.data.system.rulesElement[idx].selector}
             onchange={onSelectorChange}
             options={selectorOptions[element.checkType]}
          />
@@ -219,7 +219,7 @@
          <div class="field select">
             {#if getSelector()}
                {@const Selector = getSelector()}
-               <Selector bind:value={$document.system.rulesElement[idx].key}/>
+               <Selector bind:value={document.data.system.rulesElement[idx].key}/>
             {/if}
          </div>
       {/if}
@@ -228,7 +228,7 @@
    <!--Message text-->
    <div class="message">
       <DocumentBoundEditorInput
-         bind:value={$document.system.rulesElement[idx].message}
+         bind:value={document.data.system.rulesElement[idx].message}
       />
    </div>
 </div>

@@ -21,8 +21,8 @@
    {tooltip}
 >
    <IntegerInput
-      bind:value={$document.system.xpCost}
-      disabled={disabled || !$document?.isOwner}
-      onchange={() => $document.update({system: {xpCost: $document.system.xpCost}})}
+      bind:value={document.data.system.xpCost}
+      disabled={disabled || !document.data?.isOwner}
+      onchange={() => document.data.update({system: {xpCost: document.data.system.xpCost}})}
    />
 </LabeledElement>

@@ -11,7 +11,7 @@
     * @returns {Promise<Document>} The imported Document.
     */
    async function importItem() {
-      return $document.collection.importFromCompendium($document.compendium, $document.id);
+      return document.data.collection.importFromCompendium(document.data.compendium, document.data.id);
    }
 </script>
 

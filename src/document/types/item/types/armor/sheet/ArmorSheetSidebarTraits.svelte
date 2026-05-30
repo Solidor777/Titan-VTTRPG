@@ -14,13 +14,13 @@
     */
    const itemTypeTraits = $derived.by(() => {
       const result = [];
-      for (const [idx] in $document.system.trait) {
+      for (const [idx] in document.data.system.trait) {
          result.push({
-            id: $document.system.trait[idx].name,
+            id: document.data.system.trait[idx].name,
             component: LabelTag,
             props: {
-               tooltip: localize(getArmorTraitDescription($document.system.trait[idx].name)),
-               label: localize($document.system.trait[idx].name),
+               tooltip: localize(getArmorTraitDescription(document.data.system.trait[idx].name)),
+               label: localize(document.data.system.trait[idx].name),
             }
          });
       }
@@ -29,6 +29,6 @@
 </script>
 
 <ItemSheetSidebarTraits
-   editTraits={() => $document.system.editArmorTraits()}
+   editTraits={() => document.data.system.editArmorTraits()}
    {itemTypeTraits}
 />

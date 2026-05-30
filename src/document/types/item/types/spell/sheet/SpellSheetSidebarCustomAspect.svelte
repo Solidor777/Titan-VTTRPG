@@ -17,7 +17,7 @@
    const document = getContext('document');
 
    /** @type {object} The custom aspect data. */
-   const aspect = $derived($document.system.customAspect[idx]);
+   const aspect = $derived(document.data.system.customAspect[idx]);
 </script>
 
 {#if aspect}

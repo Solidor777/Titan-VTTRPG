@@ -17,7 +17,7 @@
    /** @type {number[]} The filtered list of attack indices to display. */
    const filteredEntries = $derived.by(() => {
       const result = [];
-      $document.system.attack.forEach((entry, idx) => {
+      document.data.system.attack.forEach((entry, idx) => {
          if (
             entry.label
                .toLowerCase()
@@ -32,7 +32,7 @@
 
 <div class="tab">
    <!--Filter-->
-   {#if $document.system.attack.length > 0}
+   {#if document.data.system.attack.length > 0}
       <div class="filter" transition:slide|local>
          <TopFilter bind:value={$appState.tabs.attacks.filter}/>
       </div>
@@ -42,10 +42,10 @@
    <ScrollingContainer bind:scrollTop={$appState.tabs.attacks.scrollTop}>
       <div class="scrolling-content">
          <!--Attacks List-->
-         {#if $document.system.attack.length > 0}
+         {#if document.data.system.attack.length > 0}
             <ol out:slide|local>
                <!--Each Attack-->
-               {#each filteredEntries as idx ($document.system.attack[idx].uuid)}
+               {#each filteredEntries as idx (document.data.system.attack[idx].uuid)}
                   <li out:slide|local>
                      <WeaponSheetAttackSettings {idx}/>
                   </li>
@@ -57,7 +57,7 @@
          <div class="add-entry-button">
             <DocumentOwnerButton
                onclick={() => {
-                  $document.system.addAttack();
+                  document.data.system.addAttack();
                }}
             >
                <!--Button Content-->

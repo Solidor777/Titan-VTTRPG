@@ -18,7 +18,7 @@
 
 <div class="tab">
    <!--Filter-->
-   {#if $document.system.check.length > 0}
+   {#if document.data.system.check.length > 0}
       <div class="filter" transition:slide|local>
          <TopFilter bind:value={$appState.tabs.checks.filter}/>
       </div>
@@ -30,7 +30,7 @@
          <!--Checks List-->
          <FiltereedList
             componentFunction={() => ItemSheetCheckSettings}
-            entries={$document.system.check}
+            entries={document.data.system.check}
             filterFunction={(entry) => entry.label.toLowerCase().includes($appState.tabs.checks.filter.toLowerCase())}
             idFunction={(entry) => entry.uuid}
             mapFunction={(entry, idx) => idx}
@@ -43,7 +43,7 @@
          <div class="add-entry-button">
             <DocumentOwnerButton
                onclick={() => {
-                  $document.addCheck();
+                  document.data.addCheck();
                }}
             >
                <!--Button Content-->

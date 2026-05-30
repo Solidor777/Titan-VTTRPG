@@ -30,7 +30,7 @@
    const appState = getContext('applicationState');
 
    /** @type {object} The custom aspect data. */
-   const aspect = $derived($document.system.customAspect[idx]);
+   const aspect = $derived(document.data.system.customAspect[idx]);
 
    /** @type {boolean} Whether this component is currently expanded. */
    const isExpanded = $derived($appState.tabs.customAspects.isExpanded[idx]);
@@ -72,7 +72,7 @@
             <IconButton
                icon={DELETE_ICON}
                onclick={() => {
-                  $document.system.removeCustomAspect(idx);
+                  document.data.system.removeCustomAspect(idx);
                }}
             />
          </div>

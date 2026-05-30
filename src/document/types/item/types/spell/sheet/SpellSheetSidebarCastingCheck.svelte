@@ -25,20 +25,20 @@
    }
 
    $: aspectsEnabled =
-      areAspectsEnabled($document.system.aspect) ||
-      $document.system.customAspect.length > 0;
+      areAspectsEnabled(document.data.system.aspect) ||
+      document.data.system.customAspect.length > 0;
 </script>
 
 <!--Casting Check-->
 <div class="casting-check">
    <!--Head-->
-   <div class="header {$document.system.castingCheck.attribute}">
+   <div class="header {document.data.system.castingCheck.attribute}">
       {#if aspectsEnabled}
          <!--Label-->
          <div class="label-button">
-            {localize($document.system.castingCheck.attribute)} ({localize(
-            $document.system.castingCheck.skill,
-         )}) {$document.system.castingCheck.difficulty}:{$document.system
+            {localize(document.data.system.castingCheck.attribute)} ({localize(
+            document.data.system.castingCheck.skill,
+         )}) {document.data.system.castingCheck.difficulty}:{document.data.system
             .castingCheck.complexity}
          </div>
          <!--Expand button-->
@@ -64,9 +64,9 @@
       {:else}
          <!--Label-->
          <div class="label-normal">
-            {localize($document.system.castingCheck.attribute)} ({localize(
-            $document.system.castingCheck.skill,
-         )}) {$document.system.castingCheck.difficulty}:{$document.system
+            {localize(document.data.system.castingCheck.attribute)} ({localize(
+            document.data.system.castingCheck.skill,
+         )}) {document.data.system.castingCheck.difficulty}:{document.data.system
             .castingCheck.complexity}
          </div>
       {/if}

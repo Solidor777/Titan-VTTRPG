@@ -30,7 +30,7 @@
       <!--Selector-->
       <div class="field select">
          <DocumentSelect
-            bind:value={$document.system.rulesElement[idx].selector}
+            bind:value={document.data.system.rulesElement[idx].selector}
             options={selectorOptions}
          />
       </div>
@@ -39,7 +39,7 @@
    <!--Message text-->
    <div class="message">
       <DocumentBoundEditorInput
-         bind:value={$document.system.rulesElement[idx].message}
+         bind:value={document.data.system.rulesElement[idx].message}
       />
    </div>
 </div>

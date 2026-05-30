@@ -37,7 +37,7 @@
    const appState = getContext('applicationState');
 
    /** @type {ItemCheck} The Check this component represents. */
-   const check = $derived($document.system.check[idx]);
+   const check = $derived(document.data.system.check[idx]);
 
    /** @type {boolean} Whether this component is currently expanded. */
    const isExpanded = $derived($appState.tabs.checks.isExpanded[idx]);
@@ -78,7 +78,7 @@
             <IconButton
                icon={DELETE_ICON}
                onclick={async () => {
-                  $document.deleteCheck(idx);
+                  document.data.deleteCheck(idx);
                }}
             />
          </div>

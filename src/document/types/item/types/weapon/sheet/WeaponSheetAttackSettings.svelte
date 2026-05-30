@@ -44,7 +44,7 @@
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 
    /** @type {object} The attack data for this component. */
-   const attack = $derived($document.system.attack[idx]);
+   const attack = $derived(document.data.system.attack[idx]);
 
    /** @type {boolean} Whether this attack component is currently expanded. */
    const isExpanded = $derived($appState.attacks.isExpanded[idx]);
@@ -54,22 +54,22 @@
     * @returns {Promise<void>} Returns after the document update completes if needed.
     */
    async function updateAttackSkill() {
-      if ($document?.isOwner && attack) {
+      if (document.data?.isOwner && attack) {
          if (attack.type === 'melee') {
             if (attack.skill === 'rangedWeapons') {
                attack.skill = 'meleeWeapons';
-               $document.update({
+               document.data.update({
                   system: {
-                     attack: structuredClone($document.system.attack),
+                     attack: structuredClone(document.data.system.attack),
                   },
                });
             }
          }
          else if (attack.skill === 'meleeWeapons') {
             attack.skill = 'rangedWeapons';
-            $document.update({
+            document.data.update({
                system: {
-                  attack: structuredClone($document.system.attack),
+                  attack: structuredClone(document.data.system.attack),
                },
             });
          }
@@ -113,7 +113,7 @@
             <IconButton
                icon={DELETE_ICON}
                onclick={() => {
-                  $document.system.deleteAttack(idx);
+                  document.data.system.deleteAttack(idx);
                }}
             />
          </div>
@@ -208,7 +208,7 @@
                   <div class="button">
                      <DocumentOwnerButton
                         onclick={() => {
-                           $document.system.editAttackTraits(idx);
+                           document.data.system.editAttackTraits(idx);
                         }}
                      >
                         <i class={EDIT_ICON}></i>
@@ -220,7 +220,7 @@
                   <div class="button">
                      <DocumentOwnerButton
                         onclick={() => {
-                           $document.system.addCustomAttackTrait(idx);
+                           document.data.system.addCustomAttackTrait(idx);
                         }}
                      >
                         <i class={CREATE_ICON}></i>
