@@ -8,7 +8,9 @@ management). Data model classes hold the schema, field validation, and derived-d
 **Actor side**
 
 - `TitanActor` (`src/document/types/actor/TitanActor.js`) extends Foundry's `Actor`. Adds
-  `addItem`, `deleteItem`, `addActiveEffect`, `getItemsOfType`, and `getSpeaker`. On creation it
+  `addItem`, `deleteItem`, `addActiveEffect`, `getItemsOfType`, `getSpeaker`, and `getCombatant`
+  (returns this actor's Combatant in the active combat via `game.combat?.getCombatantByActor(this.id)`,
+  whose `.initiative` is the source for effect initiative capture). On creation it
   assigns a system UUID (stored in `flags.titan.uuid`) and delegates prototype-token initialization
   and post-add/delete callbacks to the data model.
 - `TitanActorDataModel` (`src/document/types/actor/TitanActorDataModel.js`) extends
@@ -31,8 +33,10 @@ management). Data model classes hold the schema, field validation, and derived-d
 - `PlayerDataModel` (`src/document/types/actor/types/character/types/player/PlayerDataModel.js`)
   extends `CharacterDataModel`. Adds XP tracking and an `inspiration` flag.
 - `NPCDataModel` (`src/document/types/actor/types/character/types/npc/NPCDataModel.js`) extends
-  `CharacterDataModel`. Adds `role` (minion / etc.) and overrides `applyDamage` to handle
-  one-hit kills and overkill damage for minions.
+  `CharacterDataModel`. Adds `role` (minion / etc.), adds a `type` subfield to the inherited `bio`
+  SchemaField via `schema.bio.extendFields({ type })` (assigning `schema.bio.type` directly does not
+  register a real subfield), and overrides `applyDamage` to handle one-hit kills and overkill damage
+  for minions.
 
 **Data model base**
 
@@ -89,7 +93,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
   initiative, custom }), a `check` array, and a `customTrait` array; it provides `isExpired` /
   `isActive` (`!parent?.disabled`, for all duration types) / `isCombatEffect` getters and
-  `_getInitialDocumentData` (captures the owning actor's active-combat initiative). Active/inactive
+  `_getInitialDocumentData` (captures the owning actor's active-combat initiative via
+  `actor.getCombatant()?.initiative`). Active/inactive
   state is the native `disabled` field (the universal gate); rich text is the native `description`
   field. The `effect` ActiveEffect subtype is declared in `system.json`
   `documentTypes.ActiveEffect.effect`.

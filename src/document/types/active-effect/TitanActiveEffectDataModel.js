@@ -98,7 +98,7 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
       if (actor && actor.documentName === 'Actor' && !actor.pack && actor.id &&
          typeof data?.system?.duration?.initiative !== 'number') {
          /** @type {number | null | undefined} - The owning actor's first active-combat initiative. */
-         const initiative = actor.getFirstActiveCombat()?.initiative;
+         const initiative = actor.getCombatant()?.initiative;
          if (initiative !== null && initiative !== undefined) {
             retVal ??= {};
             retVal.system ??= {};

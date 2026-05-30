@@ -88,7 +88,15 @@ export default class NPCDataModel extends CharacterDataModel {
     */
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
-      schema.bio.type = createStringField();
+
+      // Register the NPC `type` subfield on the inherited `bio` SchemaField. Assigning
+      // `schema.bio.type` directly would mutate the SchemaField instance rather than register a
+      // real subfield, leaving `system.bio.type` undefined; `extendFields` initializes and parents
+      // the new field correctly without re-parenting the inherited subfields.
+      schema.bio.extendFields({
+         type: createStringField(),
+      });
+
       schema.role = createStringField('warrior');
 
       return schema;
