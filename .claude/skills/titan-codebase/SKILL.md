@@ -14,21 +14,25 @@ exists, where it lives, and how to fit new work in. It is **descriptive, not pre
 
 ## Stack at a glance
 
-- TyphonJS runtime (`@typhonjs-fvtt/runtime`) + `@typhonjs-fvtt/standard`, imported via bare
-  `@typhonjs-fvtt/...` specifiers directly. The `#runtime/*` and `#standard/*` subpath maps are
-  declared in `package.json` but are **not** used in `src/`. Intra-project imports use the `~/`
-  Vite alias (resolves to `src/`).
-- Svelte **4** (not 5). Foundry **v13** (`foundry-vtt-types` v13).
-- Build: Vite 5. Source lives in `src/`; build output goes to the repo root.
+- **Pure Svelte 5 (runes)** mounted directly into Foundry **v14** `ApplicationV2` — no UI
+  middleware. TyphonJS was fully removed in the v14 migration. Intra-project imports use the `~/`
+  Vite alias (resolves to `src/`); `$fonts/` aliases the repo `fonts/` directory.
+- Foundry **v14** (`system.json` compatibility: minimum 13 / verified 14 / maximum 14). Note: the
+  `@league-of-foundry-developers/foundry-vtt-types` dev dependency is still **v13** — a known
+  type-package/runtime version mismatch, not a code issue.
+- Build: Vite 5 with `@sveltejs/vite-plugin-svelte`. Source lives in `src/`; build output goes to
+  the repo root.
 
 ## Sibling skills — route here for framework/API knowledge
 
-- `foundry-svelte-typhonjs` — the Svelte + Foundry UI layer this project actually uses.
-- `svelte-4` — Svelte syntax. **Do NOT use `svelte-5`.**
+- `foundry-svelte` — the no-middleware **pure Svelte 5 + ApplicationV2** UI layer this project
+  actually uses.
+- `svelte-5` — Svelte syntax (runes, snippets, `mount()`).
 - `foundry-vtt` (router) plus `foundry-data-models`, `foundry-applications`, `foundry-hooks`,
-  `foundry-dice-chat`, `foundry-combat`, `foundry-config` — Foundry v13 API shape.
+  `foundry-dice-chat`, `foundry-combat`, `foundry-config` — Foundry API shape.
 
-`foundry-svelte` (the no-middleware Svelte 5 path) and `svelte-5` do **NOT** apply to this codebase.
+`foundry-svelte-typhonjs` and `svelte-4` (the TyphonJS / Svelte 4 path) do **NOT** apply to this
+codebase — that stack was removed in the v14 migration.
 
 ## Knowledge map — open the file you need
 
@@ -36,8 +40,8 @@ exists, where it lives, and how to fit new work in. It is **descriptive, not pre
 - `references/abstractions.md` — the core classes and how they relate.
 - `references/data-flow.md` — lifecycles and control/data flow (a check from dialog to chat report,
   sheet render, migration, combat turns).
-- `references/conventions.md` — import maps, TyphonJS patterns in use, SCSS mixins, `assert()`,
-  gotchas, and the pointer to `.claude/CLAUDE.md` for style rules.
+- `references/conventions.md` — import maps, application & reactivity patterns, SCSS mixins,
+  `assert()`, gotchas, and the pointer to `.claude/CLAUDE.md` for style rules.
 
 ## High-level architecture
 
@@ -54,16 +58,16 @@ elements, constructs a typed `CheckParameters` object, optionally opens a `Titan
 user options, then instantiates the appropriate `TitanCheck` subclass (`AttributeCheck`, `AttackCheck`, etc.)
 and calls `evaluateCheck()`. The check rolls dice, applies expertise, and computes type-specific results; all
 output travels in `flags.titan` when `ChatMessage.create` is called. The `OnRenderChatMessageHTML` hook wraps
-the resulting message in a `TJSDocument` store and mounts `ChatMessageShell.svelte`, which dispatches to the
-correct check or report Svelte component based on the `flags.titan.type` flag.
+the resulting message in a `ReactiveDocument` bridge and mounts `ChatMessageShell.svelte` with Svelte 5's
+`mount()`, which dispatches to the correct check or report Svelte component based on the `flags.titan.type` flag.
 
-All sheets follow a three-layer TyphonJS pattern: a JS application class extending `SvelteApplication`
-(`TitanDocumentSheet` and its subclasses) wraps the Foundry document in a `TJSDocument` reactive store and
-mounts `DocumentSheetShell.svelte`; the shell sets `document` and `applicationState` stores into Svelte context
-so every descendant component can subscribe reactively via `$document`; the innermost components read and write
-back through `document.update(...)` or the `refreshSystemDocument` snapshot helper. The `~/` Vite alias (→
-`src/`) is the only intra-project import mechanism; TyphonJS packages are imported as bare `@typhonjs-fvtt/...`
-specifiers.
+All sheets follow a three-layer pattern: a JS application class extending Foundry v14 `DocumentSheetV2`
+(`TitanDocumentSheet` and its subclasses) builds a `ReactiveDocument` bridge around the Foundry document and
+mounts `DocumentSheetShell.svelte` with Svelte 5's `mount()` on first render; the shell sets the `document`
+bridge and the `applicationState` store into Svelte context so every descendant reads
+`const document = getContext('document')` and accesses live, reactive data via `document.data.system.*`; the
+innermost components write back through `document.data.update(...)` or the `refreshSystemDocument` snapshot
+helper. The `~/` Vite alias (→ `src/`) is the intra-project import mechanism; no TyphonJS packages remain.
 
 Report chat messages close the loop between automation and actor state: confirm/apply buttons in report Svelte
 components call back into `CharacterDataModel` methods (routed via `SocketManager` when the acting user does not
