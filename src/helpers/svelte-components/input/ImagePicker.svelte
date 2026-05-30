@@ -27,7 +27,7 @@
    function onEditImage() {
       if (!disabled) {
          const current = value;
-         const filePicker = new foundry.applications.apps.FilePicker({
+         const filePicker = new foundry.applications.apps.FilePicker.implementation({
             type: 'image',
             current: current,
             callback: async (newPath) => {
@@ -36,7 +36,7 @@
             },
             position: {
                top: application.position.top + 40,
-               left: application.position.left + (application.position.width - application.options.width) + 10,
+               left: application.position.left + (application.position.width - application.position.width) + 10,
             },
          });
          filePicker.browse();

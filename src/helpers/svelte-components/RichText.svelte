@@ -12,11 +12,23 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} Enriched HTML to display. */
-   let displayText = $derived(TextEditor.enrichHTML(value, {
-      async: false,
-      secrets: true,
-   }));
+   /** @type {string} - The enriched HTML, resolved asynchronously. */
+   let displayText = $state('');
+
+   $effect(() => {
+      /** @type {boolean} - Guards against applying a stale enrich result. */
+      let cancelled = false;
+      foundry.applications.ux.TextEditor.implementation
+         .enrichHTML(value, { secrets: true })
+         .then((html) => {
+            if (!cancelled) {
+               displayText = html;
+            }
+         });
+      return () => {
+         cancelled = true;
+      };
+   });
 </script>
 
 <div
