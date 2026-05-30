@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import { setContext } from 'svelte';
 

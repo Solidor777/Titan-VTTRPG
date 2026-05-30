@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';

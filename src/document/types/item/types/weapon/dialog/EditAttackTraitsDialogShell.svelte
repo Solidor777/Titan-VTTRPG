@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import { ATTACK_TRAIT_DESCRIPTIONS, ATTACK_TRAITS, } from '~/document/types/item/types/weapon/AttackTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';

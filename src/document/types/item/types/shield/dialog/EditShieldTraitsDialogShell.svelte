@@ -1,5 +1,3 @@
-<svelte:options accessors={true}/>
-
 <script>
    import { SHIELD_TRAIT_DESCRIPTIONS, SHIELD_TRAITS, } from '~/document/types/item/types/shield/ShieldTraits.js';
    import EditTraitsDialogBase from '~/document/types/item/dialog/EditTraitsDialogBase.svelte';
