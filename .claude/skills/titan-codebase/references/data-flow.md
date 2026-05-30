@@ -132,9 +132,11 @@ mirror the `document.data.system.*` field, then call `refreshSystemDocument(docu
 `document.update({ system: structuredClone(document.system), flags: structuredClone(document.flags) })`,
 writing the entire mutated system blob back to Foundry in one call.
 
-*Direct item.update calls* (e.g. `CharacterSheetCommodity.svelte`, `CharacterSheetEffect.svelte`):
-Some sheet rows hold a local reference to an embedded `TitanItem` and call
-`item.update({ system: { fieldName: newValue } })` directly on `change`, bypassing the snapshot helper.
+*Direct document.update calls* (e.g. `CharacterSheetCommodity.svelte`, `CharacterSheetEffect.svelte`):
+Some sheet rows hold a local reference to an embedded document and call
+`doc.update({ system: { fieldName: newValue } })` directly on `change`, bypassing the snapshot helper.
+`CharacterSheetCommodity` holds a `TitanItem`; `CharacterSheetEffect` holds an effect-subtype
+`TitanActiveEffect` and writes its duration via `effect.update(...)`.
 
 ---
 

@@ -3,12 +3,10 @@
    import { getContext } from 'svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
-   import CharacterSheetItemList
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
+   import CharacterSheetEffectList
+      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectList.svelte';
    import CharacterSheetTabHeaderButton
       from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
-   import CharacterSheetEffect
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
    import { CREATE_ICON, REMOVE_TEMP_EFFECTS_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the Application State store. */
@@ -28,7 +26,10 @@
                icon={CREATE_ICON}
                label={localize('addNewEffect')}
                onclick={() => {
-                  document.data.createItemFromType('effect');
+                  document.data.createEmbeddedDocuments('ActiveEffect', [{
+                     name: localize('newEffect'),
+                     type: 'effect',
+                  }]);
                }}
             />
          </div>
@@ -61,15 +62,11 @@
    <!--Scrolling Containers-->
    <div class="scrolling-content">
       <ScrollingContainer bind:scrollTop={$appState.tabs.abilities.scrollTop}>
-         <!--Abilities List-->
+         <!--Effects List-->
          <div class="list">
-            <CharacterSheetItemList
+            <CharacterSheetEffectList
                filter={$appState.tabs.abilities.filter}
-               filterFunction={(item) => {
-                  return item.type === 'effect';
-               }}
                isExpandedMap={$appState.tabs.abilities.isExpanded}
-               itemComponent={CharacterSheetEffect}
             />
          </div>
       </ScrollingContainer>

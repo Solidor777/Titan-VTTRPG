@@ -1,38 +1,37 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
+   import { getContext } from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
+   import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import CharacterSheetItem
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
-   import CharacterSheetItemSendToChatButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
-   import CharacterSheetItemEditButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
-   import CharacterSheetItemDeleteButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
-   import CharacterSheetItemChecks
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import CharacterSheetItemToggleActiveButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemToggleActiveButton.svelte';
+   import CharacterSheetEffectToggleActiveButton
+      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectToggleActiveButton.svelte';
+   import { DELETE_ICON, EDIT_ICON, SEND_TO_CHAT_ICON, SHEET_ICON } from '~/system/Icons.js';
 
    /**
     * @typedef {object} CharacterSheetEffectProps
-    * @property {TitanItem} [item] Reference to the Item document.
-    * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    * @property {TitanActiveEffect} [effect] - Reference to the effect Active Effect document.
+    * @property {boolean} [isExpanded] - Whether this effect is currently expanded.
     */
 
    /** @type {CharacterSheetEffectProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { effect = undefined, isExpanded = $bindable(undefined) } = $props();
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem item={effect} bind:isExpanded>
    {#snippet controls()}
       <!--Duration-->
-      {#if item.system.duration.type !== 'permanent'}
-         {#if item.system.duration.type === 'initiative'}
+      {#if effect.system.duration.type !== 'permanent'}
+         {#if effect.system.duration.type === 'initiative'}
             <!--Initiative-->
             <div class="field margin-right">
                <div class="label">
@@ -41,13 +40,13 @@
                <div class="input">
                   <IntegerInput
                      min={0}
-                     bind:value={item.system.duration.initiative}
+                     bind:value={effect.system.duration.initiative}
                      onchange={() => {
-                           item.update({
+                           effect.update({
                               system: {
                                  duration: {
                                     initiative:
-                                       item.system.duration.initiative,
+                                       effect.system.duration.initiative,
                                  },
                               },
                            });
@@ -59,8 +58,8 @@
 
          <div class="field">
             <div class="label">
-               {item.system.duration.type === 'custom'
-                  ? item.system.duration.custom
+               {effect.system.duration.type === 'custom'
+                  ? effect.system.duration.custom
                   : localize('turns')}
             </div>
 
@@ -68,12 +67,12 @@
             <div class="input">
                <IntegerIncrementInput
                   min={0}
-                  bind:value={item.system.duration.remaining}
+                  bind:value={effect.system.duration.remaining}
                   onchange={() => {
-                        item.update({
+                        effect.update({
                            system: {
                               duration: {
-                                 remaining: item.system.duration.remaining,
+                                 remaining: effect.system.duration.remaining,
                               },
                            },
                         });
@@ -81,38 +80,46 @@
                />
             </div>
          </div>
-      {:else}
-         <!--Toggle Active Button-->
-         <CharacterSheetItemToggleActiveButton {item}/>
       {/if}
+
+      <!--Toggle Active Button-->
+      <CharacterSheetEffectToggleActiveButton {effect}/>
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <IconButton
+            icon={SEND_TO_CHAT_ICON}
+            label={localize('sendToChat')}
+            onclick={() => effect.sendToChat()}
+            tooltip={localize('sendToChat')}
+         />
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <IconButton
+            icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
+            label={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
+            onclick={() => effect.sheet.render(true)}
+            tooltip={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
+         />
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <DocumentOwnerIconButton
+            icon={DELETE_ICON}
+            label={localize('deleteItem')}
+            onclick={() => effect.delete()}
+            tooltip={localize('deleteItem')}
+         />
       </div>
    {/snippet}
 
-   <!--Item Checks-->
-   {#if item.system.check.length > 0}
-      <div class="section">
-         <CharacterSheetItemChecks {item}/>
-      </div>
-   {/if}
-
-   <!--Item Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   <!--Effect Description-->
+   {#if effect.description !== '' && effect.description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={effect.description}/>
       </div>
    {/if}
 
@@ -120,20 +127,20 @@
       <!--Duration-->
       <div class="tag">
          <DurationTag
-            type={item.system.duration.type}
-            remaining={item.system.duration.remaining}
+            type={effect.system.duration.type}
+            remaining={effect.system.duration.remaining}
          />
       </div>
 
       <!--Expired-->
-      {#if item.system.duration.type !== 'permanent' && item.system.duration.remaining <= 0}
+      {#if effect.system.isExpired}
          <div class="tag">
             <Tag>{localize('expired')}</Tag>
          </div>
       {/if}
 
       <!--Traits-->
-      {#each item.system.customTrait as trait}
+      {#each effect.system.customTrait as trait}
          <div class="tag">
             <Tag tooltip={trait.description}>
                {trait.name}

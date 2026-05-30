@@ -233,6 +233,15 @@ and one or more inner Svelte component trees.
   with a `PlayerSheetHeader.svelte` header slot.
 - `TitanNPCSheet` (`src/document/types/actor/types/character/types/npc/NPCSheet.js`) extends
   `TitanCharacterSheet`. Mounts `NPCSheetShell.svelte`.
+- Effects tab (`CharacterSheetEffectsTab.svelte`) creates, lists, and drags effect **Active
+  Effects** (not items). Its create button calls
+  `document.data.createEmbeddedDocuments('ActiveEffect', [{ name, type: 'effect' }])`. It uses a
+  dedicated `CharacterSheetEffectList.svelte` (sibling of the item-only `CharacterSheetItemList`)
+  that iterates `document.data.effects` filtered to `type === 'effect'`, handles drag-out via the
+  effect's native `toDragData()`, and renders each via `CharacterSheetEffect.svelte`.
+  `CharacterSheetEffect` takes an `effect` prop, reuses the generic `CharacterSheetItem` shell, and
+  exposes a `CharacterSheetEffectToggleActiveButton.svelte` (active = `effect.system.isActive`,
+  toggled via `document.data.system.toggleEffectActive(effect.id)`) shown for all duration types.
 
 **Item sheets**
 
