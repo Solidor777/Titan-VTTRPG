@@ -14,7 +14,7 @@ export default function deepFreeze(data) {
    // Otherwise, freeze every property on this object.
    else if (typeof data === 'object') {
       for (const key in data) {
-         if (Object.prototype.hasOwn(data, key)) {
+         if (Object.hasOwn(data, key)) {
             deepFreeze(data[key]);
          }
       }

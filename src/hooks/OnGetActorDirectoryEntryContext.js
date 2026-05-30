@@ -5,42 +5,45 @@ import { ID_ICON } from '~/system/Icons.js';
 
 /**
  * Generates contextual options when right-clicking on an Actor in the Actors directory.
- * @param {Element} element - The Element that was clicked.
- * @param {object[]} options - Array of buttons containing the contextual options.
+ * In Foundry v14 the hook signature is (application, menuItems); each ContextMenuEntry uses
+ * `visible(li)` and `onClick(event, li)` where `li` is the target HTMLElement.
+ * @param {ApplicationV2} _application - The ApplicationV2 instance the context menu belongs to.
+ * @param {object[]} options - Array of ContextMenuEntry objects to be mutated.
  */
-export default function onGetActorDirectoryEntryContext(element, options) {
+export default function onGetActorDirectoryEntryContext(_application, options) {
 
    // Regenerate UUID.
    options.push({
       name: localize('regenerateUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
-      condition: isActorOwner,
-      callback: (entry) => onRegenerateDocumentUUID(getActorFromDirectoryEntry(entry)),
+      visible: (li) => isActorOwner(li),
+      onClick: (_event, li) => onRegenerateDocumentUUID(getActorFromDirectoryEntry(li)),
    });
 
    // Edit UUID.
    options.push({
       name: localize('editUUID'),
       icon: `<i class="${ID_ICON}"></i>`,
-      condition: isActorOwner,
-      callback: (entry) => onEditDocumentUUID(getActorFromDirectoryEntry(entry)),
+      visible: (li) => isActorOwner(li),
+      onClick: (_event, li) => onEditDocumentUUID(getActorFromDirectoryEntry(li)),
    });
 }
 
 /**
  * Gets the Actor from an Entry in the Actors directory.
- * @param {Element} element - Element Entry for the Document in the directory.
+ * In v14 directory items carry the document id in data-entry-id on the li element itself.
+ * @param {HTMLElement} li - The li HTMLElement for the Document in the directory.
  * @returns {TitanActor} The Document from the Entry in the directory.
  */
-function getActorFromDirectoryEntry(element) {
-   return game.actors.get(element.data('document-id'));
+function getActorFromDirectoryEntry(li) {
+   return game.actors.get(li.closest('[data-entry-id]')?.dataset.entryId);
 }
 
 /**
  * Determines whether the current user owns the Actor for an Entry in the Actors directory.
- * @param {Element} element - Element Entry for the Document in the directory.
+ * @param {HTMLElement} li - The li HTMLElement for the Document in the directory.
  * @returns {boolean} Whether the current user owns the Document for an Entry in the directory.
  */
-function isActorOwner(element) {
-   return getActorFromDirectoryEntry(element)?.isOwner;
+function isActorOwner(li) {
+   return getActorFromDirectoryEntry(li)?.isOwner;
 }

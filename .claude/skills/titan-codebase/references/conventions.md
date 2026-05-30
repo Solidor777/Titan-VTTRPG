@@ -134,6 +134,27 @@ if (assert(someCondition, 'Error message')) { ... }
 underlying function. Throughout the codebase the convention is to prefer the locally-imported form over the
 `game.titan.*` accessors (see `CLAUDE.md`).
 
+## v14 API breakpoints (confirmed against live Foundry source)
+
+- **`ChatMessage` style field** — In v14, `ChatMessage.type` is a string `DocumentTypeField` (subtype, default
+  `"base"`). The numeric render style (`CONST.CHAT_MESSAGE_STYLES.*`) moved to a separate `style` NumberField.
+  All four TITAN `ChatMessage.create()` call sites (`Check.js`, `TitanActiveEffect.js`,
+  `CharacterDataModel._whisperOwners`, `TitanItem.js`) use `style: CONST.CHAT_MESSAGE_STYLES.OTHER`.
+
+- **`TextEditor.enrichHTML` is always async in v14** — The `async: false` option was removed; the method is
+  declared `static async` and always returns a `Promise<string>`. The canonical call pattern is
+  `foundry.applications.ux.TextEditor.implementation.enrichHTML(value, { secrets: true })`. `RichText.svelte`
+  populates a `$state('')` variable from a `$effect` that awaits this promise (with a cancellation guard).
+
+- **`FilePicker` constructor** — use `new foundry.applications.apps.FilePicker.implementation({...})` (honors
+  `CONFIG.ux` override); `new foundry.applications.apps.FilePicker({...})` is not the canonical v14 path.
+
+- **AppV2 position width** — `ApplicationV2` instances have no `options.width`; the current rendered width lives
+  on `application.position.width`. (`options.width` yields `undefined`, producing `NaN` in arithmetic.)
+
+- **Status-effect icon field** — v14 `CONFIG.statusEffects` entries use `img` (not `icon`). Token HUD reads
+  `status.img`; the v13 `icon` fallback was removed. All entries in `src/system/Conditions.js` use `img:`.
+
 ## Other gotchas
 
 - **`localize()` wrapper** — All i18n calls go through `src/helpers/utility-functions/Localize.js` rather than
@@ -143,14 +164,37 @@ underlying function. Throughout the codebase the convention is to prefer the loc
 - **`~/` alias vs relative paths** — The codebase uses the `~/` alias for cross-directory imports;
   relative paths (`./`, `../`) appear only within the same immediate directory.
 
-- **Svelte context protocol** — `document` (a `ReactiveDocument` bridge) and `applicationState` (a writable
-  store) are set into context by `DocumentSheetShell.svelte`. All descendant components must use `getContext`
-  to access them — they are never passed as props down the tree. Read reactive data via `document.data.*`
-  (not `$document`).
+- **Svelte context protocol** — Three keys are set into Svelte context at mount time:
+  - `'document'` (`ReactiveDocument` bridge) and `'applicationState'` (writable store) are set by
+    `DocumentSheetShell.svelte`; all sheet descendant components access them via `getContext`.
+  - `'application'` (the owning `ApplicationV2` / `DocumentSheetV2` instance) is set at the `mount()` call
+    site in both `TitanDocumentSheet._replaceHTML` and `TitanDialog._replaceHTML`. All components (sheet,
+    dialog, and their descendants) can call `getApplication()` (`~/helpers/utility-functions/GetApplication.js`)
+    which reads `getContext('application')`; it returns `undefined` when mounted without an application context
+    (e.g. chat messages). The obsolete TyphonJS `getContext('#external').application` pattern has been removed.
+  Read reactive data via `document.data.*` (not `$document`); context values are never passed as props down
+  the tree.
 
 - **Build output goes to the repo root** — `vite.config.mjs` sets `build.outDir` to the project root
   (`__dirname`), not a `dist/` folder. Source lives in `src/`; build artifacts such as `index.js` land at the
   top level. See `architecture.md` for the full directory layout.
+
+## Test infrastructure
+
+**Vitest harness** — `vitest.config.mjs` (project root) configures Vitest 2 with `happy-dom`, Svelte 5
+(`@sveltejs/vite-plugin-svelte` with `hot: false`), `svelte-preprocess` (same SCSS `prependData` as
+`vite.config.mjs`), and the `~/` / `$fonts/` aliases. Tests live in `tests/unit/**/*.test.js`; there is NO
+test code under `src/`.
+
+**Foundry globals mock** — `tests/setup.js` (loaded as Vitest `setupFiles`) installs:
+- `globalThis.foundry = { abstract: { Document: MockDocument }, utils: { mergeObject } }` — a minimal
+  `foundry.abstract.Document` stub (for `instanceof` checks) and a recursive `mergeObject` plain-object
+  merge.
+- `globalThis.Hooks` — a `HooksMock` instance reinstalled fresh `beforeEach` test so hook registrations
+  never leak across tests. Supports `on(name, fn)`, `off(name, fn)`, and `call(name, ...args)`.
+
+**npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
+mode; `npm run test:e2e` is reserved for Playwright (not yet wired up).
 
 ## Style rules live in CLAUDE.md
 

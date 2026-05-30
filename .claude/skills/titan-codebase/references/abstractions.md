@@ -234,8 +234,10 @@ and one or more inner Svelte component trees.
 **Actor sheets**
 
 - `TitanActorSheet` (`src/document/types/actor/sheet/TitanActorSheet.js`) extends
-  `TitanDocumentSheet`. Adds token linking/unlinking header buttons and actor-level item lifecycle
-  callbacks (`postAddItem`, `preDeleteItem`, `postDeleteItem`).
+  `TitanDocumentSheet`. Declares `static DEFAULT_OPTIONS = { position: { width: 750 } }` to widen
+  the sheet (AppV2 deep-merges this onto the base 700-wide value). Adds token linking/unlinking
+  header buttons and actor-level item lifecycle callbacks (`postAddItem`, `preDeleteItem`,
+  `postDeleteItem`).
 - `TitanCharacterSheet` (`src/document/types/actor/types/character/sheet/CharacterSheet.js`)
   extends `TitanActorSheet`. Adds the `CharacterSheetState` reactive store and character-specific
   add/delete item handling.
@@ -258,8 +260,9 @@ and one or more inner Svelte component trees.
 **Item sheets**
 
 - `TitanItemSheet` (`src/document/types/item/sheet/TitanItemSheet.js`) extends
-  `TitanDocumentSheet`. Adds send-to-chat and import buttons; provides
-  `RulesElementItemSheetState` for items that carry rules elements.
+  `TitanDocumentSheet`. Declares `static DEFAULT_OPTIONS = { position: { height: 650 } }` to set
+  a fixed sheet height (AppV2 deep-merges this onto the base `auto` value). Adds send-to-chat and
+  import buttons; provides `RulesElementItemSheetState` for items that carry rules elements.
 - Per-type item sheets all extend `TitanItemSheet`: `TitanWeaponSheet`, `TitanArmorSheet`,
   `TitanSpellSheet`, `TitanShieldSheet`, `TitanAbilitySheet`, `TitanEquipmentSheet`,
   `TitanCommoditySheet`. Each mounts its own `*SheetShell.svelte`.

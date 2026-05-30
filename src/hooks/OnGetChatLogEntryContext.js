@@ -9,10 +9,12 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 
 /**
  * Generates contextual options when right-clicking on a Chat Message in the Chat Log.
- * @param {Element} element - The Element that was clicked.
- * @param {object[]} options - Array of buttons containing the contextual options.
+ * In Foundry v14 the hook signature is (application, menuItems); each ContextMenuEntry uses
+ * `visible(li)` and `onClick(event, li)` where `li` is the target HTMLElement with dataset.messageId.
+ * @param {ApplicationV2} _application - The ApplicationV2 instance the context menu belongs to.
+ * @param {object[]} options - Array of ContextMenuEntry objects to be mutated.
  */
-export default function onGetChatLogEntryContext(element, options) {
+export default function onGetChatLogEntryContext(_application, options) {
    // Get the settings for auto spending resolve.
    const autoSpendResolveReRollFailuresEnabled = autoSpendResolveReRollFailures();
    const autoSpendResolveDoubleExpertiseEnabled = autoSpendResolveDoubleExpertise();
@@ -23,8 +25,8 @@ export default function onGetChatLogEntryContext(element, options) {
       {
          name: localize('reRollFailuresSpendResolve'),
          icon: `<i class="${DICE_ICON}"></i>`,
-         condition: canReRollFailures,
-         callback: (entry) => reRollFailures(entry, true),
+         visible: canReRollFailures,
+         onClick: (_event, li) => reRollFailures(li, true),
       },
    ];
 
@@ -33,8 +35,8 @@ export default function onGetChatLogEntryContext(element, options) {
       reRollFailureOptions.unshift({
          name: localize('reRollFailures'),
          icon: `<i class="${DICE_ICON}"></i>`,
-         condition: canReRollFailures,
-         callback: (entry) => reRollFailures(entry, false),
+         visible: canReRollFailures,
+         onClick: (_event, li) => reRollFailures(li, false),
       });
    }
 
@@ -43,8 +45,8 @@ export default function onGetChatLogEntryContext(element, options) {
       {
          name: localize('doubleExpertiseSpendResolve'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
-         condition: canDoubleExpertise,
-         callback: (entry) => doubleExpertise(entry, true),
+         visible: canDoubleExpertise,
+         onClick: (_event, li) => doubleExpertise(li, true),
       },
    ];
 
@@ -53,8 +55,8 @@ export default function onGetChatLogEntryContext(element, options) {
       doubleExpertiseOptions.unshift({
          name: localize('doubleExpertise'),
          icon: `<i class="${EXPERTISE_ICON}"></i>`,
-         condition: canDoubleExpertise,
-         callback: (entry) => doubleExpertise(entry, false),
+         visible: canDoubleExpertise,
+         onClick: (_event, li) => doubleExpertise(li, false),
       });
    }
 
@@ -63,8 +65,8 @@ export default function onGetChatLogEntryContext(element, options) {
       {
          name: localize('doubleTrainingSpendResolve'),
          icon: `<i class="${TRAINING_ICON}"></i>`,
-         condition: canDoubleTraining,
-         callback: (entry) => doubleTraining(entry, true),
+         visible: canDoubleTraining,
+         onClick: (_event, li) => doubleTraining(li, true),
       },
    ];
 
@@ -73,8 +75,8 @@ export default function onGetChatLogEntryContext(element, options) {
       doubleTrainingOptions.push({
          name: localize('doubleTraining'),
          icon: `<i class="${TRAINING_ICON}"></i>`,
-         condition: canDoubleTraining,
-         callback: (entry) => doubleTraining(entry, false),
+         visible: canDoubleTraining,
+         onClick: (_event, li) => doubleTraining(li, false),
       });
    }
 
@@ -85,12 +87,13 @@ export default function onGetChatLogEntryContext(element, options) {
 
 /**
  * Gets the Titan flags from the Entry for a Chat Message in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * In v14 the message id is stored in the data-message-id attribute of the li element.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @returns {object} The Titan flags from the Entry for a Chat Message in the Chat Log.
  */
-function getTitanFlags(element) {
-   // Get the message from the list item.
-   const message = game.messages.get(element.data('messageId'));
+function getTitanFlags(li) {
+   // Get the message from the list item using the v14 data-message-id attribute.
+   const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
 
    // Check if this message is visible and the user owns the speaker.
    if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
@@ -107,12 +110,12 @@ function getTitanFlags(element) {
 
 /**
  * Determines whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @returns {boolean} Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
  */
-function canReRollFailures(element) {
+function canReRollFailures(li) {
    // Get the Titan Flags.
-   const titanFlags = getTitanFlags(element);
+   const titanFlags = getTitanFlags(li);
    if (titanFlags) {
 
       // If this is a check AND it has not re-rolled failures OR the current.
@@ -133,12 +136,12 @@ function canReRollFailures(element) {
 
 /**
  * Re-Rolls the failures for a Check belonging to a Chat Message Entry in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
  */
-async function reRollFailures(element, spendResolve) {
+async function reRollFailures(li, spendResolve) {
    // Get the successes and failure count.
-   const message = game.messages.get(element.data('messageId'));
+   const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
    const titanFlags = message?.flags?.titan;
    /** @type {number} */
    let failureCount = 0;
@@ -196,13 +199,13 @@ async function reRollFailures(element, spendResolve) {
 
 /**
  * Determines whether to display the Double Training contextual option for a Chat Message in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @returns {boolean} Whether to display the Double Training contextual option for a Chat Message in the Chat Log.
  */
-function canDoubleTraining(element) {
+function canDoubleTraining(li) {
    // Return true if the message is a check with Training that has not yet been.
    // doubled.
-   const titanFlags = getTitanFlags(element);
+   const titanFlags = getTitanFlags(li);
    return (titanFlags &&
       isCheck(titanFlags.type) &&
       titanFlags.parameters.totalTrainingDice > 0 &&
@@ -211,12 +214,12 @@ function canDoubleTraining(element) {
 
 /**
  * Doubles the Training for a Check belonging to a Chat Message Entry in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
  */
-async function doubleTraining(element, spendResolve) {
+async function doubleTraining(li, spendResolve) {
    // If expertise is not already doubled.
-   const message = game.messages.get(element.data('messageId'));
+   const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
    const titanFlags = message?.flags?.titan;
 
    // Re-roll dice equal to the number of failures.
@@ -255,13 +258,13 @@ async function doubleTraining(element, spendResolve) {
 
 /**
  * Determines whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @returns {boolean} Whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
  */
-function canDoubleExpertise(element) {
+function canDoubleExpertise(li) {
    // Return true if the message is a check with Expertise that has not yet been.
    // doubled.
-   const titanFlags = getTitanFlags(element);
+   const titanFlags = getTitanFlags(li);
    return (titanFlags &&
       isCheck(titanFlags.type) &&
       titanFlags.parameters.totalExpertise > 0 &&
@@ -270,12 +273,12 @@ function canDoubleExpertise(element) {
 
 /**
  * Doubles the Expertise for a Check belonging to a Chat Message Entry in the Chat Log.
- * @param {Element} element - The Entry for a Chat Message in the Chat Log.
+ * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
  * @param {boolean} spendResolve - Whether the Speaker's Actor should spend 1 Resolve.
  */
-async function doubleExpertise(element, spendResolve) {
+async function doubleExpertise(li, spendResolve) {
    // If expertise is not already doubled.
-   const message = game.messages.get(element.data('messageId'));
+   const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
    const titanFlags = message?.flags?.titan;
 
    // Double the expertise.

@@ -1,5 +1,5 @@
 import TitanActor from '~/document/types/actor/TitanActor.js';
-import Item from '~/document/types/item/TitanItem.js';
+import TitanItem from '~/document/types/item/TitanItem.js';
 import TitanPlayerSheet from '~/document/types/actor/types/character/types/player/PlayerSheet.js';
 import TitanNPCSheet from '~/document/types/actor/types/character/types/npc/NPCSheet.js';
 import TitanAbilitySheet from '~/document/types/item/types/ability/sheet/AbilitySheet.js';
@@ -66,7 +66,7 @@ export default function onceInit() {
    CONFIG.Actor.trackableAttributes = getTrackableAttributes();
 
    // Configure Items.
-   CONFIG.Item.documentClass = Item;
+   CONFIG.Item.documentClass = TitanItem;
    CONFIG.Item.dataModels = {
       ability: AbilityDataModel,
       armor: ArmorDataModel,
@@ -159,7 +159,6 @@ export default function onceInit() {
    // Register the Active Effect sheet for the 'effect' subtype.
    foundry.applications.apps.DocumentSheetConfig.registerSheet(
       foundry.documents.ActiveEffect, 'titan', TitanActiveEffectSheet, {
-         types: ['effect'],
          makeDefault: true,
          label: localize('defaultEffectSheet'),
       },

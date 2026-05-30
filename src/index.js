@@ -16,13 +16,13 @@ import onceSetup from '~/hooks/OnceSetup.js';
 
 Hooks.on('combatNextTurn', onCombatNextTurn);
 Hooks.on('combatPreviousTurn', onCombatPreviousTurn);
-Hooks.on('getActorDirectoryEntryContext', onGetActorDirectoryEntryContext);
-Hooks.on('getChatLogEntryContext', onGetChatLogEntryContext);
-Hooks.on('getItemDirectoryEntryContext', onGetItemDirectoryEntryContext);
+Hooks.on('getActorContextOptions', onGetActorDirectoryEntryContext);
+Hooks.on('getChatMessageContextOptions', onGetChatLogEntryContext);
+Hooks.on('getItemContextOptions', onGetItemDirectoryEntryContext);
 Hooks.on('preDeleteChatMessage', onPreDeleteChatMessage);
 Hooks.on('renderChatMessageHTML', onRenderChatMessageHTML);
-Hooks.on('renderJournalSheet', onRenderJournalSheet);
-Hooks.on('renderJournalTextPageSheet', onRenderJournalTextPageSheet);
+Hooks.on('renderJournalEntrySheet', onRenderJournalSheet);
+Hooks.on('renderJournalEntryPageProseMirrorSheet', onRenderJournalTextPageSheet);
 Hooks.once('init', onceInit);
 Hooks.once('ready', onceReady);
 Hooks.once('setup', onceSetup);
