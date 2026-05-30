@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename); // get the name of the directory
 // the dev server.
 const s_PACKAGE_ID = 'systems/titan';
 
-const s_COMPRESS = false;  // Set to true to compress the module bundle.
+const s_COMPRESS = true;  // Set to true to compress the module bundle.
 const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).
 
 // Used in bundling particularly during development. If you npm-link packages to your project add them here.
