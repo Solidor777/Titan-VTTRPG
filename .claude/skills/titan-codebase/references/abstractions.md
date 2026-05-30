@@ -51,6 +51,27 @@ management). Data model classes hold the schema, field validation, and derived-d
   - `CommodityDataModel` — `TitanItemDataModel` (rarity, value, quantity; no rules elements)
   - `SpellDataModel` — `TitanItemDataModel` (aspects, custom aspects; no rules elements)
 
+**Active Effect side**
+
+- `TitanActiveEffect` (`src/document/types/active-effect/TitanActiveEffect.js`) extends
+  `foundry.documents.ActiveEffect`. Registered as `CONFIG.ActiveEffect.documentClass`. All
+  type-specific logic is guarded by `this.type === 'effect'` so conditions (default subtype,
+  `flags.titan.type === 'condition'`) and other Active Effects are unaffected. On `_preCreate` of an
+  `effect` it runs `this.system.onPreCreate(data)`, forces `showIcon` to
+  `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS` (2), and seeds `flags['visual-active-effects'].data.content`
+  with the enriched native `description`; on `_preUpdate` it re-syncs that flag whenever `description`
+  changes. Enrichment uses `foundry.applications.ux.TextEditor.implementation.enrichHTML(html,
+  { secrets: true })` (v14 async API; no `async` option). `sendToChat` packages
+  `{ id, name, img, type: 'effect', system: { ...getRollData(), description } }` into `flags.titan` and
+  calls `ChatMessage.create`, producing the same card the effect chat components render.
+- `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
+  extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
+  Schema adds a custom `duration` ({ type, remaining, initiative, custom }), a `check` array, and a
+  `customTrait` array; provides `isExpired` / `isActive` / `isCombatEffect` getters and
+  `_getInitialDocumentData` (captures the owning actor's active-combat initiative). Active/inactive
+  state is the native `disabled` field; rich text is the native `description` field. The `effect`
+  ActiveEffect subtype is declared in `system.json` `documentTypes.ActiveEffect`.
+
 
 ## Checks
 
