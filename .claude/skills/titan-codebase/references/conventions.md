@@ -134,6 +134,27 @@ if (assert(someCondition, 'Error message')) { ... }
 underlying function. Throughout the codebase the convention is to prefer the locally-imported form over the
 `game.titan.*` accessors (see `CLAUDE.md`).
 
+## v14 hook names and ContextMenuEntry shape
+
+**Directory context-menu hooks** — In v14, `DocumentDirectory._createContextMenus()` fires
+`get${documentName}ContextOptions` (e.g. `getActorContextOptions`, `getItemContextOptions`). The old
+v13 names (`getActorDirectoryEntryContext`, `getItemDirectoryEntryContext`) no longer fire.
+Hook signature: `(application: ApplicationV2, menuItems: ContextMenuEntry[])`.
+
+**Chat context-menu hook** — `getChatMessageContextOptions` (was `getChatLogEntryContext` in v13).
+Hook signature: `(application: ApplicationV2, menuItems: ContextMenuEntry[])`.
+
+**Journal render hooks** — `renderJournalEntrySheet` (was `renderJournalSheet`) and
+`renderJournalEntryPageProseMirrorSheet` (was `renderJournalTextPageSheet`). Both follow the standard
+AppV2 render hook signature: `(application, element: HTMLElement, context, options)`.
+
+**ContextMenuEntry shape (v14)** — `{ name, icon, visible(li: HTMLElement), onClick(event, li: HTMLElement) }`.
+The old v13 shape used `condition` and `callback(entry)` (one argument); v14 renames these and passes
+two arguments to `onClick`. Directory entry `li` elements carry `li.dataset.entryId`; chat message
+`li` elements carry `li.dataset.messageId` (confirmed in `document-directory.mjs` line 237 and
+`chat.mjs` line 338). `li.closest('[data-entry-id]')?.dataset.entryId` is the safe accessor pattern
+(same as used in `_getEntryContextOptions` at `document-directory.mjs:237`).
+
 ## v14 API breakpoints (confirmed against live Foundry source)
 
 - **`ChatMessage` style field** — In v14, `ChatMessage.type` is a string `DocumentTypeField` (subtype, default
