@@ -48,11 +48,12 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
     * @protected
     */
    _createReactiveState() {
-      return createRulesElementItemSheetState(/** @type {TitanItem} */ this.document);
+      return createRulesElementItemSheetState(/** @type {TitanActiveEffect} */ this.document);
    }
 
    /**
     * Called after a Check is added to this Sheet's Active Effect.
+    * @returns {void}
     */
    postAddCheck() {
       this.applicationState.postAddCheck();
@@ -61,6 +62,7 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
    /**
     * Called before a Check is deleted from this Sheet's Active Effect.
     * @param {number} idx - The index of the Check about to be deleted.
+    * @returns {void}
     */
    preDeleteCheck(idx) {
       this.applicationState.preDeleteCheck(idx);

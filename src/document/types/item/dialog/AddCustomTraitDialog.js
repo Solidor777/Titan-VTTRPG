@@ -7,7 +7,7 @@ import AddCustomTraitDialogShell from '~/document/types/item/dialog/AddCustomTra
  */
 export default class AddCustomTraitDialog extends TitanDialog {
    /**
-    * @param {TitanItem} item - The Item to add the Trait to.
+    * @param {TitanItem | TitanActiveEffect} item - The Item to add the Trait to.
     */
    constructor(item) {
       super({

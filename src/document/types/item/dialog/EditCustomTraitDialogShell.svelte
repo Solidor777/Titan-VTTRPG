@@ -8,7 +8,7 @@
 
    /**
     * @typedef {object} EditCustomTraitDialogShellProps
-    * @property {TitanItem} [item] The item owning the custom trait being edited.
+    * @property {TitanItem | TitanActiveEffect} [item] The item owning the custom trait being edited.
     * @property {number} [traitIdx] The index of the trait in the item's custom traits array.
     */
 

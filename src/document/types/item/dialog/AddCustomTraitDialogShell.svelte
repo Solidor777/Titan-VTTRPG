@@ -9,7 +9,7 @@
 
    /**
     * @typedef {object} AddCustomTraitDialogShellProps
-    * @property {TitanItem} [item] The document owning the trait.
+    * @property {TitanItem | TitanActiveEffect} [item] The document owning the trait.
     */
 
    /** @type {AddCustomTraitDialogShellProps} */
