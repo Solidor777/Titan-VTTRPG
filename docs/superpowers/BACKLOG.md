@@ -94,3 +94,43 @@ split off to keep that spec focused.
 - **Why deferred:** Native `_getHeaderControls()` is functional and shipped; the
   rich always-visible+tooltip version is a UX enhancement, not a correctness fix.
 - **Depends on:** The v14 context-and-migration-repair spec (Task 11).
+
+## E2E suite — related items
+
+### 8. Harden the `itemRollData` false-sentinel root cause
+
+- **What:** The 2b-3 fix (`fix(item-check)`, commit `f155c1e0`) changed
+  `validateItemCheckOptions` from `??` to `||` so the literal-`false`
+  `itemRollData` default falls back to the item lookup. That was the deliberate
+  minimal fix, but the underlying fragility remains: `createItemCheckOptions`
+  (`src/check/types/item-check/ItemCheckOptions.js:43`) defaults `itemRollData`
+  to the literal `false` (forcing every consumer to use truthy checks rather
+  than `??`), and `initializeItemCheckOptions`
+  (`CharacterDataModel.js:3369-3371`) resolves the real roll data into a *local*
+  variable and never writes it back into `checkOptions` — so any future code that
+  reads `checkOptions.itemRollData` after initialization gets `false` even when an
+  item was supplied.
+- **To do:** Either default `itemRollData` to `undefined` (so `??` and `||`
+  behave identically everywhere and the sentinel is a true "absent"), or have
+  `initializeItemCheckOptions` assign the resolved roll data back into the returned
+  options. Add parity tests.
+- **Why deferred:** The shipped minimal fix closes the user-facing bug (the item
+  options dialog no longer self-closes) and all five dialog types pass E2E; this
+  is hardening against a latent class of bug, not a live defect.
+- **Found by:** The 2b-3 checks-dialog E2E (see `e2e-suite-status.md` bug #3).
+
+### 9. Replace fixed-timeout waits in the E2E dialog/check helpers
+
+- **What:** `tests/e2e/checkDialog.js` waits a hard-coded 400ms for the dialog to
+  mount (`openCheckDialog`) and 300ms for the chat message to settle
+  (`readNewestCheckFlags`), and `readNewestCheckFlags` reads the *globally* newest
+  message (`game.messages.contents[size-1]`) rather than the one this roll
+  produced. The same fixed-sleep + global-newest pattern exists in the 2b-2
+  `checks-integration.spec.js`. These are race-prone on a loaded/CI machine.
+- **To do:** Replace fixed sleeps with polling (e.g. `expect.poll`) — wait for the
+  dialog locator (already auto-retried) and poll for a chat message whose creation
+  postdates the roll click, across both the dialog and integration helpers.
+- **Why deferred:** Non-blocking — the full suite is green (40/40 e2e); this is
+  flake-prevention, and fixing it well means revisiting the shared pattern across
+  specs rather than one helper.
+- **Found by:** Final code review of the 2b-3 implementation.
