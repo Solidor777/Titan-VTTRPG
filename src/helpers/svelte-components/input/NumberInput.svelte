@@ -15,6 +15,7 @@
     * @property {Function} [onblur] - Callback forwarded from the native blur event.
     * @property {Function} [onfocus] - Callback forwarded from the native focus event.
     * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
 
    /** @type {NumberInputProps} */
@@ -30,6 +31,7 @@
       onblur    = undefined,
       onfocus   = undefined,
       onkeyup   = undefined,
+      testId    = undefined,
    } = $props();
 
    /** @type {boolean} Whether editing is currently active for the input. */
@@ -142,6 +144,7 @@
 
 <input bind:value={input}
        class={`${maxDigits ? 'max-digits' : ''}`}
+       data-testid={testId}
        {disabled}
        onblur={handleBlur}
        onchange={handleChange}

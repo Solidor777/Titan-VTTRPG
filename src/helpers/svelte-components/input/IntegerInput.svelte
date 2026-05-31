@@ -11,6 +11,7 @@
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
     * @property {Function} [onchange] - Callback forwarded from the native change event.
     * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
 
    /** @type {IntegerInputProps} */
@@ -23,6 +24,7 @@
       tooltip   = undefined,
       onchange  = undefined,
       onkeyup   = undefined,
+      testId    = undefined,
    } = $props();
 </script>
 
@@ -35,5 +37,6 @@
    {min}
    {onchange}
    {onkeyup}
+   {testId}
    {tooltip}
 />

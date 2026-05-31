@@ -91,3 +91,73 @@ test.describe('component probe — TextInput', () => {
       await expect(input).toHaveValue('locked');
    });
 });
+
+test.describe('component probe — NumberInput / IntegerInput', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('NumberInput clamps to max on commit and fires onchange', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'NumberInput', {
+         props: {
+            value: 1,
+            max: 5,
+            isInteger: true,
+            testId: 'probe-number',
+         },
+         events: ['onchange'],
+      });
+      const input = page.locator(`${selector} input`);
+      await input.focus();
+      await input.fill('9');
+      // keyup drives parseInput (commit); blur deactivates editing so the display resets to the clamp.
+      await input.press('9');
+      await input.blur();
+      await expect(input).toHaveValue('5');
+      const events = await readProbeEvents(page);
+      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+   });
+
+   test('IntegerInput commits an integer value', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'IntegerInput', {
+         props: {
+            value: 0,
+            min: 0,
+            max: 10,
+            testId: 'probe-integer',
+         },
+         events: ['onchange'],
+      });
+      const input = page.locator(`${selector} input`);
+      await input.focus();
+      await input.fill('7');
+      // Enter is filtered from the value but still fires keyup, driving the commit without doubling the digit.
+      await input.press('Enter');
+      await input.blur();
+      await expect(input).toHaveValue('7');
+   });
+
+   test('disabled blocks editing', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'NumberInput', {
+         props: {
+            value: 3,
+            disabled: true,
+         },
+      });
+      await expect(page.locator(`${selector} input`)).toBeDisabled();
+   });
+
+   test('testId resolves on NumberInput', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'NumberInput', {
+         props: {
+            value: 1,
+            testId: 'probe-number',
+         },
+      });
+      await expect(page.locator(`${selector} input[data-testid="probe-number"]`)).toBeVisible();
+   });
+});
