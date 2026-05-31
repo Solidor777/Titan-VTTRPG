@@ -1,16 +1,32 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **finish Phase 3a** — Concern A's
-**item** custom-trait edit/delete is done (`tests/e2e/traits.spec.js`, 3 tests) and **fixed two real bugs**
-(#4, #5 below). Remaining in 3a: (a) **effect** custom-trait edit/delete coverage (effects reuse the same
-fixed `ItemSheetSidebarTraits`, so they should now work — needs a test), and (b) **Concern B** — the
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **finish Phase 3a.** Concern A's
+**item** custom-trait coverage is done (`tests/e2e/traits.spec.js`, 5 tests) and fixed four real bugs
+(#4–#7). A separate reactivity bug (#8, effect toggle) and the icon hover (#9) were also fixed mid-stream.
+Remaining in 3a: (a) **effect** custom-trait edit/delete coverage (effects reuse the same fixed
+`ItemSheetSidebarTraits`, so they should now work — needs a test), and (b) **Concern B** — the
 rules-element add/delete reactivity **bug hunt** (`RulesElementMixin.addRulesElement/deleteRulesElement`
 mutate in place and pass the mutated reference to `update()`; user pre-authorized the fresh-array fix).
-Then 3b (component-tier probe harness) and 3c (integration manifests) per the spec's "Phase 3
-decomposition". All of the checks surface (2b-1..2b-4) is done. Phase 3a Concern A's item custom-trait
-coverage (`tests/e2e/traits.spec.js`, 5 tests) found and fixed **four** real bugs (#4–#7 below): the idx
-string bug, the FontAwesome `font-family`/`<button>` icon bug, the localized-description tooltip, and the
-edit dialog's missing class.
+Then 3b (component-tier probe harness), 3c (integration manifests), and **3d — reactive-control sweep**
+(see below) per the spec's "Phase 3 decomposition". All of the checks surface (2b-1..2b-4) is done. Phase 3a
+Concern A's item custom-trait coverage (`tests/e2e/traits.spec.js`, 5 tests) found and fixed **four** real
+bugs (#4–#7 below): the idx string bug, the FontAwesome `font-family`/`<button>` icon bug, the
+localized-description tooltip, and the edit dialog's missing class.
+
+## Phase 3d — reactive-control e2e sweep (scoped per user, 2026-05-31)
+
+**Decision:** the systemic Svelte-5 reactivity issue (a control reading `someDocProp.system.x` off a passed
+Document prop instead of through `document.data` → stale-until-remount) is verified **behaviorally in the
+e2e suite**, one test per interactive reactive control. Pattern: render the sheet, activate the control,
+assert the rendered result updates **in place (no tab switch)**. Each failure is a real bug → fix by reading
+through `document.data` (e.g. `$derived(document.data.<collection>.get(id)?.system.x)`), TDD red→green.
+
+- **Done:** effect **active** toggle — `tests/e2e/effect-reactivity.spec.js` (fixed bug #8).
+- **Backlog (named by user):** item/effect **expanded** toggle; then sweep the remaining toggles, selects,
+  and inputs whose displayed value derives from a passed Document prop (inventory/ability/spell/effect
+  rows). Add a test per control; fix any that fail.
+- Note: `Tabs.svelte` lazy-mounts only the active tab, so cross-tab effects always re-mount regardless —
+  in-place reactivity tests must stay within the active tab.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
