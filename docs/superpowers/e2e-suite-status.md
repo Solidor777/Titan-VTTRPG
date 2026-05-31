@@ -1,9 +1,13 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3 — UI component /
-manifest tiers** (brainstorm first). All of the checks surface (2b-1..2b-4) is now done. `testId` is
-already on the base primitives (`Button`/`TextInput`) and on the check-dialog fields, so Phase 3 starts
-from a partial foundation.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3a — sheet array-CRUD
+reactivity** — the design spec is **written and awaiting user review**
+(`docs/superpowers/specs/2026-05-31-titan-e2e-sheet-array-crud-design.md`); on approval, run
+`writing-plans` then execute. Phase 3 was decomposed into 3a (array-CRUD reactivity: custom-trait dialog
+lock-in + rules-element CRUD bug hunt), 3b (component-tier probe harness), 3c (integration manifests) —
+see the spec's "Phase 3 decomposition". All of the checks surface (2b-1..2b-4) is done. **Heads-up:** 3a's
+Concern B may surface a real reactivity bug in `RulesElementMixin.addRulesElement/deleteRulesElement`
+(in-place mutation) requiring a production fix + user approval.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
