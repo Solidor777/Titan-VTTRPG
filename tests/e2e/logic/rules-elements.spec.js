@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from '../fixtures.js';
-import { buildFlatModifierAbilityData } from '../../shared/builders.js';
+import { buildFlatModifierAbilityData, buildMulBaseAbilityData } from '../../shared/builders.js';
 
 /**
  * Behavioral coverage of the rules-element math, asserted against the live derived-data pipeline.
@@ -47,5 +47,41 @@ test.describe('rules elements — derived attribute math', () => {
 
       // Base Body 1 + flat 2 = 3.
       expect(bodyValue, 'derived Body should be base 1 + flat 2').toBe(3);
+   });
+
+   test('a mulBase of 2 raises Body from 1 to 2', async ({ page }) => {
+      const bodyValue = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return actor.system.attribute.body.value;
+      }, { name: ACTOR_NAME, abilityData: buildMulBaseAbilityData('E2E x2 Body', 2) });
+
+      // Base 1 + base*(2-1) = 1 + 1 = 2.
+      expect(bodyValue, 'derived Body should be base 1 + base*(mul-1)=1').toBe(2);
+   });
+
+   test('mulBase 2 plus flatModifier 3 raises Body from 1 to 5', async ({ page }) => {
+      const bodyValue = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return actor.system.attribute.body.value;
+      }, { name: ACTOR_NAME, abilityData: buildMulBaseAbilityData('E2E x2 +3 Body', 2, [3]) });
+
+      // Base 1 + base*(2-1) + 3 = 1 + 1 + 3 = 5.
+      expect(bodyValue, 'derived Body should be 1 + 1 + 3').toBe(5);
    });
 });

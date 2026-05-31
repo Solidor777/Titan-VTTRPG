@@ -60,3 +60,36 @@ export function buildFlatModifierAbilityData(name, values) {
       },
    };
 }
+
+/**
+ * Builds an ability item create-payload carrying a single mulBase rules element on the Body attribute,
+ * optionally followed by flatModifier elements. mulBase adds `base * (value - 1)` to the attribute mod.
+ * @param {string} name - The ability name.
+ * @param {number} mulValue - The mulBase multiplier value.
+ * @param {number[]} [flatValues] - Optional flatModifier values appended after the mulBase element.
+ * @returns {object} An `Item.create` payload of type `ability`.
+ */
+export function buildMulBaseAbilityData(name, mulValue, flatValues = []) {
+   return {
+      name: name,
+      type: 'ability',
+      system: {
+         rulesElement: [
+            {
+               operation: 'mulBase',
+               selector: 'attribute',
+               key: 'body',
+               value: mulValue,
+               uuid: 'e2e-mulbase-0',
+            },
+            ...flatValues.map((value, index) => ({
+               operation: 'flatModifier',
+               selector: 'attribute',
+               key: 'body',
+               value: value,
+               uuid: `e2e-mulbase-flat-${index}`,
+            })),
+         ],
+      },
+   };
+}
