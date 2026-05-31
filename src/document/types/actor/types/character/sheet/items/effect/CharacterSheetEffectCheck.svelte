@@ -65,6 +65,8 @@
     * Rolls the effect's Check via the shared item-check engine.
     */
    function rollEffectCheck() {
+      // Build options fresh at roll time so the roll captures the effect's current state, unlike the
+      // item check which can reuse a static options constant resolved by item ID.
       const checkOptions = getCheckOptions();
       if (checkOptions) {
          document.data.system.requestItemCheck(checkOptions);
