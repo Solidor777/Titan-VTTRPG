@@ -15,6 +15,7 @@ export default class EditCustomTraitDialog extends TitanDialog {
    constructor(item, traitIdx) {
       super({
          title: `${item.name}`,
+         classes: ['titan-edit-custom-trait-dialog'],
          content: {
             class: EditCustomTraitDialogShell,
             props: {
@@ -24,12 +25,5 @@ export default class EditCustomTraitDialog extends TitanDialog {
          },
          id: `titan-edit-custom-trait-dialog-${item._id}`,
       });
-   }
-
-   _getDialogClasses() {
-      const retVal = super._getDialogClasses();
-      retVal.push('titan-edit-custom-trait-dialog');
-
-      return retVal;
    }
 }
