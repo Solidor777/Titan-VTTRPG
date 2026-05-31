@@ -3,6 +3,11 @@
 **Date:** 2026-05-30
 **Status:** Approved (brainstorm), pending implementation plan
 
+> **Logic-layer superseded (2026-05-30):** Quench 0.10.0 is broken for headless runs on Foundry v14
+> (verified). The **logic layer below (Quench) is replaced by Playwright + fast-check** —
+> see `2026-05-30-titan-e2e-logic-layer-design.md`. The Foundation, UI-tier, and multi-user portions
+> of this spec stand unchanged; ignore the Quench rows/sections when reading the logic layer.
+
 ## Goal
 
 Behavioral end-to-end coverage for every testable surface in the TITAN system — rules elements,
