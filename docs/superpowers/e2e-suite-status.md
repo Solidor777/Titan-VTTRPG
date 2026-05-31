@@ -1,13 +1,17 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3a — sheet array-CRUD
-reactivity** — the design spec is **written and awaiting user review**
-(`docs/superpowers/specs/2026-05-31-titan-e2e-sheet-array-crud-design.md`); on approval, run
-`writing-plans` then execute. Phase 3 was decomposed into 3a (array-CRUD reactivity: custom-trait dialog
-lock-in + rules-element CRUD bug hunt), 3b (component-tier probe harness), 3c (integration manifests) —
-see the spec's "Phase 3 decomposition". All of the checks surface (2b-1..2b-4) is done. **Heads-up:** 3a's
-Concern B may surface a real reactivity bug in `RulesElementMixin.addRulesElement/deleteRulesElement`
-(in-place mutation) requiring a production fix + user approval.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **finish Phase 3a** — Concern A's
+**item** custom-trait edit/delete is done (`tests/e2e/traits.spec.js`, 3 tests) and **fixed two real bugs**
+(#4, #5 below). Remaining in 3a: (a) **effect** custom-trait edit/delete coverage (effects reuse the same
+fixed `ItemSheetSidebarTraits`, so they should now work — needs a test), and (b) **Concern B** — the
+rules-element add/delete reactivity **bug hunt** (`RulesElementMixin.addRulesElement/deleteRulesElement`
+mutate in place and pass the mutated reference to `update()`; user pre-authorized the fresh-array fix).
+Then 3b (component-tier probe harness) and 3c (integration manifests) per the spec's "Phase 3
+decomposition". All of the checks surface (2b-1..2b-4) is done. **Known follow-up (bug #6, latent):**
+`EditCustomTraitDialog` sets its class via the dead `_getDialogClasses()` override, so
+`.titan-edit-custom-trait-dialog` is never applied — select that dialog by id prefix
+`[id^="titan-edit-custom-trait-dialog-"]`; fix by moving the class to `classes:[...]` in `super()` like
+`AddCustomTraitDialog`.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
@@ -102,6 +106,24 @@ re-deriving context.
 
 ## Bugs found & fixed (by this testing effort)
 
+(Newest first: #4 and #5 found by Phase 3a's custom-trait edit/delete tests, `tests/e2e/traits.spec.js`.)
+
+5. **Trait edit/delete icons rendered as the notdef "missing" box** — `EditDeleteTag.svelte`'s `.tag button`
+   reset forced `font-weight: inherit` (specificity 0,1,1), overriding FontAwesome's `.fas { font-weight:
+   900 }` (0,1,0). FontAwesome Free solid glyphs only exist at weight 900, so the edit/delete icons fell
+   back to the notdef glyph. Fixed by removing the `font-weight: inherit` line (the FA class keeps both its
+   font-family and 900 weight). Regression: the icon-weight test asserts computed `font-weight === '900'`
+   (was `'700'`). Commit `3a8ef8d1`.
+4. **Custom-trait edit and delete silently no-op'd** — `ItemSheetSidebarTraits.svelte` built the trait tags
+   with `for (const [idx] in document.data.system.customTrait)`. `for...in` yields string keys and the
+   `const [idx]` destructuring takes the first character, so `idx` was a **string** ("0",…). The downstream
+   handlers compare strictly against numeric indices (`deleteCustomTrait`: `filter((t,i)=> i !== traitIdx)`
+   → `0 !== "0"` true → nothing removed; `editTrait`: `map((t,i)=> i === traitIdx ? …)` → `0 === "0"` false
+   → nothing replaced). ADD ignores the index, so it appeared to work — exactly the reported symptom. Fixed
+   with a numeric `for` loop; the same copy-pasted antipattern in `ArmorSheetSidebarTraits` /
+   `ShieldSheetSidebarTraits` (`system.trait`, render-only `LabelTag`s — benign except mis-keying ≥10
+   entries) was corrected too. Commit `c7a543f6`. Found by `tests/e2e/traits.spec.js`.
+
 1. **Trait reactivity** — in-place mutation of `document.system.customTrait` before `update()` defeated
    `ReactiveDocument` change-detection (saved but didn't re-render). Fixed across custom-trait
    add/edit/delete (items + effects). Regression test: `tests/e2e/trait-add-custom.spec.js`. (Same
@@ -140,5 +162,7 @@ v14 — see conventions.md).
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-opposed.spec.js --reporter=list`
-  → expect 46 passing (Foundry must be running on :30000, or webServer launches it).
+- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/traits.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-opposed.spec.js --reporter=list`
+  → expect 49 passing (Foundry must be running on :30000, or webServer launches it). **After editing any
+  `.svelte`/`.js` source, run `npm run build` first** so the live Foundry serves the change (test-only
+  changes don't need a build).
