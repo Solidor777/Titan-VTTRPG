@@ -7,11 +7,10 @@ fixed `ItemSheetSidebarTraits`, so they should now work — needs a test), and (
 rules-element add/delete reactivity **bug hunt** (`RulesElementMixin.addRulesElement/deleteRulesElement`
 mutate in place and pass the mutated reference to `update()`; user pre-authorized the fresh-array fix).
 Then 3b (component-tier probe harness) and 3c (integration manifests) per the spec's "Phase 3
-decomposition". All of the checks surface (2b-1..2b-4) is done. **Known follow-up (bug #6, latent):**
-`EditCustomTraitDialog` sets its class via the dead `_getDialogClasses()` override, so
-`.titan-edit-custom-trait-dialog` is never applied — select that dialog by id prefix
-`[id^="titan-edit-custom-trait-dialog-"]`; fix by moving the class to `classes:[...]` in `super()` like
-`AddCustomTraitDialog`.
+decomposition". All of the checks surface (2b-1..2b-4) is done. Phase 3a Concern A's item custom-trait
+coverage (`tests/e2e/traits.spec.js`, 5 tests) found and fixed **four** real bugs (#4–#7 below): the idx
+string bug, the FontAwesome `font-family`/`<button>` icon bug, the localized-description tooltip, and the
+edit dialog's missing class.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
@@ -106,14 +105,27 @@ re-deriving context.
 
 ## Bugs found & fixed (by this testing effort)
 
-(Newest first: #4 and #5 found by Phase 3a's custom-trait edit/delete tests, `tests/e2e/traits.spec.js`.)
+(Newest first: #4–#7 found by Phase 3a's custom-trait tests, `tests/e2e/traits.spec.js`.)
 
-5. **Trait edit/delete icons rendered as the notdef "missing" box** — `EditDeleteTag.svelte`'s `.tag button`
-   reset forced `font-weight: inherit` (specificity 0,1,1), overriding FontAwesome's `.fas { font-weight:
-   900 }` (0,1,0). FontAwesome Free solid glyphs only exist at weight 900, so the edit/delete icons fell
-   back to the notdef glyph. Fixed by removing the `font-weight: inherit` line (the FA class keeps both its
-   font-family and 900 weight). Regression: the icon-weight test asserts computed `font-weight === '900'`
-   (was `'700'`). Commit `3a8ef8d1`.
+7. **Custom-trait description tooltip was localized** — the description is user-written, but
+   `ItemSheetCustomTraitTag` passed it to `labelTooltip` as a bare string, and `processTextData` runs plain
+   strings through `localize()`. A description equal to a key (or any future key collision) would be
+   replaced by its localized value. Fixed by passing `{ text: description, localize: false }` (the
+   `TextData` opt-out); edit/delete tooltips remain localized keys. Commit `f4247c55`. Regression reads the
+   label's tippy `props.content` and asserts it is the raw text.
+6. **Edit-custom-trait dialog never got its CSS class** — `EditCustomTraitDialog` added
+   `titan-edit-custom-trait-dialog` via the dead `_getDialogClasses()` override (not called in v14), unlike
+   `AddCustomTraitDialog` which uses `classes:[...]`. Fixed by moving it to `classes:[...]` in `super()` and
+   deleting the dead override. Commit `a07323c4`. (Select that dialog by class OR id prefix now.)
+5. **Trait edit/delete icons rendered as the notdef "missing" box** — root cause is **`font-family`**, not
+   weight: `EditDeleteTag` put the FontAwesome class directly on a `<button>`, and Foundry's button UI font
+   (`Signika…`) overrides `.fas`'s `font-family` (higher specificity), so the glyph fell back to notdef.
+   (The old code used `<a>` anchors, which weren't overridden.) Fixed by moving the icon class onto an
+   **inner `<i>`** — the standard FA pattern, matching every working icon in the system. Commit `aa13c8b4`.
+   Regression asserts the icon element's computed `font-family` matches `/Font Awesome/`. NOTE: an earlier
+   commit (`3a8ef8d1`) also dropped a `font-weight: inherit` from the same reset — a real-but-incidental
+   tidy-up that did NOT fix the icons (it was a red herring surfaced by a too-weak first assertion); the
+   font-family/inner-`<i>` fix is the actual one.
 4. **Custom-trait edit and delete silently no-op'd** — `ItemSheetSidebarTraits.svelte` built the trait tags
    with `for (const [idx] in document.data.system.customTrait)`. `for...in` yields string keys and the
    `const [idx]` destructuring takes the first character, so `idx` was a **string** ("0",…). The downstream
@@ -163,6 +175,6 @@ v14 — see conventions.md).
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
 - `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/traits.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-opposed.spec.js --reporter=list`
-  → expect 49 passing (Foundry must be running on :30000, or webServer launches it). **After editing any
+  → expect 51 passing (Foundry must be running on :30000, or webServer launches it). **After editing any
   `.svelte`/`.js` source, run `npm run build` first** so the live Foundry serves the change (test-only
   changes don't need a build).
