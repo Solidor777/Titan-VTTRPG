@@ -12,7 +12,11 @@ function resolveProbeComponents(value) {
    }
    if (value && typeof value === 'object') {
       if (typeof value.__probeComponent === 'string') {
-         return componentRegistry[value.__probeComponent];
+         const resolved = componentRegistry[value.__probeComponent];
+         if (!resolved) {
+            throw new Error(`resolveProbeComponents: unknown component "${value.__probeComponent}"`);
+         }
+         return resolved;
       }
       const out = {};
       for (const [k, v] of Object.entries(value)) {
