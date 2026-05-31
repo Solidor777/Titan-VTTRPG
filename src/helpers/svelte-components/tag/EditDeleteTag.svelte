@@ -78,6 +78,13 @@
          font-size: inherit;
          line-height: inherit;
          cursor: pointer;
+         transition: text-shadow 0.2s ease;
+
+         // Restore the hover highlight the icons had as anchors (Foundry's default link glow), now lost
+         // because they are <button>s. text-shadow is inherited, so the inner <i> glyph glows on hover.
+         &:hover {
+            text-shadow: 0 0 8px var(--color-shadow-primary, currentColor);
+         }
       }
    }
 </style>
