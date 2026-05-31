@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { DEFAULT_GM } from './users.js';
 
 /**
  * Authenticate against the live Foundry v14 `/join` screen and wait for the
@@ -9,11 +10,11 @@ import { expect } from '@playwright/test';
  * `input[name="password"]` is the optional user password field;
  * `button[name="join"]` is the "Join Game Session" submit button.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {string} [user] - The display name of the Foundry user to log in as.
+ *   Defaults to `FOUNDRY_USER` env var when set, otherwise `DEFAULT_GM` (`'E2E GM 1'`).
  * @returns {Promise<void>} Resolves once `game.ready === true`.
  */
-export async function login(page) {
-   // The user name to select; defaults to the test world's Gamemaster.
-   const user = process.env.FOUNDRY_USER || 'Gamemaster';
+export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM) {
 
    // Navigate to the join screen and select the configured user.
    await page.goto('/join');
