@@ -42,6 +42,17 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
    }
 
    /**
+    * Default Application options. AppV2 merges `DEFAULT_OPTIONS` down the class chain onto the base
+    * defined in TitanDocumentSheet. ItemSheetBase (shared with the item sheet) lays out with
+    * `height: 100%`, which collapses under the inherited `height: 'auto'`; a fixed height gives the
+    * layout a definite basis, mirroring the effect Item sheet.
+    * @override
+    */
+   static DEFAULT_OPTIONS = {
+      position: { height: 650 },
+   };
+
+   /**
     * Overridable function for creating the reactive state store for this sheet.
     * The Rules Element Item Sheet state is document-agnostic (it only reads `system.check.length` to seed the
     * expanded-state arrays), so it is reused directly for the effect Active Effect sheet.
