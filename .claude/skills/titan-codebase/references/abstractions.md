@@ -248,9 +248,14 @@ and one or more inner Svelte component trees.
 
 - `TitanActorSheet` (`src/document/types/actor/sheet/TitanActorSheet.js`) extends
   `TitanDocumentSheet`. Declares `static DEFAULT_OPTIONS = { position: { width: 750 } }` to widen
-  the sheet (AppV2 deep-merges this onto the base 700-wide value). Adds token linking/unlinking
-  header buttons and actor-level item lifecycle callbacks (`postAddItem`, `preDeleteItem`,
-  `postDeleteItem`).
+  the sheet (AppV2 deep-merges this onto the base 700-wide value). Overrides `_getHeaderControls()`
+  to add native AppV2 header controls (see conventions.md): an Edit Token control (`_onEditToken`,
+  gated by `game.user.isGM || (actor.isOwner && game.user.can('TOKEN_CONFIGURE'))`), a dynamic
+  link/unlink control built by `_getTokenLinkControl(token)` (directory actor → toggle prototype
+  `actorLink` via `_onToggleTokenLink`; placed linked token → irreversible unlink via
+  `_onUnlinkToken`; placed unlinked token → informational no-op), and a compendium Import control
+  (`_onImportActor`, GM-only when `actor.pack`). Also provides actor-level item lifecycle callbacks
+  (`postAddItem`, `preDeleteItem`, `postDeleteItem`).
 - `TitanCharacterSheet` (`src/document/types/actor/types/character/sheet/CharacterSheet.js`)
   extends `TitanActorSheet`. Adds the `CharacterSheetState` reactive store and character-specific
   add/delete item handling.
@@ -274,8 +279,10 @@ and one or more inner Svelte component trees.
 
 - `TitanItemSheet` (`src/document/types/item/sheet/TitanItemSheet.js`) extends
   `TitanDocumentSheet`. Declares `static DEFAULT_OPTIONS = { position: { height: 650 } }` to set
-  a fixed sheet height (AppV2 deep-merges this onto the base `auto` value). Adds send-to-chat and
-  import buttons; provides `RulesElementItemSheetState` for items that carry rules elements.
+  a fixed sheet height (AppV2 deep-merges this onto the base `auto` value). Overrides
+  `_getHeaderControls()` to add a Send to Chat control (`item.sendToChat()`) and a compendium Import
+  control (`_onImportItem`, only when `item.pack`). Provides `RulesElementItemSheetState` for items
+  that carry rules elements.
 - Per-type item sheets all extend `TitanItemSheet`: `TitanWeaponSheet`, `TitanArmorSheet`,
   `TitanSpellSheet`, `TitanShieldSheet`, `TitanAbilitySheet`, `TitanEquipmentSheet`,
   `TitanCommoditySheet`. Each mounts its own `*SheetShell.svelte`.
@@ -284,7 +291,7 @@ and one or more inner Svelte component trees.
 
 - `TitanActiveEffectSheet` (`src/document/types/active-effect/sheet/TitanActiveEffectSheet.js`)
   extends `TitanDocumentSheet` directly (NOT `TitanItemSheet`, to avoid item-only send-to-chat/import
-  header buttons). Reuses `createRulesElementItemSheetState` (document-agnostic) and exposes
+  header controls). Reuses `createRulesElementItemSheetState` (document-agnostic) and exposes
   `postAddCheck`/`preDeleteCheck`. Registered as the default sheet for `ActiveEffect` subtype
   `effect` via `foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.ActiveEffect, …)`
   in `OnceInit.js`. Mounts `ActiveEffectSheetShell.svelte`, which composes the generic

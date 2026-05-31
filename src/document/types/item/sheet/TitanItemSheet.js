@@ -1,8 +1,8 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
-import ItemSheetSendToChatButton from '~/document/types/item/sheet/ItemSheetSendToChatButton.svelte';
-import ItemSheetImportItemButton from '~/document/types/item/sheet/ItemSheetImportItemButton.svelte';
+import localize from '~/helpers/utility-functions/Localize.js';
+import { IMPORT_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
 
 /**
  * A Document Sheet class with functionality shared by all Items.
@@ -50,31 +50,44 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Get the header buttons for the sheet.
+    * Build the native AppV2 header controls for this Item sheet. These render in the window's header
+    * controls dropdown (the ellipsis menu).
     * @override
-    * @returns {object[]} Array of button configuration objects.
+    * @returns {ApplicationHeaderControlsEntry[]} The header control entries to render.
     * @protected
     */
-   _getHeaderButtons() {
-      const buttons = super._getHeaderButtons();
+   _getHeaderControls() {
+      /** @type {ApplicationHeaderControlsEntry[]} The accumulated control entries. */
+      const controls = super._getHeaderControls();
 
-      // Button for sending the item to chat.
-      buttons.unshift({
-         svelte: {
-            class: ItemSheetSendToChatButton,
-         }
+      // Send to Chat control: posts this Item to chat.
+      controls.push({
+         action: 'titanSendToChat',
+         icon: SEND_TO_CHAT_ICON,
+         label: localize('sendToChat'),
+         onClick: () => this.item.sendToChat(),
       });
 
-      // Button for importing the item from a compendium pack.
+      // Import control for Items loaded from a compendium pack.
       if (this.item.pack) {
-         buttons.unshift({
-            svelte: {
-               class: ItemSheetImportItemButton,
-            },
+         controls.push({
+            action: 'titanImportItem',
+            icon: IMPORT_ICON,
+            label: localize('importItem'),
+            onClick: () => this._onImportItem(),
          });
       }
 
-      return buttons;
+      return controls;
+   }
+
+   /**
+    * Import this Item from its compendium pack into the game world.
+    * @returns {Promise<Document>} The imported Item document.
+    * @protected
+    */
+   async _onImportItem() {
+      return this.item.collection.importFromCompendium(this.item.compendium, this.item.id);
    }
 
    /**

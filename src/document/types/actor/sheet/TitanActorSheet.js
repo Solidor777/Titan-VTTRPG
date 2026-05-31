@@ -2,11 +2,8 @@ import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
 import warn from '~/helpers/utility-functions/Warn.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDocumentSheetArguments.js';
-import ActorSheetToggleLinkedTokenButton from '~/document/types/actor/sheet/ActorSheetToggleLinkedTokenButton.svelte';
-import ActorSheetUnlinkTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkTokenButton.svelte';
-import ActorSheetUnlinkedTokenButton from '~/document/types/actor/sheet/ActorSheetUnlinkedTokenButton.svelte';
-import ActorSheetEditTokenButton from '~/document/types/actor/sheet/ActorSheetEditTokenButton.svelte';
-import ActorSheetImportActorButton from '~/document/types/actor/sheet/ActorSheetImportActorButton.svelte';
+import localize from '~/helpers/utility-functions/Localize.js';
+import { EDIT_TOKEN_ICON, IMPORT_ICON, LINKED_ICON, UNLINKED_ICON } from '~/system/Icons.js';
 
 /**
  * A Document Sheet class with functionality shared by all Actors.
@@ -49,66 +46,142 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    };
 
    /**
-    * Get the header buttons for the sheet.
+    * Build the native AppV2 header controls for this Actor sheet. These render in the window's
+    * header controls dropdown (the ellipsis menu). Computed on each frame render so the dynamic
+    * link/unlink control reflects the current token-link state.
     * @override
-    * @returns {object[]} Array of button configuration objects.
+    * @returns {ApplicationHeaderControlsEntry[]} The header control entries to render.
     * @protected
     */
-   _getHeaderButtons() {
-      const buttons = super._getHeaderButtons();
+   _getHeaderControls() {
+      /** @type {ApplicationHeaderControlsEntry[]} The accumulated control entries. */
+      const controls = super._getHeaderControls();
 
-      // If the active user can edit this sheet's Actor's tokens...
+      // Whether the active user may edit this Actor's tokens.
       const canEditToken = game.user.isGM || (this.actor.isOwner && game.user.can('TOKEN_CONFIGURE'));
       if (canEditToken) {
+         // The active (placed) Token document, or null when the Actor lives in the directory.
          const token = this.token;
 
-         // Configure token button.
-         buttons.unshift({
-            svelte: {
-               class: ActorSheetEditTokenButton,
-            }
+         // Edit Token control: opens the active Token's config when placed, otherwise the prototype config.
+         controls.push({
+            action: 'titanEditToken',
+            icon: EDIT_TOKEN_ICON,
+            label: localize('editToken'),
+            onClick: () => this._onEditToken(),
          });
 
-         // Toggle token link for actors still in the directory.
-         if (token === null) {
-            buttons.unshift({
-               svelte: {
-                  class: ActorSheetToggleLinkedTokenButton,
-               },
-            });
-         }
-
-         // For actors not in the directory (on the canvas).
-         else {
-            // Unlink button for linked tokens.
-            if (token.actorLink === true) {
-               buttons.unshift({
-                  svelte: {
-                     class: ActorSheetUnlinkTokenButton,
-                  },
-               });
-            }
-
-            // Warning icon for unlinked tokens.
-            else {
-               buttons.unshift({
-                  svelte: {
-                     class: ActorSheetUnlinkedTokenButton,
-                  }
-               });
-            }
-         }
+         // Dynamic link/unlink control: icon and label reflect the current link state.
+         controls.push(this._getTokenLinkControl(token));
       }
 
-      // Import button for actors that can be imported.
+      // Import control for Actors loaded from a compendium pack.
       if (game.user.isGM && this.actor.pack) {
-         buttons.unshift({
-            svelte: {
-               class: ActorSheetImportActorButton,
-            }
+         controls.push({
+            action: 'titanImportActor',
+            icon: IMPORT_ICON,
+            label: localize('importActor'),
+            onClick: () => this._onImportActor(),
          });
       }
-      return buttons;
+
+      return controls;
+   }
+
+   /**
+    * Build the dynamic token link/unlink header control whose icon and label reflect the current
+    * token-link state.
+    * @param {TokenDocument | null} token - The active Token document, or null for directory Actors.
+    * @returns {ApplicationHeaderControlsEntry} The link/unlink control entry.
+    * @protected
+    */
+   _getTokenLinkControl(token) {
+      // Directory Actor: toggle the prototype token's link state. The icon reflects the current
+      // state and the label states the action that clicking will perform.
+      if (token === null) {
+         /** @type {boolean} Whether the prototype token is currently linked. */
+         const isLinked = this.actor.prototypeToken?.actorLink === true;
+         return {
+            action: 'titanToggleTokenLink',
+            icon: isLinked ? LINKED_ICON : UNLINKED_ICON,
+            label: localize('toggleTokenLink'),
+            onClick: () => this._onToggleTokenLink(),
+         };
+      }
+
+      // Placed, linked Token: offer an irreversible unlink action.
+      if (token.actorLink === true) {
+         return {
+            action: 'titanUnlinkToken',
+            icon: LINKED_ICON,
+            label: localize('unlinkToken'),
+            onClick: () => this._onUnlinkToken(),
+         };
+      }
+
+      // Placed, already-unlinked Token: informational entry (unlink is irreversible).
+      return {
+         action: 'titanUnlinkedToken',
+         icon: UNLINKED_ICON,
+         label: localize('tokenUnlinked'),
+         onClick: () => {},
+      };
+   }
+
+   /**
+    * Open the appropriate Token configuration for this Actor: the active Token's config when the
+    * Actor is placed, otherwise the prototype Token config.
+    * @protected
+    */
+   _onEditToken() {
+      // Placed Token: edit the active Token document directly.
+      if (this.token) {
+         this.token.sheet.render({ force: true });
+         return;
+      }
+
+      // Directory Actor: edit the prototype Token.
+      new CONFIG.Token.prototypeSheetClass({ prototype: this.actor.prototypeToken }).render({ force: true });
+   }
+
+   /**
+    * Toggle whether this Actor's prototype Token is linked, then re-render so the control updates.
+    * @returns {Promise<void>} Resolves once the prototype token has been updated.
+    * @protected
+    */
+   async _onToggleTokenLink() {
+      // Flip the prototype token link state.
+      await this.actor.prototypeToken.update({
+         actorLink: !this.actor.prototypeToken.actorLink,
+      });
+
+      // Re-render the frame so the dynamic control's icon and label refresh.
+      this.render({ parts: [] });
+   }
+
+   /**
+    * Irreversibly unlink the active Token from this Actor, then reopen the now-synthetic Actor's sheet.
+    * @returns {Promise<void>} Resolves once the token has been unlinked and the sheet reopened.
+    * @protected
+    */
+   async _onUnlinkToken() {
+      // Unlink the active token.
+      const token = this.token;
+      await token.update({ actorLink: false });
+
+      // Close this sheet and open the newly synthetic Actor's sheet.
+      const newToken = this.token;
+      await this.close();
+      newToken.actor.sheet.render({ force: true });
+   }
+
+   /**
+    * Import this Actor from its compendium pack into the game world.
+    * @returns {Promise<Document>} The imported Actor document.
+    * @protected
+    */
+   async _onImportActor() {
+      return this.actor.collection.importFromCompendium(this.actor.compendium, this.actor.id);
    }
 
    /**

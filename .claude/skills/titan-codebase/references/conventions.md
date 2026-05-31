@@ -156,6 +156,20 @@ deprecation shim (removed in v16); TITAN's hooks use the v14 names. Directory en
 `chat.mjs` line 338). `li.closest('[data-entry-id]')?.dataset.entryId` is the safe accessor pattern
 (same as used in `_getEntryContextOptions` at `document-directory.mjs:237`).
 
+**AppV2 header controls (no `_getHeaderButtons`)** — v14 `ApplicationV2` has no `_getHeaderButtons`;
+sheet header actions are returned from `_getHeaderControls()` (runs on every frame render). Each entry
+is `{ action, icon, label, onClick?, visible?, ownership? }` (`ApplicationHeaderControlsEntry` =
+`ContextMenuEntry` + `action`). Controls render **in the header controls dropdown** opened by the
+ellipsis button (`button[data-action="toggleControls"]`), as `#context-menu li.context-item` rows
+(icon `<i>` + label `<span>`) — NOT inline in the header (`_renderHeaderControl` is unused in v14 core;
+inline buttons would require `_getFrameButtons`). The menu entry shows only icon + label (no tooltip
+field), and the label runs through core `_loc` (pass already-localized text). Click dispatch: if
+`onClick` is a function it is called directly; otherwise the `action` string is looked up in
+`options.actions`. TITAN sheets (`TitanActorSheet`, `TitanItemSheet`) use `onClick` arrow functions
+bound to the sheet instance so dynamic per-render entries (the actor link/unlink control) need no
+static `actions` map. To refresh a dynamic control's icon/label after a state change, call
+`this.render({ parts: [] })` (re-renders the frame without re-running the Svelte mount).
+
 ## v14 API breakpoints (confirmed against live Foundry source)
 
 - **`ChatMessage` style field** — In v14, `ChatMessage.type` is a string `DocumentTypeField` (subtype, default
