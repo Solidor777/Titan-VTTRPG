@@ -202,4 +202,73 @@ test.describe('v14 opposed checks (forced dice)', () => {
          .toBe(flags.parameters.attackerRating);
       expect(flags.parameters.difficulty, 'fallback difficulty is the unopposed 4').toBe(4);
    });
+
+   test('failed resistance reduces incoming damage by the successes rolled', async ({ page }) => {
+      // One resilience die forced to a success (face 4 >= difficulty 4); complexity 2 leaves the check
+      // one success short, so it fails and reduces the incoming damage by the successes rolled.
+      await forceDice(page, [4]);
+      const flags = await page.evaluate(async () => {
+         const roller = game.actors.getName('E2E Roller');
+         const before = game.messages.size;
+         await roller.system.rollResistanceCheck({
+            resistance: 'resilience',
+            difficulty: 4,
+            complexity: 2,
+            damageToReduce: 5,
+         });
+         await new Promise((resolve) => {
+            setTimeout(resolve, 300);
+         });
+         const newest = game.messages.contents[game.messages.size - 1];
+         return {
+            created: game.messages.size > before,
+            parameters: newest?.flags?.titan?.parameters,
+            results: newest?.flags?.titan?.results,
+         };
+      });
+
+      expect(flags.created, 'a resistance message was created').toBe(true);
+      expect(flags.results.dice.length, 'resilience rolls a single die').toBe(1);
+
+      const oracle = expectedCheckResults([4], {
+         difficulty: 4,
+         complexity: 2,
+         extraSuccessOnCritical: flags.parameters.extraSuccessOnCritical,
+         extraFailureOnCritical: flags.parameters.extraFailureOnCritical,
+      });
+      expect(flags.results.successes, 'one forced success').toBe(1);
+      expect(oracle.succeeded, 'oracle: 1 success < complexity 2 fails').toBe(false);
+      expect(flags.results.succeeded, 'engine: the resist failed').toBe(false);
+
+      // damageTaken = damageToReduce - successes when the resist fails.
+      expect(flags.results.damageTaken, 'damageTaken = 5 - successes').toBe(5 - flags.results.successes);
+   });
+
+   test('successful resistance takes no damage', async ({ page }) => {
+      // One resilience die forced to a success; complexity 1 means the single success succeeds, so no
+      // damage is taken even though damage was incoming.
+      await forceDice(page, [4]);
+      const flags = await page.evaluate(async () => {
+         const roller = game.actors.getName('E2E Roller');
+         const before = game.messages.size;
+         await roller.system.rollResistanceCheck({
+            resistance: 'resilience',
+            difficulty: 4,
+            complexity: 1,
+            damageToReduce: 5,
+         });
+         await new Promise((resolve) => {
+            setTimeout(resolve, 300);
+         });
+         const newest = game.messages.contents[game.messages.size - 1];
+         return {
+            created: game.messages.size > before,
+            results: newest?.flags?.titan?.results,
+         };
+      });
+
+      expect(flags.created, 'a resistance message was created').toBe(true);
+      expect(flags.results.succeeded, 'check succeeded (1 success >= complexity 1)').toBe(true);
+      expect(flags.results.damageTaken, 'no damage taken on a successful resist').toBe(0);
+   });
 });
