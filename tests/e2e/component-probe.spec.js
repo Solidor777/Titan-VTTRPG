@@ -250,3 +250,25 @@ test.describe('component probe — Select', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 });
+
+test.describe('component probe — LabelTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders the supplied label and resolves testId', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'LabelTag', {
+         props: {
+            label: 'Frostbite',
+            testId: 'probe-label',
+         },
+      });
+      const tag = page.locator(`${selector} .tag`);
+      await expect(tag).toHaveText('Frostbite');
+      await expect(page.locator(`${selector} .tag[data-testid="probe-label"]`)).toBeVisible();
+   });
+});
