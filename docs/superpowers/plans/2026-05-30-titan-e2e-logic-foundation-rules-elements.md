@@ -114,13 +114,21 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @returns {Promise<void>} Resolves once `tests/vendor/fast-check.iife.js` has been written.
  */
 export default async function globalSetup() {
+   // The repo root, used as the module resolution base so the bare `fast-check` import resolves.
+   const repoRoot = path.resolve(dirname, '../..');
+
    // The vendor directory that holds the generated browser bundle (gitignored).
    const vendorDir = path.resolve(dirname, '../vendor');
    await mkdir(vendorDir, { recursive: true });
 
-   // Bundle fast-check's ESM entry into an IIFE exposing the `fc` global for in-page property tests.
+   // Bundle fast-check into an IIFE exposing the `fc` global for in-page property tests. An inline
+   // stdin entry re-exports the package (esbuild entry points are file paths, not bare specifiers).
    await build({
-      entryPoints: ['fast-check'],
+      stdin: {
+         contents: "export * from 'fast-check';",
+         resolveDir: repoRoot,
+         sourcefile: 'fast-check-entry.js',
+      },
       bundle: true,
       format: 'iife',
       globalName: 'fc',
