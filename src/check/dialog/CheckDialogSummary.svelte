@@ -7,6 +7,7 @@
     * @property {string | TextData} [label] The text label to display for this element.
     * @property {*} [value] The value to display.
     * @property {string | TextData} [tooltip] The tooltip to display when the element is hovered.
+    * @property {string} [testId] The stable `data-testid` applied to the value tag.
     */
 
    /** @type {CheckDialogSummaryProps} */
@@ -14,6 +15,7 @@
       label = undefined,
       value = undefined,
       tooltip = undefined,
+      testId = undefined,
    } = $props();
 
 </script>
@@ -28,7 +30,7 @@
 
    <!--Value-->
    <div class="value">
-      <div class="tag">
+      <div class="tag" data-testid={testId}>
          {value}
       </div>
    </div>

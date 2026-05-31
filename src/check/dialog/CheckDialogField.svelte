@@ -9,6 +9,7 @@
     * @property {typeof import('svelte').SvelteComponent} [input] The input Svelte component to bind the value to.
     * @property {string | TextData} [tooltip] The tooltip to display when the element is hovered.
     * @property {*} [inputProps] Properties for the input Svelte component.
+    * @property {string} [testId] The stable `data-testid` applied to the field wrapper.
     */
 
    /** @type {CheckDialogFieldProps} */
@@ -18,11 +19,12 @@
       input = undefined,
       tooltip = undefined,
       inputProps = undefined,
+      testId = undefined,
    } = $props();
 </script>
 
 <!--Field-->
-<div class="field" use:tooltipAction={tooltip}>
+<div class="field" data-testid={testId} use:tooltipAction={tooltip}>
 
    <!--Label-->
    <div class="label">
