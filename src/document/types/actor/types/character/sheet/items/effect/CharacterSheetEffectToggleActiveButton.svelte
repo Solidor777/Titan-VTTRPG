@@ -13,10 +13,17 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /**
+    * The effect's active state, read THROUGH `document.data` so the toggle re-renders reactively when
+    * the effect is toggled (reading `effect.system.isActive` off the prop directly is not tracked).
+    * @type {boolean}
+    */
+   const isActive = $derived(document.data.effects.get(effect.id)?.system.isActive ?? false);
 </script>
 
 <ToggleButton
-   active={effect.system.isActive}
+   active={isActive}
    disabled={!document.data.isOwner}
    label={localize('active')}
    onclick={() => document.data.system.toggleEffectActive(effect.id)}
