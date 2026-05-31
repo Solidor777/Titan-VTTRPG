@@ -5,6 +5,7 @@ import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte'
 import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 import LabelTag from '~/helpers/svelte-components/tag/LabelTag.svelte';
+import RichText from '~/helpers/svelte-components/RichText.svelte';
 
 /**
  * Registry of base primitives the test probe can mount in isolation. Keyed by the name passed to
@@ -19,6 +20,7 @@ const componentRegistry = {
    CheckboxInput,
    Select,
    LabelTag,
+   RichText,
 };
 
 export default componentRegistry;

@@ -2,6 +2,28 @@ import { mount, unmount, createRawSnippet } from 'svelte';
 import componentRegistry from '~/test-probe/componentRegistry.js';
 
 /**
+ * Recursively replace `{ __probeComponent: name }` markers with the registered component constructor.
+ * @param {*} value - Any prop value possibly containing component markers.
+ * @returns {*} The value with markers resolved to component constructors.
+ */
+function resolveProbeComponents(value) {
+   if (Array.isArray(value)) {
+      return value.map(resolveProbeComponents);
+   }
+   if (value && typeof value === 'object') {
+      if (typeof value.__probeComponent === 'string') {
+         return componentRegistry[value.__probeComponent];
+      }
+      const out = {};
+      for (const [k, v] of Object.entries(value)) {
+         out[k] = resolveProbeComponents(v);
+      }
+      return out;
+   }
+   return value;
+}
+
+/**
  * Install the test-only component probe API on `game.titan._probe`. Mounts a registered primitive
  * into a detached container appended to `document.body`, tracks the handle, and exposes teardown.
  * This module is only imported when the bundle is built with `--mode e2e` (gated by `__TITAN_PROBE__`).
@@ -47,8 +69,15 @@ export default function registerProbe() {
             throw new Error(`Unknown probe component: ${name}`);
          }
 
-         // Convert a `text` shorthand into a renderable children snippet when no children supplied.
          const finalProps = { ...props };
+
+         // Resolve any `{ __probeComponent: name }` markers (and arrays/object values containing them) into
+         // the registered component constructor so component-valued props survive the page boundary.
+         for (const [key, value] of Object.entries(finalProps)) {
+            finalProps[key] = resolveProbeComponents(value);
+         }
+
+         // Convert a `text` shorthand into a renderable children snippet when no children supplied.
          if (typeof finalProps.text === 'string' && finalProps.children === undefined) {
             const text = finalProps.text;
             finalProps.children = createRawSnippet(() => {
