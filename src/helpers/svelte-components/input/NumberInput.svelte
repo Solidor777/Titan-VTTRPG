@@ -1,5 +1,4 @@
 <script>
-   import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /**

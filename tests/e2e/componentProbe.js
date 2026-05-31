@@ -17,7 +17,11 @@ export async function mountProbe(page, name, { props = {}, events = [] } = {}) {
             globalThis.window.__titanProbeEvents.push({ event: ev, key: arg && arg.key });
          };
       }
-      return globalThis.game.titan._probe.mount(name, builtProps);
+      const probe = globalThis.game.titan._probe;
+      if (!probe) {
+         throw new Error('game.titan._probe is not registered — build the e2e bundle with `npm run build:e2e`.');
+      }
+      return probe.mount(name, builtProps);
    }, { name, props, events });
 }
 

@@ -89,7 +89,11 @@ export default function registerProbe() {
          };
       },
 
-      // Unmount a single probe and remove its container node.
+      /**
+       * Unmount a single probe by id and remove its container node.
+       * @param {string} id - The probe id returned from `mount`.
+       * @returns {void}
+       */
       unmount: unmountProbe,
 
       /**
