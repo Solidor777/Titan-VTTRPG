@@ -1,5 +1,13 @@
 # v14 Context & Migration Repair Implementation Plan
 
+> **STATUS: COMPLETE (2026-05-30).** All tasks (0–11) implemented and committed. Final coverage:
+> Vitest **5/5**, Playwright **22/22** (render-smoke + interaction rolls + dialogs + header controls),
+> Quench scaffold installed (in-client verification pending the module being enabled in-world).
+> Beyond the planned tasks, the runtime walk also fixed: `ChatMessage.style` (was `type`), the
+> initiative-shadowing build bug, NPC `bio.type` schema, effect `getCombatant()` initiative capture,
+> and the Rolldown-Vite `process.env.NODE_ENV` shim. Deferred follow-up: rich always-visible header
+> buttons (BACKLOG #7).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make all TITAN sheets, dialogs, and chat cards render under Foundry v14 (pure Svelte 5) by replacing the broken TyphonJS `#external` context convention, then lock the fixes in with a three-tier test strategy (Vitest unit/wiring, Playwright render-smoke, Quench in-client).
