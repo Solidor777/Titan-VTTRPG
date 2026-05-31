@@ -2,7 +2,7 @@
    import { onMount, untrack } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {{ value?: string, editable?: boolean, toggled?: boolean, enriched?: string, enrichedReady?: boolean, documentUUID?: string, tooltip?: (string | object), notOwner?: boolean }} */
+   /** @type {{ value?: string, editable?: boolean, toggled?: boolean, enriched?: string, enrichedReady?: boolean, documentUUID?: string, tooltip?: (string | object), notOwner?: boolean, testId?: string }} */
    let {
       value = $bindable(''),
       editable = true,
@@ -12,6 +12,7 @@
       documentUUID = void 0,
       tooltip = void 0,
       notOwner = false,
+      testId = void 0,
    } = $props();
 
    /** @type {HTMLElement} The container the <prose-mirror> element is appended into. */
@@ -135,6 +136,7 @@
 <div
    bind:this={container}
    class={notOwner ? 'editor rich-text not-owner' : 'editor rich-text'}
+   data-testid={testId}
    use:tooltipAction={tooltip}
 ></div>
 

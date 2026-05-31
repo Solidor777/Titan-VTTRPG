@@ -2,11 +2,11 @@
    import { TURN_END_ICON } from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /** @type {{ effect: TurnEffectData }} Data for this tag's Effect. */
-   let { effect = void 0 } = $props();
+   /** @type {{ effect: TurnEffectData, testId?: string }} Data for this tag's Effect plus an optional test id. */
+   let { effect = void 0, testId = void 0 } = $props();
 </script>
 
-<div class="tag">
+<div class="tag" data-testid={testId}>
    <EffectTag {effect} icon={TURN_END_ICON}/>
 </div>
 

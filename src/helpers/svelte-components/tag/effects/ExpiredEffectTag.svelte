@@ -2,11 +2,11 @@
    import { EXPIRED_ICON } from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /** @type {{ effect: ExpiredEffectData }} Data for this tag's Effect. */
-   let { effect = void 0 } = $props();
+   /** @type {{ effect: ExpiredEffectData, testId?: string }} Data for this tag's Effect plus an optional test id. */
+   let { effect = void 0, testId = void 0 } = $props();
 </script>
 
-<div class="tag">
+<div class="tag" data-testid={testId}>
    <EffectTag {effect} icon={EXPIRED_ICON}/>
 </div>
 

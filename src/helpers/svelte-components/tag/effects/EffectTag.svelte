@@ -66,10 +66,11 @@
     * @typedef {object} EffectTagProps
     * @property {EffectTagEffectData} effect - The effect data this tag displays.
     * @property {string} [icon] - Optional font-icon class shown alongside the effect.
+    * @property {string} [testId] - Optional test id bound to the root element for probing.
     */
 
    /** @type {EffectTagProps} */
-   let { effect = void 0, icon = void 0 } = $props();
+   let { effect = void 0, icon = void 0, testId = void 0 } = $props();
 
    /** @type {string} Calculated tooltip depending on whether the effect has a description. */
    const tooltip = $derived(!isHTMLBlank(effect.description) ?
@@ -77,7 +78,7 @@
       localize('effect.custom.desc'));
 </script>
 
-<div class="tag" use:tooltipAction={tooltip}>
+<div class="tag" data-testid={testId} use:tooltipAction={tooltip}>
    <!--Image-->
    <img alt="img" class={checkAddDarkSVGClass(effect.img)} src={effect.img}/>
 

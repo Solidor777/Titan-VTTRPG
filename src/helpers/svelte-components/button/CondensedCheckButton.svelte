@@ -22,6 +22,7 @@
     * @property {string} [label] - The display Label of the check.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string} [testId] - Optional test id bound to the root element for probing.
     */
 
    /** @type {CondensedCheckButtonProps} */
@@ -36,10 +37,11 @@
       label = void 0,
       tooltip = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
-<div class="check-button {attribute}">
+<div class="check-button {attribute}" data-testid={testId}>
    <DocumentOwnerAttributeButton
       {attribute}
       {onclick}

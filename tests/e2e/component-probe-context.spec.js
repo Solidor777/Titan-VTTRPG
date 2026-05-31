@@ -1,6 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
-import { mountProbe, unmountAll, clearProbeEvents, documentContext } from './componentProbe.js';
+import {
+   mountProbe,
+   unmountAll,
+   clearProbeEvents,
+   documentContext,
+   readProbeEvents,
+   probeFn,
+} from './componentProbe.js';
 
 test.describe('component probe — RichText (context)', () => {
    test.beforeEach(async ({ page }) => {
@@ -31,5 +38,306 @@ test.describe('component probe — RichText (context)', () => {
          context: documentContext({ isOwner: false }),
       });
       await expect(page.locator(`${selector} .rich-text`)).toHaveClass(/not-owner/);
+   });
+});
+
+test.describe('component probe — EffectTag (plain effect data)', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders label, image, and custom remaining duration', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'EffectTag', {
+         props: {
+            effect: {
+               label: 'Burning',
+               img: 'icons/svg/fire.svg',
+               description: '<p>On fire.</p>',
+               custom: 'rounds',
+               remaining: 3,
+            },
+            testId: 'probe-effect',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-effect"]`);
+      await expect(tag).toContainText('Burning');
+      await expect(tag.locator('.time')).toContainText('3 (rounds)');
+      await expect(tag.locator('img')).toHaveAttribute('src', 'icons/svg/fire.svg');
+   });
+});
+
+test.describe('component probe — CustomEffectTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and custom-unit remaining duration', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'CustomEffectTag', {
+         props: {
+            effect: {
+               label: 'Inspired',
+               img: 'icons/svg/aura.svg',
+               description: '<p>Custom.</p>',
+               custom: 'scenes',
+               remaining: 2,
+            },
+            testId: 'probe-custom',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-custom"]`);
+      await expect(tag).toContainText('Inspired');
+      await expect(tag.locator('.time')).toContainText('2 (scenes)');
+   });
+});
+
+test.describe('component probe — ExpiredEffectTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and no time element (expired effects have no remaining)', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ExpiredEffectTag', {
+         props: {
+            effect: {
+               label: 'Faded',
+               img: 'icons/svg/daze.svg',
+               description: '<p>Expired.</p>',
+            },
+            testId: 'probe-expired',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-expired"]`);
+      await expect(tag).toContainText('Faded');
+      await expect(tag.locator('.time')).toHaveCount(0);
+   });
+});
+
+test.describe('component probe — InitiativeEffectTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and initiative-based remaining duration', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'InitiativeEffectTag', {
+         props: {
+            effect: {
+               label: 'Bleeding',
+               img: 'icons/svg/blood.svg',
+               description: '<p>Initiative.</p>',
+               initiative: 12,
+               remaining: 4,
+            },
+            testId: 'probe-initiative',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-initiative"]`);
+      await expect(tag).toContainText('Bleeding');
+      await expect(tag.locator('.time')).toContainText('4 (12)');
+   });
+});
+
+test.describe('component probe — PermanentEffectTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and no time element (permanent effects have no remaining)', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'PermanentEffectTag', {
+         props: {
+            effect: {
+               label: 'Blessed',
+               img: 'icons/svg/angel.svg',
+               description: '<p>Permanent.</p>',
+            },
+            testId: 'probe-permanent',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-permanent"]`);
+      await expect(tag).toContainText('Blessed');
+      await expect(tag.locator('.time')).toHaveCount(0);
+   });
+});
+
+test.describe('component probe — TurnEndEffectTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and bare turn-based remaining duration', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'TurnEndEffectTag', {
+         props: {
+            effect: {
+               label: 'Regenerating',
+               img: 'icons/svg/regen.svg',
+               description: '<p>Turn end.</p>',
+               remaining: 5,
+            },
+            testId: 'probe-turn-end',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-turn-end"]`);
+      await expect(tag).toContainText('Regenerating');
+      await expect(tag.locator('.time')).toHaveText('5');
+   });
+});
+
+test.describe('component probe — TurnStartEffectTag', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and bare turn-based remaining duration', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'TurnStartEffectTag', {
+         props: {
+            effect: {
+               label: 'Burning Aura',
+               img: 'icons/svg/fire.svg',
+               description: '<p>Turn start.</p>',
+               remaining: 6,
+            },
+            testId: 'probe-turn-start',
+         },
+      });
+      const tag = page.locator(`${selector} [data-testid="probe-turn-start"]`);
+      await expect(tag).toContainText('Burning Aura');
+      await expect(tag.locator('.time')).toHaveText('6');
+   });
+});
+
+test.describe('component probe — FiltereedList (context)', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its container and one item per supplied entry', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'FiltereedList', {
+         props: {
+            entries: [
+               {
+                  label: 'Alpha',
+                  testId: 'list-item-0',
+               },
+               {
+                  label: 'Beta',
+                  testId: 'list-item-1',
+               },
+            ],
+            filterFunction: probeFn('returnTrue'),
+            mapFunction: probeFn('returnEntry'),
+            componentFunction: probeFn('returnComponent', { component: 'LabelTag' }),
+            propsFunction: probeFn('returnEntry'),
+            testId: 'probe-list',
+         },
+         context: documentContext({ isOwner: true }),
+      });
+      const list = page.locator(`${selector} [data-testid="probe-list"]`);
+      await expect(list).toHaveCount(1);
+      await expect(list.locator('li')).toHaveCount(2);
+      await expect(page.locator(`${selector} [data-testid="list-item-0"]`)).toContainText('Alpha');
+      await expect(page.locator(`${selector} [data-testid="list-item-1"]`)).toContainText('Beta');
+   });
+});
+
+test.describe('component probe — CondensedCheckButton (context)', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders its label and stats and fires onclick when owned', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'CondensedCheckButton', {
+         props: {
+            attribute: 'body',
+            difficulty: 4,
+            complexity: 2,
+            totalDice: 5,
+            label: 'Athletics',
+            testId: 'probe-check',
+         },
+         events: ['onclick'],
+         context: documentContext({ isOwner: true }),
+      });
+      const root = page.locator(`${selector} [data-testid="probe-check"]`);
+      await expect(root).toContainText('Athletics');
+      await expect(root.locator('.stat').first()).toContainText('4:2');
+
+      const button = root.locator('button');
+      await expect(button).not.toBeDisabled();
+      await button.click();
+      const events = await readProbeEvents(page);
+      expect(events.filter((entry) => entry.event === 'onclick').length).toBe(1);
+   });
+
+   test('disables the button when the document context is not the owner', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'CondensedCheckButton', {
+         props: {
+            attribute: 'body',
+            difficulty: 4,
+            complexity: 2,
+            totalDice: 5,
+            label: 'Athletics',
+            testId: 'probe-check-disabled',
+         },
+         context: documentContext({ isOwner: false }),
+      });
+      await expect(page.locator(`${selector} [data-testid="probe-check-disabled"] button`)).toBeDisabled();
+   });
+});
+
+test.describe('component probe — ProseMirrorEditor', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('builds the native prose-mirror element and tears it down on unmount', async ({ page }) => {
+      const { id, selector } = await mountProbe(page, 'ProseMirrorEditor', {
+         props: {
+            value: '<p>Editor body</p>',
+            editable: true,
+            enrichedReady: true,
+         },
+      });
+      await expect(page.locator(`${selector} prose-mirror`)).toHaveCount(1);
+      await page.evaluate((id) => globalThis.game.titan._probe.unmount(id), id);
+      await expect(page.locator(`${selector}`)).toHaveCount(0);
    });
 });

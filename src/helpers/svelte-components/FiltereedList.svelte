@@ -16,6 +16,7 @@
     * @property {Function} [idFunction] - Function to generate unique IDs for each entry.
     * @property {Function} componentFunction - Function to get the component to use for an entry.
     * @property {Function} [propsFunction] - Function to get the props for an entry's component.
+    * @property {string} [testId] - Optional test id bound to the root list element for probing.
     */
 
    /** @type {FiltereedListProps} */
@@ -26,6 +27,7 @@
       idFunction = (entry, idx) => idx,
       componentFunction,
       propsFunction = void 0,
+      testId = void 0,
    } = $props();
 
    /** @type {any[]} The filtered and mapped entries to display. */
@@ -37,7 +39,7 @@
 
 
 {#if filteredEntries.length > 0}
-   <ol out:slide>
+   <ol data-testid={testId} out:slide>
       {#each entries as entry, idx (idFunction(entry, idx))}
          {@const EntryComponent = componentFunction(entry)}
          <li transition:slide>

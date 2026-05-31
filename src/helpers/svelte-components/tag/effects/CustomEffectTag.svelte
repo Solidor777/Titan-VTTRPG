@@ -2,11 +2,11 @@
    import { CUSTOM_ICON } from '~/system/Icons.js';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 
-   /** @type {{ effect: CustomEffectData }} Data for this tag's Effect. */
-   let { effect = void 0 } = $props();
+   /** @type {{ effect: CustomEffectData, testId?: string }} Data for this tag's Effect plus an optional test id. */
+   let { effect = void 0, testId = void 0 } = $props();
 </script>
 
-<div class="tag">
+<div class="tag" data-testid={testId}>
    <EffectTag {effect} icon={CUSTOM_ICON}/>
 </div>
 
