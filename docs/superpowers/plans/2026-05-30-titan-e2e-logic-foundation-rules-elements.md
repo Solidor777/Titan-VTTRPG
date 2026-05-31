@@ -132,6 +132,9 @@ export default async function globalSetup() {
       bundle: true,
       format: 'iife',
       globalName: 'fc',
+      // Playwright's addInitScript wraps the file in a function, so the IIFE's top-level `var fc`
+      // would be function-scoped and never reach the page. The footer promotes it to a true global.
+      footer: { js: 'globalThis.fc = fc;' },
       platform: 'browser',
       outfile: path.join(vendorDir, 'fast-check.iife.js'),
       logLevel: 'silent',
