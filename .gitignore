@@ -14,3 +14,4 @@ playwright-report/
 packs/**/LOG
 packs/**/LOCK
 *.old
+tests/vendor/
