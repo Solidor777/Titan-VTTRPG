@@ -176,3 +176,73 @@ export function buildE2ERollerItemData() {
       },
    ];
 }
+
+/**
+ * Builds a plain target character (player) create-payload used as an attack target. Its Defense
+ * flat modifier is supplied separately by {@link buildE2ETargetDefenseItemData}.
+ * @param {string} name - The actor name.
+ * @returns {object} An `Actor.create` payload.
+ */
+export function buildE2ETargetActorData(name) {
+   return {
+      name: name,
+      type: 'player',
+   };
+}
+
+/**
+ * Builds an ability item create-payload carrying a single flatModifier rules element on the Defense
+ * rating, so an owned copy shifts the target's `rating.defense.value` by a known amount. Abilities
+ * apply their rules elements on mere ownership, with no equip required.
+ * @param {number} defenseMod - The flat modifier applied to the Defense rating; may be negative.
+ * @returns {object} An `Item.create` payload of type `ability`.
+ */
+export function buildE2ETargetDefenseItemData(defenseMod) {
+   return {
+      name: `E2E Defense ${defenseMod}`,
+      type: 'ability',
+      system: {
+         rulesElement: [
+            {
+               operation: 'flatModifier',
+               selector: 'rating',
+               key: 'defense',
+               value: defenseMod,
+               uuid: `e2e-target-def-${defenseMod}`,
+            },
+         ],
+      },
+   };
+}
+
+/**
+ * Builds an ability item create-payload that boosts the owner's Melee and Accuracy attack ratings by a
+ * fixed amount, so an attacker's rating is high enough for the difficulty clamp to reach its lower
+ * bound. Targets the `rating` selector for both keys, so the weapon's attack type is irrelevant.
+ * @param {number} value - The flat modifier applied to both the Melee and Accuracy ratings.
+ * @returns {object} An `Item.create` payload of type `ability`.
+ */
+export function buildE2EAttackerRatingItemData(value) {
+   return {
+      name: 'E2E Attacker Boost',
+      type: 'ability',
+      system: {
+         rulesElement: [
+            {
+               operation: 'flatModifier',
+               selector: 'rating',
+               key: 'melee',
+               value: value,
+               uuid: 'e2e-attacker-melee',
+            },
+            {
+               operation: 'flatModifier',
+               selector: 'rating',
+               key: 'accuracy',
+               value: value,
+               uuid: 'e2e-attacker-accuracy',
+            },
+         ],
+      },
+   };
+}
