@@ -36,3 +36,27 @@ export function buildFlatModifierItemData(name) {
       },
    };
 }
+
+/**
+ * Builds an ability item create-payload carrying one flatModifier rules element per supplied value,
+ * each targeting the Body attribute. Abilities apply their rules elements on mere ownership (no equip),
+ * making them the simplest fixture for asserting derived-attribute deltas.
+ * @param {string} name - The ability name.
+ * @param {number[]} values - The flat modifier values; one flatModifier element is created per value.
+ * @returns {object} An `Item.create` payload of type `ability`.
+ */
+export function buildFlatModifierAbilityData(name, values) {
+   return {
+      name: name,
+      type: 'ability',
+      system: {
+         rulesElement: values.map((value, index) => ({
+            operation: 'flatModifier',
+            selector: 'attribute',
+            key: 'body',
+            value: value,
+            uuid: `e2e-flatmod-${index}`,
+         })),
+      },
+   };
+}

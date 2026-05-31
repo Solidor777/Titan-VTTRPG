@@ -1,11 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { buildPlayerActorData, buildFlatModifierItemData } from '../shared/builders.js';
+import { buildPlayerActorData, buildFlatModifierItemData, buildFlatModifierAbilityData } from '../shared/builders.js';
 import { FLAT_MODIFIER } from '../shared/fixtureConstants.js';
 
 describe('fixture builders', () => {
    it('builds a player actor create-payload', () => {
       const data = buildPlayerActorData('E2E Player Fixture');
       expect(data).toEqual({ name: 'E2E Player Fixture', type: 'player' });
+   });
+
+   it('builds an ability carrying flatModifier rules elements on Body', () => {
+      const data = buildFlatModifierAbilityData('E2E Mod Ability', [2, 3]);
+      expect(data.type).toBe('ability');
+      expect(data.name).toBe('E2E Mod Ability');
+      expect(data.system.rulesElement).toHaveLength(2);
+      expect(data.system.rulesElement[0]).toMatchObject({
+         operation: 'flatModifier',
+         selector: 'attribute',
+         key: 'body',
+         value: 2,
+      });
+      expect(data.system.rulesElement[1].value).toBe(3);
    });
 
    it('builds an item carrying a single flatModifier rules element', () => {
