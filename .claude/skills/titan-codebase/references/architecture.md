@@ -77,10 +77,10 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
   and a fresh `HooksMock` on `globalThis.Hooks` before every test.
 - `tests/unit/` — Vitest unit tests (`.test.js`).
 - `tests/components/` — Svelte probe components used by unit tests (e.g. `DocumentProbe.svelte`).
-- `tests/shared/` — Framework-agnostic fixture helpers shared by Vitest and Quench/Playwright:
+- `tests/shared/` — Framework-agnostic fixture helpers shared by Vitest and Playwright:
   - `fixtureConstants.js` — typed constants for known fixture values (e.g. `FLAT_MODIFIER`).
   - `builders.js` — pure factory functions returning plain `Document.create` payloads (no live documents,
-    no side effects); consumed by Vitest directly and by Quench/Playwright via `Document.create` or
+    no side effects); consumed by Vitest directly and by Playwright via `Document.create` or
     `page.evaluate`.
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
 

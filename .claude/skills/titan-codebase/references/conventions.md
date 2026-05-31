@@ -270,35 +270,13 @@ it catches v14 API breaks that the mocked Vitest tier cannot.
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above.
 
-**Quench in-client tier** — `src/quench/RegisterQuenchTests.js` exports a default
-`registerQuenchTests()` function that calls `Hooks.on('quenchReady', (quench) => { ... })`. This
-listener is COMPLETELY INERT unless the Quench module (v0.10+) is installed and enabled; Quench fires
-`quenchReady` only from its own `setup` hook. `registerQuenchTests()` is called unconditionally at
-module level in `src/index.js` (after the other `Hooks.once` registrations). The registrar is thin: it
-imports per-batch registrar modules from `src/quench/batches/` and invokes each with the `quench` API
-object inside the `quenchReady` listener. One batch is registered:
-- `titan.render.player-sheet` (`displayName: 'TITAN: Player sheet render smoke test'`), defined by the
-  default export `registerPlayerSheetRenderBatch(quench)` in
-  `src/quench/batches/player-sheet-render.batch.js` — uses `before`/`after` plus `describe`/`it`/`assert`
-  from the Quench context object; finds a `player`-type actor via
-  `game.actors.find(a => a.type === 'player')`, renders its sheet, asserts `actor.sheet.element` is
-  present, and closes the sheet in `after`. Skips gracefully via `this.skip()` if no player actor exists.
-New batches follow the same pattern: add a `*.batch.js` module under `src/quench/batches/` exporting a
-default `register<Name>Batch(quench)`, then import and call it in `RegisterQuenchTests.js`.
-The Quench batch API (`quench.registerBatch(key, (context) => { ... }, { displayName })`) was
-confirmed from `modules/quench/README.md`. `this.skip()` (Mocha) marks a test pending at runtime.
-
-**Quench → Playwright bridge** — `tests/e2e/quench-runner.spec.js` (run via the `test:e2e:quench`
-npm script) is the single signal for the in-client logic layer: it logs in via the `login` fixture,
-then `test.skip()`s cleanly when `typeof game.quench === 'undefined'` (Quench absent/disabled in the
-test world). When present, it calls `await game.quench.runAllBatches()` in-page, reads
-`runner.stats.failures`, and fails the Playwright run on any non-zero failure count. Note: the Quench
-module is installed under `modules/quench` but is NOT enabled in the e2e test world, so this spec
-currently SKIPs; enable Quench in that world to fully exercise the bridge. **Caveat:** Quench is last
-verified for Foundry **v13**; on v14 it may have version-induced bugs (init, or a changed
-`runAllBatches()`/`runner.stats` shape). The bridge's `runner.stats.failures` read is therefore
-UNVERIFIED on v14 — validate it before relying on the Quench logic layer; the safer v14 path for
-logic assertions is Playwright `page.evaluate` against the live data models (no external dependency).
+**Logic layer — Playwright + fast-check** — The in-client logic tier uses Playwright `page.evaluate`
+calls against the live v14 runtime (no external module dependency). Property-based tests inject the
+`fast-check` library as the `fc` page global and drive data-model operations directly in the running
+Foundry world. Quench 0.10.0 was **removed** because its `runBatches` executes 0 tests under Foundry
+v14: the async-`describe` / ApplicationV2 timing mismatch causes all batch registrations to be skipped
+silently. `src/quench/` and `tests/e2e/quench-runner.spec.js` were deleted; the `test:e2e:quench` npm
+script was removed. No Quench code remains in `src/` or `tests/`.
 
 ## Style rules live in CLAUDE.md
 

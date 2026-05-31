@@ -13,7 +13,6 @@ import onRenderJournalTextPageSheet from '~/hooks/OnRenderJournalTextPageSheet.j
 import onceInit from '~/hooks/OnceInit.js';
 import onceReady from '~/hooks/OnceReady.js';
 import onceSetup from '~/hooks/OnceSetup.js';
-import registerQuenchTests from '~/quench/RegisterQuenchTests.js';
 
 Hooks.on('combatNextTurn', onCombatNextTurn);
 Hooks.on('combatPreviousTurn', onCombatPreviousTurn);
@@ -27,6 +26,3 @@ Hooks.on('renderJournalEntryPageProseMirrorSheet', onRenderJournalTextPageSheet)
 Hooks.once('init', onceInit);
 Hooks.once('ready', onceReady);
 Hooks.once('setup', onceSetup);
-
-// Register Quench in-client test batches (inert unless the Quench module is active).
-registerQuenchTests();
