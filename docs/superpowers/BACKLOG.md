@@ -86,3 +86,25 @@ split off to keep that spec focused.
 - **To do:** Extend the converter (or add a one-shot tool) to iterate unlocked
   actor compendium packs and convert their effect Items, then re-lock.
 - **Depends on:** The "Effects → TitanActiveEffect" spec.
+
+## v14 migration — related items
+
+### 7. Rich (TyphonJS-style) sheet header buttons
+
+- **What:** The actor/item sheet header buttons (edit-token, dynamic
+  link/unlink, import, send-to-chat) were restored under v14 via native AppV2
+  `_getHeaderControls()` (see the v14 context-and-migration-repair spec, Task
+  11). Native v14 controls render in the header **ellipsis dropdown**, expose
+  only an icon + label (no tooltip field), so the dynamic link/unlink state is
+  conveyed by a changing icon + label and is only visible when the dropdown is
+  open.
+- **To do:** Re-create the old TyphonJS-era experience — **always-visible inline
+  header buttons rendered as Svelte components** in the sheet's window header,
+  with the rich `.desc` HTML tooltips restored (especially for the dynamic
+  link/unlink button). Likely approach: mount a small Svelte tree into the AppV2
+  `.window-header` in `_onRender` (and unmount in `_onClose`), mirroring how
+  TyphonJS injected header content — or render the buttons inside the sheet's
+  Svelte header area.
+- **Why deferred:** Native `_getHeaderControls()` is functional and shipped; the
+  rich always-visible+tooltip version is a UX enhancement, not a correctness fix.
+- **Depends on:** The v14 context-and-migration-repair spec (Task 11).
