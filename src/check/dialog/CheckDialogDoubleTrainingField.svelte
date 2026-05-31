@@ -12,5 +12,6 @@
    bind:value={$checkOptions.doubleTraining}
    input={CheckboxInput}
    label={'doubleTraining'}
+   testId={'check-field-doubleTraining'}
    tooltip={'check.doubleTraining.desc'}
 />

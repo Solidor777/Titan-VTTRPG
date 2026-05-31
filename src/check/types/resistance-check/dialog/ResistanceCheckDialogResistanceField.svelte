@@ -13,4 +13,5 @@
    bind:value={$checkOptions.resistance}
    input={ResistanceSelect}
    label={localize('resistance')}
+   testId={'check-field-resistance'}
 />

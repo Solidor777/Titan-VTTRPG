@@ -12,5 +12,6 @@
    bind:value={$checkOptions.difficulty}
    input={CheckDifficultySelect}
    label={'difficulty'}
+   testId={'check-field-difficulty'}
    tooltip={'check.difficulty.desc'}
 />

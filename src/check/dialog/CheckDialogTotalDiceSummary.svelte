@@ -10,6 +10,7 @@
 
 <CheckDialogSummary
    label={'totalDice'}
+   testId={'check-summary-totalDice'}
    tooltip={'check.totalDice.desc'}
    value={$checkParameters.totalDice}
 />

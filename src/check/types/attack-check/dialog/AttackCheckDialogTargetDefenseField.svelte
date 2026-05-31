@@ -16,5 +16,6 @@
    input={IntegerInput}
    {inputProps}
    label={localize('targetDefense')}
+   testId={'check-field-targetDefense'}
    tooltip={'check.targetDefense.desc'}
 />

@@ -15,5 +15,6 @@
    input={SkillSelect}
    {inputProps}
    label={'skill'}
+   testId={'check-field-skill'}
    tooltip={'check.skill.desc'}
 />

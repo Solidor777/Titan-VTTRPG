@@ -16,5 +16,6 @@
    input={IntegerInput}
    {inputProps}
    label={localize('attackerAccuracy')}
+   testId={'check-field-attackerAccuracy'}
    tooltip={'check.attackerAccuracy.desc'}
 />

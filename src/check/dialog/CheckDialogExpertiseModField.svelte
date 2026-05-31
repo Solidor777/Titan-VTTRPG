@@ -12,5 +12,6 @@
    bind:value={$checkOptions.expertiseMod}
    input={IntegerInput}
    label={'expertiseMod'}
+   testId={'check-field-expertiseMod'}
    tooltip={'check.expertiseMod.desc'}
 />

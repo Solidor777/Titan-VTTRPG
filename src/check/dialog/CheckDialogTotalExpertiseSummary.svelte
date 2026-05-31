@@ -10,6 +10,7 @@
 
 <CheckDialogSummary
    label={'totalExpertise'}
+   testId={'check-summary-totalExpertise'}
    tooltip={'check.totalExpertise.desc'}
    value={$checkParameters.totalExpertise}
 />

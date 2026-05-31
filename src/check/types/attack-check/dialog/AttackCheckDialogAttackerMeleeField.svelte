@@ -16,5 +16,6 @@
    input={IntegerInput}
    {inputProps}
    label={localize('attackerMelee')}
+   testId={'check-field-attackerMelee'}
    tooltip={'check.attackerMelee.desc'}
 />

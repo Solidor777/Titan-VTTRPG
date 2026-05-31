@@ -15,5 +15,6 @@
    input={IntegerInput}
    {inputProps}
    label={'complexity'}
+   testId={'check-field-complexity'}
    tooltip={'check.complexity.desc'}
 />

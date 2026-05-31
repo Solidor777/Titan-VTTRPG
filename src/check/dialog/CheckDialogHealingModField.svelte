@@ -12,5 +12,6 @@
    bind:value={$checkOptions.healingMod}
    input={IntegerInput}
    label={'healingMod'}
+   testId={'check-field-healingMod'}
    tooltip={'check.healingMod.desc'}
 />

@@ -13,5 +13,6 @@
    bind:value={$checkOptions.trainingMod}
    input={IntegerInput}
    label={localize('trainingMod')}
+   testId={'check-field-trainingMod'}
    tooltip={'check.trainingMod.desc'}
 />

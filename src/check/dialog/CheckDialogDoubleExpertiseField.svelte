@@ -12,5 +12,6 @@
    bind:value={$checkOptions.doubleExpertise}
    input={CheckboxInput}
    label={'doubleExpertise'}
+   testId={'check-field-doubleExpertise'}
    tooltip={'check.doubleExpertise.desc'}
 />

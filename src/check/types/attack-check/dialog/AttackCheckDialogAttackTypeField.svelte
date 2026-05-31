@@ -13,5 +13,6 @@
    bind:value={$checkOptions.type}
    input={AttackTypeSelect}
    label={localize('type')}
+   testId={'check-field-type'}
    tooltip={'check.attackType.desc'}
 />
