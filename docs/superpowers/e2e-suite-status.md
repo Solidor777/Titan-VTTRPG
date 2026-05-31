@@ -1,10 +1,40 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3b / 3c / 3d.** Phase 3a
-is **complete**. Pick up at 3b (component-tier probe harness over the base primitives), 3c (integration
-manifests), and continue **3d — reactive-control sweep** (next backlog item: item/effect **expanded**
-toggle; see the 3d section). Full e2e suite is **61 passing** (`npx playwright test`). All of the checks
-surface (2b-1..2b-4) and Phase 3a are done.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3b-remaining / 3c / 3d.**
+Phase 3a and the **first 3b pass** (component-probe harness + 7-component core set) are **complete**. Pick up
+at: **3b-remaining** (extend the probe registry over the rest of `src/helpers/svelte-components/**`), **3c**
+(integration manifests), and continue **3d — reactive-control sweep** (next backlog item: item/effect
+**expanded** toggle; see the 3d section). Full e2e suite is **75 passing** (`npx playwright test`, on the
+`npm run build:e2e` bundle). All of the checks surface (2b-1..2b-4), Phase 3a, and the 3b core set are done.
+
+### Phase 3b (first pass) — DONE (component-tier probe harness)
+
+- **Gated probe harness** — `src/test-probe/` (`componentRegistry.js` + `registerProbe.js`) installs
+  `game.titan._probe = { components, mount(name, props?, context?), unmount(id), unmountAll() }` inside the
+  live Foundry runtime. `mount` drops a detached `<div data-titan-probe="<id>">` (positioned `fixed`, max
+  `z-index` so it clears Foundry chrome for pointer events), mounts the named primitive, returns
+  `{ id, selector }`. A string `text` prop becomes a `children` snippet via `createRawSnippet` (text via
+  `textContent`, never raw HTML). Gated by `__TITAN_PROBE__` (Vite `define`, `true` only under
+  `vite build --mode e2e`); `OnceInit.js` registers it via a fire-and-forget dynamic `import()` so terser
+  tree-shakes it out of production (verified: `npm run build` → 0 probe identifiers in `index.js`).
+- **New npm script** — `build:e2e` (`vite build --mode e2e`). **Build gotcha:** the component-probe specs
+  require this bundle, NOT `npm run build`. The live Foundry on :30000 serves the built `index.js`, so run
+  `npm run build:e2e` after any `src/` edit before running probe specs.
+- **Page object** — `tests/e2e/componentProbe.js`: `mountProbe`/`readProbeEvents`/`clearProbeEvents`/
+  `unmountAll`. Callbacks are instrumented INSIDE `page.evaluate` (functions can't cross the Node↔page
+  boundary) and record `{ event, key }` into `window.__titanProbeEvents`.
+- **Behavioral probes** — `tests/e2e/component-probe.spec.js`, 14 tests across the core set: `Button` (click
+  fires/disabled suppresses/testId), `TextInput` (typing commits + keyup forwarded/disabled), `NumberInput`
+  + `IntegerInput` (clamp-to-max on commit + onchange/integer commit/disabled/testId), `CheckboxInput`
+  (toggle flips glyph + 2× onchange/disabled blocks), `Select` (change fires onchange + value updates,
+  mount-clamp onchange cleared/disabled), `LabelTag` (renders label + testId). **No engine bugs found.**
+- **testId parity** — added a `testId` (`data-testid`) prop to `NumberInput`, `IntegerInput`,
+  `CheckboxInput`, `Select`, `LabelTag` (Button/TextInput already had it).
+- **Backlog (3b-remaining):** the rest of `src/helpers/svelte-components/**` (~63 primitives — tags, labels,
+  the `select/` subtypes, meters, editors). Add each to `componentRegistry.js` + a describe block; the
+  harness's optional `context` Map param is ready for components that read `getContext`.
+- Spec/plan: `docs/superpowers/specs/2026-05-31-titan-e2e-component-probe-design.md`,
+  `docs/superpowers/plans/2026-05-31-titan-e2e-component-probe.md`.
 
 ### Phase 3a — DONE (sheet array-CRUD reactivity)
 
@@ -190,15 +220,21 @@ re-deriving context.
    (`initializeItemCheckOptions`, `getItemCheckParameters`) already use (commit `f155c1e0`). Found by the
    2b-3 item dialog test.
 
-## NEXT: Phase 3 — UI component / manifest tiers (BRAINSTORM first, then plan, then execute)
+## NEXT: Phase 3 — remaining tiers
 
-**Start by invoking `superpowers:brainstorming`.** The checks surface (2b-1..2b-4) is complete. Phase 3
-covers the UI component / manifest tiers: drive the rendered Svelte component surfaces (buttons, inputs,
-sheet sections) and assert manifest-driven wiring. `testId` is already on the base primitives
-(`Button`/`TextInput`) and on the check-dialog field/summary wrappers, so the first open question is which
-component/sheet tiers to cover and what additional `testId` anchors are needed. Load `foundry-vtt` +
-`titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface touched). Route all
-`.js`/`.svelte` work through the `titan-svelte-dev` subagent.
+The **3b first pass is done** (component-probe harness + 7-component core set; see the "Phase 3b (first
+pass) — DONE" section above). Remaining Phase 3 work:
+
+- **3b-remaining** — extend the probe registry over the rest of `src/helpers/svelte-components/**` (~63
+  primitives). Mechanical follow-on: per component, add to `componentRegistry.js`, add a `testId` prop if
+  missing, append a behavioral describe block, `npm run build:e2e`, run. The harness's optional `context`
+  Map param handles components that read `getContext`.
+- **3c — integration manifests** — assert manifest-driven wiring (document subtypes, sheet registration,
+  `system.json` hookups). BRAINSTORM first (`superpowers:brainstorming`).
+- **3d — reactive-control sweep** — continue per the Phase 3d section (next: item/effect **expanded** toggle).
+
+Load `foundry-vtt` + `titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface
+touched). Route all `.js`/`.svelte` work through the `titan-svelte-dev` subagent.
 
 **After Phase 3:** Phase 4 (multi-user permissions + 2-client socket sync via per-user browser contexts).
 
@@ -211,7 +247,9 @@ v14 — see conventions.md).
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/traits.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-opposed.spec.js --reporter=list`
-  → expect 51 passing (Foundry must be running on :30000, or webServer launches it). **After editing any
-  `.svelte`/`.js` source, run `npm run build` first** so the live Foundry serves the change (test-only
-  changes don't need a build).
+- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **75 passing** (Foundry must be
+  running on :30000, or the `webServer` config launches it). The full suite now includes
+  `tests/e2e/component-probe.spec.js` (14 tests), which REQUIRE the `build:e2e` bundle.
+- **Build discipline:** after editing any `.svelte`/`.js` source, run `npm run build:e2e` first so the live
+  Foundry serves the change AND keeps the gated component probe available (a plain `npm run build` strips the
+  probe, breaking `component-probe.spec.js`). Test-only changes don't need a build.

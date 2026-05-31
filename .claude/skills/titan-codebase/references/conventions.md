@@ -314,6 +314,9 @@ the inner `<div class="tag" data-testid={testId}>`. `CheckDialogBase` passes `te
 `testId={'check-dialog-cancel'}` to the two `Button` components. Each of the 16 concrete `CheckDialogField`
 users and 2 `CheckDialogSummary` users supplies a static string literal such as `testId={'check-field-attribute'}` or
 `testId={'check-summary-totalDice'}`. Playwright specs select these with `page.locator('[data-testid="..."]')`.
+The base input/tag primitives also carry an optional `testId` (`data-testid` passthrough): `Button`,
+`TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, and `LabelTag` — used by the
+component-probe harness below.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against a running Foundry world
 (`playwright.config.mjs`, `baseURL: http://localhost:30000`; env `FOUNDRY_USER` / optional
@@ -325,7 +328,26 @@ and `ensureDocument` (creates missing world fixtures). Drives the real built sys
 it catches v14 API breaks that the mocked Vitest tier cannot.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
-mode; `npm run test:e2e` runs the Playwright suite above.
+mode; `npm run test:e2e` runs the Playwright suite above. `npm run build:e2e` (`vite build --mode e2e`)
+produces the probe-enabled bundle required by the component-probe specs (see next entry).
+
+**Component-probe harness (gated, test-only)** — `src/test-probe/` lets Playwright mount a single base
+Svelte primitive in isolation inside the live Foundry runtime, with controlled props, to assert its
+interaction contract independent of any sheet. `registerProbe.js` installs `game.titan._probe =
+{ components, mount(name, props?, context?), unmount(id), unmountAll() }`; `mount` creates a detached
+`<div data-titan-probe="<id>">` (positioned `fixed`, max `z-index` so it sits above Foundry chrome and
+receives pointer events), mounts the named component from `componentRegistry.js`, and returns
+`{ id, selector }`. A string `text` prop is converted to a `children` snippet via `createRawSnippet`
+(text set through `textContent`, never interpolated HTML). The registry is gated: `OnceInit.js` registers
+the probe only behind `if (__TITAN_PROBE__)` (a Vite `define` compile-time constant, `true` only under
+`vite build --mode e2e`), via a fire-and-forget dynamic `import()` so terser dead-code-eliminates it from
+the production bundle entirely. The Playwright page object `tests/e2e/componentProbe.js` exposes
+`mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`; callbacks are instrumented INSIDE
+`page.evaluate` (functions cannot cross the Node↔page boundary) and record into `window.__titanProbeEvents`.
+Specs live in `tests/e2e/component-probe.spec.js` — behavioral probes for the core set `Button`,
+`TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`. To probe a new primitive:
+add it to `componentRegistry.js`, add a `testId` prop if it lacks one, append a describe block, then
+`npm run build:e2e` before running the spec (the live Foundry serves the built bundle).
 
 **Logic layer — Playwright + fast-check** — The in-client logic tier uses Playwright `page.evaluate`
 calls against the live v14 runtime (no external module dependency). Property-based tests inject the
