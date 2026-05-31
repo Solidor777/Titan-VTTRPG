@@ -1,7 +1,9 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** write + execute the
-**2b-3 (checks-dialog)** plan.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **brainstorm 2b-3
+(checks-dialog)** — invoke `superpowers:brainstorming` FIRST (the open question is how to drive the
+rendered Svelte check-dialog DOM from Playwright; resolve that before writing a plan), then plan +
+execute via subagent-driven-development through the `titan-svelte-dev` subagent.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
@@ -72,7 +74,13 @@ re-deriving context.
    it didn't have (negative remaining, unpaid crit). Found by the fast-check invariant. Fixed with an
    affordability guard (commit `29c5083e`).
 
-## NEXT: 2b-3 checks-dialog (write the plan, then execute)
+## NEXT: 2b-3 checks-dialog (BRAINSTORM first, then plan, then execute)
+
+**Start by invoking `superpowers:brainstorming`.** The unresolved design question is how to drive the
+rendered Svelte check-option dialog from Playwright (open it, change option inputs, read recomputed
+totals, click Roll) — settle the approach in brainstorming before writing the plan. Per `.claude/CLAUDE.md`,
+load `foundry-vtt` + `titan-codebase` (and `svelte-5` + `foundry-svelte`, since the dialog is a Svelte
+surface) before/while brainstorming.
 
 **Goal:** prove the check-OPTION dialog path (which the `roll<Type>Check` APIs bypass) assembles and
 mutates parameters correctly — e.g. `requestAttributeCheck` opening `AttributeCheckDialog` when
