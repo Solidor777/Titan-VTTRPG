@@ -1,0 +1,40 @@
+import { expect, test } from '@playwright/test';
+import { login } from './fixtures.js';
+import { forceDice, resetDice } from './dice.js';
+
+/**
+ * Guards the determinism seam the whole checks-integration approach depends on: stubbing
+ * `CONFIG.Dice.randomUniform` so a d6 lands on a chosen face. If Foundry ever changes
+ * `DiceTerm.mapRandomFace`, this spec fails loudly before the check tests do.
+ */
+test.describe('forced dice seam', () => {
+   test.afterEach(async ({ page }) => {
+      // Restore the original RNG so a failed test cannot leak a stub into later specs.
+      await resetDice(page);
+   });
+
+   test('forceDice maps each queued face onto a real Roll', async ({ page }) => {
+      await login(page);
+
+      // Force three faces, then roll a real 3d6 inside the world and read the raw results.
+      await forceDice(page, [6, 4, 1]);
+      const faces = await page.evaluate(async () => {
+         const roll = new Roll('3d6');
+         await roll.evaluate();
+         return roll.terms[0].results.map((die) => die.result);
+      });
+
+      // The Roll consumes the queue in order; assert exact faces (order as produced, pre-sort).
+      expect(faces).toEqual([6, 4, 1]);
+   });
+
+   test('resetDice restores non-deterministic rolling', async ({ page }) => {
+      await login(page);
+
+      // Install then immediately reset; a fresh stub must no longer be in effect.
+      await forceDice(page, [2]);
+      await resetDice(page);
+      const isStubbed = await page.evaluate(() => globalThis.__titanForcedDiceActive === true);
+      expect(isStubbed).toBe(false);
+   });
+});
