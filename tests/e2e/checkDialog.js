@@ -5,8 +5,12 @@ import { expect } from '@playwright/test';
  *
  * Each `request<Type>Check` opens its dialog when the `titan.getCheckOptions` setting is on (and no
  * modifier key inverts it — headless Playwright never holds one). Every dialog extends `TitanDialog`
- * (ApplicationV2) so its window root is `.application.titan-dialog`, with a per-type class added by
- * `_getDialogClasses`. Option inputs are native widgets: `NumberInput` renders `<input type="number">`
+ * (ApplicationV2) so its window root carries `.application.titan-dialog`; the per-type window is
+ * identified by its element id prefix `titan-<type>-check-dialog-<actorId>...` (the actor id is
+ * suffixed with a generated UUID by the base constructor). The per-type CSS class declared in each
+ * subclass's `_getDialogClasses()` does NOT reach the DOM (the v14 `TitanDialog` never invokes that
+ * leftover method), so id-prefix targeting is the stable per-type selector. Option inputs are native
+ * widgets: `NumberInput` renders `<input type="number">`
  * and commits on keyup; `Select` renders a native `<select>`; `CheckboxInput` renders a toggle
  * `<button>` whose checked state is the presence of an `i.fa-check`. Totals render as text inside a
  * `.tag` carrying a `check-summary-*` test id.
@@ -19,23 +23,23 @@ import { expect } from '@playwright/test';
  */
 const DIALOG_META = {
    attribute: {
-      selector: '.application.titan-attribute-check-dialog',
+      selector: '.application.titan-dialog[id^="titan-attribute-check-dialog-"]',
       request: 'await actor.system.requestAttributeCheck({ attribute: "body" });',
    },
    resistance: {
-      selector: '.application.titan-resistance-check-dialog',
+      selector: '.application.titan-dialog[id^="titan-resistance-check-dialog-"]',
       request: 'await actor.system.requestResistanceCheck({ resistance: "resilience" });',
    },
    attack: {
-      selector: '.application.titan-attack-check-dialog',
+      selector: '.application.titan-dialog[id^="titan-attack-check-dialog-"]',
       request: 'await actor.system.requestAttackCheck({ itemId: fixtures.weaponId, attackIdx: 0 });',
    },
    casting: {
-      selector: '.application.titan-casting-check-dialog',
+      selector: '.application.titan-dialog[id^="titan-casting-check-dialog-"]',
       request: 'await actor.system.requestCastingCheck({ itemId: fixtures.spellId });',
    },
    item: {
-      selector: '.application.titan-item-check-dialog',
+      selector: '.application.titan-dialog[id^="titan-item-check-dialog-"]',
       request: 'await actor.system.requestItemCheck({ itemId: fixtures.abilityId, checkIdx: 0 });',
    },
 };
