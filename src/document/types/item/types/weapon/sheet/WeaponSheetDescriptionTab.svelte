@@ -25,7 +25,7 @@
 </script>
 
 <div class="tab">
-   <Tabs bind:activeTab={$appState.activeDescriptionTab} {tabs}/>
+   <Tabs bind:activeTab={$appState.tabs.description.activeDescriptionTab} {tabs}/>
 </div>
 
 <style lang="scss">
