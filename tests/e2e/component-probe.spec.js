@@ -163,3 +163,45 @@ test.describe('component probe — NumberInput / IntegerInput', () => {
       await expect(page.locator(`${selector} input[data-testid="probe-number"]`)).toBeVisible();
    });
 });
+
+test.describe('component probe — CheckboxInput', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('toggling flips the checked glyph and fires onchange', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'CheckboxInput', {
+         props: {
+            value: false,
+            testId: 'probe-checkbox',
+         },
+         events: ['onchange'],
+      });
+      const button = page.locator(`${selector} button`);
+      const check = page.locator(`${selector} button i.fa-check`);
+      await expect(check).toHaveCount(0);
+      await button.click();
+      await expect(check).toHaveCount(1);
+      await button.click();
+      await expect(check).toHaveCount(0);
+      const events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(2);
+   });
+
+   test('disabled blocks toggling', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'CheckboxInput', {
+         props: {
+            value: false,
+            disabled: true,
+         },
+         events: ['onchange'],
+      });
+      await page.locator(`${selector} button`).click({ force: true });
+      const events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(0);
+   });
+});

@@ -8,6 +8,7 @@
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {Function} [onchange] - Callback invoked after the value is toggled.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
 
    /** @type {CheckboxInputProps} */
@@ -16,6 +17,7 @@
       disabled = false,
       tooltip = void 0,
       onchange = void 0,
+      testId = void 0,
    } = $props();
 
    /** Toggles the value and invokes the onchange callback. */
@@ -27,6 +29,7 @@
 
 <button
    {disabled}
+   data-testid={testId}
    onclick={onClick}
    onmousedown={preventDefault}
    use:tooltipAction={tooltip}
