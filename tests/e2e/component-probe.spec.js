@@ -139,6 +139,8 @@ test.describe('component probe — NumberInput / IntegerInput', () => {
       await input.press('Enter');
       await input.blur();
       await expect(input).toHaveValue('7');
+      const events = await readProbeEvents(page);
+      expect(events.some((e) => e.event === 'onchange')).toBe(true);
    });
 
    test('disabled blocks editing', async ({ page }) => {
