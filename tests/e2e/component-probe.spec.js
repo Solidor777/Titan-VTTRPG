@@ -205,3 +205,48 @@ test.describe('component probe — CheckboxInput', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(0);
    });
 });
+
+test.describe('component probe — Select', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('changing the selection fires onchange and updates the value', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'Select', {
+         props: {
+            value: 'a',
+            options: [
+               { value: 'a', label: 'Alpha' },
+               { value: 'b', label: 'Beta' },
+            ],
+            testId: 'probe-select',
+         },
+         events: ['onchange'],
+      });
+      // Drop the mount-time clamp onchange (if any) so we assert only the user-driven change.
+      await clearProbeEvents(page);
+      const select = page.locator(`${selector} select`);
+      await select.selectOption('b');
+      await expect(select).toHaveValue('b');
+      const events = await readProbeEvents(page);
+      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+   });
+
+   test('disabled blocks selection', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'Select', {
+         props: {
+            value: 'a',
+            disabled: true,
+            options: [
+               { value: 'a', label: 'Alpha' },
+               { value: 'b', label: 'Beta' },
+            ],
+         },
+      });
+      await expect(page.locator(`${selector} select`)).toBeDisabled();
+   });
+});

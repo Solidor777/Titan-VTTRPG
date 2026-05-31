@@ -18,10 +18,18 @@
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
     * @property {() => void} [onchange] - Callback fired when the selected value changes.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
 
    /** @type {SelectProps} */
-   let { options = void 0, value = $bindable(void 0), disabled = false, tooltip = void 0, onchange } = $props();
+   let {
+      options = void 0,
+      value = $bindable(void 0),
+      disabled = false,
+      tooltip = void 0,
+      onchange,
+      testId = void 0,
+   } = $props();
 
    // Clamp value into the available options. Guarded so it converges (no loop): only writes when out
    // of range, which makes the next run's guard false.
@@ -35,7 +43,7 @@
    });
 </script>
 
-<select bind:value {disabled} onchange={() => onchange?.()} use:tooltipAction={tooltip}>
+<select bind:value {disabled} data-testid={testId} onchange={() => onchange?.()} use:tooltipAction={tooltip}>
    {#each options as option}
       <option value={option.value ?? option} use:tooltipAction={option.tooltip}>
          <Text text={option.label ?? option.value ?? option}/>
