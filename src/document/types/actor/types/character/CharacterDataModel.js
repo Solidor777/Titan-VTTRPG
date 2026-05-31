@@ -3334,7 +3334,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
 
       // Ensure an item ID or Item Roll Data was provided.
-      let itemRollData = options.itemRollData ?? this.parent.items.get(options.itemId)?.getRollData();
+      let itemRollData = options.itemRollData || this.parent.items.get(options.itemId)?.getRollData();
       if (!itemRollData) {
          game.titan.error(
             'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
