@@ -23,9 +23,10 @@
 
    // Capture initial trait data from the dialog's fixed props to seed the editable state.
    // This is a one-time dialog initialisation — item and traitIdx never change while mounted.
+   // Seed from a clone so binding to the inputs never mutates the live system object.
    // svelte-ignore state_referenced_locally
    /** @type {object} The custom trait being edited. */
-   let trait = $state(item?.system.customTrait[traitIdx] ?? {});
+   let trait = $state(structuredClone(item?.system.customTrait[traitIdx] ?? {}));
 
    /**
     * Saves the edited trait and closes the dialog.
@@ -35,11 +36,12 @@
       const customTrait = item?.system.customTrait;
 
       if (customTrait && customTrait[traitIdx]) {
-         customTrait[traitIdx] = trait;
+         /** @type {object[]} A fresh array with the edited trait replacing the original entry. */
+         const next = customTrait.map((existingTrait, idx) => (idx === traitIdx ? trait : existingTrait));
 
          item.update({
             system: {
-               customTrait: structuredClone(customTrait),
+               customTrait: next,
             },
          });
       }

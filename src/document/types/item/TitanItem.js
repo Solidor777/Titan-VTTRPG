@@ -196,10 +196,12 @@ export default class TitanItem extends Item {
          'Cannot modify document %s if not owner.',
          this.name,
       )) {
-         this.system.customTrait.splice(traitIdx, 1);
+         /** @type {object[]} A fresh array with the targeted Custom Trait removed. */
+         const next = this.system.customTrait.filter((trait, idx) => idx !== traitIdx);
+
          await this.update({
             system: {
-               customTrait: structuredClone(this.system.customTrait),
+               customTrait: next,
             },
          });
       }

@@ -28,11 +28,12 @@
       const customTrait = item?.system.customTrait;
 
       if (customTrait) {
-         customTrait.push(newTrait);
-
          item.update({
             system: {
-               customTrait: structuredClone(customTrait),
+               customTrait: [
+                  ...customTrait,
+                  newTrait,
+               ],
             },
          });
       }
