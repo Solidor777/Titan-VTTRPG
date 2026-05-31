@@ -25,7 +25,7 @@
     */
    const tags = $derived.by(() => {
       const result = [...itemTypeTraits];
-      for (const [idx] in document.data.system.customTrait) {
+      for (let idx = 0; idx < document.data.system.customTrait.length; idx++) {
          result.push({
             id: document.data.system.customTrait[idx].uuid,
             component: ItemSheetCustomTraitTag,

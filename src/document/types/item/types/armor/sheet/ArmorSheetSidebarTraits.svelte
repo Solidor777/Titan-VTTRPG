@@ -14,7 +14,7 @@
     */
    const itemTypeTraits = $derived.by(() => {
       const result = [];
-      for (const [idx] in document.data.system.trait) {
+      for (let idx = 0; idx < document.data.system.trait.length; idx++) {
          result.push({
             id: document.data.system.trait[idx].name,
             component: LabelTag,
