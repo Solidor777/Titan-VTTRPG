@@ -3,10 +3,15 @@ import { login } from './fixtures.js';
 
 /**
  * Phase 3a — custom-trait edit/delete behavioral coverage on an Item sheet, driven through the live UI.
- * Regression for the `for (const [idx] in ...)` bug in ItemSheetSidebarTraits.svelte that passed a STRING
- * index to the trait tag, so the edit/delete handlers' strict (number === / !==) comparisons never
- * matched: editing never replaced and deleting never removed the trait (while ADD, which ignores the
- * index, appeared to work).
+ * Regressions for two real bugs in the trait sidebar:
+ *   1. `for (const [idx] in ...)` in ItemSheetSidebarTraits.svelte passed a STRING index to the trait
+ *      tag, so the edit/delete handlers' strict (number === / !==) comparisons never matched: editing
+ *      never replaced and deleting never removed the trait (ADD ignores the index, so it appeared fine).
+ *   2. EditDeleteTag's button reset forced `font-weight: inherit`, overriding FontAwesome's required
+ *      solid weight (900), so the edit/delete glyphs fell back to the notdef "missing" box.
+ *
+ * The edit dialog has no stable CSS class (its `_getDialogClasses()` override is dead in v14), so it is
+ * selected by element-id prefix, like the check dialogs.
  */
 
 // The world item, its seeded trait, and the edited name.
@@ -57,13 +62,15 @@ test.describe('custom trait edit/delete on items', () => {
          errors.push(err.message);
       });
 
-      // The seeded trait renders as a sidebar tag.
-      const tag = page.locator('.tag').filter({ hasText: ORIGINAL_NAME });
-      await expect(tag, 'seeded trait tag should render').toBeVisible();
+      // The seeded trait renders in the sidebar.
+      await expect(
+         page.locator('.sidebar').getByText(ORIGINAL_NAME).first(),
+         'seeded trait should render',
+      ).toBeVisible();
 
-      // Open the edit dialog via the tag's edit (pen) icon.
-      await tag.locator('button.fa-pen-to-square').click();
-      const dialog = page.locator('.titan-edit-custom-trait-dialog');
+      // Open the edit dialog via the tag's edit (pen) icon, selecting the dialog by id prefix.
+      await page.locator('.sidebar button.fa-pen-to-square').click();
+      const dialog = page.locator('[id^="titan-edit-custom-trait-dialog-"]');
       await expect(dialog, 'edit-custom-trait dialog should open').toBeVisible();
 
       // Replace the name and apply.
@@ -80,9 +87,12 @@ test.describe('custom trait edit/delete on items', () => {
       expect(persisted.names, 'trait name was edited in place').toEqual([EDITED_NAME]);
 
       // Re-rendered: the sidebar shows the new name and no longer the old one.
-      await expect(page.getByText(EDITED_NAME).first(), 'edited name renders').toBeVisible();
       await expect(
-         page.locator('.tag').filter({ hasText: ORIGINAL_NAME }),
+         page.locator('.sidebar').getByText(EDITED_NAME).first(),
+         'edited name renders',
+      ).toBeVisible();
+      await expect(
+         page.locator('.sidebar').getByText(ORIGINAL_NAME),
          'old name no longer renders',
       ).toHaveCount(0);
 
@@ -95,11 +105,13 @@ test.describe('custom trait edit/delete on items', () => {
          errors.push(err.message);
       });
 
-      const tag = page.locator('.tag').filter({ hasText: ORIGINAL_NAME });
-      await expect(tag, 'seeded trait tag should render').toBeVisible();
+      await expect(
+         page.locator('.sidebar').getByText(ORIGINAL_NAME).first(),
+         'seeded trait should render',
+      ).toBeVisible();
 
       // Delete via the tag's trash icon.
-      await tag.locator('button.fa-trash').click();
+      await page.locator('.sidebar button.fa-trash').click();
       await page.waitForTimeout(500);
 
       // Persisted: the trait array is now empty.
@@ -109,10 +121,26 @@ test.describe('custom trait edit/delete on items', () => {
 
       // Re-rendered: the tag is gone.
       await expect(
-         page.locator('.tag').filter({ hasText: ORIGINAL_NAME }),
+         page.locator('.sidebar').getByText(ORIGINAL_NAME),
          'deleted tag no longer renders',
       ).toHaveCount(0);
 
       expect(errors, `uncaught errors during delete:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('the edit and delete icons render at FontAwesome solid weight (900)', async ({ page }) => {
+      // FontAwesome Free solid glyphs only exist at weight 900; a lighter weight falls back to the
+      // notdef "missing" box. Assert the icon buttons compute to weight 900.
+      const weights = await page.evaluate(() => {
+         const sidebar = document.querySelector('.sidebar');
+         const edit = sidebar?.querySelector('button.fa-pen-to-square');
+         const del = sidebar?.querySelector('button.fa-trash');
+         return {
+            edit: edit ? getComputedStyle(edit).fontWeight : null,
+            delete: del ? getComputedStyle(del).fontWeight : null,
+         };
+      });
+      expect(weights.edit, 'edit icon font-weight').toBe('900');
+      expect(weights.delete, 'delete icon font-weight').toBe('900');
    });
 });
