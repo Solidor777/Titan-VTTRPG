@@ -141,7 +141,8 @@ export default class TitanCheck {
             if (extraSuccessOnCritical) {
                for (const die of retVal.dice) {
                   if (die.final < 6 &&
-                     6 - die.final === increment
+                     6 - die.final === increment &&
+                     increment <= retVal.expertiseRemaining
                   ) {
                      retVal.expertiseRemaining -= increment;
                      die.final = 6;
