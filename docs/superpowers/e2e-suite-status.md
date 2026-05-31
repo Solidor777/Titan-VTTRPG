@@ -105,7 +105,24 @@ re-deriving context.
 
 ## Bugs found & fixed (by this testing effort)
 
-(Newest first: #4–#7 found by Phase 3a's custom-trait tests, `tests/e2e/traits.spec.js`.)
+(Newest first. #4–#7 found by `tests/e2e/traits.spec.js`; #8 by `tests/e2e/effect-reactivity.spec.js`.)
+
+9. **Edit/delete icon buttons lost their hover highlight** — the anchors→buttons conversion (`5ea0c5d5`)
+   dropped Foundry's default `a:hover` glow. Restored a `text-shadow: 0 0 8px var(--color-shadow-primary,
+   currentColor)` hover on the reset `.tag button` (text-shadow inherits to the inner `<i>`). Commit
+   visual-only (no automated test). Commit on `development`.
+8. **Sheet not reactive on effect toggle (Svelte 4→5 migration fallout)** — toggling an effect's active
+   state updated the data and fired `updateActiveEffect`, but the rendered toggle's checkmark stayed stale
+   until the tab re-mounted. Root cause: `CharacterSheetEffectToggleActiveButton` read
+   `active={effect.system.isActive}` off the **passed doc prop**, not through the reactive `document.data`
+   bridge — Svelte 5 fine-grained reactivity only tracks reads that go through `document.data`, so the
+   expression had no dependency and never re-ran. Fixed with
+   `$derived(document.data.effects.get(effect.id)?.system.isActive)`. Commit `a960e135`. **SYSTEMIC RISK:**
+   this antipattern (`someProp.system.x` read off a Document prop instead of `document.data...`) likely
+   recurs across other list/row components from the in-progress Svelte-5 migration; each instance is
+   stale-until-remount. A comprehensive audit/sweep is its own task (flagged, awaiting decision) — the
+   `titan-codebase` conventions note now documents the rule. Also note: `Tabs.svelte` lazy-mounts only the
+   active tab (`{#if tab.id === activeTab}`), so cross-tab effects always need a re-mount regardless.
 
 7. **Custom-trait description tooltip was localized** — the description is user-written, but
    `ItemSheetCustomTraitTag` passed it to `labelTooltip` as a bare string, and `processTextData` runs plain
