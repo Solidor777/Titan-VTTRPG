@@ -1,7 +1,7 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
 **Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** write + execute the
-**2b-2 (checks-integration)** plan.
+**2b-3 (checks-dialog)** plan.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
@@ -48,6 +48,18 @@ re-deriving context.
 - **2b-1 checks-engine** ✅ — `tests/unit/check/` vitest + fast-check: `calculate-check-results.test.js`,
   `apply-expertise.test.js`, `type-results.test.js`, `check-test-helpers.js`. fast-check imported as
   `import fc from 'fast-check'` (works). Full unit suite: 32 tests green.
+- **2b-2 checks-integration** ✅ — forced-dice Playwright proof that all five `roll<Type>Check` APIs
+  assemble parameters from the actor and plumb dice into `flags.titan`. Determinism seam: `tests/e2e/dice.js`
+  `forceDice(page,faces)`/`resetDice(page)` stub `CONFIG.Dice.randomUniform` (force face `f` via
+  `u=(6.5-f)/6`; `mapRandomFace` confirmed `ceil((1-u)*6)` on v14). Independent results oracle (no engine
+  import): `tests/shared/checkOracle.js` `expectedCheckResults(faces, params)`, validated by
+  `tests/unit/check/check-oracle.test.js`. Shared fixture builders `buildE2ERollerActorData` /
+  `buildE2ERollerItemData` in `tests/shared/builders.js` (roller actor + weapon/spell/ability; ability
+  carries the inlined item-check entry AND flatModifier +2 body/+2 mind → those checks roll 3 dice).
+  `tests/e2e/checks-integration.spec.js`: 5 tests, all at `totalExpertise=0`, difficulty 4; complexity 0 for
+  attribute/resistance, 1 for attack/casting/item; **resistance stays 1 die** (resistances derive from
+  attribute baseValues, so attribute flatModifiers don't boost resilience). No engine bugs found; all
+  fixture-table values held without loosening any assertion.
 
 ## Bugs found & fixed (by this testing effort)
 
@@ -60,43 +72,32 @@ re-deriving context.
    it didn't have (negative remaining, unpaid crit). Found by the fast-check invariant. Fixed with an
    affordability guard (commit `29c5083e`).
 
-## NEXT: 2b-2 checks-integration (write the plan, then execute)
+## NEXT: 2b-3 checks-dialog (write the plan, then execute)
 
-**Goal:** one forced-dice Playwright test per check type, proving each `roll<Type>Check` API assembles
-parameters from the actor and plumbs results (through the now-verified engine) into `flags.titan`.
+**Goal:** prove the check-OPTION dialog path (which the `roll<Type>Check` APIs bypass) assembles and
+mutates parameters correctly — e.g. `requestAttributeCheck` opening `AttributeCheckDialog` when
+`shouldGetCheckOptions()` is true, the `CheckDialogShell` + type-shell recomputing totals from
+`actor.system.getAttributeCheckParameters($checkOptions)` as options change, and the Roll button handing
+off to `rollAttributeCheck($checkOptions)`.
 
 **Key facts already gathered (don't re-derive):**
 
-- **Determinism seam (CONFIRMED live on 14.363):** stub `CONFIG.Dice.randomUniform`. Foundry maps a d6
-  as `face = 6 - floor(u * 6)`, so to force face `f`, return `u = (6.5 - f) / 6`. Plan: a
-  `tests/e2e/dice.js` helper `forceDice(page, faces)` that installs a stub returning successive mapped
-  values, plus a reset to restore the original RNG in `afterEach`. (Install the stub inside the
-  `page.evaluate` that performs the roll, or via a queue on `globalThis`.)
-- **The 5 dialog-bypassing roll APIs** (on `CharacterDataModel`, confirmed in
-  `tests/e2e/interaction-rolls.spec.js`): `rollAttributeCheck({ attribute })`,
-  `rollResistanceCheck({ resistance })`, `rollAttackCheck({ itemId, attackIdx })`,
-  `rollCastingCheck({ itemId })`, `rollItemCheck({ itemId, checkIdx })`. Post to chat;
-  `flags.titan.type` ∈ {attributeCheck, resistanceCheck, attackCheck, castingCheck, itemCheck};
-  results in `flags.titan.results`, parameters in `flags.titan.parameters` (incl. `difficulty`,
-  `totalDice`, `totalExpertise`).
-- **Fixture pattern:** `interaction-rolls.spec.js` builds an `E2E Roller` player actor owning a weapon
-  (attack), spell (casting), and an ability with a full inlined item-check template (item check). Reuse
-  / lift that into a builder in `tests/shared/builders.js`.
-- **Assertion approach:** force a known dice sequence of length ≥ `totalDice`; read
-  `flags.titan.parameters` (difficulty etc.) and `flags.titan.results`; compute expected results in the
-  test using the verified engine rules (successes/crit/expertise/damage) for the forced faces, and
-  assert exact equality. Because forced faces + parameters are both known, expected is exact.
-- **fast-check NOT required here** — integration uses forced dice + `page.evaluate`; the in-page
-  `injectFastCheck` harness is only for surfaces needing randomized live-actor input (e.g. rules-element
-  stacking).
+- **How to force the dialog path:** `requestAttributeCheck` (and siblings) branch on `shouldGetCheckOptions()`,
+  which reads the `titan.getCheckOptions` setting (inverted when a modifier key is held). The bypass APIs
+  used in 2b-2 (`rollAttributeCheck`, etc.) skip the dialog; to test the dialog, either set that setting or
+  call `_createAttributeCheckDialog(options)` directly. Still UNVERIFIED: how to drive the rendered Svelte
+  dialog DOM (option inputs → recomputed totals → Roll button) from Playwright.
+- **Reuse from 2b-2:** the `forceDice`/`resetDice` seam (`tests/e2e/dice.js`), the `expectedCheckResults`
+  oracle (`tests/shared/checkOracle.js`), and the `buildE2ERoller*` builders (`tests/shared/builders.js`)
+  all transfer directly.
 
-**Then:** 2b-3 checks-dialog (needs: how to open a check dialog programmatically — the roll APIs bypass
-it), 2b-4 checks-opposed (needs: how `AttackCheckParameters` reads target Defense). After checks:
-Phase 3 (UI component/manifest tiers, `testId` already on base primitives) and Phase 4 (multi-user
+**Then:** 2b-4 checks-opposed (needs: how `AttackCheckParameters` reads target Defense — select a target
+token so `targetDefense` is non-default, vs the 2b-2 no-target case where difficulty defaults to 4). After
+checks: Phase 3 (UI component/manifest tiers, `testId` already on base primitives) and Phase 4 (multi-user
 permissions + 2-client socket sync via per-user browser contexts).
 
 ## How to verify current state quickly on resume
 
-- `npx vitest run` → expect 32 passing (incl. `tests/unit/check/**`).
-- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js --reporter=list`
+- `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
+- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js --reporter=list`
   → expect all passing (Foundry must be running on :30000, or webServer launches it).

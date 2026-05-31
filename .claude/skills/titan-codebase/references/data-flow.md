@@ -32,6 +32,15 @@ messages via `_getAttributeCheckMessages`, then delegates to `_rollCheck`. (The 
 `_createAttributeCheckDialog` is invoked earlier by `requestAttributeCheck` only when user confirmation of
 options is needed; once the dialog's Roll button fires, it hands off directly to `rollAttributeCheck`.)
 
+Parameter derivation (attribute/attack/casting/item checks share `_initializeAttributeBasedCheck`):
+`totalDice = attributeDice + totalTrainingDice + diceMod`; `totalExpertise = (skillExpertise + expertiseMod)`
+(×2 if `doubleExpertise`); an untrained skill contributes 0 training and 0 expertise. Resistance checks use
+`resistanceDice = resistance[x].value` instead. Attack difficulty is
+`clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected `targetDefense` defaults to the
+attacker's own rating, yielding difficulty 4. Gotcha: resistances/ratings are derived from attribute
+**baseValues** (computed before mods), so a `flatModifier` on an attribute's `.value` does NOT propagate into
+resistance or rating dice — boost a resistance via a `resistance`-selector element, not an `attribute` one.
+
 **4. Roll & evaluate — `TitanCheck.evaluateCheck` (src/check/Check.js)**
 `_rollCheck` optionally spends Resolve via `_expendCheckResolve`, then calls `check.sendToChat()`.
 `sendToChat` calls `evaluateCheck()` if needed. `evaluateCheck` calls `rollCheckDice(totalDice)`
