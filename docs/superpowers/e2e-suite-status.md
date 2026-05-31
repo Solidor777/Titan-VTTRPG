@@ -30,11 +30,55 @@ at: **3b-remaining** (extend the probe registry over the rest of `src/helpers/sv
   mount-clamp onchange cleared/disabled), `LabelTag` (renders label + testId). **No engine bugs found.**
 - **testId parity** — added a `testId` (`data-testid`) prop to `NumberInput`, `IntegerInput`,
   `CheckboxInput`, `Select`, `LabelTag` (Button/TextInput already had it).
-- **Backlog (3b-remaining):** the rest of `src/helpers/svelte-components/**` (~63 primitives — tags, labels,
-  the `select/` subtypes, meters, editors). Add each to `componentRegistry.js` + a describe block; the
-  harness's optional `context` Map param is ready for components that read `getContext`.
+- **Backlog (3b-remaining):** the other **77** components in `src/helpers/svelte-components/**`. See the
+  dedicated "Phase 3b-remaining worklist" section below for the categorized inventory and recommended order.
 - Spec/plan: `docs/superpowers/specs/2026-05-31-titan-e2e-component-probe-design.md`,
   `docs/superpowers/plans/2026-05-31-titan-e2e-component-probe.md`.
+
+## Phase 3b-remaining worklist (resume here)
+
+**Goal:** extend the existing probe harness over the remaining **77** `src/helpers/svelte-components/**`
+primitives. The harness, page object, and `testId` pattern are DONE — this is mechanical follow-on, but
+some components need props/context the 7-component core set did not. **Brainstorm/plan first** (the core-set
+plan covered only context-free leaves); decide the harness extension for data-dependent components before
+mass-probing. Route all `.js`/`.svelte` work through `titan-svelte-dev`; subagent-driven-development.
+
+**Per-component recipe** (from `titan-codebase` conventions.md → "Component-probe harness"): add the import +
+entry to `src/test-probe/componentRegistry.js`; add a `testId` (`data-testid`) prop if the component lacks
+one; append a behavioral `describe` block to `tests/e2e/component-probe.spec.js`; `npm run build:e2e`; run.
+**Build gotcha:** probe specs require the `build:e2e` bundle, NOT `npm run build`.
+
+**Inventory by family (counts exclude the 7 already done):**
+- **Tier 1 — simple leaves (do first, context-free, mostly props-only):**
+  - top-level (8): `Text`, `Label`-likes, `Meter`, `ScrollingContainer`, `Tabs`, `LabeledElement`,
+    `BorderedColumnList`. (`Tabs` lazy-mounts only the active tab — see Phase 3d note.)
+  - label/ (5): `IconLabel`, `Label`, `ModifiableStatValueLabel`, `ModifiedValueLabel`, `TextLabel`.
+  - tag/ (18): `Tag`, `IconTag`, `IconStatTag`, `LabelTag`(done-pattern), `StatTag`, `ValueTag`,
+    `RarityTag`, `DurationTag`, `AttributeTag`, `AttributeCheckTag`, `OpposedCheckTag`, `ResistanceTag`,
+    `ResistedByTag`, `TraitTag`, `SpellAspectTag(s)`, `SpellCustomAspectTag`, `TagContainer`, `EditDeleteTag`.
+  - input/ leaves (8): `TextAreaInput`, `LabeledTextInput`, `IntegerIncrementInput`, `AttributeInput`,
+    `RarityInput`, `ResistanceInput`, `ImagePicker`, `TopFilter`.
+  - button/ leaves (most of 14): `IconButton`, `IconLabelButton`, `ImageButton`, `MiniButton`,
+    `MiniIconButton`, `ExpandButton`, `ToggleButton`, `ToggleOptionButton`, `AttributeButton`,
+    `SpendResolveButton`.
+- **Tier 2 — typed selects (16, batchable):** `AttributeSelect`, `SkillSelect`, `RaritySelect`,
+  `RatingSelect`, `ResistanceSelect`, `ResourceSelect`, `SpeedSelect`, `ModSelect`, `AttackTypeSelect`,
+  `CheckDifficultySelect`, `DamageReducedBySelect`, `InventoryItemTypeSelect`, `RulesElementOperationSelect`,
+  `ArmorTraitSelect`, `AttackTraitSelect`, `ShieldTraitSelect`. These mostly wrap the (done) `Select` with
+  preset options — verify each one's required props (some take an `options`/value source); the `Select`
+  probe (mount-clamp `onchange` cleared after mount) is the template.
+- **Tier 3 — data/context-dependent (do last; decide harness extension):**
+  - **Uses `getContext` (3):** `RichText`, `CondensedCheckButton`, `FiltereedList` — supply a stub via the
+    harness's `mount(name, props, context)` `context` Map param (already designed in, currently unused).
+  - **tag/effects/ (7):** `CustomEffectTag`, `EffectTag`, `ExpiredEffectTag`, `InitiativeEffectTag`,
+    `PermanentEffectTag`, `TurnEndEffectTag`, `TurnStartEffectTag` — likely need an effect Document prop;
+    may be better probed through the effect sheet (compare `effect-traits.spec.js`) than via the harness.
+  - **editor (1):** `ProseMirrorEditor` — wraps Foundry's editor; probe render + teardown only.
+  - **check-coupled buttons:** `ItemCheckButton`, `ResistanceButton`, `ResistanceCheckButton` — take check
+    data; the check-dialog specs (2b-3) show the data shapes.
+- Open harness question to settle in the plan: whether to extend `mount` to accept a stub Document (for the
+  effect tags / check buttons) or to cover those via their sheets instead. The core-set harness deliberately
+  scoped to context-free leaves; Tier 3 is where that boundary gets revisited.
 
 ### Phase 3a — DONE (sheet array-CRUD reactivity)
 
