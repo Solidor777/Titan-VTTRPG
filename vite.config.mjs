@@ -1,5 +1,4 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import resolve from '@rollup/plugin-node-resolve'; // This resolves NPM modules from node_modules.
 import { sveltePreprocess } from 'svelte-preprocess';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,12 +16,6 @@ const s_PACKAGE_ID = 'systems/titan';
 
 const s_COMPRESS = true;  // Set to true to compress the module bundle.
 const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).
-
-// Used in bundling particularly during development. If you npm-link packages to your project add them here.
-const s_RESOLVE_CONFIG = {
-   browser: true,
-   dedupe: ['svelte'],
-};
 
 export default () => {
    /** @type {import('vite').UserConfig} */
@@ -96,16 +89,14 @@ export default () => {
             entry: './index.js',
             formats: ['es'],
             fileName: 'index',
-         },
-      },
-      // Necessary when using the dev server for top-level await usage inside TRL.
-      optimizeDeps: {
-         esbuildOptions: {
-            target: 'es2022',
+            // Emit CSS as `style.css` to match `system.json` styles and the dev-server proxy. Without this
+            // the lib CSS filename follows `fileName` ('index') and Foundry keeps loading a stale style.css.
+            cssFileName: 'style',
          },
       },
       plugins: [
          svelte({
+            configFile: false,
             preprocess: sveltePreprocess({
                scss: {
                   api: 'modern',
@@ -125,8 +116,6 @@ export default () => {
                handler(warning);
             },
          }),
-
-         resolve(s_RESOLVE_CONFIG),    // Necessary when bundling npm-linked packages.
       ],
    };
 };

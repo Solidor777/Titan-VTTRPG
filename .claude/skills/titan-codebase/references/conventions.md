@@ -87,7 +87,24 @@ renders the chosen class the same way.
 
 **Rich text** — `ProseMirrorEditor.svelte` (`src/helpers/svelte-components/editor/`) wraps Foundry's
 native `foundry.applications.elements.HTMLProseMirrorElement`; `DocumentBoundEditorInput.svelte` and
-`DocumentEditorInput.svelte` delegate to it (TyphonJS `TJSProseMirror` is gone).
+`DocumentEditorInput.svelte` delegate to it (TyphonJS `TJSProseMirror` is gone). The wrapper runs the
+element in **toggled** mode (`toggled = true` by default): it shows enriched HTML with a hover-revealed
+pencil edit button (owner only, via core CSS) and shows the formatting toolbar only while editing. The
+two input wrappers compute `enriched` reactively with
+`foundry.applications.ux.TextEditor.implementation.enrichHTML(value, { secrets: isOwner, relativeTo:
+doc })` and pass `enriched` plus `documentUUID={doc.uuid}` so content links/relative UUIDs resolve.
+Because the `<prose-mirror>` element is appended at runtime (`container.appendChild`) it never receives
+Svelte's scoping attribute, so its fill is set with an **inline JS style** (`editor.style.flex = '1'`
+only — never zero its `min-height`, which would drop Foundry's 150px floor and collapse it) over a
+single fill container (`flex-column` + `align-items: stretch` + `flex: 1 1 auto` + `min-height: 0`);
+scoped CSS cannot target the element and `:global` is forbidden. The two input wrappers
+(`DocumentBoundEditorInput`/`DocumentEditorInput`) render `ProseMirrorEditor` as their root — they no
+longer wrap it in their own `.editor` div; instead they pass `tooltip` and `notOwner={!isOwner}`, and
+`ProseMirrorEditor`'s single container div carries the tooltip (`use:tooltipAction`) and the
+`not-owner` class. Foundry captures the toggled element's enriched HTML once at construction and
+`save()` → `_refresh()` repaints the inactive view from that snapshot, so the wrapper **rebuilds the
+element when `enriched` changes while inactive** (guarded by `classList.contains('active')`) to avoid
+stale rendered content; rebuilds never write `value`, so they do not loop with the persist effect.
 
 ## Styling
 
@@ -214,6 +231,10 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 - **Build output goes to the repo root** — `vite.config.mjs` sets `build.outDir` to the project root
   (`__dirname`), not a `dist/` folder. Source lives in `src/`; build artifacts such as `index.js` land at the
   top level. See `architecture.md` for the full directory layout.
+- **CSS must be emitted as `style.css`** — `system.json` (`styles: ["style.css"]`) and the dev-server proxy
+  both reference `style.css`, so `build.lib.cssFileName` is pinned to `'style'`. Without it the Vite 8 lib
+  build names the CSS after `lib.fileName` (`index` → `index.css`), which Foundry never loads — CSS-only
+  changes then build cleanly but silently fail to deploy while JS changes still apply.
 
 ## Test infrastructure
 
