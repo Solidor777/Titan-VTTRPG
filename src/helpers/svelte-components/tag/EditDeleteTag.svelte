@@ -62,7 +62,8 @@
       }
 
       // Reset native button chrome so the icon buttons render identically to the previous anchors.
-      // font-family is intentionally NOT reset, so the FontAwesome glyph class keeps its font.
+      // font-family and font-weight are intentionally NOT reset so the FontAwesome glyph class
+      // keeps its own font and its required 900 weight for solid glyphs.
       button {
          appearance: none;
          background: none;
@@ -71,7 +72,6 @@
          padding: 0;
          color: inherit;
          font-size: inherit;
-         font-weight: inherit;
          line-height: inherit;
          cursor: pointer;
       }
