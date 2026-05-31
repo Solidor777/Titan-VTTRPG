@@ -1,9 +1,10 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **brainstorm 2b-3
-(checks-dialog)** — invoke `superpowers:brainstorming` FIRST (the open question is how to drive the
-rendered Svelte check-dialog DOM from Playwright; resolve that before writing a plan), then plan +
-execute via subagent-driven-development through the `titan-svelte-dev` subagent.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **2b-4 checks-opposed** —
+brainstorm first. The open question: how a selected **target token** auto-populates `targetDefense`
+(Canvas/targeting), vs the 2b-3 case where the dialog sets `targetDefense` directly. Resolve the
+target-selection approach, then plan + execute via subagent-driven-development through the
+`titan-svelte-dev` subagent.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
@@ -62,6 +63,20 @@ re-deriving context.
   attribute/resistance, 1 for attack/casting/item; **resistance stays 1 die** (resistances derive from
   attribute baseValues, so attribute flatModifiers don't boost resilience). No engine bugs found; all
   fixture-table values held without loosening any assertion.
+- **2b-3 checks-dialog** ✅ — drives all five rendered Svelte check-option dialogs from Playwright.
+  Added a `testId` prop to the shared wrappers (`CheckDialogField`→`.field`, `CheckDialogSummary`→
+  `.tag`, `CheckDialogBase` Roll/Cancel buttons) and stable keys to all 18 concrete field/summary
+  components (`check-field-<key>`, `check-summary-<key>`, `check-dialog-roll`). Page object
+  `tests/e2e/checkDialog.js` opens via the gated `request<Type>Check` (sets `getCheckOptions`), drives
+  native widgets (number input commits on **keyup** via a dispatched keyup; native `<select>`;
+  checkbox is a toggle `<button>`, checked = `i.fa-check`), reads `.tag` totals, clicks Roll, reads
+  newest `flags.titan`. Spec `tests/e2e/checks-dialog.spec.js`: 5 core (mutate diceMod/expertiseMod/
+  doubleExpertise → assert recomputed totals → reset expertise to 0 → Roll → verify via the 2b-2
+  `expectedCheckResults` oracle) + attribute difficulty-`<select>` flow-through + attack `targetDefense`
+  clamp-to-6 flow-through = **7 tests, all green**. **Gotcha:** the per-type dialog CSS classes
+  (`titan-<type>-check-dialog`) are NOT rendered — v14 `TitanDialog` hardcodes `['titan','titan-dialog']`
+  and never calls the (dead) `_getDialogClasses()` overrides; select dialogs by the stable element **id**
+  prefix `[id^="titan-<type>-check-dialog-"]` instead. Found + fixed one real engine bug (#3 below).
 
 ## Bugs found & fixed (by this testing effort)
 
@@ -73,39 +88,37 @@ re-deriving context.
 2. **Expertise overspend** — `_applyExpertise` (`src/check/Check.js`) crit-success loop spent expertise
    it didn't have (negative remaining, unpaid crit). Found by the fast-check invariant. Fixed with an
    affordability guard (commit `29c5083e`).
+3. **Item check-options dialog self-closes** — `createItemCheckOptions` defaults `itemRollData` to the
+   literal `false`, but `validateItemCheckOptions` resolved it with `??` (`options.itemRollData ?? items
+   .get(itemId)?.getRollData()`), so the `false` never fell back to the item lookup → validation failed
+   → the item dialog's mount `$effect` ran `onCheckInvalid()` → `application.close()`, making item checks
+   unrollable via the dialog. The 2b-2 bypass-API tests missed it (they don't round-trip initialized
+   options through validate). Fixed by aligning validate to the truthy fallback (`||`) its two siblings
+   (`initializeItemCheckOptions`, `getItemCheckParameters`) already use (commit `f155c1e0`). Found by the
+   2b-3 item dialog test.
 
-## NEXT: 2b-3 checks-dialog (BRAINSTORM first, then plan, then execute)
+## NEXT: 2b-4 checks-opposed (BRAINSTORM first, then plan, then execute)
 
-**Start by invoking `superpowers:brainstorming`.** The unresolved design question is how to drive the
-rendered Svelte check-option dialog from Playwright (open it, change option inputs, read recomputed
-totals, click Roll) — settle the approach in brainstorming before writing the plan. Per `.claude/CLAUDE.md`,
-load `foundry-vtt` + `titan-codebase` (and `svelte-5` + `foundry-svelte`, since the dialog is a Svelte
-surface) before/while brainstorming.
+**Start by invoking `superpowers:brainstorming`.** 2b-3 set `targetDefense` directly via the dialog
+field; 2b-4's unresolved question is the **token-target** path: how a selected target token
+auto-populates `targetDefense`. The mechanics are known — `getAttackCheckParameters` (and the request
+flow at `CharacterDataModel.js:2498-2507`) reads `getTargetedCharacters()` and pulls
+`target.system.getRollData().rating.defense.value` when `options.targetDefense === undefined`; difficulty
+is then `clamp(targetDefense − attackerRating + 4, 2, 6)`. The open question is the **Playwright
+mechanism** to select a target token on the Canvas (place/target a token, then roll) — settle that before
+planning. Load `foundry-vtt` + `titan-codebase` (+ `foundry-canvas` for token targeting, and `svelte-5` +
+`foundry-svelte` if a dialog surface is touched).
 
-**Goal:** prove the check-OPTION dialog path (which the `roll<Type>Check` APIs bypass) assembles and
-mutates parameters correctly — e.g. `requestAttributeCheck` opening `AttributeCheckDialog` when
-`shouldGetCheckOptions()` is true, the `CheckDialogShell` + type-shell recomputing totals from
-`actor.system.getAttributeCheckParameters($checkOptions)` as options change, and the Roll button handing
-off to `rollAttributeCheck($checkOptions)`.
+**Reuse from 2b-2/2b-3:** `forceDice`/`resetDice` (`tests/e2e/dice.js`), `expectedCheckResults`
+(`tests/shared/checkOracle.js`), `buildE2ERoller*` (`tests/shared/builders.js`), and the dialog page
+object (`tests/e2e/checkDialog.js`) all transfer. Dialogs select by element-id prefix, not by per-type
+class (the `_getDialogClasses()` overrides are dead in v14 — see conventions.md).
 
-**Key facts already gathered (don't re-derive):**
-
-- **How to force the dialog path:** `requestAttributeCheck` (and siblings) branch on `shouldGetCheckOptions()`,
-  which reads the `titan.getCheckOptions` setting (inverted when a modifier key is held). The bypass APIs
-  used in 2b-2 (`rollAttributeCheck`, etc.) skip the dialog; to test the dialog, either set that setting or
-  call `_createAttributeCheckDialog(options)` directly. Still UNVERIFIED: how to drive the rendered Svelte
-  dialog DOM (option inputs → recomputed totals → Roll button) from Playwright.
-- **Reuse from 2b-2:** the `forceDice`/`resetDice` seam (`tests/e2e/dice.js`), the `expectedCheckResults`
-  oracle (`tests/shared/checkOracle.js`), and the `buildE2ERoller*` builders (`tests/shared/builders.js`)
-  all transfer directly.
-
-**Then:** 2b-4 checks-opposed (needs: how `AttackCheckParameters` reads target Defense — select a target
-token so `targetDefense` is non-default, vs the 2b-2 no-target case where difficulty defaults to 4). After
-checks: Phase 3 (UI component/manifest tiers, `testId` already on base primitives) and Phase 4 (multi-user
-permissions + 2-client socket sync via per-user browser contexts).
+**After checks:** Phase 3 (UI component/manifest tiers, `testId` already on base primitives + dialog
+fields) and Phase 4 (multi-user permissions + 2-client socket sync via per-user browser contexts).
 
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js --reporter=list`
-  → expect all passing (Foundry must be running on :30000, or webServer launches it).
+- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js --reporter=list`
+  → expect 40 passing (Foundry must be running on :30000, or webServer launches it).

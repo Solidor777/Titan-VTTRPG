@@ -39,6 +39,11 @@ and tears it down with `unmount(handle, { outro: true })` in `_onClose()`. `_ren
 ApplicationV2 options object — the `svelte` key is a naming holdover, not TyphonJS middleware).
 `TitanDialog` (`src/helpers/dialogs/Dialog.js`) follows the same lifecycle on a bare
 `foundry.applications.api.ApplicationV2`, mounting `options.content.class` with `options.content.props`.
+Its constructor hardcodes element classes `['titan', 'titan-dialog']` (plus `titan-dark-mode`); the
+per-type `_getDialogClasses()` overrides on every subclass are **dead code** (the v14 `TitanDialog`
+never calls that leftover de-TyphonJS hook), so per-type CSS classes like `titan-attribute-check-dialog`
+never reach the DOM. The stable per-type window identifier is the element **id** prefix
+`titan-<type>-check-dialog-<actorId>` (base ctor suffixes a generated UUID).
 
 **`ReactiveDocument` bridge** — `src/document/reactive/ReactiveDocument.svelte.js` is the
 Foundry↔Svelte-5 reactivity bridge (it replaces TyphonJS `TJSDocument`). It wraps the live document;
@@ -257,6 +262,14 @@ test code under `src/`.
   merge.
 - `globalThis.Hooks` — a `HooksMock` instance reinstalled fresh `beforeEach` test so hook registrations
   never leak across tests. Supports `on(name, fn)`, `off(name, fn)`, and `call(name, ...args)`.
+
+**`data-testid` convention** — Stable E2E selectors are wired via `testId` props on shared dialog
+wrappers. `CheckDialogField` (`src/check/dialog/CheckDialogField.svelte`) forwards its `testId` prop
+to the wrapper `<div class="field" data-testid={testId}>`. `CheckDialogSummary` forwards `testId` to
+the inner `<div class="tag" data-testid={testId}>`. `CheckDialogBase` passes `testId={'check-dialog-roll'}` and
+`testId={'check-dialog-cancel'}` to the two `Button` components. Each of the 16 concrete `CheckDialogField`
+users and 2 `CheckDialogSummary` users supplies a static string literal such as `testId={'check-field-attribute'}` or
+`testId={'check-summary-totalDice'}`. Playwright specs select these with `page.locator('[data-testid="..."]')`.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against a running Foundry world
 (`playwright.config.mjs`, `baseURL: http://localhost:30000`; env `FOUNDRY_USER` / optional
