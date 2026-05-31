@@ -86,7 +86,7 @@ test.describe('v14 effect check rolling', () => {
    test('effect roll data carries the effect description', async ({ page }) => {
       const description = await page.evaluate(({ actorName, effectName }) => {
          const actor = game.actors.getName(actorName);
-         const effect = actor.effects.getName(effectName);
+         const effect = actor.effects.find((e) => e.name === effectName);
          return effect.getRollData().description;
       }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME });
 
@@ -102,7 +102,7 @@ test.describe('v14 effect check rolling', () => {
       // Roll the effect's check through the shared engine using the itemRollData passthrough.
       const result = await page.evaluate(async ({ actorName, effectName }) => {
          const actor = game.actors.getName(actorName);
-         const effect = actor.effects.getName(effectName);
+         const effect = actor.effects.find((e) => e.name === effectName);
 
          const before = game.messages.size;
          await actor.system.requestItemCheck({ itemRollData: effect.getRollData(), checkIdx: 0 });
