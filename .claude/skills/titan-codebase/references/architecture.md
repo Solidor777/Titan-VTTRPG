@@ -68,6 +68,22 @@ self-contained Svelte UIs that live beside their check type.
 Base classes (`TitanDataModel.js`, `TitanDocumentSheet.js`) in `document/data-model/` and `document/sheet/` are
 extended by every concrete type under `document/types/`.
 
+## Test layout
+
+Unit tests live under `tests/` (excluded from the Vite build); Vitest is configured in `vitest.config.mjs`
+(`environment: 'happy-dom'`, `globals: true`, `include: ['tests/unit/**/*.test.js']`):
+
+- `tests/setup.js` — global Vitest setup: injects `globalThis.foundry` (with `MockDocument` and `mergeObject`)
+  and a fresh `HooksMock` on `globalThis.Hooks` before every test.
+- `tests/unit/` — Vitest unit tests (`.test.js`).
+- `tests/components/` — Svelte probe components used by unit tests (e.g. `DocumentProbe.svelte`).
+- `tests/shared/` — Framework-agnostic fixture helpers shared by Vitest and Quench/Playwright:
+  - `fixtureConstants.js` — typed constants for known fixture values (e.g. `FLAT_MODIFIER`).
+  - `builders.js` — pure factory functions returning plain `Document.create` payloads (no live documents,
+    no side effects); consumed by Vitest directly and by Quench/Playwright via `Document.create` or
+    `page.evaluate`.
+- `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
+
 ## Build and output
 
 **Vite configuration** (`vite.config.mjs`):

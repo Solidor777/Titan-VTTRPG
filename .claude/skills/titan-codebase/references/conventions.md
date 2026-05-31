@@ -50,6 +50,14 @@ automatically when the last reactive reader unsubscribes (on unmount). Because `
 document, reads (`.data.system.x`), writes (`.data.update(...)`), collections (`.data.items`), and
 methods all go through the same accessor.
 
+**Never mutate a live `document.system.*` array in place before `update()`** — pushing/splicing the
+live array (e.g. `this.system.customTrait.push(x); this.update({ system: { customTrait: ... } })`)
+defeats `ReactiveDocument` change-detection: the document persists but dependent `$derived`/sheets do
+not re-render. Always build a fresh array and pass that to `update()` (e.g.
+`this.update({ system: { customTrait: [...this.system.customTrait, x] } })`). This bug was fixed
+across the custom-trait add/edit/delete paths on items and effects; the same antipattern still exists
+in `TitanActiveEffect`'s inline-`check` add/delete paths and in `RulesElementMixin` add/delete.
+
 **Context access convention** — `DocumentSheetShell.svelte` sets the `ReactiveDocument` bridge into
 context under `'document'` and the UI-state store under `'applicationState'`. Every descendant reads:
 
@@ -266,18 +274,31 @@ mode; `npm run test:e2e` runs the Playwright suite above.
 `registerQuenchTests()` function that calls `Hooks.on('quenchReady', (quench) => { ... })`. This
 listener is COMPLETELY INERT unless the Quench module (v0.10+) is installed and enabled; Quench fires
 `quenchReady` only from its own `setup` hook. `registerQuenchTests()` is called unconditionally at
-module level in `src/index.js` (after the other `Hooks.once` registrations). Two batches are
-registered:
-- `titan.render.player-sheet` (`displayName: 'TITAN: Player sheet render smoke test'`) — uses
-  `before`/`after` plus `describe`/`it`/`assert` from the Quench context object; finds a
-  `player`-type actor via `game.actors.find(a => a.type === 'player')`, renders its sheet, asserts
-  `actor.sheet.element` is present, and closes the sheet in `after`. Skips gracefully via
-  `this.skip()` inside each `it` if no player actor exists.
-- `titan.checks.accuracy` (`displayName: 'TITAN: Check result accuracy (placeholder)'`) — a single
-  `it` that immediately calls `this.skip()`, reserving the slot for future check-result accuracy
-  tests.
+module level in `src/index.js` (after the other `Hooks.once` registrations). The registrar is thin: it
+imports per-batch registrar modules from `src/quench/batches/` and invokes each with the `quench` API
+object inside the `quenchReady` listener. One batch is registered:
+- `titan.render.player-sheet` (`displayName: 'TITAN: Player sheet render smoke test'`), defined by the
+  default export `registerPlayerSheetRenderBatch(quench)` in
+  `src/quench/batches/player-sheet-render.batch.js` — uses `before`/`after` plus `describe`/`it`/`assert`
+  from the Quench context object; finds a `player`-type actor via
+  `game.actors.find(a => a.type === 'player')`, renders its sheet, asserts `actor.sheet.element` is
+  present, and closes the sheet in `after`. Skips gracefully via `this.skip()` if no player actor exists.
+New batches follow the same pattern: add a `*.batch.js` module under `src/quench/batches/` exporting a
+default `register<Name>Batch(quench)`, then import and call it in `RegisterQuenchTests.js`.
 The Quench batch API (`quench.registerBatch(key, (context) => { ... }, { displayName })`) was
 confirmed from `modules/quench/README.md`. `this.skip()` (Mocha) marks a test pending at runtime.
+
+**Quench → Playwright bridge** — `tests/e2e/quench-runner.spec.js` (run via the `test:e2e:quench`
+npm script) is the single signal for the in-client logic layer: it logs in via the `login` fixture,
+then `test.skip()`s cleanly when `typeof game.quench === 'undefined'` (Quench absent/disabled in the
+test world). When present, it calls `await game.quench.runAllBatches()` in-page, reads
+`runner.stats.failures`, and fails the Playwright run on any non-zero failure count. Note: the Quench
+module is installed under `modules/quench` but is NOT enabled in the e2e test world, so this spec
+currently SKIPs; enable Quench in that world to fully exercise the bridge. **Caveat:** Quench is last
+verified for Foundry **v13**; on v14 it may have version-induced bugs (init, or a changed
+`runAllBatches()`/`runner.stats` shape). The bridge's `runner.stats.failures` read is therefore
+UNVERIFIED on v14 — validate it before relying on the Quench logic layer; the safer v14 path for
+logic assertions is Playwright `page.evaluate` against the live data models (no external dependency).
 
 ## Style rules live in CLAUDE.md
 
