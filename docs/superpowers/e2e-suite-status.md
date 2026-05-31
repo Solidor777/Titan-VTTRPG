@@ -1,17 +1,21 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **finish Phase 3a.** Concern A's
-**item** custom-trait coverage is done (`tests/e2e/traits.spec.js`, 5 tests) and fixed four real bugs
-(#4–#7). A separate reactivity bug (#8, effect toggle) and the icon hover (#9) were also fixed mid-stream.
-Remaining in 3a: (a) **effect** custom-trait edit/delete coverage (effects reuse the same fixed
-`ItemSheetSidebarTraits`, so they should now work — needs a test), and (b) **Concern B** — the
-rules-element add/delete reactivity **bug hunt** (`RulesElementMixin.addRulesElement/deleteRulesElement`
-mutate in place and pass the mutated reference to `update()`; user pre-authorized the fresh-array fix).
-Then 3b (component-tier probe harness), 3c (integration manifests), and **3d — reactive-control sweep**
-(see below) per the spec's "Phase 3 decomposition". All of the checks surface (2b-1..2b-4) is done. Phase 3a
-Concern A's item custom-trait coverage (`tests/e2e/traits.spec.js`, 5 tests) found and fixed **four** real
-bugs (#4–#7 below): the idx string bug, the FontAwesome `font-family`/`<button>` icon bug, the
-localized-description tooltip, and the edit dialog's missing class.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3b / 3c / 3d.** Phase 3a
+is **complete**. Pick up at 3b (component-tier probe harness over the base primitives), 3c (integration
+manifests), and continue **3d — reactive-control sweep** (next backlog item: item/effect **expanded**
+toggle; see the 3d section). Full e2e suite is **61 passing** (`npx playwright test`). All of the checks
+surface (2b-1..2b-4) and Phase 3a are done.
+
+### Phase 3a — DONE (sheet array-CRUD reactivity)
+
+- **Concern A (custom traits):** items — `tests/e2e/traits.spec.js` (5 tests), found+fixed **four** real
+  bugs (#4 idx string, #5 FA `font-family`/`<button>` icon, #7 localized-description tooltip, #6 edit-dialog
+  missing class); effects — `tests/e2e/effect-traits.spec.js` (2 tests, lock-in, reuse the fixed sidebar).
+- **Concern B (rules elements):** `tests/e2e/rules-element-crud.spec.js` (1 test) — add/delete list
+  reactivity **works** (no bug; the in-place mutation is benign because `this.rulesElement` is prepared
+  data, not `_source`, so Foundry still diffs and `updateItem` fires). Regression lock-in.
+- **Mid-stream (reported by user):** effect-toggle reactivity bug #8 fixed (`tests/e2e/effect-reactivity.spec.js`,
+  seeds Phase 3d), icon hover #9 restored.
 
 ## Phase 3d — reactive-control e2e sweep (scoped per user, 2026-05-31)
 
