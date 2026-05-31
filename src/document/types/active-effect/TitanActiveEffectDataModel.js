@@ -117,6 +117,7 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
     */
    getRollData() {
       const retVal = super.getRollData();
+      retVal.description = this.parent.description;
       retVal.duration = structuredClone(this.duration);
       retVal.check = structuredClone(this.check);
       retVal.customTrait = structuredClone(this.customTrait);
