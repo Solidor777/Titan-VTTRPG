@@ -39,11 +39,12 @@ and tears it down with `unmount(handle, { outro: true })` in `_onClose()`. `_ren
 ApplicationV2 options object — the `svelte` key is a naming holdover, not TyphonJS middleware).
 `TitanDialog` (`src/helpers/dialogs/Dialog.js`) follows the same lifecycle on a bare
 `foundry.applications.api.ApplicationV2`, mounting `options.content.class` with `options.content.props`.
-Its constructor hardcodes element classes `['titan', 'titan-dialog']` (plus `titan-dark-mode`); the
-per-type `_getDialogClasses()` overrides on every subclass are **dead code** (the v14 `TitanDialog`
-never calls that leftover de-TyphonJS hook), so per-type CSS classes like `titan-attribute-check-dialog`
-never reach the DOM. The stable per-type window identifier is the element **id** prefix
-`titan-<type>-check-dialog-<actorId>` (base ctor suffixes a generated UUID).
+Its constructor hardcodes element classes `['titan', 'titan-dialog']` (plus `titan-dark-mode`); any
+per-type CSS classes must be passed as `classes: [...]` in the `super({...})` options object (the
+v14 `TitanDialog` never calls `_getDialogClasses()` — that leftover de-TyphonJS override is dead).
+`AddCustomTraitDialog` and `EditCustomTraitDialog` both use the correct `classes:` pattern. The stable
+per-type window identifier is the element **id** prefix `titan-<type>-check-dialog-<actorId>` (base
+ctor suffixes a generated UUID).
 
 **`ReactiveDocument` bridge** — `src/document/reactive/ReactiveDocument.svelte.js` is the
 Foundry↔Svelte-5 reactivity bridge (it replaces TyphonJS `TJSDocument`). It wraps the live document;
@@ -133,13 +134,22 @@ stale rendered content; rebuilds never write `value`, so they do not loop with t
 SCSS mixins are the deliberate, preferred styling mechanism — a codebase-wide refactor replaced all
 `:global` selector usage with mixins, and no `:global` occurrences remain in `src/`.
 
-**Icon-button resets must not force `font-weight`** — `EditDeleteTag.svelte`'s `.tag button { ... }`
-block resets native button chrome (appearance, background, border, margin, padding, color, font-size,
-line-height, cursor) but intentionally omits `font-weight`. The `.tag button` selector has specificity
-0,1,1, which beats FontAwesome's `.fas` rule (0,1,0), so including `font-weight: inherit` overrides
-FA's required `font-weight: 900` and causes solid glyphs (`fa-pen-to-square`, `fa-trash`) to render
-as the notdef box. The same applies to `font-family`: both must be left unset in button resets that
-sit inside FontAwesome icon button contexts.
+**FontAwesome icon classes belong on an inner `<i>`, never on `<button>` directly** —
+Foundry's global button styling (`Signika, …`) has higher specificity than `.fas`, so placing the FA
+class on a `<button>` causes the Signika font to win and glyphs render as the notdef box. The
+established pattern (used in `IconLabel` inside `Button`, and now in `EditDeleteTag.svelte`) is to put
+the FA class on an inner `<i class={ICON}></i>` inside the button. The `.tag button { ... }` reset in
+`EditDeleteTag.svelte` resets button chrome (appearance, background, border, margin, padding, color,
+font-size, line-height, cursor) without touching `font-family` or `font-weight`; since the glyph now
+lives on the `<i>` these two properties are irrelevant on the button, but must still not be reset to
+`inherit` in any context where FA icon `<i>` elements are nested inside buttons.
+
+**User-authored text in tooltips must use `{ text, localize: false }`** — `TooltipAction.js`
+processes tooltip data through `processTextData`, which calls `localize()` on a bare string. Passing a
+user-written value (e.g. a custom-trait description) as a plain string therefore runs it through
+`game.i18n.localize`, corrupting arbitrary text. Pass a TextData object instead:
+`{ text: userValue, localize: false }`. Localization keys (edit/delete button tooltips, etc.) can
+continue as plain strings.
 
 **Where mixins live:** `src/styles/Mixins/` contains per-domain files (see `architecture.md`,
 `src/styles/` section, for the full mixin file list).
