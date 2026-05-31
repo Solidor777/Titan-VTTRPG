@@ -99,9 +99,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {boolean} [ineffective = false] - Whether the Attack had the Ineffective trait.
  * @property {boolean} [penetrating = false] - Whether the Attack had the Penetrating trait.
  * @property {boolean} [updateActor = true] - Whether to update the Character after applying the Damage.
- *    When updating multiple values, it is useful to set this to false.
+ * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
- *    When sending multiple reports, it is useful to set this to false.
+ * When sending multiple reports, it is useful to set this to false.
  * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
@@ -131,9 +131,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * Options for applying Healing to a Character.
  * @typedef {object} HealingOptions
  * @property {boolean} [updateActor = true] - Whether to update the Character after applying the Healing.
- *    When updating multiple values, it is useful to set this to false.
+ * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
- *    When sending multiple reports, it is useful to set this to false.
+ * When sending multiple reports, it is useful to set this to false.
  * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
@@ -156,9 +156,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * Options for restoring a Character's Resolve.
  * @typedef {object} RestoreResolveOptions
  * @property {boolean} [updateActor = true] - Whether to update the Character after restoring the Resolve.
- *    When updating multiple values, it is useful to set this to false.
+ * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
- *    When sending multiple reports, it is useful to set this to false.
+ * When sending multiple reports, it is useful to set this to false.
  * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
@@ -166,9 +166,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * Options for spending a Character's Resolve.
  * @typedef {object} SpendResolveOptions
  * @property {boolean} [updateActor = true] - Whether to update the Character after spending the Resolve.
- *    When updating multiple values, it is useful to set this to false.
+ * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
- *    When sending multiple reports, it is useful to set this to false.
+ * When sending multiple reports, it is useful to set this to false.
  * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
@@ -187,9 +187,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @typedef {object} RendOptions
  * @property {boolean} [magical = false] - Whether the rending Attack was magical.
  * @property {boolean} [updateArmor = true] - Whether to update the Armor after applying the Rend.
- *    When updating multiple values, it is useful to set this to false.
+ * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
- *    When sending multiple reports, it is useful to set this to false.
+ * When sending multiple reports, it is useful to set this to false.
  * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
@@ -208,9 +208,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * Options for Repairing the character's Armor.
  * @typedef {object} RepairsOptions
  * @property {boolean} [updateArmor = true] - Whether to update the Armor after applying the repairs.
- *    When updating multiple values, it is useful to set this to false.
+ * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
- *    When sending multiple reports, it is useful to set this to false.
+ * When sending multiple reports, it is useful to set this to false.
  * @property {boolean} [playSound = true] - Whether to play a sound when sending the report.
  */
 
@@ -264,8 +264,8 @@ import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Actor data model with extra functionality for Characters.
- * @extends {TitanActorDataModel}
  * @property {TitanActor} parent - The Actor that owns this data model.
+ * @extends {TitanActorDataModel}
  */
 export default class CharacterDataModel extends TitanActorDataModel {
 
@@ -476,8 +476,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Called before an Item is removed from this Actor.
-    * @param {TitanItem} item - The Item being deleted.
     * @override
+    * @param {TitanItem} item - The Item being deleted.
     */
    async preDeleteItem(item) {
       if (assert(
@@ -539,7 +539,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets all the Effect Active Effects affecting this Character that have Expired.
     * @returns {ActiveEffect[]|boolean} Array of Expired Effect Active Effects affecting this character, or false if
-    *    there are none.
+    * there are none.
     */
    getExpiredEffects() {
       const effects = this.parent.effects.filter((effect) => effect.type === 'effect' && effect.system.isExpired);
@@ -720,7 +720,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
        * Copies the Rules Elements from an item to the Rules Elements array.
        * @param {TitanItem} item - The Item to copy the Rules Elements from.
        * @param {string} type - The type by which to categorize the items Rules Elements (ability, equipment, or
-       *    effect).
+       * effect).
        */
       function processItemElements(item, type) {
          processElements(item.system.rulesElement, type);
@@ -1173,7 +1173,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Applies Conditional Rating Modifier Rules Elements to this Character.
     * @param {ConditionalRatingModifierElement[]} elements - Array of Conditional Rating Modifier Rules Elements to
-    *    apply.
+    * apply.
     * @private
     */
    _applyConditionalRatingModifierElements(elements) {
@@ -1291,7 +1291,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Applies Defense mods from trait-based Conditional Rating Modifier Rules Elements to this Character.
     * @param {ConditionalRatingModifierElement[]} elements - Array of Conditional Rating Modifier Rules Elements that
-    *    modify defense.
+    * modify defense.
     * @param {TitanItem} item - Item to check for satisfying modifier conditions.
     * @private
     */
@@ -1697,7 +1697,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} selector - The type of condition for modifying the rating.
     * @param {*[]} keys - Array of keys to test against.
     * @returns {object|boolean} Object containing the mods to apply, sorted by source type, or false if there were no
-    *    mods matching the input.
+    * mods matching the input.
     * @private
     */
    _getConditionalRatingModsForSelectorKeys(
@@ -1734,7 +1734,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} selector - The type of condition for modifying the rating (attackType, etc.).
     * @param {string} key - The specific result of the condition for modifying the rating (melee, ranged, etc.).
     * @returns {object|boolean} Object containing the mods to apply, sorted by source type, or false if there were no
-    *    mods matching the input.
+    * mods matching the input.
     * @private
     */
    _getConditionalRatingModsForSelectorKey(
@@ -3690,7 +3690,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Helper function for getting the conditional check modifiers for the inputted selector and key pair.
     * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check and
-    *    modifier type.
+    * modifier type.
     * @param {string} selector - The type of condition for modifying the check (any, attribute, trait, etc.).
     * @param {string} key - The specific result of the condition for modifying the check (body, melee, etc.).
     * @returns {number} The mod to apply to the requested check.
@@ -3717,7 +3717,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Helper function for getting the sum conditional check modifiers for the inputted selector and an array of keys.
     * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check and
-    *    modifier type.
+    * modifier type.
     * @param {string} selector - The type of condition for modifying the check (trait, customTrait.).
     * @param {*[]} keys - Array of keys to test against.
     * @returns {number} The mod to apply to the requested check.
@@ -3753,7 +3753,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} selector - Desired Selector value to filter for.
     * @param {string} key - Desired Key value to filter for.
     * @returns {string[]|boolean} Array of messages whose Selector and Key values match those provided, or false if
-    *    there were no matches.
+    * there were no matches.
     * @private
     */
    _getRollMessages(categoryMessages, selector, key) {
@@ -3780,7 +3780,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} selector - Desired Selector value to filter for.
     * @param {string[]} keys - Array of desired Key values to filter for.
     * @returns {string[]|boolean} Array of messages whose Selector and Key values match those provided, or false if
-    *    there were no matches.
+    * there were no matches.
     * @private
     */
    _getRollMessagesForSelectorKeys(categoryMessages, selector, keys) {
@@ -5471,7 +5471,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @param {string} autoRemoveExpiredEffects - The setting for automatically removing expired effects.
     * @param {ActiveEffect[]} expiredEffects - The expired Effect Active Effects for this character.
     * @param {object} reportData - Report data object for storing the result of removing expired effects,
-    *    such as whether they were removed, or whether a button should be shown to remove them.
+    * such as whether they were removed, or whether a button should be shown to remove them.
     * @returns {Promise<void>}
     */
    async _processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData) {

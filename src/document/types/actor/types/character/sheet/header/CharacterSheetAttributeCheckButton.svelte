@@ -16,13 +16,13 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {AttributeCheckParameters} Calculated check parameters. */
+   /** @type {AttributeCheckParameters} Resolved dice and modifiers for the attribute check this button rolls. */
    let checkParameters = $derived(
       document.data.system.getAttributeCheckParameters(
          document.data.system.initializeAttributeCheckOptions({ attribute: attribute }))
    );
 
-   /** @type {string} Calculated tooltip. */
+   /** @type {string} Hover text describing the attribute and its check modifiers. */
    let tooltip = $derived(
       localize(`${checkParameters.attribute}.desc`) +
       getAttributeCheckParametersTooltip(checkParameters)
@@ -30,7 +30,7 @@
 
    // attribute is a fixed prop for this button's lifetime; capturing once for the icon is correct.
    // svelte-ignore state_referenced_locally
-   /** @type {string} Calculated icon. */
+   /** @type {string} Font-icon class chosen to represent this attribute. */
    const icon = getIcon(attribute);
 </script>
 

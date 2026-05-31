@@ -20,6 +20,7 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    #bridge = void 0;
 
    /**
+    * Resolves the polymorphic constructor arguments and applies the default and theme CSS classes to the sheet.
     * @param {foundry.abstract.Document} sheetDocument - The Document this sheet represents.
     * @param {object} [options={}] - Application configuration options.
     */
@@ -107,7 +108,7 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    /**
     * Tear down the Svelte tree and the bridge when the window closes.
     * @override
-    * @param {object} options - Close options.
+    * @param {object} options - Settings forwarded from the Application close lifecycle.
     * @protected
     */
    _onClose(options) {

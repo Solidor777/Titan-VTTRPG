@@ -11,6 +11,7 @@ import { EDIT_TOKEN_ICON, IMPORT_ICON, LINKED_ICON, UNLINKED_ICON } from '~/syst
  */
 export default class TitanActorSheet extends TitanDocumentSheet {
    /**
+    * Resolves the synthetic-token Actor, merges the Actor sheet CSS classes, and stores the Actor on the sheet.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
     * @param {object} [options={}] - Application configuration options.
     */
@@ -197,7 +198,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
     * @returns {Promise<ActiveEffect[] | boolean>} The created ActiveEffect
-    *    instances, or false if the effect couldn't be created.
+    * instances, or false if the effect couldn't be created.
     * @protected
     */
    async _onDropActiveEffect(event, data) {
@@ -218,7 +219,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
     * @returns {Promise<Item[] | boolean>} The created or updated Item instances,
-    *    or false if the drop was not permitted.
+    * or false if the drop was not permitted.
     * @protected
     */
    async _onDropItem(event, data) {
@@ -296,7 +297,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
     * @returns {Promise<Item[] | boolean>} The created Item instances, or false if the folder was invalid or not of type
-    *    Item.
+    * Item.
     * @protected
     */
    async _onDropFolder(event, data) {
@@ -346,7 +347,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @override
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @returns {Promise<Item[] | ActiveEffect[] | boolean>} The newly created
-    *    embedded documents, or false if the drop was not allowed.
+    * embedded documents, or false if the drop was not allowed.
     * @protected
     */
    async _onDrop(event) {

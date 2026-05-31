@@ -58,13 +58,17 @@
     */
 
    /**
-    * @type {{
-    *    effect: CustomEffectData | ExpiredEffectData | InitiativeEffectData
-    *       | PermanentEffectData | TurnEffectData | ConditionEffectData,
-    *    icon?: string
-    * }}
-    * Props for this component.
+    * @typedef {CustomEffectData | ExpiredEffectData | InitiativeEffectData | PermanentEffectData | TurnEffectData
+    * | ConditionEffectData} EffectTagEffectData Any of the duration-specific effect data shapes this tag can render.
     */
+
+   /**
+    * @typedef {object} EffectTagProps
+    * @property {EffectTagEffectData} effect - The effect data this tag displays.
+    * @property {string} [icon] - Optional font-icon class shown alongside the effect.
+    */
+
+   /** @type {EffectTagProps} */
    let { effect = void 0, icon = void 0 } = $props();
 
    /** @type {string} Calculated tooltip depending on whether the effect has a description. */

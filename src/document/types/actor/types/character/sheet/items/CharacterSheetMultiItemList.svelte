@@ -38,7 +38,8 @@
 
    // Drag item start.
    /**
-    * @param {DragEvent} event - The drag event.
+    * Serializes the dragged item onto the drag payload and flags it as the active hover target.
+    * @param {DragEvent} event - The native dragstart event whose data transfer receives the payload.
     * @param {string} id - The ID of the item being dragged.
     */
    function onDragStart(event, id) {
@@ -57,6 +58,7 @@
 
    // Drag item hovered.
    /**
+    * Marks the hovered item as the current drop target while a drag is in progress.
     * @param {string} id - The ID of the item being hovered over.
     */
    function onDragEnter(id) {

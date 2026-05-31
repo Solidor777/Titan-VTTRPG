@@ -9,6 +9,7 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
 export default class ConfirmRegenerateUUIDDialog extends ConfirmationDialog {
 
    /**
+    * Configures the confirmation prompt and registers the callback that regenerates the Document's UUID on confirm.
     * @param {TitanItem | TitanActor} document - The Document to regenerate the UUID for.
     */
    constructor(document) {

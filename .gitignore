@@ -11,3 +11,6 @@ node_modules/
 titan.zip
 test-results/
 playwright-report/
+packs/**/LOG
+packs/**/LOCK
+*.old

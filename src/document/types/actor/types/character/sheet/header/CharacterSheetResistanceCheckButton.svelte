@@ -20,19 +20,19 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {ResistanceCheckParameters} Calculated check parameters. */
+   /** @type {ResistanceCheckParameters} Resolved dice and modifiers for the resistance check this button rolls. */
    let checkParameters = $derived(
       document.data.system.getResistanceCheckParameters(
          document.data.system.initializeResistanceCheckOptions({ resistance: resistance }))
    );
 
-   /** @type {string} Calculated tooltip. */
+   /** @type {string} Hover text describing the resistance and its check modifiers. */
    let tooltip = $derived(
       localize(`${checkParameters.resistance}.desc`) +
       getResistanceCheckParametersTooltip(checkParameters)
    );
 
-   /** @type {string} Calculated icon. */
+   /** @type {string} Font-icon class chosen to represent this resistance. */
    const icon = (() => {
       switch (resistance) {
          case 'reflexes': {

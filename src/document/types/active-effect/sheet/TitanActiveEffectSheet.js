@@ -7,11 +7,12 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
  * A Document Sheet class for Titan Active Effects of the 'effect' subtype.
  * Mirrors the effect Item sheet (Description / Checks / Rules Elements tabs and a duration header) while
  * targeting native ActiveEffect fields where appropriate (name, img, description, disabled).
- * @extends {TitanDocumentSheet}
  * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
+ * @extends {TitanDocumentSheet}
  */
 export default class TitanActiveEffectSheet extends TitanDocumentSheet {
    /**
+    * Merges the Active Effect sheet CSS classes into the options before delegating to the base document sheet.
     * @param {TitanActiveEffect} sheetDocument - The Active Effect this sheet represents.
     * @param {object} [options={}] - Application configuration options.
     */

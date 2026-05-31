@@ -6,8 +6,8 @@ import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Extends the base Item class to implement additional system-specific logic for Titan.
- * @extends {Item}
  * @property {TitanItemSheet} sheet - The Sheet that represents this Item.
+ * @extends {Item}
  */
 export default class TitanItem extends Item {
 
@@ -207,7 +207,7 @@ export default class TitanItem extends Item {
 
    /**
     * Marks the item as being deleted before actually deleting the item
-    *    so that asynchronous update operations will not apply.
+    * so that asynchronous update operations will not apply.
     * @returns {Promise<void|boolean>} Resolves once the item is deleted, or false if the deletion could not proceed.
     */
    async safeDelete() {

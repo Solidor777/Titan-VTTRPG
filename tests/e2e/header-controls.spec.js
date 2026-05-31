@@ -5,12 +5,12 @@ import { ensureDocument, login } from './fixtures.js';
  * Render a document's sheet and open its AppV2 window-header controls dropdown,
  * returning the labels of the control entries that appear.
  *
- * v14 renders `_getHeaderControls()` entries inside the controls dropdown opened
+ * V14 renders `_getHeaderControls()` entries inside the controls dropdown opened
  * by the header ellipsis button (`button[data-action="toggleControls"]`). The
  * opened menu lives at `#context-menu` with one `li.context-item` per entry.
- * @param {import('@playwright/test').Page} - page      The Playwright page to drive.
- * @param {string}                          - locateSrc Stringified locator returning the document.
- * @param {string}                          - sheetSelector CSS selector the rendered sheet must expose.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {string} locateSrc - Stringified locator returning the document.
+ * @param {string} sheetSelector - CSS selector the rendered sheet must expose.
  * @returns {Promise<string[]>} The trimmed text labels of the dropdown control entries.
  */
 async function openHeaderControls(page, locateSrc, sheetSelector) {

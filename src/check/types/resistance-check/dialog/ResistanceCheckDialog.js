@@ -11,9 +11,10 @@ import ResistanceCheckDialogShell from '~/check/types/resistance-check/dialog/Re
 export default class ResistanceCheckDialog extends TitanDialog {
 
    /**
+    * Constructs the Resistance Check dialog and seeds its reactive stores with the supplied options and parameters.
     * @param {ResistanceCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {ResistanceCheckParameters} checkParameters - The initial
-    *    parameters for the check, calculated from the options.
+    * parameters for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
@@ -33,9 +34,9 @@ export default class ResistanceCheckDialog extends TitanDialog {
    }
 
    /**
+    * @override
     * @returns {string[]} Array of CSS classes to apply to the dialog element.
     * @protected
-    * @override
     */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();

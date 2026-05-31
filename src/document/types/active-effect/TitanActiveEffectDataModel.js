@@ -14,14 +14,14 @@ import createDataField from '~/helpers/utility-functions/CreateDataField.js';
  * Carries the Rules Elements, the custom Titan duration, item-check templates, and custom traits.
  * Active/inactive state is the native ActiveEffect.disabled field; the rich description is the native
  * ActiveEffect.description field.
- * @extends {TitanDataModel}
  * @property {TitanActiveEffect} parent - The Active Effect that owns this data model.
+ * @extends {TitanDataModel}
  */
 export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanDataModel) {
    /**
     * Defines the data schema for Titan Active Effect documents.
-    * @returns {object} The document schema.
     * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     * @protected
     */
    static _defineDocumentSchema() {
@@ -85,9 +85,9 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
 
    /**
     * Captures the owning actor's active-combat initiative onto a new effect, if applicable.
-    * @param {object} data - The initial document data.
-    * @returns {object | undefined} Initial data overrides, or undefined if none.
     * @override
+    * @param {object} data - The source values supplied when the effect is being created.
+    * @returns {object | undefined} Initial data overrides, or undefined if none.
     * @protected
     */
    _getInitialDocumentData(data) {
@@ -112,8 +112,8 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
 
    /**
     * Returns the roll data for this effect.
-    * @returns {object} The roll data.
     * @override
+    * @returns {object} Object of properties usable as substitution variables when evaluating roll formulas.
     */
    getRollData() {
       const retVal = super.getRollData();

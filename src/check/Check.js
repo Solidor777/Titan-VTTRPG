@@ -40,6 +40,7 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 export default class TitanCheck {
 
    /**
+    * Stores the supplied parameters and marks the check as not yet evaluated.
     * @param {CheckParameters} [parameters={}] - Parameters for the Check.
     */
    constructor(parameters = {}) {

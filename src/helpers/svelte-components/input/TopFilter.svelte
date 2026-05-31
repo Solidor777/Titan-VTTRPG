@@ -4,9 +4,9 @@
 
    /**
     * @typedef {object} TopFilterProps
-    * @property {string}        [label='filter']    - Label to display.
-    * @property {string}        [icon=undefined]    - Optional Icon to display.
-    * @property {string}        [value=undefined]   - The value that this input should modify.
+    * @property {string} [label='filter'] - Label to display.
+    * @property {string} [icon=undefined] - Optional Icon to display.
+    * @property {string} [value=undefined] - The value that this input should modify.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
     */
 

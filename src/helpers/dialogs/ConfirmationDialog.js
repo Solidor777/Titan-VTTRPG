@@ -7,6 +7,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
  */
 export default class ConfirmationDialog extends TitanDialog {
    /**
+    * Builds the confirmation dialog window, wiring the prompt content and binding the confirm-button callback.
     * @param {string} title - The title for the Dialog.
     * @param {string[]} headers - Header lines to display at the top of the dialog.
     * @param {string} message - Message explaining the purpose of the dialog.
@@ -47,9 +48,9 @@ export default class ConfirmationDialog extends TitanDialog {
    }
 
    /**
+    * @override
     * @returns {string[]} Array of CSS classes to apply to the dialog element.
     * @protected
-    * @override
     */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();

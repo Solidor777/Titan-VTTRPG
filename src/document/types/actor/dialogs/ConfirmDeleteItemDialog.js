@@ -8,6 +8,7 @@ import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
 export default class ConfirmDeleteItemDialog extends ConfirmationDialog {
 
    /**
+    * Configures the confirmation prompt and registers the callback that deletes the Item from the Actor on confirm.
     * @param {TitanActor} actor - The Actor to delete the Item from.
     * @param {TitanItem} item - The Item to delete from the Actor.
     */

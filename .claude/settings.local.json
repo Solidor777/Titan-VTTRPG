@@ -70,7 +70,9 @@
       "Bash(sed -i \"s|import getSetting from '~/helpers/utility-functions/GetSetting.js';|import defaultXpCostAbility from '~/helpers/Settings/DefaultXpCostAbility.js';|\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/item/types/ability/AbilityDataModel.js\")",
       "Bash(sed -i \"s|getSetting\\('defaultXpCost.ability'\\)|defaultXpCostAbility\\(\\)|g\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/item/types/ability/AbilityDataModel.js\")",
       "Bash(sed -i \"s|import getSetting from '~/helpers/utility-functions/GetSetting.js';|import minionStaminaMultiplier from '~/helpers/Settings/MinionStaminaMultiplier.js';\\\\nimport reportTakingDamage from '~/helpers/Settings/ReportTakingDamage.js';|\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/types/npc/NPCDataModel.js\")",
-      "Bash(sed -i \"s|getSetting\\('minionStaminaMultiplier'\\)|minionStaminaMultiplier\\(\\)|g; s|getSetting\\('reportTakingDamage'\\)|reportTakingDamage\\(\\)|g\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/types/npc/NPCDataModel.js\")"
+      "Bash(sed -i \"s|getSetting\\('minionStaminaMultiplier'\\)|minionStaminaMultiplier\\(\\)|g; s|getSetting\\('reportTakingDamage'\\)|reportTakingDamage\\(\\)|g\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/types/npc/NPCDataModel.js\")",
+      "Bash(npx eslint *)",
+      "Read(//c/FoundryVTT/**)"
     ]
   }
 }

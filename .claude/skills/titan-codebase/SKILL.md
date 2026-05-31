@@ -20,8 +20,9 @@ exists, where it lives, and how to fit new work in. It is **descriptive, not pre
 - Foundry **v14** (`system.json` compatibility: minimum 13 / verified 14 / maximum 14). Editor types
   come from the live Foundry install — `jsconfig.json` includes `../../../../foundry/common/**` and
   `foundry/public/scripts/**`; there is no `foundry-vtt-types` dependency.
-- Build: Vite 5 with `@sveltejs/vite-plugin-svelte`. Source lives in `src/`; build output goes to
-  the repo root.
+- Build: Vite 8 (Rolldown-based) with `@sveltejs/vite-plugin-svelte`. Source lives in `src/`; build
+  output goes to the repo root. The Svelte plugin sets `configFile: false` (inline `preprocess`, no
+  `svelte.config.js`); node-module resolution is native (no `@rollup/plugin-node-resolve`).
 
 ## Sibling skills — route here for framework/API knowledge
 

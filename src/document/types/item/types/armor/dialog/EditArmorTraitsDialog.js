@@ -9,6 +9,7 @@ import EditArmorTraitsDialogShell from '~/document/types/item/types/armor/dialog
 export default class EditArmorTraitsDialog extends TitanDialog {
 
    /**
+    * Builds the dialog window and passes the target Armor item to the trait editor shell component.
     * @param {TitanItem} item - The Item to edit the Traits of.
     */
    constructor(item) {

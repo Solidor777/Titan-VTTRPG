@@ -8,6 +8,7 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
  */
 export default class TitanPlayerSheet extends TitanCharacterSheet {
    /**
+    * Merges the player CSS class and Svelte shell into the options before delegating to the base character sheet.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
     * @param {object} [options={}] - Application configuration options.
     */

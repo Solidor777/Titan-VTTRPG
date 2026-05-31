@@ -20,7 +20,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {AttributeCheckParameters} Calculated check parameters. */
+   /** @type {AttributeCheckParameters} Resolved dice and modifiers for this skill's check. */
    let checkParameters = $derived(
       document.data.system.getAttributeCheckParameters(
          document.data.system.initializeAttributeCheckOptions({ skill: key }))
@@ -265,32 +265,6 @@
                      height: 100%;
 
                      @include margin-left-standard;
-                  }
-               }
-
-               .tag {
-                  @include flex-column;
-                  @include flex-group-top;
-                  @include border;
-                  @include tag;
-                  @include font-size-small;
-                  @include padding-standard;
-
-                  .label {
-                     @include flex-row;
-                     @include flex-group-center;
-                     @include border-bottom;
-
-                     font-weight: bold;
-
-                     i {
-                        @include margin-right-standard;
-                     }
-                  }
-
-                  .value {
-                     @include flex-row;
-                     @include flex-group-center;
                   }
                }
             }

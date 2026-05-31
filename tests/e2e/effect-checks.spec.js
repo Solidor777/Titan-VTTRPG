@@ -7,10 +7,10 @@ import { login } from './fixtures.js';
  * description for the resulting check card.
  *
  * Confirmed against source:
- *   - TitanActiveEffectDataModel.getRollData() returns { description, duration, check, customTrait, ... }.
- *   - CharacterDataModel.requestItemCheck/getItemCheckParameters branch on options.itemRollData and
- *     never touch actor.items.get(id) when roll data is supplied.
- *   - flags.titan.type for an item check is 'itemCheck'; the mounted card root is '.check-chat-message'.
+ * TitanActiveEffectDataModel.getRollData() returns { description, duration, check, customTrait, ... };
+ * CharacterDataModel.requestItemCheck/getItemCheckParameters branch on options.itemRollData and never touch
+ * actor.items.get(id) when roll data is supplied;
+ * flags.titan.type for an item check is 'itemCheck'; the mounted card root is '.check-chat-message'.
  */
 
 test.describe('v14 effect check rolling', () => {

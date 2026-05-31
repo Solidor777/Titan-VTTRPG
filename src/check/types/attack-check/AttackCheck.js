@@ -70,9 +70,9 @@ export default class AttackCheck extends TitanCheck {
    }
 
    /**
+    * @override
     * @returns {string} The check type identifier.
     * @protected
-    * @override
     */
    _getCheckType() {
       return 'attackCheck';

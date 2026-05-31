@@ -3,13 +3,15 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
 
 /**
  * @typedef {import('svelte/store').Writable<TitanItemSheetData>} ItemSheetState A custom reactive store for managing
- *    an Item Sheet.
- * @property {import('svelte/store').Writable<TitanItemSheetData>['set']} set
- * @property {import('svelte/store').Writable<TitanItemSheetData>['update']} update
- * @property {import('svelte/store').Writable<TitanItemSheetData>['subscribe']} subscribe
+ * an Item Sheet.
+ * @property {import('svelte/store').Writable<TitanItemSheetData>['set']} set - Replaces the entire stored state value.
+ * @property {import('svelte/store').Writable<TitanItemSheetData>['update']} update - Mutates the stored state via an
+ * updater callback.
+ * @property {import('svelte/store').Writable<TitanItemSheetData>['subscribe']} subscribe - Registers a reactive
+ * subscriber notified on every state change.
  * @property {() => void} postAddCheck - Updates the reactive state store in response to an Item Check being added.
  * @property {(idx: number) => void} preDeleteCheck - Updates the reactive state store in response to an Item Check
- *    being deleted.
+ * being deleted.
  */
 
 /**
@@ -27,7 +29,7 @@ export default function createTitanItemSheetState(item, overrideData) {
     */
    function postAddCheck() {
       update((data) => {
-         data.checks.isExpanded.push(true);
+         data.tabs.checks.isExpanded.push(true);
          data.sidebar.checks.isExpanded.push(true);
          return data;
       });
@@ -39,7 +41,7 @@ export default function createTitanItemSheetState(item, overrideData) {
     */
    function preDeleteCheck(idx) {
       update((data) => {
-         data.checks.isExpanded.splice(idx, 1);
+         data.tabs.checks.isExpanded.splice(idx, 1);
          data.sidebar.checks.isExpanded.splice(idx, 1);
          return data;
       });

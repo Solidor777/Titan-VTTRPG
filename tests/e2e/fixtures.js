@@ -5,10 +5,10 @@ import { expect } from '@playwright/test';
  * world to become fully ready.
  *
  * Verified selectors against the running v14 join page:
- *   - `select[name="userid"]` — the user picker; options are labelled by user name.
- *   - `input[name="password"]` — the (optional) user password field.
- *   - `button[name="join"]`    — the "Join Game Session" submit button.
- * @param {import('@playwright/test').Page} - page The Playwright page to drive.
+ * `select[name="userid"]` is the user picker (options labelled by user name);
+ * `input[name="password"]` is the optional user password field;
+ * `button[name="join"]` is the "Join Game Session" submit button.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @returns {Promise<void>} Resolves once `game.ready === true`.
  */
 export async function login(page) {
@@ -37,9 +37,9 @@ export async function login(page) {
  * The document is located inside the page via a stringified locator function
  * body (e.g. `"() => game.actors.find((a) => a.type === 'player')"`) so the
  * lookup runs in the Foundry runtime, not the Node test process.
- * @param {import('@playwright/test').Page} - page             The Playwright page to drive.
- * @param {string}                          - locateSrc        Stringified locator: a function returning the document.
- * @param {string}                          - expectedSelector CSS selector the rendered sheet must expose.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {string} locateSrc - Stringified locator: a function returning the document.
+ * @param {string} expectedSelector - CSS selector the rendered sheet must expose.
  * @returns {Promise<void>} Resolves once the sheet is visible and asserted error-free.
  */
 export async function renderSheet(page, locateSrc, expectedSelector) {
@@ -74,10 +74,10 @@ export async function renderSheet(page, locateSrc, expectedSelector) {
 /**
  * Ensure a document of the given type exists in the world, creating a minimal
  * one when absent, and return a stringified locator that finds it again.
- * @param {import('@playwright/test').Page} - page         The Playwright page to drive.
- * @param {('Actor'|'Item')}                - documentType The base document class name.
- * @param {string}                          - subtype      The document subtype to ensure.
- * @param {string}                          - name         The name to use for a created fixture.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {('Actor'|'Item')} documentType - The base document class name.
+ * @param {string} subtype - The document subtype to ensure.
+ * @param {string} name - The name to use for a created fixture.
  * @returns {Promise<string>} A stringified locator function body for the ensured document.
  */
 export async function ensureDocument(page, documentType, subtype, name) {

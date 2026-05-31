@@ -6,7 +6,7 @@ import formatString from '~/helpers/utility-functions/FormatString.js';
  * @property {string|number} text - The string or number to display.
  * @property {boolean} [localize] - Whether to localize the text. Assumed to be true if not provided.
  * @property {*[]} [formattingArgs] - Arguments for formatting the string if appropriate.
- * */
+ */
 
 /**
  * Calculates the string text to display from a string or Text object.

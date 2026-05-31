@@ -19,14 +19,14 @@ import weaponMigrations from '~/helpers/migration/item/WeaponMigrations.js';
  * @typedef {object} TitanMigration
  * @property {number} version - The system version (as a decimal, e.g. 1.1) this migration upgrades the document to.
  * @property {function(foundry.abstract.Document, object): object} migrate - Applies changes to the accumulated update
- *   data and returns the updated data object.
+ * data and returns the updated data object.
  */
 
 /**
  * Ordered migration chains keyed by Actor type. Each chain lists migration arrays from most base to most specific.
  * For a given version, migrations are run from each level in order before advancing to the next version.
  * Version numbers must be unique and ascending within each level, and consistent across the chain.
- * @type {object<string, Array<TitanMigration[]>>}
+ * @type {{[key: string]: Array<TitanMigration[]>}}
  */
 const ACTOR_MIGRATION_CHAINS = {
    player: [
@@ -45,7 +45,7 @@ const ACTOR_MIGRATION_CHAINS = {
  * Ordered migration chains keyed by Item type. Each chain lists migration arrays from most base to most specific.
  * For a given version, migrations are run from each level in order before advancing to the next version.
  * Version numbers must be unique and ascending within each level, and consistent across the chain.
- * @type {object<string, Array<TitanMigration[]>>}
+ * @type {{[key: string]: Array<TitanMigration[]>}}
  */
 const ITEM_MIGRATION_CHAINS = {
    ability: [

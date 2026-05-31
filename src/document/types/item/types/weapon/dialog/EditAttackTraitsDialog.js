@@ -8,6 +8,7 @@ import EditAttackTraitsDialogShell from '~/document/types/item/types/weapon/dial
 export default class EditAttackTraitsDialog extends TitanDialog {
 
    /**
+    * Builds the dialog window and passes the target Item and attack index to the attack-trait editor shell.
     * @param {TitanItem} item - The Item to edit the Traits of.
     * @param {number} attackIdx - The idx of the Attack in the attacks array.
     */

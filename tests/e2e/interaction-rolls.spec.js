@@ -8,15 +8,15 @@ import { login } from './fixtures.js';
  * chat-log DOM without throwing.
  *
  * Confirmed against source:
- *   - CharacterDataModel exposes `rollAttributeCheck`, `rollResistanceCheck`, `rollAttackCheck`,
- *     `rollCastingCheck`, `rollItemCheck`; all post to chat via `_rollCheck` -> `check.sendToChat`
- *     and skip the option dialog.
- *   - Option keys: attribute `{ attribute }`; resistance `{ resistance }`; attack `{ itemId, attackIdx }`;
- *     casting `{ itemId }`; item `{ itemId, checkIdx }`.
- *   - `flags.titan.type` strings (ChatMessageShell dispatch map): attributeCheck, resistanceCheck,
- *     attackCheck, castingCheck, itemCheck.
- *   - `OnRenderChatMessageHTML` adds the `titan` class to the `.message[data-message-id]` element and
- *     mounts the check card (root `.check-chat-message`) into `.message-content`.
+ * CharacterDataModel exposes `rollAttributeCheck`, `rollResistanceCheck`, `rollAttackCheck`,
+ * `rollCastingCheck`, `rollItemCheck`; all post to chat via `_rollCheck` -> `check.sendToChat`
+ * and skip the option dialog.
+ * Option keys: attribute `{ attribute }`; resistance `{ resistance }`; attack `{ itemId, attackIdx }`;
+ * casting `{ itemId }`; item `{ itemId, checkIdx }`.
+ * `flags.titan.type` strings (ChatMessageShell dispatch map): attributeCheck, resistanceCheck,
+ * attackCheck, castingCheck, itemCheck.
+ * `OnRenderChatMessageHTML` adds the `titan` class to the `.message[data-message-id]` element and
+ * mounts the check card (root `.check-chat-message`) into `.message-content`.
  */
 
 // The per-check definitions: the type key, the in-page roll invocation, and the expected flag type.

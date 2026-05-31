@@ -19,8 +19,8 @@ import assert from '~/helpers/utility-functions/Assert.js';
 export default class WeaponDataModel extends RulesElementItemDataModel {
    /**
     * Defines the data schema for Weapon documents.
-    * @returns {object} The document schema.
     * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     */
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
@@ -51,8 +51,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Returns the roll data object for this document.
-    * @returns {object} The roll data.
     * @override
+    * @returns {object} Object of properties usable as substitution variables when evaluating roll formulas.
     */
    getRollData() {
       const retVal = super.getRollData();
@@ -68,8 +68,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Returns the default image path for new Weapon documents.
-    * @returns {string} The default image path.
     * @override
+    * @returns {string} The default image path.
     */
    _getDefaultImage() {
       return WEAPON_IMAGE;
@@ -77,8 +77,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
    /**
     * Returns the default name for new Weapon documents.
-    * @returns {string} The default name.
     * @override
+    * @returns {string} Localized placeholder label applied to a freshly created Weapon.
     */
    _getDefaultName() {
       return localize('newWeapon');

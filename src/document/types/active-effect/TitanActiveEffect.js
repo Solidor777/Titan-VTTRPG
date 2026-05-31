@@ -7,8 +7,8 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * Extends the base ActiveEffect class to implement system-specific logic for Titan.
  * The 'effect' subtype carries Rules Elements, a custom duration, item-check templates, and custom traits via
  * its data model; conditions and other Active Effect subtypes are left untouched by all type-specific logic here.
- * @extends {foundry.documents.ActiveEffect}
  * @property {TitanActiveEffectDataModel} system - The typed system data model for this Active Effect.
+ * @extends {foundry.documents.ActiveEffect}
  */
 export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
 
@@ -33,11 +33,11 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
     * Performs initialization logic before document creation.
     * For the 'effect' subtype, captures initial document data, forces the status icon to always display, and
     * seeds the Visual Active Effects description flag with the enriched native description.
+    * @override
     * @param {object} data - The initial data object provided to the document creation request.
     * @param {object} options - Additional options which modify the creation request.
     * @param {User} user - The User requesting the document creation.
     * @returns {Promise<boolean|void>} A return value of false indicates the creation operation should be cancelled.
-    * @override
     * @protected
     */
    async _preCreate(data, options, user) {
@@ -82,11 +82,11 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
     * Performs initialization logic before a document update.
     * For the 'effect' subtype, keeps the Visual Active Effects description flag in sync whenever the native
     * description changes.
+    * @override
     * @param {object} changes - The differential data that is requested to be updated.
     * @param {object} options - Additional options which modify the update request.
     * @param {User} user - The User requesting the document update.
     * @returns {Promise<boolean|void>} A return value of false indicates the update operation should be cancelled.
-    * @override
     * @protected
     */
    async _preUpdate(changes, options, user) {
@@ -110,7 +110,7 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
 
    /**
     * Returns the roll data for this Active Effect, delegating to the data model.
-    * @returns {object} The roll data.
+    * @returns {object} Object of properties usable as substitution variables when evaluating roll formulas.
     */
    getRollData() {
       return this.system.getRollData();

@@ -9,6 +9,15 @@ export default [
       plugins: {
          jsdoc
       },
+      settings: {
+         jsdoc: {
+            // Keep `@extends` (matches the ES `class extends` keyword and the
+            // mandated house style) instead of the plugin's `@augments` default.
+            tagNamePreference: {
+               augments: 'extends',
+            },
+         },
+      },
       rules: {
          'svelte/no-at-html-tags': 'off',
          'svelte/html-quotes/dynamic/quoted': 'off',
@@ -78,6 +87,8 @@ export default [
          'templates/',
          'index.js',
          'node_modules/',
+         'fix-comments.js',
+         'count-long.cjs',
       ],
    },
 ];

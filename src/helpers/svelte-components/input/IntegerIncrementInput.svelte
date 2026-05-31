@@ -8,15 +8,15 @@
 
    /**
     * @typedef {object} IntegerIncrementInputProps
-    * @property {number}        [value=undefined]         - The value that this input should modify.
-    * @property {number|boolean}[min=false]               - The minimum value of the input.
-    * @property {number|boolean}[max=false]               - The maximum value of the input.
-    * @property {boolean}       [disabled=false]          - Whether the input should currently be disabled.
-    * @property {string|object} [tooltip=undefined]       - The Tooltip to display for this element, if any.
-    * @property {number}        [increment=1]             - Amount to change the value per button press (no modifier).
-    * @property {number}        [modifierIncrement=10]    - Amount to change the value per button press (modifier active).
-    * @property {Function}      [onchange]                - Callback forwarded from the native change event.
-    * @property {Function}      [onkeyup]                 - Callback forwarded from the native keyup event.
+    * @property {number} [value=undefined] - The value that this input should modify.
+    * @property {number|boolean} [min=false] - The minimum value of the input, or false for no minimum.
+    * @property {number|boolean} [max=false] - The maximum value of the input, or false for no maximum.
+    * @property {boolean} [disabled=false] - Whether the input should currently be disabled.
+    * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
+    * @property {number} [increment=1] - Amount to change the value per button press (no modifier).
+    * @property {number} [modifierIncrement=10] - Amount to change the value per button press (modifier active).
+    * @property {Function} [onchange] - Callback forwarded from the native change event.
+    * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
     */
 
    /** @type {IntegerIncrementInputProps} */

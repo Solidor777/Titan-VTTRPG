@@ -8,7 +8,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default {
    plugins: [
       svelte({
-         hot: false,
          preprocess: sveltePreprocess({
             scss: { prependData: '@use "src/styles/Root.scss" as *;' },
          }),

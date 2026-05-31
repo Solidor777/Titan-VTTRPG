@@ -4,11 +4,12 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Actor Sheet class with functionality shared by all Characters.
- * @extends {TitanActorSheet}
  * @property {CharacterSheetState} applicationState - Reactive store for managing the state of the Character Sheet.
+ * @extends {TitanActorSheet}
  */
 export default class TitanCharacterSheet extends TitanActorSheet {
    /**
+    * Merges the character-specific CSS class into the options before delegating to the base Actor sheet.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
     * @param {object} [options={}] - Application configuration options.
     */

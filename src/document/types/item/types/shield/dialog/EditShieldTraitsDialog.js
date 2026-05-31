@@ -9,6 +9,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 export default class EditShieldTraitsDialog extends TitanDialog {
 
    /**
+    * Builds the dialog window and passes the target Shield item to the trait editor shell component.
     * @param {TitanItem} item - The Item to edit the Traits of.
     */
    constructor(item) {

@@ -5,40 +5,40 @@
  * @property {object} tabs.abilities - State for the Abilities tab.
  * @property {string} tabs.abilities.filter - The current filter text for the Abilities tab.
  * @property {object} tabs.abilities.filterOptions - Object containing the state of the filter options for the
- *    Abilities tab.
+ * Abilities tab.
  * @property {boolean} tabs.abilities.filterOptions.action - Whether to filter the Abilities tab for Action abilities.
  * @property {boolean} tabs.abilities.filterOptions.reaction - Whether to filter the Abilities tab for Reaction
- *    abilities.
+ * abilities.
  * @property {boolean} tabs.abilities.filterOptions.passive - Whether to filter the Abilities tab for Passive
- *    abilities.
- * @property {Object.<string, boolean>} tabs.abilities.isExpanded - Object of booleans representing whether an Ability
- *    is expanded, arranged by Item ID.
+ * abilities.
+ * @property {{[key: string]: boolean}} tabs.abilities.isExpanded - Object of booleans representing whether an Ability
+ * is expanded, arranged by Item ID.
  * @property {number} tabs.abilities.scrollTop - The current top of the scrollbar for the Abilities tab.
  * @property {object} tabs.effects - State for the Effects tab.
  * @property {string} tabs.effects.filter - The current filter text for the Effects tab.
  * @property {object} tabs.effects.filterOptions - Object containing the state of the filter options for the
- *    Effects tab.
+ * Effects tab.
  * @property {boolean} tabs.effects.filterOptions.action - Whether to filter the Effects tab for Action effects.
  * @property {boolean} tabs.effects.filterOptions.reaction - Whether to filter the Effects tab for Reaction
- *    effects.
+ * effects.
  * @property {boolean} tabs.effects.filterOptions.passive - Whether to filter the Effects tab for Passive
- *    effects.
- * @property {Object.<string, boolean>} tabs.effects.isExpanded - Object of booleans representing whether an Effect
- *    is expanded, arranged by Active Effect ID.
+ * effects.
+ * @property {{[key: string]: boolean}} tabs.effects.isExpanded - Object of booleans representing whether an Effect
+ * is expanded, arranged by Active Effect ID.
  * @property {number} tabs.effects.scrollTop - The current top of the scrollbar for the Effects tab.
  * @property {object} tabs.inventory - State for the Inventory tab.
  * @property {string} tabs.inventory.filter - The current filter text for the Inventory tab.
  * @property {object} tabs.inventory.filterOptions - Object containing the state of the filter options for the
- *    Inventory tab.
+ * Inventory tab.
  * @property {boolean} tabs.inventory.filterOptions.armor - Whether to filter the Inventory Tab for Armor items.
  * @property {boolean} tabs.inventory.filterOptions.commodity - Whether to filter the Inventory Tab for Commodity
- *    items.
+ * items.
  * @property {boolean} tabs.inventory.filterOptions.equipment - Whether to filter the Inventory Tab for Equipment
- *    items.
+ * items.
  * @property {boolean} tabs.inventory.filterOptions.shield - Whether to filter the Inventory Tab for Shield items.
  * @property {boolean} tabs.inventory.filterOptions.weapon - Whether to filter the Inventory Tab for Weapon items.
- * @property {Object.<string, boolean>} tabs.inventory.isExpanded - Object of booleans representing whether an item is
- *    expanded, arranged by Item ID.
+ * @property {{[key: string]: boolean}} tabs.inventory.isExpanded - Object of booleans representing whether an item is
+ * expanded, arranged by Item ID.
  * @property {number} tabs.inventory.scrollTop - The current top of the scrollbar for the Inventory tab.
  * @property {object} tabs.notes - State for the Notes tab.
  * @property {number} tabs.notes.scrollTop - The current top of the scrollbar for the Notes tab.
@@ -47,8 +47,8 @@
  * @property {number} tabs.skills.scrollTop - The current top of the scrollbar for the Skills tab.
  * @property {object} tabs.spells - State for the Spells tab.
  * @property {string} tabs.spells.filter - The current filter text for the Spells tab.
- * @property {Object.<string, boolean>} tabs.spells.isExpanded - Object of booleans representing whether a Spell is
- *    expanded, arranged by Item ID.
+ * @property {{[key: string]: boolean}} tabs.spells.isExpanded - Object of booleans representing whether a Spell is
+ * expanded, arranged by Item ID.
  * @property {number} tabs.spells.scrollTop - The current top of the scrollbar for the Spells tab.
  */
 

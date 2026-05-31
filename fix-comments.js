@@ -3,6 +3,12 @@ const path = require('path');
 
 const MAX_LEN = 80;
 
+/**
+ * @param text
+ * @param firstLinePrefix
+ * @param continuationPrefix
+ * @param maxLen
+ */
 function wrapText(text, firstLinePrefix, continuationPrefix, maxLen) {
    if (
       text.includes('http://') ||
@@ -29,6 +35,9 @@ function wrapText(text, firstLinePrefix, continuationPrefix, maxLen) {
    return lines;
 }
 
+/**
+ * @param filePath
+ */
 function processFile(filePath) {
    const content = fs.readFileSync(filePath, 'utf8');
    const lines = content.split('\n');
@@ -207,6 +216,9 @@ function processFile(filePath) {
    return false;
 }
 
+/**
+ * @param dir
+ */
 function walk(dir) {
    const entries = fs.readdirSync(dir, { withFileTypes: true });
    let fixedFiles = 0;
@@ -228,6 +240,9 @@ const fixedFiles = walk('src');
 console.log('Fixed files:', fixedFiles);
 
 let remaining = 0;
+/**
+ * @param dir
+ */
 function walkCount(dir) {
    const entries = fs.readdirSync(dir, { withFileTypes: true });
    for (const e of entries) {

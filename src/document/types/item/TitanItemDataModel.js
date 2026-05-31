@@ -9,14 +9,14 @@ import { ITEM_IMAGE } from '~/system/DefaultImages.js';
 
 /**
  * Data model with extra functionality for Items.
- * @extends {TitanDataModel}
  * @property {TitanItem} parent - The Item that owns this data model.
+ * @extends {TitanDataModel}
  */
 export default class TitanItemDataModel extends TitanDataModel {
    /**
     * Defines the schema for Item documents, adding description, checks, and custom traits.
     * @override
-    * @returns {object} The document schema.
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     * @protected
     */
    static _defineDocumentSchema() {

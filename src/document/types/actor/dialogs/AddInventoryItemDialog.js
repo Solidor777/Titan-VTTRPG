@@ -7,6 +7,7 @@ import AddAddInventoryItemDialogShell from '~/document/types/actor/dialogs/AddAd
  */
 export default class AddInventoryItemDialog extends TitanDialog {
    /**
+    * Builds the dialog window and hands the target Actor to the item-type chooser shell component.
     * @param {TitanActor} actor - The Actor to add the inventory item to.
     */
    constructor(actor) {
@@ -23,8 +24,8 @@ export default class AddInventoryItemDialog extends TitanDialog {
    }
 
    /**
-    * @returns {string[]} The CSS classes to apply to the dialog.
     * @override
+    * @returns {string[]} The CSS classes to apply to the dialog.
     * @protected
     */
    _getDialogClasses() {

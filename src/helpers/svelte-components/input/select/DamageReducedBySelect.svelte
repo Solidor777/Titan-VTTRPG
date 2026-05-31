@@ -23,7 +23,7 @@
 
    /**
     * @type {string[]} Options for the Select Svelte component, derived to include conditional check
-    *                  options when allowed.
+    * options when allowed.
     */
    const options = $derived.by(() => {
       const list = ['none'];

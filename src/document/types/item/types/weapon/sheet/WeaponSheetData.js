@@ -3,13 +3,15 @@ import createRulesElementItemSheetData from '~/document/types/item/sheet/RulesEl
 
 /**
  * @typedef {RulesElementItemSheetData} WeaponSheetData Data representing the state of a Weapon Sheet.
+ * @property {object} sidebar - State for the sheet sidebar sections.
  * @property {object} sidebar.attacks - State for the Attacks sidebar section.
  * @property {boolean[]} sidebar.attacks.isExpanded - Array of booleans representing whether an Attack in the sidebar
- *    is expanded.
+ * is expanded.
+ * @property {object} tabs - State for the sheet Tabs.
  * @property {object} tabs.attacks - State for the Attacks tab.
  * @property {string} tabs.attacks.filter - The current filter text for the Attacks tab.
  * @property {boolean[]} tabs.attacks.isExpanded - Array of booleans representing whether an Attack in the Attacks tab
- *    is expanded.
+ * is expanded.
  * @property {number} tabs.attacks.scrollTop - The current top of the scrollbar for the Attacks tab.
  * @property {string} tabs.description.activeDescriptionTab - Which sub-tab in the description should be active.
  */

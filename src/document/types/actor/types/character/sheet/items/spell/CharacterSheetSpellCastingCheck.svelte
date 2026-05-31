@@ -27,7 +27,7 @@
       itemId: item._id,
    };
 
-   /** @type {CastingCheckParameters} Calculated check parameters. */
+   /** @type {CastingCheckParameters} Resolved dice and modifiers for the spell's casting check. */
    let checkParameters = $derived.by(() => {
 
       // Ensure the item is still valid.

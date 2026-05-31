@@ -1,47 +1,43 @@
-# Project Description
+### **TITAN RPG Foundry VTT System: AI Context (Updated)**
 
-This is a Foundry Virtual Tabletop implementation of the TITAN RPG system as laid out in the TITAN Rules Compendium.md
-file. The goal is to provide a fully functional RPG system that can be used to play the game. Priorities are
-customizable automation for ease of play, simple and intuitive user interface, good sustainability of the codebase, and
-good documentation.
+**1. Architecture & Tech Stack**
 
-# Project Resources
+* **Platform:** Foundry VTT v14 (ApplicationV2 API).
+* **Core Stack:** JavaScript, Svelte 5 (Runes), SCSS.
+* **Integration:** Direct mount of Svelte to ApplicationV2. No middleware.
+* **File Structure:** All source code strictly resides in `~/src/`. Build output is generated in the root directory.
 
-This project is coded in JavaScript, Svelte, and SCSS. It is built with pure Svelte 5 (runes) mounted directly into
-Foundry v14 ApplicationV2 (no TyphonJS / UI middleware). Everything that is built is stored in the ~/src/
-directory. The build output is stored in the root. Nothing that is not built should be stored in the ~/src/ directory.
+**2. Strict Code Style Guidelines**
 
-# Code Style
+* **Formatting:**
+* 120-character wrap limit.
+* Always use multi-line `{}` for conditional scopes.
+* Require multi-line formatting for objects (>1 property) and arrays (>1 entry).
+* Svelte components with >1 property must be multi-line, placing `>` or `/>` on a new line.
 
-The wrap limit is 120 characters. All function declarations should have comments describing the function's purpose. All
-variables, properties, and parameters should be properly typed and wrapped in {} braces. Optional parameters or
-properties should use [] braces. Properties and parameters should have a - between the type and name of the property.
-All variable declarations should be typed and have a comment explaining what is being done or what the variable is for.
-All class declarations should be properly typed. All object definitions should use @extends and @typedef as appropriate.
-@typof should be used as appropriate. All functions should have a typed return value, and a description if they return
-other than void, or if they return after an async operation. All function declaration comments should be multiline. All
-variable declarations should be single-line is they can fit within the wrap limit. All objects should be multiline if
-they have more than one property. All arrays should be multiline if they have more than one entry. All svelte components
-should be multiline if they have more than one property, with the > or /> on a newline. All conditional code should
-be scoped in multiline {}. All comments should have proper grammar, spelling, punctuation, and indentation. :global
-style selectors are forbidden.
 
-# Delegating JavaScript & Svelte work
+* **Typing & Documentation:**
+* Variables: Must be typed and include a single-line descriptive comment.
+* Functions: Require multi-line comments detailing purpose, typed parameters (`{Type} [optionalParam] - description`), and typed return values (including async operations).
+* Classes/Objects: Strictly typed using `@extends`, `@typedef`, and `@typeof` where applicable.
+* Grammar: All comments must have perfect spelling, grammar, and indentation.
+* Writing Style: All comments must succinctly capture what the code does.
 
-For any JavaScript or Svelte work in this project — writing, refactoring, reviewing, or debugging
-`.js` / `.svelte` / `.svelte.js` files — use the `titan-svelte-dev` subagent
-(`.claude/agents/titan-svelte-dev.md`). It always loads the `svelte-5`, `foundry-vtt`, and
-`foundry-svelte` skills before working, and follows the code-style rules above.
 
-# Keeping the codebase skill current
+* **CSS Restrictions:** `:global` style selectors are strictly forbidden.
 
-Whenever we execute a spec or implementation plan, it must include updating the `titan-codebase`
-skill (`.claude/skills/titan-codebase/`) to reflect any code changes. This is not a changelog of
-what changed or why — the skill must describe only the current state of the codebase ("what is").
+**3. Agent Workflow & Execution Protocol**
 
-# Response to instructions
+* **Task Pipeline:**
+1. Ask clarifying questions regarding the prompt.
+2. Formulate and save a task execution plan to a file.
+3. Halt and await explicit user confirmation before executing steps.
 
-When I ask you to do something, first ask me any necessary clarifying questions before doing the work. Then analyze the
-situation and give me a clear and concise description of your plan for handling the task. Save that plan to a file for
-future reference. Then confirm with me whether you should proceed. If the task has multiple steps or options, confirm
-with me which ones you should perform.
+
+* **Skill Usage:** When brainstorming, debugging, or planning a spec, ensure the `foundry-vtt` and `titan-codebase` skills are loaded. If the spec touches Svelte files, ensure both `svelte-5` and `foundry-svelte` are also loaded.
+* **Task Resolution & Deferment:** Do not defer work by default. Fix issues immediately as they arise unless they involve cascading changes that require architectural decisions.
+* **TO DO Management:** Never push off a task as a "TO DO" without explicitly adding it to the designated TO DO document.
+* **Spec Completion:** Whenever a specification is completed, the TO DO list must be immediately updated to reflect any completed items.
+* **Delegation:** Route all `.js`, `.svelte`, and `.svelte.js` work to the `titan-svelte-dev` subagent (`.claude/agents/titan-svelte-dev.md`). Ensure `svelte-5`, `foundry-vtt`, and `foundry-svelte` skills are loaded prior to execution.
+* **State Management:** Always update the `titan-codebase` skill (`.claude/skills/titan-codebase/`) following spec implementations. This must reflect the *current state* of the code, not a historical changelog.
+* **Authorization:** Never alter architecture or deviate from defined specifications without verifying subagent findings and obtaining direct user approval.

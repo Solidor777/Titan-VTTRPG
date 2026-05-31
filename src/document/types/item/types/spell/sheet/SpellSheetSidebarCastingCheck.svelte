@@ -13,7 +13,9 @@
    const document = getContext('document');
 
    /**
-    * @param aspects
+    * Determines whether any aspect in the supplied list is currently enabled.
+    * @param {Array<{enabled: boolean}>} aspects - The spell aspects to inspect.
+    * @returns {boolean} True if at least one aspect is enabled, otherwise false.
     */
    function areAspectsEnabled(aspects) {
       for (let idx = 0; idx < aspects.length; idx++) {

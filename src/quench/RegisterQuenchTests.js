@@ -6,13 +6,12 @@
  * its own `setup` hook, so this registration is a no-op in any world where Quench is absent.
  *
  * Quench batch API (v0.10):
- *   `quench.registerBatch(key, (context) => { const { describe, it, assert, before, after } = context; ... },
- *   { displayName })`
+ * `quench.registerBatch(key, (context) => { const { describe, it, assert, before, after } = context; ... },
+ * { displayName })`.
  *
  * Mocha's `this.skip()` (called inside an `it` body) marks a test as pending without failing it.
  * `it.skip(title, fn)` is also valid but registers a no-body pending entry; `this.skip()` is
  * preferred when the skip decision is made at runtime.
- *
  * @returns {void}
  */
 export default function registerQuenchTests() {

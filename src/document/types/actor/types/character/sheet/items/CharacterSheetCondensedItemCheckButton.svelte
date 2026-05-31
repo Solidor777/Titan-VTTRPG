@@ -22,7 +22,7 @@
       itemId: itemId,
    };
 
-   /** @type {ItemCheckParameters} Calculated check parameters. */
+   /** @type {ItemCheckParameters} Resolved dice and modifiers for the item check this button rolls. */
    let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.

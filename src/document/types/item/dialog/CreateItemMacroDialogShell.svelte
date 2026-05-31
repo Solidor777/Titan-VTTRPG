@@ -201,6 +201,7 @@
 
    /**
     * Cancels macro creation and closes the dialog.
+    * @returns {Promise<void>} Resolves once the dialog window has closed.
     */
    function onCancel() {
       return application.close();

@@ -5,11 +5,12 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 /**
  * An Item Sheet class with functionality shared by all Spell Items.
- * @extends {TitanItemSheet}
  * @property {SpellSheetState} applicationState - Reactive store for managing the state of the Spell Sheet.
+ * @extends {TitanItemSheet}
  */
 export default class TitanSpellSheet extends TitanItemSheet {
    /**
+    * Merges the Spell sheet CSS class and Svelte shell into the options before delegating to the base Item sheet.
     * @param {TitanItem} sheetDocument - The Document this sheet is for.
     * @param {object} [options={}] - Application configuration options.
     */

@@ -21,7 +21,7 @@
       itemId: itemId,
    };
 
-   /** @type {CastingCheckParameters} Calculated check parameters. */
+   /** @type {CastingCheckParameters} Resolved dice and modifiers for the casting check this button rolls. */
    let checkParameters = $derived.by(() => {
 
       // Ensure the item is valid.

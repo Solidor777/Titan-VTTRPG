@@ -3,7 +3,7 @@
  * @property {object} sidebar - State for the persistent sidebar.
  * @property {object} sidebar.checks - State for the Checks sidebar section.
  * @property {boolean[]} sidebar.checks.isExpanded - Array of booleans representing whether an Item Check in the
- *    sidebar is expanded.
+ * sidebar is expanded.
  * @property {number} sidebar.scrollTop - The current top of the scrollbar for the sidebar.
  * @property {object} tabs - State for the sheet Tabs.
  * @property {string} tabs.activeTab - The currently active sheet tab.
@@ -12,7 +12,7 @@
  * @property {object} tabs.checks - State for the Checks tab.
  * @property {string} tabs.checks.filter - The current filter text for the Checks tab.
  * @property {boolean[]} tabs.checks.isExpanded - Array of booleans representing whether an Item Check in the Checks
- *    tab is expanded.
+ * tab is expanded.
  * @property {number} tabs.checks.scrollTop - The current top of the scrollbar for the Checks tab.
  */
 

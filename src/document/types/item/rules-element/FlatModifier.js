@@ -5,7 +5,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @typedef {object} FlatModifierElement
  * @property {string} operation - The operation to be performed by the Rules Element (flatModifier).
  * @property {string} selector - The type of stat being modified (attribute,
- *    rating, training, expertise, resistance, or mod).
+ * rating, training, expertise, resistance, or mod).
  * @property {string} key - The Key of the stat being multiplied (body, willpower, etc.).
  * @property {number} value - The value by which to modify the stat.
  * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.

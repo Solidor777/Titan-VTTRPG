@@ -11,6 +11,7 @@ import ItemCheckDialogShell from '~/check/types/item-check/dialog/ItemCheckDialo
 export default class ItemCheckDialog extends TitanDialog {
 
    /**
+    * Constructs the Item Check dialog and seeds its reactive stores with the supplied options and parameters.
     * @param {ItemCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {ItemCheckParameters} checkParameters - The initial parameters for the check calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
@@ -32,9 +33,9 @@ export default class ItemCheckDialog extends TitanDialog {
    }
 
    /**
+    * @override
     * @returns {string[]} Array of CSS classes to apply to the dialog element.
     * @protected
-    * @override
     */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();

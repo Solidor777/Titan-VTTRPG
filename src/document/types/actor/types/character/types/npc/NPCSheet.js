@@ -8,6 +8,7 @@ import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
  */
 export default class TitanNPCSheet extends TitanCharacterSheet {
    /**
+    * Merges the NPC CSS class and Svelte shell into the options before delegating to the base character sheet.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
     * @param {object} [options={}] - Application configuration options.
     */

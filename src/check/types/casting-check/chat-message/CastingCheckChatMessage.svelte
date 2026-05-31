@@ -74,7 +74,6 @@
       {/if}
 
       <!--Damage Buttons-->
-      <!-- svelte-ignore missing-declaration -->
       {#if document.data.flags.titan.results.damage && game.user.isGM}
          <div class="section">
             <ChatDamageButtons damage={document.data.flags.titan.results.damage}/>
@@ -82,7 +81,6 @@
       {/if}
 
       <!--Healing Button-->
-      <!-- svelte-ignore missing-declaration -->
       {#if document.data.flags.titan.results.healing && game.user.isGM}
          <div class="section">
             <ChatHealingButton

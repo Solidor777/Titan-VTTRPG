@@ -37,7 +37,7 @@
    // Drag effect start.
    /**
     * Begins dragging an effect, populating the drag data via the effect's native toDragData payload.
-    * @param {DragEvent} event - The drag event.
+    * @param {DragEvent} event - The native dragstart event whose data transfer receives the payload.
     * @param {string} id - The ID of the effect being dragged.
     */
    function onDragStart(event, id) {

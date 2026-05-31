@@ -7,15 +7,15 @@ import { login } from './fixtures.js';
  * action), then asserts the dialog window mounts with zero uncaught page errors.
  *
  * Confirmed against source:
- *   - All TITAN dialogs extend `TitanDialog` (an ApplicationV2) whose constructor stamps the classes
- *     `['titan', 'titan-dialog', ...]`. The rendered window root is therefore `.application.titan-dialog`.
- *   - Check-options dialog: gated by the `getCheckOptions` setting; `requestAttributeCheck` routes to
- *     `_createAttributeCheckDialog` -> `new AttributeCheckDialog(...).render(true)` when the setting is on.
- *   - Confirm-delete-item dialog: gated by the `confirmDeletingItems` setting; `requestItemDeletion`
- *     routes to `new ConfirmDeleteItemDialog(...).render(true)`.
- *   - Add/Edit custom-trait dialogs: `TitanItem#addCustomTrait()` / `TitanItem#editCustomTrait(idx)`.
- *   - Edit-UUID dialog: reachable only from the Actors-directory context menu ("Edit UUID"), which
- *     calls `onEditDocumentUUID(actor)` -> `new EditUUIDDialog(actor).render(true)`.
+ * All TITAN dialogs extend `TitanDialog` (an ApplicationV2) whose constructor stamps the classes
+ * `['titan', 'titan-dialog', ...]`, so the rendered window root is `.application.titan-dialog`.
+ * Check-options dialog: gated by the `getCheckOptions` setting; `requestAttributeCheck` routes to
+ * `_createAttributeCheckDialog` -> `new AttributeCheckDialog(...).render(true)` when the setting is on.
+ * Confirm-delete-item dialog: gated by the `confirmDeletingItems` setting; `requestItemDeletion`
+ * routes to `new ConfirmDeleteItemDialog(...).render(true)`.
+ * Add/Edit custom-trait dialogs: `TitanItem#addCustomTrait()` / `TitanItem#editCustomTrait(idx)`.
+ * Edit-UUID dialog: reachable only from the Actors-directory context menu ("Edit UUID"), which
+ * calls `onEditDocumentUUID(actor)` -> `new EditUUIDDialog(actor).render(true)`.
  */
 
 // The window selector shared by every TitanDialog-derived window.

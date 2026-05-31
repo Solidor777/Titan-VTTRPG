@@ -2,12 +2,14 @@
    import { setContext } from 'svelte';
 
    /**
-    * @type {{
-    *   document: import('~/document/reactive/ReactiveDocument.svelte.js').default,
-    *   applicationState: object,
-    *   shell: import('svelte').Component
-    * }}
+    * @typedef {object} DocumentSheetShellProps
+    * @property {import('~/document/reactive/ReactiveDocument.svelte.js').default} document - The reactive Document
+    * bridge shared with descendant components.
+    * @property {object} applicationState - The reactive UI state store shared with descendant components.
+    * @property {import('svelte').Component} shell - The sheet body component to render inside the shell.
     */
+
+   /** @type {DocumentSheetShellProps} */
    let { document, applicationState, shell } = $props();
 
    // Expose the document bridge and UI state to all descendant components via context.

@@ -176,7 +176,7 @@ export default class TitanMacros {
     * Gets the ID to be used with the provided ID method to retrieve the document when executing the macro.
     * @param {Document} document - The Document to get the ID for.
     * @param {string} idMethod - The method that will be used to get the
-    *    Document from the ID (uuid, name, or document ID).
+    * Document from the ID (uuid, name, or document ID).
     * @returns {string} The ID to be used with the provided ID method to retrieve the document when executing the macro.
     */
    getMacroID(document, idMethod) {
@@ -199,7 +199,7 @@ export default class TitanMacros {
     * @param {string} id - The ID to be used with the provided ID method to retrieve the item.
     * @param {string} idMethod - The method that will be used to get the Item from the ID (uuid, name, or document ID).
     * @returns {TitanItem|void} The retrieved Item from the provided Actor using the provided ID and ID method, if
-    *    any.
+    * any.
     */
    getMacroItemFromID(actor, id, idMethod) {
       switch (idMethod) {

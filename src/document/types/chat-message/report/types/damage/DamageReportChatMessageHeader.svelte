@@ -7,10 +7,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} Calculated header label. */
+   /** @type {string} Localized title text shown at the top of the report card. */
    let headerLabel;
 
-   /** @type {string} Calculated header icon. */
+   /** @type {string} Font-icon class shown beside the report's title. */
    let headerIcon;
 
    // If we took damage, use that as the main header.

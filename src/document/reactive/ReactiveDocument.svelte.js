@@ -13,6 +13,7 @@ export default class ReactiveDocument {
    #subscribe;
 
    /**
+    * Wraps the Document and registers hooks that invalidate reactive readers when it or its embedded children change.
     * @param {foundry.abstract.Document} doc - The Document to wrap.
     */
    constructor(doc) {
@@ -29,7 +30,7 @@ export default class ReactiveDocument {
           * Invalidate when this document itself updates.
           * @param {foundry.abstract.Document} changed - The updated document.
           * @param {object} _diff - The change diff (unused).
-          * @param {object} options - Update options.
+          * @param {object} options - Flags accompanying the update, including whether diffing was applied.
           */
          const onUpdate = (changed, _diff, options) => {
             if (options?.diff === false) {

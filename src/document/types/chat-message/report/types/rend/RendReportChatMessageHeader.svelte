@@ -22,7 +22,7 @@
    /** @type {string} Calculated main label for the header. */
    let headerLabel;
 
-   /** @type {string} Calculated header icon. */
+   /** @type {string} Font-icon class shown beside the report's title. */
    let headerIcon;
 
    // If armor was lost, update the header label and icon to show that the armor was damaged.

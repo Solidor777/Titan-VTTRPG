@@ -4,9 +4,9 @@
  * @param {object[]} destination - The destination array.
  * @param {object[]} source - The source array.
  * @param {Function} idFunction - The function applied to each object from the
- *    source array to determine whether it is already in the destination array.
- *    If another object in the destination array has the same return value, the
- *    object will not be added to the destination array.
+ * source array to determine whether it is already in the destination array.
+ * If another object in the destination array has the same return value, the
+ * object will not be added to the destination array.
  */
 export default function appendUniqueByFunctionValue(destination, source, idFunction) {
    for (const value of source) {

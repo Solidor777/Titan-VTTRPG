@@ -14,6 +14,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
    #components;
 
    /**
+    * Builds and freezes the component map, exposing each component as a getter on the data model instance.
     * @param {object} data - The initial data for this data model.
     * @param {object} options - Options passed to the parent TypeDataModel.
     */

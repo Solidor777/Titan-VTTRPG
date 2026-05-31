@@ -8,6 +8,7 @@ import EditCustomTraitDialogShell from '~/document/types/item/dialog/EditCustomT
 export default class EditCustomTraitDialog extends TitanDialog {
 
    /**
+    * Builds the dialog window and passes the target Item and trait index to the custom-trait editor shell.
     * @param {TitanItem | TitanActiveEffect} item - The Item to edit the Traits of.
     * @param {number} traitIdx - The idx of the Trait in the traits array.
     */

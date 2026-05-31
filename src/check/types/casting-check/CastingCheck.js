@@ -22,9 +22,9 @@ export default class CastingCheck extends TitanCheck {
    }
 
    /**
+    * @override
     * @returns {string} The check type identifier.
     * @protected
-    * @override
     */
    _getCheckType() {
       return 'castingCheck';

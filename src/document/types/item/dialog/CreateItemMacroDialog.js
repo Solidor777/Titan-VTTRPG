@@ -9,6 +9,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 export default class CreateItemMacroDialog extends TitanDialog {
 
    /**
+    * Builds the dialog window and forwards the Item, target hotbar slot, and UUID to the macro editor shell.
     * @param {TitanItem} item - The Item to create the macro for.
     * @param {number} slot - The hotbar slot to assign the macro to after creation.
     * @param {string} uuid - The unique identifier of the object.

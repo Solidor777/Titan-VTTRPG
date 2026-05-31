@@ -28,8 +28,6 @@ data flow, conventions) before locating where new work fits.
   `{}`-wrapped types with `[]` for optionals and a `-` between type and name; multiline objects
   (>1 property), arrays (>1 entry), and Svelte components (>1 prop, with `>`/`/>` on a new line);
   no `:global` selectors.
-- This codebase is pure Svelte 5 + Foundry v14. NEVER reintroduce TyphonJS, `TJSDocument`,
-  `SvelteApplication`, `ApplicationShell`, `$document`, `export let`, `$:`, `createEventDispatcher`,
-  or `<svelte:component>`. Use runes, `mount()`/`unmount()`, the `ReactiveDocument` bridge
+- This codebase is pure Svelte 5 + Foundry v14. Use runes, `mount()`/`unmount()`, the `ReactiveDocument` bridge
   (`document.data.*` via `getContext('document')`), and `{@const}` dynamic dispatch.
 - Source lives in `src/`; the build output goes to the repo root (do not hand-edit build artifacts).

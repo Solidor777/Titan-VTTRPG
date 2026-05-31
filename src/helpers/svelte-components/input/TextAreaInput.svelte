@@ -3,10 +3,10 @@
 
    /**
     * @typedef {object} TextAreaInputProps
-    * @property {string}        [value=undefined]   - The value that this input should modify.
-    * @property {boolean}       [disabled=false]    - Whether the input should currently be disabled.
+    * @property {string} [value=undefined] - The value that this input should modify.
+    * @property {boolean} [disabled=false] - Whether the input should currently be disabled.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
-    * @property {Function}      [onchange]          - Callback forwarded from the native change event.
+    * @property {Function} [onchange] - Callback forwarded from the native change event.
     */
 
    /** @type {TextAreaInputProps} */

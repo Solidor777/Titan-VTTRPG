@@ -12,7 +12,7 @@ import sortDescending from '~/helpers/utility-functions/SortDescending.js';
  * Rolls a number of d6s, sorts the results from largest to smallest, and converts them to {@link CheckDie} objects.
  * @param {number} numDie - The number of d6s to roll.
  * @returns {Promise<CheckDie[]>} Array of {@link CheckDie} sorted from largest
- *    to smallest, before any expertise is applied.
+ * to smallest, before any expertise is applied.
  */
 export default async function rollCheckDice(numDie) {
    const roll = new Roll(`${numDie}d6`);

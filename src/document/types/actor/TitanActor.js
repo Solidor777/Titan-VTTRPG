@@ -13,9 +13,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
  * Extends the base Actor class to implement additional system-specific logic for Titan.
- * @extends {Actor}
  * @property {TitanItem[]} items - A collection of embedded Item documents.
  * @property {TitanActorSheet} sheet - The Sheet that represents this Actor.
+ * @extends {Actor}
  */
 export default class TitanActor extends Actor {
 
@@ -100,7 +100,7 @@ export default class TitanActor extends Actor {
          }
 
          // Create the item or items.
-         const retVal = /** @type TitanItem [] */ await this.createEmbeddedDocuments('Item', itemData);
+         const retVal = /** @type {TitanItem[]} */ (await this.createEmbeddedDocuments('Item', itemData));
 
          // Notify the system and sheet of each added item.
          for (const item of retVal) {

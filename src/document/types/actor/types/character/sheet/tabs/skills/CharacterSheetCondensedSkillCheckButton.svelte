@@ -15,7 +15,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} Calculated tooltip. */
+   /** @type {string} Hover text describing the skill and its check modifiers. */
    let tooltip = $derived(
       localize(`${checkParameters.skill}.desc`) +
       getAttributeCheckParametersTooltip(checkParameters)

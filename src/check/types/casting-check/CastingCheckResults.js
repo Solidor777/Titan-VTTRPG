@@ -22,7 +22,7 @@ import calculateCheckResults from '~/check/CheckResults.js';
  * @property {number} expertiseRemaining - The Expertise remaining after being applied to the dice.
  * @property {number} extraSuccesses - The number of extra Successes achieved beyond the Complexity.
  * @property {number} extraSuccessesRemaining - The remaining successes that have
- *    not yet been applied to scaling aspects.
+ * not yet been applied to scaling aspects.
  * @property {number} successes - The total number of Successes achieved.
  * @property {number} healing - The amount of Healing applied.
  * @property {ScalingAspect[]} scalingAspect - The scaling aspects associated with the check.

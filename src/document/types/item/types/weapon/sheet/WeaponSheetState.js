@@ -5,7 +5,7 @@ import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesE
  * @typedef {RulesElementItemSheetState} WeaponSheetState A custom reactive store for managing a Weapon Sheet.
  * @property {() => void} addAttack - Updates the reactive state store in response to an Attack being added.
  * @property {(idx: number) => void} postDeleteAttack - Updates the reactive state store in response to an Attack being
- *    deleted.
+ * deleted.
  */
 
 /**

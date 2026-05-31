@@ -2,7 +2,7 @@
    /**
     * @typedef {object} DocumentSheetSidebarProps
     * @property {import('svelte').SvelteComponent[]} [sections] List of Svelte Components that make up the sections of
-    *    the sidebar.
+    * the sidebar.
     */
 
    /** @type {DocumentSheetSidebarProps} */

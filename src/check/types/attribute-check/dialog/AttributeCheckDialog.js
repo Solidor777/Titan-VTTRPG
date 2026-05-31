@@ -11,9 +11,10 @@ import AttributeCheckDialogShell from '~/check/types/attribute-check/dialog/Attr
 export default class AttributeCheckDialog extends TitanDialog {
 
    /**
+    * Constructs the Attribute Check dialog and seeds its reactive stores with the supplied options and parameters.
     * @param {AttributeCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {AttributeCheckParameters} checkParameters - The initial parameters
-    *    for the check, calculated from the options.
+    * for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
@@ -33,9 +34,9 @@ export default class AttributeCheckDialog extends TitanDialog {
    }
 
    /**
+    * @override
     * @returns {string[]} Array of CSS classes to apply to the dialog element.
     * @protected
-    * @override
     */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();

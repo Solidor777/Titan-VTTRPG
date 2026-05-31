@@ -9,6 +9,7 @@ import TitanDialog from '~/helpers/dialogs/Dialog.js';
 export default class EditUUIDDialog extends TitanDialog {
 
    /**
+    * Builds the dialog window and passes the target Document to the editor shell component.
     * @param {TitanItem | TitanActor} document - The Document to edit the UUID for.
     */
    constructor(document) {
@@ -25,9 +26,9 @@ export default class EditUUIDDialog extends TitanDialog {
    }
 
    /**
+    * @override
     * @returns {string[]} Array of CSS classes to apply to the dialog element.
     * @protected
-    * @override
     */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();

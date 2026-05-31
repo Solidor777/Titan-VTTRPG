@@ -28,7 +28,7 @@ const TOOLTIP_DURATION = [
  * @property {Function} update - Updates the content in response to changes.
  * @property {Function} destroy - Destroys the action when no longer needed.
  * @property {tippy|boolean} tippyTooltip - The current tippy tooltip if the content is valid. Otherwise, false.
- * */
+ */
 
 /**
  * Svelte action for adding a hovering tooltip to an element.
@@ -49,7 +49,7 @@ export default function tooltipAction(element, textData) {
       /**
        * Updates the content in response to changes.
        * @param {string|TextData} newTextData - The updated tooltip content, formatted as HTML or plain text.
-       * */
+       */
       update: (newTextData) => {
 
          // If the new content is valid.

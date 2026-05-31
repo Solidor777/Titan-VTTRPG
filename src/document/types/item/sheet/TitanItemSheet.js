@@ -6,11 +6,12 @@ import { IMPORT_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
 
 /**
  * A Document Sheet class with functionality shared by all Items.
- * @extends {TitanDocumentSheet}
  * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
+ * @extends {TitanDocumentSheet}
  */
 export default class TitanItemSheet extends TitanDocumentSheet {
    /**
+    * Merges the Item sheet CSS class into the options before delegating to the base document sheet.
     * @param {TitanItem} sheetDocument - The Document this sheet represents.
     * @param {object} [options={}] - Application configuration options.
     */

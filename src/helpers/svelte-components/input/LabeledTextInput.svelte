@@ -4,10 +4,10 @@
 
    /**
     * @typedef {object} LabeledTextInputProps
-    * @property {string}        [value=undefined]   - The value that this input should modify.
-    * @property {string}        [label=undefined]   - Label to display.
-    * @property {string}        [icon=undefined]    - Optional Icon to display.
-    * @property {boolean}       [disabled=false]    - Whether the input should currently be disabled.
+    * @property {string} [value=undefined] - The value that this input should modify.
+    * @property {string} [label=undefined] - Label to display.
+    * @property {string} [icon=undefined] - Optional Icon to display.
+    * @property {boolean} [disabled=false] - Whether the input should currently be disabled.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
     */
 

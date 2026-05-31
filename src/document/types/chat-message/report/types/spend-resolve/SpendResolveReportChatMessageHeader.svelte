@@ -7,7 +7,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} Calculated header label. */
+   /** @type {string} Localized title text shown at the top of the report card. */
    const headerLabel = localize(
       document.data.flags.titan.resolveShortage
          ? 'attemptedToSpendX%Resolve'

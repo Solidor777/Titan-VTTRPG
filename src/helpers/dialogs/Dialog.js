@@ -20,8 +20,9 @@ export default class TitanDialog extends ApplicationV2 {
    #content;
 
    /**
+    * Applies the default and theme CSS classes, assigns a unique id, and stores the Svelte content descriptor.
     * @param {object} options - Options for the dialog window. Must include
-    *    `content: { class, props }` describing the Svelte component to mount.
+    * `content: { class, props }` describing the Svelte component to mount.
     */
    constructor(options) {
       const classes = ['titan', 'titan-dialog'];
@@ -89,7 +90,7 @@ export default class TitanDialog extends ApplicationV2 {
    /**
     * Unmount the Svelte content when the dialog closes.
     * @override
-    * @param {object} options - Close options.
+    * @param {object} options - Settings forwarded from the Application close lifecycle.
     * @protected
     */
    _onClose(options) {

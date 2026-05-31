@@ -11,9 +11,10 @@ import AttackCheckDialogShell from '~/check/types/attack-check/dialog/AttackChec
 export default class AttackCheckDialog extends TitanDialog {
 
    /**
+    * Constructs the Attack Check dialog and seeds its reactive stores with the supplied options and parameters.
     * @param {AttackCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {AttackCheckParameters} checkParameters - The initial parameters
-    *    for the check, calculated from the options.
+    * for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
     */
    constructor(checkOptions, checkParameters, actor) {
@@ -33,9 +34,9 @@ export default class AttackCheckDialog extends TitanDialog {
    }
 
    /**
+    * @override
     * @returns {string[]} Array of CSS classes to apply to the dialog element.
     * @protected
-    * @override
     */
    _getDialogClasses() {
       const retVal = super._getDialogClasses();

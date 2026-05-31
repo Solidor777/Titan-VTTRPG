@@ -12,8 +12,8 @@ export default function RulesElementMixin(BaseClass) {
    return class RulesElementDataModel extends BaseClass {
       /**
        * Adds the Rules Elements array to the document schema.
-       * @returns {object} The document schema.
        * @override
+       * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
        * @protected
        */
       static _defineDocumentSchema() {
@@ -25,8 +25,8 @@ export default function RulesElementMixin(BaseClass) {
 
       /**
        * Adds the Rules Elements to the Roll Data.
-       * @returns {object} The Roll Data.
        * @override
+       * @returns {object} Object of properties usable as substitution variables when evaluating roll formulas.
        */
       getRollData() {
          const retVal = super.getRollData();

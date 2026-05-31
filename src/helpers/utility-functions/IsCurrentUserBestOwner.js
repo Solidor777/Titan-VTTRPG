@@ -6,7 +6,7 @@ import getPlayerOwners from '~/helpers/utility-functions/GetPlayerOwners.js';
  * actor's turn starts.
  * @param {Document} document - The document to test ownership for.
  * @returns {boolean} True if the current user is the first active owner of the
- *    document, or false if there are no active owners.
+ * document, or false if there are no active owners.
  */
 export default function isCurrentUserBestOwner(document) {
    // Check if a gm is currently active.

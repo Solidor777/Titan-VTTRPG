@@ -152,15 +152,6 @@
          @include flex-group-top;
       }
 
-      &.buttons {
-         @include flex-row;
-         @include flex-group-center;
-
-         .button:not(:first-child) {
-            @include margin-left-standard;
-         }
-      }
-
       &.small-text {
          @include font-size-small;
       }
