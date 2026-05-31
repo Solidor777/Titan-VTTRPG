@@ -51,3 +51,43 @@ test.describe('component probe — Button', () => {
       await expect(page.locator(`${selector} button[data-testid="probe-button"]`)).toBeVisible();
    });
 });
+
+test.describe('component probe — TextInput', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('typing commits the value and forwards keyup', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'TextInput', {
+         props: {
+            value: '',
+            testId: 'probe-text',
+         },
+         events: ['onkeyup', 'onchange'],
+      });
+      const input = page.locator(`${selector} input`);
+      await input.fill('hello');
+      // TextInput binds the value directly to the DOM input; the bound value is the input's value.
+      await expect(input).toHaveValue('hello');
+      // A keyup commits through the same seam the sheets rely on.
+      await input.press('!');
+      const events = await readProbeEvents(page);
+      expect(events.some((e) => e.event === 'onkeyup')).toBe(true);
+   });
+
+   test('disabled blocks editing', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'TextInput', {
+         props: {
+            value: 'locked',
+            disabled: true,
+         },
+      });
+      const input = page.locator(`${selector} input`);
+      await expect(input).toBeDisabled();
+      await expect(input).toHaveValue('locked');
+   });
+});

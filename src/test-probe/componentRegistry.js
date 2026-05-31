@@ -1,4 +1,5 @@
 import Button from '~/helpers/svelte-components/button/Button.svelte';
+import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 
 /**
  * Registry of base primitives the test probe can mount in isolation. Keyed by the name passed to
@@ -7,6 +8,7 @@ import Button from '~/helpers/svelte-components/button/Button.svelte';
  */
 const componentRegistry = {
    Button,
+   TextInput,
 };
 
 export default componentRegistry;
