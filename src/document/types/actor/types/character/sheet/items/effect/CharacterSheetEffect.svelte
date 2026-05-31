@@ -12,6 +12,8 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetEffectToggleActiveButton
       from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectToggleActiveButton.svelte';
+   import CharacterSheetEffectChecks
+      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
    import { DELETE_ICON, EDIT_ICON, SEND_TO_CHAT_ICON, SHEET_ICON } from '~/system/Icons.js';
 
    /**
@@ -120,6 +122,13 @@
    {#if effect.description !== '' && effect.description !== '<p></p>'}
       <div class="section rich-text">
          <RichText value={effect.description}/>
+      </div>
+   {/if}
+
+   <!--Checks-->
+   {#if effect.system.check.length > 0}
+      <div class="section">
+         <CharacterSheetEffectChecks {effect}/>
       </div>
    {/if}
 
