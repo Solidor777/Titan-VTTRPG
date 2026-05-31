@@ -47,6 +47,9 @@ export async function resetDice(page) {
       if (typeof globalThis.__titanOriginalRandomUniform === 'function') {
          CONFIG.Dice.randomUniform = globalThis.__titanOriginalRandomUniform;
       }
+
+      // Clear all forced-dice state so the next force cycle re-captures a clean original.
+      globalThis.__titanOriginalRandomUniform = undefined;
       globalThis.__titanForcedQueue = [];
       globalThis.__titanForcedDiceActive = false;
    });

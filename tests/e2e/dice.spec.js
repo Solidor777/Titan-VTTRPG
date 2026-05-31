@@ -28,13 +28,24 @@ test.describe('forced dice seam', () => {
       expect(faces).toEqual([6, 4, 1]);
    });
 
-   test('resetDice restores non-deterministic rolling', async ({ page }) => {
+   test('resetDice restores the original RNG', async ({ page }) => {
       await login(page);
 
-      // Install then immediately reset; a fresh stub must no longer be in effect.
+      // Capture the genuine RNG reference in a test-owned global before any stubbing.
+      await page.evaluate(() => {
+         globalThis.__titanGenuineRandomUniform = CONFIG.Dice.randomUniform;
+      });
+
+      // Install then reset; the live RNG must be the genuine function again and state cleared.
       await forceDice(page, [2]);
       await resetDice(page);
-      const isStubbed = await page.evaluate(() => globalThis.__titanForcedDiceActive === true);
-      expect(isStubbed).toBe(false);
+      const state = await page.evaluate(() => ({
+         active: globalThis.__titanForcedDiceActive === true,
+         restored: CONFIG.Dice.randomUniform === globalThis.__titanGenuineRandomUniform,
+      }));
+
+      // The stub must be gone (flag false) and the live RNG must be the captured genuine one.
+      expect(state.active).toBe(false);
+      expect(state.restored).toBe(true);
    });
 });
