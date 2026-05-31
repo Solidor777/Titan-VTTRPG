@@ -278,6 +278,18 @@ v14: the async-`describe` / ApplicationV2 timing mismatch causes all batch regis
 silently. `src/quench/` and `tests/e2e/quench-runner.spec.js` were deleted; the `test:e2e:quench` npm
 script was removed. No Quench code remains in `src/` or `tests/`.
 
+**Derived-data (rules-element) E2E spec** — `tests/e2e/logic/rules-elements.spec.js` asserts the live
+flatModifier pipeline: creates a fresh `player` actor (Body base = 1), attaches an `ability` item carrying
+a `+2 flatModifier` rules element via `buildFlatModifierAbilityData`, waits 100 ms for derived-data
+preparation to settle, and asserts `actor.system.attribute.body.value === 3`. Abilities apply their
+rules elements on mere ownership (no equip), making them the canonical fixture type for derived-stat
+assertions. The spec uses `test.afterEach` to delete the fixture actor so world state does not accumulate.
+
+**`buildFlatModifierAbilityData` builder** — `tests/shared/builders.js` exports `buildFlatModifierAbilityData(name, values)`:
+accepts a `string` name and a `number[]` of modifier values; returns an `Item.create` payload of type `'ability'`
+with one flatModifier rules element per value, each targeting `selector: 'attribute'`, `key: 'body'`, and
+`uuid: 'e2e-flatmod-{index}'`. The companion Vitest unit test lives in `tests/unit/builders.test.js`.
+
 ## Style rules live in CLAUDE.md
 
 `.claude/CLAUDE.md` is the single authority for all code-style, formatting, and documentation rules for this
