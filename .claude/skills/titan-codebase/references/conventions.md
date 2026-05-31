@@ -56,6 +56,23 @@ automatically when the last reactive reader unsubscribes (on unmount). Because `
 document, reads (`.data.system.x`), writes (`.data.update(...)`), collections (`.data.items`), and
 methods all go through the same accessor.
 
+**Always read displayed document values through `document.data`, never off a raw prop** — Svelte 5's
+fine-grained reactivity only tracks reads that go through the `ReactiveDocument` `.data` accessor.
+Reading a value directly off a passed Document prop (e.g. `effect.system.isActive`) is **not** tracked
+and will never re-render when the underlying data changes. Derive such values through `document.data`:
+
+```svelte
+// WRONG — not reactive; the toggle will not update when the effect is toggled
+const isActive = effect.system.isActive;
+
+// CORRECT — reads through the reactive accessor; re-evaluates on every document change
+const isActive = $derived(document.data.effects.get(effect.id)?.system.isActive ?? false);
+```
+
+This rule applies to any document collection member (effects, items, embedded docs) whose display state
+must stay in sync with Foundry mutations. The fix was applied to
+`CharacterSheetEffectToggleActiveButton.svelte` (commit a960e135).
+
 **Trait-sidebar index iteration must be numeric** — All three trait-sidebar `$derived.by` loops
 (`ItemSheetSidebarTraits`, `ArmorSheetSidebarTraits`, `ShieldSheetSidebarTraits`) iterate with a
 numeric `for (let idx = 0; idx < arr.length; idx++)` loop. Using `for...in` over an array yields
