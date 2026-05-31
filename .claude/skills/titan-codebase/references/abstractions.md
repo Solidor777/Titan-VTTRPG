@@ -101,7 +101,18 @@ management). Data model classes hold the schema, field validation, and derived-d
   `actor.getCombatant()?.initiative`). Active/inactive
   state is the native `disabled` field (the universal gate); rich text is the native `description`
   field. The `effect` ActiveEffect subtype is declared in `system.json`
-  `documentTypes.ActiveEffect.effect`.
+  `documentTypes.ActiveEffect.effect`. `getRollData()` returns `{ description (native AE field),
+  duration, check, customTrait, ... }` — `description` is included so an effect check rolled through
+  the shared item-check engine populates the chat card's description like an item does.
+- Effect rows render inline check buttons via `CharacterSheetEffectChecks` /
+  `CharacterSheetEffectCheck` (`src/document/types/actor/types/character/sheet/items/effect/`), mirrors
+  of the item `CharacterSheetItemChecks` / `CharacterSheetItemCheck`. They reuse the **item-check
+  engine** with no effect-specific path: each resolves `document.data.effects.get(effectId)` and calls
+  `getItemCheckParameters` / `requestItemCheck` with `{ itemRollData: effect.getRollData(), checkIdx }`.
+  The engine's `validateItemCheckOptions` / `initializeItemCheckOptions` / `getItemCheckParameters` all
+  branch on `options.itemRollData` and skip `actor.items.get(id)` when it is supplied (and
+  `createItemCheckOptions` preserves `itemRollData` through the chain), so the same path serves items,
+  the effect chat card, and effect sheet rows.
 
 
 ## Checks
