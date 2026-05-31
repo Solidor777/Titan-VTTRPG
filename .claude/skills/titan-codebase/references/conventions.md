@@ -55,6 +55,15 @@ automatically when the last reactive reader unsubscribes (on unmount). Because `
 document, reads (`.data.system.x`), writes (`.data.update(...)`), collections (`.data.items`), and
 methods all go through the same accessor.
 
+**Trait-sidebar index iteration must be numeric** — All three trait-sidebar `$derived.by` loops
+(`ItemSheetSidebarTraits`, `ArmorSheetSidebarTraits`, `ShieldSheetSidebarTraits`) iterate with a
+numeric `for (let idx = 0; idx < arr.length; idx++)` loop. Using `for...in` over an array yields
+string keys (`"0"`, `"1"`, …), and any `const [idx]` destructuring then takes only the first
+*character* of that string key — so `idx` remains a string. Downstream strict comparisons
+(`idx === traitIdx`, `idx !== traitIdx`) are number-vs-string and never match, breaking edit and
+delete. Never use `for...in` (or destructuring into `[idx]`) when a numeric index is required for
+later comparison.
+
 **Never mutate a live `document.system.*` array in place before `update()`** — pushing/splicing the
 live array (e.g. `this.system.customTrait.push(x); this.update({ system: { customTrait: ... } })`)
 defeats `ReactiveDocument` change-detection: the document persists but dependent `$derived`/sheets do
@@ -123,6 +132,14 @@ stale rendered content; rebuilds never write `value`, so they do not loop with t
 
 SCSS mixins are the deliberate, preferred styling mechanism — a codebase-wide refactor replaced all
 `:global` selector usage with mixins, and no `:global` occurrences remain in `src/`.
+
+**Icon-button resets must not force `font-weight`** — `EditDeleteTag.svelte`'s `.tag button { ... }`
+block resets native button chrome (appearance, background, border, margin, padding, color, font-size,
+line-height, cursor) but intentionally omits `font-weight`. The `.tag button` selector has specificity
+0,1,1, which beats FontAwesome's `.fas` rule (0,1,0), so including `font-weight: inherit` overrides
+FA's required `font-weight: 900` and causes solid glyphs (`fa-pen-to-square`, `fa-trash`) to render
+as the notdef box. The same applies to `font-family`: both must be left unset in button resets that
+sit inside FontAwesome icon button contexts.
 
 **Where mixins live:** `src/styles/Mixins/` contains per-domain files (see `architecture.md`,
 `src/styles/` section, for the full mixin file list).
