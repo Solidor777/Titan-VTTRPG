@@ -39,6 +39,7 @@
    ],
    "scripts": {
       "build": "vite build",
+      "build:e2e": "vite build --mode e2e",
       "dev": "vite",
       "test": "vitest run",
       "test:watch": "vitest",

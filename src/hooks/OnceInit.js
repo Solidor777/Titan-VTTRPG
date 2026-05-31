@@ -167,4 +167,15 @@ export default function onceInit() {
    // Unregister old sheet classes.
    foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
    foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
+
+   // Install the test-only component probe harness when built for e2e. `__TITAN_PROBE__` is a Vite
+   // compile-time constant (true only under `--mode e2e`); the production build sets it false so terser
+   // dead-code-eliminates this branch and the dynamic import is never bundled. Fire-and-forget so
+   // `onceInit` stays synchronous and CONFIG setup ordering is unaffected.
+   /* global __TITAN_PROBE__ */
+   if (__TITAN_PROBE__) {
+      import('~/test-probe/registerProbe.js').then((module) => {
+         module.default();
+      });
+   }
 }
