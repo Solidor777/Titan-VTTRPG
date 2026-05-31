@@ -37,6 +37,6 @@
       {editFunction}
       editTooltip={'editTrait'}
       label={document.data.system.customTrait[idx].name}
-      labelTooltip={document.data.system.customTrait[idx].description}
+      labelTooltip={{ text: document.data.system.customTrait[idx].description, localize: false }}
    />
 {/if}
