@@ -14,6 +14,21 @@ export default function registerProbe() {
    // Monotonic id source for probe containers.
    let nextId = 0;
 
+   /**
+    * Unmount a single probe by id and remove its container node.
+    * @param {string} id - The probe id returned from `mount`.
+    * @returns {void}
+    */
+   function unmountProbe(id) {
+      const entry = handles.get(id);
+      if (!entry) {
+         return;
+      }
+      unmount(entry.handle, { outro: false });
+      entry.target.remove();
+      handles.delete(id);
+   }
+
    game.titan._probe = {
       // The names available to mount.
       components: Object.keys(componentRegistry),
@@ -38,7 +53,10 @@ export default function registerProbe() {
             const text = finalProps.text;
             finalProps.children = createRawSnippet(() => {
                return {
-                  render: () => `<span>${text}</span>`,
+                  render: () => `<span></span>`,
+                  setup: (element) => {
+                     element.textContent = text;
+                  },
                };
             });
             delete finalProps.text;
@@ -71,20 +89,8 @@ export default function registerProbe() {
          };
       },
 
-      /**
-       * Unmount a single probe and remove its container node.
-       * @param {string} id - The probe id returned from `mount`.
-       * @returns {void}
-       */
-      unmount(id) {
-         const entry = handles.get(id);
-         if (!entry) {
-            return;
-         }
-         unmount(entry.handle, { outro: false });
-         entry.target.remove();
-         handles.delete(id);
-      },
+      // Unmount a single probe and remove its container node.
+      unmount: unmountProbe,
 
       /**
        * Unmount every active probe.
@@ -92,7 +98,7 @@ export default function registerProbe() {
        */
       unmountAll() {
          for (const id of [...handles.keys()]) {
-            this.unmount(id);
+            unmountProbe(id);
          }
       },
    };

@@ -9,7 +9,7 @@
  * @returns {Promise<{ id: string, selector: string }>} The probe id and its container selector.
  */
 export async function mountProbe(page, name, { props = {}, events = [] } = {}) {
-   return await page.evaluate(({ name, props, events }) => {
+   return page.evaluate(({ name, props, events }) => {
       globalThis.window.__titanProbeEvents = globalThis.window.__titanProbeEvents ?? [];
       const builtProps = { ...props };
       for (const ev of events) {
@@ -27,7 +27,7 @@ export async function mountProbe(page, name, { props = {}, events = [] } = {}) {
  * @returns {Promise<Array<{ event: string, key?: string }>>} The recorded events.
  */
 export async function readProbeEvents(page) {
-   return await page.evaluate(() => globalThis.window.__titanProbeEvents ?? []);
+   return page.evaluate(() => globalThis.window.__titanProbeEvents ?? []);
 }
 
 /**

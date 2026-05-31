@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
-import { mountProbe, readProbeEvents, unmountAll } from './componentProbe.js';
+import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
 
 test.describe('component probe — Button', () => {
    // Authenticate as E2E GM 1 before each probe.
@@ -11,6 +11,7 @@ test.describe('component probe — Button', () => {
    // Tear down every mounted probe so containers never leak between tests.
    test.afterEach(async ({ page }) => {
       await unmountAll(page);
+      await clearProbeEvents(page);
    });
 
    test('click fires onclick', async ({ page }) => {
