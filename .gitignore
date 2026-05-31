@@ -8,6 +8,9 @@ node_modules/
 /index.js
 /index.js.map
 /style.css
+# Vite code-split chunks emitted at repo root by `build:e2e` (gated dynamic import → `[name]-[hash].js`).
+/*-????????.js
+/*-????????.js.map
 titan.zip
 test-results/
 playwright-report/
