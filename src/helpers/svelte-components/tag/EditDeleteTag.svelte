@@ -8,7 +8,9 @@
     * @property {Function} [deleteFunction] - Callback for when the Delete button is clicked.
     * @property {Function} [editFunction] - Callback for when the Edit button is clicked.
     * @property {string} [label] - The text to display for this element.
-    * @property {string} [labelTooltip] - The tooltip to display when the Label is hovered.
+    * @property {string | object} [labelTooltip] - The tooltip to display when the Label is hovered. May be a
+    * plain localization key string, or a TextData object (e.g. `{ text, localize: false }`) for
+    * user-authored content that must be shown verbatim.
     * @property {string} [deleteTooltip] - The tooltip to display when the Delete Icon is hovered.
     * @property {string} [editTooltip] - The tooltip to display when the Edit Icon is hovered.
     */
@@ -29,12 +31,13 @@
    <button
       type="button"
       aria-label={localize('edit')}
-      class={EDIT_ICON}
       onclick={() => {
          editFunction();
       }}
       use:tooltipAction={editTooltip}
-   ></button>
+   >
+      <i class={EDIT_ICON}></i>
+   </button>
 
    <!--Label-->
    <div use:tooltipAction={labelTooltip}>
@@ -45,12 +48,13 @@
    <button
       type="button"
       aria-label={localize('delete')}
-      class={DELETE_ICON}
       onclick={() => {
          deleteFunction();
       }}
       use:tooltipAction={deleteTooltip}
-   ></button>
+   >
+      <i class={DELETE_ICON}></i>
+   </button>
 </div>
 
 <style lang="scss">
@@ -62,8 +66,8 @@
       }
 
       // Reset native button chrome so the icon buttons render identically to the previous anchors.
-      // font-family and font-weight are intentionally NOT reset so the FontAwesome glyph class
-      // keeps its own font and its required 900 weight for solid glyphs.
+      // The FontAwesome glyph class is placed on an inner <i>, not the <button> itself, so that
+      // Foundry's Signika button font-family cannot override the FA font needed for glyph rendering.
       button {
          appearance: none;
          background: none;
