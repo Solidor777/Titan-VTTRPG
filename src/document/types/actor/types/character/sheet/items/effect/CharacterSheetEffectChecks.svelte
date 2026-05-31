@@ -5,7 +5,7 @@
 
    /**
     * @typedef {object} CharacterSheetEffectChecksProps
-    * @property {TitanActiveEffect} [effect] Reference to the effect Active Effect document.
+    * @property {TitanActiveEffect} [effect] Reference to the Active Effect document.
     */
 
    /** @type {CharacterSheetEffectChecksProps} */
