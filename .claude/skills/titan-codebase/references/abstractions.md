@@ -112,7 +112,11 @@ management). Data model classes hold the schema, field validation, and derived-d
   The engine's `validateItemCheckOptions` / `initializeItemCheckOptions` / `getItemCheckParameters` all
   branch on `options.itemRollData` and skip `actor.items.get(id)` when it is supplied (and
   `createItemCheckOptions` preserves `itemRollData` through the chain), so the same path serves items,
-  the effect chat card, and effect sheet rows.
+  the effect chat card, and effect sheet rows. `itemRollData` uses the literal `false` as its
+  absent-sentinel (`createItemCheckOptions` defaults it to `false`), so all three resolutions must
+  fall back to the item lookup **truthily** (`options.itemRollData || …` / a `?` ternary), never with
+  `??` — `??` treats the `false` sentinel as present and skips the lookup, which made the item
+  options dialog self-close until the validate path was corrected.
 
 
 ## Checks
