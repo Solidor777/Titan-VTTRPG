@@ -1,10 +1,9 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **2b-4 checks-opposed** —
-brainstorm first. The open question: how a selected **target token** auto-populates `targetDefense`
-(Canvas/targeting), vs the 2b-3 case where the dialog sets `targetDefense` directly. Resolve the
-target-selection approach, then plan + execute via subagent-driven-development through the
-`titan-svelte-dev` subagent.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3 — UI component /
+manifest tiers** (brainstorm first). All of the checks surface (2b-1..2b-4) is now done. `testId` is
+already on the base primitives (`Button`/`TextInput`) and on the check-dialog fields, so Phase 3 starts
+from a partial foundation.
 
 This is a living status doc for the multi-phase E2E test suite. Read it on resume to continue without
 re-deriving context.
@@ -78,6 +77,25 @@ re-deriving context.
   and never calls the (dead) `_getDialogClasses()` overrides; select dialogs by the stable element **id**
   prefix `[id^="titan-<type>-check-dialog-"]` instead. Found + fixed one real engine bug (#3 below).
 
+- **2b-4 checks-opposed** ✅ — drives both opposed mechanics through the dialog-bypassing roll APIs;
+  spec `tests/e2e/checks-opposed.spec.js` = **6 tests, all green**. **Part A (attack vs Defense, 4 tests):**
+  skips the canvas entirely — temporarily reassigns `game.user.targets` to a fake `Set` of `{ actor }`
+  entries (the exact shape `getTargetedCharacters()` reads via `Array.from`), restoring it in a `finally`.
+  `User#targets` is a plain own-property, not a getter, so this is safe. `rollAttackCheck` (bypass API)
+  reaches `initializeAttackCheckOptions`'s target auto-populate, so no dialog/canvas is needed. Covers
+  interior difficulty, **both** clamp bounds (2 and 6 — needs the roller's attack rating boosted to 6 via a
+  `rating`/`melee`+`accuracy` flatModifier ability, because Defense floors at 0 so a base-1 attacker can't
+  drive the lower clamp), first-target-wins (`targets[0]`), and the no-target fallback (difficulty 4). Tests
+  read `targetDefense`/`attackerRating` from `flags.titan.parameters` and recompute the clamp, so they don't
+  hardcode rating internals. **Part B (resistance vs damage, 2 tests):** `rollResistanceCheck({ resistance,
+  difficulty, complexity, damageToReduce })` — the same options the Resist button passes — with forced dice
+  controlling `succeeded`; asserts `flags.titan.results.damageTaken === damageToReduce − successes` on a
+  failed resist and `=== 0` on a successful one. New builders in `tests/shared/builders.js`:
+  `buildE2ETargetActorData`, `buildE2ETargetDefenseItemData`, `buildE2EAttackerRatingItemData`. No engine
+  bugs found; all fixture-table difficulties held exactly. Spec/plan:
+  `docs/superpowers/specs/2026-05-31-titan-e2e-checks-opposed-design.md`,
+  `docs/superpowers/plans/2026-05-31-titan-e2e-checks-opposed.md`.
+
 ## Bugs found & fixed (by this testing effort)
 
 1. **Trait reactivity** — in-place mutation of `document.system.customTrait` before `update()` defeated
@@ -97,28 +115,26 @@ re-deriving context.
    (`initializeItemCheckOptions`, `getItemCheckParameters`) already use (commit `f155c1e0`). Found by the
    2b-3 item dialog test.
 
-## NEXT: 2b-4 checks-opposed (BRAINSTORM first, then plan, then execute)
+## NEXT: Phase 3 — UI component / manifest tiers (BRAINSTORM first, then plan, then execute)
 
-**Start by invoking `superpowers:brainstorming`.** 2b-3 set `targetDefense` directly via the dialog
-field; 2b-4's unresolved question is the **token-target** path: how a selected target token
-auto-populates `targetDefense`. The mechanics are known — `getAttackCheckParameters` (and the request
-flow at `CharacterDataModel.js:2498-2507`) reads `getTargetedCharacters()` and pulls
-`target.system.getRollData().rating.defense.value` when `options.targetDefense === undefined`; difficulty
-is then `clamp(targetDefense − attackerRating + 4, 2, 6)`. The open question is the **Playwright
-mechanism** to select a target token on the Canvas (place/target a token, then roll) — settle that before
-planning. Load `foundry-vtt` + `titan-codebase` (+ `foundry-canvas` for token targeting, and `svelte-5` +
-`foundry-svelte` if a dialog surface is touched).
+**Start by invoking `superpowers:brainstorming`.** The checks surface (2b-1..2b-4) is complete. Phase 3
+covers the UI component / manifest tiers: drive the rendered Svelte component surfaces (buttons, inputs,
+sheet sections) and assert manifest-driven wiring. `testId` is already on the base primitives
+(`Button`/`TextInput`) and on the check-dialog field/summary wrappers, so the first open question is which
+component/sheet tiers to cover and what additional `testId` anchors are needed. Load `foundry-vtt` +
+`titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface touched). Route all
+`.js`/`.svelte` work through the `titan-svelte-dev` subagent.
 
-**Reuse from 2b-2/2b-3:** `forceDice`/`resetDice` (`tests/e2e/dice.js`), `expectedCheckResults`
-(`tests/shared/checkOracle.js`), `buildE2ERoller*` (`tests/shared/builders.js`), and the dialog page
-object (`tests/e2e/checkDialog.js`) all transfer. Dialogs select by element-id prefix, not by per-type
-class (the `_getDialogClasses()` overrides are dead in v14 — see conventions.md).
+**After Phase 3:** Phase 4 (multi-user permissions + 2-client socket sync via per-user browser contexts).
 
-**After checks:** Phase 3 (UI component/manifest tiers, `testId` already on base primitives + dialog
-fields) and Phase 4 (multi-user permissions + 2-client socket sync via per-user browser contexts).
+**Reuse across phases:** `forceDice`/`resetDice` (`tests/e2e/dice.js`), `expectedCheckResults`
+(`tests/shared/checkOracle.js`), the shared builders (`tests/shared/builders.js`), the dialog page object
+(`tests/e2e/checkDialog.js`), and the fake-target-set pattern from 2b-4 (`game.user.targets` reassignment).
+Dialogs select by element-id prefix, not by per-type class (the `_getDialogClasses()` overrides are dead in
+v14 — see conventions.md).
 
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js --reporter=list`
-  → expect 40 passing (Foundry must be running on :30000, or webServer launches it).
+- `npx playwright test tests/e2e/render-smoke.spec.js tests/e2e/logic tests/e2e/trait-add-custom.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/dice.spec.js tests/e2e/checks-integration.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-opposed.spec.js --reporter=list`
+  → expect 46 passing (Foundry must be running on :30000, or webServer launches it).
