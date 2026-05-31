@@ -3,18 +3,24 @@
 **Date:** 2026-05-31
 **Status:** Approved (brainstorm), pending implementation plan
 **Resolves:** the open-exploration item for concern 4 (opposed / cross-actor checks) in
-`2026-05-30-titan-e2e-checks-design.md` — specifically *how a selected target's Defense reaches
-`AttackCheckParameters`*.
+`2026-05-30-titan-e2e-checks-design.md` — both halves: *how a selected target's Defense reaches
+`AttackCheckParameters`* (Part A), and *the resistance-vs-incoming-damage entry point* (Part B).
 **Builds on:** 2b-2 checks-integration (forced dice, roller fixture, oracle) and 2b-3 checks-dialog.
 
 ## Goal
 
-Prove the TITAN attack-check *opposed-difficulty* mechanic: when the user has a target, the attack's
-difficulty is computed from the **target's Defense rating**, not the attacker's own rating. Concretely,
-cover the target branch and fallback branch of `initializeAttackCheckOptions` and the difficulty formula
-in `getAttackCheckParameters`.
+Prove TITAN's two opposed check mechanics:
 
-## Key findings (resolve the open question)
+- **Part A — attack vs Defense:** when the user has a target, the attack's difficulty is computed from the
+  **target's Defense rating**, not the attacker's own rating (the target branch + fallback branch of
+  `initializeAttackCheckOptions`, and the difficulty formula in `getAttackCheckParameters`).
+- **Part B — resistance vs damage:** when a resistance check carries incoming damage (`damageToReduce`),
+  the result's `damageTaken` is reduced by the successes rolled (the `damageTaken` field in
+  `calculateResistanceCheckResults`).
+
+## Key findings (resolve the open questions)
+
+### Part A — attack vs Defense
 
 The auto-populate path is short and isolated:
 
@@ -33,7 +39,22 @@ The auto-populate path is short and isolated:
 - `User#targets` is a plain own-property on the user instance (assigned in the constructor), **not** a
   getter, so a test can temporarily reassign it.
 
-## Approach — fake target set (cheapest real case)
+### Part B — resistance vs damage
+
+Unlike Part A there is **no target lookup** — the opposed input is a plain explicit option:
+
+- `damageToReduce` is a declared `ResistanceCheckOptions` field (`ResistanceCheckOptions.js:8`), defaulting
+  to `0`, and flows verbatim into `ResistanceCheckParameters` (`ResistanceCheckParameters.js`).
+- `calculateResistanceCheckResults` (`ResistanceCheckResults.js:31`) computes
+  `damageTaken = damageToReduce && !succeeded ? damageToReduce − successes : 0`.
+- The real entry point is the damage report's **Resist** button (`ResistanceCheckButton.svelte`): it
+  passes `{ resistance, difficulty, complexity, damageToReduce }` (the incoming damage) into
+  `requestResistanceCheck` → `rollResistanceCheck`. So the bypass `rollResistanceCheck` API with an
+  explicit `damageToReduce` faithfully reproduces the opposed flow — no canvas, no chat-message plumbing.
+- Forced dice control `successes`/`succeeded`, which is exactly what `damageTaken` keys off, making the
+  result exactly assertable.
+
+## Part A approach — fake target set (cheapest real case)
 
 We are **not** testing Foundry's targeting UI — only what TITAN does *given* a target. So skip the canvas,
 scene, and PIXI entirely:
@@ -65,6 +86,8 @@ uses canvas input); a drawn-scene + `token.setTarget` (more setup cost for no ex
 
 ## Tests — `tests/e2e/checks-opposed.spec.js`
 
+### Part A — attack vs Defense
+
 1. **Targeted, interior difficulty** — target Defense offset to land an interior result (3 or 5). Assert
    `parameters.targetDefense === target Defense` and `parameters.difficulty === clamp(...)`. This is the
    opposed mechanic proven against the fallback. Force dice for this case and additionally run the
@@ -79,6 +102,22 @@ uses canvas input); a drawn-scene + `token.setTarget` (more setup cost for no ex
    `getControlledTokens()` is empty, so the GM controlled-token branch in `getTargetedCharacters()` cannot
    leak a target — the test asserts the empty set up front to make this explicit.
 
+### Part B — resistance vs damage
+
+Driven through the bypass `rollResistanceCheck({ resistance, difficulty, complexity, damageToReduce })`
+with forced dice. `difficulty`/`complexity` are passed explicitly so `succeeded` is controlled by the
+forced faces; assert `flags.titan.results.damageTaken` (and cross-check `successes`/`succeeded` against the
+`expectedCheckResults` oracle).
+
+5. **Failed resist reduces damage** — forced dice yielding `successes` below `complexity` → `!succeeded` →
+   assert `damageTaken === damageToReduce − successes`.
+6. **Successful resist takes no damage** — forced dice yielding `successes ≥ complexity` → `succeeded` →
+   assert `damageTaken === 0` even though `damageToReduce > 0`.
+
+(Dice count: the roller's resistance rolls one die in 2b-2; the plan picks `complexity` and the forced face
+— optionally a `diceMod` — so cases 5 and 6 land on the intended `succeeded` outcomes. `damageToReduce = 0`
+is already covered as the default by the engine unit tests, so it is not repeated here.)
+
 ## Reuse
 
 `forceDice`/`resetDice` (`tests/e2e/dice.js`), `expectedCheckResults` (`tests/shared/checkOracle.js`),
@@ -90,13 +129,15 @@ uses canvas input); a drawn-scene + `token.setTarget` (more setup cost for no ex
 - The dialog `targetDefense` flow-through (already covered by 2b-3's attack clamp-to-6 test).
 - A full melee-vs-ranged fallback matrix (one fallback case suffices; the targeted path is
   type-independent).
-- Resistance-vs-damage (the parent spec's other half of concern 4): the roller/oracle already exercise
-  `damageTaken` in the engine unit tests and 2b-2; an opposed resistance entry point is not part of this
-  plan. If desired later it gets its own follow-up, recorded in the backlog.
+- The damage-report chat-message plumbing for Part B (the **Resist** button's render and
+  `getBestCharactersToUpdate` targeting). The bypass `rollResistanceCheck` with an explicit
+  `damageToReduce` reproduces the opposed math the button ultimately invokes; the button's own UI is a
+  Phase 3 concern.
+- `damageToReduce = 0` / default path (already covered by the engine unit tests).
 
 ## Verification
 
 - `npx vitest run` → unchanged (35 passing).
-- `npx playwright test tests/e2e/checks-opposed.spec.js --reporter=list` → 4 passing, plus the existing
-  suite (`…/checks-integration.spec.js …/checks-dialog.spec.js` etc.) still green.
+- `npx playwright test tests/e2e/checks-opposed.spec.js --reporter=list` → 6 passing (4 Part A + 2 Part B),
+  plus the existing suite (`…/checks-integration.spec.js …/checks-dialog.spec.js` etc.) still green.
 - No `pageerror` during any roll window.
