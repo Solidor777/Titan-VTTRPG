@@ -10,7 +10,7 @@ describe('computeMulSumDelta', () => {
       expect(computeMulSumDelta(5, 0.5, 'down')).toBe(-3);
    });
 
-   it('is a no-op for an even total regardless of rounding', () => {
+   it('produces an identical delta for both rounding directions when the scaled total is already an integer', () => {
       expect(computeMulSumDelta(6, 0.5, 'up')).toBe(-3);
       expect(computeMulSumDelta(6, 0.5, 'down')).toBe(-3);
    });
