@@ -142,4 +142,48 @@ test.describe('socket sync — replicated turn-effect state', () => {
          }
       });
    });
+
+   test('A4: previousTurn reverts the applied effect and replicates to the player client', async ({ browser }) => {
+      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+         await setWorldSetting(gm, 'autoApplyPersistentDamage', 'enabled');
+         await setWorldSetting(gm, 'autoRevertPersistentDamage', 'enabled');
+
+         const seed = {
+            sceneName: 'A4 Scene',
+            effectActor: buildTurnEffectActorData('A4 Effect Actor'),
+            effectAbilities: [buildPersistentDamageAbilityData('A4 PD', 1)],
+            otherActor: buildTurnEffectActorData('A4 Other Actor'),
+            effectInitiative: 10,
+            otherInitiative: 20,
+            observerUserName: 'E2E Player 1',
+         };
+         const ids = await gm.evaluate(seedCombatEncounter, seed);
+
+         try {
+            const before = await gm.evaluate(
+               (id) => game.actors.get(id).system.resource.stamina.value,
+               ids.effectActorId,
+            );
+
+            // Forward: apply the persistent damage.
+            await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
+            await player.waitForFunction(
+               ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
+               { id: ids.effectActorId, expected: before - 1 },
+               { timeout: 15_000 },
+            );
+
+            // Backward: previousTurn reverts the damage.
+            await gm.evaluate((combatId) => game.combats.get(combatId).previousTurn(), ids.combatId);
+            await player.waitForFunction(
+               ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
+               { id: ids.effectActorId, expected: before },
+               { timeout: 15_000 },
+            );
+         }
+         finally {
+            await gm.evaluate(teardownCombatEncounter, ids);
+         }
+      });
+   });
 });
