@@ -33,6 +33,12 @@
       'training',
    ];
 
+   /** @type {string[]} Options for the rounding direction. */
+   const roundingOptions = [
+      'up',
+      'down',
+   ];
+
    /**
     * Updates the element key to a sensible default when the selector changes.
     * @returns {void}
@@ -144,6 +150,14 @@
    <!--Value-->
    <div class="field number">
       <DocumentNumberInput bind:value={document.data.system.rulesElement[idx].value}/>
+   </div>
+
+   <!--Rounding-->
+   <div class="field select">
+      <DocumentSelect
+         bind:value={document.data.system.rulesElement[idx].rounding}
+         options={roundingOptions}
+      />
    </div>
 </div>
 
