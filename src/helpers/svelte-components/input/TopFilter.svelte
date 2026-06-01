@@ -8,6 +8,7 @@
     * @property {string} [icon=undefined] - Optional Icon to display.
     * @property {string} [value=undefined] - The value that this input should modify.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
+    * @property {string} [testId] - Optional stable selector forwarded to the inner TextInput as `data-testid`.
     */
 
    /** @type {TopFilterProps} */
@@ -16,6 +17,7 @@
       icon    = undefined,
       value   = $bindable(undefined),
       tooltip = undefined,
+      testId  = void 0,
    } = $props();
 </script>
 
@@ -25,7 +27,7 @@
       {icon}
       {label}
       {tooltip}>
-      <TextInput bind:value/>
+      <TextInput bind:value {testId}/>
    </LabeledElement>
 </div>
 

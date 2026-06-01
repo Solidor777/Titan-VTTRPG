@@ -9,6 +9,7 @@
     * @property {string} [icon=undefined] - Optional Icon to display.
     * @property {boolean} [disabled=false] - Whether the input should currently be disabled.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
+    * @property {string} [testId] - Optional stable selector forwarded to the inner TextInput as `data-testid`.
     */
 
    /** @type {LabeledTextInputProps} */
@@ -18,6 +19,7 @@
       icon     = undefined,
       disabled = false,
       tooltip  = undefined,
+      testId   = void 0,
    } = $props();
 </script>
 
@@ -26,5 +28,5 @@
    {label}
    {tooltip}
 >
-   <TextInput bind:value {disabled}/>
+   <TextInput bind:value {disabled} {testId}/>
 </LabeledElement>

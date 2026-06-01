@@ -17,6 +17,7 @@
     * @property {number} [modifierIncrement=10] - Amount to change the value per button press (modifier active).
     * @property {Function} [onchange] - Callback forwarded from the native change event.
     * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid` on the root element.
     */
 
    /** @type {IntegerIncrementInputProps} */
@@ -30,6 +31,7 @@
       modifierIncrement = 10,
       onchange          = undefined,
       onkeyup           = undefined,
+      testId            = void 0,
    } = $props();
 
    /**
@@ -49,7 +51,7 @@
    }
 </script>
 
-<div class="input" use:tooltipAction={tooltip}>
+<div class="input" data-testid={testId} use:tooltipAction={tooltip}>
    <div class="decrement">
       <MiniIconButton
          {disabled}

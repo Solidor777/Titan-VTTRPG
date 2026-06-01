@@ -1,4 +1,12 @@
+import AttributeInput from '~/helpers/svelte-components/input/AttributeInput.svelte';
 import Button from '~/helpers/svelte-components/button/Button.svelte';
+import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
+import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
+import LabeledTextInput from '~/helpers/svelte-components/input/LabeledTextInput.svelte';
+import RarityInput from '~/helpers/svelte-components/input/RarityInput.svelte';
+import ResistanceInput from '~/helpers/svelte-components/input/ResistanceInput.svelte';
+import TextAreaInput from '~/helpers/svelte-components/input/TextAreaInput.svelte';
+import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
 import Label from '~/helpers/svelte-components/label/Label.svelte';
 import TextLabel from '~/helpers/svelte-components/label/TextLabel.svelte';
 import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
@@ -45,7 +53,15 @@ import TurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStar
  * @type {Record<string, import('svelte').Component>}
  */
 const componentRegistry = {
+   AttributeInput,
    Button,
+   ImagePicker,
+   IntegerIncrementInput,
+   LabeledTextInput,
+   RarityInput,
+   ResistanceInput,
+   TextAreaInput,
+   TopFilter,
    Label,
    TextLabel,
    IconLabel,

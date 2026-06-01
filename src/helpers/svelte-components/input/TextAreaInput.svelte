@@ -7,6 +7,7 @@
     * @property {boolean} [disabled=false] - Whether the input should currently be disabled.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
     * @property {Function} [onchange] - Callback forwarded from the native change event.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid` on the textarea.
     */
 
    /** @type {TextAreaInputProps} */
@@ -15,11 +16,13 @@
       disabled = false,
       tooltip  = undefined,
       onchange = undefined,
+      testId   = void 0,
    } = $props();
 </script>
 
 <textarea
    bind:value
+   data-testid={testId}
    {disabled}
    {onchange}
    use:tooltipAction={tooltip}
