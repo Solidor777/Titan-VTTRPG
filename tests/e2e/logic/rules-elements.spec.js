@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { login } from '../fixtures.js';
-import { buildFlatModifierAbilityData, buildMulBaseAbilityData } from '../../shared/builders.js';
+import {
+   buildFlatModifierAbilityData,
+   buildMulBaseAbilityData,
+   buildRulesElementAbilityData,
+} from '../../shared/builders.js';
 import { injectFastCheck } from '../fast-check.js';
 
 /**
@@ -84,6 +88,46 @@ test.describe('rules elements — derived attribute math', () => {
 
       // Base 1 + base*(2-1) + 3 = 1 + 1 + 3 = 5.
       expect(bodyValue, 'derived Body should be 1 + 1 + 3').toBe(5);
+   });
+});
+
+test.describe('rules elements — all-key selector', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+   test.afterEach(async ({ page }) => {
+      await page.evaluate(async (name) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+      }, ACTOR_NAME);
+   });
+
+   test('flatModifier with key "all" shifts every attribute', async ({ page }) => {
+      const attributes = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return {
+            body: actor.system.attribute.body.value,
+            mind: actor.system.attribute.mind.value,
+            soul: actor.system.attribute.soul.value,
+         };
+      }, {
+         name: ACTOR_NAME,
+         abilityData: buildRulesElementAbilityData('E2E All +2', [
+            { operation: 'flatModifier', selector: 'attribute', key: 'all', value: 2 },
+         ]),
+      });
+
+      expect(attributes).toEqual({ body: 3, mind: 3, soul: 3 });
    });
 });
 

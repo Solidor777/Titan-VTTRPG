@@ -38,6 +38,27 @@ export function buildFlatModifierItemData(name) {
 }
 
 /**
+ * Builds an ability item create-payload carrying an arbitrary list of rules elements, each stamped with
+ * a deterministic uuid. Abilities apply their rules elements on mere ownership (no equip), so this is
+ * the simplest fixture for asserting derived-stat math through the live pipeline.
+ * @param {string} name - The ability name.
+ * @param {object[]} elements - The rules-element objects (without uuid); a uuid is added per element.
+ * @returns {object} An `Item.create` payload of type `ability`.
+ */
+export function buildRulesElementAbilityData(name, elements) {
+   return {
+      name: name,
+      type: 'ability',
+      system: {
+         rulesElement: elements.map((element, index) => ({
+            ...element,
+            uuid: `e2e-re-${index}`,
+         })),
+      },
+   };
+}
+
+/**
  * Builds an ability item create-payload carrying one flatModifier rules element per supplied value,
  * each targeting the Body attribute. Abilities apply their rules elements on mere ownership (no equip),
  * making them the simplest fixture for asserting derived-attribute deltas.

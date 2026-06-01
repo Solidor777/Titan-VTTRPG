@@ -694,6 +694,46 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Returns the list of stat keys under a rules-element selector, used to expand an 'all'-key element
+    * into one element per concrete key.
+    * @param {string} selector - The rules-element selector (attribute, rating, speed, etc.).
+    * @returns {string[]} The concrete keys under that selector for this Character.
+    * @private
+    */
+   _getSelectorKeys(selector) {
+      if (selector === 'training' || selector === 'expertise') {
+         return Object.keys(this.skill);
+      }
+
+      return this[selector] ? Object.keys(this[selector]) : [];
+   }
+
+   /**
+    * Expands any rules element whose key is 'all' into one element per concrete key under its selector,
+    * leaving every other element untouched. Operates on the gathered element list before bucketing, so
+    * 'all' works uniformly for every operation that carries a key.
+    * @param {object[]} elements - The gathered rules elements (already tagged with a type).
+    * @returns {object[]} A new array with 'all'-key elements expanded.
+    * @private
+    */
+   _expandAllKeyElements(elements) {
+      /** @type {object[]} */
+      const expanded = [];
+      for (const element of elements) {
+         if (element.key === 'all') {
+            for (const key of this._getSelectorKeys(element.selector)) {
+               expanded.push({ ...element, key });
+            }
+         }
+         else {
+            expanded.push(element);
+         }
+      }
+
+      return expanded;
+   }
+
+   /**
     * Applies Rules Elements to the Character.
     * @private
     */
@@ -775,8 +815,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
       });
 
+      // Expand any 'all'-key elements into one element per concrete key under the selector.
+      const allElements = this._expandAllKeyElements(rulesElements);
+
       // If there are any elements.
-      if (rulesElements.length > 0) {
+      if (allElements.length > 0) {
 
          // Sort the Rules Elements by type, and process them in order.
          /** @type {*[]} */
@@ -795,7 +838,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const conditionalRatingModifierElements = [];
          /** @type {*[]} */
          const conditionalCheckModifierElements = [];
-         rulesElements.forEach((element) => {
+         allElements.forEach((element) => {
             switch (element.operation) {
                case 'mulBase': {
                   mulBaseElements.push(element);
