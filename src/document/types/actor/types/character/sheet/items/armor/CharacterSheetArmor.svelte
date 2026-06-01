@@ -29,19 +29,25 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {Array<object>} The armor's checks, re-read through document.data so the row updates in place. */
+   const check = $derived(document.data.items.get(item._id)?.system.check ?? []);
+
+   /** @type {string} The armor's description, re-read through document.data so the row updates in place. */
+   const description = $derived(document.data.items.get(item._id)?.system.description);
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
    {#snippet controls()}
       <!--Toggle Equipped button-->
-      {#if (document.data.system.equipped.armor === item._id) === false || item.system.check.length === 0}
+      {#if (document.data.system.equipped.armor === item._id) === false || check.length === 0}
          <div class="button">
             <CharacterSheetItemEquipButton
                {item}
                equipped={document.data.system.equipped.armor === item._id}
             />
          </div>
-      {:else if item.system.check.length > 0}
+      {:else if check.length > 0}
          <div class="button">
             <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
          </div>
@@ -64,7 +70,7 @@
    {/snippet}
 
    <!--Equip button-->
-   {#if item.system.check.length > 0}
+   {#if check.length > 0}
       <div class="section">
          <CharacterSheetItemEquipButton
             {item}
@@ -79,16 +85,16 @@
    </div>
 
    <!--Item Checks-->
-   {#if item.system.check.length > 0}
+   {#if check.length > 0}
       <div class="section">
          <CharacterSheetItemChecks {item}/>
       </div>
    {/if}
 
    <!--Item Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   {#if description !== '' && description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={description}/>
       </div>
    {/if}
 </CharacterSheetItem>

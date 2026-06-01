@@ -1,4 +1,5 @@
 <script>
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { ARMOR_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/armor/ArmorTraits.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
@@ -17,8 +18,29 @@
    /** @type {CharacterSheetArmorStatsProps} */
    const { item = undefined } = $props();
 
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
    /** @type {object} Descriptions of each armor trait. */
    const traitDescriptions = ARMOR_TRAIT_DESCRIPTIONS;
+
+   /** @type {number} The armor's current value, re-read through document.data so the row updates in place. */
+   const armorValue = $derived(document.data.items.get(item._id)?.system.armor.value);
+
+   /** @type {number} The armor's max value, re-read through document.data so the row updates in place. */
+   const armorMax = $derived(document.data.items.get(item._id)?.system.armor.max);
+
+   /** @type {string} The armor's rarity, re-read through document.data so the row updates in place. */
+   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+
+   /** @type {number} The armor's gp value, re-read through document.data so the row updates in place. */
+   const value = $derived(document.data.items.get(item._id)?.system.value);
+
+   /** @type {Array<object>} The armor's traits, re-read through document.data so the row updates in place. */
+   const trait = $derived(document.data.items.get(item._id)?.system.trait ?? []);
+
+   /** @type {Array<object>} The armor's custom traits, re-read through document.data for in-place updates. */
+   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
 </script>
 
 <div class="stats">
@@ -26,40 +48,40 @@
       <IconStatTag
          icon={ARMOR_ICON}
          label={localize('armor')}
-         value={item.system.armor.value === item.system.armor.max
-            ? item.system.armor.value
-            : `${item.system.armor.value} / ${item.system.armor.max}`}
+         value={armorValue === armorMax
+            ? armorValue
+            : `${armorValue} / ${armorMax}`}
       />
    </div>
 
    <!--Rarity-->
    <div class="stat">
-      <RarityTag rarity={item.system.rarity}/>
+      <RarityTag {rarity}/>
    </div>
 
    <!--Value-->
-   {#if item.system.value}
+   {#if value}
       <div class="stat">
-         <ValueTag value={item.system.value}/>
+         <ValueTag {value}/>
       </div>
    {/if}
 
    <!--Traits-->
-   {#each item.system.trait as trait}
+   {#each trait as traitEntry}
       <div class="stat">
          <TraitTag
-            label={localize(trait.name)}
-            value={trait.value}
-            tooltip={localize(traitDescriptions[trait.name])}
+            label={localize(traitEntry.name)}
+            value={traitEntry.value}
+            tooltip={localize(traitDescriptions[traitEntry.name])}
          />
       </div>
    {/each}
 
    <!--Custom traits-->
-   {#each item.system.customTrait as trait}
+   {#each customTrait as customTraitEntry}
       <div class="stat">
-         <Tag tooltip={trait.description}>
-            {trait.name}
+         <Tag tooltip={customTraitEntry.description}>
+            {customTraitEntry.name}
          </Tag>
       </div>
    {/each}

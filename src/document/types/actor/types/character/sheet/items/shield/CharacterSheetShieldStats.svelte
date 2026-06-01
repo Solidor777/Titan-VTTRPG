@@ -1,4 +1,5 @@
 <script>
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { SHIELD_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/shield/ShieldTraits.js';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
@@ -16,8 +17,26 @@
    /** @type {CharacterSheetShieldStatsProps} */
    const { item = undefined } = $props();
 
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
    /** @type {object} Descriptions of each shield trait. */
    const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
+
+   /** @type {number} The shield's defense value, re-read through document.data so the row updates in place. */
+   const defense = $derived(document.data.items.get(item._id)?.system.defense);
+
+   /** @type {string} The shield's rarity, re-read through document.data so the row updates in place. */
+   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+
+   /** @type {number} The shield's gp value, re-read through document.data so the row updates in place. */
+   const value = $derived(document.data.items.get(item._id)?.system.value);
+
+   /** @type {Array<object>} The shield's traits, re-read through document.data so the row updates in place. */
+   const trait = $derived(document.data.items.get(item._id)?.system.trait ?? []);
+
+   /** @type {Array<object>} The shield's custom traits, re-read through document.data for in-place updates. */
+   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
 </script>
 
 <div class="stats">
@@ -26,38 +45,38 @@
          icon={DEFENSE_ICON}
          label={localize('defense')}
          tooltip={localize('defense.desc')}
-         value={item.system.defense}
+         value={defense}
       />
    </div>
 
    <!--Rarity-->
    <div class="stat">
-      <RarityTag rarity={item.system.rarity}/>
+      <RarityTag {rarity}/>
    </div>
 
    <!--Value-->
-   {#if item.system.value}
+   {#if value}
       <div class="stat">
-         <ValueTag value={item.system.value}/>
+         <ValueTag {value}/>
       </div>
    {/if}
 
    <!--Traits-->
-   {#each item.system.trait as trait}
+   {#each trait as traitEntry}
       <div class="stat">
          <TraitTag
-            label={localize(trait.name)}
-            value={trait.value}
-            tooltip={localize(traitDescriptions[trait.name])}
+            label={localize(traitEntry.name)}
+            value={traitEntry.value}
+            tooltip={localize(traitDescriptions[traitEntry.name])}
          />
       </div>
    {/each}
 
    <!--Custom Traits-->
-   {#each item.system.customTrait as trait}
+   {#each customTrait as customTraitEntry}
       <div class="stat">
-         <Tag tooltip={trait.description}>
-            {trait.name}
+         <Tag tooltip={customTraitEntry.description}>
+            {customTraitEntry.name}
          </Tag>
       </div>
    {/each}
