@@ -34,7 +34,7 @@
             filterFunction={(entry) => entry.label.toLowerCase().includes($appState.tabs.checks.filter.toLowerCase())}
             idFunction={(entry) => entry.uuid}
             propsFunction={(entry, idx) => {
-              return {idx}
+               return { idx };
             }}
          />
 

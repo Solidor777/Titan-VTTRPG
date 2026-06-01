@@ -15,7 +15,7 @@ function resolveProbeFunction(marker) {
       case 'returnTrue':
          return () => true;
 
-      // Identity over the entry, e.g. a `mapFunction`/`propsFunction` that passes the entry through.
+      // Identity passthrough over the entry, e.g. a `propsFunction` that passes the entry through.
       case 'returnEntry':
          return (entry) => entry;
 

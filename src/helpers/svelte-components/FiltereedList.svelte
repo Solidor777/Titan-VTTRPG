@@ -23,6 +23,9 @@
 
    /** @type {Array<{ entry: any, idx: number }>} Entries paired with their original index, filtered. */
    const filteredEntries = $derived.by(() => {
+      if (!entries || !filterFunction) {
+         return [];
+      }
       return entries
          .map((entry, idx) => {
             return {

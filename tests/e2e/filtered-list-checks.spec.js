@@ -23,6 +23,15 @@ test.describe('checks tab filter (live item sheet)', () => {
       expect(systemReady, 'TITAN system initialized before checks-filter walk').toBe(true);
    });
 
+   test.afterEach(async ({ page }) => {
+      // Close any open sheet and delete the fixture item so sheets do not accumulate across retries.
+      await page.evaluate(async () => {
+         const item = globalThis.game.items.getName('E2E Filter Ability');
+         await item?.sheet?.close();
+         await item?.delete();
+      });
+   });
+
    test('typing into the TopFilter narrows the rendered checks list to the matching check', async ({ page }) => {
       // Capture uncaught errors during the render/filter window.
       const errors = [];
@@ -53,12 +62,10 @@ test.describe('checks tab filter (live item sheet)', () => {
          await ability.update({ system: { check } });
 
          await ability.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 600);
-         });
       }, CHECK_LABELS);
 
-      // Scope every locator to the rendered item sheet window.
+      // Scope every locator to the rendered item sheet window. Awaiting visibility replaces the previous
+      // fixed render delay: Playwright auto-retries until the freshly rendered sheet is on screen.
       const sheet = page.locator('.titan-item-sheet').last();
       await expect(sheet).toBeVisible();
 
