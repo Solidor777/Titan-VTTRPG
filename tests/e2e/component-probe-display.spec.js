@@ -19,7 +19,8 @@ test.describe('component probe — Meter', () => {
    });
 
    test('animates the bar width to value/max percent', async ({ page }) => {
-      // Formula: (value / max - min) * 100.  For value=3, max=4, min=0 → 75 %.
+      // Formula (per Meter.svelte, JS operator precedence): ((value / max) - min) * 100.
+      // For value=3, max=4, min=0 → ((3 / 4) - 0) * 100 = 75 %.
       // The bar reaches its target asynchronously via setInterval; poll until it arrives.
       const { selector } = await mountProbe(page, 'Meter', {
          props: {
@@ -166,7 +167,6 @@ test.describe('component probe — Tabs', () => {
                   id: 'tab-a',
                   label: 'Tab A',
                   component: probeComponent('LabelTag'),
-                  props: { label: 'ContentA' },
                },
             ],
             activeTab: 'tab-a',
