@@ -4,6 +4,7 @@
       from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
    import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
    import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
+   import createMulSumElement from '~/document/types/item/rules-element/MulSum.js';
    import createFastHealingElement from '~/document/types/item/rules-element/FastHealing.js';
    import createPersistentDamageElement from '~/document/types/item/rules-element/PersistentDamage.js';
    import createTurnMessageElement from '~/document/types/item/rules-element/TurnMessage.js';
@@ -43,6 +44,13 @@
             case 'mulBase': {
                document.data.system.rulesElement[idx] =
                   createMulBaseElement(
+                     document.data.system.rulesElement[idx],
+                  );
+               break;
+            }
+            case 'mulSum': {
+               document.data.system.rulesElement[idx] =
+                  createMulSumElement(
                      document.data.system.rulesElement[idx],
                   );
                break;
