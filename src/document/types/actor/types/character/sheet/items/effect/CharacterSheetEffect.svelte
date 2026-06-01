@@ -27,13 +27,34 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {string} The effect's duration type, re-read through document.data so the row updates in place. */
+   const durationType = $derived(document.data.effects.get(effect.id)?.system.duration.type);
+
+   /** @type {string} The effect's custom duration label, re-read through document.data so it updates in place. */
+   const durationCustom = $derived(document.data.effects.get(effect.id)?.system.duration.custom);
+
+   /** @type {number} The effect's remaining duration, re-read through document.data so it updates in place. */
+   const durationRemaining = $derived(document.data.effects.get(effect.id)?.system.duration.remaining);
+
+   /** @type {boolean} Whether the effect is expired, re-read through document.data so the row updates in place. */
+   const isExpired = $derived(document.data.effects.get(effect.id)?.system.isExpired);
+
+   /** @type {string} The effect's rich-text description, re-read through document.data so it updates in place. */
+   const description = $derived(document.data.effects.get(effect.id)?.description ?? '');
+
+   /** @type {number} The effect's check count, re-read through document.data so the gate updates in place. */
+   const checkLength = $derived(document.data.effects.get(effect.id)?.system.check.length ?? 0);
+
+   /** @type {Array<object>} The effect's custom traits, re-read through document.data so they update in place. */
+   const customTrait = $derived(document.data.effects.get(effect.id)?.system.customTrait ?? []);
 </script>
 
 <CharacterSheetItem item={effect} bind:isExpanded>
    {#snippet controls()}
       <!--Duration-->
-      {#if effect.system.duration.type !== 'permanent'}
-         {#if effect.system.duration.type === 'initiative'}
+      {#if durationType !== 'permanent'}
+         {#if durationType === 'initiative'}
             <!--Initiative-->
             <div class="field margin-right">
                <div class="label">
@@ -60,8 +81,8 @@
 
          <div class="field">
             <div class="label">
-               {effect.system.duration.type === 'custom'
-                  ? effect.system.duration.custom
+               {durationType === 'custom'
+                  ? durationCustom
                   : localize('turns')}
             </div>
 
@@ -119,14 +140,14 @@
    {/snippet}
 
    <!--Effect Description-->
-   {#if effect.description !== '' && effect.description !== '<p></p>'}
+   {#if description !== '' && description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={effect.description}/>
+         <RichText value={description}/>
       </div>
    {/if}
 
    <!--Checks-->
-   {#if effect.system.check.length > 0}
+   {#if checkLength > 0}
       <div class="section">
          <CharacterSheetEffectChecks {effect}/>
       </div>
@@ -136,20 +157,20 @@
       <!--Duration-->
       <div class="tag">
          <DurationTag
-            type={effect.system.duration.type}
-            remaining={effect.system.duration.remaining}
+            type={durationType}
+            remaining={durationRemaining}
          />
       </div>
 
       <!--Expired-->
-      {#if effect.system.isExpired}
+      {#if isExpired}
          <div class="tag">
             <Tag>{localize('expired')}</Tag>
          </div>
       {/if}
 
       <!--Traits-->
-      {#each effect.system.customTrait as trait}
+      {#each customTrait as trait}
          <div class="tag">
             <Tag tooltip={trait.description}>
                {trait.name}
