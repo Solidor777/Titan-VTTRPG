@@ -4915,9 +4915,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
                      const reportData = {};
 
                      // Get the report data for each expired effect if appropriate.
-                     const reportEffects = reportEffects();
-                     const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
-                     const shouldSendReport = (reportEffects || autoRemoveExpiredEffects === 'showButton');
+                     const shouldReportEffects = reportEffects();
+                     const autoRemoveExpiredEffectsSetting = autoRemoveExpiredEffects();
+                     const shouldSendReport = (shouldReportEffects || autoRemoveExpiredEffectsSetting === 'showButton');
                      if (shouldSendReport) {
                         reportData.effects = {
                            expired: this._getEffectReportData(expiredEffects),
@@ -4925,7 +4925,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                      }
 
                      // Process the expired effects.
-                     await this._processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData);
+                     await this._processExpiredEffects(autoRemoveExpiredEffectsSetting, expiredEffects, reportData);
 
                      // Send the report to chat if appropriate.
                      if (shouldSendReport) {
@@ -4934,7 +4934,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                         reportData.type = 'effectsExpiredReport';
                         reportData.actorName = this.parent.name;
                         reportData.actorImg = this.parent.img;
-                        reportData.expiredEffectsRemoved = autoRemoveExpiredEffects === 'enabled';
+                        reportData.expiredEffectsRemoved = autoRemoveExpiredEffectsSetting === 'enabled';
 
                         // Send the report to chat.
                         return this._whisperOwners(reportData, this._getTurnReportUserID(), true);
@@ -5030,12 +5030,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Calculate whether to report effects and whether to remove expired.
          // effects.
-         const reportEffects = reportEffects();
-         const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
+         const shouldReportEffects = reportEffects();
+         const autoRemoveExpiredEffectsSetting = autoRemoveExpiredEffects();
          const expiredEffects = this.getExpiredEffects();
 
          // If report effects is true, add all effects to the report.
-         if (reportEffects) {
+         if (shouldReportEffects) {
 
             // Get sorted effects.
             const sortedEffects = this.getSortedEffects();
@@ -5084,14 +5084,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
             // Otherwise, add expired effects to the report if we need to show a.
          // button for removing them.
-         else if (expiredEffects && autoRemoveExpiredEffects === 'showButton') {
+         else if (expiredEffects && autoRemoveExpiredEffectsSetting === 'showButton') {
             reportData.effects = {
                expired: this._getEffectReportData(expiredEffects),
             };
          }
 
          // Process expired effects.
-         await this._processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData);
+         await this._processExpiredEffects(autoRemoveExpiredEffectsSetting, expiredEffects, reportData);
 
          // Send a report if appropriate.
          if (Object.keys(reportData).length > 0) {
@@ -5148,19 +5148,19 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Calculate whether to report effects and whether to remove expired.
          // effects.
-         const reportEffects = reportEffects();
-         const autoRemoveExpiredEffects = autoRemoveExpiredEffects();
+         const shouldReportEffects = reportEffects();
+         const autoRemoveExpiredEffectsSetting = autoRemoveExpiredEffects();
          const expiredEffects = this.getExpiredEffects();
 
          // Otherwise, add expired effects to the report if appropriate.
-         if (expiredEffects && (reportEffects || autoRemoveExpiredEffects === 'showButton')) {
+         if (expiredEffects && (shouldReportEffects || autoRemoveExpiredEffectsSetting === 'showButton')) {
             reportData.effects = {
                expired: this._getEffectReportData(expiredEffects),
             };
          }
 
          // Process expired effects.
-         await this._processExpiredEffects(autoRemoveExpiredEffects, expiredEffects, reportData);
+         await this._processExpiredEffects(autoRemoveExpiredEffectsSetting, expiredEffects, reportData);
 
          // Send a report if appropriate.
          if (Object.keys(reportData).length > 0) {
@@ -5631,8 +5631,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let shouldUpdateActor = false;
 
       // Determine whether to auto-regain resolve.
-      const autoRegainResolve = autoRegainResolve();
-      if (autoRegainResolve !== 'disabled') {
+      const autoRegainResolveSetting = autoRegainResolve();
+      if (autoRegainResolveSetting !== 'disabled') {
 
          // If the resolve value is below max.
          const resolve = this.resource.resolve;
@@ -5643,7 +5643,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             if (maxResolveRegained > 0) {
 
                // Update the resources if appropriate.
-               const confirmed = autoRegainResolve === 'enabled';
+               const confirmed = autoRegainResolveSetting === 'enabled';
                if (confirmed) {
                   await this.regainResolve(maxResolveRegained, {
                      updateActor: false,
@@ -5794,15 +5794,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let shouldUpdateActor = false;
 
       // Determine whether to auto-revert resolve regain.
-      const autoRevertResolveRegain = autoRevertResolveRegain();
-      if (autoRevertResolveRegain !== 'disabled') {
+      const autoRevertResolveRegainSetting = autoRevertResolveRegain();
+      if (autoRevertResolveRegainSetting !== 'disabled') {
 
          // If any resolve will be reverted.
          const maxResolveToRevert = resolveBaseRegain() + this.mod.resolveRegain.value;
          if (maxResolveToRevert > 0) {
 
             // Determine whether the revert is confirmed.
-            const confirmed = autoRevertResolveRegain === 'enabled';
+            const confirmed = autoRevertResolveRegainSetting === 'enabled';
             if (confirmed) {
                await this.spendResolve(maxResolveToRevert, {
                   updateActor: false,
