@@ -71,6 +71,7 @@ test.describe('integration manifest drift guard', () => {
       // Each declared pack must resolve, belong to the titan system, and carry the declared document type.
       for (const entry of declaredPacks) {
          const found = live.find((p) => p.name === entry.name);
+         expect(found, `pack titan.${entry.name} resolved`).toBeDefined();
          expect(found.missing, `pack titan.${entry.name} must be loaded`).toBeFalsy();
          expect(found.type, `pack titan.${entry.name} type`).toBe(entry.type);
          expect(found.packageName, `pack titan.${entry.name} packageName`).toBe('titan');
