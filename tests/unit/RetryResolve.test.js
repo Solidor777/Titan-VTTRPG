@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import retryResolve from '~/helpers/utility-functions/RetryResolve.js';
 
 describe('retryResolve', () => {
