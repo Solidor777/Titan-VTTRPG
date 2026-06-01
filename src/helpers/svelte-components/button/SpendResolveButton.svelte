@@ -7,6 +7,7 @@
     * @property {number} [resolveCost] - The amount of resolve to spend.
     * @property {boolean} [disabled] - Whether the button should be disabled.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the wrapper div.
     */
 
    /** @type {SpendResolveButtonProps} */
@@ -14,10 +15,11 @@
       resolveCost = void 0,
       disabled = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
-<div class="spend-resolve-button">
+<div class="spend-resolve-button" data-testid={testId}>
    <Button {disabled} {onclick}>
       <div class="button-inner">
          <i class="fa fa-bolt"></i>

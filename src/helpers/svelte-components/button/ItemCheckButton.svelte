@@ -9,6 +9,7 @@
     * @property {number} [resolveCost] - The Resolve cost of rolling the check, if any.
     * @property {boolean} [disabled] - Whether the button should be disabled.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the wrapper div.
     */
 
    /** @type {ItemCheckButtonProps} */
@@ -18,10 +19,11 @@
       resolveCost = void 0,
       disabled = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
-<div class="item-check-button {attribute}">
+<div class="item-check-button {attribute}" data-testid={testId}>
    <Button {disabled} {onclick}>
       <div class="button-inner">
          <i class={DICE_ICON}></i>

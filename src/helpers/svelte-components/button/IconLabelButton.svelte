@@ -9,6 +9,7 @@
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the inner button.
     */
 
    /** @type {IconLabelButtonProps} */
@@ -18,12 +19,14 @@
       disabled = false,
       tooltip = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
 <Button
    {disabled}
    {onclick}
+   {testId}
    {tooltip}
 >
    <IconLabel

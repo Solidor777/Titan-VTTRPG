@@ -9,6 +9,7 @@
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {boolean} [active] - Whether the toggle is currently active.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the inner button.
     */
 
    /** @type {ToggleButtonProps} */
@@ -18,10 +19,16 @@
       tooltip = void 0,
       active = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
-<Button {disabled} {onclick} {tooltip}>
+<Button
+   {disabled}
+   {onclick}
+   {testId}
+   {tooltip}
+>
    <div class="button-inner">
       <div class="label">
          {label}

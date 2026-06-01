@@ -8,6 +8,7 @@
     * @property {string | TooltipAction | undefined} tooltip - The tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} onclick - Callback invoked when the button is clicked.
     * @property {string} label - Accessible label, forwarded to the inner IconButton.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the wrapper div.
     */
 
    /** @type {MiniIconButtonProps} */
@@ -17,11 +18,18 @@
       tooltip = void 0,
       onclick = void 0,
       label,
+      testId = void 0,
    } = $props();
 </script>
 
-<div class="button">
-   <IconButton {disabled} {icon} {label} {onclick} {tooltip}/>
+<div class="button" data-testid={testId}>
+   <IconButton
+      {disabled}
+      {icon}
+      {label}
+      {onclick}
+      {tooltip}
+   />
 </div>
 
 <style lang="scss">

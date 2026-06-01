@@ -53,7 +53,20 @@ import SpellCustomAspectTag from '~/helpers/svelte-components/tag/SpellCustomAsp
 import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 import RichText from '~/helpers/svelte-components/RichText.svelte';
 import FiltereedList from '~/helpers/svelte-components/FiltereedList.svelte';
+import AttributeButton from '~/helpers/svelte-components/button/AttributeButton.svelte';
 import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
+import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
+import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+import IconLabelButton from '~/helpers/svelte-components/button/IconLabelButton.svelte';
+import ImageButton from '~/helpers/svelte-components/button/ImageButton.svelte';
+import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
+import MiniButton from '~/helpers/svelte-components/button/MiniButton.svelte';
+import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
+import ResistanceButton from '~/helpers/svelte-components/button/ResistanceButton.svelte';
+import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
+import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
+import ToggleButton from '~/helpers/svelte-components/button/ToggleButton.svelte';
+import ToggleOptionButton from '~/helpers/svelte-components/button/ToggleOptionButton.svelte';
 import ProseMirrorEditor from '~/helpers/svelte-components/editor/ProseMirrorEditor.svelte';
 import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 import CustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
@@ -124,7 +137,20 @@ const componentRegistry = {
    EditDeleteTag,
    RichText,
    FiltereedList,
+   AttributeButton,
    CondensedCheckButton,
+   ExpandButton,
+   IconButton,
+   IconLabelButton,
+   ImageButton,
+   ItemCheckButton,
+   MiniButton,
+   MiniIconButton,
+   ResistanceButton,
+   ResistanceCheckButton,
+   SpendResolveButton,
+   ToggleButton,
+   ToggleOptionButton,
    ProseMirrorEditor,
    EffectTag,
    CustomEffectTag,

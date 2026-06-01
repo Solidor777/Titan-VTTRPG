@@ -9,6 +9,7 @@
     * @property {boolean} [expanded] - Whether the button should currently be expanded.
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the button.
     */
 
    /** @type {ExpandButtonProps} */
@@ -16,11 +17,13 @@
       expanded = $bindable(false),
       disabled = false,
       tooltip = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
 <button
    aria-label={expanded ? localize('collapse') : localize('expand')}
+   data-testid={testId}
    {disabled}
    onclick={() => (expanded = !expanded)}
    onmousedown={preventDefault}

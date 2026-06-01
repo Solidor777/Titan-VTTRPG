@@ -1,0 +1,791 @@
+import { test, expect } from '@playwright/test';
+import { login } from './fixtures.js';
+import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+
+// ---------------------------------------------------------------------------
+// AttributeButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — AttributeButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      // Mount with a valid attribute name; onclick is instrumented.
+      const live = await mountProbe(page, 'AttributeButton', {
+         props: {
+            attribute: 'body',
+            testId: 'probe-attribute-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'AttributeButton', {
+         props: {
+            attribute: 'body',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('testId resolves to data-testid on the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'AttributeButton', {
+         props: {
+            attribute: 'body',
+            testId: 'probe-attribute-button',
+         },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-attribute-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ExpandButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ExpandButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click self-flips the glyph between collapsed and expanded', async ({ page }) => {
+      // ExpandButton is self-managing: expanded=$bindable(false). No external onclick prop.
+      // Initial state: collapsed → fa-angle-double-right; after click: expanded → fa-angle-double-down.
+      const { selector } = await mountProbe(page, 'ExpandButton', {
+         props: { testId: 'probe-expand-button' },
+      });
+      const collapsed = page.locator(`${selector} i.fa-angle-double-right`);
+      const expanded = page.locator(`${selector} i.fa-angle-double-down`);
+      await expect(collapsed).toHaveCount(1);
+      await expect(expanded).toHaveCount(0);
+
+      await page.locator(`${selector} button`).click();
+      await expect(collapsed).toHaveCount(0);
+      await expect(expanded).toHaveCount(1);
+
+      // Second click collapses again.
+      await page.locator(`${selector} button`).click();
+      await expect(collapsed).toHaveCount(1);
+      await expect(expanded).toHaveCount(0);
+   });
+
+   test('testId resolves to data-testid on the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ExpandButton', {
+         props: { testId: 'probe-expand-button' },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-expand-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// IconButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — IconButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'IconButton', {
+         props: {
+            icon: 'fas fa-gear',
+            label: 'Settings',
+            testId: 'probe-icon-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'IconButton', {
+         props: {
+            icon: 'fas fa-gear',
+            label: 'Settings',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('icon class is rendered inside the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'IconButton', {
+         props: {
+            icon: 'fas fa-gear',
+            label: 'Settings',
+         },
+      });
+      await expect(page.locator(`${selector} button i.fa-gear`)).toBeVisible();
+   });
+
+   test('testId resolves to data-testid on the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'IconButton', {
+         props: {
+            icon: 'fas fa-gear',
+            label: 'Settings',
+            testId: 'probe-icon-button',
+         },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-icon-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// IconLabelButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — IconLabelButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'IconLabelButton', {
+         props: {
+            icon: 'fas fa-star',
+            label: 'Save',
+            testId: 'probe-icon-label-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'IconLabelButton', {
+         props: {
+            icon: 'fas fa-star',
+            label: 'Save',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('label text and icon class are rendered', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'IconLabelButton', {
+         props: {
+            icon: 'fas fa-star',
+            label: 'Save',
+         },
+      });
+      await expect(page.locator(`${selector} button`)).toContainText('Save');
+      await expect(page.locator(`${selector} button i.fa-star`)).toBeVisible();
+   });
+
+   test('testId resolves to data-testid on the inner button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'IconLabelButton', {
+         props: {
+            icon: 'fas fa-star',
+            label: 'Save',
+            testId: 'probe-icon-label-button',
+         },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-icon-label-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ImageButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ImageButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'ImageButton', {
+         props: {
+            src: 'icons/svg/mystery-man.svg',
+            alt: 'Actor',
+            testId: 'probe-image-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'ImageButton', {
+         props: {
+            src: 'icons/svg/mystery-man.svg',
+            alt: 'Actor',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('testId resolves to data-testid on the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ImageButton', {
+         props: {
+            src: 'icons/svg/mystery-man.svg',
+            alt: 'Actor',
+            testId: 'probe-image-button',
+         },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-image-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ItemCheckButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ItemCheckButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'ItemCheckButton', {
+         props: {
+            label: 'Strike',
+            attribute: 'body',
+            testId: 'probe-item-check-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'ItemCheckButton', {
+         props: {
+            label: 'Strike',
+            attribute: 'body',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('label text and resolve cost render', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ItemCheckButton', {
+         props: {
+            label: 'Strike',
+            attribute: 'body',
+            resolveCost: 2,
+         },
+      });
+      await expect(page.locator(`${selector} button`)).toContainText('Strike');
+      // Resolve cost section is shown when resolveCost is truthy.
+      await expect(page.locator(`${selector} .resolve`)).toBeVisible();
+      await expect(page.locator(`${selector} .resolve`)).toContainText('2');
+   });
+
+   test('testId resolves to data-testid on the wrapper div', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ItemCheckButton', {
+         props: {
+            label: 'Strike',
+            attribute: 'body',
+            testId: 'probe-item-check-button',
+         },
+      });
+      await expect(
+         page.locator(`${selector} [data-testid="probe-item-check-button"]`),
+      ).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// MiniButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — MiniButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'MiniButton', {
+         props: { testId: 'probe-mini-button' },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'MiniButton', {
+         props: { disabled: true },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('testId resolves to data-testid on the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'MiniButton', {
+         props: { testId: 'probe-mini-button' },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-mini-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// MiniIconButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — MiniIconButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'MiniIconButton', {
+         props: {
+            icon: 'fas fa-trash',
+            label: 'Delete',
+            testId: 'probe-mini-icon-button',
+         },
+         events: ['onclick'],
+      });
+      // MiniIconButton wraps IconButton in a div; the clickable element is the inner <button>.
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'MiniIconButton', {
+         props: {
+            icon: 'fas fa-trash',
+            label: 'Delete',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('icon class is rendered inside the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'MiniIconButton', {
+         props: {
+            icon: 'fas fa-trash',
+            label: 'Delete',
+         },
+      });
+      await expect(page.locator(`${selector} button i.fa-trash`)).toBeVisible();
+   });
+
+   test('testId resolves to data-testid on the wrapper div', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'MiniIconButton', {
+         props: {
+            icon: 'fas fa-trash',
+            label: 'Delete',
+            testId: 'probe-mini-icon-button',
+         },
+      });
+      await expect(
+         page.locator(`${selector} [data-testid="probe-mini-icon-button"]`),
+      ).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ResistanceButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ResistanceButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      const live = await mountProbe(page, 'ResistanceButton', {
+         props: {
+            resistance: 'resilience',
+            testId: 'probe-resistance-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'ResistanceButton', {
+         props: {
+            resistance: 'resilience',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('testId resolves to data-testid on the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ResistanceButton', {
+         props: {
+            resistance: 'resilience',
+            testId: 'probe-resistance-button',
+         },
+      });
+      await expect(
+         page.locator(`${selector} button[data-testid="probe-resistance-button"]`),
+      ).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ResistanceCheckButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ResistanceCheckButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders the resistance label with difficulty and complexity', async ({ page }) => {
+      // ResistanceCheckButton has no external onclick prop; its internal handler calls
+      // getBestCharactersToUpdate() which is safe when no targets are selected (empty loop).
+      const { selector } = await mountProbe(page, 'ResistanceCheckButton', {
+         props: {
+            resistance: 'resilience',
+            difficulty: 4,
+            complexity: 2,
+            testId: 'probe-resistance-check-button',
+         },
+      });
+      await expect(page.locator(`${selector} button`)).toContainText('4:2');
+   });
+
+   test('disabled prevents the button from being clickable', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ResistanceCheckButton', {
+         props: {
+            resistance: 'resilience',
+            disabled: true,
+         },
+      });
+      await expect(page.locator(`${selector} button`)).toBeDisabled();
+   });
+
+   test('testId resolves to data-testid on the wrapper div', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ResistanceCheckButton', {
+         props: {
+            resistance: 'resilience',
+            testId: 'probe-resistance-check-button',
+         },
+      });
+      await expect(
+         page.locator(`${selector} [data-testid="probe-resistance-check-button"]`),
+      ).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// SpendResolveButton
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — SpendResolveButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click fires onclick and disabled suppresses it', async ({ page }) => {
+      // resolveCost is required; calling .toString() on undefined would throw.
+      const live = await mountProbe(page, 'SpendResolveButton', {
+         props: {
+            resolveCost: 3,
+            testId: 'probe-spend-resolve-button',
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${live.selector} button`).click();
+      let events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'SpendResolveButton', {
+         props: {
+            resolveCost: 3,
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('resolve cost value is rendered in the button label', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'SpendResolveButton', {
+         props: { resolveCost: 5 },
+      });
+      // The label uses localize('spendX%Resolve').replace('X%', resolveCost.toString()); assert the
+      // cost number appears in the rendered text regardless of locale string shape.
+      await expect(page.locator(`${selector} button`)).toContainText('5');
+   });
+
+   test('testId resolves to data-testid on the wrapper div', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'SpendResolveButton', {
+         props: {
+            resolveCost: 1,
+            testId: 'probe-spend-resolve-button',
+         },
+      });
+      await expect(
+         page.locator(`${selector} [data-testid="probe-spend-resolve-button"]`),
+      ).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ToggleButton — prop-driven toggle (active prop, not self-managed)
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ToggleButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('icon reflects the active prop and click fires onclick', async ({ page }) => {
+      // Prop-driven: CHECKED_ICON='fas fa-square-check', UNCHECKED_ICON='fas fa-square'.
+      // Parent owns state; the button does NOT self-flip; assert glyph via two separate mounts.
+      const off = await mountProbe(page, 'ToggleButton', {
+         props: {
+            label: 'Ready',
+            active: false,
+            testId: 'probe-toggle-button-off',
+         },
+         events: ['onclick'],
+      });
+      // active=false → UNCHECKED_ICON (fa-square), no fa-square-check.
+      await expect(page.locator(`${off.selector} i.fa-square-check`)).toHaveCount(0);
+      await expect(page.locator(`${off.selector} i.fa-square`)).toHaveCount(1);
+      await page.locator(`${off.selector} button`).click();
+      expect((await readProbeEvents(page)).filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      const on = await mountProbe(page, 'ToggleButton', {
+         props: {
+            label: 'Ready',
+            active: true,
+            testId: 'probe-toggle-button-on',
+         },
+      });
+      // active=true → CHECKED_ICON (fa-square-check).
+      await expect(page.locator(`${on.selector} i.fa-square-check`)).toHaveCount(1);
+   });
+
+   test('disabled suppresses onclick', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ToggleButton', {
+         props: {
+            label: 'Ready',
+            active: false,
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${selector} button`).click({ force: true });
+      const events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('testId resolves to data-testid on the inner button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ToggleButton', {
+         props: {
+            label: 'Ready',
+            active: false,
+            testId: 'probe-toggle-button',
+         },
+      });
+      await expect(page.locator(`${selector} button[data-testid="probe-toggle-button"]`)).toBeVisible();
+   });
+});
+
+// ---------------------------------------------------------------------------
+// ToggleOptionButton — prop-driven toggle (enabled prop, CSS-class-based)
+// ---------------------------------------------------------------------------
+
+test.describe('component probe — ToggleOptionButton', () => {
+   /** Authenticate as E2E GM 1 before each probe. */
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+   });
+
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async ({ page }) => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('enabled prop drives the wrapper class and click fires onclick', async ({ page }) => {
+      // Prop-driven: enabled=false → wrapper has class 'disabled'; enabled=true → class 'enabled'.
+      // Parent owns state; no self-flip. Assert via two separate mounts.
+      const off = await mountProbe(page, 'ToggleOptionButton', {
+         props: {
+            label: 'Flanking',
+            enabled: false,
+            testId: 'probe-toggle-option-off',
+         },
+         events: ['onclick'],
+      });
+      await expect(page.locator(`${off.selector} .toggle.disabled`)).toHaveCount(1);
+      await expect(page.locator(`${off.selector} .toggle.enabled`)).toHaveCount(0);
+      await page.locator(`${off.selector} button`).click();
+      expect((await readProbeEvents(page)).filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      const on = await mountProbe(page, 'ToggleOptionButton', {
+         props: {
+            label: 'Flanking',
+            enabled: true,
+            testId: 'probe-toggle-option-on',
+         },
+      });
+      await expect(page.locator(`${on.selector} .toggle.enabled`)).toHaveCount(1);
+      await expect(page.locator(`${on.selector} .toggle.disabled`)).toHaveCount(0);
+   });
+
+   test('disabled suppresses onclick', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ToggleOptionButton', {
+         props: {
+            label: 'Flanking',
+            enabled: false,
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await page.locator(`${selector} button`).click({ force: true });
+      const events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('label text is rendered in the button', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ToggleOptionButton', {
+         props: {
+            label: 'Flanking',
+            enabled: false,
+         },
+      });
+      await expect(page.locator(`${selector} button`)).toContainText('Flanking');
+   });
+
+   test('testId resolves to data-testid on the wrapper div', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ToggleOptionButton', {
+         props: {
+            label: 'Flanking',
+            enabled: false,
+            testId: 'probe-toggle-option-button',
+         },
+      });
+      await expect(
+         page.locator(`${selector} [data-testid="probe-toggle-option-button"]`),
+      ).toBeVisible();
+   });
+});

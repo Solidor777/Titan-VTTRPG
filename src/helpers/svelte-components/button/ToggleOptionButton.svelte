@@ -8,6 +8,7 @@
     * @property {boolean} [disabled] - Whether the button should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the wrapper div.
     */
 
    /** @type {ToggleOptionButtonProps} */
@@ -17,11 +18,16 @@
       disabled = false,
       tooltip = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
-<div class="toggle {enabled ? 'enabled' : 'disabled'}">
-   <MiniButton {disabled} {onclick} {tooltip}>
+<div class="toggle {enabled ? 'enabled' : 'disabled'}" data-testid={testId}>
+   <MiniButton
+      {disabled}
+      {onclick}
+      {tooltip}
+   >
       {label}
    </MiniButton>
 </div>

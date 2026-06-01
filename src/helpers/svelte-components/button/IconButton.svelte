@@ -9,6 +9,7 @@
     * @property {string} label - Accessible label for this icon-only button (required).
     * @property {string | object | undefined} [tooltip] - The tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the button.
     */
 
    /** @type {IconButtonProps} */
@@ -18,11 +19,13 @@
       label,
       tooltip = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
 <button
    aria-label={label}
+   data-testid={testId}
    {disabled}
    {onclick}
    onmousedown={preventDefault}

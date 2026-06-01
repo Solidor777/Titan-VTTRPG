@@ -10,6 +10,7 @@
     * @property {number} [complexity] - The Complexity of the Check.
     * @property {number} [damageToReduce] - Damage to be reduced by the check, if any.
     * @property {boolean} [disabled] - Whether the button should be disabled.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the wrapper div.
     */
 
    /** @type {ResistanceCheckButtonProps} */
@@ -19,6 +20,7 @@
       complexity = 1,
       damageToReduce = 0,
       disabled = false,
+      testId = void 0,
    } = $props();
 
    /**
@@ -43,7 +45,7 @@
    }
 </script>
 
-<div class="button {resistance}">
+<div class="button {resistance}" data-testid={testId}>
    <Button
       {disabled}
       onclick={() => requestResistanceCheck()}

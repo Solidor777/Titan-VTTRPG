@@ -9,6 +9,7 @@
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
     * @property {import('svelte').Snippet} [children] - Content to render inside the button.
+    * @property {string | undefined} [testId] - Optional stable selector applied as `data-testid` on the button.
     */
 
    /** @type {ResistanceButtonProps} */
@@ -18,10 +19,17 @@
       tooltip = void 0,
       onclick = void 0,
       children,
+      testId = void 0,
    } = $props();
 </script>
 
-<button class={resistance} {disabled} {onclick} onmousedown={preventDefault} use:tooltipAction={tooltip}>
+<button
+   class={resistance}
+   data-testid={testId}
+   {disabled}
+   {onclick}
+   onmousedown={preventDefault}
+   use:tooltipAction={tooltip}>
    {@render children?.()}
 </button>
 
