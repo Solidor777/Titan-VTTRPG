@@ -17,6 +17,7 @@
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
+   import { getContext } from 'svelte';
 
    /**
     * @typedef {object} CharacterSheetAbilityProps
@@ -26,12 +27,25 @@
 
    /** @type {CharacterSheetAbilityProps} */
    let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /**
+    * Re-reads this ability item through the reactive `document.data` store. Invoked inline at each display
+    * read so the read subscribes to the document's update hooks and re-runs in place when the item changes.
+    * A `$derived` returning the live item is insufficient: the item reference is stable across updates, so
+    * its value never trips Svelte's equality check and downstream reads stay stale. Calling this in markup
+    * routes every read through `document.data`, the only reactive dependency Svelte tracks.
+    * @returns {TitanItem | undefined} The live ability item from the reactive collection.
+    */
+   const reactiveItem = () => document.data.items.get(item._id);
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
    {#snippet controls()}
       <!--Check-->
-      {#if item.system.check.length > 0}
+      {#if reactiveItem()?.system.check.length > 0}
          <div class="button">
             <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
          </div>
@@ -54,16 +68,16 @@
    {/snippet}
 
    <!--Item Checks-->
-   {#if item.system.check.length > 0}
+   {#if reactiveItem()?.system.check.length > 0}
       <div class="section">
          <CharacterSheetItemChecks {item}/>
       </div>
    {/if}
 
    <!--Item Description-->
-   {#if !(isHTMLBlank(item.system.description))}
+   {#if !(isHTMLBlank(reactiveItem()?.system.description))}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={reactiveItem()?.system.description}/>
       </div>
    {/if}
 
@@ -71,42 +85,42 @@
    <div class="section tags small-text">
       <!--Rarity-->
       <div class="tag">
-         <RarityTag rarity={item.system.rarity}/>
+         <RarityTag rarity={reactiveItem()?.system.rarity}/>
       </div>
 
       <!--Action-->
-      {#if item.system.action}
+      {#if reactiveItem()?.system.action}
          <div class="tag">
             <Tag>{localize('action')}</Tag>
          </div>
       {/if}
 
       <!--Reaction-->
-      {#if item.system.reaction}
+      {#if reactiveItem()?.system.reaction}
          <div class="tag">
             <Tag>{localize('reaction')}</Tag>
          </div>
       {/if}
 
       <!--Passive-->
-      {#if item.system.passive}
+      {#if reactiveItem()?.system.passive}
          <div class="tag">
             <Tag>{localize('passive')}</Tag>
          </div>
       {/if}
 
       <!--XP Cost-->
-      {#if item.system.xpCost}
+      {#if reactiveItem()?.system.xpCost}
          <div class="tag">
             <StatTag
                label={localize('xpCost')}
-               value={item.system.xpCost}
+               value={reactiveItem()?.system.xpCost}
             />
          </div>
       {/if}
 
       <!--Custom Traits-->
-      {#each item.system.customTrait as trait}
+      {#each reactiveItem()?.system.customTrait ?? [] as trait}
          <div class="tag">
             <Tag tooltip={trait.description}>
                {trait.name}
