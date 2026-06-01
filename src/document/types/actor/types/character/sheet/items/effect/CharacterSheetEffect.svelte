@@ -63,17 +63,10 @@
                <div class="input">
                   <IntegerInput
                      min={0}
-                     bind:value={effect.system.duration.initiative}
-                     onchange={() => {
-                           effect.update({
-                              system: {
-                                 duration: {
-                                    initiative:
-                                       effect.system.duration.initiative,
-                                 },
-                              },
-                           });
-                        }}
+                     bind:value={
+                        () => document.data.effects.get(effect.id)?.system.duration.initiative ?? 0,
+                        (newValue) => effect.update({ system: { duration: { initiative: newValue } } })
+                     }
                   />
                </div>
             </div>
@@ -90,16 +83,10 @@
             <div class="input">
                <IntegerIncrementInput
                   min={0}
-                  bind:value={effect.system.duration.remaining}
-                  onchange={() => {
-                        effect.update({
-                           system: {
-                              duration: {
-                                 remaining: effect.system.duration.remaining,
-                              },
-                           },
-                        });
-                     }}
+                  bind:value={
+                     () => document.data.effects.get(effect.id)?.system.duration.remaining ?? 0,
+                     (newValue) => effect.update({ system: { duration: { remaining: newValue } } })
+                  }
                />
             </div>
          </div>

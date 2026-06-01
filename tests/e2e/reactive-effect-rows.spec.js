@@ -112,4 +112,79 @@ test.describe('character sheet effect row reactivity', () => {
       await expect(durationRemaining, 'duration remaining updated to 0 in place').toHaveText('0');
       await expect(expiredTag, 'Expired tag appears in place when expired').toHaveCount(1);
    });
+
+   test('duration remaining input reflects an external in-place update and persists edits', async ({
+      page,
+   }) => {
+      // The effect row, and its remaining duration input (a turnStart effect renders only the remaining
+      // field, so the first number input is `remaining`).
+      const row = page.locator('[data-effect-id]').first();
+      const remainingInput = row.locator('input[type="number"]').first();
+
+      // INITIAL rendered state: remaining is 1.
+      await expect(remainingInput, 'initial remaining input value is 1').toHaveValue('1');
+
+      // REACTIVITY: mutate the effect's remaining externally; the input must update in place (no remount).
+      await page.evaluate(async (actorName) => {
+         const actor = game.actors.getName(actorName);
+         await actor.effects.contents[0].update({ system: { duration: { remaining: 5 } } });
+      }, ACTOR_NAME);
+      await page.waitForTimeout(400);
+      await expect(remainingInput, 'remaining input updated to 5 in place').toHaveValue('5');
+
+      // TYPING COMMIT (regression lock): type a new value; it must persist to the document.
+      await remainingInput.fill('8');
+      await remainingInput.dispatchEvent('keyup', { key: 'End' });
+      await page.waitForTimeout(400);
+      const typed = await page.evaluate((actorName) => {
+         return game.actors.getName(actorName).effects.contents[0].system.duration.remaining;
+      }, ACTOR_NAME);
+      expect(typed, 'typed remaining persisted to the document').toBe(8);
+
+      // INCREMENT COMMIT (latent-bug regression): clicking + must persist the incremented value.
+      await row.locator('.increment button').first().click();
+      await page.waitForTimeout(400);
+      const incremented = await page.evaluate((actorName) => {
+         return game.actors.getName(actorName).effects.contents[0].system.duration.remaining;
+      }, ACTOR_NAME);
+      expect(incremented, 'increment button persisted to the document').toBe(9);
+   });
+
+   test('duration initiative input reflects an external in-place update and persists edits', async ({
+      page,
+   }) => {
+      // Reconfigure the seeded effect to an 'initiative' duration so the initiative IntegerInput renders.
+      // durationType is a reactive derived, so the initiative field appears in place (no remount).
+      await page.evaluate(async (actorName) => {
+         const actor = game.actors.getName(actorName);
+         await actor.effects.contents[0].update({
+            system: { duration: { type: 'initiative', initiative: 3 } },
+         });
+      }, ACTOR_NAME);
+      await page.waitForTimeout(400);
+
+      // With an 'initiative' duration the initiative input renders FIRST (remaining is second).
+      const row = page.locator('[data-effect-id]').first();
+      const initiativeInput = row.locator('input[type="number"]').first();
+
+      // INITIAL rendered state: initiative is 3.
+      await expect(initiativeInput, 'initial initiative input value is 3').toHaveValue('3');
+
+      // REACTIVITY: external update must reflect in place.
+      await page.evaluate(async (actorName) => {
+         const actor = game.actors.getName(actorName);
+         await actor.effects.contents[0].update({ system: { duration: { initiative: 6 } } });
+      }, ACTOR_NAME);
+      await page.waitForTimeout(400);
+      await expect(initiativeInput, 'initiative input updated to 6 in place').toHaveValue('6');
+
+      // TYPING COMMIT: type a new value; it must persist.
+      await initiativeInput.fill('2');
+      await initiativeInput.dispatchEvent('keyup', { key: 'End' });
+      await page.waitForTimeout(400);
+      const typed = await page.evaluate((actorName) => {
+         return game.actors.getName(actorName).effects.contents[0].system.duration.initiative;
+      }, ACTOR_NAME);
+      expect(typed, 'typed initiative persisted to the document').toBe(2);
+   });
 });
