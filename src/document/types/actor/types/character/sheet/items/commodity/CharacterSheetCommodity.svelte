@@ -16,6 +16,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   import { getContext } from 'svelte';
 
    /**
     * @typedef {object} CharacterSheetCommodityProps
@@ -25,6 +26,27 @@
 
    /** @type {CharacterSheetCommodityProps} */
    let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /** @type {number} The item's quantity, re-read through document.data so the footer updates in place. */
+   const quantity = $derived(document.data.items.get(item._id)?.system.quantity);
+
+   /** @type {number} The item's check count, re-read through document.data so the row updates in place. */
+   const checkLength = $derived(document.data.items.get(item._id)?.system.check.length);
+
+   /** @type {string} The item's description, re-read through document.data so the row updates in place. */
+   const description = $derived(document.data.items.get(item._id)?.system.description);
+
+   /** @type {string} The item's rarity, re-read through document.data so the footer updates in place. */
+   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+
+   /** @type {number} The item's value, re-read through document.data so the footer updates in place. */
+   const value = $derived(document.data.items.get(item._id)?.system.value);
+
+   /** @type {Array<object>} The item's custom traits, re-read through document.data so the row updates. */
+   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
@@ -60,16 +82,16 @@
    {/snippet}
 
    <!--Item Checks-->
-   {#if item.system.check.length > 0}
+   {#if checkLength > 0}
       <div class="section">
          <CharacterSheetItemChecks {item}/>
       </div>
    {/if}
 
    <!--Item Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   {#if description !== '' && description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={description}/>
       </div>
    {/if}
 
@@ -78,24 +100,24 @@
       <div class="tag">
          <StatTag
             label={localize('quantity')}
-            value={item.system.quantity}
+            value={quantity}
          />
       </div>
 
       <!--Rarity-->
       <div class="tag">
-         <RarityTag rarity={item.system.rarity}/>
+         <RarityTag {rarity}/>
       </div>
 
       <!--Value-->
-      {#if item.system.value}
+      {#if value}
          <div class="tag">
-            <ValueTag value={item.system.value}/>
+            <ValueTag {value}/>
          </div>
       {/if}
 
       <!--Custom Traits-->
-      {#each item.system.customTrait as trait}
+      {#each customTrait as trait}
          <div class="tag">
             <Tag tooltip={trait.description}>
                {trait.name}
