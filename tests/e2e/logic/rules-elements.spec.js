@@ -317,3 +317,52 @@ test.describe('rules elements — setSum (set total)', () => {
       expect(results).toEqual({ zero: 0, two: 2 });
    });
 });
+
+test.describe('rules elements — mulBase rounding', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+      const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
+         && !!CONFIG.Actor?.dataModels?.player);
+      expect(ready, 'TITAN system must be initialized').toBe(true);
+   });
+   test.afterEach(async ({ page }) => {
+      await page.evaluate(async (name) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+      }, ACTOR_NAME);
+   });
+
+   test('a fractional mulBase rounds its base contribution up or down', async ({ page }) => {
+      const results = await page.evaluate(async ({ name, downData, upData }) => {
+         const read = async (abilityData) => {
+            const stale = game.actors.getName(name);
+            if (stale) {
+               await stale.delete();
+            }
+            const actor = await Actor.create({ name, type: 'player' });
+            await actor.createEmbeddedDocuments('Item', [abilityData]);
+            await new Promise((resolve) => {
+               setTimeout(resolve, 100);
+            });
+            const value = actor.system.attribute.body.value;
+            await actor.delete();
+            return value;
+         };
+         return { down: await read(downData), up: await read(upData) };
+      }, {
+         name: ACTOR_NAME,
+         downData: buildRulesElementAbilityData('E2E MulBase Down', [
+            { operation: 'mulBase', selector: 'attribute', key: 'body', value: 0.5, rounding: 'down' },
+         ]),
+         upData: buildRulesElementAbilityData('E2E MulBase Up', [
+            { operation: 'mulBase', selector: 'attribute', key: 'body', value: 0.5, rounding: 'up' },
+         ]),
+      });
+
+      // Body base 1; contribution = round(1 * (0.5 - 1)) = round(-0.5).
+      // down -> floor(-0.5) = -1 -> Body 0. up -> ceil(-0.5) = 0 -> Body 1.
+      expect(results).toEqual({ down: 0, up: 1 });
+   });
+});

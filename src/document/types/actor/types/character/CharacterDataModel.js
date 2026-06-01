@@ -19,6 +19,7 @@ import camelize from '~/helpers/utility-functions/Camelize.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';
 import computeSetSumDelta from '~/helpers/utility-functions/ComputeSetSumDelta.js';
+import roundDirectional from '~/helpers/utility-functions/RoundDirectional.js';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttackCheckParameters from '~/check/types/attack-check/AttackCheckParameters.js';
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
@@ -963,7 +964,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   mulBase[selector][key][type] = 0;
                   // Apply each mod.
                   for (const element of typeElements) {
-                     modObject[type] += baseValue * (element.value - 1);
+                     modObject[type] += roundDirectional(baseValue * (element.value - 1), element.rounding);
                      mulBase[selector][key][type] += element.value;
                   }
                }
