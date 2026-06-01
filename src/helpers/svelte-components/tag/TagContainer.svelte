@@ -12,14 +12,21 @@
    /**
     * @typedef {object} TagContainerProps
     * @property {Tag[]} [tags] - List of tags to place in the container.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
     */
 
    /** @type {TagContainerProps} */
-   let { tags = undefined } = $props();
+   let {
+      tags = undefined,
+      testId = void 0,
+   } = $props();
 </script>
 
 <!--Tag Container-->
-<div class="tag-container">
+<div
+   class="tag-container"
+   data-testid={testId}
+>
    <!--Each Tag-->
    {#each tags as tag (tag.id)}
       {@const TagComponent = tag.component}

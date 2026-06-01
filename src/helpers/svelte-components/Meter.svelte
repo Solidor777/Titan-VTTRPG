@@ -6,6 +6,7 @@
     * @property {number} [value] - The current value of the meter.
     * @property {number} [meterScaleSpeed] - The speed at which the meter should animate, in percent per second.
     * @property {number} [updateInterval] - The interval between meter updates, in milliseconds.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
     */
 
    /** @type {MeterProps} */
@@ -15,6 +16,7 @@
       value = undefined,
       meterScaleSpeed = 10,
       updateInterval = 10,
+      testId = void 0,
    } = $props();
 
    /** @type {number} The calculated percent of the meter. */
@@ -62,7 +64,10 @@
    });
 </script>
 
-<div class="meter">
+<div
+   class="meter"
+   data-testid={testId}
+>
    <span style={`width: ${meterPercentWidth}%`}></span>
 </div>
 

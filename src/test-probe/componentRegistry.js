@@ -1,3 +1,10 @@
+import Meter from '~/helpers/svelte-components/Meter.svelte';
+import Text from '~/helpers/svelte-components/Text.svelte';
+import Tabs from '~/helpers/svelte-components/Tabs.svelte';
+import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
+import BorderedColumnList from '~/helpers/svelte-components/BorderedColumnList.svelte';
+import TagContainer from '~/helpers/svelte-components/tag/TagContainer.svelte';
 import AttributeInput from '~/helpers/svelte-components/input/AttributeInput.svelte';
 import Button from '~/helpers/svelte-components/button/Button.svelte';
 import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
@@ -82,6 +89,13 @@ import TurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStar
  * @type {Record<string, import('svelte').Component>}
  */
 const componentRegistry = {
+   Meter,
+   Text,
+   Tabs,
+   ScrollingContainer,
+   LabeledElement,
+   BorderedColumnList,
+   TagContainer,
    AttributeInput,
    Button,
    ImagePicker,

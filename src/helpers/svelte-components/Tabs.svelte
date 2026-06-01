@@ -5,6 +5,7 @@
     * Object for storing tab information.
     * @typedef {object} Tab
     * @property {string} id - The ID to use for the type.
+    * @property {string} [label] - Display label for the tab button.
     * @property {object} component - The Svelte component to use for the tab.
     */
 
@@ -13,6 +14,7 @@
     * @property {Tab[]} [tabs] - Array of Tab objects.
     * @property {string} [activeTab] - The ID of the active Tab object.
     * @property {boolean} [border] - Whether the tabs should be bordered.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
     */
 
    /** @type {TabsProps} */
@@ -20,11 +22,15 @@
       tabs = [],
       activeTab = $bindable(undefined),
       border = false,
+      testId = void 0,
    } = $props();
 </script>
 
 <!--List of tabs-->
-<div class={`tabs${border ? ' bordered' : ''}`}>
+<div
+   class={`tabs${border ? ' bordered' : ''}`}
+   data-testid={testId}
+>
    <!--Tab List-->
    <div class="tab-list">
       <!--For each tab-->

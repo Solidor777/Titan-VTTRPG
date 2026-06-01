@@ -3,17 +3,22 @@
     * @typedef {object} BorderedColumnListProps
     * @property {object} [entryComponent] - The Svelte component to use for each object in the list.
     * @property {Array<*>} [entries] - The properties for each entry in the list.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
     */
 
    /** @type {BorderedColumnListProps} */
    let {
       entryComponent = undefined,
       entries = undefined,
+      testId = void 0,
    } = $props();
 </script>
 
 <!--Entries-->
-<div class="entries">
+<div
+   class="entries"
+   data-testid={testId}
+>
 
    <!--Each Entry-->
    {#each entries as entry}

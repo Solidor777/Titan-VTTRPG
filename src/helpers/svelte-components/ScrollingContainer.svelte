@@ -3,12 +3,14 @@
     * @typedef {object} ScrollingContainerProps
     * @property {number} [scrollTop] - Initial scroll top of this container.
     * @property {import('svelte').Snippet} [children] - Content to render inside the scrollable area.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
     */
 
    /** @type {ScrollingContainerProps} */
    let {
       scrollTop = $bindable(0),
       children,
+      testId = void 0,
    } = $props();
 
    /** @type {boolean} Whether the container is overflowing its top. */
@@ -55,7 +57,10 @@
    }
 </script>
 
-<div class="container">
+<div
+   class="container"
+   data-testid={testId}
+>
    <!--Content-->
    <div class="content" onscroll={onScroll} use:initialScroll>
       {@render children?.()}

@@ -9,6 +9,7 @@
     * @property {string} [icon] - Optional icon to display.
     * @property {string | import('~/helpers/svelte-actions/TooltipAction.js').TooltipAction} [tooltip] - The tooltip to display for this element, if any.
     * @property {import('svelte').Snippet} [children] - Content to render inside the element area.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
     */
 
    /** @type {LabeledElementProps} */
@@ -17,11 +18,13 @@
       icon = undefined,
       tooltip = undefined,
       children,
+      testId = void 0,
    } = $props();
 </script>
 
 <div
    class="labeled-element"
+   data-testid={testId}
    use:tooltipAction={tooltip}
 >
    <!--Label-->
