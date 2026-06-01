@@ -22,7 +22,7 @@
    } = $props();
 </script>
 
-<div class="toggle {enabled ? 'enabled' : 'disabled'}" data-testid={testId}>
+<div class="toggle {enabled ? 'enabled' : 'not-enabled'}" data-testid={testId}>
    <MiniButton
       {disabled}
       {onclick}

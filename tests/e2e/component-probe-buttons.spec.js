@@ -725,9 +725,11 @@ test.describe('component probe — ToggleOptionButton', () => {
       await clearProbeEvents(page);
    });
 
-   test('enabled prop drives the wrapper class and click fires onclick', async ({ page }) => {
-      // Prop-driven: enabled=false → wrapper has class 'disabled'; enabled=true → class 'enabled'.
-      // Parent owns state; no self-flip. Assert via two separate mounts.
+   test('enabled prop drives the wrapper class and an off-state option stays clickable', async ({ page }) => {
+      // Prop-driven: enabled=false → wrapper has class 'not-enabled'; enabled=true → class 'enabled'.
+      // Parent owns state; no self-flip. Assert via two separate mounts. The off-state class is
+      // deliberately NOT 'disabled' — that would collide with Foundry's global
+      // `.disabled { pointer-events: none; }`, making an off filter option permanently un-clickable.
       const off = await mountProbe(page, 'ToggleOptionButton', {
          props: {
             label: 'Flanking',
@@ -736,8 +738,11 @@ test.describe('component probe — ToggleOptionButton', () => {
          },
          events: ['onclick'],
       });
-      await expect(page.locator(`${off.selector} .toggle.disabled`)).toHaveCount(1);
+      await expect(page.locator(`${off.selector} .toggle.not-enabled`)).toHaveCount(1);
+      await expect(page.locator(`${off.selector} .toggle.disabled`)).toHaveCount(0);
       await expect(page.locator(`${off.selector} .toggle.enabled`)).toHaveCount(0);
+      // An off-state option must remain interactive so the user can turn the filter back on; a plain
+      // (non-forced) click verifies pointer events actually reach the inner button.
       await page.locator(`${off.selector} button`).click();
       expect((await readProbeEvents(page)).filter((e) => e.event === 'onclick')).toHaveLength(1);
 
@@ -749,7 +754,7 @@ test.describe('component probe — ToggleOptionButton', () => {
          },
       });
       await expect(page.locator(`${on.selector} .toggle.enabled`)).toHaveCount(1);
-      await expect(page.locator(`${on.selector} .toggle.disabled`)).toHaveCount(0);
+      await expect(page.locator(`${on.selector} .toggle.not-enabled`)).toHaveCount(0);
    });
 
    test('disabled suppresses onclick', async ({ page }) => {
