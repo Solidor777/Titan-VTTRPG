@@ -208,13 +208,14 @@ export function buildConditionDefinitions() {
 /**
  * Sets up the system conditions, registering each as a CONFIG.statusEffects entry with its localized
  * description and visual-active-effects content flag.
+ * @returns {void}
  */
 export default function setupConditions() {
    // Get the static condition definitions.
    const conditions = buildConditionDefinitions();
 
    // Sort conditions by localized name.
-   conditions.sort((a, b) => sortAscending(localize(a.name), localize(b.name)));
+   conditions.sort((a, b) => sortAscending(game.i18n.localize(a.name), game.i18n.localize(b.name)));
 
    // For each condition.
    for (const condition of conditions) {
