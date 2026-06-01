@@ -44,7 +44,7 @@ test.describe('component probe — AttributeSelect', () => {
       await expect(select).toHaveValue('mind');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -123,7 +123,7 @@ test.describe('component probe — SkillSelect', () => {
       await expect(select).toHaveValue('athletics');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -202,7 +202,7 @@ test.describe('component probe — RaritySelect', () => {
       await expect(select).toHaveValue('rare');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('disabled blocks selection', async ({ page }) => {
@@ -265,7 +265,7 @@ test.describe('component probe — RatingSelect', () => {
       await expect(select).toHaveValue('defense');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -344,7 +344,7 @@ test.describe('component probe — ResistanceSelect', () => {
       await expect(select).toHaveValue('resilience');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -423,7 +423,7 @@ test.describe('component probe — ResourceSelect', () => {
       await expect(select).toHaveValue('resolve');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -504,7 +504,7 @@ test.describe('component probe — SpeedSelect', () => {
       await expect(select).toHaveValue('stride');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -585,7 +585,7 @@ test.describe('component probe — ModSelect', () => {
       await expect(select).toHaveValue('damage');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -662,7 +662,7 @@ test.describe('component probe — AttackTypeSelect', () => {
       await expect(select).toHaveValue('ranged');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('disabled blocks selection', async ({ page }) => {
@@ -726,7 +726,7 @@ test.describe('component probe — CheckDifficultySelect', () => {
       await expect(select).toHaveValue('3');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('disabled blocks selection', async ({ page }) => {
@@ -822,7 +822,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
       await expect(select).toHaveValue('resistanceCheck');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('disabled blocks selection', async ({ page }) => {
@@ -887,7 +887,7 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
       await expect(select).toHaveValue('weapon');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -972,7 +972,7 @@ test.describe('component probe — RulesElementOperationSelect', () => {
       await expect(select).toHaveValue('mulBase');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('disabled blocks selection', async ({ page }) => {
@@ -1036,7 +1036,7 @@ test.describe('component probe — ArmorTraitSelect', () => {
       await expect(select).toHaveValue('loud');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -1116,7 +1116,7 @@ test.describe('component probe — AttackTraitSelect', () => {
       await expect(select).toHaveValue('cleave');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('adds a none option when allowNone is set', async ({ page }) => {
@@ -1195,7 +1195,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
       await expect(select).toHaveValue('none');
 
       const events = await readProbeEvents(page);
-      expect(events.some((e) => e.event === 'onchange')).toBe(true);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
    test('base option set without allowNone contains only magical', async ({ page }) => {
