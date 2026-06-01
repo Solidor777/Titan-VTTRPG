@@ -34,31 +34,31 @@
    const document = getContext('document');
 
    /** @type {SpellAspect[]} Standard Spell Aspects, re-read reactively through the document store. */
-   let aspect = $derived(document.data.items.get(item._id)?.system.aspect ?? []);
+   const aspect = $derived(document.data.items.get(item._id)?.system.aspect ?? []);
 
    /** @type {object[]} Custom Spell Aspects, re-read reactively through the document store. */
-   let customAspect = $derived(document.data.items.get(item._id)?.system.customAspect ?? []);
+   const customAspect = $derived(document.data.items.get(item._id)?.system.customAspect ?? []);
 
    /** @type {object[]} Casting checks, re-read reactively through the document store. */
-   let check = $derived(document.data.items.get(item._id)?.system.check ?? []);
+   const check = $derived(document.data.items.get(item._id)?.system.check ?? []);
 
    /** @type {string} Rich-text description, re-read reactively through the document store. */
-   let description = $derived(document.data.items.get(item._id)?.system.description);
+   const description = $derived(document.data.items.get(item._id)?.system.description);
 
    /** @type {string} Rarity key, re-read reactively through the document store. */
-   let rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
 
    /** @type {string} Spell tradition, re-read reactively through the document store. */
-   let tradition = $derived(document.data.items.get(item._id)?.system.tradition);
+   const tradition = $derived(document.data.items.get(item._id)?.system.tradition);
 
    /** @type {number} XP cost, re-read reactively through the document store. */
-   let xpCost = $derived(document.data.items.get(item._id)?.system.xpCost);
+   const xpCost = $derived(document.data.items.get(item._id)?.system.xpCost);
 
    /** @type {object[]} Custom traits, re-read reactively through the document store. */
-   let customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
 
    /** @type {SpellAspect[]} List of enabled Spell Aspects. */
-   let enabledAspects = $derived(aspect.filter((aspect) => aspect.enabled));
+   const enabledAspects = $derived(aspect.filter((aspect) => aspect.enabled));
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>

@@ -14,7 +14,7 @@
    const document = getContext('document');
 
    /** @type {string} Spell tradition, re-read reactively through the document store. */
-   let tradition = $derived(document.data.items.get(item._id)?.system.tradition);
+   const tradition = $derived(document.data.items.get(item._id)?.system.tradition);
 </script>
 
 <!--Tradition-->

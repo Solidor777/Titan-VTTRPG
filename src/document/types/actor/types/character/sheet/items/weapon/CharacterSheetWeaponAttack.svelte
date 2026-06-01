@@ -32,7 +32,7 @@
 
    // Attack reference, read reactively through document.data (its identity changes on every update).
    /** @type {object} The current attack data. */
-   let attack = $derived(document.data.items.get(item._id)?.system.attack[attackIdx]);
+   const attack = $derived(document.data.items.get(item._id)?.system.attack[attackIdx]);
 
    /** @type {boolean} Whether this Weapon is multi attacking, read reactively through document.data. */
    const multiAttack = $derived(document.data.items.get(item._id)?.system.multiAttack);
