@@ -215,7 +215,12 @@ functions in `src/document/types/item/rules-element/` create default instances:
 |----------------------------------|------------------------------|----------------------------------------------------|
 | `createFlatModifierElement`      | `flatModifier`               | Add a flat bonus/penalty to an attribute, rating,  |
 |                                  |                              | training, expertise, resistance, or mod stat.      |
-| `createMulBaseElement`           | `mulBase`                    | Multiply the base value of a stat.                 |
+| `createMulBaseElement`           | `mulBase`                    | Multiply the base value of a stat; carries an      |
+|                                  |                              | `up`/`down` `rounding` field for the scaled base.  |
+| `createMulSumElement`            | `mulSum`                     | Multiply a stat's post-additive running total      |
+|                                  |                              | (base plus all mod buckets); rounding-directional. |
+| `createSetSumElement`            | `setSum`                     | Force a stat's post-additive running total to a    |
+|                                  |                              | value via `mode` (`set`/`min`/`max`).              |
 | `createConditionalCheckModifier` | `conditionalCheckModifier`   | Modify a check's damage, bonus dice, etc. when a   |
 |                                  |                              | condition (attribute, trait, etc.) is met.         |
 | `createConditionalRatingModifier`| `conditionalRatingModifier`  | Modify accuracy, melee, or defense conditionally.  |
@@ -234,7 +239,21 @@ item type.
 `CharacterDataModel._applyRulesElements` (called from `prepareDerivedData`) applies rules elements from
 two sources: every owned item's `rulesElement` array, plus a pass over the actor's `effect`-subtype Active
 Effects (`this.parent.effects`, skipping conditions/other subtypes and any `disabled` effect). Both feed the
-character's derived stats.
+character's derived stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
+into one element per concrete key under its selector (keys resolved by `_getSelectorKeys`, which maps
+`training`/`expertise` to `Object.keys(this.skill)` and otherwise reads `Object.keys(this[selector])`); an
+`'all'` selector that resolves to no keys is dropped with a `warn`. Any operation carrying a key supports
+`'all'` at the engine level (`flatModifier`/`mulSum`/`setSum` are the additive/sum ops that use it), but the
+settings UI only exposes the `'all'` option (`allowAll` on the key select) for `mulSum` and `setSum`.
+
+It then sorts the expanded elements into per-operation arrays and invokes per-op appliers in a fixed order:
+the additive appliers (`_applyMulBaseElements`, then `_applyFlatModifierElements`) run first, then the
+post-additive sum sub-phase (`_applyMulSumElements`, then `_applySetSumElements`) so the running total (base
+plus every mod bucket) the sum ops read is already complete. `_applyMulBaseElements` rounds its (possibly
+fractional) base contribution per element via `roundDirectional(baseValue * (value - 1), rounding)`. Both sum
+appliers recompute the running total per element before computing a corrective delta (`computeMulSumDelta` /
+`computeSetSumDelta`) and writing it into the element's source mod bucket, so multiple sum ops on the same
+stat compound in order. Each applier records what it wrote under a same-named key on `rulesElementsCache`.
 
 
 ## Sheets
@@ -356,6 +375,12 @@ domain:
   invokes a synchronous resolver until it returns a truthy value or the attempt budget is exhausted,
   then returns the truthy result or `null`; default budget is 5 attempts at 50 ms each. First attempt
   is immediate (no leading delay), so the success path has no wall-clock cost.
+- **Rules-element math** — pure delta helpers for the multiplicative/sum appliers: `RoundDirectional.js`
+  (`roundDirectional(value, rounding)` ceils on `'up'`, floors otherwise), `ComputeMulSumDelta.js`
+  (`computeMulSumDelta(total, value, rounding)` returns `roundDirectional(total * value, rounding) - total`,
+  or `0` when `total <= 0` so a zero stat is never pushed negative), and `ComputeSetSumDelta.js`
+  (`computeSetSumDelta(total, value, mode)` returns the delta forcing the total to `value` under `set`, raising
+  it under `min`, or capping it under `max`).
 - **Misc** — small utilities used across layers (`GenerateUUID`, `Log`, `Assert`, `Clamp`, and
   others).
 
