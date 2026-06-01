@@ -444,6 +444,11 @@ a TDZ ReferenceError (bug #17). (c) `CompendiumCollection#getUserLevel(user)` re
 level via `Math.max` over satisfied roles. (d) `requiresReload:true` settings still read live via their
 accessors, so `game.settings.set` takes effect in-test without reload.
 
+**Open follow-ups (optional, both need user go-ahead — see the two "Deferred" blocks lower in this doc):**
+(1) harden the bug-#18 socket relay against a theoretical remote race (re-resolution retry in the two combat
+hooks); (2) make the effect-duration INPUTS reactive (one-way value+commit refactor of the shared
+`IntegerIncrementInput`/`NumberInput`, carried over from Phase 3d).
+
 ### Phase 4 kickoff prep (historical — completed)
 
 - **Test identities** (`tests/e2e/users.js`): four no-password users — `E2E GM 1/2` (`GM_USERS`),
@@ -474,6 +479,15 @@ accessors, so `game.settings.set` takes effect in-test without reload.
 **Deferred (optional, not Phase 4):** make the effect duration INPUTS reactive — needs a one-way
 `value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
 (cascading; own spec + user approval). See the 3d worklist "Deferred / follow-up".
+
+**Deferred (optional, Phase 4 outcome):** harden the combat-turn socket relay against a theoretical remote
+race. The fix for bug #18 emits IDs and re-resolves in `OnCombatNextTurn`/`OnCombatPreviousTurn` via
+`game.combats.get(combatId)` / `combat.combatants.get(id)`. The `system.titan` socket and Foundry's native
+combat replication are independent network paths, so on a congested remote client the socket message could
+arrive before the combat's embedded-combatant update has applied → `combat.combatants.get(id)` returns
+`undefined` → the handler guard silently drops the apply. Low-probability (the A1–A5 two-client tests pass
+through a real browser-to-browser relay); mitigation = a short re-resolution retry (yield + re-get, N times)
+in the two handlers before the guard. Engine change → own task + user approval.
 
 Load `foundry-vtt` + `titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface
 touched). Route all `.js`/`.svelte` work through the `titan-svelte-dev` subagent.
