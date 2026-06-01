@@ -20,11 +20,17 @@
       increaseSpeed: DECREASE_SPEED_ICON,
    };
 
-   /** @type {{ aspect: SpellAspect }} The Spell Aspect represented by this element. */
-   let { aspect = void 0 } = $props();
+   /**
+    * @typedef {object} SpellAspectTagProps
+    * @property {SpellAspect} [aspect] - The Spell Aspect to render.
+    * @property {string} [testId] - Optional test identifier forwarded to the root element of ResistanceTag.
+    */
+
+   /** @type {SpellAspectTagProps} */
+   let { aspect = void 0, testId = void 0 } = $props();
 </script>
 
-<ResistanceTag resistance={aspect.resistanceCheck ?? ''}>
+<ResistanceTag resistance={aspect.resistanceCheck ?? ''} {testId}>
    <!--Label-->
    <div class="stat label">
       <!--Icon-->

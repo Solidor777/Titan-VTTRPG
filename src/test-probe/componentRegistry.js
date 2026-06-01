@@ -5,6 +5,23 @@ import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte'
 import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 import Select from '~/helpers/svelte-components/input/select/Select.svelte';
 import LabelTag from '~/helpers/svelte-components/tag/LabelTag.svelte';
+import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
+import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
+import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
+import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
+import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
+import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
+import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
+import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
+import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
+import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
+import TraitTag from '~/helpers/svelte-components/tag/TraitTag.svelte';
+import SpellAspectTag from '~/helpers/svelte-components/tag/SpellAspectTag.svelte';
+import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
+import SpellCustomAspectTag from '~/helpers/svelte-components/tag/SpellCustomAspectTag.svelte';
+import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 import RichText from '~/helpers/svelte-components/RichText.svelte';
 import FiltereedList from '~/helpers/svelte-components/FiltereedList.svelte';
 import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
@@ -30,6 +47,23 @@ const componentRegistry = {
    CheckboxInput,
    Select,
    LabelTag,
+   Tag,
+   IconTag,
+   IconStatTag,
+   StatTag,
+   ValueTag,
+   RarityTag,
+   DurationTag,
+   AttributeTag,
+   AttributeCheckTag,
+   OpposedCheckTag,
+   ResistanceTag,
+   ResistedByTag,
+   TraitTag,
+   SpellAspectTag,
+   SpellAspectTags,
+   SpellCustomAspectTag,
+   EditDeleteTag,
    RichText,
    FiltereedList,
    CondensedCheckButton,

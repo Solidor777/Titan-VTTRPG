@@ -2,11 +2,19 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {{ type?: string, remaining?: number, tooltip?: string | TooltipAction }} Props for this component. */
-   let { type = void 0, remaining = void 0, tooltip = void 0 } = $props();
+   /**
+    * @typedef {object} DurationTagProps
+    * @property {string} [type] - The duration type key (e.g. `'permanent'`, `'turnStart'`, `'turnEnd'`).
+    * @property {number} [remaining] - The number of turns remaining; not shown for `'permanent'` type.
+    * @property {string | TooltipAction} [tooltip] - The tooltip to display on hover, if any.
+    * @property {string} [testId] - Optional test identifier bound to `data-testid` on the root element.
+    */
+
+   /** @type {DurationTagProps} */
+   let { type = void 0, remaining = void 0, tooltip = void 0, testId = void 0 } = $props();
 </script>
 
-<div class="tag" use:tooltipAction={tooltip}>
+<div class="tag" data-testid={testId} use:tooltipAction={tooltip}>
    <!--Label-->
    <div class="label">
       {localize('duration')}

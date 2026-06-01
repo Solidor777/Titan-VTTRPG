@@ -3,12 +3,20 @@
    import AttributeTag from '~/helpers/svelte-components/tag/AttributeTag.svelte';
    import createAttributeCheckLabel from '~/helpers/utility-functions/CreateAttributeCheckLabel.js';
 
-   /** @type {{ attribute?: string, skill?: string, tooltip?: string | TooltipAction }} Props for this component. */
-   let { attribute = void 0, skill = void 0, tooltip = void 0 } = $props();
+   /**
+    * @typedef {object} OpposedCheckTagProps
+    * @property {string} [attribute] - The Attribute used in the opposed check.
+    * @property {string} [skill] - The Skill used in the opposed check.
+    * @property {string | TooltipAction} [tooltip] - The tooltip to display on hover, if any.
+    * @property {string} [testId] - Optional test identifier forwarded to the root element of AttributeTag.
+    */
+
+   /** @type {OpposedCheckTagProps} */
+   let { attribute = void 0, skill = void 0, tooltip = void 0, testId = void 0 } = $props();
 </script>
 
 <!--Check label-->
-<AttributeTag {attribute} {tooltip}>
+<AttributeTag {attribute} {tooltip} {testId}>
    <!--Label-->
    <div class="label main">
       {localize('opposedCheck')}

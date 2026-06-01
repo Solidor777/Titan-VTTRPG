@@ -8,14 +8,16 @@
     * @property {string | number} [value] - The Value of this Stat.
     * @property {string} [icon] - The icon class to display for this element.
     * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {string} [testId] - Optional test identifier bound to `data-testid` on the root element.
     */
 
    /** @type {IconStatTagProps} */
-   let { label = void 0, value = void 0, icon = void 0, tooltip = void 0 } = $props();
+   let { label = void 0, value = void 0, icon = void 0, tooltip = void 0, testId = void 0 } = $props();
 </script>
 
 <div
    class="tag"
+   data-testid={testId}
    use:tooltipAction={tooltip}
 >
    <!--Icon-->

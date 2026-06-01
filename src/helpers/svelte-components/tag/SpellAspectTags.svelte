@@ -3,8 +3,15 @@
    import SpellAspectTag from '~/helpers/svelte-components/tag/SpellAspectTag.svelte';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 
-   /** @type {{ standardAspects?: SpellAspect[], customAspects?: SpellCustomAspect[] }} Props for this component. */
-   let { standardAspects = void 0, customAspects = void 0 } = $props();
+   /**
+    * @typedef {object} SpellAspectTagsProps
+    * @property {SpellAspect[]} [standardAspects] - Standard spell aspects to render as SpellAspectTag entries.
+    * @property {SpellCustomAspect[]} [customAspects] - Custom spell aspects to render as SpellCustomAspectTag entries.
+    * @property {string} [testId] - Optional test identifier bound to `data-testid` on the root container element.
+    */
+
+   /** @type {SpellAspectTagsProps} */
+   let { standardAspects = void 0, customAspects = void 0, testId = void 0 } = $props();
 
    /**
     * Calculates a number representing the approximate relative size of an Aspect Tag.
@@ -64,7 +71,7 @@
 </script>
 
 <!--Aspect Tag Container-->
-<div class="tag-container">
+<div class="tag-container" data-testid={testId}>
 
    <!--Each Aspect-->
    {#each aspectSizeMap as aspect}

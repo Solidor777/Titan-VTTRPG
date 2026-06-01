@@ -2,12 +2,20 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {{ rarity?: string, tooltip?: string | TooltipAction }} Props for this component. */
-   let { rarity = void 0, tooltip = void 0 } = $props();
+   /**
+    * @typedef {object} RarityTagProps
+    * @property {string} [rarity] - The rarity key (e.g. `'common'`, `'uncommon'`, `'rare'`, `'unique'`).
+    * @property {string | TooltipAction} [tooltip] - The tooltip to display on hover, if any.
+    * @property {string} [testId] - Optional test identifier bound to `data-testid` on the root element.
+    */
+
+   /** @type {RarityTagProps} */
+   let { rarity = void 0, tooltip = void 0, testId = void 0 } = $props();
 </script>
 
 <div
    class="tag {rarity}"
+   data-testid={testId}
    use:tooltipAction={tooltip}
 >
    {localize(rarity)}

@@ -13,6 +13,7 @@
     * user-authored content that must be shown verbatim.
     * @property {string} [deleteTooltip] - The tooltip to display when the Delete Icon is hovered.
     * @property {string} [editTooltip] - The tooltip to display when the Edit Icon is hovered.
+    * @property {string} [testId] - Optional test identifier bound to `data-testid` on the root element.
     */
 
    /** @type {EditDeleteTagProps} */
@@ -23,10 +24,11 @@
       labelTooltip = undefined,
       deleteTooltip = undefined,
       editTooltip = undefined,
+      testId = undefined,
    } = $props();
 </script>
 
-<div class="tag">
+<div class="tag" data-testid={testId}>
    <!--Edit Icon-->
    <button
       type="button"
