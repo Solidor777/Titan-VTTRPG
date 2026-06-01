@@ -246,3 +246,88 @@ export function buildE2EAttackerRatingItemData(value) {
       },
    };
 }
+
+/**
+ * Builds create-data for a character actor used in turn-effect socket tests.
+ * @param {string} name - The actor name.
+ * @param {('player'|'npc')} [type] - The actor subtype (defaults to 'player').
+ * @returns {object} The Actor.create payload.
+ */
+export function buildTurnEffectActorData(name, type = 'player') {
+   return {
+      name: name,
+      type: type,
+   };
+}
+
+/**
+ * Builds an ability item that heals stamina at the start (or end) of the owner's turn.
+ * @param {string} name - The item name.
+ * @param {number} value - The amount healed per turn.
+ * @param {('turnStart'|'turnEnd')} [selector] - When the effect fires (defaults to 'turnStart').
+ * @returns {object} The Item.create payload.
+ */
+export function buildFastHealingAbilityData(name, value, selector = 'turnStart') {
+   return {
+      name: name,
+      type: 'ability',
+      system: {
+         rulesElement: [
+            {
+               operation: 'fastHealing',
+               selector: selector,
+               value: value,
+               uuid: 'e2e-fast-healing-0',
+            },
+         ],
+      },
+   };
+}
+
+/**
+ * Builds an ability item that deals stamina damage at the start (or end) of the owner's turn.
+ * @param {string} name - The item name.
+ * @param {number} value - The amount of damage per turn.
+ * @param {('turnStart'|'turnEnd')} [selector] - When the effect fires (defaults to 'turnStart').
+ * @returns {object} The Item.create payload.
+ */
+export function buildPersistentDamageAbilityData(name, value, selector = 'turnStart') {
+   return {
+      name: name,
+      type: 'ability',
+      system: {
+         rulesElement: [
+            {
+               operation: 'persistentDamage',
+               selector: selector,
+               value: value,
+               uuid: 'e2e-persistent-damage-0',
+            },
+         ],
+      },
+   };
+}
+
+/**
+ * Builds an ability item that increases the owner's per-turn resolve regain (a mod, not an op).
+ * @param {string} name - The item name.
+ * @param {number} value - The bonus to resolve regain.
+ * @returns {object} The Item.create payload.
+ */
+export function buildResolveRegainAbilityData(name, value) {
+   return {
+      name: name,
+      type: 'ability',
+      system: {
+         rulesElement: [
+            {
+               operation: 'flatModifier',
+               selector: 'mod',
+               key: 'resolveRegain',
+               value: value,
+               uuid: 'e2e-resolve-regain-0',
+            },
+         ],
+      },
+   };
+}
