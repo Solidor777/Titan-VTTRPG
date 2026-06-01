@@ -91,4 +91,31 @@ test.describe('integration manifest drift guard', () => {
       expect(live.socket, 'socket flag matches manifest').toBe(manifest.socket);
       expect(manifest.socket, 'manifest declares socket enabled').toBe(true);
    });
+
+   // The runtime document classes must be Titan subclasses that override the Foundry base classes in
+   // OnceInit. The production build minifies class names, so identity is checked structurally (a proper
+   // subclass of, and not equal to, the Foundry base) rather than by constructor name.
+   test('base documents are overridden by Titan subclasses', async ({ page }) => {
+      // For each base document, whether CONFIG's class overrides and subclasses the Foundry base global.
+      const result = await page.evaluate(() => {
+         // Reports whether a configured document class overrides and subclasses the given base class.
+         const check = (configClass, baseClass) => ({
+            overridden: configClass !== baseClass,
+            subclass: configClass.prototype instanceof baseClass,
+         });
+         return {
+            Actor: check(CONFIG.Actor.documentClass, Actor),
+            Item: check(CONFIG.Item.documentClass, Item),
+            ActiveEffect: check(CONFIG.ActiveEffect.documentClass, ActiveEffect),
+            ChatMessage: check(CONFIG.ChatMessage.documentClass, ChatMessage),
+            Combat: check(CONFIG.Combat.documentClass, Combat),
+         };
+      });
+
+      // Every base document must be overridden by a proper Titan subclass.
+      for (const documentName of ['Actor', 'Item', 'ActiveEffect', 'ChatMessage', 'Combat']) {
+         expect(result[documentName].overridden, `${documentName} documentClass overridden`).toBe(true);
+         expect(result[documentName].subclass, `${documentName} documentClass subclasses the base`).toBe(true);
+      }
+   });
 });
