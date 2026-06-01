@@ -52,4 +52,28 @@ test.describe('integration manifest drift guard', () => {
       const registered = await page.evaluate(() => Object.keys(CONFIG.ChatMessage.dataModels ?? {}));
       expect(registered, 'no testChat ChatMessage dataModel expected').not.toContain('testChat');
    });
+
+   // Every pack declared in the manifest must resolve in the live world under the titan package, with the
+   // declared document type.
+   test('every manifest pack is loaded with matching metadata', async ({ page }) => {
+      // The pack descriptors declared in the manifest.
+      const declaredPacks = manifest.packs ?? [];
+      expect(declaredPacks.length, 'manifest declares at least one pack').toBeGreaterThan(0);
+
+      // Resolve each declared pack from the live world and read its metadata.
+      const live = await page.evaluate((packs) => packs.map((entry) => {
+         const pack = game.packs.get(`titan.${entry.name}`);
+         return pack
+            ? { name: entry.name, type: pack.metadata.type, packageName: pack.metadata.packageName }
+            : { name: entry.name, missing: true };
+      }), declaredPacks);
+
+      // Each declared pack must resolve, belong to the titan system, and carry the declared document type.
+      for (const entry of declaredPacks) {
+         const found = live.find((p) => p.name === entry.name);
+         expect(found.missing, `pack titan.${entry.name} must be loaded`).toBeFalsy();
+         expect(found.type, `pack titan.${entry.name} type`).toBe(entry.type);
+         expect(found.packageName, `pack titan.${entry.name} packageName`).toBe('titan');
+      }
+   });
 });
