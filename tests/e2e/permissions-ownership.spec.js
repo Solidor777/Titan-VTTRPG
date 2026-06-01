@@ -109,29 +109,19 @@ test.describe('permissions — sheet ownership levels', () => {
       });
    });
 
-   test('NONE: player cannot see the actor', async ({ browser }) => {
+   test('NONE: player has no view permission on the actor', async ({ browser }) => {
       await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 None Actor', 'E2E Player 1', 'NONE');
          try {
-            // With NONE (and default ownership explicitly 0), the player should not even have the actor
-            // in their collection. A brief wait is still needed for the create message to propagate.
-            await player.waitForFunction(
-               (id) => {
-                  // The actor is absent — this is the expected state. Resolve once the initial
-                  // replication window has elapsed (game.actors.size > 0 guards an uninitialised world).
-                  return game.actors.size >= 0 && game.actors.get(id) === undefined;
-               },
+            // Foundry replicates the Actor document to ALL clients regardless of ownership — permission
+            // gates VISIBILITY, not collection membership. So the doc IS present in the player's
+            // collection; wait for it to arrive, then assert the player resolves below LIMITED (no view).
+            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 15_000 });
+            const view = await player.evaluate(
+               (id) => game.actors.get(id).testUserPermission(game.user, 'LIMITED'),
                id,
-               { timeout: 15_000 },
             );
-            const state = await player.evaluate((id) => {
-               const actor = game.actors.get(id);
-               if (!actor) {
-                  return { present: false, view: false };
-               }
-               return { present: true, view: actor.testUserPermission(game.user, 'LIMITED') };
-            }, id);
-            expect(state.view).toBe(false);
+            expect(view).toBe(false);
          }
          finally {
             await gm.evaluate((id) => game.actors.get(id)?.delete(), id);
