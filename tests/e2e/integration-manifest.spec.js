@@ -174,4 +174,51 @@ test.describe('integration manifest drift guard', () => {
       expect(result.ActiveEffect.effect.hasTitanSheet, 'effect sheet registered').toBe(true);
       expect(result.ActiveEffect.effect.titanIsDefault, 'effect sheet is default').toBe(true);
    });
+
+   // Runtime-only wiring set in OnceInit (not declared in the manifest): round time, the disabled legacy
+   // effect transferral, and the custom initiative formula.
+   test('runtime configuration flags are set by the system', async ({ page }) => {
+      // The runtime config values, read from the live CONFIG.
+      const config = await page.evaluate(() => ({
+         roundTime: CONFIG.time.roundTime,
+         legacyTransferral: CONFIG.ActiveEffect.legacyTransferral,
+         initiativeFormula: CONFIG.Combat.initiative.formula,
+      }));
+
+      expect(config.roundTime, 'round time').toBe(6);
+      expect(config.legacyTransferral, 'legacy transferral disabled').toBe(false);
+
+      // The formula is `@rating.initiative.value` plus a settings-driven suffix (default `+2d6`); assert
+      // the stable code-derived prefix rather than the settings-driven tail.
+      expect(config.initiativeFormula, 'initiative formula prefix').toMatch(/^@rating\.initiative\.value/);
+   });
+
+   // The system pushes its conditions onto CONFIG.statusEffects (OnceSetup) and registers its settings
+   // (OnceInit). Assert the titan conditions are present and a representative set of settings is registered.
+   test('system conditions and settings are registered', async ({ page }) => {
+      // The condition ids the system pushes onto CONFIG.statusEffects.
+      const expectedConditions = [
+         'blinded', 'contaminated', 'dead', 'deafened', 'frightened', 'incapacitated',
+         'prone', 'restrained', 'stunned', 'sleeping', 'unconscious',
+      ];
+      // A representative sample of registered setting keys (mix of scopes and value kinds).
+      const expectedSettings = [
+         'titan.migrationMode', 'titan.getCheckOptions', 'titan.initiativeFormula',
+         'titan.staminaBaseMultiplier', 'titan.defaultAttribute.arcana', 'titan.defaultXpCost.ability',
+      ];
+
+      // Read the live status-effect ids and which sampled settings are missing.
+      const result = await page.evaluate(({ expectedSettings }) => ({
+         statusIds: CONFIG.statusEffects.map((e) => e.id),
+         missingSettings: expectedSettings.filter((key) => !game.settings.settings.has(key)),
+      }), { expectedSettings });
+
+      // Every titan condition is present among the status effects.
+      for (const id of expectedConditions) {
+         expect(result.statusIds, `status effect ${id} registered`).toContain(id);
+      }
+
+      // Every sampled setting key is registered.
+      expect(result.missingSettings, 'all sampled settings registered').toEqual([]);
+   });
 });
