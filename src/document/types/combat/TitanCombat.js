@@ -13,6 +13,8 @@ export default class TitanCombat extends Combat {
 
    /**
     * Advances to the next turn, triggering the combatNextTurn hook via socket for all clients.
+    * Emits combatant and combat IDs rather than live document instances so that the JSON-serialized
+    * socket payload delivers stable primitive values — handlers re-resolve to live documents on receipt.
     * @override
     * @returns {Promise<Combat>} The updated Combat document.
     */
@@ -21,13 +23,15 @@ export default class TitanCombat extends Combat {
       const retVal = await super.nextTurn();
       if (this.turns.length > 1) {
          const currentCombatant = this.combatant;
-         game.titan.socketManager.triggerSocketHook('combatNextTurn', currentCombatant, previousCombatant, this);
+         game.titan.socketManager.triggerSocketHook('combatNextTurn', currentCombatant?.id, previousCombatant?.id, this.id);
       }
       return retVal;
    }
 
    /**
     * Retreats to the previous turn, triggering the combatPreviousTurn hook via socket for all clients.
+    * Emits combatant and combat IDs rather than live document instances so that the JSON-serialized
+    * socket payload delivers stable primitive values — handlers re-resolve to live documents on receipt.
     * @override
     * @returns {Promise<Combat>} The updated Combat document.
     */
@@ -36,7 +40,7 @@ export default class TitanCombat extends Combat {
       const retVal = await super.previousTurn();
       if (this.turns.length > 1) {
          const restoredCombatant = this.combatant;
-         game.titan.socketManager.triggerSocketHook('combatPreviousTurn', restoredCombatant, displacedCombatant, this);
+         game.titan.socketManager.triggerSocketHook('combatPreviousTurn', restoredCombatant?.id, displacedCombatant?.id, this.id);
       }
       return retVal;
    }

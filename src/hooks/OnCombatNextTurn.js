@@ -2,11 +2,17 @@ import warn from '~/helpers/utility-functions/Warn.js';
 
 /**
  * Called when combat advances from one turn to the next turn.
- * @param {Combatant} currentCombatant - The Combatant whose turn it currently is.
- * @param {Combatant} previousCombatant - The Combatant whose turn it previously was.
- * @param {TitanCombat} combat - The Combat that just advanced a turn.
+ * @param {string} currentCombatantId - The ID of the Combatant whose turn it currently is.
+ * @param {string} previousCombatantId - The ID of the Combatant whose turn it previously was.
+ * @param {string} combatId - The ID of the Combat that just advanced a turn.
  */
-export default async function onCombatNextTurn(currentCombatant, previousCombatant, combat) {
+export default async function onCombatNextTurn(currentCombatantId, previousCombatantId, combatId) {
+   // The socket relay delivers IDs (live document instances do not survive serialization), so
+   // re-resolve to live documents on every client before use.
+   const combat = game.combats.get(combatId);
+   const currentCombatant = combat?.combatants.get(currentCombatantId);
+   const previousCombatant = combat?.combatants.get(previousCombatantId);
+
    if (currentCombatant && previousCombatant && combat) {
       // Handle Initiative based effects.
       const currentInitiative = currentCombatant.initiative;

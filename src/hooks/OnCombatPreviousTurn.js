@@ -2,11 +2,17 @@ import warn from '~/helpers/utility-functions/Warn.js';
 
 /**
  * Called when combat retreats from the current turn to the previous turn.
- * @param {Combatant} restoredCombatant - The Combatant whose turn has been restored as current.
- * @param {Combatant} displacedCombatant - The Combatant whose turn was displaced.
- * @param {TitanCombat} combat - The Combat that just retreated a turn.
+ * @param {string} restoredCombatantId - The ID of the Combatant whose turn has been restored as current.
+ * @param {string} displacedCombatantId - The ID of the Combatant whose turn was displaced.
+ * @param {string} combatId - The ID of the Combat that just retreated a turn.
  */
-export default async function onCombatPreviousTurn(restoredCombatant, displacedCombatant, combat) {
+export default async function onCombatPreviousTurn(restoredCombatantId, displacedCombatantId, combatId) {
+   // The socket relay delivers IDs (live document instances do not survive serialization), so
+   // re-resolve to live documents on every client before use.
+   const combat = game.combats.get(combatId);
+   const restoredCombatant = combat?.combatants.get(restoredCombatantId);
+   const displacedCombatant = combat?.combatants.get(displacedCombatantId);
+
    if (restoredCombatant && displacedCombatant && combat) {
       // Handle Initiative based effects.
       const restoredInitiative = restoredCombatant.initiative;
