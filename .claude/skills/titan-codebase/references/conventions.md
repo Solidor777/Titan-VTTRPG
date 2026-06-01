@@ -120,6 +120,18 @@ auto-subscription — that syntax was swept out across all of `src/`. `applicati
 Svelte `writable()` store (factory functions such as `createCharacterSheetState`), consumed with
 `$appState` / `.update()`.
 
+**`applicationState` writes must be ROOTED at `$appState`** — the compiler only emits a store `.set()`
+for assignments whose left-hand side is `$`-prefixed (`$appState.tabs.effects.filter = v`, or
+`bind:value={$appState.tabs.effects.filter}`). If you instead read an INNER object out of the store and
+pass it down as a prop, then mutate a member of that prop (`isExpandedMap[id] = true` where
+`isExpandedMap={$appState.tabs.effects.isExpanded}`), it is a plain object mutation — **no `.set()`
+fires, nothing re-renders.** This was bug #13 (the expand toggle was dead on every list tab). Fix: bind
+the leaf directly against the store root, e.g. `bind:isExpanded={$appState.tabs[tabKey].isExpanded[id]}`
+in the list component (pass a `tabKey` string, not the inner map). Dynamic keys on a `$appState`-rooted
+path DO still compile to a store-write. The `tabKey` prop on `CharacterSheetItemList` /
+`CharacterSheetMultiItemList` (and the static `tabs.effects` path in `CharacterSheetEffectList`) exist
+for exactly this reason.
+
 **Dialog data passing** — check dialogs (e.g. `AttributeCheckDialog`) construct with
 `content: { class: CheckDialogShell, props: { shell, actor, checkOptions: writable(...),
 checkParameters: writable(...) } }` and the shell distributes those stores to children via
