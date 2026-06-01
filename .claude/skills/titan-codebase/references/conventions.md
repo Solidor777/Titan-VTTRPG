@@ -89,6 +89,20 @@ description, check.length, customTrait) — handler/child-prop uses of the raw `
 `CharacterSheetItemChecks {item}`) are left as-is. Child components that themselves read off the passed
 `item` are separate reactivity candidates.
 
+**Row two-way INPUTS to a child-doc leaf use a function binding, never `bind:value={<prop>.system.x}`** —
+a `$derived` is read-only, so you cannot `bind:value` to the reactive display read. For a row input that
+edits a child collection member, use a Svelte 5 **function binding** (≥5.9.0) whose getter reads through
+the bridge and whose setter commits via the child document's own `update()`:
+`bind:value={() => document.data.<coll>.get(id)?.system.<leaf> ?? <fallback>, (v) => <childDoc>.update({ system: { <leaf>: v } })}`.
+Binding straight to the passed prop (`bind:value={effect.system.duration.remaining}`) is the input twin of
+the display-read bug: the read is non-reactive (stale until remount) and, on `IntegerIncrementInput`, the
++/- buttons never persist (they mutate the prop but never fire `onchange`). The function binding fixes both
+— the setter commits on typing AND the buttons. The `?? <fallback>` guards the mid-deletion transient where
+the derived is `undefined` (`NumberInput` would throw at `value.toString()`). Applied to
+`CharacterSheetEffect.svelte` (duration remaining + initiative) and `CharacterSheetCommodity.svelte`
+(quantity). NOTE: `bind:value={document.data.system.x}` on a document's OWN sheet is already reactive and
+does NOT need this — only rows binding a *passed child-doc prop* do.
+
 **Trait-sidebar index iteration must be numeric** — All three trait-sidebar `$derived.by` loops
 (`ItemSheetSidebarTraits`, `ArmorSheetSidebarTraits`, `ShieldSheetSidebarTraits`) iterate with a
 numeric `for (let idx = 0; idx < arr.length; idx++)` loop. Using `for...in` over an array yields

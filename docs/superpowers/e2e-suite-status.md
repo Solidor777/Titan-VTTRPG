@@ -1,7 +1,7 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
 **Last updated:** 2026-06-01. **Branch:** `development`. **Next action:** **none queued — Phase 4 complete.**
-ALL of Phase 3 AND Phase 4 are complete. Full e2e suite is **312 passing** (`npx playwright test`, on the
+ALL of Phase 3 AND Phase 4 are complete. Full e2e suite is **315 passing** (`npx playwright test`, on the
 `npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`). Phase 3a, ALL of Phase 3b
 (component-probe coverage of all 84 primitives), ALL of Phase 3c (integration manifest drift guard),
 and ALL of Phase 3d (reactive-control sweep) are done. **Phase 3 is fully complete.** **Phase 4
@@ -451,10 +451,14 @@ combat turn hooks now re-resolve the relayed combat/combatant IDs via a bounded 
 `docs/superpowers/specs/2026-06-01-socket-relay-race-hardening-design.md` /
 `docs/superpowers/plans/2026-06-01-socket-relay-race-hardening.md`; util
 `src/helpers/utility-functions/RetryResolve.js` (+ `tests/unit/RetryResolve.test.js`, 4 cases); commits
-`5310e850`/`33750d50`/`f0a2b138`. Suite still **312 e2e** / **39 unit** passing.
-(2) **OPEN (needs user go-ahead)** — make the effect-duration INPUTS reactive (one-way value+commit refactor
-of the shared `IntegerIncrementInput`/`NumberInput`, carried over from Phase 3d; see the "Deferred" block
-lower in this doc).
+`5310e850`/`33750d50`/`f0a2b138`. Suite **315 e2e** / **39 unit** passing (incl. follow-up #2).
+(2) **DONE (2026-06-01)** — made the stale child-doc row INPUTS reactive. Exploration showed the bug was
+only 3 call sites (effect duration remaining + initiative, commodity quantity) binding a *passed child-doc
+prop*, NOT the shared primitives — so the fix is Svelte 5 **function bindings** (reactive getter through
+`document.data`, committing setter via `<childDoc>.update()`), primitives untouched. Also fixed a latent
+bug: the +/- buttons never persisted. Spec/plan `2026-06-01-row-input-reactivity-*`; commits
+`3445b64a`/`e4c33277`/`e9ebc1f1`. The originally-anticipated one-way primitive refactor was rejected
+(~40-site cascade, YAGNI).
 
 ### Phase 4 kickoff prep (historical — completed)
 
@@ -483,9 +487,12 @@ lower in this doc).
   (c) does the test need to seed a `Combat` encounter with combatants (reuse `tests/shared/builders.js`)?
   (d) assertion strategy on client B (poll the document/hook, not the DOM, where possible).
 
-**Deferred (optional, not Phase 4):** make the effect duration INPUTS reactive — needs a one-way
-`value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
-(cascading; own spec + user approval). See the 3d worklist "Deferred / follow-up".
+**DONE (2026-06-01, was: Deferred not-Phase-4):** the child-doc row INPUTS (effect duration remaining +
+initiative, commodity quantity) are now reactive. The fix turned out NOT to need the anticipated one-way
+primitive refactor — the buggy surface was only 3 call sites binding a passed child-doc prop, fixed locally
+with Svelte 5 function bindings (reactive getter through `document.data`, committing setter via
+`<childDoc>.update()`); the shared `IntegerIncrementInput`/`NumberInput` primitives are unchanged. Also
+fixed the latent +/- non-persist bug. Spec/plan `2026-06-01-row-input-reactivity-*`.
 
 **DONE (2026-06-01, was: Deferred Phase 4 outcome):** hardened the combat-turn socket relay against the
 theoretical remote race. The bug-#18 fix emits IDs and re-resolves in
@@ -510,7 +517,7 @@ v14 — see conventions.md).
 
 - `npx vitest run` → expect 39 passing (incl. `tests/unit/check/**`, `check-oracle.test.js`, and
   `tests/unit/RetryResolve.test.js`).
-- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **312 passing** (Foundry must be
+- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **315 passing** (Foundry must be
   running on :30000, or the `webServer` config launches it). The full suite includes the seven
   `tests/e2e/component-probe*.spec.js` family files (all 84 primitives), the Phase 3d
   `tests/e2e/reactive-*.spec.js` + `spells-filter.spec.js` files, the Phase 3c
