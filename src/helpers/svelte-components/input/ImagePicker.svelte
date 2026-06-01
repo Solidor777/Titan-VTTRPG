@@ -9,6 +9,7 @@
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {Function} [onchange] - Callback invoked after a new image path is selected.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid` on the root element.
     */
 
    /** @type {ImagePickerProps} */
@@ -18,6 +19,7 @@
       disabled = false,
       tooltip = void 0,
       onchange = void 0,
+      testId = void 0,
    } = $props();
 
    /** @type {SvelteApp} The Svelte Component's Application. */
@@ -44,9 +46,11 @@
    }
 </script>
 
-<ImageButton
-   {alt}
-   onclick={onEditImage}
-   src={value}
-   {tooltip}
-/>
+<div data-testid={testId}>
+   <ImageButton
+      {alt}
+      onclick={onEditImage}
+      src={value}
+      {tooltip}
+   />
+</div>

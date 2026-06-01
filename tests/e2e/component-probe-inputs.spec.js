@@ -222,6 +222,17 @@ test.describe('component probe — AttributeInput', () => {
       });
       await expect(page.locator(`${selector} .attribute-input`)).toContainText('inner text');
    });
+
+   test('testId resolves to data-testid on the root element', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'AttributeInput', {
+         props: {
+            attribute: 'agility',
+            text: 'x',
+            testId: 'probe-attr',
+         },
+      });
+      await expect(page.locator(`${selector} [data-testid="probe-attr"]`)).toBeVisible();
+   });
 });
 
 // ─── RarityInput ──────────────────────────────────────────────────────────────
@@ -259,6 +270,17 @@ test.describe('component probe — RarityInput', () => {
       });
       await expect(page.locator(`${selector} .rarity-input`)).toContainText('rare item');
    });
+
+   test('testId resolves to data-testid on the root element', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'RarityInput', {
+         props: {
+            rarity: 'uncommon',
+            text: 'x',
+            testId: 'probe-rarity',
+         },
+      });
+      await expect(page.locator(`${selector} [data-testid="probe-rarity"]`)).toBeVisible();
+   });
 });
 
 // ─── ResistanceInput ──────────────────────────────────────────────────────────
@@ -295,6 +317,17 @@ test.describe('component probe — ResistanceInput', () => {
          },
       });
       await expect(page.locator(`${selector} .resistance-input`)).toContainText('magical resist');
+   });
+
+   test('testId resolves to data-testid on the root element', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ResistanceInput', {
+         props: {
+            resistance: 'physical',
+            text: 'x',
+            testId: 'probe-resistance',
+         },
+      });
+      await expect(page.locator(`${selector} [data-testid="probe-resistance"]`)).toBeVisible();
    });
 });
 
@@ -350,6 +383,26 @@ test.describe('component probe — ImagePicker', () => {
          },
       });
       await expect(page.locator(`${selector} button`)).toBeVisible();
+   });
+
+   test('testId resolves to data-testid on the root element', async ({ page }) => {
+      const { selector } = await mountProbe(page, 'ImagePicker', {
+         props: {
+            value: 'icons/svg/item-bag.svg',
+            alt: 'bag',
+            testId: 'probe-image-picker',
+         },
+         context: {
+            application: {
+               position: {
+                  top: 100,
+                  left: 100,
+                  width: 400,
+               },
+            },
+         },
+      });
+      await expect(page.locator(`${selector} [data-testid="probe-image-picker"]`)).toBeVisible();
    });
 });
 
