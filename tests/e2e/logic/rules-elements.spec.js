@@ -268,3 +268,52 @@ test.describe('rules elements — mulSum (multiply total)', () => {
       expect(body, 'two mulSum halvings of 8 should compound to 2').toBe(2);
    });
 });
+
+test.describe('rules elements — setSum (set total)', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+      const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
+         && !!CONFIG.Actor?.dataModels?.player);
+      expect(ready, 'TITAN system must be initialized').toBe(true);
+   });
+   test.afterEach(async ({ page }) => {
+      await page.evaluate(async (name) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+      }, ACTOR_NAME);
+   });
+
+   test('setSum set mode forces the Body total to the value', async ({ page }) => {
+      const results = await page.evaluate(async ({ name, zeroData, twoData }) => {
+         const read = async (abilityData) => {
+            const stale = game.actors.getName(name);
+            if (stale) {
+               await stale.delete();
+            }
+            const actor = await Actor.create({ name, type: 'player' });
+            await actor.createEmbeddedDocuments('Item', [abilityData]);
+            await new Promise((resolve) => {
+               setTimeout(resolve, 100);
+            });
+            const value = actor.system.attribute.body.value;
+            await actor.delete();
+            return value;
+         };
+         return { zero: await read(zeroData), two: await read(twoData) };
+      }, {
+         name: ACTOR_NAME,
+         zeroData: buildRulesElementAbilityData('E2E SetSum 0', [
+            { operation: 'flatModifier', selector: 'attribute', key: 'body', value: 4 },
+            { operation: 'setSum', selector: 'attribute', key: 'body', value: 0, mode: 'set' },
+         ]),
+         twoData: buildRulesElementAbilityData('E2E SetSum 2', [
+            { operation: 'flatModifier', selector: 'attribute', key: 'body', value: 4 },
+            { operation: 'setSum', selector: 'attribute', key: 'body', value: 2, mode: 'set' },
+         ]),
+      });
+
+      expect(results).toEqual({ zero: 0, two: 2 });
+   });
+});

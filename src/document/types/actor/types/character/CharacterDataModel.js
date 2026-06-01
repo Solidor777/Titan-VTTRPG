@@ -18,6 +18,7 @@ import appendUniqueByFunctionValue from '~/helpers/utility-functions/appendUniqu
 import camelize from '~/helpers/utility-functions/Camelize.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';
+import computeSetSumDelta from '~/helpers/utility-functions/ComputeSetSumDelta.js';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttackCheckParameters from '~/check/types/attack-check/AttackCheckParameters.js';
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
@@ -840,6 +841,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          /** @type {*[]} */
          const mulSumElements = [];
          /** @type {*[]} */
+         const setSumElements = [];
+         /** @type {*[]} */
          const fastHealingElements = [];
          /** @type {*[]} */
          const persistentDamageElements = [];
@@ -863,6 +866,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
                }
                case 'mulSum': {
                   mulSumElements.push(element);
+                  break;
+               }
+               case 'setSum': {
+                  setSumElements.push(element);
                   break;
                }
                case 'fastHealing': {
@@ -902,6 +909,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this._applyMulBaseElements(mulBaseElements);
          this._applyFlatModifierElements(flatModifierElements);
          this._applyMulSumElements(mulSumElements);
+         this._applySetSumElements(setSumElements);
          this._applyFastHealingElements(fastHealingElements);
          this._applyPersistentDamageElements(persistentDamageElements);
          this._applyTurnMessageElements(turnMessageElements);
@@ -1071,6 +1079,58 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
       else {
          this.rulesElementsCache.mulSum = false;
+      }
+   }
+
+   /**
+    * Applies Set-Sum Rules Elements to this Character. Each element forces the stat's running total to a
+    * target value (set), floors it (min), or caps it (max), writing a corrective delta into the source's
+    * bucket. Elements on the same stat are processed in order. Runs after the additive appliers.
+    * @param {SetSumElement[]} elements - Array of Set-Sum Rules Elements to apply.
+    * @private
+    */
+   _applySetSumElements(elements) {
+      if (elements.length > 0) {
+         /** @type {object} */
+         const setSum = {};
+
+         // Sort elements by selector.
+         const selectors = sortObjectsIntoContainerByKeyValue(elements, 'selector');
+
+         // For each selector.
+         for (const [selector, selectorElements] of Object.entries(selectors)) {
+            setSum[selector] = {};
+
+            // Sort elements by key.
+            const keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
+
+            // For each key.
+            for (const [key, keyElements] of Object.entries(keys)) {
+               setSum[selector][key] = {};
+
+               // Get the stat data and its base.
+               const stat = (selector === 'training' || selector === 'expertise') ?
+                  this.skill[key][selector] :
+                  this[selector][key];
+               const baseValue = selector === 'resource' ? stat.maxBase : stat.baseValue;
+
+               // Apply each element in order, recomputing the running total.
+               for (const element of keyElements) {
+                  let total = baseValue;
+                  for (const mod of Object.values(stat.mod)) {
+                     total += mod;
+                  }
+                  const delta = computeSetSumDelta(total, element.value, element.mode);
+                  stat.mod[element.type] += delta;
+                  setSum[selector][key][element.type] = (setSum[selector][key][element.type] ?? 0) + delta;
+               }
+            }
+         }
+
+         this.rulesElementsCache.setSum = setSum;
+      }
+      else {
+         this.rulesElementsCache.setSum = false;
       }
    }
 
