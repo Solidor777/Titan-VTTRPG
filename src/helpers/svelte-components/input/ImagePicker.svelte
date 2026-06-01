@@ -46,11 +46,10 @@
    }
 </script>
 
-<div data-testid={testId}>
-   <ImageButton
-      {alt}
-      onclick={onEditImage}
-      src={value}
-      {tooltip}
-   />
-</div>
+<ImageButton
+   {alt}
+   onclick={onEditImage}
+   src={value}
+   {testId}
+   {tooltip}
+/>

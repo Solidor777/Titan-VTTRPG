@@ -402,7 +402,7 @@ test.describe('component probe — ImagePicker', () => {
             },
          },
       });
-      await expect(page.locator(`${selector} [data-testid="probe-image-picker"]`)).toBeVisible();
+      await expect(page.locator(`${selector} button[data-testid="probe-image-picker"]`)).toBeVisible();
    });
 });
 

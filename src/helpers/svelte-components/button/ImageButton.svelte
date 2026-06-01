@@ -9,6 +9,7 @@
     * @property {boolean} [disabled] - Whether the button should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback fired when the button is clicked.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid` on the button.
     */
 
    /** @type {ImageButtonProps} */
@@ -18,10 +19,12 @@
       disabled = false,
       tooltip = void 0,
       onclick = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
 <button
+   data-testid={testId}
    {disabled}
    {onclick}
    onmousedown={preventDefault}
