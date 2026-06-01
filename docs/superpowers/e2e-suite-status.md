@@ -1,10 +1,13 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-06-01. **Branch:** `development`. **Next action:** **Phase 4 (multi-user permissions + 2-client socket sync).**
-ALL of Phase 3 is complete. Full e2e suite is **298 passing** (`npx playwright test`, on the
+**Last updated:** 2026-06-01. **Branch:** `development`. **Next action:** **none queued — Phase 4 complete.**
+ALL of Phase 3 AND Phase 4 are complete. Full e2e suite is **312 passing** (`npx playwright test`, on the
 `npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`). Phase 3a, ALL of Phase 3b
 (component-probe coverage of all 84 primitives), ALL of Phase 3c (integration manifest drift guard),
-and ALL of Phase 3d (reactive-control sweep) are done. **Phase 3 is fully complete.**
+and ALL of Phase 3d (reactive-control sweep) are done. **Phase 3 is fully complete.** **Phase 4
+(multi-user permissions + 2-client socket sync) is fully complete — see the "Phase 4 — DONE" section
+below; it found + fixed two real engine bugs (#17 const self-shadow crash, #18 socket relay passed dead
+serialized objects).**
 
 **Phase 3d outcome:** swept all 12 character-sheet row components for the Svelte 4→5 stale-prop reactivity
 bug class (reading `<prop>.system.x` off a passed Document prop instead of through `document.data`). Found +
@@ -255,8 +258,32 @@ re-deriving context.
 ## Bugs found & fixed (by this testing effort)
 
 (Newest first. #4–#7 found by `tests/e2e/traits.spec.js`; #8 by `tests/e2e/effect-reactivity.spec.js`;
-#10–#12 by the Phase 3b-remaining component probes; #13–#15 by the Phase 3d reactive-control sweep.)
+#10–#12 by the Phase 3b-remaining component probes; #13–#15 by the Phase 3d reactive-control sweep;
+#17–#18 by the Phase 4 socket-sync tests.)
 
+18. **System socket relayed dead (serialized) document objects → cross-client turn effects never applied**
+    — `SocketManager.triggerSocketHook` fires the hook locally with live `Combatant`/`Combat` instances, then
+    `game.socket.emit`s the SAME args; socket.io JSON-serializes them, so REMOTE clients received plain
+    objects (no methods/getters — `combat.constructor.name === 'Object'`, `combat.id === null`, only raw
+    fields like `._id`/`initiative` survive). `onCombatNextTurn`/`onCombatPreviousTurn` then threw on
+    `combat.getCharacterCombatants()` and applied nothing. So whenever the best-owner client was NOT the one
+    that advanced the turn (e.g. two GMs), the turn effect never replicated — defeating the socket's entire
+    purpose. Latent in single-GM play (the advancer IS the best owner, handled by the local fire). Fixed by
+    emitting combatant/combat **IDs** from `TitanCombat.nextTurn`/`previousTurn` and re-resolving to live
+    documents at the top of both handlers (`isCurrentUserBestOwner` single-writer gating unchanged). Found by
+    socket-sync test A5; replicated with a throwaway diagnostic before fixing. Commit `b4ca5729`; regression
+    `tests/e2e/socket-sync.spec.js` A5. **Rule:** never pass live Documents through `triggerSocketHook` — pass
+    IDs and re-resolve.
+17. **Turn-effect paths crashed via `const` self-shadowing an imported accessor** — multiple turn-start/
+    turn-end/resolve paths in `CharacterDataModel` wrote `const reportEffects = reportEffects()` (and the same
+    for `autoRemoveExpiredEffects`, `autoRegainResolve`, `autoRevertResolveRegain`) — a `const` whose RHS calls
+    the identically-named imported function, a temporal-dead-zone `ReferenceError` ("Cannot access 'X' before
+    initialization") thrown every time those paths run. So `onTurnEnd` / `_calculateResolveRegain` / the
+    resolve-revert path crashed for ANY actor in combat. Fixed by renaming the locals to distinct names
+    (`shouldReportEffects` / `autoRemoveExpiredEffectsSetting` / `autoRegainResolveSetting` /
+    `autoRevertResolveRegainSetting`); behavior-preserving. Swept all of `src/` — no other instances. Found by
+    socket-sync test A1 (`onTurnStart → _calculateResolveRegain` threw, blocking the persistent-damage apply).
+    Commit `00769f0a`.
 16. **Dead `testChat` ChatMessage subtype in `system.json` (manifest drift)** — `system.json` declared a
     `testChat` document subtype under `documentTypes.ChatMessage`. There was NO matching
     `CONFIG.ChatMessage.dataModels` entry (OnceInit only sets the ChatMessage `documentClass`), no sheet
@@ -382,16 +409,42 @@ re-deriving context.
    (`initializeItemCheckOptions`, `getItemCheckParameters`) already use (commit `f155c1e0`). Found by the
    2b-3 item dialog test.
 
-## NEXT: Phase 4 — multi-user permissions + 2-client socket sync
+## Phase 4 — DONE (multi-user permissions + 2-client socket sync)
 
-**ALL of Phase 3 is complete.** Phase 3b (component-probe harness + all 84 primitives), Phase 3c
-(integration manifest drift guard), and Phase 3d (reactive-control sweep) are all done. Suite: **298
-passing**.
+**Spec/plan:** `docs/superpowers/specs/2026-06-01-titan-e2e-phase4-multiuser-design.md`,
+`docs/superpowers/plans/2026-06-01-titan-e2e-phase4-multiuser.md`. Suite **312 passing** (+14).
 
-**START HERE on resume:** invoke `superpowers:brainstorming` to scope Phase 4 BEFORE any implementation
-(per `.claude/CLAUDE.md`). The kickoff context below is pre-gathered so the brainstorm is productive.
+- **Two-client harness** — `tests/e2e/multiClient.js`: `withClients(browser, { label: userName }, fn)` creates
+  one browser CONTEXT per client (separate sessions), logs each in via `login`, yields a page map, and
+  closes all contexts in a `finally`. `awaitUsersActive(page, names)` polls until users report active.
+  Two simultaneous clients = two contexts in ONE test (config is `workers:1, fullyParallel:false`).
+- **Settings control** — `tests/e2e/settings.js`: `setWorldSetting(gmPage,…)` (world scope ⇒ GM writer; read
+  live so no reload), `setClientSetting(page,…)` (per-client), `getSetting`.
+- **Combat seeding** — `tests/shared/combat.js`: `seedCombatEncounter(opts)` / `teardownCombatEncounter(ids)`,
+  self-contained fns passed to `page.evaluate`. Creates two `player` actors (effect actor at the LOWER
+  initiative so one `nextTurn()` starts its turn), a scene with a token per actor (REQUIRED — `Combatant.actor`
+  resolves via `this.token.actor`; `actorLink` defaults true), and a started Combat at round 1/turn 0.
+  Pre-seeds stamina/resolve and grants an observer OWNER.
+- **Plan Group A — socket sync** (`tests/e2e/socket-sync.spec.js`, 5 tests A1–A5): GM advances the turn, the
+  best owner applies the turn effect, the OTHER client observes the replicated `system.resource.*` via
+  `waitForFunction`. A1 persistent damage, A2 fast healing (pre-seed stamina low), A3 resolve regain
+  (resolve max for a base player is **1**: soul baseValue 1 × 0.5, floored → regain 0→1), A4 `previousTurn`
+  reversion, **A5 the relay proof** (two GM clients: GM 2 advances, GM 1 = best owner applies exactly once).
+- **Plan Group B — permissions**: B1 sheet ownership levels (`permissions-ownership.spec.js`, 4 tests —
+  asserts via `testUserPermission`/`sheet.isVisible`/`isEditable`; NOTE Foundry replicates the Actor doc to
+  ALL clients regardless of ownership, so NONE asserts no-view-permission, not absence); B3 compendium
+  ownership (`permissions-compendium.spec.js` — fs-parses `system.json`, asserts `CompendiumCollection#getUserLevel`:
+  GM→3 OWNER, player→2 OBSERVER, matching `effects` pack `PLAYER:OBSERVER`); B4 auto-open settings
+  (`permissions-auto-open.spec.js`, 2 tests — client-scope `autoOpenCharacterSheetsGM` `all`/`disabled`,
+  asserts `actor.sheet.rendered` after turn start). B2 (best-owner write routing) = A5, counted once.
 
-### Phase 4 kickoff prep (infrastructure already in place)
+**Reusable findings:** (a) `SocketManager` JSON-serializes its emit args — NEVER pass live Documents through
+`triggerSocketHook`; pass IDs and re-resolve (bug #18). (b) `const X = X()` shadowing an imported accessor is
+a TDZ ReferenceError (bug #17). (c) `CompendiumCollection#getUserLevel(user)` returns the numeric ownership
+level via `Math.max` over satisfied roles. (d) `requiresReload:true` settings still read live via their
+accessors, so `game.settings.set` takes effect in-test without reload.
+
+### Phase 4 kickoff prep (historical — completed)
 
 - **Test identities** (`tests/e2e/users.js`): four no-password users — `E2E GM 1/2` (`GM_USERS`),
   `E2E Player 1/2` (`PLAYER_USERS`); `DEFAULT_GM = 'E2E GM 1'`. `login(page, user)` (`tests/e2e/fixtures.js`)
@@ -434,12 +487,14 @@ v14 — see conventions.md).
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **298 passing** (Foundry must be
+- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **312 passing** (Foundry must be
   running on :30000, or the `webServer` config launches it). The full suite includes the seven
   `tests/e2e/component-probe*.spec.js` family files (all 84 primitives), the Phase 3d
-  `tests/e2e/reactive-*.spec.js` + `spells-filter.spec.js` files, and the Phase 3c
-  `tests/e2e/integration-manifest.spec.js` (8 tests) — all REQUIRE the `build:e2e` bundle (a plain
-  `npm run build` strips the gated probe).
+  `tests/e2e/reactive-*.spec.js` + `spells-filter.spec.js` files, the Phase 3c
+  `tests/e2e/integration-manifest.spec.js` (8 tests), and the Phase 4 multi-user files
+  (`multi-client`, `combat-seed`, `socket-sync` A1–A5, `permissions-ownership`, `permissions-compendium`,
+  `permissions-auto-open`) — all REQUIRE the `build:e2e` bundle (a plain `npm run build` strips the gated
+  probe).
 - **Build discipline:** after editing any `.svelte`/`.js` source, run `npm run build:e2e` first so the live
   Foundry serves the change AND keeps the gated component probe available (a plain `npm run build` strips the
   probe, breaking `component-probe.spec.js`). Test-only changes don't need a build.

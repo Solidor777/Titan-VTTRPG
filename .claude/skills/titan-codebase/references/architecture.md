@@ -82,7 +82,18 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
   - `builders.js` — pure factory functions returning plain `Document.create` payloads (no live documents,
     no side effects); consumed by Vitest directly and by Playwright via `Document.create` or
     `page.evaluate`.
+  - `combat.js` — `seedCombatEncounter` and `teardownCombatEncounter`: self-contained async functions
+    designed to be passed directly to `page.evaluate`. `seedCombatEncounter` creates two actors, a scene,
+    one token per actor on the scene, a `Combat` document bound to the scene, and two `Combatant` documents
+    with explicit deterministic initiative (effect actor at the lower value = turn index 1; other actor at
+    the higher value = turn index 0 after `startCombat`). Returns `{sceneId, combatId, effectActorId,
+    otherActorId, effectCombatantId}`. `teardownCombatEncounter` deletes combat, scene, and both actors in
+    that order.
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
+  - `combat-seed.spec.js` — Phase 4 smoke test (1 test): seeds a two-combatant encounter with
+    `seedCombatEncounter`, then probes that `combat.turns.length === 2`, `combatant.actor` resolves to the
+    seeded effect actor, `actor.system.isCharacter === true`, `getCharacterCombatants().length === 2`, and
+    `combat.turn === 0` (other actor holds turn 0 at start; effect actor waits at turn 1 for `nextTurn()`).
   - `integration-manifest.spec.js` — Phase 3c "drift guard" suite (8 tests): declared documentTypes ↔
     registered dataModels parity; ChatMessage no-subtypes; every manifest pack loaded with correct metadata;
     grid/socket config; Titan document-class subclass identity; per-subtype sheet registration and core-sheet
@@ -90,6 +101,12 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
     `CONFIG.ActiveEffect.legacyTransferral === false`, initiative formula prefix `@rating.initiative.value`);
     titan status-effect conditions present in `CONFIG.statusEffects` and a representative set of
     `game.settings.settings` keys registered.
+  - `permissions-ownership.spec.js` — Phase 4b B1 ownership-level suite (4 tests): seeds a `player`-type actor
+    with `ownership: { default: 0, [playerId]: level }` for each of NONE/LIMITED/OBSERVER/OWNER; asserts the
+    player client's `testUserPermission` results and sheet render/visibility at each level. Key fixture decision:
+    `default: 0` is always set explicitly so world-default ownership does not leak into the NONE case. The NONE
+    test gates on `game.actors.get(id) === undefined` (actor absent from player collection) rather than on
+    `waitForFunction` resolving to a truthy value.
 
 ## Build and output
 

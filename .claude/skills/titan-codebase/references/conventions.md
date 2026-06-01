@@ -274,6 +274,14 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 
 ## v14 API breakpoints (confirmed against live Foundry source)
 
+- **`CompendiumCollection` permission API** — `CompendiumCollection#getUserLevel(user = game.user)` returns a
+  numeric `CONST.DOCUMENT_OWNERSHIP_LEVELS` value (NONE=0, LIMITED=1, OBSERVER=2, OWNER=3). It iterates
+  `this.ownership` (merges world config override over `metadata.ownership`) and takes `Math.max` over all roles
+  the user satisfies via `user.hasRole(role)` (non-exact: `user.role >= roleLevel`). A GAMEMASTER user satisfies
+  PLAYER, ASSISTANT, and GAMEMASTER entries, so it naturally resolves OWNER even when the pack omits a GAMEMASTER
+  key. `testUserPermission(user, permission)` short-circuits to OWNER for `user.isGM` but `getUserLevel` does not
+  need that short-circuit. Source: `client/documents/collections/compendium-collection.mjs` lines 433-440 and 452-457.
+
 - **`ChatMessage` style field** — In v14, `ChatMessage.type` is a string `DocumentTypeField` (subtype, default
   `"base"`). The numeric render style (`CONST.CHAT_MESSAGE_STYLES.*`) moved to a separate `style` NumberField.
   All four TITAN `ChatMessage.create()` call sites (`Check.js`, `TitanActiveEffect.js`,
@@ -355,6 +363,15 @@ chat message of the expected `flags.titan.type` and the card renders), and `inte
 (check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/fixtures.js` provides `login`, `renderSheet`,
 and `ensureDocument` (creates missing world fixtures). Drives the real built system at the repo root, so
 it catches v14 API breaks that the mocked Vitest tier cannot.
+
+**Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides two helpers for tests that
+require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent
+`BrowserContext` per entry in `clientSpec` (a `{label: userName}` map), logs each in via `login()`, then
+calls `fn(pages)` where `pages` maps each label to its `Page`. All contexts are closed in `finally` even
+if the callback throws. `awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
+inside `page.waitForFunction` (30 s timeout) until all named users are active on that client. Because
+`playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on
+the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above. `npm run build:e2e` (`vite build --mode e2e`)

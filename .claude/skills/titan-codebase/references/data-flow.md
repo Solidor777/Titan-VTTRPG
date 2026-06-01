@@ -213,7 +213,9 @@ object; it must return the updated object. Entries must be in ascending version 
 **1. Advance — `TitanCombat.nextTurn` (src/document/types/combat/TitanCombat.js)**
 `TitanCombat` extends Foundry's `Combat`. `nextTurn()` stores `this.combatant` as `previousCombatant`,
 calls `super.nextTurn()` to advance Foundry's turn pointer, then calls
-`game.titan.socketManager.triggerSocketHook('combatNextTurn', currentCombatant, previousCombatant, this)`.
+`game.titan.socketManager.triggerSocketHook('combatNextTurn', currentCombatant?.id, previousCombatant?.id, this.id)`.
+IDs are emitted (not live document instances) because the `system.titan` socket JSON-serializes its
+payload — passing live documents would strip prototype methods and getters on the receiving client.
 
 **2. Socket broadcast — `SocketManager` (src/helpers/SocketManager.js)**
 `triggerSocketHook` immediately fires `Hooks.callAll(id, ...args)` locally, then emits the same message on
@@ -221,7 +223,9 @@ the `system.titan` socket so all other connected clients also call `Hooks.callAl
 client processes turn effects, regardless of who clicked the next-turn button.
 
 **3. Hook handler — `onCombatNextTurn` (src/hooks/OnCombatNextTurn.js)**
-Registered with `Hooks.on('combatNextTurn', onCombatNextTurn)` in `src/index.js`. The handler:
+Registered with `Hooks.on('combatNextTurn', onCombatNextTurn)` in `src/index.js`. The handler receives
+`(currentCombatantId, previousCombatantId, combatId)` and immediately re-resolves them to live documents
+via `game.combats.get` / `combat.combatants.get` before use. Then:
   a. Computes `isNewRound = currentInitiative > previousInitiative`.
   b. For every character combatant in the combat, calls
      `actor.system.onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound)` — decrements
@@ -247,7 +251,9 @@ used by `ChatMessageShell.svelte` to select the correct report component from th
 **5. Revert — `TitanCombat.previousTurn` / `onCombatPreviousTurn`**
 Each revert handler is the inverse of its forward counterpart (see the turn-start/turn-end steps above).
 `previousTurn()` mirrors `nextTurn()` — stores the displaced combatant, calls `super.previousTurn()`, then
-emits `'combatPreviousTurn'` via socket. The `onCombatPreviousTurn` hook handler calls:
+emits `'combatPreviousTurn'` with IDs (`restoredCombatant?.id, displacedCombatant?.id, this.id`) via socket.
+`onCombatPreviousTurn` receives `(restoredCombatantId, displacedCombatantId, combatId)` and re-resolves to
+live documents before use. It calls:
   - `actor.system.onInitiativeReverted(...)` on every character combatant — increments the `remaining`
     counter on the same effects `onInitiativeAdvanced` decremented.
   - `restoredCharacter.system.onTurnEndReverted()` — increments `turnEnd` effect durations and reverts
