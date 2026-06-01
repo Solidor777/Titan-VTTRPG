@@ -28,7 +28,7 @@
 
       <!--Input-->
       <div class="input">
-         <TextInput bind:value={$appState.tabs.abilities.filter}/>
+         <TextInput bind:value={$appState.tabs.spells.filter}/>
       </div>
 
       <!--Add Item Button-->
