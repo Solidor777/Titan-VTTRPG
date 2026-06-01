@@ -186,5 +186,6 @@ test.describe('character sheet effect row reactivity', () => {
          return game.actors.getName(actorName).effects.contents[0].system.duration.initiative;
       }, ACTOR_NAME);
       expect(typed, 'typed initiative persisted to the document').toBe(2);
+      // No increment-commit assertion here: the initiative field uses a plain IntegerInput (no +/- buttons).
    });
 });
