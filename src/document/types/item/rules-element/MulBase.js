@@ -8,7 +8,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * rating, training, expertise, resistance, or mod).
  * @property {string} key - The key of the stat being multiplied (body, willpower, etc.).
  * @property {number} value - The value by which to multiply the base (may be fractional).
- * @property {string} rounding - The rounding direction applied to the scaled base ('up' or 'down').
+ * @property {string} [rounding] - The rounding direction applied to the scaled base ('up' or 'down').
  * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */
 
