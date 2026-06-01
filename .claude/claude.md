@@ -36,7 +36,7 @@
 
 * **Skill Usage:** When brainstorming, debugging, or planning a spec, ensure the `foundry-vtt` and `titan-codebase` skills are loaded. If the spec touches Svelte files, ensure both `svelte-5` and `foundry-svelte` are also loaded.
 * **Task Resolution & Deferment:** Do not defer work by default. Fix issues immediately as they arise unless they involve cascading changes that require architectural decisions.
-* **TO DO Management:** Never push off a task as a "TO DO" without explicitly adding it to the designated TO DO document.
+* **TO DO Management:** Never push off a task as a "TO DO" without explicitly adding it to the designated `TODO.md` document.
 * **Spec Completion:** Whenever a specification is completed, the TO DO list must be immediately updated to reflect any completed items.
 * **Delegation:** Route all `.js`, `.svelte`, and `.svelte.js` work to the `titan-svelte-dev` subagent (`.claude/agents/titan-svelte-dev.md`). Ensure `svelte-5`, `foundry-vtt`, and `foundry-svelte` skills are loaded prior to execution.
 * **State Management:** Always update the `titan-codebase` skill (`.claude/skills/titan-codebase/`) following spec implementations. This must reflect the *current state* of the code, not a historical changelog.
