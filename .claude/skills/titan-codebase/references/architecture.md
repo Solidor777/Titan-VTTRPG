@@ -83,6 +83,13 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
     no side effects); consumed by Vitest directly and by Playwright via `Document.create` or
     `page.evaluate`.
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
+  - `integration-manifest.spec.js` — Phase 3c "drift guard" suite (8 tests): declared documentTypes ↔
+    registered dataModels parity; ChatMessage no-subtypes; every manifest pack loaded with correct metadata;
+    grid/socket config; Titan document-class subclass identity; per-subtype sheet registration and core-sheet
+    unregistration; runtime CONFIG flags (`CONFIG.time.roundTime === 6`,
+    `CONFIG.ActiveEffect.legacyTransferral === false`, initiative formula prefix `@rating.initiative.value`);
+    titan status-effect conditions present in `CONFIG.statusEffects` and a representative set of
+    `game.settings.settings` keys registered.
 
 ## Build and output
 
@@ -105,6 +112,6 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
 - `"esmodules": ["index.js"]` — Foundry loads the compiled ES module from the repo root.
 - `"styles": ["style.css"]` — Foundry loads the compiled CSS from the repo root.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `equipment`,
-  `shield`, `spell`, `weapon`), ActiveEffect (`effect`), ChatMessage (`testChat`).
+  `shield`, `spell`, `weapon`), ActiveEffect (`effect`). ChatMessage declares no subtypes.
 - `"socket": true` enables the system socket used by `SocketManager`.
 - Foundry compatibility (`system.json`): minimum v13, verified v14, maximum v14.

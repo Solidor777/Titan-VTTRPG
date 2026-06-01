@@ -1,11 +1,10 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3c (integration manifests
-— brainstorm first).**
-Phase 3a, ALL of Phase 3b (component-probe coverage of all 84 primitives), **and Phase 3d (reactive-control
-sweep — COMPLETE)** are done. Full e2e suite is **290 passing** (`npx playwright test`, on the
-`npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`). All of the checks surface
-(2b-1..2b-4), Phase 3a, and ALL of Phase 3b are done. **Only Phase 3c remains in Phase 3.**
+**Last updated:** 2026-06-01. **Branch:** `development`. **Next action:** **Phase 4 (multi-user permissions + 2-client socket sync).**
+ALL of Phase 3 is complete. Full e2e suite is **298 passing** (`npx playwright test`, on the
+`npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`). Phase 3a, ALL of Phase 3b
+(component-probe coverage of all 84 primitives), ALL of Phase 3c (integration manifest drift guard),
+and ALL of Phase 3d (reactive-control sweep) are done. **Phase 3 is fully complete.**
 
 **Phase 3d outcome:** swept all 12 character-sheet row components for the Svelte 4→5 stale-prop reactivity
 bug class (reading `<prop>.system.x` off a passed Document prop instead of through `document.data`). Found +
@@ -16,6 +15,41 @@ whole doc (silently non-reactive: stable instance). One deferral: the effect dur
 `bind:value`) need a shared-input-primitive refactor → own spec. See
 `docs/superpowers/specs/2026-05-31-titan-e2e-3d-reactive-sweep-design.md` + `…-worklist.md` and
 `docs/superpowers/plans/2026-05-31-titan-e2e-3d-reactive-sweep.md`.
+
+### Phase 3c — DONE (integration manifest drift guard)
+
+- **Spec:** `tests/e2e/integration-manifest.spec.js` (8 tests). Parses `system.json` via Node
+  `fs.readFileSync` inside Playwright's Node process (no `page.evaluate`) to get the ground-truth manifest,
+  then asserts live Foundry `CONFIG`/`game` state against those parsed values — making the manifest
+  the unambiguous source of truth.
+- **What it guards (one test each):**
+  1. `documentTypes` ↔ `dataModels` parity — every subtype declared in `system.json` has a registered
+     `CONFIG` data model, and no extra subtypes exist at runtime.
+  2. `ChatMessage` declares no subtypes (the dead `testChat` scaffolding was removed as part of this work).
+  3. Every pack declared in `system.json` is loaded at runtime with matching `metadata.name`,
+     `metadata.type`, and `metadata.label`.
+  4. Grid and socket config — `CONFIG.canvas.gridTypes` present; `game.socket` id matches
+     `` `system.${id}` ``.
+  5. Titan document classes are proper subclasses of the Foundry base — asserted structurally
+     (`cls.prototype instanceof FoundryBase && cls !== FoundryBase`), NOT by class name (see minification
+     finding below).
+  6. Per-subtype default-sheet registration — every registered TITAN sheet carries the expected
+     `titan.` id prefix; `default === true` for the declared makeDefault sheet per subtype.
+  7. Core sheets (`core.ActorSheet` / `core.ItemSheet`) are unregistered for all titan subtypes.
+  8. Runtime CONFIG flags — `CONFIG.time.roundTime === 6`, `CONFIG.ActiveEffect.legacyTransferral === false`,
+     initiative formula prefix `@rating.initiative.value`; titan conditions present in
+     `CONFIG.statusEffects`; representative `game.settings.settings` keys registered.
+- **`testChat` removal** — `system.json` previously declared a `testChat` ChatMessage subtype with a
+  matching `dataModels` entry. The drift-guard test found this dead scaffolding; both entries were removed.
+  ChatMessage now correctly declares no subtypes.
+- **Build minification finding (reusable gotcha):** Vite/Rollup minifies the system bundle, mangling all
+  system class names (e.g. `TitanActor` → `ro`). Asserting `.name` against a literal is therefore
+  unreliable in tests AND in runtime branching code. The tests instead assert document-class identity
+  structurally (`cls.prototype instanceof <FoundryBaseGlobal> && cls !== <FoundryBaseGlobal>`) and match
+  titan sheets by the `titan.` id prefix. Foundry CORE class names (`core.ActorSheet`, etc.) are NOT
+  mangled (separate bundle), so those ids remain stable.
+- Spec/plan: `docs/superpowers/specs/2026-05-31-titan-e2e-3c-integration-manifest-design.md`,
+  `docs/superpowers/plans/2026-05-31-titan-e2e-3c-integration-manifest.md`.
 
 ### Phase 3b (first pass) — DONE (component-tier probe harness)
 
@@ -221,6 +255,12 @@ re-deriving context.
 (Newest first. #4–#7 found by `tests/e2e/traits.spec.js`; #8 by `tests/e2e/effect-reactivity.spec.js`;
 #10–#12 by the Phase 3b-remaining component probes; #13–#15 by the Phase 3d reactive-control sweep.)
 
+16. **Dead `testChat` ChatMessage subtype in `system.json` (manifest drift)** — `system.json` declared a
+    `testChat` document subtype under `documentTypes.ChatMessage` and a matching `dataModels.ChatMessage`
+    entry; no sheet was registered and no production code referenced it. Found by the Phase 3c
+    `integration-manifest.spec.js` no-subtypes assertion. Removed both entries (commits in Phase 3c).
+    ChatMessage now correctly declares no subtypes.
+
 15. **Character-sheet row display values stale-until-remount (Svelte 4→5 migration fallout, systemic)** —
     all 12 character-sheet row components (`CharacterSheetAbility`/`Commodity`/`Equipment`/`Armor`(+`Stats`)/
     `Shield`(+`Stats`)/`Weapon`(+`Attack`/`Attacks`/`MultiAttackButton`)/`Spell`/`ItemTradition`/`Effect`)
@@ -339,23 +379,20 @@ re-deriving context.
    (`initializeItemCheckOptions`, `getItemCheckParameters`) already use (commit `f155c1e0`). Found by the
    2b-3 item dialog test.
 
-## NEXT: Phase 3 — remaining tiers
+## NEXT: Phase 4 — multi-user permissions + 2-client socket sync
 
-**ALL of Phase 3b is done** (component-probe harness + 7-component core set + full coverage of all 84
-primitives across seven family specs) **and ALL of Phase 3d is done** (reactive-control sweep — see the
-Phase 3d section above and bug log #13–#15). Remaining Phase 3 work:
+**ALL of Phase 3 is complete.** Phase 3b (component-probe harness + all 84 primitives), Phase 3c
+(integration manifest drift guard), and Phase 3d (reactive-control sweep) are all done. Suite: **298
+passing**.
 
-- **3c — integration manifests** — assert manifest-driven wiring (document subtypes, sheet registration,
-  `system.json` hookups). BRAINSTORM first (`superpowers:brainstorming`). **This is the only Phase 3 item
-  left.**
+- **Phase 4** — multi-user permissions and 2-client socket sync via per-user browser contexts. Brainstorm
+  first.
 - **3d follow-up (deferred, optional):** make the effect duration INPUTS reactive — needs a one-way
   `value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
   (cascading; own spec + user approval). See worklist "Deferred / follow-up".
 
 Load `foundry-vtt` + `titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface
 touched). Route all `.js`/`.svelte` work through the `titan-svelte-dev` subagent.
-
-**After Phase 3:** Phase 4 (multi-user permissions + 2-client socket sync via per-user browser contexts).
 
 **Reuse across phases:** `forceDice`/`resetDice` (`tests/e2e/dice.js`), `expectedCheckResults`
 (`tests/shared/checkOracle.js`), the shared builders (`tests/shared/builders.js`), the dialog page object
@@ -366,11 +403,12 @@ v14 — see conventions.md).
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **290 passing** (Foundry must be
+- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **298 passing** (Foundry must be
   running on :30000, or the `webServer` config launches it). The full suite includes the seven
-  `tests/e2e/component-probe*.spec.js` family files (all 84 primitives) and the Phase 3d
-  `tests/e2e/reactive-*.spec.js` + `spells-filter.spec.js` files, which REQUIRE the `build:e2e` bundle (a
-  plain `npm run build` strips the gated probe).
+  `tests/e2e/component-probe*.spec.js` family files (all 84 primitives), the Phase 3d
+  `tests/e2e/reactive-*.spec.js` + `spells-filter.spec.js` files, and the Phase 3c
+  `tests/e2e/integration-manifest.spec.js` (8 tests) — all REQUIRE the `build:e2e` bundle (a plain
+  `npm run build` strips the gated probe).
 - **Build discipline:** after editing any `.svelte`/`.js` source, run `npm run build:e2e` first so the live
   Foundry serves the change AND keeps the gated component probe available (a plain `npm run build` strips the
   probe, breaking `component-probe.spec.js`). Test-only changes don't need a build.

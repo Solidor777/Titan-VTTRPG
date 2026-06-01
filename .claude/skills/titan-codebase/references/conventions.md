@@ -425,6 +425,43 @@ accepts a `string` name and a `number[]` of modifier values; returns an `Item.cr
 with one flatModifier rules element per value, each targeting `selector: 'attribute'`, `key: 'body'`, and
 `uuid: 'e2e-flatmod-{index}'`. The companion Vitest unit test lives in `tests/unit/builders.test.js`.
 
+## Integration manifest drift guard
+
+**`system.json` is the source of truth** for declared document subtypes, packs, grid config, and the socket
+flag. `tests/e2e/integration-manifest.spec.js` (8 tests, Phase 3c) guards against runtime drift by reading
+`system.json` via Node `fs.readFileSync` inside the Playwright process and comparing the parsed values to live
+`CONFIG`/`game` state:
+
+- Every subtype declared in `documentTypes` has a registered `CONFIG` data model (and vice versa).
+- `ChatMessage` declares no subtypes. (The dead `testChat` scaffolding was removed in Phase 3c — commit in
+  that phase.)
+- Every declared pack is loaded with matching `metadata.name`, `metadata.type`, and `metadata.label`.
+- Grid and socket config (`CONFIG.canvas.gridTypes` present; `game.socket` id matches `` `system.${id}` ``).
+- Titan document classes are proper subclasses of the Foundry base (structural assertion, see minification
+  note below).
+- Per-subtype TITAN sheet registered with `default===true`; core sheets (`core.ActorSheet`/`core.ItemSheet`)
+  unregistered.
+- Runtime CONFIG flags (`roundTime`, `legacyTransferral`, initiative prefix, conditions, settings keys).
+
+**Build minifies system class names (gotcha — affects tests AND runtime branching)** — Vite/Rollup minifies
+the system bundle; all system class names are mangled (e.g. `TitanActor` → `ro`). Consequences:
+
+1. Never assert or branch on a system class's `.name` against a literal string — it will not match in the
+   built bundle.
+2. Sheet registration ids are built by Foundry as `` `${scope}.${SheetClass.name}` ``, so titan sheet ids
+   become `` `titan.<mangled>` `` (not `` `titan.TitanActorSheet` ``). Match titan sheets by the `titan.`
+   prefix rather than a full literal id.
+3. Assert document-class identity structurally: `cls.prototype instanceof <FoundryBaseGlobal> && cls !==
+   <FoundryBaseGlobal>`. This is reliable because the class hierarchy is preserved even after minification.
+4. Foundry CORE class names (`core.ActorSheet`, `core.ItemSheet`, etc.) are NOT mangled — they ship in a
+   separate bundle — so those ids remain stable and can be matched as literals.
+
+**v14 sheet registration shape** — `CONFIG[doc].sheetClasses[subtype]["<scope>.<SheetClass.name>"]` →
+`{ id, label, cls, default, ... }`. `default === true` marks the makeDefault sheet for that subtype.
+Per-subtype sheet entries are keyed by the full `<scope>.<SheetClass.name>` string (mangled for titan
+sheets), so iterating `Object.values(CONFIG[doc].sheetClasses[subtype])` and checking `.default` or
+the `titan.` prefix on `.id` is the robust pattern.
+
 ## Style rules live in CLAUDE.md
 
 `.claude/CLAUDE.md` is the single authority for all code-style, formatting, and documentation rules for this
