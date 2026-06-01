@@ -2,7 +2,7 @@
    import isModifierActive from '~/helpers/utility-functions/IsModifierActive.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import MiniIconButton from '~/helpers/svelte-components/button/MiniIconButton.svelte';
-   import { DECREMENT_ICON, INCREMENT_ICON } from '~/system/icons.js';
+   import { DECREMENT_ICON, INCREMENT_ICON } from '~/system/Icons.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
