@@ -76,4 +76,19 @@ test.describe('integration manifest drift guard', () => {
          expect(found.packageName, `pack titan.${entry.name} packageName`).toBe('titan');
       }
    });
+
+   // The runtime System document must expose the manifest's grid + socket declarations.
+   test('grid and socket configuration match the manifest', async ({ page }) => {
+      // The grid units/diagonals and socket flag, read from the live System document.
+      const live = await page.evaluate(() => ({
+         units: game.system.grid.units,
+         diagonals: game.system.grid.diagonals,
+         socket: game.system.socket,
+      }));
+
+      expect(live.units, 'grid units').toBe(manifest.grid.units);
+      expect(live.diagonals, 'grid diagonals').toBe(manifest.grid.diagonals);
+      expect(live.socket, 'socket flag matches manifest').toBe(manifest.socket);
+      expect(manifest.socket, 'manifest declares socket enabled').toBe(true);
+   });
 });
