@@ -32,6 +32,7 @@ import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js'
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
+import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
 import TitanActiveEffectSheet from '~/document/types/active-effect/sheet/TitanActiveEffectSheet.js';
 
 /**
@@ -81,6 +82,7 @@ export default function onceInit() {
    CONFIG.ActiveEffect.documentClass = TitanActiveEffect;
    CONFIG.ActiveEffect.dataModels = {
       effect: TitanActiveEffectDataModel,
+      condition: ConditionDataModel,
    };
 
    // Configure Chat Messages.
@@ -159,6 +161,7 @@ export default function onceInit() {
    // Register the Active Effect sheet for the 'effect' subtype.
    foundry.applications.apps.DocumentSheetConfig.registerSheet(
       foundry.documents.ActiveEffect, 'titan', TitanActiveEffectSheet, {
+         types: ['effect'],
          makeDefault: true,
          label: localize('defaultEffectSheet'),
       },

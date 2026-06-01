@@ -31,7 +31,8 @@
    ],
    "documentTypes": {
       "ActiveEffect": {
-         "effect": {}
+         "effect": {},
+         "condition": {}
       },
       "Actor": {
          "player": {},
