@@ -40,4 +40,16 @@ test.describe('integration manifest drift guard', () => {
          ).toEqual(declared[documentName].sort());
       }
    });
+
+   // ChatMessage uses the TitanChatMessage document class but declares no system subtypes. An unused
+   // declared subtype (the former `testChat`) would surface in the type picker backed by no dataModel.
+   test('ChatMessage declares no document subtypes', async ({ page }) => {
+      // The manifest must declare zero ChatMessage subtypes.
+      const declared = Object.keys(manifest.documentTypes.ChatMessage ?? {});
+      expect(declared, 'ChatMessage should declare no subtypes').toEqual([]);
+
+      // The live CONFIG must carry no `testChat` ChatMessage dataModel.
+      const registered = await page.evaluate(() => Object.keys(CONFIG.ChatMessage.dataModels ?? {}));
+      expect(registered, 'no testChat ChatMessage dataModel expected').not.toContain('testChat');
+   });
 });
