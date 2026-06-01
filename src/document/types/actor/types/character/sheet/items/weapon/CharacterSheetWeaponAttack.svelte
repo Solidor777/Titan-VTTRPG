@@ -30,9 +30,15 @@
    /** @type {CharacterSheetWeaponAttackProps} */
    const { item = undefined, attackIdx = undefined } = $props();
 
-   // Attack reference.
+   // Attack reference, read reactively through document.data (its identity changes on every update).
    /** @type {object} The current attack data. */
-   let attack = $derived(item.system.attack[attackIdx]);
+   let attack = $derived(document.data.items.get(item._id)?.system.attack[attackIdx]);
+
+   /** @type {boolean} Whether this Weapon is multi attacking, read reactively through document.data. */
+   const multiAttack = $derived(document.data.items.get(item._id)?.system.multiAttack);
+
+   /** @type {boolean} Whether this Weapon is equipped, read reactively through document.data. */
+   const equipped = $derived(document.data.items.get(item._id)?.system.equipped);
 
    // Calculate dice pool.
    /** @type {number} Calculated total dice pool for the attack. */
@@ -46,11 +52,11 @@
             'expertise',
             item,
             attack,
-            item.system.multiAttack,
+            multiAttack,
          );
 
       // Cut the dice in half if multi attacking.
-      if (item.system.multiAttack) {
+      if (multiAttack) {
          // Round up or down, depending on the flurry trait.
          /** @type {boolean} Whether the flurry trait is active. */
          let flurry = false;
@@ -79,11 +85,11 @@
             'expertise',
             item,
             attack,
-            item.system.multiAttack,
+            multiAttack,
          );
 
       // Cut the expertise in half if multi attacking.
-      if (item.system.multiAttack) {
+      if (multiAttack) {
          exp = Math.floor(exp * 0.5);
       }
 
@@ -97,7 +103,7 @@
 <div class="attack">
    <!--Header-->
    <div class="header {attack.attribute}">
-      {#if item.system.equipped}
+      {#if equipped}
          <DocumentOwnerButton
             onclick={() =>
                document.data.system.requestAttackCheck({
@@ -142,7 +148,7 @@
                   'damage',
                   item,
                   attack,
-                  item.system.multiAttack,
+                  multiAttack,
                )
             }${
                attack.plusExtraSuccessDamage

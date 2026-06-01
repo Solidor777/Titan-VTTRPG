@@ -1,4 +1,5 @@
 <script>
+   import { getContext } from 'svelte';
    import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import ValueTag from '~/helpers/svelte-components/tag/ValueTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
@@ -30,18 +31,45 @@
 
    /** @type {CharacterSheetWeaponProps} */
    let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /** @type {boolean} Whether this Weapon is currently equipped, read reactively through document.data. */
+   const equipped = $derived(document.data.items.get(item._id)?.system.equipped);
+
+   /** @type {number} Number of Attacks on this Weapon, read reactively through document.data. */
+   const attackCount = $derived(document.data.items.get(item._id)?.system.attack.length ?? 0);
+
+   /** @type {number} Number of Checks on this Weapon, read reactively through document.data. */
+   const checkCount = $derived(document.data.items.get(item._id)?.system.check.length ?? 0);
+
+   /** @type {string} The Weapon's Attack notes, read reactively through document.data. */
+   const attackNotes = $derived(document.data.items.get(item._id)?.system.attackNotes);
+
+   /** @type {string} The Weapon's description, read reactively through document.data. */
+   const description = $derived(document.data.items.get(item._id)?.system.description);
+
+   /** @type {string} The Weapon's rarity key, read reactively through document.data. */
+   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+
+   /** @type {number} The Weapon's value, read reactively through document.data. */
+   const value = $derived(document.data.items.get(item._id)?.system.value);
+
+   /** @type {object[]} The Weapon's custom traits, read reactively through document.data. */
+   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
    {#snippet controls()}
       <div class="button">
-         {#if !item.system.equipped}
+         {#if !equipped}
             <!--Toggle Equipped button-->
             <CharacterSheetItemEquipButton
                {item}
-               equipped={item.system.equipped}
+               {equipped}
             />
-         {:else if item.system.attack.length > 0}
+         {:else if attackCount > 0}
             <CharacterSheetCondensedAttackCheckButton itemId={item._id}/>
          {/if}
       </div>
@@ -70,7 +98,7 @@
       <div class="button">
          <CharacterSheetItemEquipButton
             {item}
-            equipped={item.system.equipped}
+            {equipped}
          />
       </div>
    </div>
@@ -81,21 +109,21 @@
    </div>
 
    <!--Attack notes-->
-   {#if item.system.attackNotes !== '' && item.system.attackNotes !== '<p></p>'}
+   {#if attackNotes !== '' && attackNotes !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.attackNotes}/>
+         <RichText value={attackNotes}/>
       </div>
    {/if}
 
    <!--Item Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   {#if description !== '' && description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={description}/>
       </div>
    {/if}
 
    <!--Item Checks-->
-   {#if item.system.check.length > 0}
+   {#if checkCount > 0}
       <div class="section">
          <CharacterSheetItemChecks {item}/>
       </div>
@@ -105,18 +133,18 @@
    <div class="section tags small-text">
       <!--Rarity-->
       <div class="tag">
-         <RarityTag rarity={item.system.rarity}/>
+         <RarityTag {rarity}/>
       </div>
 
       <!--Value-->
-      {#if item.system.value}
+      {#if value}
          <div class="tag">
-            <ValueTag value={item.system.value}/>
+            <ValueTag {value}/>
          </div>
       {/if}
 
       <!--Custom Traits-->
-      {#each item.system.customTrait as trait}
+      {#each customTrait as trait}
          <div class="tag">
             <Tag tooltip={trait.description}>
                {trait.name}

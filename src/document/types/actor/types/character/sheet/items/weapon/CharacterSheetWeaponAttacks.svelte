@@ -1,4 +1,5 @@
 <script>
+   import { getContext } from 'svelte';
    import CharacterSheetWeaponAttack
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte';
 
@@ -9,12 +10,18 @@
 
    /** @type {CharacterSheetWeaponAttacksProps} */
    const { item = undefined } = $props();
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /** @type {string[]} The Attack array indices, read reactively through document.data. */
+   const attackKeys = $derived(Object.keys(document.data.items.get(item._id)?.system.attack ?? []));
 </script>
 
 <!--Attacks list-->
 <ol>
    <!--Each Attack-->
-   {#each Object.keys(item.system.attack) as attackIdx}
+   {#each attackKeys as attackIdx}
       <li>
          <CharacterSheetWeaponAttack {attackIdx} {item}/>
       </li>
