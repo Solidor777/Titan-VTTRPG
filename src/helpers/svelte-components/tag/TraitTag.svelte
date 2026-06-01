@@ -5,8 +5,8 @@
    /**
     * @typedef {object} TraitTagProps
     * @property {string} [label] - The trait label text.
-    * @property {number|undefined} [value] - The numeric value, if applicable.
-    * @property {string|undefined} [tooltip] - The tooltip text.
+    * @property {number | undefined} [value] - The numeric value, if applicable.
+    * @property {string | undefined} [tooltip] - The tooltip text.
     * @property {string} [testId] - Optional test identifier forwarded to the root element of the inner tag.
     */
 

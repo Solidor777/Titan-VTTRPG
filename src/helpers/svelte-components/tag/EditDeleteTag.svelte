@@ -18,13 +18,13 @@
 
    /** @type {EditDeleteTagProps} */
    let {
-      deleteFunction = undefined,
-      editFunction = undefined,
-      label = undefined,
-      labelTooltip = undefined,
-      deleteTooltip = undefined,
-      editTooltip = undefined,
-      testId = undefined,
+      deleteFunction = void 0,
+      editFunction = void 0,
+      label = void 0,
+      labelTooltip = void 0,
+      deleteTooltip = void 0,
+      editTooltip = void 0,
+      testId = void 0,
    } = $props();
 </script>
 
