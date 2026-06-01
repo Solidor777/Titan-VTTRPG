@@ -12,11 +12,25 @@ keyed by `item._id` (`CharacterSheetItemList.svelte` / `CharacterSheetMultiItemL
 receive `effect` iterated from `document.data.effects` keyed by `effect.id` (`CharacterSheetEffectList.svelte`).
 **Fix form:** `const reactiveX = $derived(document.data.<collection>.get(<prop>._id)); ... reactiveX?.system.<path>`.
 
-**Execution granularity:** fix **per component** — one shared `$derived(document.data.<collection>.get(id))`
-routes ALL of that component's display reads at once (identical root cause). One subagent per component:
-write red test(s) for the component's drivable display features, confirm RED, introduce the shared derived
-+ route reads, confirm GREEN. Handlers keep using the raw prop (they run at call time, already correct).
-`status` values: `pending` / `fixed` / `not-a-bug`.
+**Execution granularity:** fix **per component**, one subagent each: write red test(s) for the component's
+drivable display features, confirm RED, route reads through the reactive store, confirm GREEN. Handlers keep
+using the raw prop (they run at call time, already correct). `status` values: `pending` / `fixed` / `not-a-bug`.
+
+**CANONICAL FIX RECIPE (validated on the `CharacterSheetAbility` anchor — see decision gate below):**
+- Use **per-leaf primitive `$derived`**: `const rarity = $derived(document.data.<collection>.get(<id>)?.system.rarity)`,
+  one per displayed value (matches the bug-#8 effect-toggle precedent and house style).
+- **DO NOT** use `const reactiveItem = $derived(document.data.<collection>.get(<id>))` and then read
+  `reactiveItem?.system.x` — **this is silently NON-reactive.** `document.data.items.get(id)` returns the
+  SAME `TitanItem` instance across `update()` (`sameItemRef: true`, empirically probed), so the `$derived`'s
+  `===` equality check short-circuits and never notifies; only deriving a CHANGING leaf (a primitive, or
+  `.system` whose ref DOES change) propagates.
+- **Permitted exception:** components with many (~6+) display reads off one embedded doc may use a
+  **function accessor** `const reactiveItem = () => document.data.<collection>.get(<id>)` read inline as
+  `reactiveItem()?.system.x` (reactive because the read happens in markup through `document.data` each
+  render). `CharacterSheetAbility` uses this (8 reads). Keep guards: `reactiveItem()?.system.customTrait ?? []`.
+
+**DECISION GATE RESULT (anchor `CharacterSheetAbility`, commit `0efaf9b6`): RED CONFIRMED** — item-row prop
+reads DO go stale on in-place `update()`. The sweep premise holds; fan out to the remaining components.
 
 **`can change in place?`** — `yes` = value can change while the row stays mounted (real bug if it goes
 stale). `maybe` = the value is a collection (traits/checks/aspects/attacks) typically edited via the entry's
@@ -47,7 +61,7 @@ not a straight bind. This is the one judgment-heavy component → use Opus.
 
 ## Inventory / ability / spell / weapon-attack rows  (collection: `document.data.items`, key `item._id`)
 
-### `ability/CharacterSheetAbility.svelte`  — Character → Abilities tab  *(reads verified against source)*
+### `ability/CharacterSheetAbility.svelte`  — Character → Abilities tab  *(reads verified against source)* — **FIXED (anchor, commit `0efaf9b6`; function-accessor shape; regression `tests/e2e/reactive-ability.spec.js`)**
 
 | status | prop | read expression | can change in place? | drive |
 |--------|------|-----------------|----------------------|-------|

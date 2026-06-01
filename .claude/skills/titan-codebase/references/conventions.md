@@ -73,6 +73,22 @@ This rule applies to any document collection member (effects, items, embedded do
 must stay in sync with Foundry mutations. The fix was applied to
 `CharacterSheetEffectToggleActiveButton.svelte` (commit a960e135).
 
+**Re-reading a whole embedded document through `document.data` must return a CHANGING value, not the
+live document object** — a `$derived` whose value is the live embedded document
+(`const reactiveItem = $derived(document.data.items.get(item._id))`) does NOT propagate: the document
+reference is stable across `update()`, so the derived's new value is `===` its previous value, Svelte's
+equality check trips, and downstream `reactiveItem?.system.x` reads stay stale even though the derived
+re-ran and the leaf data changed. Two working shapes: (a) derive the leaf PRIMITIVE directly, as the
+effect toggle does (`$derived(document.data.effects.get(id)?.system.isActive ?? false)`); or (b) when a
+component has many display reads off one embedded doc and a per-leaf derived would be verbose, expose a
+plain **function** accessor and invoke it inline at each read so each markup expression subscribes to
+`document.data` itself: `const reactiveItem = () => document.data.items.get(item._id);` then
+`reactiveItem()?.system.rarity`, `reactiveItem()?.system.xpCost`, etc. `CharacterSheetAbility.svelte`
+uses shape (b) for its expandable-footer display reads (rarity, action, reaction, passive, xpCost,
+description, check.length, customTrait) — handler/child-prop uses of the raw `item` prop (`item._id`,
+`CharacterSheetItemChecks {item}`) are left as-is. Child components that themselves read off the passed
+`item` are separate reactivity candidates.
+
 **Trait-sidebar index iteration must be numeric** — All three trait-sidebar `$derived.by` loops
 (`ItemSheetSidebarTraits`, `ArmorSheetSidebarTraits`, `ShieldSheetSidebarTraits`) iterate with a
 numeric `for (let idx = 0; idx < arr.length; idx++)` loop. Using `for...in` over an array yields
