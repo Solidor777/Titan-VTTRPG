@@ -53,7 +53,7 @@
                filterFunction={(item) => {
                   return item.type === 'spell';
                }}
-               isExpandedMap={$appState.tabs.spells.isExpanded}
+               tabKey={'spells'}
                itemComponent={CharacterSheetSpell}
             />
          </div>

@@ -64,10 +64,7 @@
       <ScrollingContainer bind:scrollTop={$appState.tabs.effects.scrollTop}>
          <!--Effects List-->
          <div class="list">
-            <CharacterSheetEffectList
-               filter={$appState.tabs.effects.filter}
-               isExpandedMap={$appState.tabs.effects.isExpanded}
-            />
+            <CharacterSheetEffectList filter={$appState.tabs.effects.filter}/>
          </div>
       </ScrollingContainer>
    </div>

@@ -8,14 +8,17 @@
     * @property {typeof import('svelte').SvelteComponent} [itemComponent] Component class for the item.
     * @property {Function} [filterFunction] Filter function for the items.
     * @property {string} [filter] Optional filter for the items.
-    * @property {object} [isExpandedMap] Map of item IDs to their expanded state.
+    * @property {string} [tabKey] - The applicationState tab key whose isExpanded map backs these rows.
     */
 
    /** @type {CharacterSheetItemListProps} */
-   const { itemComponent = undefined, filterFunction = undefined, filter = '', isExpandedMap = undefined } = $props();
+   const { itemComponent = undefined, filterFunction = undefined, filter = '', tabKey = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} Reference to the Application State store. */
+   const appState = getContext('applicationState');
 
    // Currently drag hovered state.
    /** @type {boolean} Whether a drag is currently in progress. */
@@ -97,7 +100,7 @@
             {#each [itemComponent] as ItemComponent}
                <ItemComponent
                   {item}
-                  bind:isExpanded={isExpandedMap[item._id]}
+                  bind:isExpanded={$appState.tabs[tabKey].isExpanded[item._id]}
                />
             {/each}
          </li>

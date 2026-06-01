@@ -106,7 +106,7 @@
                      !item.system.passive);
                   }
                }
-               isExpandedMap={$appState.tabs.abilities.isExpanded}
+               tabKey={'abilities'}
                itemComponent={CharacterSheetAbility}
             />
          </div>

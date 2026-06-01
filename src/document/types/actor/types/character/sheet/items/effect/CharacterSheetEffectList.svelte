@@ -8,14 +8,16 @@
    /**
     * @typedef {object} CharacterSheetEffectListProps
     * @property {string} [filter] - Optional name filter for the effects.
-    * @property {object} [isExpandedMap] - Map of effect IDs to their expanded state.
     */
 
    /** @type {CharacterSheetEffectListProps} */
-   const { filter = '', isExpandedMap = undefined } = $props();
+   const { filter = '' } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} Reference to the Application State store. */
+   const appState = getContext('applicationState');
 
    // Currently drag hovered state.
    /** @type {boolean} Whether a drag is currently in progress. */
@@ -99,7 +101,7 @@
          >
             <CharacterSheetEffect
                {effect}
-               bind:isExpanded={isExpandedMap[effect.id]}
+               bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}
             />
          </li>
       {/each}

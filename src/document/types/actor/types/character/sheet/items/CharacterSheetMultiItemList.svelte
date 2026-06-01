@@ -8,14 +8,17 @@
     * @property {object} [itemComponents] Map of item types to their component classes.
     * @property {Function} [filterFunction] Filter function for the items.
     * @property {string} [filter] Optional filter for the items.
-    * @property {object} [isExpandedMap] Map of item IDs to their expanded state.
+    * @property {string} [tabKey] - The applicationState tab key whose isExpanded map backs these rows.
     */
 
    /** @type {CharacterSheetMultiItemListProps} */
-   const { itemComponents = undefined, filterFunction = undefined, filter = '', isExpandedMap = undefined } = $props();
+   const { itemComponents = undefined, filterFunction = undefined, filter = '', tabKey = undefined } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {object} Reference to the Application State store. */
+   const appState = getContext('applicationState');
 
    // Currently drag hovered state.
    /** @type {boolean} Whether a drag is currently in progress. */
@@ -99,7 +102,7 @@
             {#each [itemComponents[item.type]] as ItemComponent}
                <ItemComponent
                   {item}
-                  bind:isExpanded={isExpandedMap[item._id]}
+                  bind:isExpanded={$appState.tabs[tabKey].isExpanded[item._id]}
                />
             {/each}
          </li>

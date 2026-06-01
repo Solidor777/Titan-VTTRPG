@@ -147,7 +147,7 @@
                   }
                }
             }}
-            isExpandedMap={$appState.tabs.inventory.isExpanded}
+            tabKey={'inventory'}
             {itemComponents}
          />
       </ScrollingContainer>
