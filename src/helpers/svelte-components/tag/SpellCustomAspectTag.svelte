@@ -13,7 +13,10 @@
    let { aspect = void 0, testId = void 0 } = $props();
 </script>
 
-<ResistanceTag resistance={aspect.resistanceCheck ?? ''} {testId}>
+<ResistanceTag
+   resistance={aspect.resistanceCheck ?? ''}
+   {testId}
+>
    <!--Label-->
    <div class="stat label">
       <!--Damage Icon-->

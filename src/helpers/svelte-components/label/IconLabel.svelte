@@ -14,7 +14,10 @@
    let { label = void 0, icon = void 0, tooltip = void 0, testId = void 0 } = $props();
 </script>
 
-<Label {tooltip} {testId}>
+<Label
+   {tooltip}
+   {testId}
+>
    <!--Icon-->
    <i class={icon}></i>
 

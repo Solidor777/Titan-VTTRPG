@@ -13,7 +13,10 @@
    let { label = void 0, tooltip = void 0, testId = void 0 } = $props();
 </script>
 
-<Label {tooltip} {testId}>
+<Label
+   {tooltip}
+   {testId}
+>
    <div class="text">
       <Text text={label}/>
    </div>

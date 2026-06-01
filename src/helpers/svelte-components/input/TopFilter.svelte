@@ -27,7 +27,10 @@
       {icon}
       {label}
       {tooltip}>
-      <TextInput bind:value {testId}/>
+      <TextInput
+         bind:value
+         {testId}
+      />
    </LabeledElement>
 </div>
 

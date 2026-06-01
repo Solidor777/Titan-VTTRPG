@@ -15,7 +15,15 @@
 </script>
 
 {#if typeof value === 'number'}
-   <StatTag {label} {value} {tooltip} {testId} />
+   <StatTag
+      {label}
+      {value}
+      {tooltip}
+      {testId}
+   />
 {:else}
-   <Tag {tooltip} {testId}>{label}</Tag>
+   <Tag
+      {tooltip}
+      {testId}
+   >{label}</Tag>
 {/if}
