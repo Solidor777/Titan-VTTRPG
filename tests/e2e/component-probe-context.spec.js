@@ -95,6 +95,7 @@ test.describe('component probe — CustomEffectTag', () => {
       const tag = page.locator(`${selector} [data-testid="probe-custom"]`);
       await expect(tag).toContainText('Inspired');
       await expect(tag.locator('.time')).toContainText('2 (scenes)');
+      await expect(tag.locator('i.fa-star')).toHaveCount(1);
    });
 });
 
@@ -121,6 +122,7 @@ test.describe('component probe — ExpiredEffectTag', () => {
       const tag = page.locator(`${selector} [data-testid="probe-expired"]`);
       await expect(tag).toContainText('Faded');
       await expect(tag.locator('.time')).toHaveCount(0);
+      await expect(tag.locator('i.fa-trash-clock')).toHaveCount(1);
    });
 });
 
@@ -149,6 +151,7 @@ test.describe('component probe — InitiativeEffectTag', () => {
       const tag = page.locator(`${selector} [data-testid="probe-initiative"]`);
       await expect(tag).toContainText('Bleeding');
       await expect(tag.locator('.time')).toContainText('4 (12)');
+      await expect(tag.locator('i.fa-clock')).toHaveCount(1);
    });
 });
 
@@ -175,6 +178,7 @@ test.describe('component probe — PermanentEffectTag', () => {
       const tag = page.locator(`${selector} [data-testid="probe-permanent"]`);
       await expect(tag).toContainText('Blessed');
       await expect(tag.locator('.time')).toHaveCount(0);
+      await expect(tag.locator('i.fa-infinity')).toHaveCount(1);
    });
 });
 
@@ -202,6 +206,7 @@ test.describe('component probe — TurnEndEffectTag', () => {
       const tag = page.locator(`${selector} [data-testid="probe-turn-end"]`);
       await expect(tag).toContainText('Regenerating');
       await expect(tag.locator('.time')).toHaveText('5');
+      await expect(tag.locator('i.fa-hourglass-end')).toHaveCount(1);
    });
 });
 
@@ -229,6 +234,7 @@ test.describe('component probe — TurnStartEffectTag', () => {
       const tag = page.locator(`${selector} [data-testid="probe-turn-start"]`);
       await expect(tag).toContainText('Burning Aura');
       await expect(tag.locator('.time')).toHaveText('6');
+      await expect(tag.locator('i.fa-hourglass-start')).toHaveCount(1);
    });
 });
 
@@ -241,32 +247,37 @@ test.describe('component probe — FiltereedList (context)', () => {
       await clearProbeEvents(page);
    });
 
-   test('renders its container and one item per supplied entry', async ({ page }) => {
+   test('renders only filtered entries while preserving each entry original index', async ({ page }) => {
       const { selector } = await mountProbe(page, 'FiltereedList', {
          props: {
             entries: [
                {
-                  label: 'Alpha',
-                  testId: 'list-item-0',
+                  keep: true,
                },
                {
-                  label: 'Beta',
-                  testId: 'list-item-1',
+                  keep: false,
+               },
+               {
+                  keep: true,
                },
             ],
-            filterFunction: probeFn('returnTrue'),
-            mapFunction: probeFn('returnEntry'),
+            filterFunction: probeFn('entryKeep'),
             componentFunction: probeFn('returnComponent', { component: 'LabelTag' }),
-            propsFunction: probeFn('returnEntry'),
+            propsFunction: probeFn('labelFromIdx'),
             testId: 'probe-list',
          },
-         context: documentContext({ isOwner: true }),
       });
+
+      // The middle entry is filtered out, so exactly two list items render.
       const list = page.locator(`${selector} [data-testid="probe-list"]`);
       await expect(list).toHaveCount(1);
       await expect(list.locator('li')).toHaveCount(2);
-      await expect(page.locator(`${selector} [data-testid="list-item-0"]`)).toContainText('Alpha');
-      await expect(page.locator(`${selector} [data-testid="list-item-1"]`)).toContainText('Beta');
+
+      // Each rendered tag is labelled with its ORIGINAL index — "0" and "2", not "0" and "1".
+      const tags = list.locator('li .tag');
+      await expect(tags).toHaveCount(2);
+      await expect(tags.nth(0)).toHaveText('0');
+      await expect(tags.nth(1)).toHaveText('2');
    });
 });
 

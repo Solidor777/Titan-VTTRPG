@@ -33,7 +33,6 @@
             entries={document.data.system.check}
             filterFunction={(entry) => entry.label.toLowerCase().includes($appState.tabs.checks.filter.toLowerCase())}
             idFunction={(entry) => entry.uuid}
-            mapFunction={(entry, idx) => idx}
             propsFunction={(entry, idx) => {
               return {idx}
             }}

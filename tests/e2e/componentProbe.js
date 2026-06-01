@@ -58,9 +58,11 @@ export function probeComponent(name) {
 /**
  * Build a marker the harness resolves in-page to a real function, for props that take a function
  * (functions cannot cross the Node<->page boundary). Supported kinds: `returnTrue` (always-true
- * predicate), `returnEntry` (identity over the entry), and `returnComponent` (constant supplier of a
- * registered component, named via `component`).
- * @param {string} kind - The function marker kind (`returnTrue` | `returnEntry` | `returnComponent`).
+ * predicate), `returnEntry` (identity over the entry), `returnComponent` (constant supplier of a
+ * registered component, named via `component`), `entryKeep` (predicate keeping entries whose `keep`
+ * flag is truthy), and `labelFromIdx` (props supplier labelling an entry by its original index).
+ * @param {string} kind - The function marker kind (`returnTrue` | `returnEntry` | `returnComponent` |
+ *   `entryKeep` | `labelFromIdx`).
  * @param {{ component?: string }} [options] - Extra marker fields; `component` names a registered component
  *   for the `returnComponent` kind.
  * @returns {{ __probeFn: string, component?: string }} The marker object.

@@ -19,6 +19,14 @@ function resolveProbeFunction(marker) {
       case 'returnEntry':
          return (entry) => entry;
 
+      // Selective predicate keeping only entries whose `keep` flag is truthy, e.g. a `filterFunction`.
+      case 'entryKeep':
+         return (entry) => entry.keep;
+
+      // Props supplier labelling an entry by its original index, e.g. a `propsFunction` for `LabelTag`.
+      case 'labelFromIdx':
+         return (entry, idx) => ({ label: String(idx) });
+
       // Constant supplier of a registered component, e.g. a `componentFunction`.
       case 'returnComponent': {
          const resolved = componentRegistry[marker.component];
