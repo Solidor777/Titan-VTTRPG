@@ -314,9 +314,10 @@ the inner `<div class="tag" data-testid={testId}>`. `CheckDialogBase` passes `te
 `testId={'check-dialog-cancel'}` to the two `Button` components. Each of the 16 concrete `CheckDialogField`
 users and 2 `CheckDialogSummary` users supplies a static string literal such as `testId={'check-field-attribute'}` or
 `testId={'check-summary-totalDice'}`. Playwright specs select these with `page.locator('[data-testid="..."]')`.
-The base input/tag primitives also carry an optional `testId` (`data-testid` passthrough): `Button`,
-`TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, and `LabelTag` — used by the
-component-probe harness below.
+Essentially every base primitive in `src/helpers/svelte-components/**` now carries an optional `testId`
+(`data-testid` passthrough on its root element, or forwarded to its inner primitive's root for wrappers) —
+the lone exception is `Text` (no root element). See the component-probe harness entry below for the full
+coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against a running Foundry world
 (`playwright.config.mjs`, `baseURL: http://localhost:30000`; env `FOUNDRY_USER` / optional
@@ -338,16 +339,43 @@ interaction contract independent of any sheet. `registerProbe.js` installs `game
 `<div data-titan-probe="<id>">` (positioned `fixed`, max `z-index` so it sits above Foundry chrome and
 receives pointer events), mounts the named component from `componentRegistry.js`, and returns
 `{ id, selector }`. A string `text` prop is converted to a `children` snippet via `createRawSnippet`
-(text set through `textContent`, never interpolated HTML). The registry is gated: `OnceInit.js` registers
+(text set through `textContent`, never interpolated HTML). Props are recursively scanned for two marker
+shapes that survive the Node↔page boundary in place of un-serializable references: `{ __probeComponent: name }`
+resolves to a registered component constructor (for component-valued props), and `{ __probeFn: kind, component? }`
+resolves to a fixed-library helper function — `returnTrue` (`() => true`), `returnEntry` (`(entry) => entry`),
+and `returnComponent` (`() => Component`, named via `component`) — sufficient for list components such as
+`FiltereedList` whose props are functions. The registry is gated: `OnceInit.js` registers
 the probe only behind `if (__TITAN_PROBE__)` (a Vite `define` compile-time constant, `true` only under
 `vite build --mode e2e`), via a fire-and-forget dynamic `import()` so terser dead-code-eliminates it from
 the production bundle entirely. The Playwright page object `tests/e2e/componentProbe.js` exposes
-`mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`; callbacks are instrumented INSIDE
-`page.evaluate` (functions cannot cross the Node↔page boundary) and record into `window.__titanProbeEvents`.
-Specs live in `tests/e2e/component-probe.spec.js` — behavioral probes for the core set `Button`,
-`TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`. To probe a new primitive:
-add it to `componentRegistry.js`, add a `testId` prop if it lacks one, append a describe block, then
-`npm run build:e2e` before running the spec (the live Foundry serves the built bundle).
+`mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`, the marker builders `probeComponent(name)`
+and `probeFn(kind, { component })`, and `documentContext({ isOwner })` (a minimal non-reactive `document`
+context for components reading `getContext('document')`); callbacks are instrumented INSIDE `page.evaluate`
+(functions cannot cross the Node↔page boundary) and record into `window.__titanProbeEvents`.
+
+**Coverage is complete:** all **84** primitives in `src/helpers/svelte-components/**` are registered in
+`componentRegistry.js` and probed. Specs are split by family (each describe = one component):
+`tests/e2e/component-probe.spec.js` (core: `Button`, `TextInput`, `NumberInput`, `IntegerInput`,
+`CheckboxInput`, `Select`, `LabelTag`); `-context.spec.js` (`RichText`, the `EffectTag` family + its six
+duration-variant wrappers, `FiltereedList`, `CondensedCheckButton`, `ProseMirrorEditor`); `-tags.spec.js`
+(17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome `font-family`
+regression); `-labels.spec.js` (5 `label/`); `-inputs.spec.js` (8 `input/` non-select); `-selects.spec.js`
+(16 `input/select/` typed wrappers); `-buttons.spec.js` (13 `button/`); `-display.spec.js` (`Meter`, `Text`,
+`Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`). Every primitive
+carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders `{processTextData(text)}`
+inline with no root element — a wrapper would change its DOM contract, so its probe locates via the probe
+container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root
+(e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner
+`<Select>`'s `<select>`; `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
+`componentRegistry.js`, add a `testId` prop on its root if it lacks one (never add a wrapper element solely
+to host it), append a describe block, then `npm run build:e2e` before running the spec (the live Foundry
+serves the built bundle).
+
+**Gotcha — Foundry global `.disabled`:** Foundry's `foundry2.css` defines `.disabled { pointer-events: none; }`.
+Never use `disabled` as a CSS class on an element wrapping interactive content — it silently blocks all
+pointer events on descendants. Use a non-colliding name (e.g. `not-enabled`). `ToggleOptionButton` originally
+used `disabled` for its off state, which made toggled-off filter options permanently un-clickable; the
+off-state class is now `not-enabled`.
 
 **Logic layer — Playwright + fast-check** — The in-client logic tier uses Playwright `page.evaluate`
 calls against the live v14 runtime (no external module dependency). Property-based tests inject the

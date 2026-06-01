@@ -1,11 +1,11 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3b-remaining / 3c / 3d.**
-Phase 3a and the **first 3b pass** (component-probe harness + 7-component core set) are **complete**. Pick up
-at: **3b-remaining** (extend the probe registry over the rest of `src/helpers/svelte-components/**`), **3c**
-(integration manifests), and continue **3d — reactive-control sweep** (next backlog item: item/effect
-**expanded** toggle; see the 3d section). Full e2e suite is **75 passing** (`npx playwright test`, on the
-`npm run build:e2e` bundle). All of the checks surface (2b-1..2b-4), Phase 3a, and the 3b core set are done.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3c / 3d.**
+Phase 3a, the 3b core set, **and Phase 3b-remaining (FULL component-probe coverage — all 84 primitives)** are
+**complete**. Pick up at: **3c** (integration manifests — brainstorm first), and continue **3d — reactive-control
+sweep** (next backlog item: item/effect **expanded** toggle; see the 3d section). Full e2e suite is **276
+passing** (`npx playwright test`, on the `npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`).
+All of the checks surface (2b-1..2b-4), Phase 3a, and ALL of Phase 3b are done.
 
 ### Phase 3b (first pass) — DONE (component-tier probe harness)
 
@@ -35,13 +35,22 @@ at: **3b-remaining** (extend the probe registry over the rest of `src/helpers/sv
 - Spec/plan: `docs/superpowers/specs/2026-05-31-titan-e2e-component-probe-design.md`,
   `docs/superpowers/plans/2026-05-31-titan-e2e-component-probe.md`.
 
-## Phase 3b-remaining worklist (resume here)
+## Phase 3b-remaining — DONE (full component-probe coverage)
 
-**Goal:** extend the existing probe harness over the remaining **77** `src/helpers/svelte-components/**`
-primitives. The harness, page object, and `testId` pattern are DONE — this is mechanical follow-on, but
-some components need props/context the 7-component core set did not. **Brainstorm/plan first** (the core-set
-plan covered only context-free leaves); decide the harness extension for data-dependent components before
-mass-probing. Route all `.js`/`.svelte` work through `titan-svelte-dev`; subagent-driven-development.
+**Outcome:** ALL **84** primitives in `src/helpers/svelte-components/**` are registered in
+`componentRegistry.js` and behaviorally probed. New per-family specs: `component-probe-context.spec.js`
+(11), `-tags.spec.js` (17), `-labels.spec.js` (5), `-inputs.spec.js` (8), `-selects.spec.js` (16),
+`-buttons.spec.js` (13), `-display.spec.js` (7) — plus the original 7-component core
+`component-probe.spec.js`. Suite **276 passing**. testId parity on every component **except `Text`** (no
+root element — probe locates via the container selector). Harness extensions (Task 1/2): `mountProbe`
+forwards a `context` Map; `documentContext({ isOwner })` stub; `probeComponent(name)` / `probeFn(kind, …)`
+markers resolved in-page by `registerProbe.js` (component- and function-valued props can't cross the
+Node↔page boundary). **Three real bugs found + fixed** (see #10–#12 in the bug log). Spec/plan:
+`docs/superpowers/specs/2026-05-31-titan-e2e-3b-remaining-design.md`,
+`docs/superpowers/plans/2026-05-31-titan-e2e-3b-remaining.md`. The detailed pre-execution worklist below is
+retained as historical reference.
+
+### Phase 3b-remaining worklist (historical — completed)
 
 **Per-component recipe** (from `titan-codebase` conventions.md → "Component-probe harness"): add the import +
 entry to `src/test-probe/componentRegistry.js`; add a `testId` (`data-testid`) prop if the component lacks
@@ -199,8 +208,32 @@ re-deriving context.
 
 ## Bugs found & fixed (by this testing effort)
 
-(Newest first. #4–#7 found by `tests/e2e/traits.spec.js`; #8 by `tests/e2e/effect-reactivity.spec.js`.)
+(Newest first. #4–#7 found by `tests/e2e/traits.spec.js`; #8 by `tests/e2e/effect-reactivity.spec.js`;
+#10–#12 by the Phase 3b-remaining component probes.)
 
+12. **`ToggleOptionButton` off-state silently un-clickable (Foundry global `.disabled` collision)** — the
+    component rendered its OFF state as `<div class="toggle disabled">`. Foundry's `foundry2.css` defines
+    `.disabled { pointer-events: none; }`, so the wrapper and its inner `<button>` became non-interactive
+    whenever `enabled` was falsy. `ToggleOptionButton` is the filter-option toggle on the character
+    ability/inventory tabs and spell aspect settings — so a filter toggled OFF could never be clicked back
+    ON. Fixed by renaming the off-state class to `not-enabled` (the component's own SCSS only styles
+    `.enabled`, so the off-state carried no intended styling). Same class-of-bug as #5. Found by
+    `component-probe-buttons.spec.js`; commit `98ce4e29`. conventions.md now documents the `.disabled`
+    gotcha.
+11. **`IntegerIncrementInput` imported `~/system/icons.js` (lowercase)** — the file is `Icons.js`; all 117
+    other imports use the capital form. Works on Windows (case-insensitive FS) but a latent failure on
+    case-sensitive filesystems (Linux/CI). Fixed the casing; commit `a69ce75e`.
+10. **`FiltereedList` rendered the UNFILTERED list (item-sheet Checks-tab search filter was dead)** — it
+    computed `filteredEntries` (filter + map) and gated the list on `filteredEntries.length > 0`, but the
+    `{#each}` iterated the raw `entries`, so the filter/map were discarded at render — typing in the
+    Checks-tab filter narrowed nothing, and a no-match filter hid the whole list. Sole consumer is
+    `ItemSheetChecksTab`, whose child `ItemSheetCheckSettings` indexes the UNFILTERED arrays by `idx`, so the
+    fix had to preserve each entry's ORIGINAL index. Fixed (user-approved contract): `filteredEntries =
+    entries.map((entry, idx) => ({ entry, idx })).filter(({ entry }) => filterFunction(entry))`, `{#each
+    filteredEntries as { entry, idx } …}` passing original entry+index to `id`/`component`/`propsFunction`;
+    removed the now-unused `mapFunction` prop (+ its call-site line) and dead `getContext` reads. Regression:
+    `component-probe-context.spec.js` (isolation, proves filter + original-index preservation) +
+    `filtered-list-checks.spec.js` (live checks-tab narrow). Commits `95b7d216`, `587c33c9`.
 9. **Edit/delete icon buttons lost their hover highlight** — the anchors→buttons conversion (`5ea0c5d5`)
    dropped Foundry's default `a:hover` glow. Restored a `text-shadow: 0 0 8px var(--color-shadow-primary,
    currentColor)` hover on the reset `.tag button` (text-shadow inherits to the inner `<i>`). Commit
@@ -266,13 +299,10 @@ re-deriving context.
 
 ## NEXT: Phase 3 — remaining tiers
 
-The **3b first pass is done** (component-probe harness + 7-component core set; see the "Phase 3b (first
-pass) — DONE" section above). Remaining Phase 3 work:
+**ALL of Phase 3b is done** (component-probe harness + 7-component core set + full coverage of all 84
+primitives across seven family specs; see the "Phase 3b-remaining — DONE" section above). Remaining Phase 3
+work:
 
-- **3b-remaining** — extend the probe registry over the rest of `src/helpers/svelte-components/**` (~63
-  primitives). Mechanical follow-on: per component, add to `componentRegistry.js`, add a `testId` prop if
-  missing, append a behavioral describe block, `npm run build:e2e`, run. The harness's optional `context`
-  Map param handles components that read `getContext`.
 - **3c — integration manifests** — assert manifest-driven wiring (document subtypes, sheet registration,
   `system.json` hookups). BRAINSTORM first (`superpowers:brainstorming`).
 - **3d — reactive-control sweep** — continue per the Phase 3d section (next: item/effect **expanded** toggle).
@@ -291,9 +321,10 @@ v14 — see conventions.md).
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **75 passing** (Foundry must be
-  running on :30000, or the `webServer` config launches it). The full suite now includes
-  `tests/e2e/component-probe.spec.js` (14 tests), which REQUIRE the `build:e2e` bundle.
+- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **276 passing** (Foundry must be
+  running on :30000, or the `webServer` config launches it). The full suite includes the seven
+  `tests/e2e/component-probe*.spec.js` family files (all 84 primitives), which REQUIRE the `build:e2e`
+  bundle (a plain `npm run build` strips the gated probe).
 - **Build discipline:** after editing any `.svelte`/`.js` source, run `npm run build:e2e` first so the live
   Foundry serves the change AND keeps the gated component probe available (a plain `npm run build` strips the
   probe, breaking `component-probe.spec.js`). Test-only changes don't need a build.
