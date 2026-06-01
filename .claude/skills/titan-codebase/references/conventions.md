@@ -435,8 +435,10 @@ flag. `tests/e2e/integration-manifest.spec.js` (8 tests, Phase 3c) guards agains
 - Every subtype declared in `documentTypes` has a registered `CONFIG` data model (and vice versa).
 - `ChatMessage` declares no subtypes. (The dead `testChat` scaffolding was removed in Phase 3c — commit in
   that phase.)
-- Every declared pack is loaded with matching `metadata.name`, `metadata.type`, and `metadata.label`.
-- Grid and socket config (`CONFIG.canvas.gridTypes` present; `game.socket` id matches `` `system.${id}` ``).
+- Every declared pack resolves via `game.packs.get(`titan.${name}`)` with matching `metadata.type` and
+  `metadata.packageName === 'titan'`.
+- Grid and socket config (`game.system.grid.units`/`.diagonals` and `game.system.socket` equal the manifest
+  `grid` block and `socket` flag).
 - Titan document classes are proper subclasses of the Foundry base (structural assertion, see minification
   note below).
 - Per-subtype TITAN sheet registered with `default===true`; core sheets (`core.ActorSheet`/`core.ItemSheet`)

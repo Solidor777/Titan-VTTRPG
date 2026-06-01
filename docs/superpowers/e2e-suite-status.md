@@ -26,22 +26,24 @@ whole doc (silently non-reactive: stable instance). One deferral: the effect dur
   1. `documentTypes` ↔ `dataModels` parity — every subtype declared in `system.json` has a registered
      `CONFIG` data model, and no extra subtypes exist at runtime.
   2. `ChatMessage` declares no subtypes (the dead `testChat` scaffolding was removed as part of this work).
-  3. Every pack declared in `system.json` is loaded at runtime with matching `metadata.name`,
-     `metadata.type`, and `metadata.label`.
-  4. Grid and socket config — `CONFIG.canvas.gridTypes` present; `game.socket` id matches
-     `` `system.${id}` ``.
+  3. Every pack declared in `system.json` resolves via `game.packs.get(`titan.${name}`)` with matching
+     `metadata.type` and `metadata.packageName === 'titan'`.
+  4. Grid and socket config — `game.system.grid.units`/`.diagonals` and `game.system.socket` equal the
+     manifest `grid` block and `socket` flag.
   5. Titan document classes are proper subclasses of the Foundry base — asserted structurally
      (`cls.prototype instanceof FoundryBase && cls !== FoundryBase`), NOT by class name (see minification
      finding below).
-  6. Per-subtype default-sheet registration — every registered TITAN sheet carries the expected
-     `titan.` id prefix; `default === true` for the declared makeDefault sheet per subtype.
-  7. Core sheets (`core.ActorSheet` / `core.ItemSheet`) are unregistered for all titan subtypes.
-  8. Runtime CONFIG flags — `CONFIG.time.roundTime === 6`, `CONFIG.ActiveEffect.legacyTransferral === false`,
-     initiative formula prefix `@rating.initiative.value`; titan conditions present in
-     `CONFIG.statusEffects`; representative `game.settings.settings` keys registered.
-- **`testChat` removal** — `system.json` previously declared a `testChat` ChatMessage subtype with a
-  matching `dataModels` entry. The drift-guard test found this dead scaffolding; both entries were removed.
-  ChatMessage now correctly declares no subtypes.
+  6. Per-subtype sheet registration — a `titan.`-prefixed sheet with `default === true` is registered for
+     every Actor/Item subtype AND the ActiveEffect `effect` subtype, and the core AppV1 sheets
+     (`core.ActorSheet` / `core.ItemSheet`) are unregistered (one combined test).
+  7. Runtime CONFIG flags — `CONFIG.time.roundTime === 6`, `CONFIG.ActiveEffect.legacyTransferral === false`,
+     and the initiative formula prefix `@rating.initiative.value`.
+  8. Titan conditions present in `CONFIG.statusEffects`; a representative set of `game.settings.settings`
+     keys registered.
+- **`testChat` removal** — `system.json` previously declared a `testChat` subtype under
+  `documentTypes.ChatMessage`. It had NO `CONFIG.ChatMessage.dataModels` entry (OnceInit only sets the
+  ChatMessage `documentClass`) and no production-code references — pure dead scaffolding. The drift-guard
+  test found it; the manifest declaration was removed and ChatMessage now declares no subtypes.
 - **Build minification finding (reusable gotcha):** Vite/Rollup minifies the system bundle, mangling all
   system class names (e.g. `TitanActor` → `ro`). Asserting `.name` against a literal is therefore
   unreliable in tests AND in runtime branching code. The tests instead assert document-class identity
@@ -256,10 +258,11 @@ re-deriving context.
 #10–#12 by the Phase 3b-remaining component probes; #13–#15 by the Phase 3d reactive-control sweep.)
 
 16. **Dead `testChat` ChatMessage subtype in `system.json` (manifest drift)** — `system.json` declared a
-    `testChat` document subtype under `documentTypes.ChatMessage` and a matching `dataModels.ChatMessage`
-    entry; no sheet was registered and no production code referenced it. Found by the Phase 3c
-    `integration-manifest.spec.js` no-subtypes assertion. Removed both entries (commits in Phase 3c).
-    ChatMessage now correctly declares no subtypes.
+    `testChat` document subtype under `documentTypes.ChatMessage`. There was NO matching
+    `CONFIG.ChatMessage.dataModels` entry (OnceInit only sets the ChatMessage `documentClass`), no sheet
+    registration, and no production-code reference — pure dead scaffolding. Found by the Phase 3c
+    `integration-manifest.spec.js` no-subtypes assertion. Removed the manifest declaration (commit
+    `566c7d0f`). ChatMessage now correctly declares no subtypes.
 
 15. **Character-sheet row display values stale-until-remount (Svelte 4→5 migration fallout, systemic)** —
     all 12 character-sheet row components (`CharacterSheetAbility`/`Commodity`/`Equipment`/`Armor`(+`Stats`)/
