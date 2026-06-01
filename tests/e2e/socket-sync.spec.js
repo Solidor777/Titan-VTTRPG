@@ -96,4 +96,50 @@ test.describe('socket sync — replicated turn-effect state', () => {
          }
       });
    });
+
+   test('A3: resolve regain applied by the GM replicates to the player client', async ({ browser }) => {
+      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+         await setWorldSetting(gm, 'autoRegainResolve', 'enabled');
+
+         // Pre-spend resolve to 0 so a regain is observable (regain only raises a below-cap resource).
+         // Expected post-regain: resolveBaseRegain (default 1) + mod.resolveRegain (1 from the ability)
+         // = 2 total regained, clamped to resolve.max. Soul baseValue defaults to 1, so
+         // resolve.max = Math.max(Math.ceil(1 * 0.5), 1) = 1. Result: Math.min(1, 0 + 2) = 1.
+         const expectedResolve = 1;
+
+         const seed = {
+            sceneName: 'A3 Scene',
+            effectActor: buildTurnEffectActorData('A3 Effect Actor'),
+            effectAbilities: [buildResolveRegainAbilityData('A3 RR', 1)],
+            otherActor: buildTurnEffectActorData('A3 Other Actor'),
+            effectInitiative: 10,
+            otherInitiative: 20,
+            resolveValue: 0,
+            observerUserName: 'E2E Player 1',
+         };
+         const ids = await gm.evaluate(seedCombatEncounter, seed);
+
+         try {
+            // Confirm the pre-seed (resolve = 0) has replicated to the player client.
+            await player.waitForFunction(
+               ({ id }) => game.actors.get(id)?.system.resource.resolve.value === 0,
+               { id: ids.effectActorId },
+               { timeout: 15_000 },
+            );
+
+            // GM (best owner) advances the turn → effect actor's turn starts → resolve regain applies.
+            await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
+
+            // Player observes the replicated resolve regain: 0 → 1 (clamped to resolve.max = 1).
+            await player.waitForFunction(
+               ({ id, expected }) => game.actors.get(id)?.system.resource.resolve.value === expected,
+               { id: ids.effectActorId, expected: expectedResolve },
+               { timeout: 15_000 },
+            );
+         }
+         finally {
+            await gm.evaluate(teardownCombatEncounter, ids);
+         }
+      });
+   });
 });
