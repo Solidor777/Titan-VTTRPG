@@ -56,4 +56,44 @@ test.describe('socket sync — replicated turn-effect state', () => {
          }
       });
    });
+
+   test('A2: fast healing applied by the GM replicates to the player client', async ({ browser }) => {
+      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+         await setWorldSetting(gm, 'autoApplyFastHealing', 'enabled');
+
+         // Pre-seed stamina to 1 so a +2 heal is observable (heal is capped at max).
+         const seed = {
+            sceneName: 'A2 Scene',
+            effectActor: buildTurnEffectActorData('A2 Effect Actor'),
+            effectAbilities: [buildFastHealingAbilityData('A2 FH', 2)],
+            otherActor: buildTurnEffectActorData('A2 Other Actor'),
+            effectInitiative: 10,
+            otherInitiative: 20,
+            staminaValue: 1,
+            observerUserName: 'E2E Player 1',
+         };
+         const ids = await gm.evaluate(seedCombatEncounter, seed);
+
+         try {
+            // Confirm the pre-seed landed on the player client.
+            await player.waitForFunction(
+               ({ id }) => game.actors.get(id)?.system.resource.stamina.value === 1,
+               { id: ids.effectActorId },
+               { timeout: 15_000 },
+            );
+
+            await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
+
+            // Player observes the heal: 1 → 3 (1 + 2), assuming a base player stamina max >= 3.
+            await player.waitForFunction(
+               ({ id }) => game.actors.get(id)?.system.resource.stamina.value === 3,
+               { id: ids.effectActorId },
+               { timeout: 15_000 },
+            );
+         }
+         finally {
+            await gm.evaluate(teardownCombatEncounter, ids);
+         }
+      });
+   });
 });
