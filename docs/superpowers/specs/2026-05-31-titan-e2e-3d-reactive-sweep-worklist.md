@@ -151,8 +151,23 @@ not a straight bind. This is the one judgment-heavy component → use Opus.
   confirm this.) Not candidates.
 - **`CharacterSheetEffectToggleActiveButton.svelte`** — already fixed (bug #8); the gold-standard pattern.
 - **Chat-message / report components** — render-once roll snapshots, out of scope.
-- **item/effect `expanded` toggle** — local `$bindable` UI state (`isExpandedMap[id]`), not a `document.data`
-  read; verified not-a-bug in plan Task 2.
+## Bugs found during the sweep (distinct root cause from the `document.data` antipattern)
+
+- **item/effect `expanded` toggle — REAL BUG, FIXED** (commit `5ed6ce3b`; review fixes `7790d241`). NOT the
+  `document.data` antipattern and NOT benign local state as first assumed: expansion state lives in the
+  `applicationState` `writable` store under `tabs.<tab>.isExpanded` (plain `{}`), but each tab passed the
+  inner object DOWN as an `isExpandedMap` prop and the leaf bound `bind:isExpanded={isExpandedMap[id]}`.
+  Mutating a plain object member is not a `$appState.x = v` assignment, so Svelte emitted no `appState.set()`
+  → nothing re-rendered → expand was dead on all 4 list tabs (effects/abilities/spells/inventory). Fixed by
+  **re-rooting the bind at `$appState`** in the 3 list components (`CharacterSheetEffectList` static path;
+  `CharacterSheetItemList` / `CharacterSheetMultiItemList` via a new `tabKey` string prop +
+  `$appState.tabs[tabKey].isExpanded[id]`), with the 4 tabs passing `tabKey`. Confirmed Svelte DOES emit the
+  store-write for dynamic-keyed `$appState` assignments. Regression: `tests/e2e/reactive-expanded-toggle.spec.js`
+  (4 tests, all 3 list components incl. spells).
+- **Spells-tab filter input cross-wired — REAL BUG, FIXED** (commit `a509a771`). Found by the expand-fix code
+  review. `CharacterSheetSpellsTab` bound its filter `TextInput` to `$appState.tabs.abilities.filter` while
+  the list reads `tabs.spells.filter` — so the spells filter box did nothing (and silently mutated the
+  abilities filter). One-line fix + regression `tests/e2e/spells-filter.spec.js`.
 
 ## Audit notes
 
