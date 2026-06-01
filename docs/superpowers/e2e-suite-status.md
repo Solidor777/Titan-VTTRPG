@@ -508,7 +508,8 @@ v14 — see conventions.md).
 
 ## How to verify current state quickly on resume
 
-- `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
+- `npx vitest run` → expect 39 passing (incl. `tests/unit/check/**`, `check-oracle.test.js`, and
+  `tests/unit/RetryResolve.test.js`).
 - `npm run build:e2e` then `npx playwright test --reporter=list` → expect **312 passing** (Foundry must be
   running on :30000, or the `webServer` config launches it). The full suite includes the seven
   `tests/e2e/component-probe*.spec.js` family files (all 84 primitives), the Phase 3d
