@@ -47,12 +47,16 @@ Spec A generalizes that trick into first-class, user-authorable operations.
 
 Mirrors the existing `mulBase` convention:
 
-| Operation     | Meaning                                  |
-| ------------- | ---------------------------------------- |
-| `mulBase`     | multiply the base value (exists)         |
-| `flatModifier`| add a flat delta (exists)                |
-| **`mulSum`**  | multiply the running total (sum)         |
-| **`setSum`**  | force the running total to a value       |
+| Operation     | Meaning                                              |
+| ------------- | ---------------------------------------------------- |
+| `mulBase`     | multiply the base value (exists; **gains rounding**) |
+| `flatModifier`| add a flat delta (exists)                            |
+| **`mulSum`**  | multiply the running total (sum)                     |
+| **`setSum`**  | force the running total to a value                   |
+
+All multiplicative operations (`mulBase`, `mulSum`) accept a fractional `value` and
+carry a `rounding` field of `'up' | 'down'` (`ceil` / `floor`). `nearest` is
+intentionally omitted — TITAN rounding is always explicit up or down.
 
 ## Operation semantics
 
@@ -70,15 +74,15 @@ Fields:
   `training`, `expertise`, `mod`).
 - `key` — the specific stat, or `'all'` (see below).
 - `value` — fractional multiplier (e.g. `0.5` to halve).
-- `rounding` — `'up' | 'down' | 'nearest'`.
+- `rounding` — `'up' | 'down'`.
 
 Computation per target stat:
 
 1. `T = baseValue + Σ existing mod buckets`.
 2. Guard: if `T <= 0`, no-op (preserves current `_applyConditions` behavior and avoids
    sign weirdness on already-zero/negative totals).
-3. `newTotal = round(T * value, rounding)` where `round` is `ceil` / `floor` /
-   `Math.round` for `up` / `down` / `nearest`.
+3. `newTotal = round(T * value, rounding)` where `round` is `ceil` / `floor` for
+   `up` / `down`.
 4. Write `delta = newTotal - T` into the source's `mod[type]` bucket.
 
 Worked example — "halve, round up" on a speed total of 5: `value 0.5, rounding 'up'`
@@ -109,6 +113,22 @@ Computation per target stat:
 Restrained's "speed → 0" = `mode 'set', value 0`. `min`/`max` cover future floor/cap
 needs and are trivial to support; the TODO named the operation "set/**floor**", so both
 are included.
+
+### `mulBase` — rounding (amended)
+
+`mulBase` is an existing operation; this spec extends it so its `value` may be
+fractional and its per-base contribution is rounded explicitly.
+
+- New field: `rounding` — `'up' | 'down'`.
+- Existing applier computes each element's contribution as
+  `baseValue * (value - 1)` written into `mod[type]`. With a fractional `value` this can
+  be non-integer, so the contribution becomes
+  `round(baseValue * (value - 1), rounding)` per element (rounding applied per element,
+  not to the aggregate, to keep behavior predictable when multiple `mulBase` elements
+  stack).
+- Backward compatibility: existing `mulBase` elements default `rounding` to `'down'` (or
+  `'up'` — finalized in the plan), which is a no-op for the integer multipliers in use
+  today, so no migration is required.
 
 ### `'all'` selector key
 
@@ -168,10 +188,15 @@ New factory modules under `src/document/types/item/rules-element/`, modeled on
 (Default selector/key chosen to be valid out of the box; exact defaults finalized in the
 plan.)
 
+Amended factory:
+
+- `MulBase.js` → `createMulBaseElement` gains a `rounding` field (default `'down'` or
+  `'up'`, finalized in the plan). A no-op for current integer multipliers.
+
 Registration points:
 
 - `src/system/RulesElementOperations.js` — add `'mulSum'`, `'setSum'` to
-  `RULES_ELEMENT_OPERATIONS`.
+  `RULES_ELEMENT_OPERATIONS` (`mulBase` already present).
 - `ItemSheetRulesElementOperationSelect.svelte` — add cases to the operation-change
   switch that swap in the new factory output.
 - `ItemSheetRulesElementSettings.svelte` — add cases to the settings-component dispatcher.
@@ -184,9 +209,11 @@ Registration points:
 - `'all'` added as a selectable key option in the relevant `Document*Select`
   components (attribute, rating, resistance, resource, speed, skill).
 - `mulSum` needs a **fractional** value input (existing settings use
-  `DocumentIntegerInput`) plus a `rounding`-mode select; `setSum` needs a `mode` select.
+  `DocumentIntegerInput`) plus a `rounding` select; `setSum` needs a `mode` select.
+- `ItemSheetMulBaseSettings.svelte` gains the same fractional value input + `rounding`
+  select (the existing `mulBase` UI assumes an integer multiplier).
 - Localization strings in `lang/en.json` for the new operation labels, the rounding
-  modes, the set modes, and the `'all'` key option.
+  options, the set modes, and the `'all'` key option.
 
 `:global` selectors remain forbidden; new `.svelte` settings components follow the
 existing SCSS-mixin patterns in `ItemSheetFlatModifierSettings.svelte`.
@@ -195,8 +222,12 @@ existing SCSS-mixin patterns in `ItemSheetFlatModifierSettings.svelte`.
 
 ### Unit (`tests/unit/`)
 
-- Factory defaults for `createMulSumElement` / `createSetSumElement`.
-- `mulSum` delta math: each rounding mode; the `T <= 0` guard; fractional multipliers.
+- Factory defaults for `createMulSumElement` / `createSetSumElement`, and the new
+  `rounding` default on `createMulBaseElement`.
+- `mulSum` delta math: each rounding mode (`up`/`down`); the `T <= 0` guard; fractional
+  multipliers.
+- `mulBase` rounding: fractional multiplier with `up`/`down` rounds the per-base
+  contribution; integer multipliers remain unaffected (regression guard).
 - `setSum` delta math: each of `set` / `min` / `max`.
 - `'all'` expansion produces one delta per key under the selector.
 - Compounding: two sum-ops on one stat apply in processing order.
