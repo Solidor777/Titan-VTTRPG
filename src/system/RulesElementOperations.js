@@ -4,6 +4,8 @@ import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
 export const RULES_ELEMENT_OPERATIONS = deepFreeze([
    'flatModifier',
    'mulBase',
+   'mulSum',
+   'setSum',
    'fastHealing',
    'persistentDamage',
    'turnMessage',
