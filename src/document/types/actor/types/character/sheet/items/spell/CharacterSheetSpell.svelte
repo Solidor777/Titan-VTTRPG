@@ -1,4 +1,5 @@
 <script>
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
@@ -29,8 +30,35 @@
    /** @type {CharacterSheetSpellProps} */
    let { item = undefined, isExpanded = $bindable(undefined) } = $props();
 
+   /** @type {object} Reactive bridge to the parent document; descendants read live data via `data`. */
+   const document = getContext('document');
+
+   /** @type {SpellAspect[]} Standard Spell Aspects, re-read reactively through the document store. */
+   let aspect = $derived(document.data.items.get(item._id)?.system.aspect ?? []);
+
+   /** @type {object[]} Custom Spell Aspects, re-read reactively through the document store. */
+   let customAspect = $derived(document.data.items.get(item._id)?.system.customAspect ?? []);
+
+   /** @type {object[]} Casting checks, re-read reactively through the document store. */
+   let check = $derived(document.data.items.get(item._id)?.system.check ?? []);
+
+   /** @type {string} Rich-text description, re-read reactively through the document store. */
+   let description = $derived(document.data.items.get(item._id)?.system.description);
+
+   /** @type {string} Rarity key, re-read reactively through the document store. */
+   let rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+
+   /** @type {string} Spell tradition, re-read reactively through the document store. */
+   let tradition = $derived(document.data.items.get(item._id)?.system.tradition);
+
+   /** @type {number} XP cost, re-read reactively through the document store. */
+   let xpCost = $derived(document.data.items.get(item._id)?.system.xpCost);
+
+   /** @type {object[]} Custom traits, re-read reactively through the document store. */
+   let customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+
    /** @type {SpellAspect[]} List of enabled Spell Aspects. */
-   let enabledAspects = $derived(item.system.aspect.filter((aspect) => aspect.enabled));
+   let enabledAspects = $derived(aspect.filter((aspect) => aspect.enabled));
 </script>
 
 <CharacterSheetItem {item} bind:isExpanded>
@@ -62,26 +90,26 @@
    </div>
 
    <!--Spell Aspects-->
-   {#if enabledAspects.length > 0 || item.system.customAspect.length > 0}
+   {#if enabledAspects.length > 0 || customAspect.length > 0}
       <div class="section tags">
          <SpellAspectTags
             standardAspects={enabledAspects}
-            customAspects={item.system.customAspect}
+            customAspects={customAspect}
          />
       </div>
    {/if}
 
    <!--Item Checks-->
-   {#if item.system.check.length > 0}
+   {#if check.length > 0}
       <div class="section">
          <CharacterSheetItemChecks {item}/>
       </div>
    {/if}
 
    <!--Item Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   {#if description !== '' && description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={description}/>
       </div>
    {/if}
 
@@ -89,29 +117,29 @@
    <div class="section tags small-text">
       <!--Rarity-->
       <div class="tag">
-         <RarityTag rarity={item.system.rarity}/>
+         <RarityTag {rarity}/>
       </div>
 
       <!--Tradition-->
       <div class="tag">
          <StatTag
             label={localize('tradition')}
-            value={item.system.tradition}
+            value={tradition}
          />
       </div>
 
       <!--XP Cost-->
-      {#if item.system.xpCost}
+      {#if xpCost}
          <div class="tag">
             <StatTag
                label={localize('xpCost')}
-               value={item.system.xpCost}
+               value={xpCost}
             />
          </div>
       {/if}
 
       <!--Custom Traits-->
-      {#each item.system.customTrait as trait}
+      {#each customTrait as trait}
          <div class="tag">
             <Tag tooltip={trait.description}>
                {trait.name}

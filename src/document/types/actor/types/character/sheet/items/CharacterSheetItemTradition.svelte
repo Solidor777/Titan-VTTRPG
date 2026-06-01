@@ -1,4 +1,5 @@
 <script>
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    /**
@@ -8,6 +9,12 @@
 
    /** @type {CharacterSheetItemTraditionProps} */
    const { item = undefined } = $props();
+
+   /** @type {object} Reactive bridge to the parent document; descendants read live data via `data`. */
+   const document = getContext('document');
+
+   /** @type {string} Spell tradition, re-read reactively through the document store. */
+   let tradition = $derived(document.data.items.get(item._id)?.system.tradition);
 </script>
 
 <!--Tradition-->
@@ -19,7 +26,7 @@
 
    <!--Value-->
    <div class="value">
-      {item.system.tradition}
+      {tradition}
    </div>
 </div>
 
