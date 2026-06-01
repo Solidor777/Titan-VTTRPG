@@ -316,6 +316,53 @@ test.describe('rules elements — setSum (set total)', () => {
 
       expect(results).toEqual({ zero: 0, two: 2 });
    });
+
+   test('setSum min mode raises a low total to the floor', async ({ page }) => {
+      const body = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return actor.system.attribute.body.value;
+      }, {
+         name: ACTOR_NAME,
+         abilityData: buildRulesElementAbilityData('E2E SetSum Min', [
+            { operation: 'setSum', selector: 'attribute', key: 'body', value: 5, mode: 'min' },
+         ]),
+      });
+
+      // Body base 1, below the floor of 5 -> raised to 5.
+      expect(body, 'setSum min should raise Body from 1 to its floor of 5').toBe(5);
+   });
+
+   test('setSum max mode caps a high total', async ({ page }) => {
+      const body = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return actor.system.attribute.body.value;
+      }, {
+         name: ACTOR_NAME,
+         abilityData: buildRulesElementAbilityData('E2E SetSum Max', [
+            { operation: 'flatModifier', selector: 'attribute', key: 'body', value: 7 },
+            { operation: 'setSum', selector: 'attribute', key: 'body', value: 5, mode: 'max' },
+         ]),
+      });
+
+      // Body base 1 + flat 7 = 8, capped at 5.
+      expect(body, 'setSum max should cap Body total of 8 at 5').toBe(5);
+   });
 });
 
 test.describe('rules elements — mulBase rounding', () => {

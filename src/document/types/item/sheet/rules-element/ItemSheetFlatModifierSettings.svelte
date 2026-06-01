@@ -138,7 +138,10 @@
    <div class="field select">
       {#if getKeySelect()}
          {@const KeySelect = getKeySelect()}
-         <KeySelect bind:value={document.data.system.rulesElement[idx].key}/>
+         <KeySelect
+            allowAll
+            bind:value={document.data.system.rulesElement[idx].key}
+         />
       {/if}
    </div>
 
