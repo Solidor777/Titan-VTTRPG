@@ -388,11 +388,39 @@ re-deriving context.
 (integration manifest drift guard), and Phase 3d (reactive-control sweep) are all done. Suite: **298
 passing**.
 
-- **Phase 4** — multi-user permissions and 2-client socket sync via per-user browser contexts. Brainstorm
-  first.
-- **3d follow-up (deferred, optional):** make the effect duration INPUTS reactive — needs a one-way
-  `value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
-  (cascading; own spec + user approval). See worklist "Deferred / follow-up".
+**START HERE on resume:** invoke `superpowers:brainstorming` to scope Phase 4 BEFORE any implementation
+(per `.claude/CLAUDE.md`). The kickoff context below is pre-gathered so the brainstorm is productive.
+
+### Phase 4 kickoff prep (infrastructure already in place)
+
+- **Test identities** (`tests/e2e/users.js`): four no-password users — `E2E GM 1/2` (`GM_USERS`),
+  `E2E Player 1/2` (`PLAYER_USERS`); `DEFAULT_GM = 'E2E GM 1'`. `login(page, user)` (`tests/e2e/fixtures.js`)
+  already accepts any identity by display name.
+- **Two simultaneous clients = two browser CONTEXTS in ONE test.** `playwright.config.mjs` runs
+  `workers: 1, fullyParallel: false`, so multi-client must happen WITHIN a single test: create
+  `const ctxA = await browser.newContext()` / `const pageA = await ctxA.newPage()` (repeat for B), then
+  `login(pageA, 'E2E GM 1')` + `login(pageB, 'E2E Player 1')`. Each context has its own session/cookies so
+  the two Foundry clients are genuinely independent. (Tests get `browser` from the Playwright fixture.)
+  Remember to `ctx.close()` both in a `finally`.
+- **Socket-sync surface is SMALL and known.** The only system socket usage is `system.titan` →
+  `SocketManager.triggerSocketHook(id, ...args)` (`src/helpers/SocketManager.js`), emitted ONLY by
+  `TitanCombat` (`src/document/types/combat/TitanCombat.js`) for `'combatNextTurn'` / `'combatPreviousTurn'`.
+  Those hooks drive cross-client replication of turn-change effects (auto fast-healing / persistent-damage
+  apply+revert, gated by the world settings in `SystemSettings.js`). So a socket-sync test = drive a Combat
+  turn change on the GM client, assert client B receives the hook / sees the replicated document state
+  (`page.waitForFunction` on the second client to avoid flakiness — never a fixed sleep).
+- **Permissions surface = Foundry document ownership/visibility.** Brainstorm what a Player client should
+  see vs a GM: sheet ownership levels (NONE/LIMITED/OBSERVER/OWNER), which documents/fields are visible or
+  editable, the `autoOpenCharacterSheetsPlayer` / `autoOpenCharacterSheetsGM` settings, and the
+  `effects` compendium `ownership` (`PLAYER: OBSERVER`, `ASSISTANT: OWNER`) declared in `system.json`.
+- **Open questions to settle in the brainstorm:** (a) scope — permissions only, socket only, or both?
+  (b) determinism — the auto-apply settings have `enabled`/`showButton`/`disabled` modes; pin them per test.
+  (c) does the test need to seed a `Combat` encounter with combatants (reuse `tests/shared/builders.js`)?
+  (d) assertion strategy on client B (poll the document/hook, not the DOM, where possible).
+
+**Deferred (optional, not Phase 4):** make the effect duration INPUTS reactive — needs a one-way
+`value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
+(cascading; own spec + user approval). See the 3d worklist "Deferred / follow-up".
 
 Load `foundry-vtt` + `titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface
 touched). Route all `.js`/`.svelte` work through the `titan-svelte-dev` subagent.
