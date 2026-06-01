@@ -32,6 +32,37 @@ using the raw prop (they run at call time, already correct). `status` values: `p
 **DECISION GATE RESULT (anchor `CharacterSheetAbility`, commit `0efaf9b6`): RED CONFIRMED** — item-row prop
 reads DO go stale on in-place `update()`. The sweep premise holds; fan out to the remaining components.
 
+## SWEEP COMPLETE — all 12 row components fixed (every candidate RED-confirmed then GREEN)
+
+| component(s) | commit | regression spec |
+|---|---|---|
+| `CharacterSheetAbility` (anchor, function-accessor) | `0efaf9b6` | `reactive-ability.spec.js` |
+| `CharacterSheetCommodity`, `CharacterSheetEquipment` | `eb680405` | `reactive-inventory-basic.spec.js` |
+| `CharacterSheetArmor`+`ArmorStats`, `CharacterSheetShield`+`ShieldStats` | `9d29b843` | `reactive-armor-shield.spec.js` |
+| `CharacterSheetWeapon`+`WeaponAttack`+`WeaponAttacks`+`MultiAttackButton` | `6d5d5092` | `reactive-weapon.spec.js` |
+| `CharacterSheetSpell` + `CharacterSheetItemTradition` | `338c2dd3` | `reactive-spell.spec.js` |
+| `CharacterSheetEffect` (display reads) | `e1e21a1a` | `reactive-effect-rows.spec.js` |
+| style follow-up (`let`→`const` on `$derived`) | (review) | — |
+
+Final comprehensive review: **APPROVED** (after the `let`→`const` fix). No object-derive anti-pattern, no
+missed display reads, all `{#each}` guarded `?? []`, scope clean.
+
+### Deferred / follow-up (NOT done in this sweep)
+
+- **Effect duration INPUTS** (`CharacterSheetEffect` `IntegerInput`/`IntegerIncrementInput`, two-way
+  `bind:value={effect.system.duration.initiative|remaining}`) — left two-way. Their displayed value does NOT
+  reflect an external in-place `update()` while mounted, because the inputs own a local `$bindable` copy and
+  `IntegerIncrementInput`'s increment buttons mutate the bound value with no `onchange`-value. Making them
+  reactive requires refactoring the shared `IntegerIncrementInput`/`NumberInput` primitives to a one-way
+  `value` + commit-with-value API — a cascading change across many sheets → its own spec + user approval.
+  The pure-display DurationTag/isExpired/description/customTrait on the same row ARE fixed.
+- **`CharacterSheetItemTradition.svelte` is dead code** — rendered nowhere in `src/` (the spell row's tradition
+  display lives in `CharacterSheetSpell`'s footer). Fixed for correctness anyway; candidate for deletion in a
+  later cleanup pass.
+
+(Originally-assumed not-a-bug, now corrected:)
+- **item/effect `expanded` toggle** — turned out to be a REAL bug (separate root cause); see the bug log above.
+
 **`can change in place?`** — `yes` = value can change while the row stays mounted (real bug if it goes
 stale). `maybe` = the value is a collection (traits/checks/aspects/attacks) typically edited via the entry's
 own sheet, which re-mounts the list and masks staleness; the shared per-component derived fixes these for
