@@ -5,6 +5,7 @@
    import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
    import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
    import createMulSumElement from '~/document/types/item/rules-element/MulSum.js';
+   import createSetSumElement from '~/document/types/item/rules-element/SetSum.js';
    import createFastHealingElement from '~/document/types/item/rules-element/FastHealing.js';
    import createPersistentDamageElement from '~/document/types/item/rules-element/PersistentDamage.js';
    import createTurnMessageElement from '~/document/types/item/rules-element/TurnMessage.js';
@@ -51,6 +52,13 @@
             case 'mulSum': {
                document.data.system.rulesElement[idx] =
                   createMulSumElement(
+                     document.data.system.rulesElement[idx],
+                  );
+               break;
+            }
+            case 'setSum': {
+               document.data.system.rulesElement[idx] =
+                  createSetSumElement(
                      document.data.system.rulesElement[idx],
                   );
                break;

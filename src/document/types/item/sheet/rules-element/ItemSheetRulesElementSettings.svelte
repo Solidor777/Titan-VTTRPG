@@ -15,6 +15,7 @@
       from '~/document/types/item/sheet/rules-element/ItemSheetFlatModifierSettings.svelte';
    import ItemSheetMulBaseSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte';
    import ItemSheetMulSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulSumSettings.svelte';
+   import ItemSheetSetSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetSetSumSettings.svelte';
    import ItemSheetPersistentDamageSettings
       from '~/document/types/item/sheet/rules-element/ItemSheetPersistentDamageSettings.svelte';
    import ItemSheetRollMessageSettings
@@ -59,6 +60,9 @@
          }
          case 'mulSum': {
             return ItemSheetMulSumSettings;
+         }
+         case 'setSum': {
+            return ItemSheetSetSumSettings;
          }
          case 'persistentDamage': {
             return ItemSheetPersistentDamageSettings;
