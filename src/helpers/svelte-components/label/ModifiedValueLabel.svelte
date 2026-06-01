@@ -6,10 +6,11 @@
     * @property {number} [baseValue] - The Base value of the stat before any modifiers are applied.
     * @property {number} [currentValue] - The Current value of the stat after modifiers are applied.
     * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {string | undefined} [testId] - Optional data-testid for automated probing.
     */
 
    /** @type {ModifiedValueLabelProps} */
-   let { baseValue = void 0, currentValue = void 0, tooltip = void 0 } = $props();
+   let { baseValue = void 0, currentValue = void 0, tooltip = void 0, testId = void 0 } = $props();
 
    /**
     * The class to use for styling the label, derived reactively from baseValue and currentValue.
@@ -27,7 +28,7 @@
 </script>
 
 <!--Total Value-->
-<div class={styleClass} use:tooltipAction={tooltip}>
+<div class={styleClass} data-testid={testId} use:tooltipAction={tooltip}>
    {currentValue}
 </div>
 

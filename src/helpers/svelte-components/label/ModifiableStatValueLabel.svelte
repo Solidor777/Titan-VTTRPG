@@ -12,6 +12,7 @@
     * @property {number} [equipmentMod] - Bonuses and penalties from Equipment.
     * @property {number} [staticMod] - Bonuses and penalties from Static modifiers.
     * @property {string} [baseTooltip] - Label for the base value of the stat in the tooltip.
+    * @property {string | undefined} [testId] - Optional data-testid for automated probing.
     */
 
    /** @type {ModifiableStatValueLabelProps} */
@@ -24,6 +25,7 @@
       equipmentMod = void 0,
       staticMod = void 0,
       baseTooltip = void 0,
+      testId = void 0,
    } = $props();
 
    /**
@@ -74,6 +76,7 @@
 <!--Total Value-->
 <div
    class={styleClass}
+   data-testid={testId}
    use:tooltipAction={{
       text: tooltip,
       localize: false

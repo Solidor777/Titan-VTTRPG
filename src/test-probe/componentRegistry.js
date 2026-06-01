@@ -1,4 +1,9 @@
 import Button from '~/helpers/svelte-components/button/Button.svelte';
+import Label from '~/helpers/svelte-components/label/Label.svelte';
+import TextLabel from '~/helpers/svelte-components/label/TextLabel.svelte';
+import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
+import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
+import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
 import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
@@ -41,6 +46,11 @@ import TurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStar
  */
 const componentRegistry = {
    Button,
+   Label,
+   TextLabel,
+   IconLabel,
+   ModifiableStatValueLabel,
+   ModifiedValueLabel,
    TextInput,
    NumberInput,
    IntegerInput,
