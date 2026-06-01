@@ -1,11 +1,21 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3c / 3d.**
-Phase 3a, the 3b core set, **and Phase 3b-remaining (FULL component-probe coverage — all 84 primitives)** are
-**complete**. Pick up at: **3c** (integration manifests — brainstorm first), and continue **3d — reactive-control
-sweep** (next backlog item: item/effect **expanded** toggle; see the 3d section). Full e2e suite is **276
-passing** (`npx playwright test`, on the `npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`).
-All of the checks surface (2b-1..2b-4), Phase 3a, and ALL of Phase 3b are done.
+**Last updated:** 2026-05-31. **Branch:** `development`. **Next action:** **Phase 3c (integration manifests
+— brainstorm first).**
+Phase 3a, ALL of Phase 3b (component-probe coverage of all 84 primitives), **and Phase 3d (reactive-control
+sweep — COMPLETE)** are done. Full e2e suite is **290 passing** (`npx playwright test`, on the
+`npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`). All of the checks surface
+(2b-1..2b-4), Phase 3a, and ALL of Phase 3b are done. **Only Phase 3c remains in Phase 3.**
+
+**Phase 3d outcome:** swept all 12 character-sheet row components for the Svelte 4→5 stale-prop reactivity
+bug class (reading `<prop>.system.x` off a passed Document prop instead of through `document.data`). Found +
+fixed **3 real bugs** (#13 item/effect EXPAND toggle dead on all 4 list tabs; #14 spells-tab filter
+cross-wired; #15 the display-read sweep itself). +14 new e2e tests. **Canonical fix recipe** (validated):
+per-leaf `$derived(document.data.<collection>.get(id)?.system.<leaf>)` — NOT `$derived(...get(id))` of the
+whole doc (silently non-reactive: stable instance). One deferral: the effect duration INPUTS (two-way
+`bind:value`) need a shared-input-primitive refactor → own spec. See
+`docs/superpowers/specs/2026-05-31-titan-e2e-3d-reactive-sweep-design.md` + `…-worklist.md` and
+`docs/superpowers/plans/2026-05-31-titan-e2e-3d-reactive-sweep.md`.
 
 ### Phase 3b (first pass) — DONE (component-tier probe harness)
 
@@ -209,8 +219,40 @@ re-deriving context.
 ## Bugs found & fixed (by this testing effort)
 
 (Newest first. #4–#7 found by `tests/e2e/traits.spec.js`; #8 by `tests/e2e/effect-reactivity.spec.js`;
-#10–#12 by the Phase 3b-remaining component probes.)
+#10–#12 by the Phase 3b-remaining component probes; #13–#15 by the Phase 3d reactive-control sweep.)
 
+15. **Character-sheet row display values stale-until-remount (Svelte 4→5 migration fallout, systemic)** —
+    all 12 character-sheet row components (`CharacterSheetAbility`/`Commodity`/`Equipment`/`Armor`(+`Stats`)/
+    `Shield`(+`Stats`)/`Weapon`(+`Attack`/`Attacks`/`MultiAttackButton`)/`Spell`/`ItemTradition`/`Effect`)
+    read `item.system.x` / `effect.system.x` off the passed Document prop, so edits made while the row stayed
+    mounted (rarity, value, defense, xpCost, description, duration tag, isExpired, etc.) did not re-render
+    until the list re-mounted. Fixed by re-reading each DISPLAY value through the reactive store, **per-leaf**:
+    `$derived(document.data.<collection>.get(id)?.system.<leaf>)`. **Gotcha (load-bearing):** deriving the
+    whole doc — `$derived(document.data.items.get(id))` then `x?.system.y` — is **silently non-reactive**
+    because `.get(id)` returns the SAME instance across `update()`, so the `$derived` `===` check
+    short-circuits; you must derive a CHANGING leaf (a primitive, or a `.system.<subobject>` whose ref is
+    rebuilt on update). Anchor `CharacterSheetAbility` (commit `0efaf9b6`) used a function-accessor variant
+    for its 8 reads. Commits `0efaf9b6`/`eb680405`/`9d29b843`/`6d5d5092`/`338c2dd3`/`e1e21a1a` (+`let`→`const`
+    review fix). Regressions: `tests/e2e/reactive-{ability,inventory-basic,armor-shield,weapon,spell,effect-rows}.spec.js`.
+    **DEFERRED:** the effect duration INPUTS (two-way `bind:value`) still don't reflect external in-place
+    updates — needs a one-way `value`+commit refactor of the shared `IntegerIncrementInput`/`NumberInput`
+    primitives (cascading → own spec). conventions.md documents the rule.
+14. **Spells-tab filter input cross-wired to the abilities filter** — `CharacterSheetSpellsTab` bound its
+    filter `TextInput` to `$appState.tabs.abilities.filter` while the list read `tabs.spells.filter`, so the
+    spells filter box did nothing (and silently mutated the abilities filter). One-line fix; found by the
+    expand-toggle code review. Commit `a509a771`; regression `tests/e2e/spells-filter.spec.js`.
+13. **Item/effect EXPAND toggle dead on all 4 list tabs (effects/abilities/spells/inventory)** — clicking a
+    row's expand chevron flipped the bound `isExpanded` but nothing re-rendered. Root cause: expansion state
+    lives in the `applicationState` `writable` store under `tabs.<tab>.isExpanded` (a plain `{}`), but each
+    tab passed that inner object DOWN as an `isExpandedMap` prop and the leaf bound
+    `bind:isExpanded={isExpandedMap[id]}`. Mutating a plain object member is not a `$appState.x = v`
+    assignment, so Svelte emitted no `appState.set()` → no subscriber notified → no re-render. (The sibling
+    `bind:value={$appState.tabs.effects.filter}` works precisely because it is rooted at `$appState`.) Fixed
+    by **re-rooting the bind at `$appState`** inside the 3 list components (`CharacterSheetEffectList` static
+    path; `CharacterSheetItemList`/`CharacterSheetMultiItemList` via a new `tabKey` string prop +
+    `$appState.tabs[tabKey].isExpanded[id]`), the 4 tabs passing `tabKey`. Confirmed Svelte DOES emit the
+    store-write for dynamic-keyed `$appState` assignments. The user had flagged this control as the 3d
+    backlog item. Commit `5ed6ce3b` (+review `7790d241`); regression `tests/e2e/reactive-expanded-toggle.spec.js`.
 12. **`ToggleOptionButton` off-state silently un-clickable (Foundry global `.disabled` collision)** — the
     component rendered its OFF state as `<div class="toggle disabled">`. Foundry's `foundry2.css` defines
     `.disabled { pointer-events: none; }`, so the wrapper and its inner `<button>` became non-interactive
@@ -300,12 +342,15 @@ re-deriving context.
 ## NEXT: Phase 3 — remaining tiers
 
 **ALL of Phase 3b is done** (component-probe harness + 7-component core set + full coverage of all 84
-primitives across seven family specs; see the "Phase 3b-remaining — DONE" section above). Remaining Phase 3
-work:
+primitives across seven family specs) **and ALL of Phase 3d is done** (reactive-control sweep — see the
+Phase 3d section above and bug log #13–#15). Remaining Phase 3 work:
 
 - **3c — integration manifests** — assert manifest-driven wiring (document subtypes, sheet registration,
-  `system.json` hookups). BRAINSTORM first (`superpowers:brainstorming`).
-- **3d — reactive-control sweep** — continue per the Phase 3d section (next: item/effect **expanded** toggle).
+  `system.json` hookups). BRAINSTORM first (`superpowers:brainstorming`). **This is the only Phase 3 item
+  left.**
+- **3d follow-up (deferred, optional):** make the effect duration INPUTS reactive — needs a one-way
+  `value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
+  (cascading; own spec + user approval). See worklist "Deferred / follow-up".
 
 Load `foundry-vtt` + `titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface
 touched). Route all `.js`/`.svelte` work through the `titan-svelte-dev` subagent.
@@ -321,10 +366,11 @@ v14 — see conventions.md).
 ## How to verify current state quickly on resume
 
 - `npx vitest run` → expect 35 passing (incl. `tests/unit/check/**` and `check-oracle.test.js`).
-- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **276 passing** (Foundry must be
+- `npm run build:e2e` then `npx playwright test --reporter=list` → expect **290 passing** (Foundry must be
   running on :30000, or the `webServer` config launches it). The full suite includes the seven
-  `tests/e2e/component-probe*.spec.js` family files (all 84 primitives), which REQUIRE the `build:e2e`
-  bundle (a plain `npm run build` strips the gated probe).
+  `tests/e2e/component-probe*.spec.js` family files (all 84 primitives) and the Phase 3d
+  `tests/e2e/reactive-*.spec.js` + `spells-filter.spec.js` files, which REQUIRE the `build:e2e` bundle (a
+  plain `npm run build` strips the gated probe).
 - **Build discipline:** after editing any `.svelte`/`.js` source, run `npm run build:e2e` first so the live
   Foundry serves the change AND keeps the gated component probe available (a plain `npm run build` strips the
   probe, breaking `component-probe.spec.js`). Test-only changes don't need a build.
