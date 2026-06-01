@@ -89,6 +89,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
+import warn from '~/helpers/utility-functions/Warn.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -721,7 +722,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const expanded = [];
       for (const element of elements) {
          if (element.key === 'all') {
-            for (const key of this._getSelectorKeys(element.selector)) {
+            // Resolve the concrete keys under this selector; an empty result means the element would be
+            // silently dropped, so warn naming the offending selector.
+            /** @type {string[]} */
+            const keys = this._getSelectorKeys(element.selector);
+            if (keys.length === 0) {
+               warn(`Rules element selector "${element.selector}" has no keys to expand for key "all".`);
+               continue;
+            }
+
+            for (const key of keys) {
                expanded.push({ ...element, key });
             }
          }

@@ -94,6 +94,9 @@ test.describe('rules elements — derived attribute math', () => {
 test.describe('rules elements — all-key selector', () => {
    test.beforeEach(async ({ page }) => {
       await login(page);
+      const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
+         && !!CONFIG.Actor?.dataModels?.player);
+      expect(ready, 'TITAN system must be initialized').toBe(true);
    });
    test.afterEach(async ({ page }) => {
       await page.evaluate(async (name) => {
