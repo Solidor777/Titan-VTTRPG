@@ -12,7 +12,12 @@
     */
 
    /** @type {CharacterSheetMultiItemListProps} */
-   const { itemComponents = undefined, filterFunction = undefined, filter = '', tabKey = undefined } = $props();
+   const {
+      itemComponents = undefined,
+      filterFunction = undefined,
+      filter = '',
+      tabKey = undefined,
+   } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

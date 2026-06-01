@@ -27,6 +27,7 @@ test.describe('character sheet expand toggle reactivity', () => {
          await actor.createEmbeddedDocuments('Item', [
             { name: 'E2E Expand Ability', type: 'ability' },
             { name: 'E2E Expand Weapon', type: 'weapon' },
+            { name: 'E2E Expand Spell', type: 'spell' },
          ]);
          await actor.sheet.render(true);
          await new Promise((resolve) => {
@@ -69,5 +70,9 @@ test.describe('character sheet expand toggle reactivity', () => {
 
    test('inventory rows expand in place (CharacterSheetMultiItemList)', async ({ page }) => {
       await expectExpandInPlace(page, 'Inventory', '[data-item-id]');
+   });
+
+   test('spell rows expand in place (CharacterSheetItemList/spells)', async ({ page }) => {
+      await expectExpandInPlace(page, 'Spells', '[data-item-id]');
    });
 });
