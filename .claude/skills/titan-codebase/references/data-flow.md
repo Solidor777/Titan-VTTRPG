@@ -224,8 +224,12 @@ client processes turn effects, regardless of who clicked the next-turn button.
 
 **3. Hook handler — `onCombatNextTurn` (src/hooks/OnCombatNextTurn.js)**
 Registered with `Hooks.on('combatNextTurn', onCombatNextTurn)` in `src/index.js`. The handler receives
-`(currentCombatantId, previousCombatantId, combatId)` and immediately re-resolves them to live documents
-via `game.combats.get` / `combat.combatants.get` before use. Then:
+`(currentCombatantId, previousCombatantId, combatId)` and re-resolves them to live documents via
+`game.combats.get` / `combat.combatants.get` using a bounded retry (`retryResolve`, 5 attempts × 50 ms) —
+because the `system.titan` socket and Foundry's native combat replication are independent network paths, the
+relayed update may not have replicated yet on a congested client. On exhaustion it `warn`s and bails rather
+than silently dropping the apply (the downstream best-owner write gate makes the retry double-apply-safe). The
+same re-resolution applies to `onCombatPreviousTurn`. Then:
   a. Computes `isNewRound = currentInitiative > previousInitiative`.
   b. For every character combatant in the combat, calls
      `actor.system.onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound)` — decrements

@@ -351,6 +351,11 @@ domain:
 - **Settings accessors** — each system setting has its own getter module (e.g., `GetSetting`,
   `ShouldGetCheckOptions`).
 - **String helpers** — general-purpose text formatting (`Localize`, `Capitalize`, and others).
+- **Async / retry** — `Delay.js` (`delay(ms)`) returns a Promise that resolves after a fixed
+  millisecond wait. `RetryResolve.js` (`retryResolve(resolveFn, { attempts, delayMs })`) repeatedly
+  invokes a synchronous resolver until it returns a truthy value or the attempt budget is exhausted,
+  then returns the truthy result or `null`; default budget is 5 attempts at 50 ms each. First attempt
+  is immediate (no leading delay), so the success path has no wall-clock cost.
 - **Misc** — small utilities used across layers (`GenerateUUID`, `Log`, `Assert`, `Clamp`, and
   others).
 

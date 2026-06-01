@@ -444,10 +444,17 @@ a TDZ ReferenceError (bug #17). (c) `CompendiumCollection#getUserLevel(user)` re
 level via `Math.max` over satisfied roles. (d) `requiresReload:true` settings still read live via their
 accessors, so `game.settings.set` takes effect in-test without reload.
 
-**Open follow-ups (optional, both need user go-ahead — see the two "Deferred" blocks lower in this doc):**
-(1) harden the bug-#18 socket relay against a theoretical remote race (re-resolution retry in the two combat
-hooks); (2) make the effect-duration INPUTS reactive (one-way value+commit refactor of the shared
-`IntegerIncrementInput`/`NumberInput`, carried over from Phase 3d).
+**Open follow-ups:**
+(1) **DONE (2026-06-01)** — hardened the bug-#18 socket relay against the theoretical remote race: both
+combat turn hooks now re-resolve the relayed combat/combatant IDs via a bounded retry (`retryResolve`,
+5×50 ms) and `warn` on exhaustion instead of dropping the apply silently. Spec/plan
+`docs/superpowers/specs/2026-06-01-socket-relay-race-hardening-design.md` /
+`docs/superpowers/plans/2026-06-01-socket-relay-race-hardening.md`; util
+`src/helpers/utility-functions/RetryResolve.js` (+ `tests/unit/RetryResolve.test.js`, 4 cases); commits
+`5310e850`/`33750d50`/`f0a2b138`. Suite still **312 e2e** / **39 unit** passing.
+(2) **OPEN (needs user go-ahead)** — make the effect-duration INPUTS reactive (one-way value+commit refactor
+of the shared `IntegerIncrementInput`/`NumberInput`, carried over from Phase 3d; see the "Deferred" block
+lower in this doc).
 
 ### Phase 4 kickoff prep (historical — completed)
 
@@ -480,14 +487,15 @@ hooks); (2) make the effect-duration INPUTS reactive (one-way value+commit refac
 `value`+commit-with-value refactor of the shared `IntegerIncrementInput`/`NumberInput` primitives
 (cascading; own spec + user approval). See the 3d worklist "Deferred / follow-up".
 
-**Deferred (optional, Phase 4 outcome):** harden the combat-turn socket relay against a theoretical remote
-race. The fix for bug #18 emits IDs and re-resolves in `OnCombatNextTurn`/`OnCombatPreviousTurn` via
-`game.combats.get(combatId)` / `combat.combatants.get(id)`. The `system.titan` socket and Foundry's native
-combat replication are independent network paths, so on a congested remote client the socket message could
-arrive before the combat's embedded-combatant update has applied → `combat.combatants.get(id)` returns
-`undefined` → the handler guard silently drops the apply. Low-probability (the A1–A5 two-client tests pass
-through a real browser-to-browser relay); mitigation = a short re-resolution retry (yield + re-get, N times)
-in the two handlers before the guard. Engine change → own task + user approval.
+**DONE (2026-06-01, was: Deferred Phase 4 outcome):** hardened the combat-turn socket relay against the
+theoretical remote race. The bug-#18 fix emits IDs and re-resolves in
+`OnCombatNextTurn`/`OnCombatPreviousTurn` via `game.combats.get(combatId)` / `combat.combatants.get(id)`; the
+`system.titan` socket and Foundry's native combat replication are independent network paths, so on a congested
+remote client the socket could arrive before the embedded-combatant update applied → `.get(id)` `undefined` →
+the guard dropped the apply silently. Resolved: both handlers now wrap the three-way resolution in
+`retryResolve` (`src/helpers/utility-functions/RetryResolve.js`, bounded 5×50 ms, yields between attempts) and
+`warn` on exhaustion (diagnosable, no longer silent). The downstream best-owner write gate is unchanged, so
+retry cannot double-apply. Spec/plan `2026-06-01-socket-relay-race-hardening-*`.
 
 Load `foundry-vtt` + `titan-codebase` (+ `svelte-5` + `foundry-svelte` for any component/sheet surface
 touched). Route all `.js`/`.svelte` work through the `titan-svelte-dev` subagent.
