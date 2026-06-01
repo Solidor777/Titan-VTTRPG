@@ -37,20 +37,32 @@ test.describe('permissions — sheet ownership levels', () => {
     * @returns {Promise<{visible: boolean, editable: boolean, rendered: boolean}>} The sheet state.
     */
    async function readSheetState(player, actorId) {
-      return player.evaluate(async (id) => {
+      // testUserPermission is the source of truth for visibility/editability.
+      const perms = await player.evaluate((id) => {
          const actor = game.actors.get(id);
-         // testUserPermission is the source of truth; render to confirm visibility gating.
-         const visible = actor ? actor.testUserPermission(game.user, 'OBSERVER') : false;
-         const editable = actor ? actor.testUserPermission(game.user, 'OWNER') : false;
-         let rendered = false;
-         if (actor) {
-            await actor.sheet.render(true);
-            await new Promise((resolve) => setTimeout(resolve, 400));
-            rendered = actor.sheet.rendered === true && actor.sheet.isVisible === true;
-            await actor.sheet.close();
-         }
-         return { visible, editable, rendered };
+         return {
+            visible: actor ? actor.testUserPermission(game.user, 'OBSERVER') : false,
+            editable: actor ? actor.testUserPermission(game.user, 'OWNER') : false,
+         };
       }, actorId);
+
+      // Trigger the render, then POLL for the rendered+visible state (no fixed sleep).
+      await player.evaluate((id) => game.actors.get(id)?.sheet.render(true), actorId);
+      await player.waitForFunction(
+         (id) => {
+            const sheet = game.actors.get(id)?.sheet;
+            return sheet?.rendered === true && sheet?.isVisible === true;
+         },
+         actorId,
+         { timeout: 15_000 },
+      );
+      await player.evaluate((id) => game.actors.get(id)?.sheet.close(), actorId);
+
+      return {
+         visible: perms.visible,
+         editable: perms.editable,
+         rendered: true,
+      };
    }
 
    test('OWNER: player can view and edit', async ({ browser }) => {
