@@ -54,14 +54,10 @@
       <!--Quantity-->
       <div class="field">
          <IntegerIncrementInput
-            bind:value={item.system.quantity}
-            onchange={() => {
-                  item.update({
-                     system: {
-                        quantity: item.system.quantity,
-                     },
-                  });
-               }}
+            bind:value={
+               () => document.data.items.get(item._id)?.system.quantity ?? 0,
+               (newValue) => item.update({ system: { quantity: newValue } })
+            }
          />
       </div>
 

@@ -111,4 +111,61 @@ test.describe('character sheet inventory row reactivity', () => {
       await seedActorWithItem(page, EQUIPMENT_ACTOR_NAME, 'equipment');
       await expectInventoryRowReactive(page, EQUIPMENT_ACTOR_NAME);
    });
+
+   test('commodity quantity input reflects an external in-place update and persists edits', async ({
+      page,
+   }) => {
+      const ACTOR = 'E2E Reactive Commodity Quantity Actor';
+      await login(page);
+
+      // Seed a commodity with a known starting quantity and render the sheet.
+      await page.evaluate(async (actorName) => {
+         const stale = game.actors.getName(actorName);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name: actorName, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [
+            { name: 'E2E Reactive Commodity Qty', type: 'commodity', system: { quantity: 2 } },
+         ]);
+         await actor.sheet.render(true);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 600);
+         });
+      }, ACTOR);
+
+      // Activate the Inventory tab and locate the commodity row's quantity input.
+      await page.getByText('Inventory', { exact: true }).first().click();
+      await page.waitForTimeout(400);
+      const row = page.locator('[data-item-id]').first();
+      const quantityInput = row.locator('input[type="number"]').first();
+
+      // INITIAL rendered state: quantity is 2.
+      await expect(quantityInput, 'initial quantity input value is 2').toHaveValue('2');
+
+      // REACTIVITY: external update must reflect in place.
+      await page.evaluate(async (actorName) => {
+         const actor = game.actors.getName(actorName);
+         await actor.items.contents[0].update({ system: { quantity: 5 } });
+      }, ACTOR);
+      await page.waitForTimeout(400);
+      await expect(quantityInput, 'quantity input updated to 5 in place').toHaveValue('5');
+
+      // TYPING COMMIT (regression lock).
+      await quantityInput.fill('8');
+      await quantityInput.dispatchEvent('keyup', { key: 'End' });
+      await page.waitForTimeout(400);
+      let qty = await page.evaluate((actorName) => {
+         return game.actors.getName(actorName).items.contents[0].system.quantity;
+      }, ACTOR);
+      expect(qty, 'typed quantity persisted to the document').toBe(8);
+
+      // INCREMENT COMMIT (latent-bug regression).
+      await row.locator('.increment button').first().click();
+      await page.waitForTimeout(400);
+      qty = await page.evaluate((actorName) => {
+         return game.actors.getName(actorName).items.contents[0].system.quantity;
+      }, ACTOR);
+      expect(qty, 'increment button persisted quantity').toBe(9);
+   });
 });
