@@ -15,10 +15,10 @@
    /** @type {LabeledTextInputProps} */
    let {
       value    = $bindable(undefined),
-      label    = undefined,
-      icon     = undefined,
+      label    = void 0,
+      icon     = void 0,
       disabled = false,
-      tooltip  = undefined,
+      tooltip  = void 0,
       testId   = void 0,
    } = $props();
 </script>

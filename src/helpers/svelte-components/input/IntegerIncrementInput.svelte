@@ -26,11 +26,11 @@
       min               = false,
       max               = false,
       disabled          = false,
-      tooltip           = undefined,
+      tooltip           = void 0,
       increment         = 1,
       modifierIncrement = 10,
-      onchange          = undefined,
-      onkeyup           = undefined,
+      onchange          = void 0,
+      onkeyup           = void 0,
       testId            = void 0,
    } = $props();
 

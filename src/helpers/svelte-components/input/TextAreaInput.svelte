@@ -14,8 +14,8 @@
    let {
       value    = $bindable(undefined),
       disabled = false,
-      tooltip  = undefined,
-      onchange = undefined,
+      tooltip  = void 0,
+      onchange = void 0,
       testId   = void 0,
    } = $props();
 </script>

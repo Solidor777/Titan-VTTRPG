@@ -14,9 +14,9 @@
    /** @type {TopFilterProps} */
    let {
       label   = 'filter',
-      icon    = undefined,
+      icon    = void 0,
       value   = $bindable(undefined),
-      tooltip = undefined,
+      tooltip = void 0,
       testId  = void 0,
    } = $props();
 </script>
