@@ -119,4 +119,59 @@ test.describe('integration manifest drift guard', () => {
          expect(result[documentName].subclass, `${documentName} documentClass subclasses the base`).toBe(true);
       }
    });
+
+   // Every declared Actor/Item subtype must have a titan-scoped sheet registered AND set as the default,
+   // the core AppV1 sheets must be unregistered, and the ActiveEffect titan sheet must be default. Class
+   // names are minified in the build, so a titan sheet is identified by its `titan.`-scoped registration
+   // id prefix rather than an exact class name.
+   test('per-subtype Titan sheets are registered as default and core sheets are unregistered', async ({ page }) => {
+      // The declared Actor/Item subtypes whose default-sheet registration is asserted.
+      const subtypes = {
+         Actor: ['player', 'npc'],
+         Item: ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon'],
+      };
+
+      // Inspect the live sheet-registration maps (CONFIG[doc].sheetClasses[subtype]).
+      const result = await page.evaluate(({ subtypes }) => {
+         // Summarises one subtype's registration: a default titan-scoped sheet present, core sheets absent.
+         const inspect = (documentName, subtype) => {
+            const map = CONFIG[documentName].sheetClasses[subtype] ?? {};
+            const titanEntries = Object.entries(map).filter(([id]) => id.startsWith('titan.'));
+            return {
+               hasTitanSheet: titanEntries.length > 0,
+               titanIsDefault: titanEntries.some(([, cfg]) => cfg.default === true),
+               hasCoreActorSheet: 'core.ActorSheet' in map,
+               hasCoreItemSheet: 'core.ItemSheet' in map,
+            };
+         };
+
+         const out = { Actor: {}, Item: {}, ActiveEffect: {} };
+         for (const subtype of subtypes.Actor) {
+            out.Actor[subtype] = inspect('Actor', subtype);
+         }
+         for (const subtype of subtypes.Item) {
+            out.Item[subtype] = inspect('Item', subtype);
+         }
+         // The ActiveEffect sheet is registered with no types, so it lands under the 'effect' subtype map.
+         out.ActiveEffect.effect = inspect('ActiveEffect', 'effect');
+         return out;
+      }, { subtypes });
+
+      // Every declared Actor/Item subtype: a titan-scoped sheet is registered AND is the default.
+      for (const documentName of ['Actor', 'Item']) {
+         for (const subtype of subtypes[documentName]) {
+            const r = result[documentName][subtype];
+            expect(r.hasTitanSheet, `${documentName}.${subtype} titan sheet registered`).toBe(true);
+            expect(r.titanIsDefault, `${documentName}.${subtype} titan sheet is default`).toBe(true);
+         }
+      }
+
+      // The core AppV1 sheets are unregistered (sampled on one subtype per base document).
+      expect(result.Actor.player.hasCoreActorSheet, 'core ActorSheet unregistered').toBe(false);
+      expect(result.Item.weapon.hasCoreItemSheet, 'core ItemSheet unregistered').toBe(false);
+
+      // The ActiveEffect titan sheet is registered + default.
+      expect(result.ActiveEffect.effect.hasTitanSheet, 'effect sheet registered').toBe(true);
+      expect(result.ActiveEffect.effect.titanIsDefault, 'effect sheet is default').toBe(true);
+   });
 });
