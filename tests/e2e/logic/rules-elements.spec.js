@@ -204,3 +204,67 @@ test.describe('rules elements — stacking invariants (property-based)', () => {
       expect(result.numRuns, 'property should have executed its runs').toBeGreaterThan(0);
    });
 });
+
+test.describe('rules elements — mulSum (multiply total)', () => {
+   test.beforeEach(async ({ page }) => {
+      await login(page);
+      const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
+         && !!CONFIG.Actor?.dataModels?.player);
+      expect(ready, 'TITAN system must be initialized').toBe(true);
+   });
+   test.afterEach(async ({ page }) => {
+      await page.evaluate(async (name) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+      }, ACTOR_NAME);
+   });
+
+   test('mulSum halves the post-additive Body total, rounding up', async ({ page }) => {
+      const body = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return actor.system.attribute.body.value;
+      }, {
+         name: ACTOR_NAME,
+         abilityData: buildRulesElementAbilityData('E2E MulSum', [
+            { operation: 'flatModifier', selector: 'attribute', key: 'body', value: 4 },
+            { operation: 'mulSum', selector: 'attribute', key: 'body', value: 0.5, rounding: 'up' },
+         ]),
+      });
+
+      expect(body, 'mulSum should halve the post-additive total of 5 to 3').toBe(3);
+   });
+
+   test('stacked mulSum elements compound in order', async ({ page }) => {
+      const body = await page.evaluate(async ({ name, abilityData }) => {
+         const stale = game.actors.getName(name);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [abilityData]);
+         await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+         });
+         return actor.system.attribute.body.value;
+      }, {
+         name: ACTOR_NAME,
+         abilityData: buildRulesElementAbilityData('E2E MulSum Stack', [
+            { operation: 'flatModifier', selector: 'attribute', key: 'body', value: 7 },
+            { operation: 'mulSum', selector: 'attribute', key: 'body', value: 0.5, rounding: 'up' },
+            { operation: 'mulSum', selector: 'attribute', key: 'body', value: 0.5, rounding: 'up' },
+         ]),
+      });
+
+      expect(body, 'two mulSum halvings of 8 should compound to 2').toBe(2);
+   });
+});

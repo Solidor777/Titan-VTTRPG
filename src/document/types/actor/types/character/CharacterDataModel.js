@@ -17,6 +17,7 @@ import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
 import appendUniqueByFunctionValue from '~/helpers/utility-functions/appendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
+import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttackCheckParameters from '~/check/types/attack-check/AttackCheckParameters.js';
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
@@ -837,6 +838,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          /** @type {*[]} */
          const flatModifierElements = [];
          /** @type {*[]} */
+         const mulSumElements = [];
+         /** @type {*[]} */
          const fastHealingElements = [];
          /** @type {*[]} */
          const persistentDamageElements = [];
@@ -856,6 +859,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
                }
                case 'flatModifier': {
                   flatModifierElements.push(element);
+                  break;
+               }
+               case 'mulSum': {
+                  mulSumElements.push(element);
                   break;
                }
                case 'fastHealing': {
@@ -894,6 +901,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Apply elements.
          this._applyMulBaseElements(mulBaseElements);
          this._applyFlatModifierElements(flatModifierElements);
+         this._applyMulSumElements(mulSumElements);
          this._applyFastHealingElements(fastHealingElements);
          this._applyPersistentDamageElements(persistentDamageElements);
          this._applyTurnMessageElements(turnMessageElements);
@@ -1010,6 +1018,59 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
       else {
          this.rulesElementsCache.flatModifier = false;
+      }
+   }
+
+   /**
+    * Applies Mul-Sum Rules Elements to this Character. Each element multiplies the stat's running total
+    * (base value plus every accumulated mod bucket) and writes a corrective delta into the source's
+    * bucket. Elements on the same stat are processed in order so multiple multiplications compound.
+    * Runs after the additive appliers so the total it reads is complete.
+    * @param {MulSumElement[]} elements - Array of Mul-Sum Rules Elements to apply.
+    * @private
+    */
+   _applyMulSumElements(elements) {
+      if (elements.length > 0) {
+         /** @type {object} */
+         const mulSum = {};
+
+         // Sort elements by selector.
+         const selectors = sortObjectsIntoContainerByKeyValue(elements, 'selector');
+
+         // For each selector.
+         for (const [selector, selectorElements] of Object.entries(selectors)) {
+            mulSum[selector] = {};
+
+            // Sort elements by key.
+            const keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
+
+            // For each key.
+            for (const [key, keyElements] of Object.entries(keys)) {
+               mulSum[selector][key] = {};
+
+               // Get the stat data and its base.
+               const stat = (selector === 'training' || selector === 'expertise') ?
+                  this.skill[key][selector] :
+                  this[selector][key];
+               const baseValue = selector === 'resource' ? stat.maxBase : stat.baseValue;
+
+               // Apply each element in order, recomputing the running total so multiplications compound.
+               for (const element of keyElements) {
+                  let total = baseValue;
+                  for (const mod of Object.values(stat.mod)) {
+                     total += mod;
+                  }
+                  const delta = computeMulSumDelta(total, element.value, element.rounding);
+                  stat.mod[element.type] += delta;
+                  mulSum[selector][key][element.type] = (mulSum[selector][key][element.type] ?? 0) + delta;
+               }
+            }
+         }
+
+         this.rulesElementsCache.mulSum = mulSum;
+      }
+      else {
+         this.rulesElementsCache.mulSum = false;
       }
    }
 
