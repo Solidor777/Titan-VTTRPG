@@ -960,13 +960,15 @@ test.describe('component probe — RulesElementOperationSelect', () => {
       const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
       expect(optionValues).toContain('flatModifier');
       expect(optionValues).toContain('mulBase');
+      expect(optionValues).toContain('mulSum');
+      expect(optionValues).toContain('setSum');
       expect(optionValues).toContain('fastHealing');
       expect(optionValues).toContain('persistentDamage');
       expect(optionValues).toContain('turnMessage');
       expect(optionValues).toContain('rollMessage');
       expect(optionValues).toContain('conditionalRatingModifier');
       expect(optionValues).toContain('conditionalCheckModifier');
-      expect(optionValues).toHaveLength(8);
+      expect(optionValues).toHaveLength(10);
 
       await select.selectOption('mulBase');
       await expect(select).toHaveValue('mulBase');
