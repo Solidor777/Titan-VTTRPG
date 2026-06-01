@@ -81,9 +81,15 @@ Deterministic world-scope setting control:
   **persistentDamage**, **resolveRegain** (one ability item applying the element on ownership — same
   mechanism as the Phase 2a `flatModifier` ability; abilities apply rules elements on ownership with
   no equip requirement).
-- A combat-seeding helper that creates a `Combat`, adds `Combatant`s for the seeded actors, and sets
-  initiative so `this.turns.length > 1` (required for the socket emit) and the
-  `currentInitiative`/`previousInitiative` comparison in the handlers is well-defined.
+- A combat-seeding helper that:
+  1. creates (or reuses) a `Scene` and **places a `Token` on it for each seeded actor** — Combatants
+     require a token on a scene for `combatant.actor` to resolve (confirmed requirement), which is
+     what `getCharacterCombatants()` reads;
+  2. creates a `Combat` bound to that scene, adds a `Combatant` per token, and sets initiative so
+     `this.turns.length > 1` (required for the socket emit) and the
+     `currentInitiative`/`previousInitiative` comparison in the handlers is well-defined.
+- The helper must clean up the scene/tokens/combat it creates (teardown in a `finally`, mirroring the
+  context cleanup) so runs don't accumulate scene state.
 
 ### Determinism levers (carried by every Group A/B4 test)
 - Pin the auto-apply / auto-revert setting for the effect under test to `'enabled'`; pin the others
@@ -144,14 +150,13 @@ client's document via `waitForFunction`.
 
 ## Risks / open items to settle in the plan (not blocking the design)
 
-1. **Combatant resolution without a token/scene** — verify `Combatant.actor` resolves (so
-   `getCharacterCombatants()` returns the actor) when a Combatant is created with `actorId` and no
-   token on a scene. If it does not, the combat-seeding helper must place a token on a scene. **This
-   is the first plan task.**
-2. **World-setting write timing** — confirm `awaitSetting` reliably observes propagation on the
+1. **World-setting write timing** — confirm `awaitSetting` reliably observes propagation on the
    non-writing client before the action under test runs.
-3. **Best-owner determinism** — both clients log in before the action; confirm `game.users` reports
+2. **Best-owner determinism** — both clients log in before the action; confirm `game.users` reports
    both `active` on each client so `isCurrentUserBestOwner` resolves consistently (first active GM).
+
+**Settled (no longer open):** Combatants require a token on a scene for `combatant.actor` to resolve;
+the combat-seeding helper creates a scene + per-actor tokens accordingly (see Section 1).
 
 ## Working agreements (carry from prior phases)
 
