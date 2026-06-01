@@ -17,6 +17,22 @@ import NumberInput from '~/helpers/svelte-components/input/NumberInput.svelte';
 import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
 import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+import ArmorTraitSelect from '~/helpers/svelte-components/input/select/ArmorTraitSelect.svelte';
+import AttackTraitSelect from '~/helpers/svelte-components/input/select/AttackTraitSelect.svelte';
+import AttackTypeSelect from '~/helpers/svelte-components/input/select/AttackTypeSelect.svelte';
+import AttributeSelect from '~/helpers/svelte-components/input/select/AttributeSelect.svelte';
+import CheckDifficultySelect from '~/helpers/svelte-components/input/select/CheckDifficultySelect.svelte';
+import DamageReducedBySelect from '~/helpers/svelte-components/input/select/DamageReducedBySelect.svelte';
+import InventoryItemTypeSelect from '~/helpers/svelte-components/input/select/InventoryItemTypeSelect.svelte';
+import ModSelect from '~/helpers/svelte-components/input/select/ModSelect.svelte';
+import RaritySelect from '~/helpers/svelte-components/input/select/RaritySelect.svelte';
+import RatingSelect from '~/helpers/svelte-components/input/select/RatingSelect.svelte';
+import ResistanceSelect from '~/helpers/svelte-components/input/select/ResistanceSelect.svelte';
+import ResourceSelect from '~/helpers/svelte-components/input/select/ResourceSelect.svelte';
+import RulesElementOperationSelect from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
+import ShieldTraitSelect from '~/helpers/svelte-components/input/select/ShieldTraitSelect.svelte';
+import SkillSelect from '~/helpers/svelte-components/input/select/SkillSelect.svelte';
+import SpeedSelect from '~/helpers/svelte-components/input/select/SpeedSelect.svelte';
 import LabelTag from '~/helpers/svelte-components/tag/LabelTag.svelte';
 import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
@@ -72,6 +88,22 @@ const componentRegistry = {
    IntegerInput,
    CheckboxInput,
    Select,
+   ArmorTraitSelect,
+   AttackTraitSelect,
+   AttackTypeSelect,
+   AttributeSelect,
+   CheckDifficultySelect,
+   DamageReducedBySelect,
+   InventoryItemTypeSelect,
+   ModSelect,
+   RaritySelect,
+   RatingSelect,
+   ResistanceSelect,
+   ResourceSelect,
+   RulesElementOperationSelect,
+   ShieldTraitSelect,
+   SkillSelect,
+   SpeedSelect,
    LabelTag,
    Tag,
    IconTag,

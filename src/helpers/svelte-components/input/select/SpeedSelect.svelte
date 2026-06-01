@@ -9,6 +9,7 @@
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
     * @property {(event: Event) => void} [onchange] - Callback fired when the selected value changes.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid` on the root element.
     */
 
    /** @type {SpeedSelectProps} */
@@ -18,6 +19,7 @@
       disabled = false,
       tooltip = void 0,
       onchange = void 0,
+      testId = void 0,
    } = $props();
 
    /** @type {string[]} Options for the Select Svelte component, derived to include None when allowed. */
@@ -36,4 +38,5 @@
    onchange={onchange}
    {options}
    {tooltip}
+   testId={testId}
 />

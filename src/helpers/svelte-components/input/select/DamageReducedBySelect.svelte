@@ -9,6 +9,7 @@
     * @property {boolean} [allowOpposedCheck] - Whether to allow Opposed Check as an option.
     * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
     * @property {(event: Event) => void} [onchange] - Callback fired when the selected value changes.
+    * @property {string} [testId] - Optional stable selector applied as `data-testid` on the root element.
     */
 
    /** @type {DamageReducedBySelectProps} */
@@ -19,6 +20,7 @@
       allowOpposedCheck = void 0,
       tooltip = void 0,
       onchange = void 0,
+      testId = void 0,
    } = $props();
 
    /**
@@ -48,4 +50,5 @@
    onchange={onchange}
    {options}
    {tooltip}
+   testId={testId}
 />
