@@ -207,7 +207,7 @@ export function buildConditionDefinitions() {
 
 /**
  * Sets up the system conditions, registering each as a CONFIG.statusEffects entry with its localized
- * description and visual-active-effects content flag.
+ * description.
  * @returns {void}
  */
 export default function setupConditions() {
@@ -223,14 +223,14 @@ export default function setupConditions() {
       // Set the description.
       const description = localize(`${condition.id}.desc`);
 
-      // Set the flags for visual active effects.
+      // Set the titan flags carrying the condition's description and subtype. The HUD reads
+      // flags.titan.description for conditions (which have no native description field).
       condition.flags = {
          titan: {
             description: description,
             type: 'condition',
          },
-         'visual-active-effects.data.content': description,
       };
-      CONFIG.statusEffects.push(condition);
    }
+   CONFIG.statusEffects = conditions;
 }
