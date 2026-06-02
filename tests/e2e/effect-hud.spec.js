@@ -81,10 +81,19 @@ test.describe('native effect HUD', () => {
    });
 
    test('hides when the controlled actor has no effects or conditions', async ({ page }) => {
-      await setupControlledActor(page, { name: 'HUD Empty Actor' });
+      // Seed an effect first and prove the panel shows for this controlled actor. This guards against
+      // a false pass: a bare toHaveCount(0) also succeeds when the actor silently fails to resolve
+      // (HUD never mounts) — so we assert presence, then remove the content and assert the hide.
+      await setupControlledActor(page, { name: 'HUD Empty Actor', addEffect: true });
+      const panel = page.locator('#titan-effect-hud .titan-effect-hud');
+      await expect(panel).toBeVisible();
 
-      // The actor resolves (its token is controlled) but has nothing to show, so no panel renders.
-      await expect(page.locator('#titan-effect-hud .titan-effect-hud')).toHaveCount(0);
+      // Removing every effect empties the actor; the bridge-driven HUD must then hide its panel.
+      await page.evaluate(async () => {
+         const actor = game.actors.getName('HUD Empty Actor');
+         await actor.deleteEmbeddedDocuments('ActiveEffect', actor.effects.map((effect) => effect.id));
+      });
+      await expect(panel).toHaveCount(0);
    });
 
    test('unmounts when the enableEffectHud setting is turned off', async ({ page }) => {
