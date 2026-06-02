@@ -40,7 +40,7 @@ export default function createItemCheckOptions(options) {
       extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,
       healingMod: options.healingMod ?? 0,
       itemId: options.itemId ?? '',
-      itemRollData: options.itemRollData ?? false,
+      itemRollData: options.itemRollData ?? undefined,
       resolveCost: options.resolveCost ?? 0,
       skill: options.skill ?? 'default',
       trainingMod: options.trainingMod ?? 0,
