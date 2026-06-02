@@ -87,4 +87,61 @@ test.describe('effect tray sidebar tab', () => {
          page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' }).first(),
       ).toBeVisible();
    });
+
+   test('Apply copies the effect onto the controlled token actor', async ({ page }) => {
+      // Create an actor + token on the active scene and control it.
+      await page.evaluate(async () => {
+         const stale = game.actors.getName('E2E Tray Target');
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name: 'E2E Tray Target', type: 'player' });
+         const scene = game.scenes.active ?? (await Scene.create({ name: 'E2E Tray Scene', active: true }));
+         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
+            await actor.getTokenDocument({ x: 100, y: 100 }),
+         ]);
+         // Poll until the placeable is rendered on the canvas, then control it. A fixed delay races
+         // canvas readiness and can no-op when the placeable is not yet drawn.
+         await new Promise((resolve) => {
+            /** @type {number} The remaining poll attempts before giving up. */
+            let attempts = 50;
+
+            /** @type {number} The interval handle used to poll for the placeable. */
+            const handle = setInterval(() => {
+               attempts -= 1;
+               if (tokenDoc.object || attempts <= 0) {
+                  clearInterval(handle);
+                  resolve();
+               }
+            }, 50);
+         });
+         tokenDoc.object?.control({ releaseOthers: true });
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await new Promise((resolve) => {
+            setTimeout(resolve, 400);
+         });
+      });
+
+      // Select the seeded world pack via the mounted select element, dispatching a change event so
+      // the Svelte onchange handler fires regardless of the harness's native-select behavior.
+      await page.evaluate(async () => {
+         /** @type {HTMLSelectElement} The mounted pack-select element. */
+         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
+         select.value = 'world.e2e-tray-effects';
+         select.dispatchEvent(new Event('change', { bubbles: true }));
+         await new Promise((resolve) => {
+            setTimeout(resolve, 400);
+         });
+      });
+
+      await page.locator('[data-testid="effect-tray-apply"]').first().click();
+      await page.waitForTimeout(400);
+
+      const applied = await page.evaluate(() => {
+         const actor = game.actors.getName('E2E Tray Target');
+         return [...actor.effects].some((e) => e.name === 'E2E Tray Effect');
+      });
+      expect(applied, 'the effect must be copied onto the controlled token actor').toBe(true);
+   });
 });
