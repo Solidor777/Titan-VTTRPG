@@ -13,7 +13,9 @@
 
    // Provide the actor bridge as the 'document' context so reused effect leaf components
    // (checks, description, owner-gated delete) resolve the active actor exactly as they
-   // do inside the character sheet.
+   // do inside the character sheet. The capture is intentional: documentStore is stable for
+   // this mount's lifetime (the controller remounts the shell when the tracked actor changes).
+   // svelte-ignore state_referenced_locally
    setContext('document', documentStore);
 </script>
 
