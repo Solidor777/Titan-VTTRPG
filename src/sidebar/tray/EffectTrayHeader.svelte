@@ -5,7 +5,10 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { CREATE_ICON, FOLDER_ICON } from '~/system/Icons.js';
 
-   /** @type {object} The reactive tray state from context. */
+   /**
+    * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
+    *    context.
+    */
    const trayState = getContext('trayState');
 
    // The dropdown options: one per visible ActiveEffect compendium.

@@ -1,12 +1,89 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import focusOnMount from '~/helpers/svelte-actions/FocusOnMount.js';
    import EffectTrayRow from '~/sidebar/tray/EffectTrayRow.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { COLLAPSED_ICON, DELETE_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
-   /** @type {object} The reactive tray state from context. */
+   /**
+    * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
+    *    context.
+    */
    const trayState = getContext('trayState');
+
+   /** @type {string | null} The id of the folder currently being renamed inline, or null when none. */
+   let renamingFolderId = $state(null);
+
+   /** @type {string} The working value of the inline folder-rename input. */
+   let folderRenameValue = $state('');
+
+   /** @type {boolean} Whether the current folder rename is being cancelled, so the blur commit is skipped. */
+   let isCancellingFolderRename = false;
+
+   /**
+    * Enters inline-rename mode for a folder, seeding the input with the folder's current name. No-ops
+    * when the current user cannot edit the selected pack.
+    * @param {Folder} folder - The folder to begin renaming.
+    * @returns {void}
+    */
+   function beginFolderRename(folder) {
+      if (!trayState.canEdit) {
+         return;
+      }
+
+      folderRenameValue = folder.name;
+      renamingFolderId = folder.id;
+   }
+
+   /**
+    * Commits the inline folder rename, persisting the new name through the tray state, then reverts
+    * to the static name display. When the rename was cancelled via Escape, clears the cancelling flag
+    * and returns early without persisting.
+    * @param {Folder} folder - The folder being renamed.
+    * @returns {Promise<void>}
+    */
+   async function commitFolderRename(folder) {
+      if (isCancellingFolderRename) {
+         isCancellingFolderRename = false;
+         return;
+      }
+
+      renamingFolderId = null;
+      await trayState.renameFolder(folder, folderRenameValue.trim());
+   }
+
+   /**
+    * Handles keydown within the folder-rename input: Enter commits, Escape cancels.
+    * @param {KeyboardEvent} event - The keydown event.
+    * @param {Folder} folder - The folder being renamed.
+    * @returns {void}
+    */
+   function onFolderRenameKeydown(event, folder) {
+      if (event.key === 'Enter') {
+         event.preventDefault();
+         void commitFolderRename(folder);
+      }
+      else if (event.key === 'Escape') {
+         event.preventDefault();
+         isCancellingFolderRename = true;
+         renamingFolderId = null;
+      }
+   }
+
+   /**
+    * Handles keydown on the static folder name: Enter or F2 begins inline rename, mirroring the
+    * double-click affordance for keyboard users.
+    * @param {KeyboardEvent} event - The keydown event.
+    * @param {Folder} folder - The folder to begin renaming.
+    * @returns {void}
+    */
+   function onFolderNameKeydown(event, folder) {
+      if (event.key === 'Enter' || event.key === 'F2') {
+         event.preventDefault();
+         beginFolderRename(folder);
+      }
+   }
 
    // The lowercased search term, computed once per filter change rather than per element.
    /** @type {string} The lowercased search filter text. */
@@ -124,7 +201,29 @@
                   testId="effect-tray-folder-toggle"
                   tooltip={group.folder.name}
                />
-               <span class="effect-tray-folder-name">{group.folder.name}</span>
+
+               <!--Folder name (double-click to rename when editable)-->
+               {#if renamingFolderId === group.folder.id}
+                  <input
+                     class="effect-tray-folder-rename"
+                     data-testid="effect-tray-folder-rename"
+                     type="text"
+                     use:focusOnMount
+                     onblur={() => void commitFolderRename(group.folder)}
+                     onkeydown={(event) => onFolderRenameKeydown(event, group.folder)}
+                     bind:value={folderRenameValue}
+                  />
+               {:else}
+                  <span
+                     class="effect-tray-folder-name"
+                     role="button"
+                     tabindex={trayState.canEdit ? 0 : -1}
+                     ondblclick={() => beginFolderRename(group.folder)}
+                     onkeydown={(event) => onFolderNameKeydown(event, group.folder)}
+                  >
+                     {group.folder.name}
+                  </span>
+               {/if}
                <span class="effect-tray-folder-count">{group.effects.length}</span>
 
                {#if trayState.canEdit}
@@ -232,6 +331,13 @@
                overflow: hidden;
                text-overflow: ellipsis;
                white-space: nowrap;
+            }
+
+            .effect-tray-folder-rename {
+               @include input;
+               @include margin-left-standard;
+
+               flex: 1;
             }
 
             .effect-tray-folder-count {

@@ -3,7 +3,10 @@
    import EffectTrayHeader from '~/sidebar/tray/EffectTrayHeader.svelte';
    import EffectTrayList from '~/sidebar/tray/EffectTrayList.svelte';
 
-   /** @type {object} The reactive tray state from context. */
+   /**
+    * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
+    *    context.
+    */
    const trayState = getContext('trayState');
 
    /**

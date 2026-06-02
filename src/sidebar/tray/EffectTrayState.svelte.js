@@ -5,6 +5,14 @@ import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
  * Reactive state for the Effect Tray: the available compendiums, the selected pack, its loaded
  * effect documents, the search filter, and expanded-folder tracking. Lives in Svelte context and is
  * read by every tray component. Refreshes itself when the selected pack's contents change.
+ *
+ * Public interface (read by tray components via `getContext('trayState')`):
+ * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `filter`, `expandedFolders`,
+ *   `folders`.
+ * - Getters: `selectedPack`, `canEdit`.
+ * - Methods: `selectPack`, `refresh`, `createBlankEffect`, `duplicateEffect`, `renameEffect`,
+ *   `stashFromDragData`, `createFolder`, `renameFolder`, `deleteFolder`, `moveEffectToFolder`,
+ *   `toggleFolder`, `destroy`.
  */
 export default class EffectTrayState {
 

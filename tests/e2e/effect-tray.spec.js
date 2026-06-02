@@ -206,6 +206,56 @@ test.describe('effect tray sidebar tab', () => {
       expect(deleted, 'the created effect must be deletable from the pack').toBe(true);
    });
 
+   test('renaming a folder inline persists the new name to the pack', async ({ page }) => {
+      // Seed a folder in the world pack to rename, render the tray, and select the world pack.
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         const stale = pack.folders.find((f) => f.name === 'E2E Rename Folder' || f.name === 'E2E Renamed Folder');
+         if (stale) {
+            await stale.delete();
+         }
+         await Folder.create({ name: 'E2E Rename Folder', type: 'ActiveEffect' }, { pack: pack.collection });
+
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await new Promise((resolve) => {
+            setTimeout(resolve, 300);
+         });
+
+         /** @type {HTMLSelectElement} The mounted pack-select element. */
+         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
+         select.value = 'world.e2e-tray-effects';
+         select.dispatchEvent(new Event('change', { bubbles: true }));
+         await new Promise((resolve) => {
+            setTimeout(resolve, 400);
+         });
+      });
+
+      // Double-click the folder name to enter inline rename, type a new name, and commit with Enter.
+      await page.locator('[data-testid="effect-tray-folder"]', { hasText: 'E2E Rename Folder' })
+         .locator('.effect-tray-folder-name')
+         .first()
+         .dblclick();
+      const input = page.locator('[data-testid="effect-tray-folder-rename"]').first();
+      await input.fill('E2E Renamed Folder');
+      await input.press('Enter');
+      await page.waitForTimeout(400);
+
+      const renamed = await page.evaluate(() => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         return pack.folders.some((f) => f.name === 'E2E Renamed Folder')
+            && !pack.folders.some((f) => f.name === 'E2E Rename Folder');
+      });
+      expect(renamed, 'the folder must be renamed in the pack').toBe(true);
+
+      // Clean up the seeded folder so the shared world pack is left as later tests expect.
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         const folder = pack.folders.find((f) => f.name === 'E2E Renamed Folder');
+         await folder?.delete();
+      });
+   });
+
    test('stash-from-actor copies a dropped effect into the selected pack', async ({ page }) => {
       // Create an actor that owns an effect to stash, render the tray, and select the world pack.
       await page.evaluate(async () => {

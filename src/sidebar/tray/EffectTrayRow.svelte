@@ -15,7 +15,10 @@
    /** @type {EffectTrayRowProps} */
    const { effect } = $props();
 
-   /** @type {object} The reactive tray state from context. */
+   /**
+    * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
+    *    context.
+    */
    const trayState = getContext('trayState');
 
    /** @type {string} The localized label for the Apply to Target button. */
