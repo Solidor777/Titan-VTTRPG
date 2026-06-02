@@ -373,7 +373,8 @@ and one or more inner Svelte component trees.
   `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from the tab's `_onClose`)
   removes them. `canEdit` = unlocked pack + owner level; it gates all CRUD/folder writes.
 - UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone) → `EffectTrayHeader` (compendium
-  `Select` dropdown, search, owner-gated New / New Folder) + `EffectTrayList` (folder-grouped or flat) of
+  `Select` dropdown, search, owner-gated New / New Folder) + `EffectTrayList` (folder-grouped or flat; folder
+  headers carry owner-gated inline-rename mirroring the row, plus collapse toggle, count, delete) of
   `EffectTrayRow` (icon, inline-rename, owner-gated Open/Duplicate/Delete, drag-out via `effect.toDragData()`, and
   an always-visible owner-gated **Apply**). Apply uses `applyEffectToTargets()`
   (`src/helpers/utility-functions/ApplyEffectToTargets.js`) → copies `effect.toObject()` onto each
