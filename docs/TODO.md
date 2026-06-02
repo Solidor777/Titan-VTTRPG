@@ -139,6 +139,14 @@ split off to keep that spec focused.
 
 ### 5. Confirm-delete dialog for effects
 
+- **Status: COMPLETE.** Added a `confirmDeletingEffects` client setting (default
+  true, Shift inverts) + `shouldConfirmDeletingEffects` helper +
+  `ConfirmDeleteEffectDialog` + `requestEffectDeletion`/`safeDeleteEffect` on
+  `CharacterDataModel` (inherited by player + npc). The effect-row delete button
+  is repointed off the raw `effect.delete()` onto `requestEffectDeletion` and its
+  `deleteItem`->`deleteEffect` label fixed. Two new `interaction-dialogs` e2e
+  cases cover confirm-on (dialog mounts, effect persists) and confirm-off
+  (immediate deletion). Commit `fd9ececd`.
 - **What:** Effect deletion uses native `effect.delete()` (owner-gated) with no
   confirmation dialog. The "confirm deleting items" setting and
   `ConfirmDeleteItemDialog` are item-only, so effects bypass it.

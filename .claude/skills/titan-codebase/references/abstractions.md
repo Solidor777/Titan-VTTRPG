@@ -324,6 +324,11 @@ and one or more inner Svelte component trees.
   `CharacterSheetEffect` takes an `effect` prop, reuses the generic `CharacterSheetItem` shell, and
   exposes a `CharacterSheetEffectToggleActiveButton.svelte` (active = `effect.system.isActive`,
   toggled via `document.data.system.toggleEffectActive(effect.id)`) shown for all duration types.
+  Its delete button routes through `document.data.system.requestEffectDeletion(effect.id)`, which —
+  gated by the `confirmDeletingEffects` client setting (default true, Shift inverts, via
+  `ShouldConfirmDeletingEffects`) — either shows `ConfirmDeleteEffectDialog` or immediately calls
+  `safeDeleteEffect` (owner-gated `deleteEmbeddedDocuments('ActiveEffect', …)`). This mirrors the
+  item path (`requestItemDeletion`/`safeDeleteItem`/`ConfirmDeleteItemDialog`/`confirmDeletingItems`).
 
 **Item sheets**
 
