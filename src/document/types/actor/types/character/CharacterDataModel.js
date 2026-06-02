@@ -452,7 +452,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       this._calculateBaseResources();
       this._resetDynamicMods();
       this._applyRulesElements();
-      this._applyConditions();
       this._applyArmorAndShields();
       this._applyMods();
       this._clampResources();
@@ -536,7 +535,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {ActiveEffect[]|boolean} Array of standard conditions affecting this actor, or false if there are none.
     */
    getConditions() {
-      const conditions = this.parent.effects.filter((effect) => effect.flags.titan?.type === 'condition');
+      const conditions = this.parent.effects.filter((effect) => effect.type === 'condition');
       return conditions.length > 0 ? conditions : null;
    }
 
@@ -658,6 +657,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          mods.equipment = 0;
          mods.effect = 0;
          mods.ability = 0;
+         mods.condition = 0;
       }
 
       // Attributes.
@@ -825,6 +825,19 @@ export default class CharacterDataModel extends TitanActorDataModel {
             effect.system.rulesElement.length > 0
          ) {
             processElements(effect.system.rulesElement, 'effect');
+         }
+      });
+
+      // Also process Rules Elements from the actor's condition Active Effects. Conditions are the 'condition'
+      // subtype; their rules elements derive stats through the same pipeline as effects, tagged 'condition'.
+      this.parent.effects.forEach((effect) => {
+         if (
+            effect.type === 'condition' &&
+            !effect.disabled &&
+            effect.system.rulesElement &&
+            effect.system.rulesElement.length > 0
+         ) {
+            processElements(effect.system.rulesElement, 'condition');
          }
       });
 
@@ -1615,125 +1628,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
 
       this.rulesElementsCache.conditionalCheckModifier = false;
-   }
-
-   /**
-    * Applies the effects of conditions to the Character.
-    * @private
-    */
-   _applyConditions() {
-      // If there are any valid conditions.
-      const conditions = this.getConditions();
-      if (conditions) {
-
-         // Make the modifications for each condition.
-         for (const condition of conditions) {
-            switch (condition.name) {
-
-               // Blinded.
-               case 'blinded': {
-
-                  // Decrease Melee, Accuracy, and Defense by 1.
-                  this.rating.melee.mod.effect -= 1;
-                  this.rating.accuracy.mod.effect -= 1;
-                  this.rating.defense.mod.effect -= 1;
-
-                  break;
-               }
-
-               // Contaminated.
-               case 'contaminated': {
-
-                  // Decrease all Skills and Resistances by 1.
-                  for (const attribute of Object.values(this.attribute)) {
-                     attribute.mod.effect -= 1;
-                  }
-                  for (const resistance of Object.values(this.resistance)) {
-                     resistance.mod.effect -= 1;
-                  }
-                  break;
-               }
-
-               // Prone.
-               case 'prone': {
-
-                  // Decrease Speed by half.
-                  for (const speed of Object.values(this.speed)) {
-
-                     // Calculate the total speed.
-                     let speedValue = speed.baseValue;
-                     for (const mod of Object.values(speed.mod)) {
-                        speedValue += mod;
-                     }
-
-                     // Set the effect mod so that the total speed is 1/2 of normal.
-                     if (speedValue > 0) {
-                        speed.mod.effect -= (Math.ceil(speedValue / 2));
-                     }
-                  }
-
-                  break;
-               }
-
-               // Restrained.
-               case 'restrained': {
-
-                  // Decrease Melee, Accuracy, and Defense by 1.
-                  this.rating.melee.mod.effect -= 1;
-                  this.rating.accuracy.mod.effect -= 1;
-                  this.rating.defense.mod.effect -= 1;
-
-                  // Decrease Speed to 0.
-                  for (const speed of Object.values(this.speed)) {
-
-                     // Calculate the total speed.
-                     let speedValue = speed.baseValue;
-                     for (const mod of Object.values(speed.mod)) {
-                        speedValue += mod;
-                     }
-
-                     // Set the effect speed so that the total speed is 0.
-                     if (speedValue > 0) {
-                        speed.mod.effect -= speedValue;
-                     }
-                  }
-
-                  break;
-               }
-
-               // Sleep.
-               case 'sleep': {
-
-                  // Calculate the total awareness.
-                  const awareness = this.rating.awareness;
-                  let awarenessValue = awareness.baseValue + awareness.mod.static + awareness.equipment;
-                  for (const mod of Object.values(awareness.mod)) {
-                     awarenessValue += mod;
-                  }
-
-                  // Set the effect mod so that the total awareness is 1/2 of normal.
-                  if (awarenessValue > 0) {
-                     awareness.mod.effect -= (Math.ceil(awarenessValue / 2));
-                  }
-
-                  break;
-               }
-
-               // Sleep.
-               case 'stunned': {
-
-                  // Decrease Defense by 1.
-                  this.rating.defense.mod.effect -= 1;
-
-                  break;
-               }
-
-               default: {
-                  break;
-               }
-            }
-         }
-      }
    }
 
    /**
