@@ -3,7 +3,7 @@ import resolveHudActor from '~/ui/effect-hud/ResolveHudActor.js';
 
 /**
  * Builds a minimal mock actor for resolution tests.
- * @param {string} id - The actor id.
+ * @param {string} id - Unique identifier used to match the mock against the resolution ladder.
  * @param {boolean} [isOwner] - Whether the user owns the actor.
  * @returns {{ id: string, isOwner: boolean }} The mock actor.
  */
