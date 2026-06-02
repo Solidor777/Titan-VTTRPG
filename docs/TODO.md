@@ -115,6 +115,24 @@ split off to keep that spec focused.
 
 ### 2. Custom sidebar-tab effect directory
 
+- **Status: COMPLETE (sub-project A).** Shipped the Effect Tray: a native
+  `titanEffects` sidebar tab (`TitanEffectTrayTab` extends `AbstractSidebarTab`,
+  mounts a Svelte tray; registered additively via `Sidebar.TABS` +
+  `CONFIG.ui.titanEffects`). A compendium **dropdown** selects any visible
+  `ActiveEffect` pack (system + the user's own); **search**; per-row one-click
+  **Apply** (owner-gated copy to smart targets) + drag-to-apply; **full CRUD**
+  (create / stash-from-actor drag-in / duplicate / inline rename / confirmed
+  delete / open sheet) and native compendium **folders**. The shared
+  `getBestCharactersToUpdate` targeting ladder was upgraded in place (damage/
+  healing benefit too). Spec/plan:
+  `docs/superpowers/specs/2026-06-02-effect-tray-sidebar-tab-design.md`,
+  `docs/superpowers/plans/2026-06-02-effect-tray-sidebar-tab.md`. Covered by
+  `tests/e2e/effect-tray.spec.js` (5 cases) + `tests/unit/GetEffectCompendiums.test.js`
+  and `tests/unit/GetBestCharactersToUpdate.test.js`.
+- **Sub-project B (deferred):** ship a seeded *standard effects* compendium — needs
+  a pack-build pipeline (foundryvtt-cli `compilePack` or ClassicLevel) and the
+  effect content (a future rulebook-scrape script). The tray already works against
+  the empty scratch pack and user packs; B just fills a pack with shipped defaults.
 - **What:** A custom sidebar-tab directory (ApplicationV2 + Svelte) presenting a
   browsable library of reusable effects, backed by the ActiveEffect compendium
   (or a world-setting store), as a dedicated top-level tab.

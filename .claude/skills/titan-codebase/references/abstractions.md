@@ -356,6 +356,36 @@ and one or more inner Svelte component trees.
   NATIVE `description` field, persisting via `document.data.update({ description })`; the Checks and
   Rules Elements tabs reuse the item `ItemSheet*` components unchanged.
 
+**Effect Tray sidebar tab**
+
+- `TitanEffectTrayTab` (`src/sidebar/TitanEffectTrayTab.js`) extends
+  `foundry.applications.sidebar.AbstractSidebarTab` (an `ApplicationV2`) and mounts a Svelte tray the same way
+  sheets mount shells (imperative `mount()`/`unmount()` in `_replaceHTML`/`_onClose`, gated on
+  `options.isFirstRender`). It has NO backing document; instead it builds an `EffectTrayState` and sets it into
+  Svelte context as `'trayState'`. Registered additively in `OnceInit.js` (`Sidebar.TABS.titanEffects` +
+  `CONFIG.ui.titanEffects`); core instantiates `ui.titanEffects` and handles the tab strip / activation / popout.
+- `EffectTrayState` (`src/sidebar/tray/EffectTrayState.svelte.js`) is a Svelte 5 runes class holding `compendiums`,
+  `selectedPackId`, `effects`, `folders`, `filter`, and `expandedFolders`. `getEffectCompendiums()`
+  (`src/sidebar/tray/GetEffectCompendiums.js`) lists visible `ActiveEffect`-type packs (system/TITAN first, then
+  alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/system packs filtered to `type==='effect'`; user
+  packs show all), with a post-await stale-selection guard. The last-selected pack persists in the per-user
+  `effectTrayLastPack` client setting. The state registers create/update/delete hooks for both `ActiveEffect` and
+  `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from the tab's `_onClose`)
+  removes them. `canEdit` = unlocked pack + owner level; it gates all CRUD/folder writes.
+- UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone) → `EffectTrayHeader` (compendium
+  `Select` dropdown, search, owner-gated New / New Folder) + `EffectTrayList` (folder-grouped or flat) of
+  `EffectTrayRow` (icon, inline-rename, owner-gated Open/Duplicate/Delete, drag-out via `effect.toDragData()`, and
+  an always-visible owner-gated **Apply**). Apply uses `applyEffectToTargets()`
+  (`src/helpers/utility-functions/ApplyEffectToTargets.js`) → copies `effect.toObject()` onto each
+  `getBestCharactersToUpdate()` target the user owns. Stash-in resolves the drop via
+  `getDocumentClass('ActiveEffect').fromDropData(...)` and creates a copy in the selected pack (guarding against
+  re-stashing an effect already in that pack). The system ships one empty `effects` compendium (scratch); seeding a
+  standard-effects pack + pack-build pipeline is deferred (backlog #2 sub-project B).
+- **Shared-targeting upgrade:** `getBestCharactersToUpdate()` (`src/helpers/utility-functions/`) was upgraded for
+  this feature (used by damage/healing too): the prior primary order is preserved and fallbacks are appended — GM:
+  targeted → controlled → focused-sheet actor; player: controlled → assigned (`game.user.character`) →
+  focused-sheet actor (`GetFocusedCharacterSheetActor.js`, reads `ui.activeWindow`), de-duplicated by id.
+
 
 ## Shared helpers
 

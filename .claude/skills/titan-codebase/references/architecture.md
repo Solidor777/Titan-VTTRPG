@@ -14,6 +14,10 @@
   Svelte actions in `svelte-actions/`, world-migration logic in `migration/`, and shared dialog helpers in `dialogs/`.
 - `src/hooks/` — One file per Foundry hook, each exporting a single handler. See "## Module boundaries" for
   specifics on which hooks are wired and when.
+- `src/sidebar/` — Custom sidebar-tab layer. `TitanEffectTrayTab.js` (extends `AbstractSidebarTab`, mounts Svelte
+  like a sheet) plus a `tray/` folder of the Effect Tray UI (`EffectTrayState.svelte.js` runes state,
+  `GetEffectCompendiums.js`, and the shell/tray/header/list/row components). Registered in `OnceInit.js`. See
+  `abstractions.md` "Effect Tray sidebar tab".
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), CSS custom-property variables
   (`Variables.scss`), global resets (`Global.scss`), a prepended `Root.scss` (injected into every Svelte component
   via svelte-preprocess), and a `Mixins/` folder of per-domain SCSS mixin files covering flex, font, border, button,
@@ -34,7 +38,9 @@
 - `OnceInit.js` (Foundry `init` hook) does all heavy registration: creates `game.titan` namespace, calls
   `registerSystemSettings()` and `registerInitiativeFormula()` from `src/system/`, sets `CONFIG.Actor`,
   `CONFIG.Item`, `CONFIG.ChatMessage`, and `CONFIG.Combat` document classes and data models from `src/document/`,
-  and registers all sheet classes.
+  and registers all sheet classes. It also registers the custom Effect Tray sidebar tab additively —
+  `foundry.applications.sidebar.Sidebar.TABS.titanEffects = { icon, tooltip }` plus
+  `CONFIG.ui.titanEffects = TitanEffectTrayTab` (no `Sidebar` subclass; core instantiates `ui.titanEffects`).
 - `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`. That module
   exports a pure `buildConditionDefinitions()` (no `game`/localize access, unit-tested) returning the static
   condition list — every entry is `type: 'condition'`, and the six mechanically-active conditions (blinded,
