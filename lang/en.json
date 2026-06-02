@@ -648,6 +648,10 @@
          "label": "Confirm Deleting Effects from Actors",
          "hint": "If true, a confirmation dialog will be displayed when attempting to delete an Effect from an Actor. Can be suppressed by holding Shift."
       },
+      "enableEffectHud": {
+         "label": "Enable Effect HUD",
+         "hint": "If true, a panel listing the active character's conditions and effects is shown on screen, replacing the Visual Active Effects module."
+      },
       "autoOpenCharacterSheetsPlayer": {
          "label": "Auto-Open Character Sheets (Player Only)",
          "hint": "Configure whether to automatically open an owned character's sheet on their turn in combat. This setting only applies to Players."
