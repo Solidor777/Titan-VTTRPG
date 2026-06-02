@@ -112,18 +112,14 @@
          document.data.system.rulesElement[idx].checkType === 'attack'
       ) {
          document.data.system.rulesElement[idx].checkType = 'any';
-         if (onCheckTypeChange() !== true) {
-            document.data.update({
-               system: structuredClone(document.data.system),
-            });
-         }
+         onCheckTypeChange();
       }
    }
 
    /**
     * Updates the selector when the check type changes.
     * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a valid 'skill' selector.
-    * @returns {boolean} Whether a document update was triggered.
+    * @returns {void}
     */
    function onCheckTypeChange() {
       if (
@@ -134,15 +130,12 @@
       ) {
          document.data.system.rulesElement[idx].selector = 'any';
          onSelectorChange();
-
-         return true;
       }
-
-      return false;
    }
 
    /**
-    * Updates the element key to a default value when the selector changes, then triggers a document update.
+    * Updates the element key to a default value when the selector changes.
+    * @returns {void}
     */
    function onSelectorChange() {
       switch (document.data.system.rulesElement[idx].selector) {
@@ -175,10 +168,6 @@
             break;
          }
       }
-
-      document.data.update({
-         system: structuredClone(document.data.system),
-      });
    }
 
    /**
