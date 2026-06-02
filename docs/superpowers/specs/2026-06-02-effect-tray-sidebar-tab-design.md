@@ -71,9 +71,17 @@ Register the tab the blessed v14 way rather than fighting the sidebar with a
 - Additively add a `titanEffects` entry to `Sidebar.TABS` (icon + tooltip) at
   `init` and set `CONFIG.ui.titanEffects = TitanEffectTrayTab`. **No wholesale
   `Sidebar` replacement** — additive mutation minimizes collision risk with
-  modules. (Planning verifies whether mutating the static `TABS` suffices or a
-  minimal `Sidebar` subclass assigned to `CONFIG.ui.sidebar` is required; this is
-  the documented feasibility hinge.)
+  modules.
+- **Feasibility hinge — RESOLVED (Task 1, 2026-06-02).** Mutating the static
+  `Sidebar.TABS` plus setting `CONFIG.ui.titanEffects` at `init` **is
+  sufficient**; no `Sidebar` subclass / `CONFIG.ui.sidebar` override is needed.
+  Verified in the v14 client source: `Game#initialize` fires `Hooks.callAll("init")`
+  before `Game#setupGame` → `Game#initializeUI`, and `initializeUI` instantiates
+  every `ui[k] = new cls()` from `Object.entries(CONFIG.ui)`; `Sidebar` reads
+  `this.constructor.TABS` at render time and `#renderTabs` renders `ui[id]` into a
+  per-tab stub. The Task 1 e2e (`tests/e2e/effect-tray.spec.js`) confirms at runtime
+  that `ui.titanEffects` exists, the tab is in `Sidebar.TABS` + `CONFIG.ui`, and the
+  Svelte panel mounts with no console errors.
 - Core then handles the tab-strip icon, active-tab switching, expand/collapse, and
   popout for free.
 

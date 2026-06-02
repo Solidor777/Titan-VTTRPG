@@ -35,6 +35,9 @@ import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActi
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
 import TitanActiveEffectSheet from '~/document/types/active-effect/sheet/TitanActiveEffectSheet.js';
 
+// Sidebar tab.
+import TitanEffectTrayTab from '~/sidebar/TitanEffectTrayTab.js';
+
 /**
  * Attached to the Init Hook.
  * Sets up the Titan system once the game is initiated.
@@ -166,6 +169,15 @@ export default function onceInit() {
          label: localize('defaultEffectSheet'),
       },
    );
+
+   // Register the TITAN Effect Tray sidebar tab (additive — do not replace the core Sidebar). The
+   // init hook runs before Game#initializeUI instantiates ui[tabId] from CONFIG.ui, so mutating the
+   // static Sidebar.TABS and setting CONFIG.ui.titanEffects here is sufficient for the tab to appear.
+   foundry.applications.sidebar.Sidebar.TABS.titanEffects = {
+      icon: 'fa-solid fa-wand-sparkles',
+      tooltip: 'TYPES.SidebarTab.titanEffects',
+   };
+   CONFIG.ui.titanEffects = TitanEffectTrayTab;
 
    // Unregister old sheet classes.
    foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);

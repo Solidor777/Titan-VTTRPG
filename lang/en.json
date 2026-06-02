@@ -893,6 +893,9 @@
          "shield": "Shield",
          "spell": "Spell",
          "weapon": "Weapon"
+      },
+      "SidebarTab": {
+         "titanEffects": "TITAN Effects"
       }
    }
 }
