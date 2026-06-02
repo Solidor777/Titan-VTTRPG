@@ -7,6 +7,7 @@ import AttributeCheckDialog from '~/check/types/attribute-check/dialog/Attribute
 import CastingCheck from '~/check/types/casting-check/CastingCheck.js';
 import CastingCheckDialog from '~/check/types/casting-check/dialog/CastingCheckDialog.js';
 import ConfirmDeleteItemDialog from '~/document/types/actor/dialogs/ConfirmDeleteItemDialog.js';
+import ConfirmDeleteEffectDialog from '~/document/types/actor/dialogs/ConfirmDeleteEffectDialog.js';
 import ConfirmRemoveExpiredEffectsDialog
    from '~/document/types/actor/types/character/dialogs/ConfirmRemoveExpiredEffectsDialog.js';
 import ItemCheck from '~/check/types/item-check/ItemCheck.js';
@@ -87,6 +88,7 @@ import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import pushUnique from '~/helpers/utility-functions/PushUnique.js';
 import shouldConfirmDeletingItems from '~/helpers/utility-functions/ShouldConfirmDeletingItems.js';
+import shouldConfirmDeletingEffects from '~/helpers/utility-functions/ShouldConfirmDeletingEffects.js';
 import shouldGetCheckOptions from '~/helpers/utility-functions/ShouldGetCheckOptions.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import sortObjectsIntoContainerByFunctionValue
@@ -6197,6 +6199,50 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.name,
       )) {
          await this.parent.deleteEmbeddedDocuments('Item', [itemId]);
+      }
+   }
+
+   /**
+    * Requests deletion of an Active Effect from this Character, prompting for confirmation per the
+    * confirmDeletingEffects setting (suppressed by holding the modifier key).
+    * @param {string} effectId - The ID of the Effect to delete.
+    * @returns {Promise<void>}
+    */
+   async requestEffectDeletion(effectId) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+
+         // If the deletion does not need to be confirmed, then delete the effect.
+         if (!shouldConfirmDeletingEffects()) {
+            await this.safeDeleteEffect(effectId);
+         }
+
+         // Otherwise, confirm deleting the effect.
+         const effect = this.parent.effects.get(effectId);
+         if (effect) {
+            new ConfirmDeleteEffectDialog(
+               this.parent,
+               effect,
+            ).render(true);
+         }
+      }
+   }
+
+   /**
+    * Deletes an Active Effect from this Character without a confirmation dialog.
+    * @param {string} effectId - The ID of the Effect to be deleted.
+    * @returns {Promise<void>}
+    */
+   async safeDeleteEffect(effectId) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         await this.parent.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
       }
    }
 

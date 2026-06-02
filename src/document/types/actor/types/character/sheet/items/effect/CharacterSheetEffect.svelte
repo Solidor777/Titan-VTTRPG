@@ -119,9 +119,9 @@
       <div class="button">
          <DocumentOwnerIconButton
             icon={DELETE_ICON}
-            label={localize('deleteItem')}
-            onclick={() => effect.delete()}
-            tooltip={localize('deleteItem')}
+            label={localize('deleteEffect')}
+            onclick={() => document.data.system.requestEffectDeletion(effect.id)}
+            tooltip={localize('deleteEffect')}
          />
       </div>
    {/snippet}

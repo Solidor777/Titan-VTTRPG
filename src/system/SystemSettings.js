@@ -23,6 +23,16 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
+   // Confirm Deleting Effects.
+   game.settings.register('titan', 'confirmDeletingEffects', {
+      config: true,
+      default: true,
+      hint: 'SETTINGS.confirmDeletingEffects.hint',
+      name: 'SETTINGS.confirmDeletingEffects.text',
+      scope: 'client',
+      type: Boolean,
+   });
+
    // Auto-open Combatant Sheets for Players.
    game.settings.register('titan', 'autoOpenCharacterSheetsPlayer', {
       config: true,

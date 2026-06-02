@@ -93,9 +93,19 @@ test.describe('v14 interaction dialogs', () => {
             },
          ]);
 
+         // An owned effect that exists so it can be targeted by the confirm-delete-effect dialog.
+         await actor.createEmbeddedDocuments('ActiveEffect', [
+            {
+               name: 'E2E Dialog Effect',
+               type: 'effect',
+               disabled: false,
+            },
+         ]);
+
          // Default the gating settings to off; each test flips the one it needs.
          await game.settings.set('titan', 'getCheckOptions', false);
          await game.settings.set('titan', 'confirmDeletingItems', false);
+         await game.settings.set('titan', 'confirmDeletingEffects', false);
       });
    });
 
@@ -143,6 +153,41 @@ test.describe('v14 interaction dialogs', () => {
 
       await expect(page.locator(DIALOG_SELECTOR).first()).toBeVisible();
       expect(errors, `uncaught errors during confirm-delete dialog render:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   // Confirm-delete-effect dialog (forced via the confirmDeletingEffects setting + requestEffectDeletion).
+   test('confirm-delete-effect dialog mounts', async ({ page }) => {
+      const errors = await triggerInWorld(page, `
+         const actor = game.actors.getName('E2E Dialog Actor');
+         const effect = actor.effects.getName('E2E Dialog Effect');
+         await game.settings.set('titan', 'confirmDeletingEffects', true);
+         await actor.system.requestEffectDeletion(effect.id);
+      `);
+
+      await expect(page.locator(DIALOG_SELECTOR).first()).toBeVisible();
+
+      // The effect must still exist while the confirmation is pending.
+      const stillPresent = await page.evaluate(() =>
+         !!game.actors.getName('E2E Dialog Actor').effects.getName('E2E Dialog Effect'));
+      expect(stillPresent, 'effect is not deleted until the dialog is confirmed').toBe(true);
+      expect(errors, `uncaught errors during confirm-delete-effect dialog render:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   // Immediate effect deletion when confirmation is disabled (requestEffectDeletion -> safeDeleteEffect).
+   test('requestEffectDeletion deletes immediately when confirmation is disabled', async ({ page }) => {
+      const errors = await triggerInWorld(page, `
+         const actor = game.actors.getName('E2E Dialog Actor');
+         const effect = actor.effects.getName('E2E Dialog Effect');
+         await game.settings.set('titan', 'confirmDeletingEffects', false);
+         await actor.system.requestEffectDeletion(effect.id);
+      `);
+
+      // No dialog should have mounted, and the effect should be gone.
+      await expect(page.locator(DIALOG_SELECTOR)).toHaveCount(0);
+      const gone = await page.evaluate(() =>
+         !game.actors.getName('E2E Dialog Actor').effects.getName('E2E Dialog Effect'));
+      expect(gone, 'effect deleted immediately with no confirmation').toBe(true);
+      expect(errors, `uncaught errors during immediate effect deletion:\n${errors.join('\n')}`).toEqual([]);
    });
 
    // Add custom-trait dialog (TitanItem#addCustomTrait).
