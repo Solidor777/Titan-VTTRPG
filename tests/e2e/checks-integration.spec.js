@@ -99,8 +99,8 @@ test.describe('v14 checks integration (forced dice)', () => {
          // Force the known dice sequence immediately before rolling.
          await forceDice(page, FORCED_FACES);
 
-         // Capture the pre-roll message count and fire the gated request, then poll for the
-         // message this roll produced rather than sleeping a fixed delay.
+         // Snapshot the baseline count and fire the roll in one serialized evaluate so no message
+         // can slip between the snapshot and the invocation; then poll for the message it produced.
          const before = await page.evaluate(async ({ actorLocate, invokeSrc }) => {
             const actor = new Function(`return (${actorLocate})()`)();
             const fixtures = {
