@@ -31,6 +31,12 @@ export default class TitanEffectHud {
     * @returns {void}
     */
    init() {
+      // Guard against double-initialization (e.g. a dev hot reload) so we never orphan a
+      // container, duplicate the hook listeners, or leak a second mounted tree.
+      if (this.#element) {
+         return;
+      }
+
       // Build the fixed-position container above the players list.
       this.#element = window.document.createElement('div');
       this.#element.id = 'titan-effect-hud';
