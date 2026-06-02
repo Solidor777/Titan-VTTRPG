@@ -18,3 +18,4 @@ packs/**/LOG
 packs/**/LOCK
 *.old
 tests/vendor/
+.superpowers/
