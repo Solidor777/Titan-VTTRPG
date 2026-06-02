@@ -532,7 +532,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Gets all the standard conditions affecting this Character.
-    * @returns {ActiveEffect[]|boolean} Array of standard conditions affecting this actor, or false if there are none.
+    * @returns {ActiveEffect[]|null} Array of conditions affecting this actor, or null if there are none.
     */
    getConditions() {
       const conditions = this.parent.effects.filter((effect) => effect.type === 'condition');
@@ -815,8 +815,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
       });
 
-      // Also process Rules Elements from the actor's effect Active Effects. Only the 'effect' subtype carries
-      // Rules Elements; conditions and other subtypes are skipped. Disabled effects contribute nothing.
+      // Process Rules Elements from the actor's Active Effects: the 'effect' subtype (tagged 'effect') and
+      // the 'condition' subtype (tagged 'condition') both contribute; disabled effects and other subtypes
+      // are skipped.
       this.parent.effects.forEach((effect) => {
          if (
             effect.type === 'effect' &&

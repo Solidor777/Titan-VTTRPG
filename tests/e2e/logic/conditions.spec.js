@@ -42,6 +42,9 @@ test.describe('conditions — derived-stat mechanics', () => {
    /**
     * Creates the boosted actor, captures a baseline snapshot, toggles the condition, and returns
     * { baseline, after } snapshots of the derived stat block. Runs entirely in the browser.
+    * @param {import('@playwright/test').Page} page - The Playwright page fixture.
+    * @param {string} statusId - The status effect id to toggle (e.g., 'blinded').
+    * @returns {Promise<{baseline: object, after: object}>} Before and after derived-stat snapshots.
     */
    async function applyCondition(page, statusId) {
       return page.evaluate(async ({ name, abilityData, statusId }) => {
