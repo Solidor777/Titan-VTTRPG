@@ -205,8 +205,18 @@ split off to keep that spec focused.
 
 ## E2E suite — related items
 
-### 8. Harden the `itemRollData` false-sentinel root cause
+### 8. Harden the `itemRollData` false-sentinel root cause — DONE
 
+- **Status: COMPLETE.** Both prongs shipped: `createItemCheckOptions`
+  (`src/check/types/item-check/ItemCheckOptions.js`) now passes `itemRollData`
+  through unchanged (absent → `undefined`, a true "absent") instead of defaulting
+  to the literal `false`, so `??` and `||` behave identically across every
+  consumer; and `initializeItemCheckOptions` (`CharacterDataModel.js`) now writes
+  the resolved roll data back into `checkOptions.itemRollData` so
+  post-initialization readers get the real object. A grep confirmed all current
+  `itemRollData` consumers use truthy checks, so the sentinel change is
+  behavior-preserving. Parity unit test: `tests/unit/CreateItemCheckOptions.test.js`
+  (default-`undefined` + passthrough + shape). Commits `52015399`, `bfb592d8`.
 - **What:** The 2b-3 fix (`fix(item-check)`, commit `f155c1e0`) changed
   `validateItemCheckOptions` from `??` to `||` so the literal-`false`
   `itemRollData` default falls back to the item lookup. That was the deliberate
@@ -227,8 +237,19 @@ split off to keep that spec focused.
   is hardening against a latent class of bug, not a live defect.
 - **Found by:** The 2b-3 checks-dialog E2E (see `e2e-suite-status.md` bug #3).
 
-### 9. Replace fixed-timeout waits in the E2E dialog/check helpers
+### 9. Replace fixed-timeout waits in the E2E dialog/check helpers — DONE
 
+- **Status: COMPLETE.** `openCheckDialog` dropped its 400ms mount sleep (relies on
+  the auto-retried `toBeVisible`); `clickRoll(dialog, page)` now captures the
+  pre-roll `game.messages.size` baseline; `readNewestCheckFlags(page, baseline)`
+  `expect.poll`s for the newest titan-flagged message created at/after that
+  baseline (no fixed sleep, no global-newest read). The shared helper is reused in
+  `checks-integration.spec.js` (its 300ms-sleep + global-newest block replaced;
+  redundant `created` assertion removed); the three `checks-dialog.spec.js` call
+  sites were updated. The same fixed-sleep pattern in other specs
+  (`checks-opposed`, `effect-checks`, `interaction-rolls`) was left out of scope
+  for a future pass. **E2E run is user-gated** (needs the launched world) — pending
+  a green run before merge. Commits `7d491c1f`, `0c0774e8`.
 - **What:** `tests/e2e/checkDialog.js` waits a hard-coded 400ms for the dialog to
   mount (`openCheckDialog`) and 300ms for the chat message to settle
   (`readNewestCheckFlags`), and `readNewestCheckFlags` reads the *globally* newest
