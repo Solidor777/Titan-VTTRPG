@@ -17,6 +17,7 @@ export const DECREMENT_ICON = 'fas fa-minus';
 export const DEFENSE_ICON = 'fas fa-shield';
 export const DELETE_ICON = 'fas fa-trash';
 export const DICE_ICON = 'fas fa-dice';
+export const DUPLICATE_ICON = 'fas fa-copy';
 export const DURATION_ICON = 'fas fa-clock';
 export const EDIT_ICON = 'fas fa-pen-to-square';
 export const EDIT_TOKEN_ICON = 'fas fa-user-circle';
@@ -91,6 +92,7 @@ const ICON_MAP = deepFreeze({
    defense: DEFENSE_ICON,
    delete: DELETE_ICON,
    dice: DICE_ICON,
+   duplicate: DUPLICATE_ICON,
    duration: DURATION_ICON,
    edit: EDIT_ICON,
    expanded: EXPANDED_ICON,

@@ -108,6 +108,68 @@ export default class EffectTrayState {
    }
 
    /**
+    * Creates a blank effect-subtype Active Effect in the selected pack and opens its sheet. No-ops
+    * when there is no selected pack or the current user cannot edit it.
+    * @returns {Promise<void>}
+    */
+   async createBlankEffect() {
+      /** @type {CompendiumCollection | undefined} The selected pack. */
+      const pack = this.selectedPack;
+      if (!pack || !this.canEdit) {
+         return;
+      }
+
+      /** @type {ActiveEffect[]} The created effect documents. */
+      const [created] = await pack.documentClass.createDocuments(
+         [
+            {
+               name: game.i18n.localize('LOCAL.effectTrayNewName.text'),
+               type: 'effect',
+            },
+         ],
+         { pack: pack.collection },
+      );
+
+      created?.sheet?.render(true);
+   }
+
+   /**
+    * Duplicates an effect within the selected pack, appending a "(Copy)" suffix to its name. No-ops
+    * when there is no selected pack or the current user cannot edit it.
+    * @param {ActiveEffect} effect - The effect to duplicate.
+    * @returns {Promise<void>}
+    */
+   async duplicateEffect(effect) {
+      /** @type {CompendiumCollection | undefined} The selected pack. */
+      const pack = this.selectedPack;
+      if (!pack || !this.canEdit) {
+         return;
+      }
+
+      /** @type {object} The serialized effect data for the duplicate. */
+      const data = effect.toObject();
+      data.name = `${data.name} ${game.i18n.localize('LOCAL.effectTrayCopySuffix.text')}`;
+      delete data._id;
+
+      await pack.documentClass.createDocuments([data], { pack: pack.collection });
+   }
+
+   /**
+    * Renames an effect in the selected pack. No-ops when the current user cannot edit, the name is
+    * empty, or the name is unchanged.
+    * @param {ActiveEffect} effect - The effect to rename.
+    * @param {string} name - The new name.
+    * @returns {Promise<void>}
+    */
+   async renameEffect(effect, name) {
+      if (!this.canEdit || !name || name === effect.name) {
+         return;
+      }
+
+      await effect.update({ name });
+   }
+
+   /**
     * Registers Foundry hooks that refresh the tray when the selected pack's contents change. The
     * registration ids are stored so the listeners can be removed in `destroy()`, preventing leaks
     * when the sidebar popout path constructs a second tray state.
