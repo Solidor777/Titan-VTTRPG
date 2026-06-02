@@ -3443,8 +3443,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.items.get(checkOptions.itemId).system.getRollData();
       const checkData = itemRollData.check[checkOptions.checkIdx];
 
-      // Write the resolved roll data back so callers reading checkOptions.itemRollData after
-      // initialization get the real data rather than the absent sentinel.
+      // Persist the resolved roll data into checkOptions so post-initialization readers see the real object.
       checkOptions.itemRollData = itemRollData;
 
       // If no attribute is set.
