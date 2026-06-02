@@ -67,9 +67,10 @@ management). Data model classes hold the schema, field validation, and derived-d
 **Active Effect side**
 
 - `TitanActiveEffect` (`src/document/types/active-effect/TitanActiveEffect.js`) extends
-  `foundry.documents.ActiveEffect`. Registered as `CONFIG.ActiveEffect.documentClass`. Conditions are
-  instances of this same class (default subtype, `flags.titan.type === 'condition'`); effects are the
-  `effect` subtype. Its `_preCreate` / `_preUpdate` overrides guard their work on `this.type === 'effect'`
+  `foundry.documents.ActiveEffect`. Registered as `CONFIG.ActiveEffect.documentClass`. Conditions are the
+  native `condition` subtype (`CONFIG.ActiveEffect.dataModels.condition = ConditionDataModel`, declared in
+  `system.json` `documentTypes.ActiveEffect`); effects are the `effect` subtype. Its `_preCreate` /
+  `_preUpdate` overrides guard their work on `this.type === 'effect'`
   so conditions and other subtypes are unaffected: `_preCreate` runs `this.system.onPreCreate(data)`,
   forces `showIcon` to `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS` (2), and seeds
   `flags['visual-active-effects'].data.content` with the enriched native `description`; `_preUpdate`
@@ -104,6 +105,16 @@ management). Data model classes hold the schema, field validation, and derived-d
   `documentTypes.ActiveEffect.effect`. `getRollData()` returns `{ description (native AE field),
   duration, check, customTrait, ... }` — `description` is included so an effect check rolled through
   the shared item-check engine populates the chat card's description like an item does.
+- `ConditionDataModel` (`src/document/types/active-effect/ConditionDataModel.js`) extends
+  `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.condition`; the
+  `condition` ActiveEffect subtype is declared in `system.json` `documentTypes.ActiveEffect.condition`.
+  Beyond the mixin's `rulesElement` array it adds only the v14-mandated permissive `changes` ArrayField
+  (the `Game##verifyActiveEffectModels` shape — `{ key, value, mode, priority, type, phase }`); unlike
+  `TitanActiveEffectDataModel` it carries no `duration`, `check`, or `customTrait`. Condition definitions
+  (and their seeded `rulesElement` arrays) come from `buildConditionDefinitions()` in
+  `src/system/Conditions.js`, pushed onto `CONFIG.statusEffects` by `setupConditions()`; toggling a
+  status effect on a token instantiates this subtype, and its mechanics derive through
+  `CharacterDataModel._applyRulesElements` like any other rules element.
 - Effect rows render inline check buttons via `CharacterSheetEffectChecks` /
   `CharacterSheetEffectCheck` (`src/document/types/actor/types/character/sheet/items/effect/`), mirrors
   of the item `CharacterSheetItemChecks` / `CharacterSheetItemCheck`. They reuse the **item-check
@@ -237,9 +248,14 @@ Effect Active Effects carry rules elements via the same mixin on `TitanActiveEff
 item type.
 
 `CharacterDataModel._applyRulesElements` (called from `prepareDerivedData`) applies rules elements from
-two sources: every owned item's `rulesElement` array, plus a pass over the actor's `effect`-subtype Active
-Effects (`this.parent.effects`, skipping conditions/other subtypes and any `disabled` effect). Both feed the
-character's derived stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
+three sources: every owned item's `rulesElement` array, a pass over the actor's `effect`-subtype Active
+Effects (tagged `'effect'`), and a sibling pass over the actor's `condition`-subtype Active Effects (tagged
+`'condition'`); both Active-Effect passes skip `disabled` effects and require a non-empty `system.rulesElement`.
+Condition mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on each
+mechanically-active condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers,
+and each stat-mod bucket carries a `condition` entry (alongside `equipment`/`effect`/`ability`). There is no
+hardcoded condition `switch`; the old `_applyConditions` method was retired. All feed the character's derived
+stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
 into one element per concrete key under its selector (keys resolved by `_getSelectorKeys`, which maps
 `training`/`expertise` to `Object.keys(this.skill)` and otherwise reads `Object.keys(this[selector])`); an
 `'all'` selector that resolves to no keys is dropped with a `warn`. Any operation carrying a key supports

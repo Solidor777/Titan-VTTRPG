@@ -9,8 +9,34 @@ The "Effects → TitanActiveEffect" effort is specced in
 `specs/2026-05-30-titan-active-effects-conversion-design.md`. The following were
 split off to keep that spec focused.
 
-### 1. Convert Conditions to rules elements
+### 1. Convert Conditions to rules elements — DONE
 
+- **Status: COMPLETE.** Both Spec A (sum operations) and Spec B (conditions as a
+  `condition`-subtype Active Effect) have shipped. Spec B design:
+  `docs/superpowers/specs/2026-06-01-conditions-to-rules-elements-design.md`; plan:
+  `docs/superpowers/plans/2026-06-01-conditions-to-rules-elements.md`.
+- **Spec B end-state (shipped):**
+  - Conditions are a native `condition` ActiveEffect subtype (`system.json`
+    `documentTypes.ActiveEffect.condition`; `CONFIG.ActiveEffect.dataModels.condition =
+    ConditionDataModel`, a `RulesElementMixin(TitanDataModel)` carrying only the
+    v14-mandated `changes` ArrayField — no duration/checks/customTraits).
+  - `Conditions.js` exports pure `buildConditionDefinitions()`; every condition is
+    `type: 'condition'`, and the six mechanically-active ones (blinded, contaminated,
+    prone, restrained, stunned, sleeping) carry a seeded `system.rulesElement` built
+    from the Spec A operations. The five inert conditions (dead, deafened, frightened,
+    incapacitated, unconscious) carry none.
+  - `CharacterDataModel._applyRulesElements` derives from three sources — owned items,
+    `effect`-subtype AEs, and `condition`-subtype AEs (tagged `'condition'`);
+    `_resetDynamicMods` has a `condition` mod bucket; `getConditions()` filters
+    `effect.type === 'condition'`. The old `_applyConditions` `switch` was **removed**.
+  - `TitanActiveEffectSheet` is registered for `types: ['effect']` only; conditions use
+    Foundry's default config sheet.
+  - Verified by unit tests (`ConditionDefinitions.test.js`, 8) and e2e
+    (`tests/e2e/logic/conditions.spec.js`, 7).
+- **No migration (deliberate):** legacy applied conditions created before the subtype
+  existed are inert (their mechanics no longer run through any code path) until removed
+  and re-toggled, which re-instantiates them as the `condition` subtype with the seeded
+  rules elements. No one-shot converter was written for in-world condition effects.
 - **Spec A (sum operations) — COMPLETE.** The rules-element operations needed to
   express condition math now ship: **`mulSum`** (multiply the post-additive
   running total), **`setSum`** (force/floor/cap the running total via

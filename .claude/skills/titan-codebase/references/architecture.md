@@ -35,7 +35,11 @@
   `registerSystemSettings()` and `registerInitiativeFormula()` from `src/system/`, sets `CONFIG.Actor`,
   `CONFIG.Item`, `CONFIG.ChatMessage`, and `CONFIG.Combat` document classes and data models from `src/document/`,
   and registers all sheet classes.
-- `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`.
+- `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`. That module
+  exports a pure `buildConditionDefinitions()` (no `game`/localize access, unit-tested) returning the static
+  condition list — every entry is `type: 'condition'`, and the six mechanically-active conditions (blinded,
+  contaminated, prone, restrained, stunned, sleeping) carry a `system.rulesElement` array; `setupConditions()`
+  consumes it, localize-sorts, enriches each with `flags`, and pushes to `CONFIG.statusEffects`.
 - `OnceReady.js` (Foundry `ready` hook), for the GM, unconditionally runs the one-shot effect-item→Active-Effect
   converter, then runs the version-chain migration if needed (both from `src/helpers/migration/`); for all users it
   registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js`.
@@ -129,6 +133,6 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
 - `"esmodules": ["index.js"]` — Foundry loads the compiled ES module from the repo root.
 - `"styles": ["style.css"]` — Foundry loads the compiled CSS from the repo root.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `equipment`,
-  `shield`, `spell`, `weapon`), ActiveEffect (`effect`). ChatMessage declares no subtypes.
+  `shield`, `spell`, `weapon`), ActiveEffect (`effect`, `condition`). ChatMessage declares no subtypes.
 - `"socket": true` enables the system socket used by `SocketManager`.
 - Foundry compatibility (`system.json`): minimum v13, verified v14, maximum v14.
