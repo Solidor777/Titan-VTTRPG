@@ -1,5 +1,6 @@
 import { mount, unmount } from 'svelte';
 import EffectTrayShell from '~/sidebar/tray/EffectTrayShell.svelte';
+import EffectTrayState from '~/sidebar/tray/EffectTrayState.svelte.js';
 
 /**
  * @class TitanEffectTrayTab
@@ -62,11 +63,11 @@ export default class TitanEffectTrayTab extends foundry.applications.sidebar.Abs
    }
 
    /**
-    * Creates the reactive tray state. Stubbed in Task 1; replaced in Task 3 with EffectTrayState.
-    * @returns {object} The tray state instance.
+    * Creates the reactive tray state instance backing the mounted Svelte tree.
+    * @returns {EffectTrayState} The tray state instance.
     */
    #createTrayState() {
-      return {};
+      return new EffectTrayState();
    }
 
    /**
@@ -81,5 +82,8 @@ export default class TitanEffectTrayTab extends foundry.applications.sidebar.Abs
          unmount(this.#mountHandle, { outro: true });
          this.#mountHandle = void 0;
       }
+
+      this.#trayState?.destroy?.();
+      this.#trayState = void 0;
    }
 }

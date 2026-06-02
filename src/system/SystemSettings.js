@@ -537,4 +537,12 @@ export default function registerSystemSettings() {
       scope: 'client',
       type: Number,
    });
+
+   // The last ActiveEffect compendium selected in the Effect Tray (per-user).
+   game.settings.register('titan', 'effectTrayLastPack', {
+      config: false,
+      default: '',
+      scope: 'client',
+      type: String,
+   });
 }
