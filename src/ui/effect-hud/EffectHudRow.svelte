@@ -26,27 +26,26 @@
    /** @type {boolean} Whether this entry is a full effect (vs an inert condition). */
    const isEffect = $derived(effect.type === 'effect');
 
+   /** @type {TitanActiveEffect | undefined} The live effect re-read through the bridge so the row updates in place (undefined once deleted). */
+   const liveEffect = $derived(document.data.effects.get(effect.id));
+
    /** @type {string} The entry's description HTML, sourced per subtype. */
    const description = $derived(
       isEffect
-         ? (document.data.effects.get(effect.id)?.description ?? '')
-         : (document.data.effects.get(effect.id)?.flags?.titan?.description ?? ''),
+         ? (liveEffect?.description ?? '')
+         : (liveEffect?.flags?.titan?.description ?? ''),
    );
 
    /** @type {number} The effect's embedded-check count (conditions have none). */
-   const checkLength = $derived(
-      isEffect ? (document.data.effects.get(effect.id)?.system.check.length ?? 0) : 0,
-   );
+   const checkLength = $derived(isEffect ? (liveEffect?.system.check.length ?? 0) : 0);
 
-   /** @type {string} The effect's duration type (effects only). */
+   /** @type {string} The effect's duration type (effects only; defaults to permanent when absent). */
    const durationType = $derived(
-      isEffect ? document.data.effects.get(effect.id)?.system.duration.type : 'permanent',
+      isEffect ? (liveEffect?.system.duration.type ?? 'permanent') : 'permanent',
    );
 
    /** @type {number} The effect's remaining duration. */
-   const durationRemaining = $derived(
-      document.data.effects.get(effect.id)?.system.duration?.remaining,
-   );
+   const durationRemaining = $derived(liveEffect?.system.duration?.remaining);
 </script>
 
 <div
@@ -57,6 +56,7 @@
    <button
       class="row-header"
       type="button"
+      aria-label={`${effect.name}: ${localize(isExpanded ? 'collapse' : 'expand')}`}
       onclick={() => isExpanded = !isExpanded}
    >
       <img
@@ -83,7 +83,7 @@
          </div>
       {/if}
 
-      <!--Embedded checks-->
+      <!--Embedded checks (passed the effect prop, mirroring the sheet; the checkLength gate is reactive)-->
       {#if checkLength > 0}
          <div class="checks">
             <CharacterSheetEffectChecks {effect}/>
