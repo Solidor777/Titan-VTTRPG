@@ -44,6 +44,7 @@
 
    /**
     * Updates the element's key to a sensible default when the selector changes.
+    * @returns {void}
     */
    function onSelectorChange() {
       switch (document.data.system.rulesElement[idx].selector) {
