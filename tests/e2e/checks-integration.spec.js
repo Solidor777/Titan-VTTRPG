@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { readNewestCheckFlags } from './checkDialog.js';
 import { forceDice, resetDice } from './dice.js';
 import { buildE2ERollerActorData, buildE2ERollerItemData } from '../shared/builders.js';
 import { expectedCheckResults } from '../shared/checkOracle.js';
@@ -98,8 +99,9 @@ test.describe('v14 checks integration (forced dice)', () => {
          // Force the known dice sequence immediately before rolling.
          await forceDice(page, FORCED_FACES);
 
-         // Roll inside the world and report the new message's flags.
-         const flags = await page.evaluate(async ({ actorLocate, invokeSrc }) => {
+         // Capture the pre-roll message count and fire the gated request, then poll for the
+         // message this roll produced rather than sleeping a fixed delay.
+         const before = await page.evaluate(async ({ actorLocate, invokeSrc }) => {
             const actor = new Function(`return (${actorLocate})()`)();
             const fixtures = {
                weaponId: actor.items.find((i) => i.type === 'weapon')?.id,
@@ -107,23 +109,14 @@ test.describe('v14 checks integration (forced dice)', () => {
                abilityId: actor.items.find((i) => i.type === 'ability')?.id,
             };
 
-            const before = game.messages.size;
+            const beforeCount = game.messages.size;
             await new Function('actor', 'fixtures', `return (async () => { ${invokeSrc} })();`)(actor, fixtures);
-            await new Promise((resolve) => {
-               setTimeout(resolve, 300);
-            });
-
-            const newest = game.messages.contents[game.messages.size - 1];
-            return {
-               created: game.messages.size > before,
-               type: newest?.flags?.titan?.type,
-               parameters: newest?.flags?.titan?.parameters,
-               results: newest?.flags?.titan?.results,
-            };
+            return beforeCount;
          }, { actorLocate: ACTOR_LOCATE, invokeSrc: checkCase.invoke });
 
+         const flags = await readNewestCheckFlags(page, before);
+
          // (0) A message of the right type was created.
-         expect(flags.created, 'a chat message was created').toBe(true);
          expect(flags.type, 'flags.titan.type').toBe(checkCase.expectedType);
 
          // (1) Parameters were assembled from the actor.

@@ -108,8 +108,8 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
 
          // (4) Roll handoff: force dice, roll, then read the produced message.
          await forceDice(page, FORCED_FACES);
-         await clickRoll(dialog);
-         const flags = await readNewestCheckFlags(page);
+         const baseline = await clickRoll(dialog, page);
+         const flags = await readNewestCheckFlags(page, baseline);
 
          // The right check type was produced.
          expect(flags.type, 'flags.titan.type').toBe(checkCase.expectedType);
@@ -159,8 +159,8 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
 
       // It must flow into the rolled difficulty.
       await forceDice(page, FORCED_FACES);
-      await clickRoll(dialog);
-      const flags = await readNewestCheckFlags(page);
+      const baseline = await clickRoll(dialog, page);
+      const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.type, 'flags.titan.type').toBe('attributeCheck');
       expect(flags.parameters.difficulty, 'dialog difficulty select flows into rolled params').toBe(6);
 
@@ -179,8 +179,8 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
       // A high targetDefense drives difficulty to its clamp ceiling (6); the raw value flows through.
       await setNumberField(dialog, 'targetDefense', 10);
       await forceDice(page, FORCED_FACES);
-      await clickRoll(dialog);
-      const flags = await readNewestCheckFlags(page);
+      const baseline = await clickRoll(dialog, page);
+      const flags = await readNewestCheckFlags(page, baseline);
 
       expect(flags.type, 'flags.titan.type').toBe('attackCheck');
       expect(flags.parameters.targetDefense, 'dialog targetDefense flows into rolled params').toBe(10);

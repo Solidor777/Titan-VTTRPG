@@ -64,9 +64,6 @@ export async function openCheckDialog(page, type) {
          abilityId: actor.items.find((i) => i.type === 'ability')?.id,
       };
       await new Function('actor', 'fixtures', `return (async () => { ${requestSrc} })();`)(actor, fixtures);
-      await new Promise((resolve) => {
-         setTimeout(resolve, 400);
-      });
    }, meta.request);
 
    // The dialog window root; assert it mounted before returning.
@@ -131,29 +128,53 @@ export async function readSummary(dialog, key) {
 }
 
 /**
- * Clicks the dialog's Roll button (which rolls the check and closes the dialog).
+ * Captures the pre-roll chat-message count, clicks the dialog's Roll button (which rolls the
+ * check and closes the dialog), and returns that baseline so the caller can poll for exactly
+ * the message this roll produces.
  * @param {import('@playwright/test').Locator} dialog - The dialog root locator.
- * @returns {Promise<void>} Resolves once the click is dispatched.
+ * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @returns {Promise<number>} The chat-message count captured immediately before the roll.
  */
-export async function clickRoll(dialog) {
+export async function clickRoll(dialog, page) {
+   const baseline = await page.evaluate(() => game.messages.size);
    await dialog.getByTestId('check-dialog-roll').click();
+   return baseline;
 }
 
 /**
- * Reads the `flags.titan` payload of the most-recently-created chat message, after a settle delay.
+ * Polls for the newest titan-flagged chat message created after the given baseline count and
+ * returns its flags. Replaces a fixed settle delay + global-newest read so the wait is bounded
+ * by the message actually appearing, and never reads a message created before this roll.
  * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @param {number} baseline - The chat-message count captured immediately before the roll.
  * @returns {Promise<{ type: string, parameters: object, results: object }>} The newest message flags.
  */
-export async function readNewestCheckFlags(page) {
-   return await page.evaluate(async () => {
-      await new Promise((resolve) => {
-         setTimeout(resolve, 300);
-      });
-      const newest = game.messages.contents[game.messages.size - 1];
-      return {
-         type: newest?.flags?.titan?.type,
-         parameters: newest?.flags?.titan?.parameters,
-         results: newest?.flags?.titan?.results,
-      };
-   });
+export async function readNewestCheckFlags(page, baseline) {
+   /** @type {{ type: string, parameters: object, results: object } | null} The resolved flags. */
+   let flags = null;
+   await expect.poll(
+      async () => {
+         flags = await page.evaluate((base) => {
+            // Only consider messages created after the baseline; return the newest titan one.
+            if (game.messages.size <= base) {
+               return null;
+            }
+            const created = game.messages.contents.slice(base);
+            const message = [...created].reverse().find((msg) => msg?.flags?.titan?.type) ?? null;
+            return message
+               ? {
+                  type: message.flags.titan.type,
+                  parameters: message.flags.titan.parameters,
+                  results: message.flags.titan.results,
+               }
+               : null;
+         }, baseline);
+         return flags?.type ?? null;
+      },
+      {
+         message: 'a titan check chat message should be created after the roll',
+         timeout: 10000,
+      },
+   ).not.toBeNull();
+   return flags;
 }
