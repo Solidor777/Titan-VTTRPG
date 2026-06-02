@@ -9,6 +9,7 @@
     * @property {(import('~/helpers/svelte-components/input/select/Select.svelte').SelectOption | string | number)[]} [options] - Options for the Select component.
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {() => void} [onchange] - Optional callback fired (as a pure mutation) before the document is persisted.
     */
 
    /** @type {DocumentSelectProps} */
@@ -17,6 +18,7 @@
       options = void 0,
       disabled = false,
       tooltip = void 0,
+      onchange = void 0,
    } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
@@ -26,7 +28,10 @@
 <Select
    bind:value
    disabled={disabled || !document.data?.isOwner}
-   onchange={() => refreshSystemDocument(document.data, disabled)}
+   onchange={() => {
+      onchange?.();
+      refreshSystemDocument(document.data, disabled);
+   }}
    {options}
    {tooltip}
 />

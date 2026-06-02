@@ -9,7 +9,6 @@
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
    import DocumentAttackTraitSelect from '~/document/svelte-components/select/DocumentAttackTraitSelect.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
-   import assert from '~/helpers/utility-functions/Assert.js';
 
    /**
     * @typedef {object} ItemSheetRollMessageSettingsProps
@@ -108,50 +107,40 @@
     * Updates the element key to a sensible default when the selector changes.
     */
    function onSelectorChange() {
-      if (assert(
-         document?.isOwner,
-         'Cannot modify document %s if not owner.',
-         document?.name,
-      )) {
-         switch (element.selector) {
-            case 'any':
-            case 'customTrait':
-            case 'multiAttack': {
-               element.key = '';
-               break;
-            }
-            case 'attackTrait': {
-               element.key = 'blast';
-               break;
-            }
-            case 'attackType': {
-               element.key = 'melee';
-               break;
-            }
-            case 'attribute': {
-               element.key = 'body';
-               break;
-            }
-            case 'resistance': {
-               element.key = 'reflexes';
-               break;
-            }
-            case 'skill': {
-               element.key = 'arcana';
-               break;
-            }
-            case 'spellTradition': {
-               element.key = localize('any');
-               break;
-            }
-            default: {
-               break;
-            }
+      switch (element.selector) {
+         case 'any':
+         case 'customTrait':
+         case 'multiAttack': {
+            element.key = '';
+            break;
          }
-
-         document.data.update({
-            system: structuredClone(document.data.system),
-         });
+         case 'attackTrait': {
+            element.key = 'blast';
+            break;
+         }
+         case 'attackType': {
+            element.key = 'melee';
+            break;
+         }
+         case 'attribute': {
+            element.key = 'body';
+            break;
+         }
+         case 'resistance': {
+            element.key = 'reflexes';
+            break;
+         }
+         case 'skill': {
+            element.key = 'arcana';
+            break;
+         }
+         case 'spellTradition': {
+            element.key = localize('any');
+            break;
+         }
+         default: {
+            break;
+         }
       }
    }
 

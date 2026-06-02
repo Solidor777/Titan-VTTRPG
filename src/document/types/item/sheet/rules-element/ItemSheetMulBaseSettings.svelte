@@ -8,7 +8,6 @@
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
-   import assert from '~/helpers/utility-functions/Assert.js';
    import DocumentNumberInput from '~/document/svelte-components/input/DocumentNumberInput.svelte';
 
    /**
@@ -44,50 +43,40 @@
     * @returns {void}
     */
    function onSelectorChange() {
-      if (assert(
-         document?.isOwner,
-         'Cannot modify document %s if not owner.',
-         document?.name,
-      )) {
-         switch (document.data.system.rulesElement[idx].selector) {
-            case 'attribute': {
-               document.data.system.rulesElement[idx].key = 'body';
-               break;
-            }
-            case 'training':
-            case 'expertise': {
-               document.data.system.rulesElement[idx].key = 'arcana';
-               break;
-            }
-            case 'mod': {
-               document.data.system.rulesElement[idx].key = 'armor';
-               break;
-            }
-            case 'rating': {
-               document.data.system.rulesElement[idx].key = 'awareness';
-               break;
-            }
-            case 'resistance': {
-               document.data.system.rulesElement[idx].key = 'reflexes';
-               break;
-            }
-            case 'resource': {
-               document.data.system.rulesElement[idx].key = 'resolve';
-               break;
-            }
-            case 'speed': {
-               document.data.system.rulesElement[idx].key = 'burrow';
-               break;
-            }
-
-            default: {
-               break;
-            }
+      switch (document.data.system.rulesElement[idx].selector) {
+         case 'attribute': {
+            document.data.system.rulesElement[idx].key = 'body';
+            break;
+         }
+         case 'training':
+         case 'expertise': {
+            document.data.system.rulesElement[idx].key = 'arcana';
+            break;
+         }
+         case 'mod': {
+            document.data.system.rulesElement[idx].key = 'armor';
+            break;
+         }
+         case 'rating': {
+            document.data.system.rulesElement[idx].key = 'awareness';
+            break;
+         }
+         case 'resistance': {
+            document.data.system.rulesElement[idx].key = 'reflexes';
+            break;
+         }
+         case 'resource': {
+            document.data.system.rulesElement[idx].key = 'resolve';
+            break;
+         }
+         case 'speed': {
+            document.data.system.rulesElement[idx].key = 'burrow';
+            break;
          }
 
-         document.data.update({
-            system: structuredClone(document.data.system),
-         });
+         default: {
+            break;
+         }
       }
    }
 

@@ -7,7 +7,6 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentArmorTraitSelect from '~/document/svelte-components/select/DocumentArmorTraitSelect.svelte';
    import DocumentShieldTraitSelect from '~/document/svelte-components/select/DocumentShieldTraitSelect.svelte';
-   import assert from '~/helpers/utility-functions/Assert.js';
 
    /**
     * @typedef {object} ItemSheetConditionalRatingModifierSettingsProps
@@ -47,40 +46,30 @@
     * Updates the element's key to a sensible default when the selector changes.
     */
    function onSelectorChange() {
-      if (assert(
-         document?.isOwner,
-         'Cannot modify document %s if not owner.',
-         document?.name,
-      )) {
-         switch (document.data.system.rulesElement[idx].selector) {
-            case 'armorTrait':
-            case 'shieldTrait': {
-               document.data.system.rulesElement[idx].key = 'magical';
-               break;
-            }
-            case 'customArmorTrait':
-            case 'customWeaponTrait':
-            case 'customShieldTrait':
-            case 'multiAttack': {
-               document.data.system.rulesElement[idx].key = '';
-               break;
-            }
-            case 'attackTrait': {
-               document.data.system.rulesElement[idx].key = 'blast';
-               break;
-            }
-            case 'attackType': {
-               document.data.system.rulesElement[idx].key = 'melee';
-               break;
-            }
-            default: {
-               break;
-            }
+      switch (document.data.system.rulesElement[idx].selector) {
+         case 'armorTrait':
+         case 'shieldTrait': {
+            document.data.system.rulesElement[idx].key = 'magical';
+            break;
          }
-
-         document.data.update({
-            system: structuredClone(document.data.system),
-         });
+         case 'customArmorTrait':
+         case 'customWeaponTrait':
+         case 'customShieldTrait':
+         case 'multiAttack': {
+            document.data.system.rulesElement[idx].key = '';
+            break;
+         }
+         case 'attackTrait': {
+            document.data.system.rulesElement[idx].key = 'blast';
+            break;
+         }
+         case 'attackType': {
+            document.data.system.rulesElement[idx].key = 'melee';
+            break;
+         }
+         default: {
+            break;
+         }
       }
    }
 
