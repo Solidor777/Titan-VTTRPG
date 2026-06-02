@@ -141,6 +141,13 @@ mirror the `document.data.system.*` field, then call `refreshSystemDocument(docu
 `document.update({ system: structuredClone(document.system), flags: structuredClone(document.flags) })`,
 writing the entire mutated system blob back to Foundry in one call.
 
+`DocumentSelect.svelte` accepts an optional `onchange` callback, composed to run **before**
+`refreshSystemDocument`: `() => { onchange?.(); refreshSystemDocument(document.data, disabled); }`.
+Consumers use it for pure in-memory mutations that must land in the persisted snapshot — e.g. the
+rules-element settings components (`src/document/types/item/sheet/rules-element/ItemSheet*Settings.svelte`)
+reset a sensible-default `key` when the `selector`/`checkType`/`rating` changes, then let
+`DocumentSelect` persist once. Those handlers are pure key-setters; they do not call `update()` themselves.
+
 *Direct document.update calls* (e.g. `CharacterSheetCommodity.svelte`, `CharacterSheetEffect.svelte`):
 Some sheet rows hold a local reference to an embedded document and call
 `doc.update({ system: { fieldName: newValue } })` directly on `change`, bypassing the snapshot helper.

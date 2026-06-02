@@ -70,7 +70,33 @@ split off to keep that spec focused.
   `TitanActiveEffect` instances after it; their mechanics still run through
   `_applyConditions`).
 
-### 1a. Rules-element settings: `onSelectorChange` never fires (pre-existing nit)
+### 1a. Rules-element settings: `onSelectorChange` never fires — DONE
+
+- **Status: COMPLETE.** `DocumentSelect` now declares and forwards an optional
+  `onchange`, composed to run the consumer callback as a pure mutation **before**
+  `refreshSystemDocument` persists, so the curated default-key reset fires on
+  selector change. All **seven** rules-element settings components that wire a
+  handler through `DocumentSelect` (the four sum-operation files plus
+  `ItemSheetConditionalRatingModifierSettings`, `ItemSheetRollMessageSettings`,
+  and `ItemSheetConditionalCheckModifierSettings`) became pure key-setters:
+  the dead `assert(document?.isOwner, …)` guard (it checked the `ReactiveDocument`
+  bridge, which has no `isOwner`/`name`) and the handlers' own
+  `document.data.update(...)` were removed; `ConditionalCheckModifier` also shed
+  an obsolete boolean return-value protocol. Owner-gating + persistence now live
+  solely in `DocumentSelect` (disables for non-owners) and `refreshSystemDocument`.
+  Commits `e67f9863`, `d9a510a7`, `f383b56a`. Spec/plan:
+  `docs/superpowers/specs/2026-06-01-rules-element-selector-onchange-design.md`,
+  `docs/superpowers/plans/2026-06-01-rules-element-selector-onchange.md`.
+- **Note (7th component):** `ItemSheetConditionalCheckModifierSettings` was not in
+  the original audit (it had no broken `assert` guard) but was surfaced during
+  execution because the `DocumentSelect` fix is global — its previously-dead
+  handlers began double-persisting. A discriminating e2e case is impossible for it:
+  its curated key defaults coincide with each key-select's first option
+  (`body`/`blast`/`melee`/`arcana`) and it uses no `allowAll`, so the `Select`
+  clamp produces the identical end-state — which is precisely why the dead cascade
+  went unnoticed. Verified by full-suite regression instead. The discriminating
+  e2e lives on the flatModifier `resource`→`resolve` case in
+  `tests/e2e/rules-element-crud.spec.js`.
 
 - **What:** The per-operation settings components (`ItemSheetFlatModifierSettings`,
   `ItemSheetMulBaseSettings`, `ItemSheetMulSumSettings`, `ItemSheetSetSumSettings`)

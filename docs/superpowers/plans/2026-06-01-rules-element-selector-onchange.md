@@ -317,3 +317,20 @@ git commit -m "docs(rules-element): close backlog #1a; sync codebase skill"
 **Placeholder scan:** No TBD/TODO/"handle edge cases"/"similar to". The handler transform shows the exact canonical before/after; per-file `switch` bodies are explicitly preserved verbatim (not rewritten), which is correct because they are unchanged by this work. ✅
 
 **Type/name consistency:** `onchange` prop name matches `Select.svelte`'s existing `onchange`; `refreshSystemDocument(document.data, disabled)` signature unchanged; `ITEM_NAME_SELECTOR` is local to the new describe and does not collide with the existing `ITEM_NAME`. Locator `.rules-element .operation-settings .field.select select` matches `ItemSheetRulesElementSettings.svelte` markup. ✅
+
+---
+
+## Execution addendum — 7th component (added during execution)
+
+A full sweep of `DocumentSelect onchange` consumers during execution found a seventh
+component the original six-file audit missed: `ItemSheetConditionalCheckModifierSettings.svelte`
+(invisible to the `document?.isOwner` grep because it has no `assert` guard). Since the
+`DocumentSelect` fix is global, its three previously-dead handlers
+(`onModifierTypeChanged`/`onCheckTypeChange`/`onSelectorChange`) began firing and
+double-persisting. User-approved resolution: apply the same pure-mutator transform and
+remove its obsolete boolean return-value protocol. No discriminating e2e is possible for it
+(its curated defaults coincide with the `Select` clamp's first option), so it is verified by
+full-suite regression. See the spec's "Addendum — 7th component" section.
+
+Commits: `e67f9863` (DocumentSelect + six handlers + test), `d9a510a7`
+(ConditionalCheckModifier), `f383b56a` (JSDoc follow-ups from code review).

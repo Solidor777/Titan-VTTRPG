@@ -187,4 +187,34 @@ pre-existing and unchanged by this work.
 - The per-operation default-key maps themselves (unchanged).
 - Any other `DocumentSelect` consumer.
 - The broader `document?.isOwner`-vs-`document.data?.isOwner` audit elsewhere in
-  the codebase (only the six rules-element handlers are touched here).
+  the codebase (only the rules-element handlers are touched here).
+
+## Addendum — 7th component discovered during execution
+
+The original audit keyed on the broken `document?.isOwner` guard and found six
+components. A full sweep of `DocumentSelect` `onchange` consumers during execution
+found a **seventh**: `ItemSheetConditionalCheckModifierSettings.svelte`. It has no
+`assert` guard (so it was invisible to the guard-based grep) but it does wire three
+handlers — `onModifierTypeChanged`, `onCheckTypeChange`, `onSelectorChange` —
+through `DocumentSelect onchange`. Because the `DocumentSelect` fix is global, its
+previously-dead handlers began firing, and since they self-persisted they
+**double-wrote** on every change.
+
+Resolution (user-approved): the same Option B transform was applied — all three
+handlers became pure in-memory mutators, and an obsolete internal boolean
+return-value protocol (`onCheckTypeChange` returned whether it had persisted, so
+`onModifierTypeChanged` could skip a second `update()`) was removed, since
+`DocumentSelect` now owns the single persist.
+
+**No discriminating e2e is possible for this component.** Its curated key defaults
+coincide exactly with each key-select's first option (`attribute`→`body`,
+`attackTrait`→`blast`, `attackType`→`melee`, `skill`→`arcana`) and its key-selects
+use no `allowAll`, so the `Select` clamp `$effect` yields the identical end-state
+with or without the handlers — which is exactly why the dead cascade was never
+noticed. Its checkType→selector and modifierType→checkType cascades are likewise
+masked by corresponding clamps. The change is therefore end-state-behavior-
+preserving (its only real effect is collapsing the double-write to one), and is
+verified by full-suite regression plus the flatModifier `resource`→`resolve`
+discriminating case rather than a vacuous per-component test.
+
+Net scope: **seven** components, not six.
