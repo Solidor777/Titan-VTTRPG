@@ -44,8 +44,8 @@
       isEffect ? (liveEffect?.system.duration.type ?? 'permanent') : 'permanent',
    );
 
-   /** @type {number} The effect's remaining duration. */
-   const durationRemaining = $derived(liveEffect?.system.duration?.remaining);
+   /** @type {number} The effect's remaining duration (effects only; conditions carry no duration). */
+   const durationRemaining = $derived(isEffect ? liveEffect?.system.duration?.remaining : undefined);
 </script>
 
 <div
