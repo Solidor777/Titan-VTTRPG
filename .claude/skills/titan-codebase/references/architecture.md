@@ -18,6 +18,13 @@
   like a sheet) plus a `tray/` folder of the Effect Tray UI (`EffectTrayState.svelte.js` runes state,
   `GetEffectCompendiums.js`, and the shell/tray/header/list/row components). Registered in `OnceInit.js`. See
   `abstractions.md` "Effect Tray sidebar tab".
+- `src/ui/` — Screen-level (non-sheet, non-sidebar) Svelte mounts. Currently holds `effect-hud/` — the native
+  Effect HUD: a `TitanEffectHud` singleton controller (created on the `ready` hook, attached as
+  `game.titan.effectHud`) that mounts `EffectHudShell` into a fixed-position container appended to `#interface`.
+  A pure `ResolveHudActor.js` ladder picks the tracked actor; `EffectHudState.svelte.js` holds the runes UI state
+  (`collapsed`), preserved across remounts. The shell sets the active actor's `ReactiveDocument` bridge as the
+  `document` context, so the reused effect leaf components (checks, description, owner-gated delete) resolve the
+  actor exactly as they do inside the character sheet. See `data-flow.md` "Effect HUD".
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), CSS custom-property variables
   (`Variables.scss`), global resets (`Global.scss`), a prepended `Root.scss` (injected into every Svelte component
   via svelte-preprocess), and a `Mixins/` folder of per-domain SCSS mixin files covering flex, font, border, button,

@@ -145,6 +145,19 @@ split off to keep that spec focused.
 
 ### 3. Native visual-active-effects-style panel
 
+- **Status: COMPLETE.** Shipped a native screen-level Effect HUD
+  (`src/ui/effect-hud/`): a `TitanEffectHud` singleton controller (created on
+  `ready`, attached as `game.titan.effectHud`) that mounts `EffectHudShell` into
+  a fixed-position container and tracks the active actor via the pure
+  `resolveHudActor` ladder. Grouped Conditions/Effects sections, a
+  collapse-to-icon-grid header, owner-gated send-to-chat + delete, and rollable
+  embedded checks (reusing the character sheet's effect leaf components through
+  the actor `ReactiveDocument` bridge). Gated by an `enableEffectHud` client
+  setting (default on). The `visual-active-effects` flag stamping and the dead
+  `_enrichDescription` method were removed. Spec/plan:
+  `docs/superpowers/specs/2026-06-02-native-effect-hud-design.md`,
+  `docs/superpowers/plans/2026-06-02-native-effect-hud.md`. Covered by
+  `tests/unit/ResolveHudActor.test.js` + `tests/e2e/effect-hud.spec.js`.
 - **What:** Build a native, in-system panel that displays active effects with
   their descriptions on the character UI — replacing the dependency on the
   third-party `visual-active-effects` module. Until this lands, the conversion

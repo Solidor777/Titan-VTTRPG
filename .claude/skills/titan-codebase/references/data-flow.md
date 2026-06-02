@@ -156,6 +156,30 @@ Some sheet rows hold a local reference to an embedded document and call
 
 ---
 
+## Effect HUD
+
+**Resolution & mount — `TitanEffectHud` (src/ui/effect-hud/TitanEffectHud.js)**
+Created on the `ready` hook and attached as `game.titan.effectHud`. `init()` builds a fixed-position container
+(`#titan-effect-hud`), appends it to `#interface`, and wires `controlToken` / `canvasReady` / `updateUser` hooks
+plus the `enableEffectHud` setting's `onChange`, each calling `refresh()`. `refresh()` honors the
+`enableEffectHud` client setting (unmounts and stops when off), then resolves the tracked actor via the pure
+`resolveHudActor` ladder (selected character tokens, owned scene tokens, the user's assigned character; GM tracks
+only the first selected token). It early-returns when the resolved actor id is unchanged — within one actor the
+bridge drives reactivity. On an actor change it rebuilds a `new ReactiveDocument(actor)` bridge and remounts
+`EffectHudShell` via Svelte 5 `mount()`, passing the bridge as `documentStore` and the shared `EffectHudState` as
+`hudState`. The shell sets the bridge into context as `'document'`.
+
+**Render — `EffectHud.svelte` → sections → rows**
+`EffectHud` derives condition-subtype and effect-subtype lists from `document.data.effects` and renders nothing
+when both are empty (so the panel only mounts a `.titan-effect-hud` when there is something to show). Effect CRUD
+and duration ticks flow through the bridge automatically. `EffectHudRow` sources its description per subtype:
+conditions render from `flags.titan.description` (conditions have no native description field), effects from the
+native `description`. Duration, embedded checks, and send-to-chat are effect-only; both subtypes expose an
+owner-gated delete (`requestEffectDeletion`). The `visual-active-effects` module flag is no longer stamped on
+effects or conditions — this HUD replaces it.
+
+---
+
 ## Migration system
 
 **Where it lives:** `src/helpers/migration/`
