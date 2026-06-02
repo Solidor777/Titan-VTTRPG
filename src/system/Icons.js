@@ -26,6 +26,7 @@ export const EXPANDED_ICON = 'fas fa-angle-double-down';
 export const EXPERTISE_ICON = 'fas fa-graduation-cap';
 export const EXPIRED_ICON = 'fas fa-trash-clock';
 export const FAST_HEALING_ICON = 'fas fa-heart';
+export const FOLDER_ICON = 'fas fa-folder-plus';
 export const HALF_DAMAGE_ICON = 'fas fa-heart-half-stroke';
 export const HEALING_ICON = 'fas fa-heart';
 export const ID_ICON = 'fas fa-id-card';
@@ -99,6 +100,7 @@ const ICON_MAP = deepFreeze({
    expertise: EXPERTISE_ICON,
    expired: EXPIRED_ICON,
    fastHealing: FAST_HEALING_ICON,
+   folder: FOLDER_ICON,
    halfDamage: HALF_DAMAGE_ICON,
    healing: HEALING_ICON,
    id: ID_ICON,
@@ -128,6 +130,7 @@ const ICON_MAP = deepFreeze({
    resolve: RESOLVE_ICON,
    sendToChat: SEND_TO_CHAT_ICON,
    settings: SETTINGS_ICON,
+   sheet: SHEET_ICON,
    shortRest: SHORT_REST_ICON,
    soul: SOUL_ICON,
    spendResolve: SPEND_RESOLVE_ICON,

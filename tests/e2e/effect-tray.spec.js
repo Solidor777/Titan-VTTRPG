@@ -135,7 +135,12 @@ test.describe('effect tray sidebar tab', () => {
          });
       });
 
-      await page.locator('[data-testid="effect-tray-apply"]').first().click();
+      // Scope the Apply click to the seeded effect's own row so the assertion is independent of how
+      // many other effects the shared world pack holds or their alphabetical ordering.
+      await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
+         .locator('[data-testid="effect-tray-apply"]')
+         .first()
+         .click();
       await page.waitForTimeout(400);
 
       const applied = await page.evaluate(() => {
@@ -199,5 +204,72 @@ test.describe('effect tray sidebar tab', () => {
          return !(await pack.getDocuments()).some((e) => e.name === 'New Effect');
       });
       expect(deleted, 'the created effect must be deletable from the pack').toBe(true);
+   });
+
+   test('stash-from-actor copies a dropped effect into the selected pack', async ({ page }) => {
+      // Create an actor that owns an effect to stash, render the tray, and select the world pack.
+      await page.evaluate(async () => {
+         const stale = game.actors.getName('E2E Stash Source');
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name: 'E2E Stash Source', type: 'player' });
+         await actor.createEmbeddedDocuments('ActiveEffect', [
+            {
+               name: 'E2E Stash Effect',
+               type: 'effect',
+            },
+         ]);
+
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await new Promise((resolve) => {
+            setTimeout(resolve, 300);
+         });
+
+         /** @type {HTMLSelectElement} The mounted pack-select element. */
+         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
+         select.value = 'world.e2e-tray-effects';
+         select.dispatchEvent(new Event('change', { bubbles: true }));
+         await new Promise((resolve) => {
+            setTimeout(resolve, 400);
+         });
+      });
+
+      // Simulate a real drop of the actor's effect onto the tray container, dispatching a drop event
+      // carrying the effect's standard Foundry drag data on a DataTransfer.
+      await page.evaluate(async () => {
+         const actor = game.actors.getName('E2E Stash Source');
+         const effect = [...actor.effects].find((e) => e.name === 'E2E Stash Effect');
+
+         /** @type {object} The standard Foundry drag data for the source effect. */
+         const dragData = effect.toDragData();
+
+         /** @type {HTMLElement} The tray drop-zone container. */
+         const tray = ui.titanEffects.element.querySelector('[data-testid="effect-tray"]');
+
+         /** @type {DataTransfer} The transfer carrying the serialized drag data. */
+         const dataTransfer = new DataTransfer();
+         dataTransfer.setData('text/plain', JSON.stringify(dragData));
+
+         tray.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer }));
+         await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+         });
+      });
+
+      const stashed = await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         return (await pack.getDocuments()).some((e) => e.name === 'E2E Stash Effect');
+      });
+      expect(stashed, 'the dropped effect must be copied into the selected pack').toBe(true);
+
+      // Remove the stashed copy so the shared world pack is left holding only its seeded effect,
+      // keeping later tests that act on the first pack row deterministic regardless of run order.
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         const copy = (await pack.getDocuments()).find((e) => e.name === 'E2E Stash Effect');
+         await copy?.delete();
+      });
    });
 });

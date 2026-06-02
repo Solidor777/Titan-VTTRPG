@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { CREATE_ICON } from '~/system/Icons.js';
+   import { CREATE_ICON, FOLDER_ICON } from '~/system/Icons.js';
 
    /** @type {object} The reactive tray state from context. */
    const trayState = getContext('trayState');
@@ -17,6 +17,12 @@
 
    /** @type {string} The localized label for the New Effect button. */
    const newLabel = localize('effectTrayNew');
+
+   /** @type {string} The localized label for the New Folder button. */
+   const newFolderLabel = localize('effectTrayNewFolder');
+
+   /** @type {boolean} Whether the selected pack supports folders (compendium packs do). */
+   const supportsFolders = $derived(!!trayState.selectedPack?.folders);
 </script>
 
 <div class="effect-tray-header">
@@ -29,7 +35,7 @@
          bind:value={trayState.selectedPackId}
       />
 
-      <!--New Effect button-->
+      <!--New Effect and New Folder buttons-->
       <div class="effect-tray-header-new">
          <IconButton
             disabled={!trayState.canEdit}
@@ -39,6 +45,17 @@
             testId="effect-tray-new"
             tooltip={newLabel}
          />
+
+         {#if supportsFolders}
+            <IconButton
+               disabled={!trayState.canEdit}
+               icon={FOLDER_ICON}
+               label={newFolderLabel}
+               onclick={() => trayState.createFolder()}
+               testId="effect-tray-new-folder"
+               tooltip={newFolderLabel}
+            />
+         {/if}
       </div>
    </div>
    <input

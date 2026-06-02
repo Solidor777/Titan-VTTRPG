@@ -100,6 +100,17 @@
    }
 
    /**
+    * Writes the effect's standard Foundry drag data onto the drag event so dropping the row onto an
+    * actor sheet or token applies the effect natively, and dropping it on another tray pack stashes
+    * it there.
+    * @param {DragEvent} event - The dragstart event.
+    * @returns {void}
+    */
+   function onDragStart(event) {
+      event.dataTransfer.setData('text/plain', JSON.stringify(effect.toDragData()));
+   }
+
+   /**
     * Prompts for confirmation, then deletes the effect from its pack on confirm.
     * @returns {void}
     */
@@ -118,6 +129,9 @@
    class="effect-tray-row"
    data-effect-id={effect.id}
    data-testid="effect-tray-row"
+   draggable={true}
+   ondragstart={onDragStart}
+   role="listitem"
 >
    <img
       alt=""
