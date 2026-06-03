@@ -38,7 +38,13 @@
          "player": {},
          "npc": {}
       },
-      "ChatMessage": {},
+      "ChatMessage": {
+         "attributeCheck": {},
+         "resistanceCheck": {},
+         "attackCheck": {},
+         "castingCheck": {},
+         "itemCheck": {}
+      },
       "Item": {
          "ability": {},
          "armor": {},

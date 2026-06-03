@@ -146,6 +146,10 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
 - `"esmodules": ["index.js"]` — Foundry loads the compiled ES module from the repo root.
 - `"styles": ["style.css"]` — Foundry loads the compiled CSS from the repo root.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `equipment`,
-  `shield`, `spell`, `weapon`), ActiveEffect (`effect`, `condition`). ChatMessage declares no subtypes.
+  `shield`, `spell`, `weapon`), ActiveEffect (`effect`, `condition`), ChatMessage (`attributeCheck`,
+  `resistanceCheck`, `attackCheck`, `castingCheck`, `itemCheck`). The five ChatMessage check subtypes are
+  fully registered: declared in `system.json`, mapped to data models via `CONFIG.ChatMessage.dataModels` in
+  `OnceInit.js`, and labelled under `TYPES.ChatMessage` in `lang/en.json`. Later phases will add
+  item/report/effect subtypes.
 - `"socket": true` enables the system socket used by `SocketManager`.
 - Foundry compatibility (`system.json`): minimum v13, verified v14, maximum v14.

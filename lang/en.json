@@ -922,6 +922,13 @@
          "spell": "Spell",
          "weapon": "Weapon"
       },
+      "ChatMessage": {
+         "attributeCheck": "Attribute Check",
+         "resistanceCheck": "Resistance Check",
+         "attackCheck": "Attack Check",
+         "castingCheck": "Casting Check",
+         "itemCheck": "Item Check"
+      },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"
       }

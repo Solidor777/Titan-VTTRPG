@@ -477,9 +477,12 @@ flag. `tests/e2e/integration-manifest.spec.js` (8 tests, Phase 3c) guards agains
 `system.json` via Node `fs.readFileSync` inside the Playwright process and comparing the parsed values to live
 `CONFIG`/`game` state:
 
-- Every subtype declared in `documentTypes` has a registered `CONFIG` data model (and vice versa).
-- `ChatMessage` declares no subtypes. (The dead `testChat` scaffolding was removed in Phase 3c — commit in
-  that phase.)
+- Every subtype declared in `documentTypes` has a registered `CONFIG` data model (and vice versa), including
+  `ChatMessage`: the bidirectional guard now covers `Actor`, `Item`, `ActiveEffect`, and `ChatMessage`.
+- `ChatMessage` now declares 5 check subtypes (`attributeCheck`, `resistanceCheck`, `attackCheck`,
+  `castingCheck`, `itemCheck`), registered in `CONFIG.ChatMessage.dataModels` (set in `OnceInit.js`). The old
+  `'ChatMessage declares no document subtypes'` test was removed and replaced by the bidirectional declared ==
+  registered guard above. Later phases will add item/report/effect subtypes.
 - Every declared pack resolves via `game.packs.get(`titan.${name}`)` with matching `metadata.type` and
   `metadata.packageName === 'titan'`.
 - Grid and socket config (`game.system.grid.units`/`.diagonals` and `game.system.socket` equal the manifest

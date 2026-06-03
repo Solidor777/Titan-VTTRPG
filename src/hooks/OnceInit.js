@@ -30,6 +30,11 @@ import TitanCombat from '~/document/types/combat/TitanCombat.js';
 import SocketManager from '~/helpers/SocketManager.js';
 import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
+import AttributeCheckChatMessageDataModel from '~/check/types/attribute-check/chat-message/AttributeCheckChatMessageDataModel.js';
+import ResistanceCheckChatMessageDataModel from '~/check/types/resistance-check/chat-message/ResistanceCheckChatMessageDataModel.js';
+import AttackCheckChatMessageDataModel from '~/check/types/attack-check/chat-message/AttackCheckChatMessageDataModel.js';
+import CastingCheckChatMessageDataModel from '~/check/types/casting-check/chat-message/CastingCheckChatMessageDataModel.js';
+import ItemCheckChatMessageDataModel from '~/check/types/item-check/chat-message/ItemCheckChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -90,6 +95,13 @@ export default function onceInit() {
 
    // Configure Chat Messages.
    CONFIG.ChatMessage.documentClass = TitanChatMessage;
+   CONFIG.ChatMessage.dataModels = {
+      attributeCheck: AttributeCheckChatMessageDataModel,
+      resistanceCheck: ResistanceCheckChatMessageDataModel,
+      attackCheck: AttackCheckChatMessageDataModel,
+      castingCheck: CastingCheckChatMessageDataModel,
+      itemCheck: ItemCheckChatMessageDataModel,
+   };
 
    CONFIG.time.roundTime = 6;
    CONFIG.ActiveEffect.legacyTransferral = false;
