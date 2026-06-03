@@ -111,13 +111,14 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
     `seedCombatEncounter`, then probes that `combat.turns.length === 2`, `combatant.actor` resolves to the
     seeded effect actor, `actor.system.isCharacter === true`, `getCharacterCombatants().length === 2`, and
     `combat.turn === 0` (other actor holds turn 0 at start; effect actor waits at turn 1 for `nextTurn()`).
-  - `integration-manifest.spec.js` — Phase 3c "drift guard" suite (8 tests): declared documentTypes ↔
-    registered dataModels parity; ChatMessage no-subtypes; every manifest pack loaded with correct metadata;
-    grid/socket config; Titan document-class subclass identity; per-subtype sheet registration and core-sheet
-    unregistration; runtime CONFIG flags (`CONFIG.time.roundTime === 6`,
+  - `integration-manifest.spec.js` — Phase 3c "drift guard" suite (7 tests): declared documentTypes ↔
+    registered dataModels parity (covers Actor, Item, ActiveEffect, ChatMessage); every manifest pack loaded
+    with correct metadata; grid/socket config; Titan document-class subclass identity; per-subtype sheet
+    registration and core-sheet unregistration; runtime CONFIG flags (`CONFIG.time.roundTime === 6`,
     `CONFIG.ActiveEffect.legacyTransferral === false`, initiative formula prefix `@rating.initiative.value`);
     titan status-effect conditions present in `CONFIG.statusEffects` and a representative set of
-    `game.settings.settings` keys registered.
+    `game.settings.settings` keys registered. (The former `'ChatMessage declares no document subtypes'` test
+    was removed when ChatMessage gained 5 registered subtypes in Task 4.)
   - `permissions-ownership.spec.js` — Phase 4b B1 ownership-level suite (4 tests): seeds a `player`-type actor
     with `ownership: { default: 0, [playerId]: level }` for each of NONE/LIMITED/OBSERVER/OWNER; asserts the
     player client's `testUserPermission` results and sheet render/visibility at each level. Key fixture decision:
