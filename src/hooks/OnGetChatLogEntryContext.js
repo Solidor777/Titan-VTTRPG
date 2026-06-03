@@ -86,23 +86,21 @@ export default function onGetChatLogEntryContext(_application, options) {
 }
 
 /**
- * Gets the Titan flags from the Entry for a Chat Message in the Chat Log.
- * In v14 the message id is stored in the data-message-id attribute of the li element.
+ * Gets a plain check-data object ({ type, parameters, results, failuresReRolled, message }) for the
+ * chat message under the given list item, or false when it is not an owned, visible check message.
  * @param {HTMLElement} li - The li HTMLElement for the Chat Message in the Chat Log.
- * @returns {object} The Titan flags from the Entry for a Chat Message in the Chat Log.
+ * @returns {object | false} The check data, or false.
  */
-function getTitanFlags(li) {
-   // Get the message from the list item using the v14 data-message-id attribute.
+function getCheckData(li) {
+   // Resolve the message via the v14 data-message-id attribute.
    const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
 
-   // Check if this message is visible and the user owns the speaker.
-   if (message?.isContentVisible && message.constructor.getSpeakerActor(message.speaker)?.isOwner) {
-
-      // Check if the message is a titan message.
-      const titanFlags = message?.flags?.titan;
-      if (titanFlags) {
-         return titanFlags;
-      }
+   // Only owned, visible check messages expose these options.
+   if (message?.isContentVisible
+      && message.constructor.getSpeakerActor(message.speaker)?.isOwner
+      && isCheck(message.type)
+   ) {
+      return { type: message.type, ...message.system.toObject() };
    }
 
    return false;
@@ -114,17 +112,17 @@ function getTitanFlags(li) {
  * @returns {boolean} Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
  */
 function canReRollFailures(li) {
-   // Get the Titan Flags.
-   const titanFlags = getTitanFlags(li);
-   if (titanFlags) {
+   // Get the check data.
+   const checkData = getCheckData(li);
+   if (checkData) {
 
       // If this is a check AND it has not re-rolled failures OR the current.
       // user is a GM.
-      if (isCheck(titanFlags.type) && (titanFlags.failuresReRolled === false || game.user.isGM)) {
+      if (isCheck(checkData.type) && (checkData.failuresReRolled === false || game.user.isGM)) {
 
          // Return true if the check has any failures.
-         for (const die of titanFlags.results.dice) {
-            if (die.base < titanFlags.parameters.difficulty) {
+         for (const die of checkData.results.dice) {
+            if (die.base < checkData.parameters.difficulty) {
                return true;
             }
          }
@@ -142,13 +140,13 @@ function canReRollFailures(li) {
 async function reRollFailures(li, spendResolve) {
    // Get the successes and failure count.
    const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
-   const titanFlags = message?.flags?.titan;
+   const checkData = message.system.toObject();
    /** @type {number} */
    let failureCount = 0;
    /** @type {number} */
    let expertiseToRefund = 0;
-   const successes = titanFlags.results.dice.filter((die) => {
-      if (die.base >= titanFlags.parameters.difficulty) {
+   const successes = checkData.results.dice.filter((die) => {
+      if (die.base >= checkData.parameters.difficulty) {
          return true;
       }
       else {
@@ -163,19 +161,23 @@ async function reRollFailures(li, spendResolve) {
    // If there are any failures.
    if (failureCount > 0) {
       const rerolledDice = await rollCheckDice(failureCount);
-      titanFlags.results.dice = successes.concat(rerolledDice);
-      titanFlags.results.expertiseRemaining += expertiseToRefund;
+      checkData.results.dice = successes.concat(rerolledDice);
+      checkData.results.expertiseRemaining += expertiseToRefund;
 
       // Recalculate the check.
-      const newResults = recalculateCheckResults(titanFlags);
+      const newResults = recalculateCheckResults(
+         {
+            type: message.type,
+            parameters: checkData.parameters,
+            results: checkData.results,
+         },
+      );
 
       // Update the message.
       await message.update({
-         flags: {
-            titan: {
-               results: newResults,
-               failuresReRolled: true,
-            },
+         system: {
+            results: newResults,
+            failuresReRolled: true,
          },
       });
 
@@ -205,11 +207,11 @@ async function reRollFailures(li, spendResolve) {
 function canDoubleTraining(li) {
    // Return true if the message is a check with Training that has not yet been.
    // doubled.
-   const titanFlags = getTitanFlags(li);
-   return (titanFlags &&
-      isCheck(titanFlags.type) &&
-      titanFlags.parameters.totalTrainingDice > 0 &&
-      (titanFlags.parameters.doubleTraining === false));
+   const checkData = getCheckData(li);
+   return (checkData &&
+      isCheck(checkData.type) &&
+      checkData.parameters.totalTrainingDice > 0 &&
+      (checkData.parameters.doubleTraining === false));
 }
 
 /**
@@ -220,21 +222,22 @@ function canDoubleTraining(li) {
 async function doubleTraining(li, spendResolve) {
    // If expertise is not already doubled.
    const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
-   const titanFlags = message?.flags?.titan;
+   const checkData = message.system.toObject();
 
    // Re-roll dice equal to the number of failures.
-   if (titanFlags.parameters.doubleTraining === false && titanFlags.parameters.totalTrainingDice > 0) {
-      titanFlags.parameters.doubleTraining = true;
+   if (checkData.parameters.doubleTraining === false && checkData.parameters.totalTrainingDice > 0) {
+      checkData.parameters.doubleTraining = true;
 
       // Roll the new dice and update the message.
-      const newTrainingDice = await rollCheckDice(titanFlags.parameters.totalTrainingDice);
-      titanFlags.results.dice =
-         titanFlags.results.dice.concat(newTrainingDice);
-      titanFlags.results.totalDice += titanFlags.parameters.totalTrainingDice;
-      titanFlags.parameters.totalTrainingDice *= 2;
+      const newTrainingDice = await rollCheckDice(checkData.parameters.totalTrainingDice);
+      checkData.results.dice =
+         checkData.results.dice.concat(newTrainingDice);
+      checkData.results.totalDice += checkData.parameters.totalTrainingDice;
+      checkData.parameters.totalTrainingDice *= 2;
       await message.update({
-         flags: {
-            titan: structuredClone(titanFlags),
+         system: {
+            parameters: checkData.parameters,
+            results: checkData.results,
          },
       });
 
@@ -264,11 +267,11 @@ async function doubleTraining(li, spendResolve) {
 function canDoubleExpertise(li) {
    // Return true if the message is a check with Expertise that has not yet been.
    // doubled.
-   const titanFlags = getTitanFlags(li);
-   return (titanFlags &&
-      isCheck(titanFlags.type) &&
-      titanFlags.parameters.totalExpertise > 0 &&
-      (titanFlags.parameters.doubleExpertise === false));
+   const checkData = getCheckData(li);
+   return (checkData &&
+      isCheck(checkData.type) &&
+      checkData.parameters.totalExpertise > 0 &&
+      (checkData.parameters.doubleExpertise === false));
 }
 
 /**
@@ -279,18 +282,19 @@ function canDoubleExpertise(li) {
 async function doubleExpertise(li, spendResolve) {
    // If expertise is not already doubled.
    const message = game.messages.get(li.closest('[data-message-id]')?.dataset.messageId);
-   const titanFlags = message?.flags?.titan;
+   const checkData = message.system.toObject();
 
    // Double the expertise.
-   if (titanFlags.parameters.doubleExpertise === false && titanFlags.parameters.totalExpertise > 0) {
-      titanFlags.parameters.doubleExpertise = true;
-      titanFlags.results.expertiseRemaining += titanFlags.parameters.totalExpertise;
-      titanFlags.parameters.totalExpertise *= 2;
+   if (checkData.parameters.doubleExpertise === false && checkData.parameters.totalExpertise > 0) {
+      checkData.parameters.doubleExpertise = true;
+      checkData.results.expertiseRemaining += checkData.parameters.totalExpertise;
+      checkData.parameters.totalExpertise *= 2;
 
       // Update the message.
       await message.update({
-         flags: {
-            titan: structuredClone(titanFlags),
+         system: {
+            parameters: checkData.parameters,
+            results: checkData.results,
          },
       });
 

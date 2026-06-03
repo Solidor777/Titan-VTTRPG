@@ -9,7 +9,7 @@
 
 <div class="aspects">
    <!--Each aspect-->
-   {#each document.data.flags.titan.results.scalingAspect as aspect, idx}
+   {#each document.data.system.results.scalingAspect as aspect, idx}
       <!--Aspect-->
       <div class="aspect">
          <CheckChatScalingAspect {idx}/>

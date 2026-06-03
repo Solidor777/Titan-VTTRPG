@@ -13,20 +13,24 @@
     */
    function resetExpertise() {
       // Remove the expertise from each die.
-      for (const die of document.data.flags.titan.results.dice) {
+      for (const die of document.data.system.results.dice) {
          die.final = die.base;
          die.expertiseApplied = 0;
       }
 
       // Reset the expertise available and recalculate the check results.
-      document.data.flags.titan.results.expertiseRemaining = document.data.flags.titan.parameters.totalExpertise;
-      const newResults = recalculateCheckResults(document.data.flags.titan);
+      document.data.system.results.expertiseRemaining = document.data.system.parameters.totalExpertise;
+      const newResults = recalculateCheckResults(
+         {
+            type: document.data.type,
+            parameters: document.data.system.parameters,
+            results: document.data.system.results,
+         },
+      );
 
       document.data.update({
-         flags: {
-            titan: {
-               results: structuredClone(newResults),
-            },
+         system: {
+            results: structuredClone(newResults),
          },
       });
    }

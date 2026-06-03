@@ -19,26 +19,26 @@
    <!--Type-->
    <div class="stat">
       <IconTag
-         icon={document.data.flags.titan.parameters.type === 'melee'
+         icon={document.data.system.parameters.type === 'melee'
             ? MELEE_ICON
             : ACCURACY_ICON}
-         label={localize(document.data.flags.titan.parameters.type)}
+         label={localize(document.data.system.parameters.type)}
       />
    </div>
 
    <!--Range-->
-   {#if document.data.flags.titan.parameters.range !== 1}
+   {#if document.data.system.parameters.range !== 1}
       <div class="stat">
          <IconStatTag
             stat={localize('range')}
-            value={document.data.flags.titan.parameters.range}
+            value={document.data.system.parameters.range}
             icon={RANGE_ICON}
          />
       </div>
    {/if}
 
    <!--Multi-Attack-->
-   {#if document.data.flags.titan.parameters.multiAttack}
+   {#if document.data.system.parameters.multiAttack}
       <div class="stat">
          <IconTag
             label={localize('multiAttack')}
@@ -48,7 +48,7 @@
    {/if}
 
    <!--Custom Traits-->
-   {#each document.data.flags.titan.parameters.customTrait as trait}
+   {#each document.data.system.parameters.customTrait as trait}
       <div class="stat">
          <Tag tooltip={{ text: trait.description, localize: false }}>
             {trait.name}
@@ -57,7 +57,7 @@
    {/each}
 
    <!--Attack Traits-->
-   {#each document.data.flags.titan.parameters.attackTrait as trait}
+   {#each document.data.system.parameters.attackTrait as trait}
       <div class="stat">
          <TraitTag
             label={localize(trait.name)}

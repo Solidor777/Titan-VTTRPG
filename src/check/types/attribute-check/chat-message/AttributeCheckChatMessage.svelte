@@ -17,7 +17,7 @@
    </div>
 
    <!--Chat Messages-->
-   {#if document.data.flags.titan.message}
+   {#if document.data.system.message.length}
       <div class="section">
          <CheckChatMessages/>
       </div>
@@ -35,10 +35,10 @@
 
    <!--Damage Buttons-->
    <!-- svelte-ignore missing-declaration -->
-   {#if document.data.flags.titan.results.damageTaken && game.user.isGM}
+   {#if document.data.system.results.damageTaken && game.user.isGM}
       <div class="section">
          <ChatDamageButtons
-            damage={document.data.flags.titan.results.damageTaken}
+            damage={document.data.system.results.damageTaken}
          />
       </div>
    {/if}

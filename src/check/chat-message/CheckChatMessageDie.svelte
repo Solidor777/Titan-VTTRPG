@@ -27,7 +27,7 @@
    /** @type {string} The class to affect the appearance of the die. */
    const result = $derived(
       die.final >= 6 ? 'critical-success' :
-         die.final >= document.data.flags.titan.parameters.difficulty ? 'success' :
+         die.final >= document.data.system.parameters.difficulty ? 'success' :
             die.final <= 1 ? 'critical-failure' :
                'failure',
    );
@@ -35,7 +35,7 @@
    /** @type {boolean} Whether applying Expertise to the die should be disabled. */
    const disabled = $derived(
       !document.data.isOwner ||
-      document.data.flags.titan.results.expertiseRemaining === 0 ||
+      document.data.system.results.expertiseRemaining === 0 ||
       die.final >= 6,
    );
 
@@ -56,25 +56,27 @@
     */
    function applyExpertise() {
       // If expertise can be applied.
-      if (document.data.flags.titan.results.expertiseRemaining > 0 &&
+      if (document.data.system.results.expertiseRemaining > 0 &&
          die.final < 6
       ) {
          // Add the expertise and decrement it from those remaining.
          die.final += 1;
          die.expertiseApplied += 1;
-         document.data.flags.titan.results.expertiseRemaining -= 1;
+         document.data.system.results.expertiseRemaining -= 1;
 
-         // Recalculate the results.
-         document.data.flags.titan.results = recalculateCheckResults(
-            document.data.flags.titan,
+         // Recalculate the results, passing the message type for type-specific recalculation.
+         document.data.system.results = recalculateCheckResults(
+            {
+               type: document.data.type,
+               parameters: document.data.system.parameters,
+               results: document.data.system.results,
+            },
          );
 
          // Update the document.
          document.data.update({
-            flags: {
-               titan: {
-                  results: structuredClone(document.data.flags.titan.results),
-               },
+            system: {
+               results: structuredClone(document.data.system.results),
             },
          });
       }

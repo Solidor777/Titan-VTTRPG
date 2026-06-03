@@ -189,30 +189,28 @@ export default class TitanCheck {
          await this.evaluateCheck();
       }
 
-      // Create the context object.
-      const messageData = {
+      // Build the typed system data for the chat message.
+      const system = {
          parameters: this.parameters,
          results: this.results,
-         type: this._getCheckType(),
          failuresReRolled: false,
       };
 
       // Add the messages if appropriate.
       if (options?.message) {
-         messageData.message = options.message;
+         system.message = options.message;
       }
 
-      // Create and post the message.
+      // Create and post the message as a typed check subtype.
       return ChatMessage.create(
          ChatMessage.applyRollMode(
             {
                user: game.user.id,
+               type: this._getCheckType(),
                speaker: options?.speaker ?? ChatMessage.getSpeaker(),
                style: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.dice,
-               flags: {
-                  titan: messageData,
-               },
+               system,
                classes: ['titan'],
             },
             game.settings.get('core', 'rollMode'),

@@ -8,24 +8,24 @@
 </script>
 
 <CheckChatMessageItemHeader
-   attribute={document.data.flags.titan.parameters.attribute}
-   img={document.data.flags.titan.parameters.img}
+   attribute={document.data.system.parameters.attribute}
+   img={document.data.system.parameters.img}
 >
    <!--Label-->
    <div class="label">
-      {document.data.flags.titan.parameters.itemName}
+      {document.data.system.parameters.itemName}
    </div>
 
    <!--Type Label-->
    <div class="sub-label">
-      {`${localize(document.data.flags.titan.parameters.attribute)} (${localize(document.data.flags.titan.parameters.skill)})`}
+      {`${localize(document.data.system.parameters.attribute)} (${localize(document.data.system.parameters.skill)})`}
    </div>
 
    <!--Tradition-->
-   {#if document.data.flags.titan.parameters.tradition !== '' &&
-   document.data.flags.titan.parameters.tradition !== localize('any')}
+   {#if document.data.system.parameters.tradition !== '' &&
+   document.data.system.parameters.tradition !== localize('any')}
       <div class="sub-label">
-         {document.data.flags.titan.parameters.tradition}
+         {document.data.system.parameters.tradition}
       </div>
    {/if}
 </CheckChatMessageItemHeader>

@@ -16,7 +16,7 @@
    const document = getContext('document');
 
    /** @type {ScalingAspect} Reference to the scaling aspect. */
-   const aspect = $derived(document.data.flags.titan.results.scalingAspect[idx]);
+   const aspect = $derived(document.data.system.results.scalingAspect[idx]);
 
    /** @type {number} Calculated scaling cost of the aspect. */
    const aspectIncrement = $derived(Math.max(aspect.initialValue, 1));
@@ -47,24 +47,22 @@
       aspect.currentValue += aspectIncrement;
 
       // Decrease the extra successes by the cost.
-      document.data.flags.titan.results.extraSuccessesRemaining -= aspect.cost;
+      document.data.system.results.extraSuccessesRemaining -= aspect.cost;
 
       // Update damage if appropriate.
       if (aspect.isDamage) {
-         document.data.flags.titan.results.damage += aspectIncrement;
+         document.data.system.results.damage += aspectIncrement;
       }
 
       // Update healing if appropriate.
       if (aspect.isHealing) {
-         document.data.flags.titan.results.healing += aspectIncrement;
+         document.data.system.results.healing += aspectIncrement;
       }
 
       // Update the document.
       document.data.update({
-         flags: {
-            titan: {
-               results: structuredClone(document.data.flags.titan.results),
-            }
+         system: {
+            results: structuredClone(document.data.system.results),
          }
       });
    }
@@ -77,24 +75,22 @@
       aspect.currentValue -= aspectIncrement;
 
       // Increase the extra successes by the cost.
-      document.data.flags.titan.results.extraSuccessesRemaining += aspect.cost;
+      document.data.system.results.extraSuccessesRemaining += aspect.cost;
 
       // Update damage if appropriate.
       if (aspect.isDamage) {
-         document.data.flags.titan.results.damage -= aspectIncrement;
+         document.data.system.results.damage -= aspectIncrement;
       }
 
       // Update healing if appropriate.
       if (aspect.isHealing) {
-         document.data.flags.titan.results.healing -= aspectIncrement;
+         document.data.system.results.healing -= aspectIncrement;
       }
 
       // Update the document.
       document.data.update({
-         flags: {
-            titan: {
-               results: structuredClone(document.data.flags.titan.results),
-            }
+         system: {
+            results: structuredClone(document.data.system.results),
          }
       });
    }
@@ -112,23 +108,21 @@
       aspect.currentValue = aspect.initialValue;
 
       // Reset the extra successes.
-      document.data.flags.titan.results.extraSuccessesRemaining += cost;
+      document.data.system.results.extraSuccessesRemaining += cost;
 
       // Update damage if appropriate.
       if (aspect.isDamage) {
-         document.data.flags.titan.results.damage -= delta;
+         document.data.system.results.damage -= delta;
       }
 
       // Update healing if appropriate.
       if (aspect.isHealing) {
-         document.data.flags.titan.results.healing -= delta;
+         document.data.system.results.healing -= delta;
       }
 
       document.data.update({
-         flags: {
-            titan: {
-               results: structuredClone(document.data.flags.titan.results),
-            }
+         system: {
+            results: structuredClone(document.data.system.results),
          }
       });
    }
@@ -153,7 +147,7 @@
       </div>
 
       <!--Value-->
-      <div class="value">{document.data.flags.titan.results.scalingAspect[idx].currentValue}</div>
+      <div class="value">{document.data.system.results.scalingAspect[idx].currentValue}</div>
    </div>
 
    <!-- Controls -->
@@ -200,7 +194,7 @@
       <!--Increase Button-->
       <div class="control">
          <Button
-            disabled={document.data.flags.titan.results.extraSuccessesRemaining <
+            disabled={document.data.system.results.extraSuccessesRemaining <
                aspect.cost}
             onclick={increaseAspect}
          >

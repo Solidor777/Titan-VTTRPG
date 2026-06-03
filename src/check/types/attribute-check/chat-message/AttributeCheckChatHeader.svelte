@@ -7,11 +7,11 @@
 </script>
 
 <div class="label">
-   <div class="content {document.data.flags.titan.parameters.attribute}">
+   <div class="content {document.data.system.parameters.attribute}">
       <!--Type Label -->
-      {`${localize(document.data.flags.titan.parameters.attribute)}${
-         document.data.flags.titan.parameters.skill
-            ? ` (${localize(document.data.flags.titan.parameters.skill)})`
+      {`${localize(document.data.system.parameters.attribute)}${
+         document.data.system.parameters.skill
+            ? ` (${localize(document.data.system.parameters.skill)})`
             : ''
       }`}
    </div>

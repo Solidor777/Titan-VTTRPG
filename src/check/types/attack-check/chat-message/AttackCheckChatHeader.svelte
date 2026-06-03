@@ -8,32 +8,32 @@
 </script>
 
 <CheckChatMessageItemHeader
-   attribute={document.data.flags.titan.parameters.attribute}
-   img={document.data.flags.titan.parameters.img}
+   attribute={document.data.system.parameters.attribute}
+   img={document.data.system.parameters.img}
 >
    <!--Label-->
    <div class="label">
-      {document.data.flags.titan.parameters.itemName}
+      {document.data.system.parameters.itemName}
    </div>
 
    <!--Attack-->
    <div class="sub-label">
-      {document.data.flags.titan.parameters.attackName}
+      {document.data.system.parameters.attackName}
    </div>
 
    <!--Type Label-->
    <div class="sub-label">
-      {`${localize(document.data.flags.titan.parameters.attribute)} (${localize(document.data.flags.titan.parameters.skill)})`}
+      {`${localize(document.data.system.parameters.attribute)} (${localize(document.data.system.parameters.skill)})`}
    </div>
 
    <!--Target Defense-->
-   {#if document.data.flags.titan.parameters.targetDefense !== undefined}
-      {`${document.data.flags.titan.parameters.type === 'melee' ? localize('melee') : localize('accuracy')} ${document.data.flags.titan.parameters.attackerRating} ${localize('versus')} ${localize('defense')} ${document.data.flags.titan.parameters.targetDefense}`}
+   {#if document.data.system.parameters.targetDefense !== undefined}
+      {`${document.data.system.parameters.type === 'melee' ? localize('melee') : localize('accuracy')} ${document.data.system.parameters.attackerRating} ${localize('versus')} ${localize('defense')} ${document.data.system.parameters.targetDefense}`}
    {/if}
 
    <!--Damage-->
    <div class="sub-label">
-      {`${localize('damage')}: ${document.data.flags.titan.results.damage + document.data.flags.titan.parameters.damageMod}${document.data.flags.titan.parameters.plusExtraSuccessDamage ? ` + ${localize('extraSuccesses.short')}` : ''}`}
+      {`${localize('damage')}: ${document.data.system.results.damage + document.data.system.parameters.damageMod}${document.data.system.parameters.plusExtraSuccessDamage ? ` + ${localize('extraSuccesses.short')}` : ''}`}
    </div>
 </CheckChatMessageItemHeader>
 

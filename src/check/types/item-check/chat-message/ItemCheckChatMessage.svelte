@@ -22,14 +22,14 @@
    </div>
 
    <!--Chat Messages-->
-   {#if document.data.flags.titan.message}
+   {#if document.data.system.message.length}
       <div class="section">
          <CheckChatMessages/>
       </div>
    {/if}
 
    <!--Item Traits-->
-   {#if document.data.flags.titan.parameters.itemTrait}
+   {#if document.data.system.parameters.itemTrait}
       <div class="section tags">
          <ItemCheckChatItemTraits/>
       </div>
@@ -46,53 +46,53 @@
    </div>
 
    <!--If succeeded-->
-   {#if document.data.flags.titan.results.succeeded}
+   {#if document.data.system.results.succeeded}
       <!--Damage Buttons-->
       <!-- svelte-ignore missing-declaration -->
-      {#if document.data.flags.titan.results.damage && game.user.isGM}
+      {#if document.data.system.results.damage && game.user.isGM}
          <div class="section">
-            <ChatDamageButtons damage={document.data.flags.titan.results.damage}/>
+            <ChatDamageButtons damage={document.data.system.results.damage}/>
          </div>
       {/if}
 
       <!--Healing Button-->
       <!-- svelte-ignore missing-declaration -->
-      {#if document.data.flags.titan.results.healing && game.user.isGM}
+      {#if document.data.system.results.healing && game.user.isGM}
          <div class="section">
             <ChatHealingButton
-               healing={document.data.flags.titan.results.healing}
+               healing={document.data.system.results.healing}
             />
          </div>
       {/if}
 
       <!--Opposed Check Buttons-->
-      {#if document.data.flags.titan.parameters.opposedCheck}
+      {#if document.data.system.parameters.opposedCheck}
          <div class="section">
             <ChatAttributeCheckButton
-               attribute={document.data.flags.titan.parameters.opposedCheck
+               attribute={document.data.system.parameters.opposedCheck
                   .attribute}
-               skill={document.data.flags.titan.parameters.opposedCheck.skill}
-               difficulty={document.data.flags.titan.parameters.opposedCheck
+               skill={document.data.system.parameters.opposedCheck.skill}
+               difficulty={document.data.system.parameters.opposedCheck
                   .difficulty}
-               complexity={document.data.flags.titan.results.extraSuccesses + 1}
-               damageToReduce={document.data.flags.titan.parameters.isDamage &&
-               document.data.flags.titan.parameters.damageReducedBy ===
+               complexity={document.data.system.results.extraSuccesses + 1}
+               damageToReduce={document.data.system.parameters.isDamage &&
+               document.data.system.parameters.damageReducedBy ===
                   'opposedCheck'
-                  ? document.data.flags.titan.results.damage
+                  ? document.data.system.results.damage
                   : 0}
             />
          </div>
       {/if}
 
       <!--Resistance Check Button-->
-      {#if document.data.flags.titan.parameters.resistanceCheck !== 'none'}
+      {#if document.data.system.parameters.resistanceCheck !== 'none'}
          <div class="section">
             <ResistanceCheckButton
-               resistance={document.data.flags.titan.parameters.resistanceCheck}
-               complexity={document.data.flags.titan.results.extraSuccesses + 1}
+               resistance={document.data.system.parameters.resistanceCheck}
+               complexity={document.data.system.results.extraSuccesses + 1}
                damageToReduce={
-                  document.data.flags.titan.parameters.damageReducedBy === 'resistanceCheck' ?
-                  document.data.flags.titan.results.damage :
+                  document.data.system.parameters.damageReducedBy === 'resistanceCheck' ?
+                  document.data.system.results.damage :
                   0
                }
             />

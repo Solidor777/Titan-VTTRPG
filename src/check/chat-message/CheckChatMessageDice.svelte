@@ -6,7 +6,7 @@
    const document = getContext('document');
 
    /** @type {CheckDie[]} Array of processed dice from the Check. */
-   const dice = $derived(document.data.flags.titan.results.dice);
+   const dice = $derived(document.data.system.results.dice);
 </script>
 
 <div class="container">

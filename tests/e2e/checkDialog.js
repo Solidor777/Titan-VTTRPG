@@ -155,17 +155,20 @@ export async function readNewestCheckFlags(page, baseline) {
    await expect.poll(
       async () => {
          flags = await page.evaluate((base) => {
-            // Only consider messages created after the baseline; return the newest titan one.
+            // The five check subtypes created by the check engine.
+            const checkTypes = ['attributeCheck', 'resistanceCheck', 'attackCheck', 'castingCheck', 'itemCheck'];
+
+            // Only consider messages created after the baseline; return the newest check one.
             if (game.messages.size <= base) {
                return null;
             }
             const created = game.messages.contents.slice(base);
-            const message = [...created].reverse().find((msg) => msg?.flags?.titan?.type) ?? null;
+            const message = [...created].reverse().find((msg) => checkTypes.includes(msg?.type)) ?? null;
             return message
                ? {
-                  type: message.flags.titan.type,
-                  parameters: message.flags.titan.parameters,
-                  results: message.flags.titan.results,
+                  type: message.type,
+                  parameters: message.system.parameters,
+                  results: message.system.results,
                }
                : null;
          }, baseline);
