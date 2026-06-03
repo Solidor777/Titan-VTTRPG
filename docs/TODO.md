@@ -340,3 +340,20 @@ the five check subtypes; later phases cover items, reports, and effect).
 - **Why deferred:** Out of scope for Phase 1 (parity migration of checks). Fixing it
   well means reworking the mount-tracking model shared with the legacy path.
 - **Found by:** Opus code-quality review of Phase 1, Task 3.
+
+### 11. Check chat components mutate the live DataModel before `update()`
+
+- **What:** Several check chat components — `CheckChatMessageDie.svelte`,
+  `CheckChatResetExpertiseButton.svelte`, `CastingCheckChatMessageScalingAspect.svelte` —
+  mutate `document.data.system.results` / `.parameters` (and `die.*`) in place on the live
+  `system` DataModel instance, then persist via
+  `document.data.update({ system: { results: structuredClone(...) } })`.
+- **Severity:** Not a corruption bug — Foundry's `update()` diffs the submitted payload against
+  `_source`, not the mutated prepared data, and the component remounts on the resulting
+  `updateChatMessage` render (discarding the transient mutated state). This is a **pre-existing**
+  pattern carried over unchanged from the `flags.titan` implementation.
+- **To do:** Refactor to build a local plain object (e.g. from `document.data.system.toObject()`),
+  mutate only that, and pass it to `update()` — never mutate the live model. Mirrors the clean
+  clone-then-update pattern already used in `OnGetChatLogEntryContext.js`.
+- **Why deferred:** Behavior-preserving cleanup, low risk; outside Phase 1's parity scope.
+- **Found by:** Opus code-quality review of Phase 1, Task 5.
