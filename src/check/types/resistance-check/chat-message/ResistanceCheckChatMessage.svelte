@@ -9,7 +9,7 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} The Titan-specific flags data for this document. */
+   /** @type {object} The typed system data for this check chat message. */
    const check = document.data.system;
 </script>
 

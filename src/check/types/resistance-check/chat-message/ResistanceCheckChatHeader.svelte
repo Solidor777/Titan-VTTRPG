@@ -3,7 +3,7 @@
 
    /**
     * @typedef {object} ResistanceCheckChatHeaderProps
-    * @property {object} [check] - The Titan check flags data for this document.
+    * @property {object} [check] - The typed check system data for this document.
     */
 
    /** @type {ResistanceCheckChatHeaderProps} */
